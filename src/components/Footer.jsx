@@ -1,16 +1,17 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FaInstagram, FaTwitter, FaLinkedinIn, FaYoutube, FaTiktok } from 'react-icons/fa'
+import { FaInstagram, FaYoutube, FaTiktok, FaLinkedinIn } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
 import { HiArrowUp } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import './Footer.css'
 
 const socialLinks = [
-  { icon: FaInstagram, href: '#', label: 'Instagram' },
-  { icon: FaTwitter, href: '#', label: 'Twitter' },
-  { icon: FaLinkedinIn, href: '#', label: 'LinkedIn' },
-  { icon: FaYoutube, href: '#', label: 'YouTube' },
-  { icon: FaTiktok, href: '#', label: 'TikTok' },
+  { icon: FaInstagram, href: 'https://instagram.com/kademediacom', label: 'Instagram' },
+  { icon: FaXTwitter, href: 'https://x.com/kademediacom', label: 'X' },
+  { icon: FaYoutube, href: 'https://www.youtube.com/@kademediacom', label: 'YouTube' },
+  { icon: FaTiktok, href: 'https://tiktok.com/@kademediacom', label: 'TikTok' },
+  { icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/kademediaagency', label: 'LinkedIn' },
 ]
 
 export default function Footer() {
@@ -90,10 +91,10 @@ export default function Footer() {
             <h4>{t('footer.contactTitle')}</h4>
             <ul>
               <li>
-                <a href="mailto:info@kademedia.com">info@kademedia.com</a>
+                <a href="mailto:hello@kademedia.com">hello@kademedia.com</a>
               </li>
               <li>
-                <a href="tel:+905551234567">+90 555 123 45 67</a>
+                <a href="tel:+905067293423">0 506 729 34 23</a>
               </li>
               <li>İstanbul, Türkiye</li>
             </ul>

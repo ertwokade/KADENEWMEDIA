@@ -6,96 +6,66 @@ import {
   HiOutlineArrowRight,
   HiOutlineSparkles,
 } from 'react-icons/hi'
+import { useLanguage } from '../i18n/LanguageContext'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Packages.css'
 
-const packages = [
-  {
-    name: 'Başlangıç',
-    price: '7.500',
-    period: '/ay',
-    desc: 'Sosyal medyada ilk adımlarını atan markalar için ideal paket.',
-    popular: false,
-    features: [
-      '2 Platform Yönetimi',
-      'Ayda 20 İçerik',
-      'Temel Grafik Tasarım',
-      'Aylık Rapor',
-      'Topluluk Yönetimi',
-      'İçerik Takvimi',
-    ],
-    notIncluded: [
-      'Reklam Yönetimi',
-      'Video İçerik',
-      'Influencer Marketing',
-    ],
-  },
-  {
-    name: 'Profesyonel',
-    price: '15.000',
-    period: '/ay',
-    desc: 'Büyümek isteyen markalar için kapsamlı sosyal medya çözümü.',
-    popular: true,
-    features: [
-      '4 Platform Yönetimi',
-      'Ayda 40 İçerik',
-      'Profesyonel Grafik Tasarım',
-      'Haftalık Rapor',
-      'Topluluk Yönetimi',
-      'İçerik Takvimi',
-      'Temel Reklam Yönetimi',
-      '4 Reels/TikTok Video',
-      'Rakip Analizi',
-    ],
-    notIncluded: [
-      'Influencer Marketing',
-    ],
-  },
-  {
-    name: 'Kurumsal',
-    price: '30.000',
-    period: '/ay',
-    desc: 'Dijital varlığını maksimize etmek isteyen büyük markalar için.',
-    popular: false,
-    features: [
-      'Tüm Platform Yönetimi',
-      'Sınırsız İçerik',
-      'Premium Grafik Tasarım',
-      'Anlık Raporlama',
-      'Topluluk Yönetimi',
-      'İçerik Takvimi',
-      'Gelişmiş Reklam Yönetimi',
-      '12+ Reels/TikTok Video',
-      'Rakip Analizi',
-      'Influencer Marketing',
-      'Kriz Yönetimi',
-      'Özel Strateji Danışmanı',
-    ],
-    notIncluded: [],
-  },
-]
-
-const faqs = [
-  {
-    q: 'Minimum sözleşme süresi nedir?',
-    a: 'Minimum 3 aylık sözleşme yapıyoruz. Dijital pazarlamada sonuçlar zaman alır, bu süre stratejimizin etkisini görmeniz için idealdir.',
-  },
-  {
-    q: 'Reklam bütçesi paket fiyatına dahil mi?',
-    a: 'Hayır, reklam bütçesi paket fiyatlarına dahil değildir. Reklam yönetim hizmeti dahildir ancak reklam harcaması ayrıca faturalandırılır.',
-  },
-  {
-    q: 'Hangi platformları yönetiyorsunuz?',
-    a: 'Instagram, Facebook, Twitter/X, TikTok, YouTube, LinkedIn ve Pinterest platformlarında hizmet veriyoruz.',
-  },
-  {
-    q: 'Özel paket hazırlayabilir misiniz?',
-    a: 'Evet, markanızın ihtiyaçlarına göre özel paketler hazırlayabiliriz. İletişim sayfamızdan bize ulaşabilirsiniz.',
-  },
-]
-
 export default function Packages() {
+  const { lang, t } = useLanguage()
+  const isEN = lang === 'en'
+
+  const packages = [
+    {
+      name: t('packages.starter'),
+      priceTRY: '7.500',
+      priceUSD: '220',
+      desc: t('packages.starterDesc'),
+      popular: false,
+      features: [
+        t('packages.feat_2platform'), t('packages.feat_20content'), t('packages.feat_basicDesign'),
+        t('packages.feat_monthlyReport'), t('packages.feat_community'), t('packages.feat_calendar'),
+      ],
+      notIncluded: [
+        t('packages.feat_adManagement'), t('packages.feat_videoContent'), t('packages.feat_influencerMarketing'),
+      ],
+    },
+    {
+      name: t('packages.pro'),
+      priceTRY: '15.000',
+      priceUSD: '440',
+      desc: t('packages.proDesc'),
+      popular: true,
+      features: [
+        t('packages.feat_4platform'), t('packages.feat_40content'), t('packages.feat_proDesign'),
+        t('packages.feat_weeklyReport'), t('packages.feat_community'), t('packages.feat_calendar'),
+        t('packages.feat_basicAds'), t('packages.feat_4reels'), t('packages.feat_competitorAnalysis'),
+      ],
+      notIncluded: [t('packages.feat_influencerMarketing')],
+    },
+    {
+      name: t('packages.enterprise'),
+      priceTRY: '30.000',
+      priceUSD: '880',
+      desc: t('packages.enterpriseDesc'),
+      popular: false,
+      features: [
+        t('packages.feat_allPlatforms'), t('packages.feat_unlimitedContent'), t('packages.feat_premiumDesign'),
+        t('packages.feat_instantReport'), t('packages.feat_community'), t('packages.feat_calendar'),
+        t('packages.feat_advancedAds'), t('packages.feat_12reels'), t('packages.feat_competitorAnalysis'),
+        t('packages.feat_influencerMarketing'), t('packages.feat_crisisManagement'), t('packages.feat_strategist'),
+      ],
+      notIncluded: [],
+    },
+  ]
+
+  const faqs = [
+    { q: t('packages.faq1q'), a: t('packages.faq1a') },
+    { q: t('packages.faq2q'), a: t('packages.faq2a') },
+    { q: t('packages.faq3q'), a: t('packages.faq3a') },
+    { q: t('packages.faq4q'), a: t('packages.faq4a') },
+  ]
+
   return (
     <PageTransition>
       {/* Hero */}
@@ -106,17 +76,17 @@ export default function Packages() {
           <FadeIn>
             <div className="section-badge">
               <HiOutlineSparkles size={14} />
-              Paketler
+              {t('packages.badge')}
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
             <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              Size Uygun <span>Paketi</span> Seçin
+              {t('packages.title')} <span>{t('packages.titleHighlight')}</span> {t('packages.titleEnd')}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="section-subtitle">
-              Her bütçeye ve ihtiyaca uygun paketlerimizle dijital dünyada fark yaratın.
+              {t('packages.subtitle')}
             </p>
           </FadeIn>
         </div>
@@ -135,16 +105,23 @@ export default function Packages() {
                   {pkg.popular && (
                     <div className="popular-badge">
                       <HiOutlineStar size={14} />
-                      En Popüler
+                      {t('packages.popular')}
                     </div>
                   )}
                   <div className="package-header">
                     <h3>{pkg.name}</h3>
                     <p className="package-desc">{pkg.desc}</p>
+                    
+                    {/* Primary price based on language */}
                     <div className="package-price">
-                      <span className="currency">₺</span>
-                      <span className="amount">{pkg.price}</span>
-                      <span className="period">{pkg.period}</span>
+                      <span className="currency">{isEN ? '$' : '₺'}</span>
+                      <span className="amount">{isEN ? pkg.priceUSD : pkg.priceTRY}</span>
+                      <span className="period">{t('packages.month')}</span>
+                    </div>
+
+                    {/* Secondary price (other currency) */}
+                    <div className="package-price-alt">
+                      ≈ {isEN ? `₺${pkg.priceTRY}` : `$${pkg.priceUSD}`} {t('packages.month')}
                     </div>
                   </div>
 
@@ -167,7 +144,7 @@ export default function Packages() {
                     to="/iletisim"
                     className={`btn ${pkg.popular ? 'btn-primary' : 'btn-outline'} package-btn`}
                   >
-                    Hemen Başla
+                    {t('packages.startNow')}
                     <HiOutlineArrowRight size={16} />
                   </Link>
                 </motion.div>
@@ -183,7 +160,7 @@ export default function Packages() {
           <div className="section-header">
             <FadeIn>
               <h2 className="section-title">
-                Sıkça Sorulan <span>Sorular</span>
+                {t('packages.faqTitle')} <span>{t('packages.faqHighlight')}</span>
               </h2>
             </FadeIn>
           </div>

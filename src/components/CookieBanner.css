@@ -1,0 +1,161 @@
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 215, 0, 0.15);
+  padding: 16px 24px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.cookie-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.cookie-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.cookie-content p {
+  font-size: 0.85rem;
+  color: var(--gray-lighter);
+  margin: 0;
+}
+
+.cookie-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cookie-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.cookie-accept {
+  background: var(--primary);
+  color: var(--dark);
+}
+
+.cookie-accept:hover {
+  background: var(--primary-hover);
+}
+
+.cookie-decline {
+  background: transparent;
+  color: var(--gray-light);
+  border: 1px solid var(--border-color);
+}
+
+.cookie-decline:hover {
+  border-color: var(--gray-lighter);
+  color: var(--white);
+}
+
+.cookie-details {
+  background: transparent;
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+/* KVKK Modal */
+.kvkk-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.kvkk-modal {
+  max-width: 700px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 215, 0, 0.15) !important;
+}
+
+.kvkk-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.kvkk-header h2 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin: 0;
+}
+
+.kvkk-close {
+  background: none;
+  border: none;
+  color: var(--gray-light);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.3s ease;
+}
+
+.kvkk-close:hover {
+  color: var(--white);
+}
+
+.kvkk-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.kvkk-body p {
+  font-size: 0.85rem;
+  color: var(--gray-lighter);
+  line-height: 1.7;
+  margin-bottom: 4px;
+}
+
+.kvkk-footer {
+  padding: 16px 28px;
+  border-top: 1px solid var(--border-color);
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .cookie-banner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .cookie-content {
+    flex-direction: column;
+  }
+
+  .cookie-actions {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -7,42 +7,10 @@ import {
   HiOutlineLightBulb,
   HiOutlineShieldCheck,
 } from 'react-icons/hi'
+import { useLanguage } from '../i18n/LanguageContext'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './About.css'
-
-const values = [
-  {
-    icon: HiOutlineLightBulb,
-    title: 'Yaratıcılık',
-    desc: 'Her marka için özgün ve yaratıcı çözümler üretiyoruz.',
-  },
-  {
-    icon: HiOutlineEye,
-    title: 'Şeffaflık',
-    desc: 'Tüm süreçlerimizde şeffaf ve açık iletişim sağlıyoruz.',
-  },
-  {
-    icon: HiOutlineBadgeCheck,
-    title: 'Kalite',
-    desc: 'Her içerik ve her kampanyada en yüksek kaliteyi hedefliyoruz.',
-  },
-  {
-    icon: HiOutlineHeart,
-    title: 'Tutku',
-    desc: 'İşimizi tutkuyla yapıyor, markanızı kendi markamız gibi sahipleniyoruz.',
-  },
-  {
-    icon: HiOutlineUserGroup,
-    title: 'Takım Ruhu',
-    desc: 'Deneyimli ekibimizle birlikte güçlü sonuçlar elde ediyoruz.',
-  },
-  {
-    icon: HiOutlineShieldCheck,
-    title: 'Güvenilirlik',
-    desc: 'Verdiğimiz sözleri tutarak güvene dayalı ilişkiler kuruyoruz.',
-  },
-]
 
 const team = [
   { name: 'Kade', role: 'Founder & CEO', color: '#FFD700' },
@@ -52,6 +20,17 @@ const team = [
 ]
 
 export default function About() {
+  const { t } = useLanguage()
+
+  const values = [
+    { icon: HiOutlineLightBulb, title: t('about.creativity'), desc: t('about.creativityDesc') },
+    { icon: HiOutlineEye, title: t('about.transparency'), desc: t('about.transparencyDesc') },
+    { icon: HiOutlineBadgeCheck, title: t('about.quality'), desc: t('about.qualityDesc') },
+    { icon: HiOutlineHeart, title: t('about.passion'), desc: t('about.passionDesc') },
+    { icon: HiOutlineUserGroup, title: t('about.teamwork'), desc: t('about.teamworkDesc') },
+    { icon: HiOutlineShieldCheck, title: t('about.reliability'), desc: t('about.reliabilityDesc') },
+  ]
+
   return (
     <PageTransition>
       {/* Hero */}
@@ -62,18 +41,17 @@ export default function About() {
           <FadeIn>
             <div className="section-badge">
               <HiOutlineUserGroup size={14} />
-              Hakkımızda
+              {t('about.badge')}
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
             <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              Dijital Dünyanın <span>Yaratıcı</span> Gücü
+              {t('about.title')} <span>{t('about.titleHighlight')}</span> {t('about.titleEnd')}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="section-subtitle">
-              Kade Media olarak markaların dijital dünyada büyümesine yardımcı olan tutkulu
-              bir ekibiz.
+              {t('about.subtitle')}
             </p>
           </FadeIn>
         </div>
@@ -84,32 +62,21 @@ export default function About() {
         <div className="container">
           <div className="story-grid">
             <FadeIn direction="left" className="story-content">
-              <h2>
-                Hikayemiz
-              </h2>
-              <p>
-                Kade Media, sosyal medyanın gücüne inanan ve bu gücü markalar için
-                kullanan bir dijital pazarlama ajansıdır. Kurulduğumuz günden bu yana
-                yüzlerce markaya dijital dünyada büyümeleri için yol gösterdik.
-              </p>
-              <p>
-                Deneyimli ekibimiz, yaratıcı içerik üretimi, stratejik sosyal medya
-                yönetimi ve veri odaklı reklam kampanyaları ile markanızı dijital dünyada
-                öne çıkarıyor. Her markayı benzersiz bir hikaye olarak görüyor ve bu
-                hikayeyi en etkili şekilde anlatıyoruz.
-              </p>
+              <h2>{t('about.storyTitle')}</h2>
+              <p>{t('about.storyP1')}</p>
+              <p>{t('about.storyP2')}</p>
               <div className="story-stats">
                 <div className="story-stat">
                   <span className="story-stat-number">5+</span>
-                  <span className="story-stat-label">Yıllık Deneyim</span>
+                  <span className="story-stat-label">{t('about.experience')}</span>
                 </div>
                 <div className="story-stat">
                   <span className="story-stat-number">20+</span>
-                  <span className="story-stat-label">Uzman Ekip</span>
+                  <span className="story-stat-label">{t('about.team')}</span>
                 </div>
                 <div className="story-stat">
                   <span className="story-stat-number">150+</span>
-                  <span className="story-stat-label">Mutlu Müşteri</span>
+                  <span className="story-stat-label">{t('about.happyClients')}</span>
                 </div>
               </div>
             </FadeIn>
@@ -118,7 +85,7 @@ export default function About() {
                 <div className="visual-inner">
                   <div className="visual-logo">kade</div>
                   <div className="visual-subtitle">media</div>
-                  <div className="visual-tagline">Dijitalde Fark Yaratın</div>
+                  <div className="visual-tagline">{t('about.visualTagline')}</div>
                 </div>
                 <div className="visual-dots">
                   {Array.from({ length: 9 }).map((_, i) => (
@@ -150,12 +117,12 @@ export default function About() {
             <FadeIn>
               <div className="section-badge">
                 <HiOutlineHeart size={14} />
-                Değerlerimiz
+                {t('about.valuesBadge')}
               </div>
             </FadeIn>
             <FadeIn delay={0.1}>
               <h2 className="section-title">
-                Bizi <span>Farklı</span> Kılan Değerler
+                {t('about.valuesTitle')} <span>{t('about.valuesTitleHighlight')}</span> {t('about.valuesTitleEnd')}
               </h2>
             </FadeIn>
           </div>
@@ -182,12 +149,12 @@ export default function About() {
           <div className="section-header">
             <FadeIn>
               <h2 className="section-title">
-                <span>Ekibimiz</span>
+                <span>{t('about.teamTitle')}</span>
               </h2>
             </FadeIn>
             <FadeIn delay={0.1}>
               <p className="section-subtitle">
-                Tutkulu ve deneyimli ekibimizle tanışın.
+                {t('about.teamSubtitle')}
               </p>
             </FadeIn>
           </div>

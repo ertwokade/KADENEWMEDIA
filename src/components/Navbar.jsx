@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiMenuAlt3, HiX } from 'react-icons/hi'
+import { HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useTheme } from '../i18n/ThemeContext'
 import './Navbar.css'
 
 export default function Navbar() {
@@ -10,6 +12,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
   const { lang, toggleLang, t } = useLanguage()
+  const { theme, toggleTheme } = useTheme()
 
   const navLinks = [
     { name: t('nav.home'), path: '/' },
@@ -73,6 +76,16 @@ export default function Navbar() {
 
         <div className="navbar-right">
           <motion.button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            title={theme === 'dark' ? t('theme.light') : t('theme.dark')}
+          >
+            {theme === 'dark' ? <HiOutlineSun size={18} /> : <HiOutlineMoon size={18} />}
+          </motion.button>
+
+          <motion.button
             className="lang-toggle"
             onClick={toggleLang}
             whileHover={{ scale: 1.05 }}
@@ -90,6 +103,14 @@ export default function Navbar() {
         </div>
 
         <div className="navbar-mobile-right">
+          <motion.button
+            className="theme-toggle theme-toggle-mobile"
+            onClick={toggleTheme}
+            whileTap={{ scale: 0.9 }}
+          >
+            {theme === 'dark' ? <HiOutlineSun size={18} /> : <HiOutlineMoon size={18} />}
+          </motion.button>
+
           <motion.button
             className="lang-toggle lang-toggle-mobile"
             onClick={toggleLang}

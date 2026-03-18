@@ -9,80 +9,68 @@ import {
   HiOutlinePencilAlt,
   HiOutlineSpeakerphone,
 } from 'react-icons/hi'
-import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaTwitter, FaLinkedinIn } from 'react-icons/fa'
+import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
+import { useLanguage } from '../i18n/LanguageContext'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Services.css'
 
-const services = [
-  {
-    icon: HiOutlineGlobe,
-    title: 'Sosyal Medya Yönetimi',
-    desc: 'Instagram, Facebook, Twitter, TikTok ve LinkedIn hesaplarınızı profesyonel bir şekilde yönetiyoruz. İçerik planlaması, paylaşım takvimi ve topluluk yönetimi ile markanızı dijital dünyada güçlendiriyoruz.',
-    features: ['İçerik Takvimi Oluşturma', 'Topluluk Yönetimi', 'Kriz Yönetimi', 'Aylık Raporlama'],
-    platforms: [FaInstagram, FaFacebookF, FaTwitter, FaTiktok],
-  },
-  {
-    icon: HiOutlinePencilAlt,
-    title: 'İçerik Üretimi',
-    desc: 'Markanıza özel, yaratıcı ve etkileyici içerikler üretiyoruz. Görsel, video ve metin içeriklerinizi profesyonel ekibimizle hazırlıyoruz.',
-    features: ['Grafik Tasarım', 'Copywriting', 'Marka Kimliği', 'İçerik Stratejisi'],
-    platforms: [FaInstagram, FaTiktok, FaYoutube],
-  },
-  {
-    icon: HiOutlineChartBar,
-    title: 'Reklam Yönetimi',
-    desc: 'Meta (Facebook & Instagram), Google Ads ve TikTok Ads platformlarında reklam kampanyalarınızı yönetiyoruz. Bütçenizi en verimli şekilde kullanıyoruz.',
-    features: ['Meta Ads', 'Google Ads', 'TikTok Ads', 'A/B Test'],
-    platforms: [FaFacebookF, FaInstagram, FaTiktok],
-  },
-  {
-    icon: HiOutlineSpeakerphone,
-    title: 'Influencer Marketing',
-    desc: 'Markanıza uygun influencer\'ları seçiyor, kampanya süreçlerini yönetiyoruz. Mikro ve makro influencer\'larla iş birliği yapıyoruz.',
-    features: ['Influencer Seçimi', 'Kampanya Yönetimi', 'ROI Analizi', 'İçerik Onay Süreci'],
-    platforms: [FaInstagram, FaYoutube, FaTiktok],
-  },
-  {
-    icon: HiOutlineFilm,
-    title: 'Video Prodüksiyon',
-    desc: 'Reels, TikTok videoları, YouTube içerikleri ve reklam filmleri için profesyonel video prodüksiyon hizmeti sunuyoruz.',
-    features: ['Reels & TikTok', 'YouTube İçerikleri', 'Reklam Filmleri', 'Motion Graphics'],
-    platforms: [FaInstagram, FaTiktok, FaYoutube],
-  },
-  {
-    icon: HiOutlineChatAlt2,
-    title: 'Strateji & Danışmanlık',
-    desc: 'Dijital pazarlama stratejinizi oluşturuyor, hedeflerinize ulaşmanız için yol haritası çiziyoruz.',
-    features: ['Marka Analizi', 'Rakip Analizi', 'Strateji Planı', 'KPI Belirleme'],
-    platforms: [FaLinkedinIn, FaInstagram, FaFacebookF],
-  },
-]
-
-const process = [
-  {
-    step: '01',
-    title: 'Analiz',
-    desc: 'Markanızı, hedef kitlenizi ve rakiplerinizi analiz ediyoruz.',
-  },
-  {
-    step: '02',
-    title: 'Strateji',
-    desc: 'Size özel dijital pazarlama stratejisi oluşturuyoruz.',
-  },
-  {
-    step: '03',
-    title: 'Uygulama',
-    desc: 'Stratejiyi hayata geçiriyor, içerik ve kampanyaları başlatıyoruz.',
-  },
-  {
-    step: '04',
-    title: 'Optimizasyon',
-    desc: 'Verileri analiz ediyor, sürekli iyileştirme yapıyoruz.',
-  },
-]
-
 export default function Services() {
+  const { t } = useLanguage()
+
+  const services = [
+    {
+      icon: HiOutlineGlobe,
+      title: t('services.smm'),
+      desc: t('services.smmDesc'),
+      features: [t('services.smmFeat1'), t('services.smmFeat2'), t('services.smmFeat3'), t('services.smmFeat4')],
+      platforms: [FaInstagram, FaFacebookF, FaXTwitter, FaTiktok],
+    },
+    {
+      icon: HiOutlinePencilAlt,
+      title: t('services.contentTitle'),
+      desc: t('services.contentDesc'),
+      features: [t('services.contentFeat1'), t('services.contentFeat2'), t('services.contentFeat3'), t('services.contentFeat4')],
+      platforms: [FaInstagram, FaTiktok, FaYoutube],
+    },
+    {
+      icon: HiOutlineChartBar,
+      title: t('services.adsTitle'),
+      desc: t('services.adsDesc'),
+      features: [t('services.adsFeat1'), t('services.adsFeat2'), t('services.adsFeat3'), t('services.adsFeat4')],
+      platforms: [FaFacebookF, FaInstagram, FaTiktok],
+    },
+    {
+      icon: HiOutlineSpeakerphone,
+      title: t('services.influencerTitle'),
+      desc: t('services.influencerDesc'),
+      features: [t('services.influencerFeat1'), t('services.influencerFeat2'), t('services.influencerFeat3'), t('services.influencerFeat4')],
+      platforms: [FaInstagram, FaYoutube, FaTiktok],
+    },
+    {
+      icon: HiOutlineFilm,
+      title: t('services.videoTitle'),
+      desc: t('services.videoDesc'),
+      features: [t('services.videoFeat1'), t('services.videoFeat2'), t('services.videoFeat3'), t('services.videoFeat4')],
+      platforms: [FaInstagram, FaTiktok, FaYoutube],
+    },
+    {
+      icon: HiOutlineChatAlt2,
+      title: t('services.strategyTitle'),
+      desc: t('services.strategyDesc'),
+      features: [t('services.strategyFeat1'), t('services.strategyFeat2'), t('services.strategyFeat3'), t('services.strategyFeat4')],
+      platforms: [FaLinkedinIn, FaInstagram, FaFacebookF],
+    },
+  ]
+
+  const process = [
+    { step: '01', title: t('services.processStep1'), desc: t('services.processStep1Desc') },
+    { step: '02', title: t('services.processStep2'), desc: t('services.processStep2Desc') },
+    { step: '03', title: t('services.processStep3'), desc: t('services.processStep3Desc') },
+    { step: '04', title: t('services.processStep4'), desc: t('services.processStep4Desc') },
+  ]
+
   return (
     <PageTransition>
       {/* Hero */}
@@ -93,18 +81,17 @@ export default function Services() {
           <FadeIn>
             <div className="section-badge">
               <HiOutlineLightningBolt size={14} />
-              Hizmetlerimiz
+              {t('services.badge')}
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
             <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              Dijital Başarınız İçin <span>Her Şey</span> Burada
+              {t('services.title')} <span>{t('services.titleHighlight')}</span> {t('services.titleEnd')}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="section-subtitle">
-              Sosyal medya yönetiminden reklam kampanyalarına, içerik üretiminden influencer
-              marketinge kadar tüm dijital ihtiyaçlarınızı karşılıyoruz.
+              {t('services.subtitle')}
             </p>
           </FadeIn>
         </div>
@@ -155,17 +142,17 @@ export default function Services() {
             <FadeIn>
               <div className="section-badge">
                 <HiOutlineCamera size={14} />
-                Süreç
+                {t('services.processBadge')}
               </div>
             </FadeIn>
             <FadeIn delay={0.1}>
               <h2 className="section-title">
-                Nasıl <span>Çalışıyoruz</span>?
+                {t('services.processTitle')} <span>{t('services.processHighlight')}</span>?
               </h2>
             </FadeIn>
             <FadeIn delay={0.2}>
               <p className="section-subtitle">
-                4 adımlık sürecimizle markanızı dijital dünyada büyütüyoruz.
+                {t('services.processSubtitle')}
               </p>
             </FadeIn>
           </div>

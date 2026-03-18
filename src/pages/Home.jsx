@@ -7,7 +7,6 @@ import {
   HiOutlineChartBar,
   HiOutlineGlobe,
   HiOutlineUsers,
-  HiOutlineStar,
   HiOutlinePlay,
   HiOutlineChevronDown,
   HiOutlineChevronUp,
@@ -16,25 +15,26 @@ import {
 } from 'react-icons/hi'
 import {
   FaInstagram,
-  FaFacebookF,
-  FaTwitter,
   FaYoutube,
   FaTiktok,
+  FaLinkedinIn,
   FaQuoteLeft,
 } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { partnersData } from '../data/content'
 import PageTransition from '../components/PageTransition'
 import Scene3D from '../components/Scene3D'
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '../components/Animations'
+import AuditScore from '../components/AuditScore'
 import './Home.css'
 
 const platforms = [
-  { icon: FaInstagram, name: 'Instagram' },
-  { icon: FaFacebookF, name: 'Facebook' },
-  { icon: FaTwitter, name: 'Twitter' },
-  { icon: FaYoutube, name: 'YouTube' },
-  { icon: FaTiktok, name: 'TikTok' },
+  { icon: FaInstagram, name: 'Instagram', url: 'https://instagram.com/kademediacom' },
+  { icon: FaXTwitter, name: 'X', url: 'https://x.com/kademediacom' },
+  { icon: FaYoutube, name: 'YouTube', url: 'https://www.youtube.com/@kademediacom' },
+  { icon: FaTiktok, name: 'TikTok', url: 'https://tiktok.com/@kademediacom' },
+  { icon: FaLinkedinIn, name: 'LinkedIn', url: 'https://www.linkedin.com/company/kademediaagency' },
 ]
 
 const testimonials = [
@@ -141,15 +141,8 @@ export default function Home() {
         <div className="hero-glow hero-glow-2" />
 
         <div className="container hero-content">
-          <FadeIn delay={0.2}>
-            <div className="hero-badge">
-              <HiOutlineStar size={14} />
-              <span>{t('hero.badge')}</span>
-            </div>
-          </FadeIn>
-
           <FadeIn delay={0.3}>
-            <h1 className="hero-title">
+            <h1 className="hero-title hero-gradient-text">
               {t('hero.title1')}
               <br />
               <span className="hero-highlight">{t('hero.title2')}</span>
@@ -178,8 +171,11 @@ export default function Home() {
               <span className="platforms-label">{t('hero.platforms')}</span>
               <div className="platform-icons">
                 {platforms.map((p, i) => (
-                  <motion.div
+                  <motion.a
                     key={p.name}
+                    href={p.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="platform-icon"
                     whileHover={{ scale: 1.2, y: -5 }}
                     initial={{ opacity: 0, y: 20 }}
@@ -188,7 +184,7 @@ export default function Home() {
                     title={p.name}
                   >
                     <p.icon size={20} />
-                  </motion.div>
+                  </motion.a>
                 ))}
               </div>
             </div>
@@ -391,6 +387,54 @@ export default function Home() {
               </FadeIn>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Audit Score */}
+      <AuditScore />
+
+      {/* Location */}
+      <section className="section location-section">
+        <div className="container">
+          <div className="section-header">
+            <FadeIn>
+              <div className="section-badge">
+                <HiOutlineOfficeBuilding size={14} />
+                {t('contact.locationTitle')}
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <h2 className="section-title">
+                Biruni <span>Teknopark</span>
+              </h2>
+            </FadeIn>
+          </div>
+          <FadeIn delay={0.2}>
+            <div className="location-card glass-card">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.5!2d28.8651!3d41.0143!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5f1d8e3f8e1%3A0x2b7f0e0d2a3b4c5d!2sBiruni+%C3%9Cniversitesi+Teknopark!5e0!3m2!1str!2str!4v1"
+                width="100%"
+                height="350"
+                style={{ border: 0, borderRadius: '16px', display: 'block' }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Biruni Teknopark"
+              />
+              <div className="location-footer">
+                <span className="location-address">📍 Biruni Teknopark, İstanbul</span>
+                <a
+                  href="https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                >
+                  {t('contact.getDirections')}
+                  <HiOutlineArrowRight size={16} />
+                </a>
+              </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
 

@@ -6,47 +6,29 @@ import {
   HiOutlineLocationMarker,
   HiOutlineClock,
   HiOutlinePaperAirplane,
+  HiOutlineExternalLink,
 } from 'react-icons/hi'
-import { FaInstagram, FaTwitter, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa'
+import { FaInstagram, FaYoutube, FaTiktok, FaWhatsapp, FaLinkedinIn } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
+import { useLanguage } from '../i18n/LanguageContext'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Contact.css'
 
-const contactInfo = [
-  {
-    icon: HiOutlineMail,
-    title: 'E-posta',
-    value: 'info@kademedia.com',
-    link: 'mailto:info@kademedia.com',
-  },
-  {
-    icon: HiOutlinePhone,
-    title: 'Telefon',
-    value: '+90 555 123 45 67',
-    link: 'tel:+905551234567',
-  },
-  {
-    icon: HiOutlineLocationMarker,
-    title: 'Adres',
-    value: 'İstanbul, Türkiye',
-    link: null,
-  },
-  {
-    icon: HiOutlineClock,
-    title: 'Çalışma Saatleri',
-    value: 'Pazartesi - Cuma, 09:00 - 18:00',
-    link: null,
-  },
+const socials = [
+  { icon: FaInstagram, href: 'https://instagram.com/kademediacom', label: 'Instagram' },
+  { icon: FaXTwitter, href: 'https://x.com/kademediacom', label: 'X' },
+  { icon: FaYoutube, href: 'https://www.youtube.com/@kademediacom', label: 'YouTube' },
+  { icon: FaTiktok, href: 'https://tiktok.com/@kademediacom', label: 'TikTok' },
+  { icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/kademediaagency', label: 'LinkedIn' },
+  { icon: FaWhatsapp, href: 'https://wa.me/905067293423', label: 'WhatsApp' },
 ]
 
-const socials = [
-  { icon: FaInstagram, href: '#', label: 'Instagram' },
-  { icon: FaTwitter, href: '#', label: 'Twitter' },
-  { icon: FaLinkedinIn, href: '#', label: 'LinkedIn' },
-  { icon: FaWhatsapp, href: '#', label: 'WhatsApp' },
-]
+const MAPS_LINK = 'https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7'
+const MAPS_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.5!2d28.8651!3d41.0143!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5f1d8e3f8e1%3A0x2b7f0e0d2a3b4c5d!2sBiruni+%C3%9Cniversitesi+Teknopark!5e0!3m2!1str!2str!4v1'
 
 export default function Contact() {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -56,16 +38,75 @@ export default function Contact() {
     message: '',
   })
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 4000)
+    setSending(true)
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/thekademedia@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || '-',
+          company: formData.company || '-',
+          service: formData.service || '-',
+          message: formData.message,
+          _subject: `Teklif Talebi - ${formData.name}`,
+          _template: 'table',
+        }),
+      })
+
+      if (response.ok) {
+        setSubmitted(true)
+        setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+        setTimeout(() => setSubmitted(false), 5000)
+      } else {
+        alert(t('contact.errorMessage') || 'Bir hata oluştu. Lütfen tekrar deneyin.')
+      }
+    } catch (error) {
+      alert(t('contact.errorMessage') || 'Bir hata oluştu. Lütfen tekrar deneyin.')
+    } finally {
+      setSending(false)
+    }
   }
+
+  const contactInfo = [
+    {
+      icon: HiOutlineMail,
+      title: t('contact.email'),
+      value: 'hello@kademedia.com',
+      link: 'mailto:hello@kademedia.com',
+    },
+    {
+      icon: HiOutlinePhone,
+      title: t('contact.phone'),
+      value: '0 506 729 34 23',
+      link: 'tel:+905067293423',
+    },
+    {
+      icon: HiOutlineLocationMarker,
+      title: t('contact.address'),
+      value: 'Biruni Teknopark, İstanbul',
+      link: MAPS_LINK,
+    },
+    {
+      icon: HiOutlineClock,
+      title: t('contact.hours'),
+      value: t('contact.hoursValue'),
+      link: null,
+    },
+  ]
 
   return (
     <PageTransition>
@@ -77,18 +118,17 @@ export default function Contact() {
           <FadeIn>
             <div className="section-badge">
               <HiOutlineMail size={14} />
-              İletişim
+              {t('contact.badge')}
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
             <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              Bizimle <span>İletişime</span> Geçin
+              {t('contact.title')} <span>{t('contact.titleHighlight')}</span> {t('contact.titleEnd')}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="section-subtitle">
-              Projeniz hakkında konuşmak ister misiniz? Formu doldurun, size en kısa sürede
-              dönüş yapalım.
+              {t('contact.subtitle')}
             </p>
           </FadeIn>
         </div>
@@ -100,10 +140,9 @@ export default function Contact() {
           <div className="contact-grid">
             {/* Contact Info */}
             <FadeIn direction="left" className="contact-info">
-              <h2>İletişim Bilgileri</h2>
+              <h2>{t('contact.infoTitle')}</h2>
               <p className="contact-info-desc">
-                Sorularınız, teklif talepleriniz veya iş birliği önerileriniz için bize
-                ulaşabilirsiniz.
+                {t('contact.infoDesc')}
               </p>
 
               <StaggerContainer className="contact-cards" staggerDelay={0.1}>
@@ -116,7 +155,12 @@ export default function Contact() {
                       <div>
                         <span className="contact-card-title">{info.title}</span>
                         {info.link ? (
-                          <a href={info.link} className="contact-card-value">
+                          <a
+                            href={info.link}
+                            className="contact-card-value"
+                            target={info.link.startsWith('http') ? '_blank' : undefined}
+                            rel={info.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          >
                             {info.value}
                           </a>
                         ) : (
@@ -129,12 +173,14 @@ export default function Contact() {
               </StaggerContainer>
 
               <div className="contact-socials">
-                <span className="contact-social-label">Sosyal Medya</span>
+                <span className="contact-social-label">{t('contact.socialMedia')}</span>
                 <div className="contact-social-links">
                   {socials.map((social) => (
                     <motion.a
                       key={social.label}
                       href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="contact-social-link"
                       aria-label={social.label}
                       whileHover={{ scale: 1.1, y: -2 }}
@@ -150,22 +196,22 @@ export default function Contact() {
             {/* Contact Form */}
             <FadeIn direction="right" className="contact-form-wrapper">
               <form className="contact-form glass-card" onSubmit={handleSubmit}>
-                <h3>Teklif Alın</h3>
+                <h3>{t('contact.formTitle')}</h3>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="name">Ad Soyad *</label>
+                    <label htmlFor="name">{t('contact.name')} *</label>
                     <input
                       id="name"
                       name="name"
                       type="text"
-                      placeholder="Adınız Soyadınız"
+                      placeholder={t('contact.name')}
                       value={formData.name}
                       onChange={handleChange}
                       required
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="email">E-posta *</label>
+                    <label htmlFor="email">{t('contact.emailField')} *</label>
                     <input
                       id="email"
                       name="email"
@@ -179,7 +225,7 @@ export default function Contact() {
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="phone">Telefon</label>
+                    <label htmlFor="phone">{t('contact.phoneField')}</label>
                     <input
                       id="phone"
                       name="phone"
@@ -190,41 +236,41 @@ export default function Contact() {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="company">Şirket</label>
+                    <label htmlFor="company">{t('contact.company')}</label>
                     <input
                       id="company"
                       name="company"
                       type="text"
-                      placeholder="Şirket Adınız"
+                      placeholder={t('contact.company')}
                       value={formData.company}
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="service">İlgilendiğiniz Hizmet</label>
+                  <label htmlFor="service">{t('contact.service')}</label>
                   <select
                     id="service"
                     name="service"
                     value={formData.service}
                     onChange={handleChange}
                   >
-                    <option value="">Seçiniz</option>
-                    <option value="sosyal-medya">Sosyal Medya Yönetimi</option>
-                    <option value="icerik">İçerik Üretimi</option>
-                    <option value="reklam">Reklam Yönetimi</option>
-                    <option value="influencer">Influencer Marketing</option>
+                    <option value="">{t('contact.selectService')}</option>
+                    <option value="sosyal-medya">{t('servicesSection.smm')}</option>
+                    <option value="icerik">{t('servicesSection.content')}</option>
+                    <option value="reklam">{t('servicesSection.ads')}</option>
+                    <option value="influencer">{t('servicesSection.influencer')}</option>
                     <option value="video">Video Prodüksiyon</option>
-                    <option value="danismanlik">Strateji & Danışmanlık</option>
+                    <option value="danismanlik">{t('contact.consultingOption')}</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="message">Mesajınız *</label>
+                  <label htmlFor="message">{t('contact.message')} *</label>
                   <textarea
                     id="message"
                     name="message"
                     rows="5"
-                    placeholder="Projeniz hakkında bilgi verin..."
+                    placeholder={t('contact.messagePlaceholder')}
                     value={formData.message}
                     onChange={handleChange}
                     required
@@ -236,13 +282,15 @@ export default function Contact() {
                   className="btn btn-primary submit-btn"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={submitted}
+                  disabled={submitted || sending}
                 >
                   {submitted ? (
-                    'Gönderildi! ✓'
+                    t('contact.submitted')
+                  ) : sending ? (
+                    <span className="sending-loader">{t('contact.sending') || 'Gönderiliyor...'}</span>
                   ) : (
                     <>
-                      Gönder
+                      {t('contact.submit')}
                       <HiOutlinePaperAirplane size={18} />
                     </>
                   )}
@@ -250,6 +298,39 @@ export default function Contact() {
               </form>
             </FadeIn>
           </div>
+
+          {/* Map Section */}
+          <FadeIn delay={0.3}>
+            <div className="contact-map-section">
+              <div className="contact-map-header">
+                <h3>
+                  <HiOutlineLocationMarker size={22} />
+                  {t('contact.locationTitle')}
+                </h3>
+                <a
+                  href={MAPS_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline map-directions-btn"
+                >
+                  {t('contact.getDirections')}
+                  <HiOutlineExternalLink size={16} />
+                </a>
+              </div>
+              <div className="contact-map glass-card">
+                <iframe
+                  src={MAPS_EMBED_URL}
+                  width="100%"
+                  height="400"
+                  style={{ border: 0, borderRadius: '16px' }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Biruni Teknopark - Kade Media"
+                />
+              </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
     </PageTransition>

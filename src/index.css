@@ -254,7 +254,6 @@ input, textarea {
   z-index: 0;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   :root {
     --section-padding: 60px 0;
@@ -267,4 +266,166 @@ input, textarea {
   .container {
     padding: 0 16px;
   }
+}
+
+/* ==========================================
+   LIGHT THEME (softened)
+   ========================================== */
+[data-theme="light"] {
+  --black: #F5F3EE;
+  --black-light: #EDEAE4;
+  --black-lighter: #E5E2DC;
+  --dark-gray: #D8D5CF;
+  --gray: #B0ADA7;
+  --gray-light: #6B6863;
+  --gray-lighter: #4A4744;
+  --white: #2C2926;
+  --white-dim: #3D3A36;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-color-hover: rgba(200, 150, 0, 0.35);
+  --shadow-glow: 0 4px 24px rgba(200, 170, 50, 0.12);
+  --shadow-glow-strong: 0 4px 32px rgba(200, 170, 50, 0.2);
+}
+
+[data-theme="light"] body {
+  background-color: #F5F3EE;
+  color: #2C2926;
+}
+
+[data-theme="light"] .navbar.scrolled {
+  background: rgba(245, 243, 238, 0.92);
+}
+
+[data-theme="light"] .glass-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .glass-card:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(200, 150, 0, 0.3);
+}
+
+[data-theme="light"] .mobile-menu {
+  background: rgba(245, 243, 238, 0.98);
+}
+
+[data-theme="light"] .grid-bg {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
+
+[data-theme="light"] .section-title {
+  background: linear-gradient(135deg, #1A1A1A 0%, #444444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .hero-gradient-text {
+  background: linear-gradient(135deg, #1A1A1A 0%, #FFD700 40%, #FFA500 60%, #FFFFFF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradientShift 4s ease infinite;
+}
+
+[data-theme="light"] .footer {
+  background: #1A1A1A;
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .footer .footer-desc,
+[data-theme="light"] .footer a,
+[data-theme="light"] .footer li,
+[data-theme="light"] .footer h4 {
+  color: #CCCCCC;
+}
+
+[data-theme="light"] .footer .footer-logo,
+[data-theme="light"] .footer .footer-logo span {
+  color: #FFD700;
+}
+
+[data-theme="light"] .footer .social-link {
+  color: #CCCCCC;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .footer-bottom {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .footer-bottom p {
+  color: #888888;
+}
+
+[data-theme="light"] html {
+  scrollbar-color: var(--primary) #F0F0F0;
+}
+
+[data-theme="light"] html::-webkit-scrollbar-track {
+  background: #F0F0F0;
+}
+
+[data-theme="light"] .platform-icon {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .lang-toggle,
+[data-theme="light"] .theme-toggle {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .hero-glow-1 {
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.12) 0%, transparent 70%);
+}
+
+[data-theme="light"] .hero-glow-2 {
+  background: radial-gradient(circle, rgba(255, 165, 0, 0.1) 0%, transparent 70%);
+}
+
+[data-theme="light"] .glow-effect {
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+}
+
+[data-theme="light"] .cookie-banner {
+  background: rgba(255, 255, 255, 0.95);
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .cookie-content p {
+  color: #444444;
+}
+
+[data-theme="light"] .cookie-decline {
+  color: #666666;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .audit-input {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1A1A1A;
+}
+
+[data-theme="light"] .kvkk-modal {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .kvkk-header {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .kvkk-body p {
+  color: #444444;
+}
+
+[data-theme="light"] .kvkk-footer {
+  border-top-color: rgba(0, 0, 0, 0.1);
 }

@@ -12,6 +12,8 @@ import Partners from './pages/Partners'
 import PartnerDetail from './pages/PartnerDetail'
 import Blog from './pages/Blog'
 import ScrollToTop from './components/ScrollToTop'
+import WhatsAppButton from './components/WhatsAppButton'
+import CookieBanner from './components/CookieBanner'
 
 function App() {
   const location = useLocation()
@@ -34,6 +36,8 @@ function App() {
         </Routes>
       </AnimatePresence>
       <Footer />
+      <WhatsAppButton />
+      <CookieBanner />
     </>
   )
 }

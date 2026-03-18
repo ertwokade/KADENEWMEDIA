@@ -194,6 +194,42 @@ a.contact-card-value:hover {
   cursor: default;
 }
 
+/* Map Section */
+.contact-map-section {
+  margin-top: 60px;
+}
+
+.contact-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.contact-map-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.3rem;
+  color: var(--white);
+}
+
+.map-directions-btn {
+  padding: 10px 20px;
+  font-size: 0.85rem;
+}
+
+.contact-map {
+  padding: 8px;
+  overflow: hidden;
+}
+
+.contact-map iframe {
+  display: block;
+}
+
 @media (max-width: 768px) {
   .contact-grid {
     grid-template-columns: 1fr;
@@ -205,5 +241,10 @@ a.contact-card-value:hover {
 
   .contact-form {
     padding: 28px;
+  }
+
+  .contact-map-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

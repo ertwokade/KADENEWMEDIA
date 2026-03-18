@@ -96,6 +96,13 @@
   color: var(--gray-light);
 }
 
+.package-price-alt {
+  font-size: 0.8rem;
+  color: var(--gray);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
 .package-features {
   display: flex;
   flex-direction: column;
