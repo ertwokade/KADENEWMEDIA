@@ -1,0 +1,147 @@
+/* ==========================================
+   SERVICES PAGE STYLES
+   ========================================== */
+
+.services-hero {
+  position: relative;
+  padding: 160px 0 60px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.services-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.service-detail-card {
+  padding: 36px;
+}
+
+.service-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.service-detail-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 14px;
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid var(--border-color);
+  color: var(--primary);
+}
+
+.service-detail-card h3 {
+  font-size: 1.15rem;
+  color: var(--white);
+}
+
+.service-detail-desc {
+  font-size: 0.9rem;
+  color: var(--gray-light);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.service-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.feature-tag {
+  padding: 6px 14px;
+  background: rgba(255, 215, 0, 0.06);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: var(--gray-lighter);
+  font-weight: 500;
+}
+
+.service-platforms {
+  display: flex;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.platform-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gray-lighter);
+}
+
+/* Process */
+.process-section {
+  overflow: hidden;
+}
+
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.process-card {
+  text-align: center;
+  padding: 36px 24px;
+  position: relative;
+}
+
+.process-step {
+  font-family: var(--font-primary);
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 12px;
+}
+
+.process-card h3 {
+  font-size: 1.1rem;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+
+.process-card p {
+  font-size: 0.85rem;
+  color: var(--gray-light);
+  line-height: 1.6;
+}
+
+.process-connector {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .services-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .process-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .process-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,200 @@
+/* ==========================================
+   CAREERS PAGE STYLES
+   ========================================== */
+
+.careers-hero {
+  position: relative;
+  padding: 160px 0 60px;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Perks */
+.perks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.perk-card {
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.perk-emoji {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.perk-card h4 {
+  font-size: 1rem;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.perk-card p {
+  font-size: 0.82rem;
+  color: var(--gray-light);
+  line-height: 1.5;
+}
+
+/* Job Listings */
+.jobs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.job-card {
+  padding: 0;
+  overflow: hidden;
+  cursor: default;
+}
+
+.job-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.job-header:hover {
+  background: rgba(255, 215, 0, 0.02);
+}
+
+.job-info h3 {
+  font-size: 1.1rem;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.job-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--gray-light);
+}
+
+.job-tag svg {
+  color: var(--primary);
+}
+
+.job-toggle {
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid var(--border-color);
+  color: var(--primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.job-toggle:hover {
+  background: rgba(255, 215, 0, 0.15);
+}
+
+.job-details {
+  padding: 0 28px 28px;
+  border-top: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.job-desc {
+  font-size: 0.9rem;
+  color: var(--gray-lighter);
+  line-height: 1.7;
+  margin: 20px 0 16px;
+}
+
+.job-requirements h4 {
+  font-size: 0.9rem;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+
+.job-requirements ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.job-requirements li {
+  font-size: 0.85rem;
+  color: var(--gray-light);
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.job-requirements li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.job-apply-btn {
+  padding: 10px 24px;
+  font-size: 0.85rem;
+}
+
+/* CTA */
+.jobs-cta {
+  text-align: center;
+  margin-top: 48px;
+  padding: 40px;
+  border-radius: 20px;
+  background: rgba(255, 215, 0, 0.03);
+  border: 1px solid var(--border-color);
+}
+
+.jobs-cta p {
+  font-size: 1rem;
+  color: var(--gray-lighter);
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .perks-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .job-header {
+    padding: 20px;
+  }
+
+  .job-details {
+    padding: 0 20px 20px;
+  }
+
+  .job-meta {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .perks-grid {
+    grid-template-columns: 1fr;
+  }
+}

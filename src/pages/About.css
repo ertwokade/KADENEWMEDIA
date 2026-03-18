@@ -1,0 +1,219 @@
+/* ==========================================
+   ABOUT PAGE STYLES
+   ========================================== */
+
+.about-hero {
+  position: relative;
+  padding: 160px 0 60px;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Story */
+.story-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.story-content h2 {
+  font-size: 2rem;
+  color: var(--white);
+  margin-bottom: 20px;
+}
+
+.story-content p {
+  font-size: 0.95rem;
+  color: var(--gray-light);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.story-stats {
+  display: flex;
+  gap: 32px;
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border-color);
+}
+
+.story-stat-number {
+  display: block;
+  font-family: var(--font-primary);
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.story-stat-label {
+  font-size: 0.8rem;
+  color: var(--gray-light);
+}
+
+.story-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.visual-card {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.visual-inner {
+  text-align: center;
+  z-index: 1;
+}
+
+.visual-logo {
+  font-family: var(--font-primary);
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.visual-subtitle {
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--white);
+  margin-top: -8px;
+  margin-bottom: 12px;
+}
+
+.visual-tagline {
+  font-size: 0.85rem;
+  color: var(--gray-light);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.visual-dots {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  padding: 40px;
+  z-index: 0;
+}
+
+.visual-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: 0.2;
+  align-self: center;
+  justify-self: center;
+}
+
+/* Values */
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.value-card {
+  text-align: center;
+  padding: 36px 24px;
+}
+
+.value-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid var(--border-color);
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.value-card h3 {
+  font-size: 1.05rem;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.value-card p {
+  font-size: 0.85rem;
+  color: var(--gray-light);
+  line-height: 1.6;
+}
+
+/* Team */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.team-card {
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.team-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-family: var(--font-primary);
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.team-card h4 {
+  font-size: 1rem;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.team-card p {
+  font-size: 0.82rem;
+  color: var(--gray-light);
+}
+
+@media (max-width: 768px) {
+  .story-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .values-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .story-stats {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .values-grid,
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+}
