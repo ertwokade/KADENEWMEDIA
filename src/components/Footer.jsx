@@ -45,7 +45,7 @@ export default function Footer() {
         <div className="footer-top">
           <div className="footer-brand">
             <Link to="/" className="footer-logo">
-              kade<span> media</span>
+              kade<span>media</span>
             </Link>
             <p className="footer-desc">{t('footer.desc')}</p>
             <div className="footer-socials">
