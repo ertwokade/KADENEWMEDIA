@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useState, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, MeshDistortMaterial, Sphere, Torus, Box } from '@react-three/drei'
 import * as THREE from 'three'
@@ -15,13 +15,13 @@ function GlowingSphere({ position, scale, speed, color }) {
 
   return (
     <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-      <Sphere ref={meshRef} args={[1, 64, 64]} position={position} scale={scale}>
+      <Sphere ref={meshRef} args={[1, 32, 32]} position={position} scale={scale}>
         <MeshDistortMaterial
           color={color}
           roughness={0.2}
           metalness={0.8}
-          distort={0.4}
-          speed={2}
+          distort={0.3}
+          speed={1.5}
           transparent
           opacity={0.7}
         />
@@ -42,7 +42,7 @@ function FloatingTorus({ position, scale, speed }) {
 
   return (
     <Float speed={1.5} rotationIntensity={1} floatIntensity={0.8}>
-      <Torus ref={meshRef} args={[1, 0.3, 32, 64]} position={position} scale={scale}>
+      <Torus ref={meshRef} args={[1, 0.3, 16, 32]} position={position} scale={scale}>
         <meshStandardMaterial
           color="#FFD700"
           roughness={0.3}
@@ -84,7 +84,7 @@ function FloatingCube({ position, scale, speed }) {
 }
 
 function Particles() {
-  const count = 80
+  const count = 40
   const meshRef = useRef()
 
   const particles = useMemo(() => {
@@ -112,7 +112,7 @@ function Particles() {
     <group ref={meshRef}>
       {particles.map((particle, i) => (
         <mesh key={i} position={particle.position}>
-          <sphereGeometry args={[particle.scale, 8, 8]} />
+          <sphereGeometry args={[particle.scale, 6, 6]} />
           <meshBasicMaterial color="#FFD700" transparent opacity={0.5} />
         </mesh>
       ))}
@@ -121,25 +121,47 @@ function Particles() {
 }
 
 export default function Scene3D({ style, className }) {
+  const [isVisible, setIsVisible] = useState(true)
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+      },
+      { threshold: 0, rootMargin: '100px' }
+    )
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <div style={{ position: 'absolute', inset: 0, ...style }} className={className}>
-      <Canvas
-        camera={{ position: [0, 0, 8], fov: 45 }}
-        style={{ background: 'transparent' }}
-        gl={{ alpha: true, antialias: true }}
-      >
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[5, 5, 5]} intensity={0.8} color="#FFD700" />
-        <pointLight position={[-5, -5, 5]} intensity={0.5} color="#FFA500" />
-        
-        <GlowingSphere position={[3, 1, 0]} scale={1.2} speed={0.5} color="#FFD700" />
-        <GlowingSphere position={[-3.5, -1.5, -2]} scale={0.8} speed={0.7} color="#FFA500" />
-        <FloatingTorus position={[-2, 2, -1]} scale={0.6} speed={0.3} />
-        <FloatingTorus position={[4, -2, -3]} scale={0.4} speed={0.5} />
-        <FloatingCube position={[1.5, -2, -1]} scale={0.5} speed={0.4} />
-        <FloatingCube position={[-4, 0.5, -2]} scale={0.35} speed={0.6} />
-        <Particles />
-      </Canvas>
+    <div ref={containerRef} style={{ position: 'absolute', inset: 0, ...style }} className={className}>
+      {isVisible && (
+        <Canvas
+          camera={{ position: [0, 0, 8], fov: 45 }}
+          style={{ background: 'transparent' }}
+          gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
+          dpr={[1, 1.5]}
+          frameloop="always"
+        >
+          <ambientLight intensity={0.3} />
+          <directionalLight position={[5, 5, 5]} intensity={0.8} color="#FFD700" />
+          <pointLight position={[-5, -5, 5]} intensity={0.5} color="#FFA500" />
+          
+          <GlowingSphere position={[3, 1, 0]} scale={1.2} speed={0.5} color="#FFD700" />
+          <GlowingSphere position={[-3.5, -1.5, -2]} scale={0.8} speed={0.7} color="#FFA500" />
+          <FloatingTorus position={[-2, 2, -1]} scale={0.6} speed={0.3} />
+          <FloatingTorus position={[4, -2, -3]} scale={0.4} speed={0.5} />
+          <FloatingCube position={[1.5, -2, -1]} scale={0.5} speed={0.4} />
+          <FloatingCube position={[-4, 0.5, -2]} scale={0.35} speed={0.6} />
+          <Particles />
+        </Canvas>
+      )}
     </div>
   )
 }

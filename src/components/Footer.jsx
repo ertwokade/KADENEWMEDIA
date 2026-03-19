@@ -96,7 +96,7 @@ export default function Footer() {
               <li>
                 <a href="tel:+905067293423">0 506 729 34 23</a>
               </li>
-              <li>İstanbul, Türkiye</li>
+              <li>Biruni Teknopark, Zeytinburnu/İstanbul</li>
             </ul>
           </div>
         </div>

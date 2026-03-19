@@ -18,10 +18,10 @@
   --white-dim: #F0F0F0;
 
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  --gradient-primary: linear-gradient(135deg, #FFE033 0%, #FF8C00 100%);
   --gradient-dark: linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%);
-  --gradient-card: linear-gradient(145deg, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0) 100%);
-  --gradient-glow: radial-gradient(circle at center, rgba(255,215,0,0.15) 0%, transparent 70%);
+  --gradient-card: linear-gradient(145deg, rgba(255,224,51,0.06) 0%, rgba(255,140,0,0) 100%);
+  --gradient-glow: radial-gradient(circle at center, rgba(255,224,51,0.18) 0%, transparent 70%);
 
   /* Typography */
   --font-primary: 'Space Grotesk', sans-serif;
@@ -55,6 +55,7 @@ html {
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--primary) var(--black);
+  -webkit-overflow-scrolling: touch;
 }
 
 html::-webkit-scrollbar {
@@ -125,6 +126,7 @@ input, textarea {
 .section {
   padding: var(--section-padding);
   position: relative;
+  transform: translateZ(0);
 }
 
 .section-header {
@@ -211,18 +213,20 @@ input, textarea {
 /* Cards */
 .glass-card {
   background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
   border-radius: 20px;
   padding: 32px;
   transition: var(--transition-normal);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .glass-card:hover {
   border-color: var(--border-color-hover);
   background: rgba(255, 255, 255, 0.05);
-  transform: translateY(-4px);
+  transform: translateY(-4px) translateZ(0);
   box-shadow: var(--shadow-glow);
 }
 

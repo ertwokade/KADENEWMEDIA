@@ -2,18 +2,12 @@ import { motion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
 import './WhatsAppButton.css'
 
-export default function WhatsAppButton() {
-  const phoneNumber = '905067293423'
-  const message = encodeURIComponent('Merhaba! Kade Media web sitesinden yazıyorum. Bilgi almak istiyorum.')
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
-
+export default function WhatsAppButton({ onClick }) {
   return (
-    <motion.a
-      href={whatsappUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+    <motion.button
+      onClick={onClick}
       className="whatsapp-float"
-      aria-label="WhatsApp"
+      aria-label="WhatsApp Chat"
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: 1, type: 'spring', stiffness: 260, damping: 20 }}
@@ -22,6 +16,6 @@ export default function WhatsAppButton() {
     >
       <FaWhatsapp size={28} />
       <span className="whatsapp-tooltip">WhatsApp</span>
-    </motion.a>
+    </motion.button>
   )
 }

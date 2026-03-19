@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
+import emailjs from '@emailjs/browser'
 import {
   HiOutlineMail,
   HiOutlinePhone,
@@ -25,10 +26,11 @@ const socials = [
 ]
 
 const MAPS_LINK = 'https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7'
-const MAPS_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.5!2d28.8651!3d41.0143!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5f1d8e3f8e1%3A0x2b7f0e0d2a3b4c5d!2sBiruni+%C3%9Cniversitesi+Teknopark!5e0!3m2!1str!2str!4v1'
+const MAPS_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6!2d28.9080!3d41.0048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5307e731e3f%3A0x4a3e2d8c9b7f1234!2sBiruni+%C3%9Cniversitesi+Teknopark!5e0!3m2!1str!2str!4v1'
 
 export default function Contact() {
   const { t } = useLanguage()
+  const formRef = useRef(null)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -49,33 +51,65 @@ export default function Contact() {
     setSending(true)
 
     try {
-      const response = await fetch('https://formsubmit.co/ajax/thekademedia@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
+      // Primary: EmailJS
+      await emailjs.send(
+        'service_kademedia',
+        'template_kademedia',
+        {
+          from_name: formData.name,
+          from_email: formData.email,
           phone: formData.phone || '-',
           company: formData.company || '-',
           service: formData.service || '-',
           message: formData.message,
-          _subject: `Teklif Talebi - ${formData.name}`,
-          _template: 'table',
-        }),
-      })
+          to_email: 'thekademedia@gmail.com',
+        },
+        'YOUR_EMAILJS_PUBLIC_KEY'
+      )
+      setSubmitted(true)
+      setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+      setTimeout(() => setSubmitted(false), 5000)
+    } catch (emailjsError) {
+      // Fallback: FormSubmit.co
+      try {
+        const response = await fetch('https://formsubmit.co/ajax/thekademedia@gmail.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone || '-',
+            company: formData.company || '-',
+            service: formData.service || '-',
+            message: formData.message,
+            _subject: `Teklif Talebi - ${formData.name}`,
+            _template: 'table',
+            _captcha: 'false',
+          }),
+        })
 
-      if (response.ok) {
-        setSubmitted(true)
-        setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
-        setTimeout(() => setSubmitted(false), 5000)
-      } else {
-        alert(t('contact.errorMessage') || 'Bir hata oluştu. Lütfen tekrar deneyin.')
+        if (response.ok) {
+          setSubmitted(true)
+          setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+          setTimeout(() => setSubmitted(false), 5000)
+        } else {
+          // Last resort: mailto link
+          const subject = encodeURIComponent(`Teklif Talebi - ${formData.name}`)
+          const body = encodeURIComponent(
+            `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.service || '-'}\n\nMesaj:\n${formData.message}`
+          )
+          window.open(`mailto:thekademedia@gmail.com?subject=${subject}&body=${body}`, '_blank')
+        }
+      } catch (fetchError) {
+        const subject = encodeURIComponent(`Teklif Talebi - ${formData.name}`)
+        const body = encodeURIComponent(
+          `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.service || '-'}\n\nMesaj:\n${formData.message}`
+        )
+        window.open(`mailto:thekademedia@gmail.com?subject=${subject}&body=${body}`, '_blank')
       }
-    } catch (error) {
-      alert(t('contact.errorMessage') || 'Bir hata oluştu. Lütfen tekrar deneyin.')
     } finally {
       setSending(false)
     }

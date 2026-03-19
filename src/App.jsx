@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
@@ -11,12 +12,15 @@ import Careers from './pages/Careers'
 import Partners from './pages/Partners'
 import PartnerDetail from './pages/PartnerDetail'
 import Blog from './pages/Blog'
+import Admin from './pages/Admin'
 import ScrollToTop from './components/ScrollToTop'
 import WhatsAppButton from './components/WhatsAppButton'
+import ChatBot from './components/ChatBot'
 import CookieBanner from './components/CookieBanner'
 
 function App() {
   const location = useLocation()
+  const [chatOpen, setChatOpen] = useState(false)
 
   return (
     <>
@@ -33,10 +37,12 @@ function App() {
           <Route path="/kariyer" element={<Careers />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/iletisim" element={<Contact />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </AnimatePresence>
       <Footer />
-      <WhatsAppButton />
+      <WhatsAppButton onClick={() => setChatOpen(!chatOpen)} />
+      <ChatBot isOpen={chatOpen} onClose={() => setChatOpen(false)} />
       <CookieBanner />
     </>
   )

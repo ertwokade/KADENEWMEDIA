@@ -6,13 +6,75 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { FadeIn } from './Animations'
 import './AuditScore.css'
 
-function generateScore() {
+// Deterministic hash for consistent scores per username
+function hashString(str) {
+  let hash = 0
+  const cleaned = str.replace('@', '').toLowerCase().trim()
+  for (let i = 0; i < cleaned.length; i++) {
+    const char = cleaned.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // Convert to 32bit integer
+  }
+  return Math.abs(hash)
+}
+
+// Deterministic pseudo-random from seed
+function seededRandom(seed, index) {
+  const x = Math.sin(seed + index * 127.1) * 43758.5453
+  return x - Math.floor(x)
+}
+
+function generateRealisticScore(username) {
+  const hash = hashString(username)
+  
+  // Base overall quality (weighted random in range 25-85)
+  const baseQuality = Math.floor(seededRandom(hash, 0) * 60) + 25
+  
+  // Each metric is correlated with base quality but with variation
+  const engagement = Math.max(15, Math.min(95, 
+    baseQuality + Math.floor((seededRandom(hash, 1) - 0.5) * 30)
+  ))
+  
+  const contentQuality = Math.max(20, Math.min(90,
+    baseQuality + Math.floor((seededRandom(hash, 2) - 0.5) * 25)
+  ))
+  
+  const growthPotential = Math.max(30, Math.min(95,
+    // Growth potential is inversely related to current quality (room to grow)
+    Math.floor(95 - baseQuality * 0.4 + seededRandom(hash, 3) * 30)
+  ))
+  
+  const consistency = Math.max(15, Math.min(85,
+    baseQuality + Math.floor((seededRandom(hash, 4) - 0.5) * 35)
+  ))
+  
+  // Overall is weighted average
+  const overall = Math.round(
+    engagement * 0.3 + contentQuality * 0.25 + growthPotential * 0.2 + consistency * 0.25
+  )
+  
   return {
-    overall: Math.floor(Math.random() * 30) + 45,
-    engagement: Math.floor(Math.random() * 40) + 35,
-    contentQuality: Math.floor(Math.random() * 35) + 40,
-    growthPotential: Math.floor(Math.random() * 30) + 50,
-    consistency: Math.floor(Math.random() * 40) + 30,
+    overall: Math.max(20, Math.min(90, overall)),
+    engagement,
+    contentQuality,
+    growthPotential,
+    consistency,
+  }
+}
+
+function getRecommendation(score, t, lang) {
+  if (score.overall >= 75) {
+    return lang === 'tr' 
+      ? 'Harika performans! Profesyonel destek ile skorunuzu daha da yukarı taşıyabilirsiniz.'
+      : 'Great performance! With professional support, you can push your score even higher.'
+  } else if (score.overall >= 50) {
+    return lang === 'tr'
+      ? 'İyi bir temel var! Etkileşim ve içerik stratejinizi geliştirerek önemli bir atılım yapabilirsiniz.'
+      : 'You have a good foundation! By improving your engagement and content strategy, you can make a significant leap.'
+  } else {
+    return lang === 'tr'
+      ? 'Hesabınızda önemli iyileştirme fırsatları var. Profesyonel destek ile kısa sürede fark yaratabilirsiniz!'
+      : 'There are significant improvement opportunities for your account. With professional support, you can make a difference quickly!'
   }
 }
 
@@ -43,7 +105,7 @@ function ScoreBar({ label, score, delay }) {
 }
 
 export default function AuditScore() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
@@ -54,12 +116,17 @@ export default function AuditScore() {
     setLoading(true)
     setResult(null)
     setTimeout(() => {
-      setResult(generateScore())
+      setResult(generateRealisticScore(username))
       setLoading(false)
     }, 2000)
   }
 
   const getOverallColor = (s) => s >= 75 ? '#2ECC71' : s >= 50 ? '#FFA500' : '#FF4444'
+  const getOverallLabel = (s) => {
+    if (s >= 75) return lang === 'tr' ? 'Çok İyi' : 'Very Good'
+    if (s >= 50) return lang === 'tr' ? 'Orta' : 'Average'
+    return lang === 'tr' ? 'Geliştirilmeli' : 'Needs Improvement'
+  }
 
   return (
     <section className="section audit-section">
@@ -136,6 +203,9 @@ export default function AuditScore() {
                           {result.overall}
                         </span>
                         <span className="overall-label">{t('audit.overallScore')}</span>
+                        <span className="overall-status" style={{ color: getOverallColor(result.overall), fontSize: '0.7rem', fontWeight: 600, marginTop: '2px' }}>
+                          {getOverallLabel(result.overall)}
+                        </span>
                       </motion.div>
                     </div>
 
@@ -153,7 +223,7 @@ export default function AuditScore() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1 }}
                   >
-                    <p>{t('audit.recommendation')}</p>
+                    <p>{getRecommendation(result, t, lang)}</p>
                     <Link to="/iletisim" className="btn btn-primary">
                       {t('audit.ctaButton')}
                       <HiOutlineArrowRight size={16} />
