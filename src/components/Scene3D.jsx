@@ -87,7 +87,7 @@ function Particles() {
   const count = 40
   const meshRef = useRef()
 
-  const particles = useMemo(() => {
+  const [particles] = useState(() => {
     const temp = []
     for (let i = 0; i < count; i++) {
       temp.push({
@@ -100,7 +100,7 @@ function Particles() {
       })
     }
     return temp
-  }, [])
+  })
 
   useFrame((state) => {
     if (meshRef.current) {
