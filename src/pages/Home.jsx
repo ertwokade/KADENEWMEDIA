@@ -114,6 +114,62 @@ function FAQItem({ faq }) {
 
 export default function Home() {
   const { lang, t } = useLanguage()
+  
+  // Admin Panel Overrides State
+  const [heroTexts, setHeroTexts] = useState({
+    title1: t('hero.title1'),
+    title2: t('hero.title2'),
+    subtitle: t('hero.subtitle')
+  })
+
+  // Load texts from localStorage and listen for updates
+  useEffect(() => {
+    const loadTexts = () => {
+      const savedTextsStr = localStorage.getItem('kade_hero_texts')
+      if (savedTextsStr) {
+        try {
+          const savedTexts = JSON.parse(savedTextsStr)
+          if (savedTexts[lang]) {
+            setHeroTexts({
+              title1: savedTexts[lang].title1 || t('hero.title1'),
+              title2: savedTexts[lang].title2 || t('hero.title2'),
+              subtitle: savedTexts[lang].subtitle || t('hero.subtitle')
+            })
+            return
+          }
+        } catch (e) {
+          console.error("Failed to parse hero texts", e)
+        }
+      }
+      // Fallback to defaults if no saved texts
+      setHeroTexts({
+        title1: t('hero.title1'),
+        title2: t('hero.title2'),
+        subtitle: t('hero.subtitle')
+      })
+    }
+
+    // Initial load
+    loadTexts()
+
+    // Listen to lang changes (since t() updates)
+    loadTexts()
+
+    // Listen to custom admin updates
+    const handleUpdate = (e) => {
+      const newTexts = e.detail
+      if (newTexts && newTexts[lang]) {
+        setHeroTexts({
+          title1: newTexts[lang].title1 || t('hero.title1'),
+          title2: newTexts[lang].title2 || t('hero.title2'),
+          subtitle: newTexts[lang].subtitle || t('hero.subtitle')
+        })
+      }
+    }
+
+    window.addEventListener('kade_texts_updated', handleUpdate)
+    return () => window.removeEventListener('kade_texts_updated', handleUpdate)
+  }, [lang, t])
 
   const services = [
     { icon: HiOutlineGlobe, title: t('servicesSection.smm'), desc: t('servicesSection.smmDesc') },
@@ -143,14 +199,14 @@ export default function Home() {
         <div className="container hero-content">
           <FadeIn delay={0.3}>
             <h1 className="hero-title hero-gradient-text">
-              {t('hero.title1')}
+              {heroTexts.title1}
               <br />
-              <span className="hero-highlight">{t('hero.title2')}</span>
+              <span className="hero-highlight">{heroTexts.title2}</span>
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.4}>
-            <p className="hero-subtitle">{t('hero.subtitle')}</p>
+            <p className="hero-subtitle">{heroTexts.subtitle}</p>
           </FadeIn>
 
           <FadeIn delay={0.5}>
