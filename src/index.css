@@ -18,9 +18,9 @@
   --white-dim: #F0F0F0;
 
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #FFE033 0%, #FF8C00 100%);
+  --gradient-primary: linear-gradient(135deg, #FFE033 0%, #FFD700 100%);
   --gradient-dark: linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%);
-  --gradient-card: linear-gradient(145deg, rgba(255,224,51,0.06) 0%, rgba(255,140,0,0) 100%);
+  --gradient-card: linear-gradient(145deg, rgba(255,224,51,0.06) 0%, rgba(255,215,0,0) 100%);
   --gradient-glow: radial-gradient(circle at center, rgba(255,224,51,0.18) 0%, transparent 70%);
 
   /* Typography */
@@ -328,7 +328,7 @@ input, textarea {
 }
 
 [data-theme="light"] .hero-gradient-text {
-  background: linear-gradient(135deg, #1A1A1A 0%, #FFD700 40%, #FFA500 60%, #FFFFFF 100%);
+  background: linear-gradient(135deg, #1A1A1A 0%, #FFE033 40%, #FFD700 60%, #FFFFFF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -390,7 +390,7 @@ input, textarea {
 }
 
 [data-theme="light"] .hero-glow-2 {
-  background: radial-gradient(circle, rgba(255, 165, 0, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 70%);
 }
 
 [data-theme="light"] .glow-effect {

@@ -14,9 +14,9 @@ import './About.css'
 
 const team = [
   { name: 'Kade', role: 'Founder & CEO', color: '#FFD700' },
-  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#FFA500' },
+  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#FFD700' },
   { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#FFD700' },
-  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#FFA500' },
+  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#FFD700' },
 ]
 
 export default function About() {

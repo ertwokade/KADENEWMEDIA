@@ -18,6 +18,7 @@ export default function Packages() {
   const packages = [
     {
       name: t('packages.starter'),
+      tier: 'starter',
       priceTRY: '7.500',
       priceUSD: '220',
       desc: t('packages.starterDesc'),
@@ -32,6 +33,7 @@ export default function Packages() {
     },
     {
       name: t('packages.pro'),
+      tier: 'pro',
       priceTRY: '15.000',
       priceUSD: '440',
       desc: t('packages.proDesc'),
@@ -45,6 +47,7 @@ export default function Packages() {
     },
     {
       name: t('packages.enterprise'),
+      tier: 'enterprise',
       priceTRY: '30.000',
       priceUSD: '880',
       desc: t('packages.enterpriseDesc'),
@@ -112,17 +115,27 @@ export default function Packages() {
                     <h3>{pkg.name}</h3>
                     <p className="package-desc">{pkg.desc}</p>
                     
-                    {/* Primary price based on language */}
-                    <div className="package-price">
-                      <span className="currency">{isEN ? '$' : '₺'}</span>
-                      <span className="amount">{isEN ? pkg.priceUSD : pkg.priceTRY}</span>
-                      <span className="period">{t('packages.month')}</span>
-                    </div>
-
-                    {/* Secondary price (other currency) */}
-                    <div className="package-price-alt">
-                      ≈ {isEN ? `₺${pkg.priceTRY}` : `$${pkg.priceUSD}`} {t('packages.month')}
-                    </div>
+                    {pkg.tier === 'starter' ? (
+                      <>
+                        {/* Show price for Başlangıç */}
+                        <div className="package-price">
+                          <span className="currency">{isEN ? '$' : '₺'}</span>
+                          <span className="amount">{isEN ? pkg.priceUSD : pkg.priceTRY}</span>
+                          <span className="period">{t('packages.month')}</span>
+                        </div>
+                        <div className="package-price-alt">
+                          ≈ {isEN ? `₺${pkg.priceTRY}` : `$${pkg.priceUSD}`} {t('packages.month')}
+                        </div>
+                      </>
+                    ) : (
+                      /* Discovery call CTA for Pro & Enterprise */
+                      <div className="package-discovery">
+                        <Link to="/iletisim" className="btn btn-primary package-discovery-btn">
+                          {t('packages.discoveryCall')}
+                          <HiOutlineArrowRight size={16} />
+                        </Link>
+                      </div>
+                    )}
                   </div>
 
                   <div className="package-features">
@@ -144,7 +157,7 @@ export default function Packages() {
                     to="/iletisim"
                     className={`btn ${pkg.popular ? 'btn-primary' : 'btn-outline'} package-btn`}
                   >
-                    {t('packages.startNow')}
+                    {pkg.tier === 'starter' ? t('packages.startNow') : t('packages.discoveryCall')}
                     <HiOutlineArrowRight size={16} />
                   </Link>
                 </motion.div>

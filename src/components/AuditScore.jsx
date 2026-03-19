@@ -6,127 +6,161 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { FadeIn } from './Animations'
 import './AuditScore.css'
 
-// Deterministic hash for consistent scores per username
-function hashString(str) {
-  let hash = 0
-  const cleaned = str.replace('@', '').toLowerCase().trim()
-  for (let i = 0; i < cleaned.length; i++) {
-    const char = cleaned.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash // Convert to 32bit integer
+const questions = {
+  tr: [
+    {
+      question: 'Kaç platformda aktifsiniz?',
+      options: [
+        { label: '1-2', points: 5 },
+        { label: '3-4', points: 15 },
+        { label: '5+', points: 20 },
+      ],
+    },
+    {
+      question: 'Haftada kaç içerik paylaşıyorsunuz?',
+      options: [
+        { label: '0-2', points: 5 },
+        { label: '3-5', points: 15 },
+        { label: '6+', points: 20 },
+      ],
+    },
+    {
+      question: 'Takipçi sayınız nedir?',
+      options: [
+        { label: '0 - 1K', points: 5 },
+        { label: '1K - 10K', points: 10 },
+        { label: '10K+', points: 20 },
+      ],
+    },
+    {
+      question: 'Ortalama etkileşim oranınız?',
+      options: [
+        { label: 'Düşük', points: 5 },
+        { label: 'Orta', points: 10 },
+        { label: 'Yüksek', points: 20 },
+      ],
+    },
+    {
+      question: 'Düzenli rapor alıyor musunuz?',
+      options: [
+        { label: 'Hayır', points: 0 },
+        { label: 'Evet', points: 20 },
+      ],
+    },
+  ],
+  en: [
+    {
+      question: 'How many platforms are you active on?',
+      options: [
+        { label: '1-2', points: 5 },
+        { label: '3-4', points: 15 },
+        { label: '5+', points: 20 },
+      ],
+    },
+    {
+      question: 'How many posts do you share per week?',
+      options: [
+        { label: '0-2', points: 5 },
+        { label: '3-5', points: 15 },
+        { label: '6+', points: 20 },
+      ],
+    },
+    {
+      question: 'What is your follower count?',
+      options: [
+        { label: '0 - 1K', points: 5 },
+        { label: '1K - 10K', points: 10 },
+        { label: '10K+', points: 20 },
+      ],
+    },
+    {
+      question: 'What is your average engagement rate?',
+      options: [
+        { label: 'Low', points: 5 },
+        { label: 'Medium', points: 10 },
+        { label: 'High', points: 20 },
+      ],
+    },
+    {
+      question: 'Do you receive regular reports?',
+      options: [
+        { label: 'No', points: 0 },
+        { label: 'Yes', points: 20 },
+      ],
+    },
+  ],
+}
+
+function getResultData(score, lang) {
+  if (score <= 40) {
+    return {
+      level: lang === 'tr' ? 'Kritik' : 'Critical',
+      emoji: '🔴',
+      color: '#FF4444',
+      message:
+        lang === 'tr'
+          ? 'Sosyal medya stratejinizde acil iyileştirme gerekiyor. Profesyonel destek ile kısa sürede büyük fark yaratabilirsiniz!'
+          : 'Your social media strategy needs urgent improvement. With professional support, you can make a big difference quickly!',
+    }
   }
-  return Math.abs(hash)
-}
-
-// Deterministic pseudo-random from seed
-function seededRandom(seed, index) {
-  const x = Math.sin(seed + index * 127.1) * 43758.5453
-  return x - Math.floor(x)
-}
-
-function generateRealisticScore(username) {
-  const hash = hashString(username)
-  
-  // Base overall quality (weighted random in range 25-85)
-  const baseQuality = Math.floor(seededRandom(hash, 0) * 60) + 25
-  
-  // Each metric is correlated with base quality but with variation
-  const engagement = Math.max(15, Math.min(95, 
-    baseQuality + Math.floor((seededRandom(hash, 1) - 0.5) * 30)
-  ))
-  
-  const contentQuality = Math.max(20, Math.min(90,
-    baseQuality + Math.floor((seededRandom(hash, 2) - 0.5) * 25)
-  ))
-  
-  const growthPotential = Math.max(30, Math.min(95,
-    // Growth potential is inversely related to current quality (room to grow)
-    Math.floor(95 - baseQuality * 0.4 + seededRandom(hash, 3) * 30)
-  ))
-  
-  const consistency = Math.max(15, Math.min(85,
-    baseQuality + Math.floor((seededRandom(hash, 4) - 0.5) * 35)
-  ))
-  
-  // Overall is weighted average
-  const overall = Math.round(
-    engagement * 0.3 + contentQuality * 0.25 + growthPotential * 0.2 + consistency * 0.25
-  )
-  
+  if (score <= 70) {
+    return {
+      level: lang === 'tr' ? 'Gelişime Açık' : 'Room for Growth',
+      emoji: '🟡',
+      color: '#FFD700',
+      message:
+        lang === 'tr'
+          ? 'İyi bir temel var! Profesyonel destekle stratejinizi güçlendirerek önemli bir atılım yapabilirsiniz.'
+          : 'You have a good foundation! With professional support, you can strengthen your strategy and make a significant leap.',
+    }
+  }
   return {
-    overall: Math.max(20, Math.min(90, overall)),
-    engagement,
-    contentQuality,
-    growthPotential,
-    consistency,
+    level: lang === 'tr' ? 'İyi' : 'Good',
+    emoji: '🟢',
+    color: '#2ECC71',
+    message:
+      lang === 'tr'
+        ? 'Harika performans! Doğru yoldasınız. Profesyonel destek ile skorunuzu daha da yukarı taşıyabilirsiniz.'
+        : 'Great performance! You\'re on the right track. With professional support, you can push your score even higher.',
   }
-}
-
-function getRecommendation(score, t, lang) {
-  if (score.overall >= 75) {
-    return lang === 'tr' 
-      ? 'Harika performans! Profesyonel destek ile skorunuzu daha da yukarı taşıyabilirsiniz.'
-      : 'Great performance! With professional support, you can push your score even higher.'
-  } else if (score.overall >= 50) {
-    return lang === 'tr'
-      ? 'İyi bir temel var! Etkileşim ve içerik stratejinizi geliştirerek önemli bir atılım yapabilirsiniz.'
-      : 'You have a good foundation! By improving your engagement and content strategy, you can make a significant leap.'
-  } else {
-    return lang === 'tr'
-      ? 'Hesabınızda önemli iyileştirme fırsatları var. Profesyonel destek ile kısa sürede fark yaratabilirsiniz!'
-      : 'There are significant improvement opportunities for your account. With professional support, you can make a difference quickly!'
-  }
-}
-
-function ScoreBar({ label, score, delay }) {
-  const getColor = (s) => s >= 75 ? '#2ECC71' : s >= 50 ? '#FFA500' : '#FF4444'
-  return (
-    <motion.div
-      className="score-bar-item"
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay }}
-    >
-      <div className="score-bar-header">
-        <span>{label}</span>
-        <span style={{ color: getColor(score) }}>{score}/100</span>
-      </div>
-      <div className="score-bar-track">
-        <motion.div
-          className="score-bar-fill"
-          initial={{ width: 0 }}
-          animate={{ width: `${score}%` }}
-          transition={{ duration: 1, delay: delay + 0.2 }}
-          style={{ background: getColor(score) }}
-        />
-      </div>
-    </motion.div>
-  )
 }
 
 export default function AuditScore() {
   const { t, lang } = useLanguage()
-  const [username, setUsername] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState(null)
+  const [currentStep, setCurrentStep] = useState(0)
+  const [answers, setAnswers] = useState([])
+  const [showResult, setShowResult] = useState(false)
+  const [isCalculating, setIsCalculating] = useState(false)
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (!username.trim()) return
-    setLoading(true)
-    setResult(null)
-    setTimeout(() => {
-      setResult(generateRealisticScore(username))
-      setLoading(false)
-    }, 2000)
+  const currentQuestions = questions[lang] || questions.tr
+  const totalQuestions = currentQuestions.length
+  const progress = ((currentStep) / totalQuestions) * 100
+
+  const handleAnswer = (points) => {
+    const newAnswers = [...answers, points]
+    setAnswers(newAnswers)
+
+    if (currentStep < totalQuestions - 1) {
+      setCurrentStep(currentStep + 1)
+    } else {
+      // Last question — calculate score
+      setIsCalculating(true)
+      setTimeout(() => {
+        setIsCalculating(false)
+        setShowResult(true)
+      }, 1500)
+    }
   }
 
-  const getOverallColor = (s) => s >= 75 ? '#2ECC71' : s >= 50 ? '#FFA500' : '#FF4444'
-  const getOverallLabel = (s) => {
-    if (s >= 75) return lang === 'tr' ? 'Çok İyi' : 'Very Good'
-    if (s >= 50) return lang === 'tr' ? 'Orta' : 'Average'
-    return lang === 'tr' ? 'Geliştirilmeli' : 'Needs Improvement'
+  const handleReset = () => {
+    setCurrentStep(0)
+    setAnswers([])
+    setShowResult(false)
+    setIsCalculating(false)
   }
+
+  const totalScore = answers.reduce((sum, pts) => sum + pts, 0)
+  const resultData = getResultData(totalScore, lang)
 
   return (
     <section className="section audit-section">
@@ -150,84 +184,120 @@ export default function AuditScore() {
 
         <FadeIn delay={0.3}>
           <div className="audit-card glass-card">
-            <form className="audit-form" onSubmit={handleSubmit}>
-              <div className="audit-input-group">
-                <input
-                  type="text"
-                  className="audit-input"
-                  placeholder={t('audit.placeholder')}
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-                <motion.button
-                  type="submit"
-                  className="btn btn-primary audit-btn"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span className="audit-loader" />
-                  ) : (
-                    <>
-                      {t('audit.button')}
-                      <HiOutlineArrowRight size={16} />
-                    </>
-                  )}
-                </motion.button>
-              </div>
-            </form>
-
-            <AnimatePresence>
-              {result && (
+            <AnimatePresence mode="wait">
+              {!showResult && !isCalculating && (
                 <motion.div
-                  className="audit-result"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
+                  key={`step-${currentStep}`}
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <div className="audit-result-header">
-                    <h3>{t('audit.result')}: @{username.replace('@', '')}</h3>
-                  </div>
-
-                  <div className="audit-scores">
-                    <div className="audit-overall">
+                  {/* Progress Bar */}
+                  <div className="audit-progress">
+                    <div className="audit-progress-bar">
                       <motion.div
-                        className="overall-circle"
-                        style={{ borderColor: getOverallColor(result.overall) }}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: 'spring', delay: 0.3 }}
-                      >
-                        <span className="overall-number" style={{ color: getOverallColor(result.overall) }}>
-                          {result.overall}
-                        </span>
-                        <span className="overall-label">{t('audit.overallScore')}</span>
-                        <span className="overall-status" style={{ color: getOverallColor(result.overall), fontSize: '0.7rem', fontWeight: 600, marginTop: '2px' }}>
-                          {getOverallLabel(result.overall)}
-                        </span>
-                      </motion.div>
+                        className="audit-progress-fill"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 0.4 }}
+                      />
                     </div>
-
-                    <div className="audit-details">
-                      <ScoreBar label={t('audit.engagement')} score={result.engagement} delay={0.4} />
-                      <ScoreBar label={t('audit.contentQuality')} score={result.contentQuality} delay={0.5} />
-                      <ScoreBar label={t('audit.growthPotential')} score={result.growthPotential} delay={0.6} />
-                      <ScoreBar label={t('audit.consistency')} score={result.consistency} delay={0.7} />
-                    </div>
+                    <span className="audit-progress-text">
+                      {currentStep + 1} / {totalQuestions}
+                    </span>
                   </div>
 
+                  {/* Question */}
+                  <h3 className="audit-question">
+                    {currentQuestions[currentStep].question}
+                  </h3>
+
+                  {/* Options */}
+                  <div className="audit-options">
+                    {currentQuestions[currentStep].options.map((option, i) => (
+                      <motion.button
+                        key={i}
+                        className="audit-option-btn"
+                        onClick={() => handleAnswer(option.points)}
+                        whileHover={{ scale: 1.03, y: -2 }}
+                        whileTap={{ scale: 0.97 }}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                      >
+                        {option.label}
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {isCalculating && (
+                <motion.div
+                  key="calculating"
+                  className="audit-calculating"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="audit-calc-spinner" />
+                  <p>
+                    {lang === 'tr' ? 'Skorunuz hesaplanıyor...' : 'Calculating your score...'}
+                  </p>
+                </motion.div>
+              )}
+
+              {showResult && (
+                <motion.div
+                  key="result"
+                  className="audit-result"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {/* Score Circle */}
+                  <div className="audit-result-top">
+                    <motion.div
+                      className="audit-score-circle"
+                      style={{ borderColor: resultData.color }}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', delay: 0.2 }}
+                    >
+                      <span className="audit-score-number" style={{ color: resultData.color }}>
+                        {totalScore}
+                      </span>
+                      <span className="audit-score-max">/100</span>
+                    </motion.div>
+
+                    <motion.div
+                      className="audit-result-info"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <span className="audit-result-level" style={{ color: resultData.color }}>
+                        {resultData.emoji} {resultData.level}
+                      </span>
+                      <p className="audit-result-message">{resultData.message}</p>
+                    </motion.div>
+                  </div>
+
+                  {/* Actions */}
                   <motion.div
-                    className="audit-recommendation"
+                    className="audit-result-actions"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 1 }}
+                    transition={{ delay: 0.7 }}
                   >
-                    <p>{getRecommendation(result, t, lang)}</p>
                     <Link to="/iletisim" className="btn btn-primary">
-                      {t('audit.ctaButton')}
+                      {lang === 'tr' ? 'Ücretsiz Danışmanlık Al' : 'Get Free Consultation'}
                       <HiOutlineArrowRight size={16} />
                     </Link>
+                    <button className="btn btn-outline audit-retry-btn" onClick={handleReset}>
+                      {lang === 'tr' ? 'Tekrar Dene' : 'Try Again'}
+                    </button>
                   </motion.div>
                 </motion.div>
               )}

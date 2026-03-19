@@ -103,6 +103,18 @@
   font-weight: 500;
 }
 
+.package-discovery {
+  margin-top: 8px;
+  padding-top: 4px;
+}
+
+.package-discovery-btn {
+  width: 100%;
+  justify-content: center;
+  font-size: 0.9rem;
+  padding: 12px 24px;
+}
+
 .package-features {
   display: flex;
   flex-direction: column;

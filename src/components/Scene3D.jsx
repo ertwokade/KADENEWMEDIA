@@ -151,10 +151,10 @@ export default function Scene3D({ style, className }) {
         >
           <ambientLight intensity={0.3} />
           <directionalLight position={[5, 5, 5]} intensity={0.8} color="#FFD700" />
-          <pointLight position={[-5, -5, 5]} intensity={0.5} color="#FFA500" />
+          <pointLight position={[-5, -5, 5]} intensity={0.5} color="#FFD700" />
           
           <GlowingSphere position={[3, 1, 0]} scale={1.2} speed={0.5} color="#FFD700" />
-          <GlowingSphere position={[-3.5, -1.5, -2]} scale={0.8} speed={0.7} color="#FFA500" />
+          <GlowingSphere position={[-3.5, -1.5, -2]} scale={0.8} speed={0.7} color="#FFD700" />
           <FloatingTorus position={[-2, 2, -1]} scale={0.6} speed={0.3} />
           <FloatingTorus position={[4, -2, -3]} scale={0.4} speed={0.5} />
           <FloatingCube position={[1.5, -2, -1]} scale={0.5} speed={0.4} />
