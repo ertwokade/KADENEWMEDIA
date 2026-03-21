@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { getContentApi } from '../api'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   HiOutlineArrowRight,
@@ -122,53 +123,40 @@ export default function Home() {
     subtitle: t('hero.subtitle')
   })
 
-  // Load texts from localStorage and listen for updates
+  const [dynamicStats, setDynamicStats] = useState(null)
+
+  // Load texts from API
   useEffect(() => {
-    const loadTexts = () => {
-      const savedTextsStr = localStorage.getItem('kade_hero_texts')
-      if (savedTextsStr) {
-        try {
-          const savedTexts = JSON.parse(savedTextsStr)
-          if (savedTexts[lang]) {
-            setHeroTexts({
-              title1: savedTexts[lang].title1 || t('hero.title1'),
-              title2: savedTexts[lang].title2 || t('hero.title2'),
-              subtitle: savedTexts[lang].subtitle || t('hero.subtitle')
-            })
-            return
-          }
-        } catch (e) {
-          console.error("Failed to parse hero texts", e)
+    const loadFromApi = async () => {
+      try {
+        const heroData = await getContentApi('hero')
+        if (heroData && heroData.data && heroData.data[lang]) {
+          setHeroTexts({
+            title1: heroData.data[lang].title1 || t('hero.title1'),
+            title2: heroData.data[lang].title2 || t('hero.title2'),
+            subtitle: heroData.data[lang].subtitle || t('hero.subtitle'),
+          })
         }
-      }
-      // Fallback to defaults if no saved texts
-      setHeroTexts({
-        title1: t('hero.title1'),
-        title2: t('hero.title2'),
-        subtitle: t('hero.subtitle')
-      })
-    }
-
-    // Initial load
-    loadTexts()
-
-    // Listen to lang changes (since t() updates)
-    loadTexts()
-
-    // Listen to custom admin updates
-    const handleUpdate = (e) => {
-      const newTexts = e.detail
-      if (newTexts && newTexts[lang]) {
+      } catch (e) {
+        // fallback to defaults
         setHeroTexts({
-          title1: newTexts[lang].title1 || t('hero.title1'),
-          title2: newTexts[lang].title2 || t('hero.title2'),
-          subtitle: newTexts[lang].subtitle || t('hero.subtitle')
+          title1: t('hero.title1'),
+          title2: t('hero.title2'),
+          subtitle: t('hero.subtitle'),
         })
       }
+
+      try {
+        const statsData = await getContentApi('stats')
+        if (statsData && statsData.data) {
+          setDynamicStats(statsData.data)
+        }
+      } catch (e) {
+        // use defaults
+      }
     }
 
-    window.addEventListener('kade_texts_updated', handleUpdate)
-    return () => window.removeEventListener('kade_texts_updated', handleUpdate)
+    loadFromApi()
   }, [lang, t])
 
   const services = [
@@ -179,10 +167,10 @@ export default function Home() {
   ]
 
   const stats = [
-    { number: '150+', label: t('stats.clients') },
-    { number: '2M+', label: t('stats.followers') },
-    { number: '500+', label: t('stats.campaigns') },
-    { number: '98%', label: t('stats.satisfaction') },
+    { number: dynamicStats?.clients || '150+', label: t('stats.clients') },
+    { number: dynamicStats?.followers || '2M+', label: t('stats.followers') },
+    { number: dynamicStats?.campaigns || '500+', label: t('stats.campaigns') },
+    { number: dynamicStats?.satisfaction || '98%', label: t('stats.satisfaction') },
   ]
 
   return (

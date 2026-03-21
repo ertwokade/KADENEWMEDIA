@@ -1,13 +1,32 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { HiOutlinePencilAlt, HiOutlineArrowRight, HiOutlineClock } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
-import { blogPosts } from '../data/content'
+import { blogPosts as staticBlogPosts } from '../data/content'
+import { getBlogsApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Blog.css'
 
 export default function Blog() {
   const { lang, t } = useLanguage()
+  const [blogPosts, setBlogPosts] = useState(staticBlogPosts)
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const data = await getBlogsApi()
+        if (data && data.length > 0) {
+          setBlogPosts(data)
+        }
+      } catch (err) {
+        console.log('Using static blog data')
+      }
+    }
+    fetchBlogs()
+  }, [])
+
+  if (blogPosts.length === 0) return null
 
   return (
     <PageTransition>
@@ -63,8 +82,8 @@ export default function Blog() {
 
           {/* Blog Grid */}
           <StaggerContainer className="blog-grid" staggerDelay={0.1}>
-            {blogPosts.slice(1).map((post) => (
-              <StaggerItem key={post.id}>
+            {blogPosts.slice(1).map((post, idx) => (
+              <StaggerItem key={post._id || post.id || idx}>
                 <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
                   <div className="blog-card-image" style={{ background: `${post.color}15` }}>
                     <span>{post.image}</span>

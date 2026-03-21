@@ -1,14 +1,31 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlineArrowRight, HiOutlineOfficeBuilding } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
-import { partnersData } from '../data/content'
+import { partnersData as staticPartners } from '../data/content'
+import { getPartnersApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Partners.css'
 
 export default function Partners() {
   const { lang, t } = useLanguage()
+  const [partnersData, setPartnersData] = useState(staticPartners)
+
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const data = await getPartnersApi()
+        if (data && data.length > 0) {
+          setPartnersData(data)
+        }
+      } catch (err) {
+        console.log('Using static partners data')
+      }
+    }
+    fetchPartners()
+  }, [])
 
   return (
     <PageTransition>
@@ -36,8 +53,8 @@ export default function Partners() {
       <section className="section">
         <div className="container">
           <StaggerContainer className="partners-grid" staggerDelay={0.1}>
-            {partnersData.map((partner) => (
-              <StaggerItem key={partner.id}>
+            {partnersData.map((partner, idx) => (
+              <StaggerItem key={partner.id || partner._id || idx}>
                 <Link to={`/partnerler/${partner.id}`}>
                   <motion.div
                     className="partner-card glass-card"

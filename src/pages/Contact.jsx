@@ -12,6 +12,7 @@ import {
 import { FaInstagram, FaYoutube, FaTiktok, FaWhatsapp, FaLinkedinIn } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
+import { sendContactApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Contact.css'
@@ -51,59 +52,34 @@ export default function Contact() {
     setSending(true)
 
     try {
-      // Primary: EmailJS
-      await emailjs.send(
-        'service_kademedia',
-        'template_kademedia',
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          phone: formData.phone || '-',
-          company: formData.company || '-',
-          service: formData.service || '-',
-          message: formData.message,
-          to_email: 'thekademedia@gmail.com',
-        },
-        'YOUR_EMAILJS_PUBLIC_KEY'
-      )
+      // Try backend API first (saves to MongoDB + sends via SMTP)
+      await sendContactApi(formData)
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
       setTimeout(() => setSubmitted(false), 5000)
-    } catch (emailjsError) {
-      // Fallback: FormSubmit.co
+    } catch (apiError) {
+      console.log('Backend API failed, trying fallbacks...', apiError)
       try {
-        const response = await fetch('https://formsubmit.co/ajax/thekademedia@gmail.com', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
+        // Fallback: EmailJS
+        await emailjs.send(
+          'service_kademedia',
+          'template_kademedia',
+          {
+            from_name: formData.name,
+            from_email: formData.email,
             phone: formData.phone || '-',
             company: formData.company || '-',
             service: formData.service || '-',
             message: formData.message,
-            _subject: `Teklif Talebi - ${formData.name}`,
-            _template: 'table',
-            _captcha: 'false',
-          }),
-        })
-
-        if (response.ok) {
-          setSubmitted(true)
-          setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
-          setTimeout(() => setSubmitted(false), 5000)
-        } else {
-          // Last resort: mailto link
-          const subject = encodeURIComponent(`Teklif Talebi - ${formData.name}`)
-          const body = encodeURIComponent(
-            `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.service || '-'}\n\nMesaj:\n${formData.message}`
-          )
-          window.open(`mailto:thekademedia@gmail.com?subject=${subject}&body=${body}`, '_blank')
-        }
-      } catch (fetchError) {
+            to_email: 'thekademedia@gmail.com',
+          },
+          'YOUR_EMAILJS_PUBLIC_KEY'
+        )
+        setSubmitted(true)
+        setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+        setTimeout(() => setSubmitted(false), 5000)
+      } catch (emailjsError) {
+        // Last resort: mailto
         const subject = encodeURIComponent(`Teklif Talebi - ${formData.name}`)
         const body = encodeURIComponent(
           `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.service || '-'}\n\nMesaj:\n${formData.message}`
