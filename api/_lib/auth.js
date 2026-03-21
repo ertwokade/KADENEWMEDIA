@@ -1,14 +1,16 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'kademedia-secret-key-2026';
+function getSecret() {
+  return process.env.JWT_SECRET || 'kademedia-default-secret-2026';
+}
 
 export function createToken(payload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+  return jwt.sign(payload, getSecret(), { expiresIn: '24h' });
 }
 
 export function verifyToken(token) {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, getSecret());
   } catch (e) {
     return null;
   }

@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
-import { getDb } from '../lib/mongodb.js';
-import { createToken } from '../lib/auth.js';
-import { cors } from '../lib/cors.js';
+import { getDb } from '../_lib/mongodb.js';
+import { createToken } from '../_lib/auth.js';
+import { cors } from '../_lib/cors.js';
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -11,7 +11,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { username, password } = req.body;
+    // Parse body if needed
+    let body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch (e) { body = {}; }
+    }
+
+    const { username, password } = body || {};
+
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Kullanıcı adı ve şifre gerekli' });
+    }
+
     const db = await getDb();
     const user = await db.collection('users').findOne({ username });
 
@@ -35,6 +46,6 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({ error: 'Sunucu hatası' });
+    return res.status(500).json({ error: 'Sunucu hatası: ' + error.message });
   }
 }

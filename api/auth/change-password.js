@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
-import { getDb } from '../lib/mongodb.js';
-import { requireAuth } from '../lib/auth.js';
-import { cors } from '../lib/cors.js';
+import { getDb } from '../_lib/mongodb.js';
+import { requireAuth } from '../_lib/auth.js';
+import { cors } from '../_lib/cors.js';
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
