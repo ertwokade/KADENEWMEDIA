@@ -1,0 +1,51 @@
+.chat-toggle-float {
+  position: fixed;
+  bottom: 24px;
+  right: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FAF38F, #E8E070);
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(250, 243, 143, 0.3);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.chat-toggle-float.active {
+  background: #333;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.chat-toggle-float:hover {
+  box-shadow: 0 6px 30px rgba(250, 243, 143, 0.5);
+}
+
+.chat-toggle-float.active:hover {
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5);
+}
+
+.chat-toggle-tooltip {
+  position: absolute;
+  right: 66px;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.chat-toggle-float:hover .chat-toggle-tooltip {
+  opacity: 1;
+}

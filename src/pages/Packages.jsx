@@ -127,8 +127,20 @@ export default function Packages() {
                           ≈ {isEN ? `₺${pkg.priceTRY}` : `$${pkg.priceUSD}`} {t('packages.month')}
                         </div>
                       </>
+                    ) : pkg.tier === 'enterprise' ? (
+                      <>
+                        {/* Show price for Kurumsal */}
+                        <div className="package-price">
+                          <span className="currency">{isEN ? '$' : '₺'}</span>
+                          <span className="amount">{isEN ? t('packages.enterprisePriceUSD') : t('packages.enterprisePrice')}</span>
+                          <span className="period">{t('packages.month')}</span>
+                        </div>
+                        <div className="package-price-note">
+                          {t('packages.enterprisePriceNote')}
+                        </div>
+                      </>
                     ) : (
-                      /* Discovery call CTA for Pro & Enterprise */
+                      /* Discovery call CTA for Pro */
                       <div className="package-discovery">
                         <Link to="/iletisim" className="btn btn-primary package-discovery-btn">
                           {t('packages.discoveryCall')}

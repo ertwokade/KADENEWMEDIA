@@ -47,7 +47,7 @@ const testimonials = [
     textTr: 'Kade Media ile çalışmaya başladığımızdan beri sosyal medya etkileşimimiz %300 arttı. Profesyonel ekipleri ve yaratıcı içerikleriyle markamızı bambaşka bir seviyeye taşıdılar.',
     textEn: 'Since we started working with Kade Media, our social media engagement has increased by 300%. They took our brand to a whole new level with their professional team and creative content.',
     avatar: 'AY',
-    color: '#FFD700',
+    color: '#FAF38F',
   },
   {
     nameTr: 'Elif Özkan',
@@ -167,9 +167,9 @@ export default function Home() {
   ]
 
   const stats = [
-    { number: dynamicStats?.clients || '150+', label: t('stats.clients') },
-    { number: dynamicStats?.followers || '2M+', label: t('stats.followers') },
-    { number: dynamicStats?.campaigns || '500+', label: t('stats.campaigns') },
+    { number: dynamicStats?.clients || '10+', label: t('stats.clients') },
+    { number: dynamicStats?.followers || '500+', label: t('stats.followers') },
+    { number: dynamicStats?.campaigns || '50+', label: t('stats.campaigns') },
     { number: dynamicStats?.satisfaction || '98%', label: t('stats.satisfaction') },
   ]
 

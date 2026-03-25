@@ -16,6 +16,7 @@ import Admin from './pages/Admin'
 import ScrollToTop from './components/ScrollToTop'
 import WhatsAppButton from './components/WhatsAppButton'
 import ChatBot from './components/ChatBot'
+import ChatToggleButton from './components/ChatToggleButton'
 import CookieBanner from './components/CookieBanner'
 
 function App() {
@@ -41,7 +42,8 @@ function App() {
         </Routes>
       </AnimatePresence>
       <Footer />
-      <WhatsAppButton onClick={() => setChatOpen(!chatOpen)} />
+      <WhatsAppButton />
+      <ChatToggleButton isOpen={chatOpen} onClick={() => setChatOpen(!chatOpen)} />
       <ChatBot isOpen={chatOpen} onClose={() => setChatOpen(false)} />
       <CookieBanner />
     </>

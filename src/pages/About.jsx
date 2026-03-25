@@ -13,10 +13,10 @@ import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './About.css'
 
 const team = [
-  { name: 'Kade', role: 'Founder & CEO', color: '#FFD700' },
-  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#FFD700' },
-  { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#FFD700' },
-  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#FFD700' },
+  { name: 'Kadir Demir', role: 'Founder & CEO', color: '#FAF38F' },
+  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#FAF38F' },
+  { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#FAF38F' },
+  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#FAF38F' },
 ]
 
 export default function About() {
@@ -67,15 +67,15 @@ export default function About() {
               <p>{t('about.storyP2')}</p>
               <div className="story-stats">
                 <div className="story-stat">
-                  <span className="story-stat-number">5+</span>
+                  <span className="story-stat-number">8+</span>
                   <span className="story-stat-label">{t('about.experience')}</span>
                 </div>
                 <div className="story-stat">
-                  <span className="story-stat-number">20+</span>
+                  <span className="story-stat-number">5+</span>
                   <span className="story-stat-label">{t('about.team')}</span>
                 </div>
                 <div className="story-stat">
-                  <span className="story-stat-number">150+</span>
+                  <span className="story-stat-number">100+</span>
                   <span className="story-stat-label">{t('about.happyClients')}</span>
                 </div>
               </div>

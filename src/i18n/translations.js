@@ -22,8 +22,8 @@ export const translations = {
     },
     stats: {
       clients: 'Mutlu Müşteri',
-      followers: 'Kazanılan Takipçi',
-      campaigns: 'Başarılı Kampanya',
+      followers: 'İçerik Üretimi',
+      campaigns: 'Kampanya',
       satisfaction: 'Müşteri Memnuniyeti',
     },
     servicesSection: {
@@ -231,6 +231,10 @@ export const translations = {
       faq4q: 'Özel paket hazırlayabilir misiniz?',
       faq4a: 'Evet, markanızın ihtiyaçlarına göre özel paketler hazırlayabiliriz. İletişim sayfamızdan bize ulaşabilirsiniz.',
       discoveryCall: 'Ücretsiz Keşif Görüşmesi Al',
+      enterprisePrice: '25.000',
+      enterprisePriceUSD: '730',
+      enterprisePriceNote: 'Özel paket için iletişime geçin',
+      enterprisePriceNoteEn: 'Contact us for custom package',
     },
     services: {
       badge: 'Hizmetlerimiz',
@@ -286,6 +290,12 @@ export const translations = {
       processStep3Desc: 'Stratejiyi hayata geçiriyor, içerik ve kampanyaları başlatıyoruz.',
       processStep4: 'Optimizasyon',
       processStep4Desc: 'Verileri analiz ediyor, sürekli iyileştirme yapıyoruz.',
+      webTitle: 'Web Sitesi Tasarımı',
+      webDesc: 'Markanıza özel, modern ve mobil uyumlu web siteleri tasarlıyor ve geliştiriyoruz. SEO uyumlu, hızlı ve etkileyici web çözümleri sunuyoruz.',
+      webFeat1: 'Responsive Tasarım',
+      webFeat2: 'SEO Optimizasyonu',
+      webFeat3: 'UI/UX Tasarım',
+      webFeat4: 'E-ticaret Çözümleri',
     },
     audit: {
       badge: 'Ücretsiz Analiz',
@@ -331,8 +341,8 @@ export const translations = {
     },
     stats: {
       clients: 'Happy Clients',
-      followers: 'Followers Gained',
-      campaigns: 'Successful Campaigns',
+      followers: 'Content Produced',
+      campaigns: 'Campaigns',
       satisfaction: 'Client Satisfaction',
     },
     servicesSection: {
@@ -540,6 +550,9 @@ export const translations = {
       faq4q: 'Can you create a custom package?',
       faq4a: 'Yes, we can create custom packages based on your brand\'s needs. You can reach us from our contact page.',
       discoveryCall: 'Get Free Discovery Call',
+      enterprisePrice: '25.000',
+      enterprisePriceUSD: '730',
+      enterprisePriceNote: 'Contact us for custom package',
     },
     services: {
       badge: 'Our Services',
@@ -595,6 +608,12 @@ export const translations = {
       processStep3Desc: 'We bring the strategy to life, launching content and campaigns.',
       processStep4: 'Optimization',
       processStep4Desc: 'We analyze data and continuously improve.',
+      webTitle: 'Web Design',
+      webDesc: 'We design and develop modern, mobile-friendly websites tailored to your brand. We provide SEO-optimized, fast, and impactful web solutions.',
+      webFeat1: 'Responsive Design',
+      webFeat2: 'SEO Optimization',
+      webFeat3: 'UI/UX Design',
+      webFeat4: 'E-commerce Solutions',
     },
     audit: {
       badge: 'Free Analysis',

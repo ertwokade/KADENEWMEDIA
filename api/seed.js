@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
-import { getDb } from '../_lib/mongodb.js';
-import { cors } from '../_lib/cors.js';
+import { getDb } from './_lib/mongodb.js';
+import { cors } from './_lib/cors.js';
 
 const defaultPartners = [
   {

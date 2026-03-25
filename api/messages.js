@@ -1,6 +1,6 @@
-import { getDb } from '../_lib/mongodb.js';
-import { requireAuth } from '../_lib/auth.js';
-import { cors } from '../_lib/cors.js';
+import { getDb } from './_lib/mongodb.js';
+import { requireAuth } from './_lib/auth.js';
+import { cors } from './_lib/cors.js';
 import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {

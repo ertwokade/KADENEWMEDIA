@@ -5,104 +5,163 @@ import { FaWhatsapp } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import './ChatBot.css'
 
-const knowledgeBase = {
+const KADE_CONTEXT = `Sen Kade Media'nın AI asistanısın. Kade Media İstanbul Biruni Teknopark'ta bulunan bir dijital pazarlama ajansıdır. 
+Kurucu: Kadir Demir. Şirket 8+ yıllık deneyime sahip, 5 kişilik uzman ekip, 100+ mutlu müşteri.
+
+HİZMETLER:
+- Sosyal Medya Yönetimi (Instagram, TikTok, Facebook, YouTube, LinkedIn, X)
+- İçerik Üretimi (Grafik Tasarım, Copywriting, Marka Kimliği)
+- Reklam Yönetimi (Meta Ads, Google Ads, TikTok Ads)
+- Influencer Marketing
+- Video Prodüksiyon (Reels, TikTok, YouTube)
+- Strateji & Danışmanlık
+- Web Sitesi Tasarımı (Responsive, SEO, UI/UX, E-ticaret)
+
+PAKETLER:
+- Başlangıç: ₺7.500/ay (2 platform, ayda 20 içerik, temel tasarım)
+- Profesyonel: Ücretsiz keşif görüşmesi ile fiyat belirlenir (4 platform, 40 içerik, reklam yönetimi)
+- Kurumsal: ₺25.000/ay'dan başlayan fiyatlarla (tüm platformlar, sınırsız içerik, özel strateji danışmanı)
+
+İLETİŞİM:
+- E-posta: hello@kademedia.com
+- Telefon: 0 506 729 34 23
+- WhatsApp: 0 506 729 34 23
+- Adres: Biruni Teknopark, Kazlıçeşme, Zeytinburnu/İstanbul
+- Çalışma Saatleri: Pazartesi-Cuma 09:00-18:00
+
+Kısa, samimi ve yardımcı cevaplar ver. Emoji kullan. Soruları siteyle ilgili bilgiler çerçevesinde cevapla, belirsiz konularda WhatsApp'a yönlendir.`
+
+const KADE_CONTEXT_EN = `You are Kade Media's AI assistant. Kade Media is a digital marketing agency based in Biruni Teknopark, Istanbul.
+Founder: Kadir Demir. 8+ years experience, 5-person expert team, 100+ happy clients.
+
+SERVICES:
+- Social Media Management (Instagram, TikTok, Facebook, YouTube, LinkedIn, X)
+- Content Production (Graphic Design, Copywriting, Brand Identity)
+- Ad Management (Meta Ads, Google Ads, TikTok Ads)
+- Influencer Marketing
+- Video Production (Reels, TikTok, YouTube)
+- Strategy & Consulting
+- Web Design (Responsive, SEO, UI/UX, E-commerce)
+
+PACKAGES:
+- Starter: ₺7,500/mo ($220/mo) - 2 platforms, 20 posts/month
+- Professional: Price determined via free discovery call - 4 platforms, 40 posts
+- Enterprise: Starting from ₺25,000/mo ($730/mo) - all platforms, unlimited content
+
+CONTACT:
+- Email: hello@kademedia.com
+- Phone: +90 506 729 34 23
+- WhatsApp: +90 506 729 34 23
+- Address: Biruni Teknopark, Istanbul
+- Hours: Mon-Fri 09:00-18:00
+
+Give short, friendly, helpful answers. Use emojis. Answer within the scope of the site info, redirect to WhatsApp for uncertain topics.`
+
+// Fallback keyword-based responses  
+const fallbackResponses = {
   tr: {
-    greetings: ['merhaba', 'selam', 'hey', 'merhabalar', 'günaydın', 'iyi günler'],
-    greetingResponse: 'Merhaba! 👋 Kade Media\'ya hoş geldiniz. Size nasıl yardımcı olabilirim?\n\n• Hizmetlerimiz hakkında bilgi alabilir\n• Paket fiyatlarını öğrenebilir\n• İletişim bilgilerimize ulaşabilirsiniz',
-    
-    services: ['hizmet', 'servis', 'ne yapıyorsunuz', 'neler sunuyorsunuz', 'hizmetleriniz'],
-    servicesResponse: '🚀 Hizmetlerimiz:\n\n📱 Sosyal Medya Yönetimi\n🎨 İçerik Üretimi\n📊 Reklam Yönetimi (Meta, Google, TikTok)\n🤝 Influencer Marketing\n🎬 Video Prodüksiyon\n💡 Strateji & Danışmanlık\n\nHangi hizmet hakkında detaylı bilgi almak istersiniz?',
-    
-    pricing: ['fiyat', 'ücret', 'paket', 'maliyet', 'ne kadar', 'kaça'],
-    pricingResponse: '💰 Paketlerimiz:\n\n🟡 Başlangıç: Sosyal medyada ilk adım\n🟠 Profesyonel: Büyümek isteyen markalar için\n🔴 Kurumsal: Dijital varlığını maksimize etmek isteyenler için\n\nDetaylı fiyat bilgisi için /paketler sayfamızı ziyaret edebilir veya WhatsApp üzerinden bize ulaşabilirsiniz.',
-    
-    contact: ['iletişim', 'telefon', 'mail', 'e-posta', 'adres', 'neredesiniz', 'konum'],
-    contactResponse: '📞 İletişim Bilgileri:\n\n📧 hello@kademedia.com\n📱 0 506 729 34 23\n📍 Biruni Teknopark, Zeytinburnu/İstanbul\n⏰ Pzt-Cum 09:00-18:00\n\nWhatsApp üzerinden de bize hızlıca ulaşabilirsiniz!',
-    
-    hours: ['çalışma saatleri', 'saat', 'ne zaman', 'açık mısınız', 'kaçta'],
-    hoursResponse: '⏰ Çalışma Saatlerimiz:\n\nPazartesi - Cuma: 09:00 - 18:00\nCumartesi - Pazar: Kapalı\n\nMesai saatleri dışında WhatsApp üzerinden mesaj bırakabilirsiniz, en kısa sürede dönüş yaparız!',
-    
-    smm: ['sosyal medya', 'instagram', 'tiktok', 'facebook', 'youtube', 'linkedin'],
-    smmResponse: '📱 Sosyal Medya Yönetimi:\n\nTüm sosyal medya platformlarınızı profesyonel bir şekilde yönetiyoruz:\n\n• İçerik takvimi oluşturma\n• Topluluk yönetimi\n• Kriz yönetimi\n• Aylık raporlama\n• Platform bazlı strateji\n\nDaha fazla bilgi için iletişime geçebilirsiniz!',
-    
-    ads: ['reklam', 'google ads', 'meta ads', 'kampanya'],
-    adsResponse: '📊 Reklam Yönetimi:\n\n• Meta (Facebook & Instagram) Ads\n• Google Ads\n• TikTok Ads\n• A/B Testleri\n• Performans Raporlama\n\nBütçenizi en verimli şekilde kullanarak hedef kitlenize ulaşmanızı sağlıyoruz.',
-    
-    thanks: ['teşekkür', 'sağol', 'sağ ol', 'eyvallah'],
-    thanksResponse: 'Rica ederim! 😊 Başka bir sorunuz olursa her zaman buradayım. İyi günler!',
-    
-    defaultResponse: 'Anlıyorum! Bu konuda size daha detaylı bilgi vermek için WhatsApp üzerinden veya 0 506 729 34 23 numarasından bize ulaşabilirsiniz. Ekibimiz size yardımcı olmaktan mutluluk duyacaktır! 🙂',
-    
-    quickReplies: ['Hizmetler', 'Fiyatlar', 'İletişim', 'Çalışma Saatleri'],
-    welcomeMessage: 'Merhaba! 👋 Ben Kade Media asistanıyım. Size hizmetlerimiz, fiyatlarımız ve daha fazlası hakkında bilgi verebilirim. Nasıl yardımcı olabilirim?',
+    greetings: { keys: ['merhaba', 'selam', 'hey', 'merhabalar', 'günaydın'], response: 'Merhaba! 👋 Kade Media\'ya hoş geldiniz. Size hizmetlerimiz, fiyatlarımız veya iletişim bilgilerimiz hakkında yardımcı olabilirim. Ne hakkında bilgi almak istersiniz?' },
+    services: { keys: ['hizmet', 'servis', 'ne yapıyorsunuz', 'hizmetleriniz'], response: '🚀 Hizmetlerimiz:\n\n📱 Sosyal Medya Yönetimi\n🎨 İçerik Üretimi\n📊 Reklam Yönetimi (Meta, Google, TikTok)\n🤝 Influencer Marketing\n🎬 Video Prodüksiyon\n💡 Strateji & Danışmanlık\n🌐 Web Sitesi Tasarımı\n\nDetay için sormak istediğiniz hizmeti yazabilirsiniz!' },
+    pricing: { keys: ['fiyat', 'ücret', 'paket', 'maliyet', 'ne kadar', 'kaça'], response: '💰 Paketlerimiz:\n\n🟡 Başlangıç: ₺7.500/ay\n🟠 Profesyonel: Ücretsiz keşif görüşmesi\n🔴 Kurumsal: ₺25.000/ay\'dan\n\nDetaylı bilgi için /paketler sayfamızı ziyaret edebilirsiniz!' },
+    contact: { keys: ['iletişim', 'telefon', 'mail', 'e-posta', 'adres', 'neredesiniz'], response: '📞 İletişim:\n\n📧 hello@kademedia.com\n📱 0 506 729 34 23\n📍 Biruni Teknopark, İstanbul\n⏰ Pzt-Cum 09:00-18:00' },
+    web: { keys: ['web', 'site', 'website', 'tasarım'], response: '🌐 Web Sitesi Tasarımı:\n\n• Responsive (mobil uyumlu) tasarım\n• SEO optimizasyonu\n• UI/UX tasarım\n• E-ticaret çözümleri\n\nModern ve etkileyici web siteleri tasarlıyoruz!' },
+    thanks: { keys: ['teşekkür', 'sağol', 'sağ ol'], response: 'Rica ederim! 😊 Başka sorunuz olursa yazabilirsiniz.' },
+    default: 'Bu konuda size daha detaylı bilgi verebilmem için WhatsApp üzerinden (0 506 729 34 23) veya hello@kademedia.com adresinden bize ulaşabilirsiniz! 🙂',
+    quickReplies: ['Hizmetler', 'Fiyatlar', 'İletişim', 'Web Tasarım'],
+    welcomeMessage: 'Merhaba! 👋 Ben Kade AI, Kade Media\'nın akıllı asistanıyım. Hizmetler, fiyatlar ve her türlü sorunuz için buradayım. Nasıl yardımcı olabilirim?',
     inputPlaceholder: 'Bir mesaj yazın...',
     whatsappCta: 'Canlı destek için WhatsApp\'tan yazın',
   },
   en: {
-    greetings: ['hello', 'hi', 'hey', 'good morning', 'good afternoon'],
-    greetingResponse: 'Hello! 👋 Welcome to Kade Media. How can I help you?\n\n• Learn about our services\n• Check package pricing\n• Get our contact information',
-    
-    services: ['service', 'what do you do', 'offer', 'services'],
-    servicesResponse: '🚀 Our Services:\n\n📱 Social Media Management\n🎨 Content Production\n📊 Ad Management (Meta, Google, TikTok)\n🤝 Influencer Marketing\n🎬 Video Production\n💡 Strategy & Consulting\n\nWhich service would you like to know more about?',
-    
-    pricing: ['price', 'cost', 'package', 'how much', 'pricing'],
-    pricingResponse: '💰 Our Packages:\n\n🟡 Starter: First steps in social media\n🟠 Professional: For brands that want to grow\n🔴 Enterprise: Maximize your digital presence\n\nFor detailed pricing, visit our /packages page or reach us via WhatsApp.',
-    
-    contact: ['contact', 'phone', 'email', 'address', 'where', 'location'],
-    contactResponse: '📞 Contact Information:\n\n📧 hello@kademedia.com\n📱 0 506 729 34 23\n📍 Biruni Teknopark, Zeytinburnu/İstanbul\n⏰ Mon-Fri 09:00-18:00\n\nYou can also reach us quickly via WhatsApp!',
-    
-    hours: ['working hours', 'hours', 'when', 'open', 'schedule'],
-    hoursResponse: '⏰ Working Hours:\n\nMonday - Friday: 09:00 - 18:00\nSaturday - Sunday: Closed\n\nYou can leave a message via WhatsApp outside working hours, we\'ll get back to you soon!',
-    
-    smm: ['social media', 'instagram', 'tiktok', 'facebook', 'youtube', 'linkedin'],
-    smmResponse: '📱 Social Media Management:\n\nWe professionally manage all your social media platforms:\n\n• Content calendar creation\n• Community management\n• Crisis management\n• Monthly reporting\n• Platform-specific strategy\n\nContact us for more info!',
-    
-    ads: ['advertising', 'google ads', 'meta ads', 'campaign', 'ads'],
-    adsResponse: '📊 Ad Management:\n\n• Meta (Facebook & Instagram) Ads\n• Google Ads\n• TikTok Ads\n• A/B Testing\n• Performance Reporting\n\nWe ensure your budget is used efficiently to reach your target audience.',
-    
-    thanks: ['thank', 'thanks', 'appreciate'],
-    thanksResponse: 'You\'re welcome! 😊 I\'m always here if you have any other questions. Have a great day!',
-    
-    defaultResponse: 'I understand! For more detailed information on this topic, you can reach us via WhatsApp or at 0 506 729 34 23. Our team will be happy to help! 🙂',
-    
-    quickReplies: ['Services', 'Pricing', 'Contact', 'Working Hours'],
-    welcomeMessage: 'Hello! 👋 I\'m the Kade Media assistant. I can help you with information about our services, pricing, and more. How can I assist you?',
+    greetings: { keys: ['hello', 'hi', 'hey', 'good morning'], response: 'Hello! 👋 Welcome to Kade Media. I can help you with our services, pricing, or contact info. What would you like to know?' },
+    services: { keys: ['service', 'what do you do', 'offer'], response: '🚀 Our Services:\n\n📱 Social Media Management\n🎨 Content Production\n📊 Ad Management\n🤝 Influencer Marketing\n🎬 Video Production\n💡 Strategy & Consulting\n🌐 Web Design\n\nAsk about any service for details!' },
+    pricing: { keys: ['price', 'cost', 'package', 'how much'], response: '💰 Packages:\n\n🟡 Starter: $220/mo\n🟠 Professional: Free discovery call\n🔴 Enterprise: From $730/mo\n\nVisit /packages for details!' },
+    contact: { keys: ['contact', 'phone', 'email', 'address'], response: '📞 Contact:\n\n📧 hello@kademedia.com\n📱 +90 506 729 34 23\n📍 Biruni Teknopark, Istanbul\n⏰ Mon-Fri 09:00-18:00' },
+    web: { keys: ['web', 'site', 'website', 'design'], response: '🌐 Web Design:\n\n• Responsive design\n• SEO optimization\n• UI/UX design\n• E-commerce solutions\n\nWe create modern, impactful websites!' },
+    thanks: { keys: ['thank', 'thanks', 'appreciate'], response: 'You\'re welcome! 😊 Feel free to ask anything else.' },
+    default: 'For more detailed information, reach us via WhatsApp (+90 506 729 34 23) or hello@kademedia.com! 🙂',
+    quickReplies: ['Services', 'Pricing', 'Contact', 'Web Design'],
+    welcomeMessage: 'Hello! 👋 I\'m Kade AI, Kade Media\'s smart assistant. I\'m here to help with services, pricing, and any questions. How can I assist you?',
     inputPlaceholder: 'Type a message...',
     whatsappCta: 'Chat on WhatsApp for live support',
   },
 }
 
-function findResponse(message, lang) {
-  const kb = knowledgeBase[lang] || knowledgeBase.tr
+function findFallbackResponse(message, lang) {
+  const fb = fallbackResponses[lang] || fallbackResponses.tr
   const lowerMsg = message.toLowerCase().trim()
   
-  const categories = [
-    { keywords: kb.greetings, response: kb.greetingResponse },
-    { keywords: kb.services, response: kb.servicesResponse },
-    { keywords: kb.pricing, response: kb.pricingResponse },
-    { keywords: kb.contact, response: kb.contactResponse },
-    { keywords: kb.hours, response: kb.hoursResponse },
-    { keywords: kb.smm, response: kb.smmResponse },
-    { keywords: kb.ads, response: kb.adsResponse },
-    { keywords: kb.thanks, response: kb.thanksResponse },
-  ]
-  
+  const categories = ['greetings', 'services', 'pricing', 'contact', 'web', 'thanks']
   for (const cat of categories) {
-    for (const keyword of cat.keywords) {
-      if (lowerMsg.includes(keyword)) {
-        return cat.response
+    if (fb[cat]?.keys) {
+      for (const keyword of fb[cat].keys) {
+        if (lowerMsg.includes(keyword)) return fb[cat].response
       }
     }
   }
+  return fb.default
+}
+
+async function getAIResponse(message, lang, history) {
+  // Try Gemini API (free tier)
+  const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY
   
-  return kb.defaultResponse
+  if (!GEMINI_KEY) {
+    return findFallbackResponse(message, lang)
+  }
+  
+  try {
+    const systemPrompt = lang === 'en' ? KADE_CONTEXT_EN : KADE_CONTEXT
+    
+    const contents = [
+      {
+        role: 'user',
+        parts: [{ text: systemPrompt + '\n\nKullanıcı mesajı: ' + message }]
+      }
+    ]
+    
+    // Add conversation history (last 6 messages)
+    if (history.length > 1) {
+      const recentHistory = history.slice(-6)
+      const historyText = recentHistory
+        .map(m => `${m.type === 'user' ? 'Kullanıcı' : 'Asistan'}: ${m.text}`)
+        .join('\n')
+      contents[0].parts[0].text = systemPrompt + '\n\nÖnceki konuşma:\n' + historyText + '\n\nKullanıcının son mesajı: ' + message
+    }
+    
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          generationConfig: {
+            maxOutputTokens: 300,
+            temperature: 0.7,
+          },
+        }),
+      }
+    )
+    
+    if (!res.ok) throw new Error('API error')
+    
+    const data = await res.json()
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
+    
+    if (text) return text.trim()
+    return findFallbackResponse(message, lang)
+  } catch (err) {
+    console.log('Gemini API unavailable, using fallback:', err.message)
+    return findFallbackResponse(message, lang)
+  }
 }
 
 export default function ChatBot({ isOpen, onClose }) {
   const { lang } = useLanguage()
-  const kb = knowledgeBase[lang] || knowledgeBase.tr
+  const fb = fallbackResponses[lang] || fallbackResponses.tr
   const [messages, setMessages] = useState([
-    { type: 'bot', text: kb.welcomeMessage, showQuickReplies: true },
+    { type: 'bot', text: fb.welcomeMessage, showQuickReplies: true },
   ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -119,13 +178,12 @@ export default function ChatBot({ isOpen, onClose }) {
     }
   }, [isOpen])
 
-  // Update welcome when language changes
   useEffect(() => {
-    const newKb = knowledgeBase[lang] || knowledgeBase.tr
-    setMessages([{ type: 'bot', text: newKb.welcomeMessage, showQuickReplies: true }])
+    const newFb = fallbackResponses[lang] || fallbackResponses.tr
+    setMessages([{ type: 'bot', text: newFb.welcomeMessage, showQuickReplies: true }])
   }, [lang])
 
-  const sendMessage = (text) => {
+  const sendMessage = async (text) => {
     if (!text.trim()) return
 
     const userMsg = { type: 'user', text: text.trim() }
@@ -133,11 +191,15 @@ export default function ChatBot({ isOpen, onClose }) {
     setInput('')
     setIsTyping(true)
 
-    setTimeout(() => {
-      const response = findResponse(text, lang)
+    try {
+      const response = await getAIResponse(text, lang, [...messages, userMsg])
       setMessages((prev) => [...prev, { type: 'bot', text: response, showQuickReplies: true }])
+    } catch {
+      const fallback = findFallbackResponse(text, lang)
+      setMessages((prev) => [...prev, { type: 'bot', text: fallback, showQuickReplies: true }])
+    } finally {
       setIsTyping(false)
-    }, 800 + Math.random() * 600)
+    }
   }
 
   const handleSubmit = (e) => {
@@ -170,10 +232,10 @@ export default function ChatBot({ isOpen, onClose }) {
       >
         <div className="chatbot-header">
           <div className="chatbot-header-info">
-            <div className="chatbot-avatar">K</div>
+            <div className="chatbot-avatar">🤖</div>
             <div className="chatbot-header-text">
-              <h4>Kade Media</h4>
-              <span>{lang === 'tr' ? 'Çevrimiçi' : 'Online'}</span>
+              <h4>Kade AI</h4>
+              <span>{lang === 'tr' ? 'Akıllı Asistan' : 'Smart Assistant'}</span>
             </div>
           </div>
           <button className="chatbot-close" onClick={onClose}>
@@ -193,7 +255,7 @@ export default function ChatBot({ isOpen, onClose }) {
                 ))}
                 {msg.type === 'bot' && msg.showQuickReplies && i === messages.length - 1 && !isTyping && (
                   <div className="chat-quick-replies">
-                    {kb.quickReplies.map((reply) => (
+                    {fb.quickReplies.map((reply) => (
                       <button
                         key={reply}
                         className="quick-reply-btn"
@@ -224,7 +286,7 @@ export default function ChatBot({ isOpen, onClose }) {
             ref={inputRef}
             type="text"
             className="chatbot-input"
-            placeholder={kb.inputPlaceholder}
+            placeholder={fb.inputPlaceholder}
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
@@ -240,7 +302,7 @@ export default function ChatBot({ isOpen, onClose }) {
           className="chatbot-whatsapp-cta"
         >
           <FaWhatsapp size={16} />
-          {kb.whatsappCta}
+          {fb.whatsappCta}
         </a>
       </motion.div>
     </AnimatePresence>

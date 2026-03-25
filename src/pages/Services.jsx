@@ -8,6 +8,7 @@ import {
   HiOutlineChatAlt2,
   HiOutlinePencilAlt,
   HiOutlineSpeakerphone,
+  HiOutlineCode,
 } from 'react-icons/hi'
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
@@ -61,6 +62,13 @@ export default function Services() {
       desc: t('services.strategyDesc'),
       features: [t('services.strategyFeat1'), t('services.strategyFeat2'), t('services.strategyFeat3'), t('services.strategyFeat4')],
       platforms: [FaLinkedinIn, FaInstagram, FaFacebookF],
+    },
+    {
+      icon: HiOutlineCode,
+      title: t('services.webTitle'),
+      desc: t('services.webDesc'),
+      features: [t('services.webFeat1'), t('services.webFeat2'), t('services.webFeat3'), t('services.webFeat4')],
+      platforms: [FaInstagram, FaLinkedinIn],
     },
   ]
 

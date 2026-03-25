@@ -9,9 +9,20 @@ function getAuthHeaders() {
 }
 
 async function handleResponse(res) {
-  const data = await res.json();
+  let data;
+  const contentType = res.headers.get('content-type') || '';
+  try {
+    if (contentType.includes('application/json')) {
+      data = await res.json();
+    } else {
+      const text = await res.text();
+      try { data = JSON.parse(text); } catch { throw new Error('API unavailable'); }
+    }
+  } catch (e) {
+    throw new Error(e.message || 'API unavailable');
+  }
   if (!res.ok) {
-    throw new Error(data.error || 'Bir hata oluştu');
+    throw new Error(data?.error || 'Bir hata oluştu');
   }
   return data;
 }

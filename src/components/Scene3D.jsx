@@ -44,10 +44,10 @@ function FloatingTorus({ position, scale, speed }) {
     <Float speed={1.5} rotationIntensity={1} floatIntensity={0.8}>
       <Torus ref={meshRef} args={[1, 0.3, 16, 32]} position={position} scale={scale}>
         <meshStandardMaterial
-          color="#FFD700"
+          color="#FAF38F"
           roughness={0.3}
           metalness={0.9}
-          emissive="#FFD700"
+          emissive="#FAF38F"
           emissiveIntensity={0.15}
           transparent
           opacity={0.6}
@@ -71,7 +71,7 @@ function FloatingCube({ position, scale, speed }) {
     <Float speed={1.8} rotationIntensity={0.8} floatIntensity={1.2}>
       <Box ref={meshRef} args={[1, 1, 1]} position={position} scale={scale}>
         <meshStandardMaterial
-          color="#FFD700"
+          color="#FAF38F"
           roughness={0.4}
           metalness={0.7}
           transparent
@@ -113,7 +113,7 @@ function Particles() {
       {particles.map((particle, i) => (
         <mesh key={i} position={particle.position}>
           <sphereGeometry args={[particle.scale, 6, 6]} />
-          <meshBasicMaterial color="#FFD700" transparent opacity={0.5} />
+          <meshBasicMaterial color="#FAF38F" transparent opacity={0.5} />
         </mesh>
       ))}
     </group>
@@ -150,11 +150,11 @@ export default function Scene3D({ style, className }) {
           frameloop="always"
         >
           <ambientLight intensity={0.3} />
-          <directionalLight position={[5, 5, 5]} intensity={0.8} color="#FFD700" />
-          <pointLight position={[-5, -5, 5]} intensity={0.5} color="#FFD700" />
+          <directionalLight position={[5, 5, 5]} intensity={0.8} color="#FAF38F" />
+          <pointLight position={[-5, -5, 5]} intensity={0.5} color="#FAF38F" />
           
-          <GlowingSphere position={[3, 1, 0]} scale={1.2} speed={0.5} color="#FFD700" />
-          <GlowingSphere position={[-3.5, -1.5, -2]} scale={0.8} speed={0.7} color="#FFD700" />
+          <GlowingSphere position={[3, 1, 0]} scale={1.2} speed={0.5} color="#FAF38F" />
+          <GlowingSphere position={[-3.5, -1.5, -2]} scale={0.8} speed={0.7} color="#FAF38F" />
           <FloatingTorus position={[-2, 2, -1]} scale={0.6} speed={0.3} />
           <FloatingTorus position={[4, -2, -3]} scale={0.4} speed={0.5} />
           <FloatingCube position={[1.5, -2, -1]} scale={0.5} speed={0.4} />
