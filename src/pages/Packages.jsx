@@ -115,14 +115,25 @@ export default function Packages() {
                     <h3>{pkg.name}</h3>
                     <p className="package-desc">{pkg.desc}</p>
                     
-                    <div className="package-price">
-                      <span className="currency">{isEN ? '$' : '₺'}</span>
-                      <span className="amount">{isEN ? pkg.priceUSD : pkg.priceTRY}</span>
-                      <span className="period">{t('packages.month')}</span>
-                    </div>
-                    <div className="package-price-alt">
-                      ≈ {isEN ? `₺${pkg.priceTRY}` : `$${pkg.priceUSD}`} {t('packages.month')}
-                    </div>
+                    {pkg.tier === 'pro' ? (
+                      <div className="package-discovery">
+                        <Link to="/iletisim" className="btn btn-primary package-discovery-btn">
+                          {t('packages.discoveryCall')}
+                          <HiOutlineArrowRight size={16} />
+                        </Link>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="package-price">
+                          <span className="currency">{isEN ? '$' : '₺'}</span>
+                          <span className="amount">{isEN ? pkg.priceUSD : pkg.priceTRY}</span>
+                          <span className="period">{t('packages.month')}</span>
+                        </div>
+                        <div className="package-price-alt">
+                          ≈ {isEN ? `₺${pkg.priceTRY}` : `$${pkg.priceUSD}`} {t('packages.month')}
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="package-features">

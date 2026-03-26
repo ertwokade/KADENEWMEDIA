@@ -67,9 +67,8 @@
 .active-indicator {
   position: absolute;
   bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
+  left: 12px;
+  right: 12px;
   height: 3px;
   background: var(--primary);
   border-radius: 2px;

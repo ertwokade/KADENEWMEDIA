@@ -339,12 +339,33 @@ input, textarea {
 }
 
 [data-theme="light"] .hero-gradient-text {
-  background: linear-gradient(135deg, #1A1A1A 0%, #FFFCE6 40%, #FFEE00 60%, #1A1A1A 100%);
+  background: linear-gradient(135deg, #2A2A2A 0%, #4A4A00 30%, #8B8400 55%, #2A2A2A 80%, #4A4A00 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   background-size: 300% 300%;
   animation: gradientShift 5s ease infinite;
+}
+
+[data-theme="light"] .hero-highlight {
+  background: linear-gradient(135deg, #8B8400 0%, #6B6600 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .hero-subtitle {
+  color: #4A4A46;
+}
+
+[data-theme="light"] .hero-badge {
+  background: rgba(180, 160, 0, 0.10);
+  border-color: rgba(180, 160, 0, 0.25);
+  color: #8B8400;
+}
+
+[data-theme="light"] .platforms-label {
+  color: #5C5C58;
 }
 
 [data-theme="light"] .section-title span {
@@ -355,9 +376,13 @@ input, textarea {
 }
 
 [data-theme="light"] .section-badge {
-  background: rgba(255, 238, 0, 0.10);
-  border-color: rgba(180, 160, 0, 0.20);
-  color: #A89E00;
+  background: rgba(180, 160, 0, 0.12);
+  border-color: rgba(180, 160, 0, 0.25);
+  color: #6B6600;
+}
+
+[data-theme="light"] .section-subtitle {
+  color: #4A4A46;
 }
 
 [data-theme="light"] .btn-primary {
@@ -376,10 +401,14 @@ input, textarea {
 }
 
 [data-theme="light"] .stat-number {
-  background: linear-gradient(135deg, #D4C800 0%, #A89E00 100%);
+  background: linear-gradient(135deg, #8B8400 0%, #6B6600 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+[data-theme="light"] .stat-label {
+  color: #4A4A46;
 }
 
 [data-theme="light"] .footer {
@@ -545,14 +574,147 @@ input, textarea {
 }
 
 [data-theme="light"] .feature-item.included svg {
-  color: #A89E00;
+  color: #6B6600;
 }
 
 [data-theme="light"] .logo-text {
-  color: #A89E00;
+  color: #8B8400;
 }
 
 [data-theme="light"] .logo-accent {
+  color: #1A1A1A;
+}
+
+/* Light theme – Navbar links */
+[data-theme="light"] .navbar-link {
+  color: #3A3A36;
+}
+
+[data-theme="light"] .navbar-link:hover {
+  color: #8B8400;
+}
+
+[data-theme="light"] .navbar-link.active {
+  color: #6B6600;
+}
+
+/* Light theme – Package cards */
+[data-theme="light"] .package-name,
+[data-theme="light"] .package-card h3 {
+  color: #1A1A1A;
+}
+
+[data-theme="light"] .package-desc {
+  color: #4A4A46;
+}
+
+[data-theme="light"] .package-price .currency {
+  color: #6B6600;
+}
+
+[data-theme="light"] .package-price .amount {
+  background: linear-gradient(135deg, #8B8400 0%, #6B6600 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .package-price .period {
+  color: #5C5C58;
+}
+
+[data-theme="light"] .package-price-alt {
+  color: #7A7A76;
+}
+
+[data-theme="light"] .feature-item {
+  color: #3A3A36;
+}
+
+[data-theme="light"] .feature-item.included {
+  color: #2A2A2A;
+}
+
+[data-theme="light"] .popular-badge {
+  background: linear-gradient(135deg, #FFEE00 0%, #D4C800 100%);
+  color: #1A1A1A;
+}
+
+/* Light theme – Service & glass cards */
+[data-theme="light"] .service-card h3,
+[data-theme="light"] .glass-card h3 {
+  color: #1A1A1A;
+}
+
+[data-theme="light"] .service-card p,
+[data-theme="light"] .glass-card p {
+  color: #4A4A46;
+}
+
+[data-theme="light"] .service-number {
+  color: rgba(0, 0, 0, 0.04);
+}
+
+/* Light theme – About page */
+[data-theme="light"] .about-value-card h3 {
+  color: #1A1A1A;
+}
+
+[data-theme="light"] .about-value-card p {
+  color: #4A4A46;
+}
+
+[data-theme="light"] .team-member-name {
+  color: #1A1A1A;
+}
+
+[data-theme="light"] .team-member-role {
+  color: #6B6600;
+}
+
+/* Light theme – Career, Partners, Blog */
+[data-theme="light"] .career-card h3,
+[data-theme="light"] .partner-card h3,
+[data-theme="light"] .blog-card h3 {
+  color: #1A1A1A;
+}
+
+[data-theme="light"] .career-card p,
+[data-theme="light"] .partner-card p,
+[data-theme="light"] .blog-card p {
+  color: #4A4A46;
+}
+
+/* Light theme – FAQ */
+[data-theme="light"] .faq-question {
+  color: #2A2A2A;
+}
+
+[data-theme="light"] .faq-answer {
+  color: #4A4A46;
+}
+
+/* Light theme – Contact */
+[data-theme="light"] .contact-card-label {
+  color: #7A7A76;
+}
+
+[data-theme="light"] .contact-card-value {
+  color: #1A1A1A;
+}
+
+[data-theme="light"] .contact-form-title,
+[data-theme="light"] .form-section-title {
+  color: #1A1A1A;
+}
+
+[data-theme="light"] .form-group label {
+  color: #3A3A36;
+}
+
+/* Light theme – Package discovery CTA */
+[data-theme="light"] .package-discovery-btn {
+  background: linear-gradient(135deg, #FFEE00 0%, #D4C800 100%);
   color: #1A1A1A;
 }
 

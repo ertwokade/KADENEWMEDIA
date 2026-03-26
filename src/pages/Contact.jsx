@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
+import emailjs from '@emailjs/browser'
 import {
   HiOutlineMail,
   HiOutlinePhone,
@@ -28,6 +29,11 @@ const socials = [
 const MAPS_LINK = 'https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7'
 const MAPS_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6!2d28.9080!3d41.0048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5307e731e3f%3A0x4a3e2d8c9b7f1234!2sBiruni+%C3%9Cniversitesi+Teknopark!5e0!3m2!1str!2str!4v1'
 
+// EmailJS config
+const EMAILJS_SERVICE_ID = 'service_kademedia'
+const EMAILJS_TEMPLATE_ID = 'template_u92l7zb'
+const EMAILJS_PUBLIC_KEY = '_TMInxsynNbt7MhxX'
+
 export default function Contact() {
   const { t } = useLanguage()
   const formRef = useRef(null)
@@ -55,6 +61,23 @@ export default function Contact() {
     return `https://wa.me/905067293423?text=${text}`
   }
 
+  const sendViaEmailJS = async (data) => {
+    return emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      {
+        from_name: data.name,
+        from_email: data.email,
+        phone: data.phone || '-',
+        company: data.company || '-',
+        service: data.service || '-',
+        message: data.message,
+        to_email: 'thekademedia@gmail.com',
+      },
+      EMAILJS_PUBLIC_KEY
+    )
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSending(true)
@@ -63,7 +86,7 @@ export default function Contact() {
     const waLink = buildWhatsAppLink(formData)
 
     try {
-      // Backend API (saves to MongoDB + sends via SMTP if configured)
+      // Try backend API first (saves to MongoDB + SMTP)
       await sendContactApi(formData)
       setSubmitted(true)
       setWhatsappLink(waLink)
@@ -73,12 +96,25 @@ export default function Contact() {
         setWhatsappLink(null)
       }, 10000)
     } catch (apiError) {
-      console.log('Backend API failed, opening WhatsApp...', apiError)
-      // Fallback: open WhatsApp directly
-      window.open(waLink, '_blank')
-      setSubmitted(true)
-      setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
-      setTimeout(() => setSubmitted(false), 5000)
+      console.log('Backend API failed, trying EmailJS...', apiError)
+      try {
+        // Fallback: EmailJS
+        await sendViaEmailJS(formData)
+        setSubmitted(true)
+        setWhatsappLink(waLink)
+        setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+        setTimeout(() => {
+          setSubmitted(false)
+          setWhatsappLink(null)
+        }, 10000)
+      } catch (emailjsError) {
+        console.log('EmailJS failed, opening WhatsApp...', emailjsError)
+        // Last fallback: WhatsApp
+        window.open(waLink, '_blank')
+        setSubmitted(true)
+        setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+        setTimeout(() => setSubmitted(false), 5000)
+      }
     } finally {
       setSending(false)
     }
