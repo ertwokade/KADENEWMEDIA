@@ -505,8 +505,8 @@
 }
 
 .status-badge.unread {
-  background: rgba(255, 215, 0, 0.15);
-  color: #FAF38F;
+  background: rgba(255, 238, 0, 0.15);
+  color: #FFEE00;
 }
 
 .status-badge.read {

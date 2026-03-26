@@ -107,7 +107,7 @@ function getResultData(score, lang) {
     return {
       level: lang === 'tr' ? 'Gelişime Açık' : 'Room for Growth',
       emoji: '🟡',
-      color: '#FAF38F',
+      color: '#FFEE00',
       message:
         lang === 'tr'
           ? 'İyi bir temel var! Profesyonel destekle stratejinizi güçlendirerek önemli bir atılım yapabilirsiniz.'

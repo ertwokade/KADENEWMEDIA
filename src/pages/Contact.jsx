@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import emailjs from '@emailjs/browser'
 import {
   HiOutlineMail,
   HiOutlinePhone,
@@ -43,49 +42,43 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
 
+  const [whatsappLink, setWhatsappLink] = useState(null)
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const buildWhatsAppLink = (data) => {
+    const text = encodeURIComponent(
+      `Yeni Teklif Talebi 📩\n\nAd: ${data.name}\nE-posta: ${data.email}\nTelefon: ${data.phone || '-'}\nŞirket: ${data.company || '-'}\nHizmet: ${data.service || '-'}\n\nMesaj:\n${data.message}`
+    )
+    return `https://wa.me/905067293423?text=${text}`
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSending(true)
+    setWhatsappLink(null)
+
+    const waLink = buildWhatsAppLink(formData)
 
     try {
-      // Try backend API first (saves to MongoDB + sends via SMTP)
+      // Backend API (saves to MongoDB + sends via SMTP if configured)
       await sendContactApi(formData)
+      setSubmitted(true)
+      setWhatsappLink(waLink)
+      setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+      setTimeout(() => {
+        setSubmitted(false)
+        setWhatsappLink(null)
+      }, 10000)
+    } catch (apiError) {
+      console.log('Backend API failed, opening WhatsApp...', apiError)
+      // Fallback: open WhatsApp directly
+      window.open(waLink, '_blank')
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
       setTimeout(() => setSubmitted(false), 5000)
-    } catch (apiError) {
-      console.log('Backend API failed, trying fallbacks...', apiError)
-      try {
-        // Fallback: EmailJS
-        await emailjs.send(
-          'service_kademedia',
-          'template_kademedia',
-          {
-            from_name: formData.name,
-            from_email: formData.email,
-            phone: formData.phone || '-',
-            company: formData.company || '-',
-            service: formData.service || '-',
-            message: formData.message,
-            to_email: 'thekademedia@gmail.com',
-          },
-          'YOUR_EMAILJS_PUBLIC_KEY'
-        )
-        setSubmitted(true)
-        setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
-        setTimeout(() => setSubmitted(false), 5000)
-      } catch (emailjsError) {
-        // Last resort: mailto
-        const subject = encodeURIComponent(`Teklif Talebi - ${formData.name}`)
-        const body = encodeURIComponent(
-          `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.service || '-'}\n\nMesaj:\n${formData.message}`
-        )
-        window.open(`mailto:thekademedia@gmail.com?subject=${subject}&body=${body}`, '_blank')
-      }
     } finally {
       setSending(false)
     }
@@ -305,6 +298,21 @@ export default function Contact() {
                     </>
                   )}
                 </motion.button>
+
+                {whatsappLink && (
+                  <motion.a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline whatsapp-notify-btn"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ marginTop: '12px', width: '100%', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <FaWhatsapp size={18} />
+                    WhatsApp ile de gönderin
+                  </motion.a>
+                )}
               </form>
             </FadeIn>
           </div>
