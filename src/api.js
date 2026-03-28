@@ -8,6 +8,11 @@ function getAuthHeaders() {
   };
 }
 
+export function isLocalMode() {
+  const token = localStorage.getItem('kade_admin_token');
+  return token && token.startsWith('local-dev-token-');
+}
+
 async function handleResponse(res) {
   let data;
   const contentType = res.headers.get('content-type') || '';

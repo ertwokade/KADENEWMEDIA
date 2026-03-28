@@ -67,9 +67,8 @@
 .active-indicator {
   position: absolute;
   bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
+  left: 12px;
+  right: 12px;
   height: 3px;
   background: var(--primary);
   border-radius: 2px;
@@ -135,7 +134,7 @@
 
 .theme-toggle:hover {
   border-color: var(--primary);
-  background: rgba(255, 215, 0, 0.08);
+  background: rgba(184, 74, 36, 0.08);
 }
 
 .theme-toggle-mobile {
@@ -192,7 +191,7 @@
 .mobile-link:hover,
 .mobile-link.active {
   color: var(--primary);
-  background: rgba(255, 215, 0, 0.05);
+  background: rgba(184, 74, 36, 0.05);
 }
 
 .mobile-cta {

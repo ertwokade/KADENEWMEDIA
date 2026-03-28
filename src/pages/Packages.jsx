@@ -7,12 +7,20 @@ import {
   HiOutlineSparkles,
 } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import PageBgAnimation from '../components/PageBgAnimation'
 import './Packages.css'
 
 export default function Packages() {
   const { lang, t } = useLanguage()
+  useSEO({
+    title: 'Paketler & Fiyatlar | Sosyal Medya Hizmet Paketleri',
+    description: 'Kade Media sosyal medya yönetim paketleri. Starter, Growth ve Pro paketlerimizle uygun fiyata profesyonel dijital pazarlama hizmeti alın.',
+    keywords: 'sosyal medya paketleri, sosyal medya fiyatları, instagram yönetim paketi, dijital pazarlama fiyatları, sosyal medya yönetim ücreti',
+    path: '/paketler',
+  })
   const isEN = lang === 'en'
 
   const packages = [
@@ -38,12 +46,9 @@ export default function Packages() {
       priceUSD: '440',
       desc: t('packages.proDesc'),
       popular: true,
-      features: [
-        t('packages.feat_4platform'), t('packages.feat_40content'), t('packages.feat_proDesign'),
-        t('packages.feat_weeklyReport'), t('packages.feat_community'), t('packages.feat_calendar'),
-        t('packages.feat_basicAds'), t('packages.feat_4reels'), t('packages.feat_competitorAnalysis'),
-      ],
-      notIncluded: [t('packages.feat_influencerMarketing')],
+      features: [],
+      notIncluded: [],
+      isCustom: true,
     },
     {
       name: t('packages.enterprise'),
@@ -73,6 +78,7 @@ export default function Packages() {
     <PageTransition>
       {/* Hero */}
       <section className="packages-hero">
+        <PageBgAnimation type="packages" />
         <div className="grid-bg" />
         <div className="glow-effect" style={{ top: '-150px', left: '-150px' }} />
         <div className="container">
@@ -115,9 +121,15 @@ export default function Packages() {
                     <h3>{pkg.name}</h3>
                     <p className="package-desc">{pkg.desc}</p>
                     
-                    {pkg.tier === 'starter' ? (
+                    {pkg.tier === 'pro' ? (
+                      <div className="package-discovery">
+                        <Link to="/iletisim" className="btn btn-primary package-discovery-btn">
+                          {t('packages.discoveryCall')}
+                          <HiOutlineArrowRight size={16} />
+                        </Link>
+                      </div>
+                    ) : (
                       <>
-                        {/* Show price for Başlangıç */}
                         <div className="package-price">
                           <span className="currency">{isEN ? '$' : '₺'}</span>
                           <span className="amount">{isEN ? pkg.priceUSD : pkg.priceTRY}</span>
@@ -127,42 +139,30 @@ export default function Packages() {
                           ≈ {isEN ? `₺${pkg.priceTRY}` : `$${pkg.priceUSD}`} {t('packages.month')}
                         </div>
                       </>
-                    ) : pkg.tier === 'enterprise' ? (
-                      <>
-                        {/* Show price for Kurumsal */}
-                        <div className="package-price">
-                          <span className="currency">{isEN ? '$' : '₺'}</span>
-                          <span className="amount">{isEN ? t('packages.enterprisePriceUSD') : t('packages.enterprisePrice')}</span>
-                          <span className="period">{t('packages.month')}</span>
-                        </div>
-                        <div className="package-price-note">
-                          {t('packages.enterprisePriceNote')}
-                        </div>
-                      </>
-                    ) : (
-                      /* Discovery call CTA for Pro */
-                      <div className="package-discovery">
-                        <Link to="/iletisim" className="btn btn-primary package-discovery-btn">
-                          {t('packages.discoveryCall')}
-                          <HiOutlineArrowRight size={16} />
-                        </Link>
-                      </div>
                     )}
                   </div>
 
                   <div className="package-features">
-                    {pkg.features.map((feature) => (
-                      <div key={feature} className="feature-item included">
-                        <HiOutlineCheck size={16} />
-                        <span>{feature}</span>
+                    {pkg.isCustom ? (
+                      <div className="custom-package-info">
+                        <p>{t('packages.proCustomDesc')}</p>
                       </div>
-                    ))}
-                    {pkg.notIncluded.map((feature) => (
-                      <div key={feature} className="feature-item not-included">
-                        <span className="dash">—</span>
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+                    ) : (
+                      <>
+                        {pkg.features.map((feature) => (
+                          <div key={feature} className="feature-item included">
+                            <HiOutlineCheck size={16} />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                        {pkg.notIncluded.map((feature) => (
+                          <div key={feature} className="feature-item not-included">
+                            <span className="dash">—</span>
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </>
+                    )}
                   </div>
 
                   <Link

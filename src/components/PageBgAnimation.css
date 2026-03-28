@@ -1,0 +1,183 @@
+/* =============================================
+   PAGE BACKGROUND ANIMATIONS
+   Each page gets its own subtle animated bg
+   ============================================= */
+
+.page-bg-anim {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-item {
+  position: absolute;
+}
+
+/* ---- 1. FLOAT (Home, Partners, Contact plain) ---- */
+.bg-float {
+  font-size: 1.3rem;
+  color: var(--primary);
+  opacity: var(--op);
+  animation: anim-float var(--dur, 14s) var(--delay, 0s) ease-in-out infinite;
+}
+
+@keyframes anim-float {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(18px, -22px) rotate(90deg);
+  }
+  50% {
+    transform: translate(-12px, -40px) rotate(180deg);
+  }
+  75% {
+    transform: translate(-22px, -16px) rotate(270deg);
+  }
+}
+
+/* ---- 2. BADGE (Services) ---- */
+.bg-badge {
+  padding: 4px 10px;
+  border-radius: 100px;
+  border: 1px solid rgba(250, 243, 143, var(--op));
+  color: rgba(250, 243, 143, var(--op));
+  background: rgba(250, 243, 143, calc(var(--op) * 0.25));
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  animation: anim-badge var(--dur, 13s) var(--delay, 0s) ease-in-out infinite;
+}
+
+@keyframes anim-badge {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(28px, -18px);
+  }
+  60% {
+    transform: translate(-14px, -36px);
+  }
+}
+
+/* ---- 3. SPARKLE (Packages) ---- */
+.bg-sparkle {
+  font-size: 1.1rem;
+  color: #faf38f;
+  animation: anim-sparkle var(--dur, 8s) var(--delay, 0s) ease-in-out infinite;
+}
+
+@keyframes anim-sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0deg);
+  }
+  50% {
+    opacity: var(--op);
+    transform: scale(1.4) rotate(180deg);
+  }
+}
+
+/* ---- 4. NODE (Contact) ---- */
+.bg-node {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: var(--op);
+  animation: anim-node var(--dur, 14s) var(--delay, 0s) ease-in-out infinite;
+}
+
+@keyframes anim-node {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(50px, -20px);
+  }
+  40% {
+    transform: translate(25px, -55px);
+  }
+  60% {
+    transform: translate(-35px, -40px);
+  }
+  80% {
+    transform: translate(-15px, -10px);
+  }
+}
+
+/* ---- 5. TEXT (Blog hashtags) ---- */
+.bg-text {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(250, 243, 143, var(--op));
+  white-space: nowrap;
+  animation: anim-text var(--dur, 15s) var(--delay, 0s) ease-in-out infinite;
+}
+
+@keyframes anim-text {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-28px) translateX(16px);
+  }
+}
+
+/* ---- 6. RISE (Careers) ---- */
+.bg-rise {
+  font-size: 1rem;
+  color: var(--primary);
+  animation: anim-rise var(--dur, 12s) var(--delay, 0s) linear infinite;
+}
+
+@keyframes anim-rise {
+  0% {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  15% {
+    opacity: var(--op);
+  }
+  85% {
+    opacity: var(--op);
+  }
+  100% {
+    transform: translateY(-180px);
+    opacity: 0;
+  }
+}
+
+/* ---- 7. ABOUT — Pulse rings ---- */
+.page-bg-about {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(250, 243, 143, 0.13);
+  animation: anim-pulse var(--dur, 6s) var(--delay, 0s) ease-out infinite;
+}
+
+@keyframes anim-pulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}

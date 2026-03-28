@@ -10,8 +10,10 @@ import {
   HiOutlineOfficeBuilding,
 } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import PageBgAnimation from '../components/PageBgAnimation'
 import './Careers.css'
 
 const jobsData = {
@@ -136,6 +138,12 @@ function JobCard({ job, t }) {
 
 export default function Careers() {
   const { lang, t } = useLanguage()
+  useSEO({
+    title: 'Kariyer | Kade Media\'da Çalış',
+    description: 'Kade Media kariyer fırsatları. Sosyal medya yöneticisi, içerik üreticisi ve dijital pazarlama uzmanı pozisyonları için başvurun. İstanbul hibrit çalışma.',
+    keywords: 'sosyal medya ajansı kariyer, dijital pazarlama iş ilanı, sosyal medya yöneticisi iş, içerik üreticisi iş istanbul',
+    path: '/kariyer',
+  })
   const jobs = jobsData[lang] || jobsData.tr
 
   const perks = [
@@ -151,6 +159,7 @@ export default function Careers() {
     <PageTransition>
       {/* Hero */}
       <section className="careers-hero">
+        <PageBgAnimation type="careers" />
         <div className="grid-bg" />
         <div className="glow-effect" style={{ top: '-150px', right: '-100px' }} />
         <div className="container">

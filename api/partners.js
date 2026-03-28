@@ -50,15 +50,15 @@ export default async function handler(req, res) {
     }
 
     try {
-      const { id, ...updateData } = req.body;
-      if (!id) {
+      const { _id, ...updateData } = req.body;
+      if (!_id) {
         return res.status(400).json({ error: 'Partner ID gerekli' });
       }
 
       updateData.updatedAt = new Date();
 
       const result = await collection.updateOne(
-        { _id: new ObjectId(id) },
+        { _id: new ObjectId(_id) },
         { $set: updateData }
       );
 

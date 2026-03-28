@@ -15,7 +15,7 @@ import {
   getContentApi, updateContentApi,
   getPartnersApi, createPartnerApi, updatePartnerApi, deletePartnerApi,
   getMessagesApi, markMessageReadApi, deleteMessageApi,
-  seedApi,
+  seedApi, isLocalMode,
 } from '../api'
 import './Admin.css'
 
@@ -122,22 +122,22 @@ function DashboardSection({ stats }) {
       </div>
       <div className="admin-stats-grid">
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.15)', color: '#6C63FF' }}>📝</div>
+          <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.10)', color: '#6C63FF' }}>📝</div>
           <div className="stat-number">{stats.blogs || 0}</div>
           <div className="stat-label">Blog Yazısı</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(255, 215, 0, 0.15)', color: '#FAF38F' }}>🤝</div>
+          <div className="stat-icon" style={{ background: 'rgba(184, 74, 36, 0.10)', color: '#B84A24' }}>🤝</div>
           <div className="stat-number">{stats.partners || 0}</div>
           <div className="stat-label">Partner</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.15)', color: '#2ECC71' }}>✉️</div>
+          <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>✉️</div>
           <div className="stat-number">{stats.messages || 0}</div>
           <div className="stat-label">Mesaj</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.15)', color: '#E91E63' }}>📩</div>
+          <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>📩</div>
           <div className="stat-number">{stats.unreadMessages || 0}</div>
           <div className="stat-label">Okunmamış Mesaj</div>
         </div>
@@ -155,18 +155,18 @@ function BlogSection({ showToast }) {
   const [form, setForm] = useState({
     titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
     contentTr: '', contentEn: '', category: '', categoryEn: '',
-    slug: '', image: '📝', color: '#FAF38F', readTime: 5,
+    slug: '', image: '📝', color: '#B84A24', readTime: 5,
   })
 
   const emojis = ['📱', '🎬', '📊', '🎵', '🤝', '📅', '📝', '💡', '🚀', '🎯', '💻', '🌐']
-  const colors = ['#6C63FF', '#E91E63', '#FAF38F', '#2ECC71', '#00BCD4', '#9C27B0', '#FF9800', '#607D8B']
+  const colors = ['#6C63FF', '#E91E63', '#B84A24', '#2ECC71', '#00BCD4', '#9C27B0', '#FF9800', '#607D8B']
 
   const fetchBlogs = async () => {
     try {
       const data = await getBlogsApi()
-      setBlogs(data)
-    } catch (err) {
-      showToast(err.message, 'error')
+      setBlogs(Array.isArray(data) ? data : [])
+    } catch {
+      setBlogs([])
     } finally {
       setLoading(false)
     }
@@ -178,7 +178,7 @@ function BlogSection({ showToast }) {
     setForm({
       titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
       contentTr: '', contentEn: '', category: '', categoryEn: '',
-      slug: '', image: '📝', color: '#FAF38F', readTime: 5,
+      slug: '', image: '📝', color: '#B84A24', readTime: 5,
     })
     setEditingBlog(null)
     setShowForm(false)
@@ -191,13 +191,14 @@ function BlogSection({ showToast }) {
       contentTr: blog.contentTr || '', contentEn: blog.contentEn || '',
       category: blog.category || '', categoryEn: blog.categoryEn || '',
       slug: blog.slug || '', image: blog.image || '📝',
-      color: blog.color || '#FAF38F', readTime: blog.readTime || 5,
+      color: blog.color || '#B84A24', readTime: blog.readTime || 5,
     })
     setEditingBlog(blog)
     setShowForm(true)
   }
 
   const handleSave = async () => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — yazma işlemi yapılamaz.', 'error'); return }
     try {
       if (editingBlog) {
         await updateBlogApi({ id: editingBlog._id, ...form })
@@ -214,6 +215,7 @@ function BlogSection({ showToast }) {
   }
 
   const handleDelete = async (id) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
     if (!window.confirm('Bu blog yazısını silmek istediğinize emin misiniz?')) return
     try {
       await deleteBlogApi(id)
@@ -491,11 +493,13 @@ function ContentSection({ showToast }) {
   const fetchContent = async () => {
     try {
       const data = await getContentApi()
-      const mapped = {}
-      data.forEach((item) => { mapped[item.section] = item.data })
-      setContent(mapped)
+      if (Array.isArray(data)) {
+        const mapped = {}
+        data.forEach((item) => { mapped[item.section] = item.data })
+        setContent(mapped)
+      }
     } catch (err) {
-      showToast(err.message, 'error')
+      console.warn('Content fetch failed:', err.message)
     } finally {
       setLoading(false)
     }
@@ -504,6 +508,7 @@ function ContentSection({ showToast }) {
   useEffect(() => { fetchContent() }, [])
 
   const handleSave = async (section, data) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — içerik güncellenemez.', 'error'); return }
     try {
       await updateContentApi(section, data)
       showToast('İçerik güncellendi!', 'success')
@@ -718,7 +723,7 @@ function PartnersSection({ showToast }) {
   const [showForm, setShowForm] = useState(false)
   const [editingPartner, setEditingPartner] = useState(null)
   const [form, setForm] = useState({
-    id: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#FAF38F',
+    slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#B84A24',
     descTr: '', descEn: '', longDescTr: '', longDescEn: '',
     servicesTr: '', servicesEn: '', resultsTr: '', resultsEn: '',
   })
@@ -728,9 +733,9 @@ function PartnersSection({ showToast }) {
   const fetchPartners = async () => {
     try {
       const data = await getPartnersApi()
-      setPartners(data)
-    } catch (err) {
-      showToast(err.message, 'error')
+      setPartners(Array.isArray(data) ? data : [])
+    } catch {
+      setPartners([])
     } finally {
       setLoading(false)
     }
@@ -740,7 +745,7 @@ function PartnersSection({ showToast }) {
 
   const resetForm = () => {
     setForm({
-      id: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#FAF38F',
+      slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#B84A24',
       descTr: '', descEn: '', longDescTr: '', longDescEn: '',
       servicesTr: '', servicesEn: '', resultsTr: '', resultsEn: '',
     })
@@ -750,9 +755,9 @@ function PartnersSection({ showToast }) {
 
   const handleEdit = (partner) => {
     setForm({
-      id: partner.id || '', name: partner.name || '',
+      slug: partner.id || '', name: partner.name || '',
       category: partner.category || '', categoryEn: partner.categoryEn || '',
-      logo: partner.logo || '🏢', color: partner.color || '#FAF38F',
+      logo: partner.logo || '🏢', color: partner.color || '#B84A24',
       descTr: partner.descTr || '', descEn: partner.descEn || '',
       longDescTr: partner.longDescTr || '', longDescEn: partner.longDescEn || '',
       servicesTr: (partner.servicesTr || []).join(', '),
@@ -765,8 +770,13 @@ function PartnersSection({ showToast }) {
   }
 
   const handleSave = async () => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — yazma işlemi yapılamaz.', 'error'); return }
     const payload = {
-      ...form,
+      id: form.slug,
+      name: form.name, category: form.category, categoryEn: form.categoryEn,
+      logo: form.logo, color: form.color,
+      descTr: form.descTr, descEn: form.descEn,
+      longDescTr: form.longDescTr, longDescEn: form.longDescEn,
       servicesTr: form.servicesTr.split(',').map((s) => s.trim()).filter(Boolean),
       servicesEn: form.servicesEn.split(',').map((s) => s.trim()).filter(Boolean),
       resultsTr: form.resultsTr.split(',').map((s) => s.trim()).filter(Boolean),
@@ -774,7 +784,7 @@ function PartnersSection({ showToast }) {
     }
     try {
       if (editingPartner) {
-        await updatePartnerApi({ id: editingPartner._id, ...payload })
+        await updatePartnerApi({ ...payload, _id: editingPartner._id })
         showToast('Partner güncellendi!', 'success')
       } else {
         await createPartnerApi(payload)
@@ -788,6 +798,7 @@ function PartnersSection({ showToast }) {
   }
 
   const handleDelete = async (id) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
     if (!window.confirm('Bu partneri silmek istediğinize emin misiniz?')) return
     try {
       await deletePartnerApi(id)
@@ -822,7 +833,7 @@ function PartnersSection({ showToast }) {
                 <div className="form-row">
                   <div className="form-group">
                     <label>ID (URL slug)</label>
-                    <input type="text" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} placeholder="partner-slug" />
+                    <input type="text" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="partner-slug" />
                   </div>
                   <div className="form-group">
                     <label>İsim</label>
@@ -951,10 +962,12 @@ function MessagesSection({ showToast, onNewMessageCount }) {
   const fetchMessages = async () => {
     try {
       const data = await getMessagesApi()
-      setMessages(data)
-      onNewMessageCount(data.filter((m) => !m.read).length)
-    } catch (err) {
-      showToast(err.message, 'error')
+      const arr = Array.isArray(data) ? data : []
+      setMessages(arr)
+      onNewMessageCount(arr.filter((m) => !m.read).length)
+    } catch {
+      setMessages([])
+      onNewMessageCount(0)
     } finally {
       setLoading(false)
     }
@@ -975,6 +988,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
   }
 
   const handleDelete = async (id) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
     if (!window.confirm('Bu mesajı silmek istediğinize emin misiniz?')) return
     try {
       await deleteMessageApi(id)
@@ -1098,6 +1112,7 @@ function SettingsSection({ showToast }) {
 
   const handleChangePassword = async (e) => {
     e.preventDefault()
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — şifre değiştirilemez.', 'error'); return }
     if (newPassword !== confirmPassword) {
       showToast('Yeni şifreler eşleşmiyor!', 'error')
       return
@@ -1211,6 +1226,7 @@ export default function Admin() {
     const token = localStorage.getItem('kade_admin_token')
     if (token) {
       setIsAuth(true)
+      setLocalMode(isLocalMode())
       loadStats()
     }
   }, [])
@@ -1222,11 +1238,14 @@ export default function Admin() {
         getPartnersApi().catch(() => []),
         getMessagesApi().catch(() => []),
       ])
-      const unread = messages.filter((m) => !m.read).length
+      const blogArr = Array.isArray(blogs) ? blogs : []
+      const partnerArr = Array.isArray(partners) ? partners : []
+      const messageArr = Array.isArray(messages) ? messages : []
+      const unread = messageArr.filter((m) => !m.read).length
       setStats({
-        blogs: blogs.length,
-        partners: partners.length,
-        messages: messages.length,
+        blogs: blogArr.length,
+        partners: partnerArr.length,
+        messages: messageArr.length,
         unreadMessages: unread,
       })
       setUnreadCount(unread)
@@ -1239,8 +1258,11 @@ export default function Admin() {
     setToast({ message, type })
   }
 
+  const [localMode, setLocalMode] = useState(false)
+
   const handleLogin = (data) => {
     setIsAuth(true)
+    setLocalMode(isLocalMode())
     loadStats()
   }
 
@@ -1248,6 +1270,7 @@ export default function Admin() {
     localStorage.removeItem('kade_admin_token')
     localStorage.removeItem('kade_admin_user')
     setIsAuth(false)
+    setLocalMode(false)
   }
 
   const navItems = [
@@ -1272,7 +1295,7 @@ export default function Admin() {
         <button
           className="mobile-menu-btn"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          style={{ position: 'fixed', top: 90, left: 12, zIndex: 300 }}
+          style={{ position: 'fixed', top: 12, left: 12, zIndex: 300 }}
         >
           <HiOutlineMenuAlt3 size={20} />
         </button>
@@ -1309,6 +1332,11 @@ export default function Admin() {
 
         {/* Main Content */}
         <main className="admin-main">
+          {localMode && (
+            <div className="local-mode-banner">
+              ⚠️ Çevrimdışı Mod — Sunucu bağlantısı yok. Veriler okunamıyor, yazma işlemleri çalışmaz.
+            </div>
+          )}
           {activeSection === 'dashboard' && <DashboardSection stats={stats} />}
           {activeSection === 'blog' && <BlogSection showToast={showToast} />}
           {activeSection === 'content' && <ContentSection showToast={showToast} />}

@@ -2,14 +2,22 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { HiOutlinePencilAlt, HiOutlineArrowRight, HiOutlineClock } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSEO } from '../hooks/useSEO'
 import { blogPosts as staticBlogPosts } from '../data/content'
 import { getBlogsApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import PageBgAnimation from '../components/PageBgAnimation'
 import './Blog.css'
 
 export default function Blog() {
   const { lang, t } = useLanguage()
+  useSEO({
+    title: 'Blog | Sosyal Medya ve Dijital Pazarlama İpuçları',
+    description: 'Sosyal medya stratejileri, Instagram büyüme taktikleri, TikTok algoritması ve dijital pazarlama hakkında güncel blog yazıları. Kade Media Blog.',
+    keywords: 'sosyal medya blog, instagram taktikleri, tiktok algoritması, dijital pazarlama ipuçları, içerik stratejisi',
+    path: '/blog',
+  })
   const [blogPosts, setBlogPosts] = useState(staticBlogPosts)
 
   useEffect(() => {
@@ -31,6 +39,7 @@ export default function Blog() {
   return (
     <PageTransition>
       <section className="blog-hero">
+        <PageBgAnimation type="blog" />
         <div className="grid-bg" />
         <div className="glow-effect" style={{ top: '-150px', right: '-100px' }} />
         <div className="container">

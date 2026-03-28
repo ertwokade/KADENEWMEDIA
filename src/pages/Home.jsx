@@ -23,11 +23,13 @@ import {
 } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSEO } from '../hooks/useSEO'
 import { partnersData } from '../data/content'
 import PageTransition from '../components/PageTransition'
 import Scene3D from '../components/Scene3D'
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '../components/Animations'
 import AuditScore from '../components/AuditScore'
+import PageBgAnimation from '../components/PageBgAnimation'
 import './Home.css'
 
 const platforms = [
@@ -47,7 +49,7 @@ const testimonials = [
     textTr: 'Kade Media ile çalışmaya başladığımızdan beri sosyal medya etkileşimimiz %300 arttı. Profesyonel ekipleri ve yaratıcı içerikleriyle markamızı bambaşka bir seviyeye taşıdılar.',
     textEn: 'Since we started working with Kade Media, our social media engagement has increased by 300%. They took our brand to a whole new level with their professional team and creative content.',
     avatar: 'AY',
-    color: '#FAF38F',
+    color: '#B84A24',
   },
   {
     nameTr: 'Elif Özkan',
@@ -115,6 +117,12 @@ function FAQItem({ faq }) {
 
 export default function Home() {
   const { lang, t } = useLanguage()
+  useSEO({
+    title: 'Sosyal Medya Ajansı İstanbul | Dijital Pazarlama',
+    description: 'Kade Media, İstanbul merkezli profesyonel sosyal medya yönetimi ve dijital pazarlama ajansı. Instagram, TikTok, YouTube yönetimi, içerik üretimi ve reklam danışmanlığı.',
+    keywords: 'sosyal medya ajansı istanbul, dijital pazarlama ajansı, instagram yönetimi, tiktok yönetimi, sosyal medya yönetimi, içerik üretimi ajansı, kade media',
+    path: '/',
+  })
   
   // Admin Panel Overrides State
   const [heroTexts, setHeroTexts] = useState({
@@ -125,33 +133,37 @@ export default function Home() {
 
   const [dynamicStats, setDynamicStats] = useState(null)
 
-  // Load texts from API
+  // Load texts from API, always fallback to translation defaults
   useEffect(() => {
+    const defaults = {
+      title1: t('hero.title1'),
+      title2: t('hero.title2'),
+      subtitle: t('hero.subtitle'),
+    }
+
+    // Set defaults immediately so language switch is instant
+    setHeroTexts(defaults)
+
     const loadFromApi = async () => {
       try {
         const heroData = await getContentApi('hero')
-        if (heroData && heroData.data && heroData.data[lang]) {
+        if (heroData?.data?.[lang]) {
           setHeroTexts({
-            title1: heroData.data[lang].title1 || t('hero.title1'),
-            title2: heroData.data[lang].title2 || t('hero.title2'),
-            subtitle: heroData.data[lang].subtitle || t('hero.subtitle'),
+            title1: heroData.data[lang].title1 || defaults.title1,
+            title2: heroData.data[lang].title2 || defaults.title2,
+            subtitle: heroData.data[lang].subtitle || defaults.subtitle,
           })
         }
-      } catch (e) {
-        // fallback to defaults
-        setHeroTexts({
-          title1: t('hero.title1'),
-          title2: t('hero.title2'),
-          subtitle: t('hero.subtitle'),
-        })
+      } catch {
+        // already set defaults above
       }
 
       try {
         const statsData = await getContentApi('stats')
-        if (statsData && statsData.data) {
+        if (statsData?.data) {
           setDynamicStats(statsData.data)
         }
-      } catch (e) {
+      } catch {
         // use defaults
       }
     }
@@ -177,6 +189,7 @@ export default function Home() {
     <PageTransition>
       {/* Hero Section */}
       <section className="hero">
+        <PageBgAnimation type="home" />
         <div className="hero-3d">
           <Scene3D />
         </div>

@@ -5,13 +5,13 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FAF38F, #E8E070);
-  color: #000000;
+  background: linear-gradient(135deg, #B84A24, #8E3A1C);
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  box-shadow: 0 4px 20px rgba(250, 243, 143, 0.3);
+  box-shadow: 0 4px 20px rgba(184, 74, 36, 0.3);
   cursor: pointer;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -24,7 +24,7 @@
 }
 
 .chat-toggle-float:hover {
-  box-shadow: 0 6px 30px rgba(250, 243, 143, 0.5);
+  box-shadow: 0 6px 30px rgba(184, 74, 36, 0.5);
 }
 
 .chat-toggle-float.active:hover {

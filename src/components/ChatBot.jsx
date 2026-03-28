@@ -90,7 +90,7 @@ const fallbackResponses = {
 function findFallbackResponse(message, lang) {
   const fb = fallbackResponses[lang] || fallbackResponses.tr
   const lowerMsg = message.toLowerCase().trim()
-  
+
   const categories = ['greetings', 'services', 'pricing', 'contact', 'web', 'thanks']
   for (const cat of categories) {
     if (fb[cat]?.keys) {
@@ -99,6 +99,16 @@ function findFallbackResponse(message, lang) {
       }
     }
   }
+
+  // Additional fuzzy matching for common questions
+  if (lang === 'tr') {
+    if (lowerMsg.match(/kim|nedir|hakkında|kade/)) return 'Kade Media, İstanbul Biruni Teknopark\'ta bulunan bir dijital pazarlama ajansıdır. 8+ yıllık deneyimimiz ve 5 kişilik uzman ekibimizle markanızı dijital dünyada büyütüyoruz! 🚀'
+    if (lowerMsg.match(/nasıl|süreç|adım/)) return 'Çalışma sürecimiz: 1️⃣ Analiz → 2️⃣ Strateji → 3️⃣ Uygulama → 4️⃣ Optimizasyon. Ücretsiz keşif görüşmesi için iletişime geçebilirsiniz! 💡'
+  } else {
+    if (lowerMsg.match(/who|what is|about|kade/)) return 'Kade Media is a digital marketing agency based in Biruni Teknopark, Istanbul. With 8+ years of experience and a 5-person expert team, we help grow your brand digitally! 🚀'
+    if (lowerMsg.match(/how|process|step/)) return 'Our process: 1️⃣ Analysis → 2️⃣ Strategy → 3️⃣ Execution → 4️⃣ Optimization. Contact us for a free discovery call! 💡'
+  }
+
   return fb.default
 }
 

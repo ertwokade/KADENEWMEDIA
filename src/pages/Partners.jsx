@@ -3,14 +3,22 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlineArrowRight, HiOutlineOfficeBuilding } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSEO } from '../hooks/useSEO'
 import { partnersData as staticPartners } from '../data/content'
 import { getPartnersApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import PageBgAnimation from '../components/PageBgAnimation'
 import './Partners.css'
 
 export default function Partners() {
   const { lang, t } = useLanguage()
+  useSEO({
+    title: 'Referanslarımız | Partner Markalar',
+    description: 'Kade Media\'nın çalıştığı markalar ve referanslar. Sosyal medya yönetimi ve dijital pazarlama alanında başarıyla hizmet verdiğimiz partnerlerimiz.',
+    keywords: 'kade media referanslar, sosyal medya ajansı müşterileri, dijital pazarlama partner markalar',
+    path: '/partnerler',
+  })
   const [partnersData, setPartnersData] = useState(staticPartners)
 
   useEffect(() => {
@@ -30,6 +38,7 @@ export default function Partners() {
   return (
     <PageTransition>
       <section className="partners-hero">
+        <PageBgAnimation type="partners" />
         <div className="grid-bg" />
         <div className="glow-effect" style={{ top: '-150px', left: '-100px' }} />
         <div className="container">

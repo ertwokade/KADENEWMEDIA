@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import emailjs from '@emailjs/browser'
 import {
@@ -12,9 +12,11 @@ import {
 import { FaInstagram, FaYoutube, FaTiktok, FaWhatsapp, FaLinkedinIn } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSEO } from '../hooks/useSEO'
 import { sendContactApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import PageBgAnimation from '../components/PageBgAnimation'
 import './Contact.css'
 
 const socials = [
@@ -29,9 +31,18 @@ const socials = [
 const MAPS_LINK = 'https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7'
 const MAPS_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6!2d28.9080!3d41.0048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5307e731e3f%3A0x4a3e2d8c9b7f1234!2sBiruni+%C3%9Cniversitesi+Teknopark!5e0!3m2!1str!2str!4v1'
 
+const EMAILJS_SERVICE_ID = 'service_kademedia'
+const EMAILJS_TEMPLATE_ID = 'template_u92l7zb'
+const EMAILJS_PUBLIC_KEY = '_TMInxsynNbt7MhxX'
+
 export default function Contact() {
-  const { t } = useLanguage()
-  const formRef = useRef(null)
+  const { t, lang } = useLanguage()
+  useSEO({
+    title: 'İletişim | Teklif Alın',
+    description: 'Kade Media ile iletişime geçin. Sosyal medya yönetimi, dijital pazarlama veya içerik üretimi için ücretsiz teklif alın. İstanbul - Biruni Teknopark.',
+    keywords: 'sosyal medya ajansı iletişim, dijital pazarlama teklif, sosyal medya yönetim teklifi, kade media iletişim',
+    path: '/iletisim',
+  })
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -42,53 +53,75 @@ export default function Contact() {
   })
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
+  const [whatsappLink, setWhatsappLink] = useState(null)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
+  const buildWhatsAppLink = (data) => {
+    const text = lang === 'en'
+      ? encodeURIComponent(`New Quote Request 📩\n\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone || '-'}\nCompany: ${data.company || '-'}\nService: ${data.service || '-'}\n\nMessage:\n${data.message}`)
+      : encodeURIComponent(`Yeni Teklif Talebi 📩\n\nAd: ${data.name}\nE-posta: ${data.email}\nTelefon: ${data.phone || '-'}\nŞirket: ${data.company || '-'}\nHizmet: ${data.service || '-'}\n\nMesaj:\n${data.message}`)
+    return `https://wa.me/905067293423?text=${text}`
+  }
+
+  const sendViaEmailJS = async (data) => {
+    return emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      {
+        from_name: data.name,
+        from_email: data.email,
+        phone: data.phone || '-',
+        company: data.company || '-',
+        service: data.service || '-',
+        message: data.message,
+        to_email: 'thekademedia@gmail.com',
+      },
+      EMAILJS_PUBLIC_KEY
+    )
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSending(true)
+    setWhatsappLink(null)
 
+    const waLink = buildWhatsAppLink(formData)
+    let sent = false
+
+    // Try backend API first (saves to MongoDB + SMTP)
     try {
-      // Try backend API first (saves to MongoDB + sends via SMTP)
       await sendContactApi(formData)
-      setSubmitted(true)
-      setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
-      setTimeout(() => setSubmitted(false), 5000)
+      sent = true
     } catch (apiError) {
-      console.log('Backend API failed, trying fallbacks...', apiError)
-      try {
-        // Fallback: EmailJS
-        await emailjs.send(
-          'service_kademedia',
-          'template_kademedia',
-          {
-            from_name: formData.name,
-            from_email: formData.email,
-            phone: formData.phone || '-',
-            company: formData.company || '-',
-            service: formData.service || '-',
-            message: formData.message,
-            to_email: 'thekademedia@gmail.com',
-          },
-          'YOUR_EMAILJS_PUBLIC_KEY'
-        )
-        setSubmitted(true)
-        setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
-        setTimeout(() => setSubmitted(false), 5000)
-      } catch (emailjsError) {
-        // Last resort: mailto
-        const subject = encodeURIComponent(`Teklif Talebi - ${formData.name}`)
-        const body = encodeURIComponent(
-          `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.service || '-'}\n\nMesaj:\n${formData.message}`
-        )
-        window.open(`mailto:thekademedia@gmail.com?subject=${subject}&body=${body}`, '_blank')
-      }
-    } finally {
-      setSending(false)
+      console.log('Backend API failed, trying EmailJS...', apiError)
     }
+
+    // Fallback: EmailJS
+    if (!sent) {
+      try {
+        await sendViaEmailJS(formData)
+        sent = true
+      } catch (emailjsError) {
+        console.log('EmailJS failed, opening WhatsApp...', emailjsError)
+      }
+    }
+
+    // Last fallback: WhatsApp
+    if (!sent) {
+      window.open(waLink, '_blank')
+    }
+
+    setSubmitted(true)
+    setWhatsappLink(waLink)
+    setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+    setTimeout(() => {
+      setSubmitted(false)
+      setWhatsappLink(null)
+    }, 10000)
+    setSending(false)
   }
 
   const contactInfo = [
@@ -122,6 +155,7 @@ export default function Contact() {
     <PageTransition>
       {/* Hero */}
       <section className="contact-hero">
+        <PageBgAnimation type="contact" />
         <div className="grid-bg" />
         <div className="glow-effect" style={{ top: '-150px', left: '50%', transform: 'translateX(-50%)' }} />
         <div className="container">
@@ -270,7 +304,7 @@ export default function Contact() {
                     <option value="icerik">{t('servicesSection.content')}</option>
                     <option value="reklam">{t('servicesSection.ads')}</option>
                     <option value="influencer">{t('servicesSection.influencer')}</option>
-                    <option value="video">Video Prodüksiyon</option>
+                    <option value="video">{t('contact.videoProduction')}</option>
                     <option value="danismanlik">{t('contact.consultingOption')}</option>
                   </select>
                 </div>
@@ -297,7 +331,7 @@ export default function Contact() {
                   {submitted ? (
                     t('contact.submitted')
                   ) : sending ? (
-                    <span className="sending-loader">{t('contact.sending') || 'Gönderiliyor...'}</span>
+                    <span className="sending-loader">{t('contact.sending')}</span>
                   ) : (
                     <>
                       {t('contact.submit')}
@@ -305,6 +339,21 @@ export default function Contact() {
                     </>
                   )}
                 </motion.button>
+
+                {whatsappLink && (
+                  <motion.a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline whatsapp-notify-btn"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ marginTop: '12px', width: '100%', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <FaWhatsapp size={18} />
+                    {t('contact.whatsappAlso')}
+                  </motion.a>
+                )}
               </form>
             </FadeIn>
           </div>

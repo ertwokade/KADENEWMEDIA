@@ -5,7 +5,7 @@
   right: 0;
   background: rgba(10, 10, 10, 0.95);
   backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 215, 0, 0.15);
+  border-top: 1px solid rgba(184, 74, 36, 0.15);
   padding: 16px 24px;
   z-index: 1000;
   display: flex;
@@ -51,7 +51,7 @@
 
 .cookie-accept {
   background: var(--primary);
-  color: var(--dark);
+  color: #FFFFFF;
 }
 
 .cookie-accept:hover {
@@ -94,7 +94,7 @@
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(255, 215, 0, 0.15) !important;
+  border: 1px solid rgba(184, 74, 36, 0.15) !important;
 }
 
 .kvkk-header {

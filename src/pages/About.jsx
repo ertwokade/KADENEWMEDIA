@@ -8,19 +8,27 @@ import {
   HiOutlineShieldCheck,
 } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import PageBgAnimation from '../components/PageBgAnimation'
 import './About.css'
 
 const team = [
-  { name: 'Kadir Demir', role: 'Founder & CEO', color: '#FAF38F' },
-  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#FAF38F' },
-  { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#FAF38F' },
-  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#FAF38F' },
+  { name: 'Kadir Demir', role: 'Founder & CEO', color: '#B84A24' },
+  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#B84A24' },
+  { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#B84A24' },
+  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#B84A24' },
 ]
 
 export default function About() {
   const { t } = useLanguage()
+  useSEO({
+    title: 'Hakkımızda | İstanbul Sosyal Medya Ajansı',
+    description: 'Kade Media, İstanbul Biruni Teknopark\'ta kurulu sosyal medya ve dijital pazarlama ajansı. Ekibimiz, vizyonumuz ve değerlerimiz hakkında bilgi edinin.',
+    keywords: 'kade media hakkında, sosyal medya ajansı istanbul, dijital ajans ekibi, biruni teknopark ajans, kademedia',
+    path: '/hakkimizda',
+  })
 
   const values = [
     { icon: HiOutlineLightBulb, title: t('about.creativity'), desc: t('about.creativityDesc') },
@@ -35,6 +43,7 @@ export default function About() {
     <PageTransition>
       {/* Hero */}
       <section className="about-hero">
+        <PageBgAnimation type="about" />
         <div className="grid-bg" />
         <div className="glow-effect" style={{ top: '-150px', right: '-100px' }} />
         <div className="container">

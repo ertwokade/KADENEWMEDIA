@@ -13,12 +13,20 @@ import {
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
+import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import PageBgAnimation from '../components/PageBgAnimation'
 import './Services.css'
 
 export default function Services() {
   const { t } = useLanguage()
+  useSEO({
+    title: 'Hizmetlerimiz | Sosyal Medya Yönetimi & Dijital Pazarlama',
+    description: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi, influencer marketing ve video prodüksiyon hizmetleri. Kade Media ile markanızı büyütün.',
+    keywords: 'sosyal medya yönetimi, instagram yönetimi, tiktok yönetimi, içerik üretimi, reklam yönetimi, influencer marketing, video prodüksiyon, dijital pazarlama hizmetleri',
+    path: '/hizmetler',
+  })
 
   const services = [
     {
@@ -83,6 +91,7 @@ export default function Services() {
     <PageTransition>
       {/* Hero */}
       <section className="services-hero">
+        <PageBgAnimation type="services" />
         <div className="grid-bg" />
         <div className="glow-effect" style={{ top: '-150px', right: '-150px' }} />
         <div className="container">

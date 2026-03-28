@@ -54,19 +54,19 @@ export default async function handler(req, res) {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #1a1a2e; color: #fff; border-radius: 12px;">
             <div style="text-align: center; padding: 20px 0; border-bottom: 1px solid #333;">
-              <h1 style="color: #FFD700; margin: 0;">Kade Media</h1>
+              <h1 style="color: #FFEE00; margin: 0;">Kade Media</h1>
               <p style="color: #aaa; margin: 5px 0 0;">Yeni İletişim Formu Mesajı</p>
             </div>
             <div style="padding: 20px 0;">
               <table style="width: 100%; border-collapse: collapse;">
-                <tr><td style="padding: 10px; color: #FFD700; font-weight: bold;">Ad Soyad:</td><td style="padding: 10px; color: #fff;">${name}</td></tr>
-                <tr><td style="padding: 10px; color: #FFD700; font-weight: bold;">E-posta:</td><td style="padding: 10px; color: #fff;"><a href="mailto:${email}" style="color: #FFD700;">${email}</a></td></tr>
-                <tr><td style="padding: 10px; color: #FFD700; font-weight: bold;">Telefon:</td><td style="padding: 10px; color: #fff;">${phone || '-'}</td></tr>
-                <tr><td style="padding: 10px; color: #FFD700; font-weight: bold;">Şirket:</td><td style="padding: 10px; color: #fff;">${company || '-'}</td></tr>
-                <tr><td style="padding: 10px; color: #FFD700; font-weight: bold;">Hizmet:</td><td style="padding: 10px; color: #fff;">${service || '-'}</td></tr>
+                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">Ad Soyad:</td><td style="padding: 10px; color: #fff;">${name}</td></tr>
+                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">E-posta:</td><td style="padding: 10px; color: #fff;"><a href="mailto:${email}" style="color: #FFEE00;">${email}</a></td></tr>
+                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">Telefon:</td><td style="padding: 10px; color: #fff;">${phone || '-'}</td></tr>
+                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">Şirket:</td><td style="padding: 10px; color: #fff;">${company || '-'}</td></tr>
+                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">Hizmet:</td><td style="padding: 10px; color: #fff;">${service || '-'}</td></tr>
               </table>
               <div style="padding: 20px; background: #16213e; border-radius: 8px; margin-top: 15px;">
-                <p style="color: #FFD700; font-weight: bold; margin: 0 0 10px;">Mesaj:</p>
+                <p style="color: #FFEE00; font-weight: bold; margin: 0 0 10px;">Mesaj:</p>
                 <p style="color: #fff; line-height: 1.6; margin: 0;">${message}</p>
               </div>
             </div>
@@ -78,6 +78,22 @@ export default async function handler(req, res) {
       };
 
       await transporter.sendMail(mailOptions);
+    }
+
+    // Send WhatsApp notification via Callmebot (free)
+    // Setup: WhatsApp'ta +34 644 62 75 56 numarasına "I allow callmebot to send me messages" yazın
+    // API key alacaksınız, WA_APIKEY olarak .env'e ekleyin
+    const waPhone = process.env.WA_PHONE;
+    const waApiKey = process.env.WA_APIKEY;
+    if (waPhone && waApiKey) {
+      try {
+        const waText = encodeURIComponent(
+          `🔔 Yeni Teklif Talebi!\n👤 ${name}\n📧 ${email}\n📞 ${phone || '-'}\n🏢 ${company || '-'}\n🎯 ${service || '-'}\n💬 ${message.substring(0, 100)}${message.length > 100 ? '...' : ''}`
+        );
+        await fetch(`https://api.callmebot.com/whatsapp.php?phone=${waPhone}&text=${waText}&apikey=${waApiKey}`);
+      } catch (waError) {
+        console.log('WA notification failed (non-critical):', waError.message);
+      }
     }
 
     return res.status(200).json({ message: 'Mesajınız başarıyla gönderildi!' });
