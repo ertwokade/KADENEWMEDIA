@@ -22,11 +22,12 @@ import CookieBanner from './components/CookieBanner'
 function App() {
   const location = useLocation()
   const [chatOpen, setChatOpen] = useState(false)
+  const isAdmin = location.pathname === '/admin'
 
   return (
     <>
       <ScrollToTop />
-      <Navbar />
+      {!isAdmin && <Navbar />}
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
@@ -41,11 +42,11 @@ function App() {
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </AnimatePresence>
-      <Footer />
-      <WhatsAppButton />
-      <ChatToggleButton isOpen={chatOpen} onClick={() => setChatOpen(!chatOpen)} />
-      <ChatBot isOpen={chatOpen} onClose={() => setChatOpen(false)} />
-      <CookieBanner />
+      {!isAdmin && <Footer />}
+      {!isAdmin && <WhatsAppButton />}
+      {!isAdmin && <ChatToggleButton isOpen={chatOpen} onClick={() => setChatOpen(!chatOpen)} />}
+      {!isAdmin && <ChatBot isOpen={chatOpen} onClose={() => setChatOpen(false)} />}
+      {!isAdmin && <CookieBanner />}
     </>
   )
 }

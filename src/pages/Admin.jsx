@@ -164,9 +164,9 @@ function BlogSection({ showToast }) {
   const fetchBlogs = async () => {
     try {
       const data = await getBlogsApi()
-      setBlogs(data)
-    } catch (err) {
-      showToast(err.message, 'error')
+      setBlogs(Array.isArray(data) ? data : [])
+    } catch {
+      setBlogs([])
     } finally {
       setLoading(false)
     }
@@ -491,11 +491,13 @@ function ContentSection({ showToast }) {
   const fetchContent = async () => {
     try {
       const data = await getContentApi()
-      const mapped = {}
-      data.forEach((item) => { mapped[item.section] = item.data })
-      setContent(mapped)
+      if (Array.isArray(data)) {
+        const mapped = {}
+        data.forEach((item) => { mapped[item.section] = item.data })
+        setContent(mapped)
+      }
     } catch (err) {
-      showToast(err.message, 'error')
+      console.warn('Content fetch failed:', err.message)
     } finally {
       setLoading(false)
     }
@@ -728,9 +730,9 @@ function PartnersSection({ showToast }) {
   const fetchPartners = async () => {
     try {
       const data = await getPartnersApi()
-      setPartners(data)
-    } catch (err) {
-      showToast(err.message, 'error')
+      setPartners(Array.isArray(data) ? data : [])
+    } catch {
+      setPartners([])
     } finally {
       setLoading(false)
     }
@@ -951,10 +953,12 @@ function MessagesSection({ showToast, onNewMessageCount }) {
   const fetchMessages = async () => {
     try {
       const data = await getMessagesApi()
-      setMessages(data)
-      onNewMessageCount(data.filter((m) => !m.read).length)
-    } catch (err) {
-      showToast(err.message, 'error')
+      const arr = Array.isArray(data) ? data : []
+      setMessages(arr)
+      onNewMessageCount(arr.filter((m) => !m.read).length)
+    } catch {
+      setMessages([])
+      onNewMessageCount(0)
     } finally {
       setLoading(false)
     }
@@ -1222,11 +1226,14 @@ export default function Admin() {
         getPartnersApi().catch(() => []),
         getMessagesApi().catch(() => []),
       ])
-      const unread = messages.filter((m) => !m.read).length
+      const blogArr = Array.isArray(blogs) ? blogs : []
+      const partnerArr = Array.isArray(partners) ? partners : []
+      const messageArr = Array.isArray(messages) ? messages : []
+      const unread = messageArr.filter((m) => !m.read).length
       setStats({
-        blogs: blogs.length,
-        partners: partners.length,
-        messages: messages.length,
+        blogs: blogArr.length,
+        partners: partnerArr.length,
+        messages: messageArr.length,
         unreadMessages: unread,
       })
       setUnreadCount(unread)

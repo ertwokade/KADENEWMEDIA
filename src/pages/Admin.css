@@ -132,7 +132,7 @@
 .admin-dashboard {
   min-height: 100vh;
   display: flex;
-  padding-top: 80px;
+  padding-top: 0;
   position: relative;
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -141,12 +141,12 @@
 /* Sidebar */
 .admin-sidebar {
   width: 260px;
-  min-height: calc(100vh - 80px);
+  min-height: 100vh;
   background: var(--card-bg);
   border-right: 1px solid var(--border);
   padding: 24px 0;
   position: fixed;
-  top: 80px;
+  top: 0;
   left: 0;
   z-index: 100;
   display: flex;
@@ -231,7 +231,7 @@
   flex: 1;
   margin-left: 260px;
   padding: 32px;
-  min-height: calc(100vh - 80px);
+  min-height: 100vh;
 }
 
 .admin-page-header {
@@ -737,7 +737,7 @@
     display: flex;
     width: 100%;
     position: fixed;
-    top: 80px;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
