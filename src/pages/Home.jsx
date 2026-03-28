@@ -125,33 +125,37 @@ export default function Home() {
 
   const [dynamicStats, setDynamicStats] = useState(null)
 
-  // Load texts from API
+  // Load texts from API, always fallback to translation defaults
   useEffect(() => {
+    const defaults = {
+      title1: t('hero.title1'),
+      title2: t('hero.title2'),
+      subtitle: t('hero.subtitle'),
+    }
+
+    // Set defaults immediately so language switch is instant
+    setHeroTexts(defaults)
+
     const loadFromApi = async () => {
       try {
         const heroData = await getContentApi('hero')
-        if (heroData && heroData.data && heroData.data[lang]) {
+        if (heroData?.data?.[lang]) {
           setHeroTexts({
-            title1: heroData.data[lang].title1 || t('hero.title1'),
-            title2: heroData.data[lang].title2 || t('hero.title2'),
-            subtitle: heroData.data[lang].subtitle || t('hero.subtitle'),
+            title1: heroData.data[lang].title1 || defaults.title1,
+            title2: heroData.data[lang].title2 || defaults.title2,
+            subtitle: heroData.data[lang].subtitle || defaults.subtitle,
           })
         }
-      } catch (e) {
-        // fallback to defaults
-        setHeroTexts({
-          title1: t('hero.title1'),
-          title2: t('hero.title2'),
-          subtitle: t('hero.subtitle'),
-        })
+      } catch {
+        // already set defaults above
       }
 
       try {
         const statsData = await getContentApi('stats')
-        if (statsData && statsData.data) {
+        if (statsData?.data) {
           setDynamicStats(statsData.data)
         }
-      } catch (e) {
+      } catch {
         // use defaults
       }
     }
