@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlineBadgeCheck, HiOutlineChartBar } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
-import { partnersData } from '../data/content'
+import { partnersData as staticPartners } from '../data/content'
+import { getPartnersApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import './Partners.css'
@@ -10,9 +12,30 @@ import './Partners.css'
 export default function PartnerDetail() {
   const { id } = useParams()
   const { lang, t } = useLanguage()
-  const partner = partnersData.find((p) => p.id === id)
+  const [partner, setPartner] = useState(() => staticPartners.find((p) => p.id === id))
+  const [notFound, setNotFound] = useState(false)
 
-  if (!partner) return <Navigate to="/partnerler" replace />
+  useEffect(() => {
+    const fetchPartner = async () => {
+      try {
+        const data = await getPartnersApi()
+        if (Array.isArray(data) && data.length > 0) {
+          const found = data.find((p) => p.id === id)
+          if (found) {
+            setPartner(found)
+          } else if (!partner) {
+            setNotFound(true)
+          }
+        }
+      } catch {
+        if (!partner) setNotFound(true)
+      }
+    }
+    fetchPartner()
+  }, [id])
+
+  if (notFound) return <Navigate to="/partnerler" replace />
+  if (!partner) return null
 
   const desc = lang === 'tr' ? partner.longDescTr : partner.longDescEn
   const services = lang === 'tr' ? partner.servicesTr : partner.servicesEn

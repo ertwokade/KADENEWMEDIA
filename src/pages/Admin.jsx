@@ -723,7 +723,7 @@ function PartnersSection({ showToast }) {
   const [showForm, setShowForm] = useState(false)
   const [editingPartner, setEditingPartner] = useState(null)
   const [form, setForm] = useState({
-    id: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#B84A24',
+    slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#B84A24',
     descTr: '', descEn: '', longDescTr: '', longDescEn: '',
     servicesTr: '', servicesEn: '', resultsTr: '', resultsEn: '',
   })
@@ -745,7 +745,7 @@ function PartnersSection({ showToast }) {
 
   const resetForm = () => {
     setForm({
-      id: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#B84A24',
+      slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#B84A24',
       descTr: '', descEn: '', longDescTr: '', longDescEn: '',
       servicesTr: '', servicesEn: '', resultsTr: '', resultsEn: '',
     })
@@ -755,7 +755,7 @@ function PartnersSection({ showToast }) {
 
   const handleEdit = (partner) => {
     setForm({
-      id: partner.id || '', name: partner.name || '',
+      slug: partner.id || '', name: partner.name || '',
       category: partner.category || '', categoryEn: partner.categoryEn || '',
       logo: partner.logo || '🏢', color: partner.color || '#B84A24',
       descTr: partner.descTr || '', descEn: partner.descEn || '',
@@ -772,7 +772,11 @@ function PartnersSection({ showToast }) {
   const handleSave = async () => {
     if (isLocalMode()) { showToast('Sunucu bağlantısı yok — yazma işlemi yapılamaz.', 'error'); return }
     const payload = {
-      ...form,
+      id: form.slug,
+      name: form.name, category: form.category, categoryEn: form.categoryEn,
+      logo: form.logo, color: form.color,
+      descTr: form.descTr, descEn: form.descEn,
+      longDescTr: form.longDescTr, longDescEn: form.longDescEn,
       servicesTr: form.servicesTr.split(',').map((s) => s.trim()).filter(Boolean),
       servicesEn: form.servicesEn.split(',').map((s) => s.trim()).filter(Boolean),
       resultsTr: form.resultsTr.split(',').map((s) => s.trim()).filter(Boolean),
@@ -780,7 +784,7 @@ function PartnersSection({ showToast }) {
     }
     try {
       if (editingPartner) {
-        await updatePartnerApi({ id: editingPartner._id, ...payload })
+        await updatePartnerApi({ ...payload, _id: editingPartner._id })
         showToast('Partner güncellendi!', 'success')
       } else {
         await createPartnerApi(payload)
@@ -829,7 +833,7 @@ function PartnersSection({ showToast }) {
                 <div className="form-row">
                   <div className="form-group">
                     <label>ID (URL slug)</label>
-                    <input type="text" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} placeholder="partner-slug" />
+                    <input type="text" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="partner-slug" />
                   </div>
                   <div className="form-group">
                     <label>İsim</label>
