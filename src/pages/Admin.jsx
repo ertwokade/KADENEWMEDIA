@@ -15,7 +15,7 @@ import {
   getContentApi, updateContentApi,
   getPartnersApi, createPartnerApi, updatePartnerApi, deletePartnerApi,
   getMessagesApi, markMessageReadApi, deleteMessageApi,
-  seedApi,
+  seedApi, isLocalMode,
 } from '../api'
 import './Admin.css'
 
@@ -198,6 +198,7 @@ function BlogSection({ showToast }) {
   }
 
   const handleSave = async () => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — yazma işlemi yapılamaz.', 'error'); return }
     try {
       if (editingBlog) {
         await updateBlogApi({ id: editingBlog._id, ...form })
@@ -214,6 +215,7 @@ function BlogSection({ showToast }) {
   }
 
   const handleDelete = async (id) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
     if (!window.confirm('Bu blog yazısını silmek istediğinize emin misiniz?')) return
     try {
       await deleteBlogApi(id)
@@ -506,6 +508,7 @@ function ContentSection({ showToast }) {
   useEffect(() => { fetchContent() }, [])
 
   const handleSave = async (section, data) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — içerik güncellenemez.', 'error'); return }
     try {
       await updateContentApi(section, data)
       showToast('İçerik güncellendi!', 'success')
@@ -767,6 +770,7 @@ function PartnersSection({ showToast }) {
   }
 
   const handleSave = async () => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — yazma işlemi yapılamaz.', 'error'); return }
     const payload = {
       ...form,
       servicesTr: form.servicesTr.split(',').map((s) => s.trim()).filter(Boolean),
@@ -790,6 +794,7 @@ function PartnersSection({ showToast }) {
   }
 
   const handleDelete = async (id) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
     if (!window.confirm('Bu partneri silmek istediğinize emin misiniz?')) return
     try {
       await deletePartnerApi(id)
@@ -979,6 +984,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
   }
 
   const handleDelete = async (id) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
     if (!window.confirm('Bu mesajı silmek istediğinize emin misiniz?')) return
     try {
       await deleteMessageApi(id)
@@ -1102,6 +1108,7 @@ function SettingsSection({ showToast }) {
 
   const handleChangePassword = async (e) => {
     e.preventDefault()
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — şifre değiştirilemez.', 'error'); return }
     if (newPassword !== confirmPassword) {
       showToast('Yeni şifreler eşleşmiyor!', 'error')
       return
@@ -1215,6 +1222,7 @@ export default function Admin() {
     const token = localStorage.getItem('kade_admin_token')
     if (token) {
       setIsAuth(true)
+      setLocalMode(isLocalMode())
       loadStats()
     }
   }, [])
@@ -1246,8 +1254,11 @@ export default function Admin() {
     setToast({ message, type })
   }
 
+  const [localMode, setLocalMode] = useState(false)
+
   const handleLogin = (data) => {
     setIsAuth(true)
+    setLocalMode(isLocalMode())
     loadStats()
   }
 
@@ -1255,6 +1266,7 @@ export default function Admin() {
     localStorage.removeItem('kade_admin_token')
     localStorage.removeItem('kade_admin_user')
     setIsAuth(false)
+    setLocalMode(false)
   }
 
   const navItems = [
@@ -1279,7 +1291,7 @@ export default function Admin() {
         <button
           className="mobile-menu-btn"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          style={{ position: 'fixed', top: 90, left: 12, zIndex: 300 }}
+          style={{ position: 'fixed', top: 12, left: 12, zIndex: 300 }}
         >
           <HiOutlineMenuAlt3 size={20} />
         </button>
@@ -1316,6 +1328,11 @@ export default function Admin() {
 
         {/* Main Content */}
         <main className="admin-main">
+          {localMode && (
+            <div className="local-mode-banner">
+              ⚠️ Çevrimdışı Mod — Sunucu bağlantısı yok. Veriler okunamıyor, yazma işlemleri çalışmaz.
+            </div>
+          )}
           {activeSection === 'dashboard' && <DashboardSection stats={stats} />}
           {activeSection === 'blog' && <BlogSection showToast={showToast} />}
           {activeSection === 'content' && <ContentSection showToast={showToast} />}
