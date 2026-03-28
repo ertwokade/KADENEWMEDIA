@@ -13,10 +13,10 @@ import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './About.css'
 
 const team = [
-  { name: 'Kadir Demir', role: 'Founder & CEO', color: '#FFEE00' },
-  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#FFEE00' },
-  { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#FFEE00' },
-  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#FFEE00' },
+  { name: 'Kadir Demir', role: 'Founder & CEO', color: '#B84A24' },
+  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#B84A24' },
+  { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#B84A24' },
+  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#B84A24' },
 ]
 
 export default function About() {

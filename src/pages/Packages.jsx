@@ -38,12 +38,9 @@ export default function Packages() {
       priceUSD: '440',
       desc: t('packages.proDesc'),
       popular: true,
-      features: [
-        t('packages.feat_4platform'), t('packages.feat_40content'), t('packages.feat_proDesign'),
-        t('packages.feat_weeklyReport'), t('packages.feat_community'), t('packages.feat_calendar'),
-        t('packages.feat_basicAds'), t('packages.feat_4reels'), t('packages.feat_competitorAnalysis'),
-      ],
-      notIncluded: [t('packages.feat_influencerMarketing')],
+      features: [],
+      notIncluded: [],
+      isCustom: true,
     },
     {
       name: t('packages.enterprise'),
@@ -137,18 +134,26 @@ export default function Packages() {
                   </div>
 
                   <div className="package-features">
-                    {pkg.features.map((feature) => (
-                      <div key={feature} className="feature-item included">
-                        <HiOutlineCheck size={16} />
-                        <span>{feature}</span>
+                    {pkg.isCustom ? (
+                      <div className="custom-package-info">
+                        <p>{t('packages.proCustomDesc')}</p>
                       </div>
-                    ))}
-                    {pkg.notIncluded.map((feature) => (
-                      <div key={feature} className="feature-item not-included">
-                        <span className="dash">—</span>
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+                    ) : (
+                      <>
+                        {pkg.features.map((feature) => (
+                          <div key={feature} className="feature-item included">
+                            <HiOutlineCheck size={16} />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                        {pkg.notIncluded.map((feature) => (
+                          <div key={feature} className="feature-item not-included">
+                            <span className="dash">—</span>
+                            <span>{feature}</span>
+                          </div>
+                        ))}
+                      </>
+                    )}
                   </div>
 
                   <Link

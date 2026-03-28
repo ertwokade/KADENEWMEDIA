@@ -25,7 +25,7 @@
 
 .package-card.popular {
   border-color: var(--primary);
-  background: rgba(255, 238, 0, 0.03);
+  background: rgba(184, 74, 36, 0.03);
   transform: scale(1.03);
 }
 
@@ -39,7 +39,7 @@
   gap: 6px;
   padding: 6px 18px;
   background: var(--gradient-primary);
-  color: var(--black);
+  color: #FFFFFF;
   font-size: 0.75rem;
   font-weight: 700;
   border-radius: 100px;
@@ -148,6 +148,17 @@
   text-align: center;
   flex-shrink: 0;
   color: var(--gray);
+}
+
+.custom-package-info {
+  text-align: center;
+  padding: 20px 8px;
+}
+
+.custom-package-info p {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--gray-lighter);
 }
 
 .package-btn {

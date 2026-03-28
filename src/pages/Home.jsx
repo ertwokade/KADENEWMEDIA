@@ -47,7 +47,7 @@ const testimonials = [
     textTr: 'Kade Media ile çalışmaya başladığımızdan beri sosyal medya etkileşimimiz %300 arttı. Profesyonel ekipleri ve yaratıcı içerikleriyle markamızı bambaşka bir seviyeye taşıdılar.',
     textEn: 'Since we started working with Kade Media, our social media engagement has increased by 300%. They took our brand to a whole new level with their professional team and creative content.',
     avatar: 'AY',
-    color: '#FFEE00',
+    color: '#B84A24',
   },
   {
     nameTr: 'Elif Özkan',

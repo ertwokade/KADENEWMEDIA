@@ -35,7 +35,7 @@ const EMAILJS_TEMPLATE_ID = 'template_u92l7zb'
 const EMAILJS_PUBLIC_KEY = '_TMInxsynNbt7MhxX'
 
 export default function Contact() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const formRef = useRef(null)
   const [formData, setFormData] = useState({
     name: '',
@@ -55,9 +55,9 @@ export default function Contact() {
   }
 
   const buildWhatsAppLink = (data) => {
-    const text = encodeURIComponent(
-      `Yeni Teklif Talebi 📩\n\nAd: ${data.name}\nE-posta: ${data.email}\nTelefon: ${data.phone || '-'}\nŞirket: ${data.company || '-'}\nHizmet: ${data.service || '-'}\n\nMesaj:\n${data.message}`
-    )
+    const text = lang === 'en'
+      ? encodeURIComponent(`New Quote Request 📩\n\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone || '-'}\nCompany: ${data.company || '-'}\nService: ${data.service || '-'}\n\nMessage:\n${data.message}`)
+      : encodeURIComponent(`Yeni Teklif Talebi 📩\n\nAd: ${data.name}\nE-posta: ${data.email}\nTelefon: ${data.phone || '-'}\nŞirket: ${data.company || '-'}\nHizmet: ${data.service || '-'}\n\nMesaj:\n${data.message}`)
     return `https://wa.me/905067293423?text=${text}`
   }
 
@@ -85,39 +85,39 @@ export default function Contact() {
 
     const waLink = buildWhatsAppLink(formData)
 
+    let sent = false
+
+    // Try backend API first (saves to MongoDB + SMTP)
     try {
-      // Try backend API first (saves to MongoDB + SMTP)
       await sendContactApi(formData)
-      setSubmitted(true)
-      setWhatsappLink(waLink)
-      setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
-      setTimeout(() => {
-        setSubmitted(false)
-        setWhatsappLink(null)
-      }, 10000)
+      sent = true
     } catch (apiError) {
       console.log('Backend API failed, trying EmailJS...', apiError)
+    }
+
+    // Fallback: EmailJS
+    if (!sent) {
       try {
-        // Fallback: EmailJS
         await sendViaEmailJS(formData)
-        setSubmitted(true)
-        setWhatsappLink(waLink)
-        setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
-        setTimeout(() => {
-          setSubmitted(false)
-          setWhatsappLink(null)
-        }, 10000)
+        sent = true
       } catch (emailjsError) {
         console.log('EmailJS failed, opening WhatsApp...', emailjsError)
-        // Last fallback: WhatsApp
-        window.open(waLink, '_blank')
-        setSubmitted(true)
-        setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
-        setTimeout(() => setSubmitted(false), 5000)
       }
-    } finally {
-      setSending(false)
     }
+
+    // Last fallback: WhatsApp
+    if (!sent) {
+      window.open(waLink, '_blank')
+    }
+
+    setSubmitted(true)
+    setWhatsappLink(waLink)
+    setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+    setTimeout(() => {
+      setSubmitted(false)
+      setWhatsappLink(null)
+    }, 10000)
+    setSending(false)
   }
 
   const contactInfo = [
@@ -299,7 +299,7 @@ export default function Contact() {
                     <option value="icerik">{t('servicesSection.content')}</option>
                     <option value="reklam">{t('servicesSection.ads')}</option>
                     <option value="influencer">{t('servicesSection.influencer')}</option>
-                    <option value="video">Video Prodüksiyon</option>
+                    <option value="video">{t('contact.videoProduction')}</option>
                     <option value="danismanlik">{t('contact.consultingOption')}</option>
                   </select>
                 </div>
@@ -326,7 +326,7 @@ export default function Contact() {
                   {submitted ? (
                     t('contact.submitted')
                   ) : sending ? (
-                    <span className="sending-loader">{t('contact.sending') || 'Gönderiliyor...'}</span>
+                    <span className="sending-loader">{t('contact.sending')}</span>
                   ) : (
                     <>
                       {t('contact.submit')}
@@ -346,7 +346,7 @@ export default function Contact() {
                     style={{ marginTop: '12px', width: '100%', justifyContent: 'center', gap: '8px' }}
                   >
                     <FaWhatsapp size={18} />
-                    WhatsApp ile de gönderin
+                    {t('contact.whatsappAlso')}
                   </motion.a>
                 )}
               </form>

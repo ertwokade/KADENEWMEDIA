@@ -134,7 +134,7 @@
 
 .theme-toggle:hover {
   border-color: var(--primary);
-  background: rgba(255, 238, 0, 0.08);
+  background: rgba(184, 74, 36, 0.08);
 }
 
 .theme-toggle-mobile {
@@ -191,7 +191,7 @@
 .mobile-link:hover,
 .mobile-link.active {
   color: var(--primary);
-  background: rgba(255, 238, 0, 0.05);
+  background: rgba(184, 74, 36, 0.05);
 }
 
 .mobile-cta {
