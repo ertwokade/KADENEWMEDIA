@@ -51,7 +51,7 @@ export default function Navbar() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <img src="/logo-icon.svg" alt="" className="logo-icon" />
+            <img src="/logo.svg" alt="" className="logo-icon" />
             <span className="logo-text">KADE <span className="logo-sub">MEDIA</span></span>
           </motion.div>
         </Link>

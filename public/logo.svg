@@ -4,9 +4,15 @@
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
  width="514.000000pt" height="180.000000pt" viewBox="0 0 514.000000 180.000000"
  preserveAspectRatio="xMidYMid meet">
-
+<defs>
+  <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#f5e058"/>
+    <stop offset="50%" stop-color="#eac321"/>
+    <stop offset="100%" stop-color="#b89a18"/>
+  </linearGradient>
+</defs>
 <g transform="translate(0.000000,180.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
+fill="url(#gold)" stroke="none">
 <path d="M473 1589 c-29 -53 -53 -102 -53 -108 0 -6 -5 -11 -11 -11 -5 0 -7
 -4 -4 -10 3 -5 2 -10 -2 -10 -15 0 -13 -43 3 -92 14 -42 20 -48 61 -62 26 -9
 51 -12 55 -8 5 5 7 96 6 203 l-3 194 -52 -96z"/>
