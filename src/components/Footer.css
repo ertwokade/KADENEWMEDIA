@@ -25,24 +25,14 @@
 }
 
 .footer-logo {
-  font-family: var(--font-primary);
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: 2px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #f5e058 0%, #eac321 60%, #c9a81c 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  display: inline-block;
 }
 
 .footer-logo-icon {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
+  height: 48px;
+  width: auto;
+  display: block;
+  margin-bottom: 16px;
 }
 
 .footer-logo em {
