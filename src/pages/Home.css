@@ -33,7 +33,7 @@
   height: 600px;
   top: -200px;
   right: -200px;
-  background: radial-gradient(circle, rgba(184, 74, 36, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(234, 195, 33, 0.12) 0%, transparent 70%);
 }
 
 .hero-glow-2 {
@@ -41,7 +41,7 @@
   height: 400px;
   bottom: -100px;
   left: -100px;
-  background: radial-gradient(circle, rgba(184, 74, 36, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(234, 195, 33, 0.08) 0%, transparent 70%);
 }
 
 .hero-content {
@@ -57,7 +57,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 20px;
-  background: rgba(184, 74, 36, 0.08);
+  background: rgba(234, 195, 33, 0.08);
   border: 1px solid var(--border-color);
   border-radius: 100px;
   font-size: 0.8rem;
@@ -153,7 +153,7 @@
 .platform-icon:hover {
   border-color: var(--primary);
   color: var(--primary);
-  background: rgba(184, 74, 36, 0.08);
+  background: rgba(234, 195, 33, 0.08);
 }
 
 .hero-scroll-indicator {
@@ -239,7 +239,7 @@
   width: 56px;
   height: 56px;
   border-radius: 14px;
-  background: rgba(184, 74, 36, 0.08);
+  background: rgba(234, 195, 33, 0.08);
   border: 1px solid var(--border-color);
   color: var(--primary);
   margin-bottom: 20px;
@@ -264,7 +264,7 @@
   font-family: var(--font-primary);
   font-size: 3rem;
   font-weight: 800;
-  color: rgba(184, 74, 36, 0.04);
+  color: rgba(234, 195, 33, 0.04);
   line-height: 1;
 }
 
@@ -440,7 +440,7 @@
   transform: translate(-50%, -50%);
   width: 600px;
   height: 400px;
-  background: radial-gradient(ellipse, rgba(184, 74, 36, 0.06) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(234, 195, 33, 0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 

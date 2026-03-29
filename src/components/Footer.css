@@ -13,7 +13,7 @@
   transform: translateX(-50%);
   width: 600px;
   height: 400px;
-  background: radial-gradient(ellipse, rgba(184, 74, 36, 0.06) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(234, 195, 33, 0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -65,7 +65,7 @@
 }
 
 .social-link:hover {
-  background: rgba(184, 74, 36, 0.1);
+  background: rgba(234, 195, 33, 0.1);
   border-color: var(--primary);
   color: var(--primary);
 }
@@ -115,7 +115,7 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(184, 74, 36, 0.1);
+  background: rgba(234, 195, 33, 0.1);
   border: 1px solid var(--border-color);
   color: var(--primary);
   transition: all 0.3s ease;

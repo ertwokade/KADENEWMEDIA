@@ -1,28 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56" fill="none">
   <defs>
-    <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="i1" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#f5e058"/>
       <stop offset="100%" stop-color="#eac321"/>
     </linearGradient>
-    <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="i2" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#eac321"/>
-      <stop offset="100%" stop-color="#8a6f0a"/>
-    </linearGradient>
-    <linearGradient id="lg3" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#d4b820"/>
       <stop offset="100%" stop-color="#7a6010"/>
     </linearGradient>
-    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="tg" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#f5e058"/>
-      <stop offset="50%" stop-color="#eac321"/>
-      <stop offset="100%" stop-color="#d4b820"/>
+      <stop offset="60%" stop-color="#eac321"/>
+      <stop offset="100%" stop-color="#c9a81c"/>
     </linearGradient>
   </defs>
-  <!-- Icon: 4 triangles -->
-  <polygon points="2,2 24,2 2,24" fill="url(#lg1)"/>
-  <polygon points="26,2 46,2 46,22" fill="url(#lg2)"/>
-  <polygon points="2,26 22,46 2,46" fill="url(#lg2)"/>
-  <polygon points="24,46 46,24 46,46" fill="url(#lg3)"/>
-  <!-- Text: KADE -->
-  <text x="56" y="36" font-family="'Outfit', 'Space Grotesk', sans-serif" font-size="28" font-weight="700" letter-spacing="4" fill="url(#textGrad)">KADE</text>
+
+  <!-- Icon: 4 triangles (pinwheel) -->
+  <!-- top-left large -->
+  <polygon points="2,2 26,2 2,26" fill="url(#i1)"/>
+  <!-- top-right small -->
+  <polygon points="29,2 52,2 52,25" fill="url(#i2)"/>
+  <!-- bottom-left small -->
+  <polygon points="2,29 25,52 2,52" fill="url(#i2)"/>
+  <!-- bottom-right large -->
+  <polygon points="28,52 52,28 52,52" fill="url(#i2)" opacity="0.85"/>
+
+  <!-- Text: KADE MEDIA using simple rectangles/paths -->
+  <!-- K -->
+  <rect x="64" y="12" width="4" height="32" fill="url(#tg)"/>
+  <polygon points="68,28 86,12 82,12 64,28" fill="url(#tg)"/>
+  <polygon points="68,28 86,44 82,44 64,28" fill="url(#tg)"/>
+
+  <!-- A -->
+  <polygon points="94,44 104,12 108,12 118,44 114,44 106,16 98,44" fill="url(#tg)"/>
+  <rect x="99" y="31" width="14" height="4" fill="url(#tg)"/>
+
+  <!-- D -->
+  <rect x="124" y="12" width="4" height="32" fill="url(#tg)"/>
+  <path d="M128 12 Q148 12 148 28 Q148 44 128 44 L128 40 Q142 40 142 28 Q142 16 128 16 Z" fill="url(#tg)"/>
+
+  <!-- E -->
+  <rect x="154" y="12" width="4" height="32" fill="url(#tg)"/>
+  <rect x="158" y="12" width="16" height="4" fill="url(#tg)"/>
+  <rect x="158" y="26" width="13" height="4" fill="url(#tg)"/>
+  <rect x="158" y="40" width="16" height="4" fill="url(#tg)"/>
 </svg>

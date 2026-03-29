@@ -13,8 +13,8 @@
   background: rgba(15, 15, 15, 0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(184, 74, 36, 0.2);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(184, 74, 36, 0.08);
+  border: 1px solid rgba(234, 195, 33, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(234, 195, 33, 0.08);
   animation: chatbotSlideIn 0.3s ease;
 }
 
@@ -34,8 +34,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  background: linear-gradient(135deg, rgba(184, 74, 36, 0.12) 0%, rgba(184, 74, 36, 0.08) 100%);
-  border-bottom: 1px solid rgba(184, 74, 36, 0.15);
+  background: linear-gradient(135deg, rgba(234, 195, 33, 0.12) 0%, rgba(234, 195, 33, 0.08) 100%);
+  border-bottom: 1px solid rgba(234, 195, 33, 0.15);
 }
 
 .chatbot-header-info {
@@ -108,7 +108,7 @@
   min-height: 280px;
   max-height: 340px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(184, 74, 36, 0.3) transparent;
+  scrollbar-color: rgba(234, 195, 33, 0.3) transparent;
 }
 
 .chatbot-messages::-webkit-scrollbar {
@@ -116,7 +116,7 @@
 }
 
 .chatbot-messages::-webkit-scrollbar-thumb {
-  background: rgba(184, 74, 36, 0.3);
+  background: rgba(234, 195, 33, 0.3);
   border-radius: 2px;
 }
 
@@ -162,8 +162,8 @@
 }
 
 .chat-message.user .chat-bubble {
-  background: linear-gradient(135deg, rgba(184, 74, 36, 0.15), rgba(184, 74, 36, 0.1));
-  border: 1px solid rgba(184, 74, 36, 0.25);
+  background: linear-gradient(135deg, rgba(234, 195, 33, 0.15), rgba(234, 195, 33, 0.1));
+  border: 1px solid rgba(234, 195, 33, 0.25);
   color: #fff;
   border-bottom-right-radius: 4px;
 }
@@ -180,16 +180,16 @@
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 500;
-  background: rgba(184, 74, 36, 0.08);
-  border: 1px solid rgba(184, 74, 36, 0.2);
+  background: rgba(234, 195, 33, 0.08);
+  border: 1px solid rgba(234, 195, 33, 0.2);
   color: #d4b820;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .quick-reply-btn:hover {
-  background: rgba(184, 74, 36, 0.15);
-  border-color: rgba(184, 74, 36, 0.4);
+  background: rgba(234, 195, 33, 0.15);
+  border-color: rgba(234, 195, 33, 0.4);
   transform: translateY(-1px);
 }
 
@@ -219,7 +219,7 @@
 }
 
 .chatbot-input:focus {
-  border-color: rgba(184, 74, 36, 0.3);
+  border-color: rgba(234, 195, 33, 0.3);
   outline: none;
 }
 
@@ -238,7 +238,7 @@
 
 .chatbot-send:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(184, 74, 36, 0.3);
+  box-shadow: 0 0 15px rgba(234, 195, 33, 0.3);
 }
 
 .chatbot-send:disabled {

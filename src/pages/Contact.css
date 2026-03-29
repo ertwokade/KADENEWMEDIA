@@ -52,7 +52,7 @@
   height: 48px;
   min-width: 48px;
   border-radius: 12px;
-  background: rgba(184, 74, 36, 0.08);
+  background: rgba(234, 195, 33, 0.08);
   border: 1px solid var(--border-color);
   color: var(--primary);
 }
@@ -105,7 +105,7 @@ a.contact-card-value:hover {
 }
 
 .contact-social-link:hover {
-  background: rgba(184, 74, 36, 0.1);
+  background: rgba(234, 195, 33, 0.1);
   border-color: var(--primary);
   color: var(--primary);
 }
@@ -161,7 +161,7 @@ a.contact-card-value:hover {
 .form-group select:focus,
 .form-group textarea:focus {
   border-color: var(--primary);
-  background: rgba(184, 74, 36, 0.03);
+  background: rgba(234, 195, 33, 0.03);
 }
 
 .form-group select {

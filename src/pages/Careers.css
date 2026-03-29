@@ -64,7 +64,7 @@
 }
 
 .job-header:hover {
-  background: rgba(184, 74, 36, 0.02);
+  background: rgba(234, 195, 33, 0.02);
 }
 
 .job-info h3 {
@@ -92,7 +92,7 @@
 }
 
 .job-toggle {
-  background: rgba(184, 74, 36, 0.08);
+  background: rgba(234, 195, 33, 0.08);
   border: 1px solid var(--border-color);
   color: var(--primary);
   width: 36px;
@@ -106,7 +106,7 @@
 }
 
 .job-toggle:hover {
-  background: rgba(184, 74, 36, 0.15);
+  background: rgba(234, 195, 33, 0.15);
 }
 
 .job-details {
@@ -165,7 +165,7 @@
   margin-top: 48px;
   padding: 40px;
   border-radius: 20px;
-  background: rgba(184, 74, 36, 0.03);
+  background: rgba(234, 195, 33, 0.03);
   border: 1px solid var(--border-color);
 }
 

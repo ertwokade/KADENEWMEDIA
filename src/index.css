@@ -7,11 +7,11 @@
   --primary: #eac321;
   --primary-dark: #b89a18;
   --primary-light: #fdf6c3;
-  --black: #0e0e16;
-  --black-light: #131320;
-  --black-lighter: #1a1a28;
-  --dark-gray: #22223a;
-  --gray: #2c2c45;
+  --black: #0a0a0a;
+  --black-light: #0f0f0f;
+  --black-lighter: #141414;
+  --dark-gray: #1e1e1e;
+  --gray: #282828;
   --gray-light: #888888;
   --gray-lighter: #BBBBBB;
   --white: #FFFFFF;
@@ -19,7 +19,7 @@
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #d4b820 0%, #eac321 100%);
-  --gradient-dark: linear-gradient(180deg, #0e0e16 0%, #1a1a28 100%);
+  --gradient-dark: linear-gradient(180deg, #0a0a0a 0%, #141414 100%);
   --gradient-card: linear-gradient(145deg, rgba(234,195,33,0.05) 0%, rgba(234,195,33,0) 100%);
   --gradient-glow: radial-gradient(circle at center, rgba(234,195,33,0.15) 0%, transparent 70%);
 

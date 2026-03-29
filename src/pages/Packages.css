@@ -25,7 +25,7 @@
 
 .package-card.popular {
   border-color: var(--primary);
-  background: rgba(184, 74, 36, 0.03);
+  background: rgba(234, 195, 33, 0.03);
   transform: scale(1.03);
 }
 

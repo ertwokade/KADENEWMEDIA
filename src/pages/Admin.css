@@ -11,7 +11,7 @@
   --text-secondary: #5C5753;
   --text-tertiary: #9E9994;
   --accent: #eac321;
-  --accent-alpha: rgba(184, 74, 36, 0.08);
+  --accent-alpha: rgba(234, 195, 33, 0.08);
   --border: rgba(0, 0, 0, 0.08);
 }
 
@@ -112,7 +112,7 @@
 .admin-dashboard .btn-primary:hover,
 .admin-login-container .btn-primary:hover {
   background: #b89a18;
-  box-shadow: 0 4px 16px rgba(184, 74, 36, 0.25);
+  box-shadow: 0 4px 16px rgba(234, 195, 33, 0.25);
 }
 
 .admin-dashboard .btn-outline,
@@ -570,7 +570,7 @@
 }
 
 .status-badge.unread {
-  background: rgba(184, 74, 36, 0.15);
+  background: rgba(234, 195, 33, 0.15);
   color: #eac321;
 }
 
