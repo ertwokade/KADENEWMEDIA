@@ -66,7 +66,11 @@ export default function Blog() {
           <FadeIn>
             <motion.div className="blog-featured glass-card" whileHover={{ y: -4 }}>
               <div className="blog-featured-image" style={{ background: `${blogPosts[0].color}15` }}>
-                <span>{blogPosts[0].image}</span>
+                {blogPosts[0].image && blogPosts[0].image.startsWith('http') ? (
+                  <img src={blogPosts[0].image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <span>{blogPosts[0].image}</span>
+                )}
               </div>
               <div className="blog-featured-content">
                 <div className="blog-meta">
@@ -95,7 +99,11 @@ export default function Blog() {
               <StaggerItem key={post._id || post.id || idx}>
                 <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
                   <div className="blog-card-image" style={{ background: `${post.color}15` }}>
-                    <span>{post.image}</span>
+                    {post.image && post.image.startsWith('http') ? (
+                      <img src={post.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <span>{post.image}</span>
+                    )}
                   </div>
                   <div className="blog-card-content">
                     <div className="blog-meta">

@@ -155,10 +155,9 @@ function BlogSection({ showToast }) {
   const [form, setForm] = useState({
     titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
     contentTr: '', contentEn: '', category: '', categoryEn: '',
-    slug: '', image: '📝', color: '#eac321', readTime: 5,
+    slug: '', image: '', color: '#eac321', readTime: 5,
   })
 
-  const emojis = ['📱', '🎬', '📊', '🎵', '🤝', '📅', '📝', '💡', '🚀', '🎯', '💻', '🌐']
   const colors = ['#6C63FF', '#E91E63', '#eac321', '#2ECC71', '#00BCD4', '#9C27B0', '#FF9800', '#607D8B']
 
   const fetchBlogs = async () => {
@@ -178,7 +177,7 @@ function BlogSection({ showToast }) {
     setForm({
       titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
       contentTr: '', contentEn: '', category: '', categoryEn: '',
-      slug: '', image: '📝', color: '#eac321', readTime: 5,
+      slug: '', image: '', color: '#eac321', readTime: 5,
     })
     setEditingBlog(null)
     setShowForm(false)
@@ -190,7 +189,7 @@ function BlogSection({ showToast }) {
       excerptTr: blog.excerptTr || '', excerptEn: blog.excerptEn || '',
       contentTr: blog.contentTr || '', contentEn: blog.contentEn || '',
       category: blog.category || '', categoryEn: blog.categoryEn || '',
-      slug: blog.slug || '', image: blog.image || '📝',
+      slug: blog.slug || '', image: blog.image || '',
       color: blog.color || '#eac321', readTime: blog.readTime || 5,
     })
     setEditingBlog(blog)
@@ -379,19 +378,21 @@ function BlogSection({ showToast }) {
                     />
                   </div>
                   <div className="form-group">
-                    <label>İkon</label>
-                    <div className="emoji-grid">
-                      {emojis.map((e) => (
-                        <button
-                          key={e}
-                          type="button"
-                          className={`emoji-btn ${form.image === e ? 'selected' : ''}`}
-                          onClick={() => setForm({ ...form, image: e })}
-                        >
-                          {e}
-                        </button>
-                      ))}
-                    </div>
+                    <label>Fotoğraf URL</label>
+                    <input
+                      type="url"
+                      placeholder="https://example.com/image.jpg"
+                      value={form.image}
+                      onChange={(e) => setForm({ ...form, image: e.target.value })}
+                    />
+                    {form.image && form.image.startsWith('http') && (
+                      <img
+                        src={form.image}
+                        alt="Önizleme"
+                        style={{ marginTop: '8px', maxHeight: '100px', borderRadius: '8px', objectFit: 'cover' }}
+                        onError={(e) => { e.target.style.display = 'none' }}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -452,7 +453,11 @@ function BlogSection({ showToast }) {
               {blogs.map((blog) => (
                 <tr key={blog._id}>
                   <td>
-                    <span style={{ fontSize: '1.5rem' }}>{blog.image}</span>
+                    {blog.image && blog.image.startsWith('http') ? (
+                      <img src={blog.image} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ fontSize: '1.5rem' }}>{blog.image || '-'}</span>
+                    )}
                   </td>
                   <td>
                     <strong>{blog.titleTr}</strong>

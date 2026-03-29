@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
@@ -15,13 +14,10 @@ import Blog from './pages/Blog'
 import Admin from './pages/Admin'
 import ScrollToTop from './components/ScrollToTop'
 import WhatsAppButton from './components/WhatsAppButton'
-import ChatBot from './components/ChatBot'
-import ChatToggleButton from './components/ChatToggleButton'
 import CookieBanner from './components/CookieBanner'
 
 function App() {
   const location = useLocation()
-  const [chatOpen, setChatOpen] = useState(false)
   const isAdmin = location.pathname === '/admin'
 
   return (
@@ -44,8 +40,6 @@ function App() {
       </AnimatePresence>
       {!isAdmin && <Footer />}
       {!isAdmin && <WhatsAppButton />}
-      {!isAdmin && <ChatToggleButton isOpen={chatOpen} onClick={() => setChatOpen(!chatOpen)} />}
-      {!isAdmin && <ChatBot isOpen={chatOpen} onClose={() => setChatOpen(false)} />}
       {!isAdmin && <CookieBanner />}
     </>
   )

@@ -26,7 +26,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { partnersData } from '../data/content'
 import PageTransition from '../components/PageTransition'
-import Scene3D from '../components/Scene3D'
+import HeroBackground from '../components/HeroBackground'
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '../components/Animations'
 import AuditScore from '../components/AuditScore'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -191,7 +191,7 @@ export default function Home() {
       <section className="hero">
         <PageBgAnimation type="home" />
         <div className="hero-3d">
-          <Scene3D />
+          <HeroBackground />
         </div>
         <div className="grid-bg" />
         <div className="hero-glow hero-glow-1" />
