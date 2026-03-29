@@ -43,6 +43,7 @@ export default function Contact() {
     keywords: 'sosyal medya ajansı iletişim, dijital pazarlama teklif, sosyal medya yönetim teklifi, kade media iletişim',
     path: '/iletisim',
   })
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -91,7 +92,6 @@ export default function Contact() {
     const waLink = buildWhatsAppLink(formData)
     let sent = false
 
-    // Try backend API first (saves to MongoDB + SMTP)
     try {
       await sendContactApi(formData)
       sent = true
@@ -99,7 +99,6 @@ export default function Contact() {
       console.log('Backend API failed, trying EmailJS...', apiError)
     }
 
-    // Fallback: EmailJS
     if (!sent) {
       try {
         await sendViaEmailJS(formData)
@@ -109,7 +108,6 @@ export default function Contact() {
       }
     }
 
-    // Last fallback: WhatsApp
     if (!sent) {
       window.open(waLink, '_blank')
     }
@@ -153,7 +151,6 @@ export default function Contact() {
 
   return (
     <PageTransition>
-      {/* Hero */}
       <section className="contact-hero">
         <PageBgAnimation type="contact" />
         <div className="grid-bg" />
@@ -178,11 +175,9 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Contact Content */}
       <section className="section">
         <div className="container">
           <div className="contact-grid">
-            {/* Contact Info */}
             <FadeIn direction="left" className="contact-info">
               <h2>{t('contact.infoTitle')}</h2>
               <p className="contact-info-desc">
@@ -237,7 +232,6 @@ export default function Contact() {
               </div>
             </FadeIn>
 
-            {/* Contact Form */}
             <FadeIn direction="right" className="contact-form-wrapper">
               <form className="contact-form glass-card" onSubmit={handleSubmit}>
                 <h3>{t('contact.formTitle')}</h3>
@@ -358,7 +352,6 @@ export default function Contact() {
             </FadeIn>
           </div>
 
-          {/* Map Section */}
           <FadeIn delay={0.3}>
             <div className="contact-map-section">
               <div className="contact-map-header">
