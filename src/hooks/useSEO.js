@@ -26,7 +26,7 @@ function setCanonical(url) {
 
 export function useSEO({ title, description, keywords, path = '/', image }) {
   useEffect(() => {
-    const fullTitle = title ? `${title} | Kade Media` : 'Kade Media | Sosyal Medya Ajansı İstanbul'
+    const fullTitle = title ? `${title} | Kade Media` : 'Kade Media | Sosyal Medya Ajansı'
     const canonicalUrl = `${BASE_URL}${path}`
     const ogImage = image || `${BASE_URL}/og-image.jpg`
 

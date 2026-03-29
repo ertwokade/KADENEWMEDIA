@@ -526,6 +526,11 @@ function ContentSection({ showToast }) {
   const tabs = [
     { id: 'hero', label: '🏠 Hero', desc: 'Anasayfa başlık ve açıklama' },
     { id: 'stats', label: '📊 İstatistikler', desc: 'Sayaç verileri' },
+    { id: 'services', label: '⚡ Hizmetler', desc: 'Hizmet kartları' },
+    { id: 'faq', label: '❓ SSS', desc: 'Sıkça sorulan sorular' },
+    { id: 'testimonials', label: '💬 Referanslar', desc: 'Müşteri yorumları' },
+    { id: 'packages', label: '💰 Paketler', desc: 'Fiyatlandırma' },
+    { id: 'about', label: '👥 Hakkımızda', desc: 'Hakkımızda sayfası' },
     { id: 'footer', label: '🦶 Footer', desc: 'Alt bilgi, iletişim ve sosyal medya' },
   ]
 
@@ -563,6 +568,41 @@ function ContentSection({ showToast }) {
         <StatsEditor
           data={content.stats || { clients: '150+', followers: '2M+', campaigns: '500+', satisfaction: '98%' }}
           onSave={(data) => handleSave('stats', data)}
+        />
+      )}
+
+      {activeTab === 'services' && (
+        <ServicesEditor
+          data={content.services || { items: [] }}
+          onSave={(data) => handleSave('services', data)}
+        />
+      )}
+
+      {activeTab === 'faq' && (
+        <FAQEditor
+          data={content.faq || { tr: [], en: [] }}
+          onSave={(data) => handleSave('faq', data)}
+        />
+      )}
+
+      {activeTab === 'testimonials' && (
+        <TestimonialsEditor
+          data={content.testimonials || { items: [] }}
+          onSave={(data) => handleSave('testimonials', data)}
+        />
+      )}
+
+      {activeTab === 'packages' && (
+        <PackagesEditor
+          data={content.packages || { items: [] }}
+          onSave={(data) => handleSave('packages', data)}
+        />
+      )}
+
+      {activeTab === 'about' && (
+        <AboutEditor
+          data={content.about || {}}
+          onSave={(data) => handleSave('about', data)}
         />
       )}
 
@@ -713,6 +753,410 @@ function FooterEditor({ data, onSave }) {
         </div>
       </div>
       <div className="admin-form-actions">
+        <button className="btn btn-primary" onClick={() => onSave(form)}>
+          <HiOutlineSave size={16} /> Kaydet
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ========== SERVICES EDITOR ==========
+function ServicesEditor({ data, onSave }) {
+  const emptyItem = { titleTr: '', titleEn: '', descTr: '', descEn: '', featuresTr: '', featuresEn: '' }
+  const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
+
+  useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
+
+  const updateItem = (index, field, value) => {
+    const updated = [...items]
+    updated[index] = { ...updated[index], [field]: value }
+    setItems(updated)
+  }
+
+  return (
+    <div className="admin-form">
+      <h3>Hizmetler</h3>
+      <p style={{ color: 'var(--gray-light)', fontSize: '0.85rem', marginBottom: 16 }}>
+        Her hizmetin başlık, açıklama ve özelliklerini düzenleyin. Özellikler virgülle ayrılır.
+      </p>
+      {items.map((item, i) => (
+        <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <strong style={{ color: 'var(--white)' }}>Hizmet {i + 1}</strong>
+            {items.length > 1 && (
+              <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
+                onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
+                <HiOutlineTrash size={14} /> Sil
+              </button>
+            )}
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Başlık (TR)</label>
+              <input type="text" value={item.titleTr || ''} onChange={(e) => updateItem(i, 'titleTr', e.target.value)} />
+            </div>
+            <div className="form-group"><label>Başlık (EN)</label>
+              <input type="text" value={item.titleEn || ''} onChange={(e) => updateItem(i, 'titleEn', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Açıklama (TR)</label>
+              <textarea rows="2" value={item.descTr || ''} onChange={(e) => updateItem(i, 'descTr', e.target.value)} />
+            </div>
+            <div className="form-group"><label>Açıklama (EN)</label>
+              <textarea rows="2" value={item.descEn || ''} onChange={(e) => updateItem(i, 'descEn', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Özellikler (TR, virgülle)</label>
+              <input type="text" value={item.featuresTr || ''} onChange={(e) => updateItem(i, 'featuresTr', e.target.value)} placeholder="Özellik 1, Özellik 2, ..." />
+            </div>
+            <div className="form-group"><label>Özellikler (EN, virgülle)</label>
+              <input type="text" value={item.featuresEn || ''} onChange={(e) => updateItem(i, 'featuresEn', e.target.value)} placeholder="Feature 1, Feature 2, ..." />
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="admin-form-actions" style={{ gap: 12 }}>
+        <button className="btn btn-outline" onClick={() => setItems([...items, { ...emptyItem }])}>
+          <HiOutlinePlus size={16} /> Yeni Hizmet Ekle
+        </button>
+        <button className="btn btn-primary" onClick={() => onSave({ items })}>
+          <HiOutlineSave size={16} /> Kaydet
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ========== FAQ EDITOR ==========
+function FAQEditor({ data, onSave }) {
+  const [trItems, setTrItems] = useState(data.tr?.length ? data.tr : [{ q: '', a: '' }])
+  const [enItems, setEnItems] = useState(data.en?.length ? data.en : [{ q: '', a: '' }])
+  const [langTab, setLangTab] = useState('tr')
+
+  useEffect(() => {
+    if (data.tr?.length) setTrItems(data.tr)
+    if (data.en?.length) setEnItems(data.en)
+  }, [data])
+
+  const items = langTab === 'tr' ? trItems : enItems
+  const setItems = langTab === 'tr' ? setTrItems : setEnItems
+
+  const updateItem = (index, field, value) => {
+    const updated = [...items]
+    updated[index] = { ...updated[index], [field]: value }
+    setItems(updated)
+  }
+
+  return (
+    <div className="admin-form">
+      <h3>Sıkça Sorulan Sorular (SSS)</h3>
+      <div className="admin-tabs" style={{ marginBottom: 16 }}>
+        <button className={`admin-tab ${langTab === 'tr' ? 'active' : ''}`} onClick={() => setLangTab('tr')}>🇹🇷 Türkçe</button>
+        <button className={`admin-tab ${langTab === 'en' ? 'active' : ''}`} onClick={() => setLangTab('en')}>🇬🇧 English</button>
+      </div>
+      {items.map((item, i) => (
+        <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <strong style={{ color: 'var(--white)' }}>Soru {i + 1}</strong>
+            {items.length > 1 && (
+              <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
+                onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
+                <HiOutlineTrash size={14} /> Sil
+              </button>
+            )}
+          </div>
+          <div className="form-group"><label>Soru</label>
+            <input type="text" value={item.q || ''} onChange={(e) => updateItem(i, 'q', e.target.value)} />
+          </div>
+          <div className="form-group"><label>Cevap</label>
+            <textarea rows="3" value={item.a || ''} onChange={(e) => updateItem(i, 'a', e.target.value)} />
+          </div>
+        </div>
+      ))}
+      <div className="admin-form-actions" style={{ gap: 12 }}>
+        <button className="btn btn-outline" onClick={() => setItems([...items, { q: '', a: '' }])}>
+          <HiOutlinePlus size={16} /> Yeni Soru Ekle
+        </button>
+        <button className="btn btn-primary" onClick={() => onSave({ tr: trItems, en: enItems })}>
+          <HiOutlineSave size={16} /> Kaydet
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ========== TESTIMONIALS EDITOR ==========
+function TestimonialsEditor({ data, onSave }) {
+  const emptyItem = { nameTr: '', nameEn: '', roleTr: '', roleEn: '', textTr: '', textEn: '', avatar: '', color: '#eac321' }
+  const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
+
+  useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
+
+  const updateItem = (index, field, value) => {
+    const updated = [...items]
+    updated[index] = { ...updated[index], [field]: value }
+    setItems(updated)
+  }
+
+  const colors = ['#eac321', '#6C63FF', '#2ECC71', '#E91E63', '#00BCD4', '#FF9800']
+
+  return (
+    <div className="admin-form">
+      <h3>Müşteri Referansları</h3>
+      {items.map((item, i) => (
+        <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <strong style={{ color: 'var(--white)' }}>Referans {i + 1}</strong>
+            {items.length > 1 && (
+              <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
+                onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
+                <HiOutlineTrash size={14} /> Sil
+              </button>
+            )}
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Ad Soyad (TR)</label>
+              <input type="text" value={item.nameTr || ''} onChange={(e) => updateItem(i, 'nameTr', e.target.value)} />
+            </div>
+            <div className="form-group"><label>Ad Soyad (EN)</label>
+              <input type="text" value={item.nameEn || ''} onChange={(e) => updateItem(i, 'nameEn', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Unvan (TR)</label>
+              <input type="text" value={item.roleTr || ''} onChange={(e) => updateItem(i, 'roleTr', e.target.value)} placeholder="CEO, Şirket Adı" />
+            </div>
+            <div className="form-group"><label>Unvan (EN)</label>
+              <input type="text" value={item.roleEn || ''} onChange={(e) => updateItem(i, 'roleEn', e.target.value)} placeholder="CEO, Company Name" />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Yorum (TR)</label>
+              <textarea rows="3" value={item.textTr || ''} onChange={(e) => updateItem(i, 'textTr', e.target.value)} />
+            </div>
+            <div className="form-group"><label>Yorum (EN)</label>
+              <textarea rows="3" value={item.textEn || ''} onChange={(e) => updateItem(i, 'textEn', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Avatar (İnisiyaller, ör: AY)</label>
+              <input type="text" value={item.avatar || ''} onChange={(e) => updateItem(i, 'avatar', e.target.value)} maxLength={3} />
+            </div>
+            <div className="form-group"><label>Renk</label>
+              <div className="emoji-grid">
+                {colors.map((c) => (
+                  <button key={c} type="button" className={`emoji-btn ${item.color === c ? 'selected' : ''}`}
+                    onClick={() => updateItem(i, 'color', c)} style={{ background: `${c}25` }}>
+                    <span className="color-dot" style={{ background: c }} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="admin-form-actions" style={{ gap: 12 }}>
+        <button className="btn btn-outline" onClick={() => setItems([...items, { ...emptyItem }])}>
+          <HiOutlinePlus size={16} /> Yeni Referans Ekle
+        </button>
+        <button className="btn btn-primary" onClick={() => onSave({ items })}>
+          <HiOutlineSave size={16} /> Kaydet
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ========== PACKAGES EDITOR ==========
+function PackagesEditor({ data, onSave }) {
+  const emptyItem = {
+    nameTr: '', nameEn: '', descTr: '', descEn: '',
+    priceTRY: '', priceUSD: '', tier: 'starter', popular: false,
+    featuresTr: '', featuresEn: '',
+  }
+  const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
+
+  useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
+
+  const updateItem = (index, field, value) => {
+    const updated = [...items]
+    updated[index] = { ...updated[index], [field]: value }
+    setItems(updated)
+  }
+
+  return (
+    <div className="admin-form">
+      <h3>Paketler & Fiyatlandırma</h3>
+      <p style={{ color: 'var(--gray-light)', fontSize: '0.85rem', marginBottom: 16 }}>
+        Paket özelliklerini virgülle ayırarak yazın.
+      </p>
+      {items.map((item, i) => (
+        <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <strong style={{ color: 'var(--white)' }}>Paket {i + 1}</strong>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--gray-lighter)', fontSize: '0.85rem', cursor: 'pointer' }}>
+                <input type="checkbox" checked={item.popular || false} onChange={(e) => updateItem(i, 'popular', e.target.checked)} /> Popüler
+              </label>
+              {items.length > 1 && (
+                <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
+                  onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
+                  <HiOutlineTrash size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Paket Adı (TR)</label>
+              <input type="text" value={item.nameTr || ''} onChange={(e) => updateItem(i, 'nameTr', e.target.value)} />
+            </div>
+            <div className="form-group"><label>Paket Adı (EN)</label>
+              <input type="text" value={item.nameEn || ''} onChange={(e) => updateItem(i, 'nameEn', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Açıklama (TR)</label>
+              <textarea rows="2" value={item.descTr || ''} onChange={(e) => updateItem(i, 'descTr', e.target.value)} />
+            </div>
+            <div className="form-group"><label>Açıklama (EN)</label>
+              <textarea rows="2" value={item.descEn || ''} onChange={(e) => updateItem(i, 'descEn', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Fiyat (TRY)</label>
+              <input type="text" value={item.priceTRY || ''} onChange={(e) => updateItem(i, 'priceTRY', e.target.value)} placeholder="7.500" />
+            </div>
+            <div className="form-group"><label>Fiyat (USD)</label>
+              <input type="text" value={item.priceUSD || ''} onChange={(e) => updateItem(i, 'priceUSD', e.target.value)} placeholder="220" />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Özellikler (TR, virgülle)</label>
+              <textarea rows="3" value={item.featuresTr || ''} onChange={(e) => updateItem(i, 'featuresTr', e.target.value)} placeholder="2 Platform Yönetimi, Aylık 20 İçerik, ..." />
+            </div>
+            <div className="form-group"><label>Özellikler (EN, virgülle)</label>
+              <textarea rows="3" value={item.featuresEn || ''} onChange={(e) => updateItem(i, 'featuresEn', e.target.value)} placeholder="2 Platform Management, 20 Monthly Posts, ..." />
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="admin-form-actions" style={{ gap: 12 }}>
+        <button className="btn btn-outline" onClick={() => setItems([...items, { ...emptyItem }])}>
+          <HiOutlinePlus size={16} /> Yeni Paket Ekle
+        </button>
+        <button className="btn btn-primary" onClick={() => onSave({ items })}>
+          <HiOutlineSave size={16} /> Kaydet
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ========== ABOUT EDITOR ==========
+function AboutEditor({ data, onSave }) {
+  const [form, setForm] = useState({
+    storyTr: data.storyTr || '',
+    storyEn: data.storyEn || '',
+    missionTr: data.missionTr || '',
+    missionEn: data.missionEn || '',
+    experience: data.experience || '8+',
+    teamSize: data.teamSize || '5+',
+    clients: data.clients || '100+',
+    team: data.team || [],
+  })
+  const [langTab, setLangTab] = useState('tr')
+
+  useEffect(() => {
+    setForm({
+      storyTr: data.storyTr || '',
+      storyEn: data.storyEn || '',
+      missionTr: data.missionTr || '',
+      missionEn: data.missionEn || '',
+      experience: data.experience || '8+',
+      teamSize: data.teamSize || '5+',
+      clients: data.clients || '100+',
+      team: data.team || [],
+    })
+  }, [data])
+
+  const emptyMember = { name: '', roleTr: '', roleEn: '', avatar: '' }
+
+  const updateTeam = (index, field, value) => {
+    const updated = [...form.team]
+    updated[index] = { ...updated[index], [field]: value }
+    setForm({ ...form, team: updated })
+  }
+
+  return (
+    <div className="admin-form">
+      <h3>Hakkımızda Sayfası</h3>
+      <div className="admin-tabs" style={{ marginBottom: 16 }}>
+        <button className={`admin-tab ${langTab === 'tr' ? 'active' : ''}`} onClick={() => setLangTab('tr')}>🇹🇷 Türkçe</button>
+        <button className={`admin-tab ${langTab === 'en' ? 'active' : ''}`} onClick={() => setLangTab('en')}>🇬🇧 English</button>
+      </div>
+
+      <div className="form-group"><label>Hikayemiz</label>
+        <textarea rows="4"
+          value={langTab === 'tr' ? form.storyTr : form.storyEn}
+          onChange={(e) => setForm({ ...form, [langTab === 'tr' ? 'storyTr' : 'storyEn']: e.target.value })}
+        />
+      </div>
+      <div className="form-group"><label>Misyonumuz</label>
+        <textarea rows="3"
+          value={langTab === 'tr' ? form.missionTr : form.missionEn}
+          onChange={(e) => setForm({ ...form, [langTab === 'tr' ? 'missionTr' : 'missionEn']: e.target.value })}
+        />
+      </div>
+
+      <h3 style={{ marginTop: 24 }}>İstatistikler</h3>
+      <div className="form-row">
+        <div className="form-group"><label>Deneyim (Yıl)</label>
+          <input type="text" value={form.experience} onChange={(e) => setForm({ ...form, experience: e.target.value })} />
+        </div>
+        <div className="form-group"><label>Ekip Büyüklüğü</label>
+          <input type="text" value={form.teamSize} onChange={(e) => setForm({ ...form, teamSize: e.target.value })} />
+        </div>
+        <div className="form-group"><label>Müşteri Sayısı</label>
+          <input type="text" value={form.clients} onChange={(e) => setForm({ ...form, clients: e.target.value })} />
+        </div>
+      </div>
+
+      <h3 style={{ marginTop: 24 }}>Ekip Üyeleri</h3>
+      {form.team.map((member, i) => (
+        <div key={i} className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <strong style={{ color: 'var(--white)' }}>Üye {i + 1}</strong>
+            {form.team.length > 1 && (
+              <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
+                onClick={() => setForm({ ...form, team: form.team.filter((_, idx) => idx !== i) })}>
+                <HiOutlineTrash size={14} />
+              </button>
+            )}
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Ad Soyad</label>
+              <input type="text" value={member.name || ''} onChange={(e) => updateTeam(i, 'name', e.target.value)} />
+            </div>
+            <div className="form-group"><label>Avatar (İnisiyaller)</label>
+              <input type="text" value={member.avatar || ''} onChange={(e) => updateTeam(i, 'avatar', e.target.value)} maxLength={3} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Unvan (TR)</label>
+              <input type="text" value={member.roleTr || ''} onChange={(e) => updateTeam(i, 'roleTr', e.target.value)} />
+            </div>
+            <div className="form-group"><label>Unvan (EN)</label>
+              <input type="text" value={member.roleEn || ''} onChange={(e) => updateTeam(i, 'roleEn', e.target.value)} />
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="admin-form-actions" style={{ gap: 12 }}>
+        <button className="btn btn-outline" onClick={() => setForm({ ...form, team: [...form.team, { ...emptyMember }] })}>
+          <HiOutlinePlus size={16} /> Yeni Üye Ekle
+        </button>
         <button className="btn btn-primary" onClick={() => onSave(form)}>
           <HiOutlineSave size={16} /> Kaydet
         </button>

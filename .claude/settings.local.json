@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(find 'c:/Users/Kadir Demir/Desktop/web/src' -type f -name *.tsx -o -name *.ts -o -name *.css)",
-      "Bash(find 'c:/Users/Kadir Demir/Desktop/web/src' -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.jsx -o -name *.js \\\\\\))"
+      "Bash(find 'c:/Users/Kadir Demir/Desktop/web/src' -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.jsx -o -name *.js \\\\\\))",
+      "Bash(find '/c/Users/Kadir Demir/Desktop/web' -name *translation* -o -name *i18n* -o -name *locale*)"
     ]
   }
 }
