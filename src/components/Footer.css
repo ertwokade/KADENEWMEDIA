@@ -26,15 +26,28 @@
 
 .footer-logo {
   font-family: var(--font-primary);
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  color: var(--primary);
-  display: inline-block;
+  letter-spacing: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 16px;
+  background: linear-gradient(135deg, #f5e058 0%, #eac321 60%, #c9a81c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.footer-logo span {
-  color: var(--white);
+.footer-logo-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.footer-logo em {
+  font-style: normal;
+  opacity: 0.65;
   font-weight: 400;
 }
 

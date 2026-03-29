@@ -46,13 +46,14 @@ export default function Navbar() {
     >
       <div className="container navbar-container">
         <Link to="/" className="navbar-logo">
-          <motion.img
-            src="/logo.svg"
-            alt="Kade Media"
-            className="logo-img"
+          <motion.div
+            className="logo-wrap"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-          />
+          >
+            <img src="/logo-icon.svg" alt="" className="logo-icon" />
+            <span className="logo-text">KADE <span className="logo-sub">MEDIA</span></span>
+          </motion.div>
         </Link>
 
         <div className="navbar-links">

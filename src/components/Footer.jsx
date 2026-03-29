@@ -46,7 +46,8 @@ export default function Footer() {
         <div className="footer-top">
           <div className="footer-brand">
             <Link to="/" className="footer-logo">
-              kade<span>media</span>
+              <img src="/logo-icon.svg" alt="" className="footer-logo-icon" />
+              <span>KADE <em>MEDIA</em></span>
             </Link>
             <p className="footer-desc">{t('footer.desc')}</p>
             <div className="footer-socials">

@@ -127,7 +127,7 @@ function DashboardSection({ stats }) {
           <div className="stat-label">Blog Yazısı</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(184, 74, 36, 0.10)', color: '#B84A24' }}>🤝</div>
+          <div className="stat-icon" style={{ background: 'rgba(234, 195, 33, 0.10)', color: '#eac321' }}>🤝</div>
           <div className="stat-number">{stats.partners || 0}</div>
           <div className="stat-label">Partner</div>
         </div>
@@ -155,11 +155,11 @@ function BlogSection({ showToast }) {
   const [form, setForm] = useState({
     titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
     contentTr: '', contentEn: '', category: '', categoryEn: '',
-    slug: '', image: '📝', color: '#B84A24', readTime: 5,
+    slug: '', image: '📝', color: '#eac321', readTime: 5,
   })
 
   const emojis = ['📱', '🎬', '📊', '🎵', '🤝', '📅', '📝', '💡', '🚀', '🎯', '💻', '🌐']
-  const colors = ['#6C63FF', '#E91E63', '#B84A24', '#2ECC71', '#00BCD4', '#9C27B0', '#FF9800', '#607D8B']
+  const colors = ['#6C63FF', '#E91E63', '#eac321', '#2ECC71', '#00BCD4', '#9C27B0', '#FF9800', '#607D8B']
 
   const fetchBlogs = async () => {
     try {
@@ -178,7 +178,7 @@ function BlogSection({ showToast }) {
     setForm({
       titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
       contentTr: '', contentEn: '', category: '', categoryEn: '',
-      slug: '', image: '📝', color: '#B84A24', readTime: 5,
+      slug: '', image: '📝', color: '#eac321', readTime: 5,
     })
     setEditingBlog(null)
     setShowForm(false)
@@ -191,7 +191,7 @@ function BlogSection({ showToast }) {
       contentTr: blog.contentTr || '', contentEn: blog.contentEn || '',
       category: blog.category || '', categoryEn: blog.categoryEn || '',
       slug: blog.slug || '', image: blog.image || '📝',
-      color: blog.color || '#B84A24', readTime: blog.readTime || 5,
+      color: blog.color || '#eac321', readTime: blog.readTime || 5,
     })
     setEditingBlog(blog)
     setShowForm(true)
@@ -723,7 +723,7 @@ function PartnersSection({ showToast }) {
   const [showForm, setShowForm] = useState(false)
   const [editingPartner, setEditingPartner] = useState(null)
   const [form, setForm] = useState({
-    slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#B84A24',
+    slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#eac321',
     descTr: '', descEn: '', longDescTr: '', longDescEn: '',
     servicesTr: '', servicesEn: '', resultsTr: '', resultsEn: '',
   })
@@ -745,7 +745,7 @@ function PartnersSection({ showToast }) {
 
   const resetForm = () => {
     setForm({
-      slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#B84A24',
+      slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#eac321',
       descTr: '', descEn: '', longDescTr: '', longDescEn: '',
       servicesTr: '', servicesEn: '', resultsTr: '', resultsEn: '',
     })
@@ -757,7 +757,7 @@ function PartnersSection({ showToast }) {
     setForm({
       slug: partner.id || '', name: partner.name || '',
       category: partner.category || '', categoryEn: partner.categoryEn || '',
-      logo: partner.logo || '🏢', color: partner.color || '#B84A24',
+      logo: partner.logo || '🏢', color: partner.color || '#eac321',
       descTr: partner.descTr || '', descEn: partner.descEn || '',
       longDescTr: partner.longDescTr || '', longDescEn: partner.longDescEn || '',
       servicesTr: (partner.servicesTr || []).join(', '),

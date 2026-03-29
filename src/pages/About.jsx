@@ -15,10 +15,10 @@ import PageBgAnimation from '../components/PageBgAnimation'
 import './About.css'
 
 const team = [
-  { name: 'Kadir Demir', role: 'Founder & CEO', color: '#B84A24' },
-  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#B84A24' },
-  { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#B84A24' },
-  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#B84A24' },
+  { name: 'Kadir Demir', role: 'Founder & CEO', color: '#eac321' },
+  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#eac321' },
+  { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#eac321' },
+  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#eac321' },
 ]
 
 export default function About() {

@@ -26,10 +26,33 @@
   z-index: 1001;
 }
 
-.logo-img {
-  height: 36px;
-  width: auto;
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  height: 34px;
+  width: 34px;
   display: block;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  font-family: var(--font-primary);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #f5e058 0%, #eac321 60%, #c9a81c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-sub {
+  font-weight: 400;
+  opacity: 0.75;
 }
 
 .navbar-links {
