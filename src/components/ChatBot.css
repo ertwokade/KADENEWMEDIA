@@ -48,7 +48,7 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #F5E8E2, #B84A24);
+  background: linear-gradient(135deg, #fdf6c3, #eac321);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,7 +182,7 @@
   font-weight: 500;
   background: rgba(184, 74, 36, 0.08);
   border: 1px solid rgba(184, 74, 36, 0.2);
-  color: #D4652E;
+  color: #d4b820;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -230,7 +230,7 @@
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #F5E8E2, #B84A24);
+  background: linear-gradient(135deg, #fdf6c3, #eac321);
   color: #FFFFFF;
   transition: all 0.2s ease;
   flex-shrink: 0;

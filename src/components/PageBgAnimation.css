@@ -43,9 +43,9 @@
 .bg-badge {
   padding: 4px 10px;
   border-radius: 100px;
-  border: 1px solid rgba(250, 243, 143, var(--op));
-  color: rgba(250, 243, 143, var(--op));
-  background: rgba(250, 243, 143, calc(var(--op) * 0.25));
+  border: 1px solid rgba(234, 195, 33, var(--op));
+  color: rgba(234, 195, 33, var(--op));
+  background: rgba(234, 195, 33, calc(var(--op) * 0.25));
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.3px;
@@ -69,7 +69,7 @@
 /* ---- 3. SPARKLE (Packages) ---- */
 .bg-sparkle {
   font-size: 1.1rem;
-  color: #faf38f;
+  color: #eac321;
   animation: anim-sparkle var(--dur, 8s) var(--delay, 0s) ease-in-out infinite;
 }
 
@@ -118,7 +118,7 @@
 .bg-text {
   font-size: 0.7rem;
   font-weight: 700;
-  color: rgba(250, 243, 143, var(--op));
+  color: rgba(234, 195, 33, var(--op));
   white-space: nowrap;
   animation: anim-text var(--dur, 15s) var(--delay, 0s) ease-in-out infinite;
 }
@@ -167,7 +167,7 @@
 .bg-pulse-ring {
   position: absolute;
   border-radius: 50%;
-  border: 1px solid rgba(250, 243, 143, 0.13);
+  border: 1px solid rgba(234, 195, 33, 0.13);
   animation: anim-pulse var(--dur, 6s) var(--delay, 0s) ease-out infinite;
 }
 

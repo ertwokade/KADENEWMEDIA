@@ -77,7 +77,7 @@ export default function PageBgAnimation({ type = 'home' }) {
         y: sr(i * 3.91) * 90,
         delay: sr(i * 5.71) * 8,
         dur: 10 + sr(i * 2.31) * 15,
-        op: 0.05 + sr(i * 1.91) * 0.1,
+        op: 0.12 + sr(i * 1.91) * 0.2,
       })),
     [cfg]
   )
