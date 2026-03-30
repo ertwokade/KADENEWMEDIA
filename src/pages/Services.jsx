@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   HiOutlineGlobe,
@@ -14,13 +15,31 @@ import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'rea
 import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Services.css'
 
+const iconMap = {
+  HiOutlineGlobe, HiOutlineLightningBolt, HiOutlineChartBar,
+  HiOutlineCamera, HiOutlineFilm, HiOutlineChatAlt2,
+  HiOutlinePencilAlt, HiOutlineSpeakerphone, HiOutlineCode,
+}
+
+const platformMap = { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn, FaXTwitter }
+
 export default function Services() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
+  const [dynamicServices, setDynamicServices] = useState(null)
+
+  useEffect(() => {
+    getContentApi('services')
+      .then(res => {
+        if (res?.data?.items?.length) setDynamicServices(res.data.items)
+      })
+      .catch(() => {})
+  }, [])
   useSEO({
     title: 'Hizmetlerimiz | Sosyal Medya Yönetimi & Dijital Pazarlama',
     description: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi, influencer marketing ve video prodüksiyon hizmetleri. Kade Media ile markanızı büyütün.',
@@ -28,7 +47,9 @@ export default function Services() {
     path: '/hizmetler',
   })
 
-  const services = [
+  const defaultIcons = [HiOutlineGlobe, HiOutlinePencilAlt, HiOutlineChartBar, HiOutlineSpeakerphone, HiOutlineFilm, HiOutlineChatAlt2, HiOutlineCode]
+
+  const defaultServices = [
     {
       icon: HiOutlineGlobe,
       title: t('services.smm'),

@@ -532,6 +532,7 @@ function ContentSection({ showToast }) {
     { id: 'packages', label: '💰 Paketler', desc: 'Fiyatlandırma' },
     { id: 'about', label: '👥 Hakkımızda', desc: 'Hakkımızda sayfası' },
     { id: 'footer', label: '🦶 Footer', desc: 'Alt bilgi, iletişim ve sosyal medya' },
+    { id: 'careers', label: '💼 Kariyer', desc: 'İş ilanları' },
   ]
 
   if (loading) return <div className="admin-empty-state"><p>Yükleniyor...</p></div>
@@ -610,6 +611,13 @@ function ContentSection({ showToast }) {
         <FooterEditor
           data={content.footer || {}}
           onSave={(data) => handleSave('footer', data)}
+        />
+      )}
+
+      {activeTab === 'careers' && (
+        <CareersEditor
+          data={content.careers || { tr: [], en: [] }}
+          onSave={(data) => handleSave('careers', data)}
         />
       )}
     </div>
@@ -1161,6 +1169,81 @@ function AboutEditor({ data, onSave }) {
           <HiOutlineSave size={16} /> Kaydet
         </button>
       </div>
+    </div>
+  )
+}
+
+function CareersEditor({ data, onSave }) {
+  const [form, setForm] = useState(data)
+  const [langTab, setLangTab] = useState('tr')
+
+  useEffect(() => { setForm(data) }, [data])
+
+  const jobs = form[langTab] || []
+
+  const updateJob = (index, field, value) => {
+    const updated = [...jobs]
+    updated[index] = { ...updated[index], [field]: value }
+    setForm({ ...form, [langTab]: updated })
+  }
+
+  const addJob = () => {
+    setForm({
+      ...form,
+      [langTab]: [...jobs, { title: '', department: '', location: '', type: '', description: '', requirements: [] }],
+    })
+  }
+
+  const removeJob = (index) => {
+    setForm({ ...form, [langTab]: jobs.filter((_, i) => i !== index) })
+  }
+
+  return (
+    <div className="admin-form">
+      <h3>Kariyer / İş İlanları</h3>
+      <div className="admin-tabs" style={{ marginBottom: 16 }}>
+        <button className={`admin-tab ${langTab === 'tr' ? 'active' : ''}`} onClick={() => setLangTab('tr')}>🇹🇷 Türkçe</button>
+        <button className={`admin-tab ${langTab === 'en' ? 'active' : ''}`} onClick={() => setLangTab('en')}>🇬🇧 English</button>
+      </div>
+
+      {jobs.map((job, i) => (
+        <div key={i} className="admin-form" style={{ border: '1px solid var(--border-color)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <strong>İlan #{i + 1}</strong>
+            <button className="btn-icon danger" onClick={() => removeJob(i)} title="Sil">🗑️</button>
+          </div>
+          <div className="form-group">
+            <label>Pozisyon</label>
+            <input type="text" value={job.title || ''} onChange={(e) => updateJob(i, 'title', e.target.value)} />
+          </div>
+          <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+            <div className="form-group">
+              <label>Departman</label>
+              <input type="text" value={job.department || ''} onChange={(e) => updateJob(i, 'department', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Lokasyon</label>
+              <input type="text" value={job.location || ''} onChange={(e) => updateJob(i, 'location', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label>Çalışma Şekli</label>
+              <input type="text" value={job.type || ''} onChange={(e) => updateJob(i, 'type', e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Açıklama</label>
+            <textarea rows={3} value={job.description || ''} onChange={(e) => updateJob(i, 'description', e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label>Gereksinimler (her satıra bir tane)</label>
+            <textarea rows={4} value={(job.requirements || []).join('\n')} onChange={(e) => updateJob(i, 'requirements', e.target.value.split('\n').filter(r => r.trim()))} />
+          </div>
+        </div>
+      ))}
+
+      <button className="btn btn-outline" style={{ marginBottom: 16 }} onClick={addJob}>+ Yeni İlan Ekle</button>
+      <br />
+      <button className="btn btn-primary" onClick={() => onSave(form)}>💾 Kaydet</button>
     </div>
   )
 }

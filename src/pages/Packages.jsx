@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -6,6 +7,7 @@ import {
   HiOutlineArrowRight,
   HiOutlineSparkles,
 } from 'react-icons/hi'
+import { getContentApi } from '../api'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
@@ -22,6 +24,27 @@ export default function Packages() {
     path: '/paketler',
   })
   const isEN = lang === 'en'
+
+  const [dynamicPackages, setDynamicPackages] = useState(null)
+
+  useEffect(() => {
+    getContentApi('packages')
+      .then(res => {
+        if (res?.data?.items?.length) {
+          setDynamicPackages(res.data.items.map(item => ({
+            name: isEN ? item.nameEn : item.nameTr,
+            tier: (item.nameTr || item.nameEn || '').toLowerCase().replace(/\s+/g, '-'),
+            priceTRY: item.priceTRY,
+            priceUSD: item.priceUSD,
+            desc: isEN ? item.descEn : item.descTr,
+            popular: !!item.popular,
+            features: (isEN ? item.featuresEn : item.featuresTr || '').split(',').map(f => f.trim()).filter(Boolean),
+            notIncluded: [],
+          })))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const packages = [
     {
@@ -105,7 +128,7 @@ export default function Packages() {
       <section className="section">
         <div className="container">
           <StaggerContainer className="packages-grid" staggerDelay={0.15}>
-            {packages.map((pkg) => (
+            {(dynamicPackages || packages).map((pkg) => (
               <StaggerItem key={pkg.name}>
                 <motion.div
                   className={`package-card glass-card ${pkg.popular ? 'popular' : ''}`}

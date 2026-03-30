@@ -132,6 +132,8 @@ export default function Home() {
   })
 
   const [dynamicStats, setDynamicStats] = useState(null)
+  const [dynamicFaq, setDynamicFaq] = useState(null)
+  const [dynamicTestimonials, setDynamicTestimonials] = useState(null)
 
   // Load texts from API, always fallback to translation defaults
   useEffect(() => {
@@ -166,6 +168,20 @@ export default function Home() {
       } catch {
         // use defaults
       }
+
+      try {
+        const faqData = await getContentApi('faq')
+        if (faqData?.data?.tr?.length) {
+          setDynamicFaq(faqData.data)
+        }
+      } catch {}
+
+      try {
+        const testimonialsData = await getContentApi('testimonials')
+        if (testimonialsData?.data?.items?.length) {
+          setDynamicTestimonials(testimonialsData.data.items)
+        }
+      } catch {}
     }
 
     loadFromApi()
@@ -394,7 +410,7 @@ export default function Home() {
           </div>
 
           <StaggerContainer className="testimonials-grid" staggerDelay={0.15}>
-            {testimonials.map((item, i) => (
+            {(dynamicTestimonials || testimonials).map((item, i) => (
               <StaggerItem key={i}>
                 <motion.div className="testimonial-card glass-card" whileHover={{ y: -4 }}>
                   <FaQuoteLeft className="testimonial-quote" size={24} />
@@ -438,7 +454,7 @@ export default function Home() {
           </div>
 
           <div className="faq-list">
-            {faqData[lang].map((faq, i) => (
+            {(dynamicFaq?.[lang] || faqData[lang]).map((faq, i) => (
               <FadeIn key={i} delay={i * 0.05}>
                 <FAQItem faq={faq} />
               </FadeIn>

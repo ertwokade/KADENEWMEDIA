@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   HiOutlineBriefcase,
@@ -9,6 +9,7 @@ import {
   HiOutlineMail,
   HiOutlineOfficeBuilding,
 } from 'react-icons/hi'
+import { getContentApi } from '../api'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
@@ -138,13 +139,23 @@ function JobCard({ job, t }) {
 
 export default function Careers() {
   const { lang, t } = useLanguage()
+  const [dynamicJobs, setDynamicJobs] = useState(null)
+
+  useEffect(() => {
+    getContentApi('careers')
+      .then(res => {
+        if (res?.data?.tr?.length) setDynamicJobs(res.data)
+      })
+      .catch(() => {})
+  }, [])
+
   useSEO({
     title: 'Kariyer | Kade Media\'da Çalış',
     description: 'Kade Media kariyer fırsatları. Sosyal medya yöneticisi, içerik üreticisi ve dijital pazarlama uzmanı pozisyonları için başvurun. İstanbul hibrit çalışma.',
     keywords: 'sosyal medya ajansı kariyer, dijital pazarlama iş ilanı, sosyal medya yöneticisi iş, içerik üreticisi iş istanbul',
     path: '/kariyer',
   })
-  const jobs = jobsData[lang] || jobsData.tr
+  const jobs = (dynamicJobs?.[lang] || dynamicJobs?.tr || jobsData[lang] || jobsData.tr)
 
   const perks = [
     { icon: '🏠', title: t('careers.hybridWork'), desc: t('careers.hybridWorkDesc') },

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   HiOutlineUserGroup,
@@ -9,20 +10,47 @@ import {
 } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './About.css'
 
-const team = [
-  { name: 'Kadir Demir', role: 'Founder & CEO', color: '#eac321' },
-  { name: 'Ayşe Yılmaz', role: 'Creative Director', color: '#eac321' },
-  { name: 'Mehmet Kaya', role: 'Social Media Manager', color: '#eac321' },
-  { name: 'Zeynep Demir', role: 'Content Strategist', color: '#eac321' },
+const defaultTeam = [
+  { name: 'Kadir Demir', roleTr: 'Kurucu & CEO', roleEn: 'Founder & CEO', color: '#eac321' },
+  { name: 'Ayşe Yılmaz', roleTr: 'Kreatif Direktör', roleEn: 'Creative Director', color: '#eac321' },
+  { name: 'Mehmet Kaya', roleTr: 'Sosyal Medya Yöneticisi', roleEn: 'Social Media Manager', color: '#eac321' },
+  { name: 'Zeynep Demir', roleTr: 'İçerik Stratejisti', roleEn: 'Content Strategist', color: '#eac321' },
 ]
 
+const defaultStats = { experience: '8+', teamSize: '5+', clients: '100+' }
+
 export default function About() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
+  const [aboutData, setAboutData] = useState(null)
+
+  useEffect(() => {
+    getContentApi('about')
+      .then((res) => {
+        if (res && res.data) setAboutData(res.data)
+      })
+      .catch(() => {})
+  }, [])
+
+  const team = aboutData?.team?.length
+    ? aboutData.team.map((m) => ({ ...m, color: '#eac321' }))
+    : defaultTeam
+  const stats = {
+    experience: aboutData?.experience || defaultStats.experience,
+    teamSize: aboutData?.teamSize || defaultStats.teamSize,
+    clients: aboutData?.clients || defaultStats.clients,
+  }
+  const storyP1 = aboutData
+    ? (lang === 'en' ? aboutData.storyEn : aboutData.storyTr) || t('about.storyP1')
+    : t('about.storyP1')
+  const storyP2 = aboutData
+    ? (lang === 'en' ? aboutData.missionEn : aboutData.missionTr) || t('about.storyP2')
+    : t('about.storyP2')
   useSEO({
     title: 'Hakkımızda | İstanbul Sosyal Medya Ajansı',
     description: 'Kade Media, İstanbul Biruni Teknopark\'ta kurulu sosyal medya ve dijital pazarlama ajansı. Ekibimiz, vizyonumuz ve değerlerimiz hakkında bilgi edinin.',
@@ -72,19 +100,19 @@ export default function About() {
           <div className="story-grid">
             <FadeIn direction="left" className="story-content">
               <h2>{t('about.storyTitle')}</h2>
-              <p>{t('about.storyP1')}</p>
-              <p>{t('about.storyP2')}</p>
+              <p>{storyP1}</p>
+              <p>{storyP2}</p>
               <div className="story-stats">
                 <div className="story-stat">
-                  <span className="story-stat-number">8+</span>
+                  <span className="story-stat-number">{stats.experience}</span>
                   <span className="story-stat-label">{t('about.experience')}</span>
                 </div>
                 <div className="story-stat">
-                  <span className="story-stat-number">5+</span>
+                  <span className="story-stat-number">{stats.teamSize}</span>
                   <span className="story-stat-label">{t('about.team')}</span>
                 </div>
                 <div className="story-stat">
-                  <span className="story-stat-number">100+</span>
+                  <span className="story-stat-number">{stats.clients}</span>
                   <span className="story-stat-label">{t('about.happyClients')}</span>
                 </div>
               </div>
@@ -176,12 +204,16 @@ export default function About() {
                     className="team-avatar"
                     style={{ background: `linear-gradient(135deg, ${member.color}40, ${member.color}10)` }}
                   >
-                    <span style={{ color: member.color }}>
-                      {member.name.charAt(0)}
-                    </span>
+                    {member.avatar ? (
+                      <img src={member.avatar} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                    ) : (
+                      <span style={{ color: member.color }}>
+                        {member.name.charAt(0)}
+                      </span>
+                    )}
                   </div>
                   <h4>{member.name}</h4>
-                  <p>{member.role}</p>
+                  <p>{lang === 'en' ? (member.roleEn || member.roleTr) : (member.roleTr || member.roleEn)}</p>
                 </motion.div>
               </StaggerItem>
             ))}
