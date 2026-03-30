@@ -7,6 +7,7 @@ import {
   HiOutlinePlus, HiOutlineSave, HiOutlineEye,
   HiOutlineX, HiOutlineMenuAlt3, HiOutlineDatabase,
   HiOutlineKey, HiOutlineCheck, HiOutlinePencil,
+  HiOutlineCalendar,
 } from 'react-icons/hi'
 import PageTransition from '../components/PageTransition'
 import {
@@ -47,10 +48,10 @@ function LoginScreen({ onLogin }) {
       onLogin(data)
     } catch (err) {
       // Fallback: local login when backend API is unavailable
-      if (username === 'admin' && password === 'admin123') {
+      if (username === 'kade' && password === 'kade') {
         const localData = {
           token: 'local-dev-token-' + Date.now(),
-          user: { username: 'admin', role: 'admin' }
+          user: { username: 'kade', role: 'admin' }
         }
         localStorage.setItem('kade_admin_token', localData.token)
         localStorage.setItem('kade_admin_user', JSON.stringify(localData.user))
@@ -1743,6 +1744,365 @@ function SettingsSection({ showToast }) {
   )
 }
 
+// ========== CONTENT CALENDAR ==========
+function CalendarSection({ showToast }) {
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [events, setEvents] = useState([])
+  const [showEventForm, setShowEventForm] = useState(false)
+  const [editingEvent, setEditingEvent] = useState(null)
+  const [eventForm, setEventForm] = useState({
+    title: '',
+    platform: 'instagram',
+    type: 'post',
+    time: '10:00',
+    description: '',
+    status: 'planned',
+  })
+
+  const currentYear = selectedDate.getFullYear()
+  const currentMonth = selectedDate.getMonth()
+
+  // Load events from API
+  useEffect(() => {
+    getContentApi('calendar')
+      .then(res => {
+        if (res?.data?.events) setEvents(res.data.events)
+      })
+      .catch(() => {})
+  }, [])
+
+  const saveEvents = async (updatedEvents) => {
+    setEvents(updatedEvents)
+    if (!isLocalMode()) {
+      try {
+        await updateContentApi('calendar', { events: updatedEvents })
+        showToast('Takvim güncellendi!', 'success')
+      } catch (err) {
+        showToast(err.message, 'error')
+      }
+    }
+  }
+
+  // Calendar helpers
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay()
+  const adjustedFirstDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1 // Monday start
+
+  const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
+  const dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+
+  const platformIcons = { instagram: '📸', tiktok: '🎵', youtube: '🎬', twitter: '🐦', linkedin: '💼', facebook: '📘' }
+  const statusColors = { planned: '#6C63FF', ready: '#eac321', published: '#2ECC71', cancelled: '#ff4444' }
+  const statusLabels = { planned: 'Planlandı', ready: 'Hazır', published: 'Yayınlandı', cancelled: 'İptal' }
+  const typeLabels = { post: 'Gönderi', story: 'Story', reel: 'Reels', video: 'Video', live: 'Canlı Yayın', ad: 'Reklam' }
+
+  const getEventsForDay = (day) => {
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    return events.filter(e => e.date === dateStr)
+  }
+
+  const today = new Date()
+  const isToday = (day) =>
+    today.getFullYear() === currentYear &&
+    today.getMonth() === currentMonth &&
+    today.getDate() === day
+
+  const prevMonth = () => setSelectedDate(new Date(currentYear, currentMonth - 1, 1))
+  const nextMonth = () => setSelectedDate(new Date(currentYear, currentMonth + 1, 1))
+
+  const openNewEvent = (day) => {
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    setEventForm({ title: '', platform: 'instagram', type: 'post', time: '10:00', description: '', status: 'planned', date: dateStr })
+    setEditingEvent(null)
+    setShowEventForm(true)
+  }
+
+  const openEditEvent = (event) => {
+    setEventForm({ ...event })
+    setEditingEvent(event)
+    setShowEventForm(true)
+  }
+
+  const handleSaveEvent = () => {
+    if (!eventForm.title.trim()) { showToast('Başlık gerekli', 'error'); return }
+    let updated
+    if (editingEvent) {
+      updated = events.map(e => e.id === editingEvent.id ? { ...eventForm, id: editingEvent.id } : e)
+    } else {
+      updated = [...events, { ...eventForm, id: Date.now().toString() }]
+    }
+    saveEvents(updated)
+    setShowEventForm(false)
+  }
+
+  const handleDeleteEvent = (id) => {
+    if (!window.confirm('Bu etkinliği silmek istediğinize emin misiniz?')) return
+    saveEvents(events.filter(e => e.id !== id))
+  }
+
+  // Auto-generate suggestions
+  const generateSuggestions = () => {
+    const suggestions = [
+      { title: 'Motivasyon Pazartesi', platform: 'instagram', type: 'post', time: '09:00', dayOffset: 0 },
+      { title: 'Bilgi Paylaşımı', platform: 'instagram', type: 'reel', time: '12:00', dayOffset: 1 },
+      { title: 'Müşteri Başarı Hikayesi', platform: 'instagram', type: 'story', time: '18:00', dayOffset: 2 },
+      { title: 'Trend Analizi', platform: 'tiktok', type: 'video', time: '15:00', dayOffset: 3 },
+      { title: 'Cuma İpuçları', platform: 'linkedin', type: 'post', time: '10:00', dayOffset: 4 },
+    ]
+    const newEvents = []
+    for (let week = 0; week < 4; week++) {
+      suggestions.forEach(s => {
+        const date = new Date(currentYear, currentMonth, 1 + (week * 7) + s.dayOffset)
+        if (date.getMonth() === currentMonth) {
+          const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+          if (!events.some(e => e.date === dateStr && e.title === s.title)) {
+            newEvents.push({
+              id: Date.now().toString() + Math.random(),
+              title: s.title,
+              platform: s.platform,
+              type: s.type,
+              time: s.time,
+              description: '',
+              status: 'planned',
+              date: dateStr,
+            })
+          }
+        }
+      })
+    }
+    if (newEvents.length > 0) {
+      saveEvents([...events, ...newEvents])
+    } else {
+      showToast('Bu ay için öneriler zaten eklenmiş', 'error')
+    }
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>İçerik <span>Takvimi</span></h1>
+          <p>Sosyal medya içeriklerinizi planlayın ve takip edin</p>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-outline" onClick={generateSuggestions}>
+            ✨ Otomatik Öner
+          </button>
+          <button className="btn btn-primary" onClick={() => openNewEvent(today.getDate())}>
+            <HiOutlinePlus size={16} /> Yeni İçerik
+          </button>
+        </div>
+      </div>
+
+      {/* Month Navigation */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+        <button className="btn btn-outline" onClick={prevMonth}>← Önceki</button>
+        <h2 style={{ fontSize: '1.3rem', fontWeight: 700 }}>{monthNames[currentMonth]} {currentYear}</h2>
+        <button className="btn btn-outline" onClick={nextMonth}>Sonraki →</button>
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="admin-form" style={{ padding: 0, overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
+          {dayNames.map(d => (
+            <div key={d} style={{ padding: '12px 8px', textAlign: 'center', fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-tertiary)', borderBottom: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
+              {d}
+            </div>
+          ))}
+          {Array.from({ length: adjustedFirstDay }).map((_, i) => (
+            <div key={`empty-${i}`} style={{ minHeight: 100, borderBottom: '1px solid var(--border)', borderRight: '1px solid var(--border)', background: 'var(--bg-secondary)', opacity: 0.5 }} />
+          ))}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1
+            const dayEvents = getEventsForDay(day)
+            return (
+              <div
+                key={day}
+                onClick={() => openNewEvent(day)}
+                style={{
+                  minHeight: 100,
+                  padding: 6,
+                  borderBottom: '1px solid var(--border)',
+                  borderRight: '1px solid var(--border)',
+                  cursor: 'pointer',
+                  background: isToday(day) ? 'rgba(234, 195, 33, 0.06)' : 'transparent',
+                  transition: 'background 0.2s',
+                }}
+                onMouseEnter={e => { if (!isToday(day)) e.currentTarget.style.background = 'var(--accent-alpha)' }}
+                onMouseLeave={e => { if (!isToday(day)) e.currentTarget.style.background = 'transparent' }}
+              >
+                <div style={{ fontWeight: isToday(day) ? 800 : 500, fontSize: '0.85rem', color: isToday(day) ? 'var(--accent)' : 'var(--text-primary)', marginBottom: 4 }}>
+                  {day}
+                </div>
+                {dayEvents.slice(0, 3).map(ev => (
+                  <div
+                    key={ev.id}
+                    onClick={(e) => { e.stopPropagation(); openEditEvent(ev) }}
+                    style={{
+                      fontSize: '0.7rem',
+                      padding: '2px 6px',
+                      borderRadius: 4,
+                      marginBottom: 2,
+                      background: `${statusColors[ev.status]}20`,
+                      color: statusColors[ev.status],
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {platformIcons[ev.platform]} {ev.title}
+                  </div>
+                ))}
+                {dayEvents.length > 3 && (
+                  <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', textAlign: 'center' }}>+{dayEvents.length - 3} daha</div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div style={{ display: 'flex', gap: 16, marginTop: 16, flexWrap: 'wrap' }}>
+        {Object.entries(statusLabels).map(([key, label]) => (
+          <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: statusColors[key] }} />
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {/* Upcoming Events List */}
+      <div className="admin-form" style={{ marginTop: 24 }}>
+        <h3>📋 Bu Aydaki İçerikler ({events.filter(e => e.date?.startsWith(`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`)).length})</h3>
+        {events
+          .filter(e => e.date?.startsWith(`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`))
+          .sort((a, b) => a.date.localeCompare(b.date) || a.time?.localeCompare(b.time))
+          .map(ev => (
+            <div key={ev.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ width: 44, textAlign: 'center', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                {ev.date?.split('-')[2]}
+              </div>
+              <div style={{ fontSize: '1.2rem' }}>{platformIcons[ev.platform]}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{ev.title}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+                  {ev.time} · {typeLabels[ev.type]}
+                </div>
+              </div>
+              <span className="status-badge" style={{ background: `${statusColors[ev.status]}20`, color: statusColors[ev.status] }}>
+                {statusLabels[ev.status]}
+              </span>
+              <button className="table-action-btn" onClick={() => openEditEvent(ev)}>
+                <HiOutlinePencil size={14} />
+              </button>
+              <button className="table-action-btn danger" onClick={() => handleDeleteEvent(ev.id)}>
+                <HiOutlineTrash size={14} />
+              </button>
+            </div>
+          ))}
+        {events.filter(e => e.date?.startsWith(`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`)).length === 0 && (
+          <div className="admin-empty-state">
+            <div className="empty-icon">📅</div>
+            <h3>Bu ay için planlanmış içerik yok</h3>
+            <p>Takvimde bir güne tıklayarak veya "Otomatik Öner" butonuyla içerik ekleyin</p>
+          </div>
+        )}
+      </div>
+
+      {/* Event Form Modal */}
+      <AnimatePresence>
+        {showEventForm && (
+          <motion.div
+            className="admin-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowEventForm(false)}
+          >
+            <motion.div
+              className="admin-modal"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: 500 }}
+            >
+              <div className="admin-modal-header">
+                <h3>{editingEvent ? 'İçeriği Düzenle' : 'Yeni İçerik Planla'}</h3>
+                <button className="admin-modal-close" onClick={() => setShowEventForm(false)}>
+                  <HiOutlineX size={18} />
+                </button>
+              </div>
+              <div className="admin-form" style={{ border: 'none', padding: 0 }}>
+                <div className="form-group">
+                  <label>Başlık *</label>
+                  <input type="text" value={eventForm.title} onChange={e => setEventForm({ ...eventForm, title: e.target.value })} placeholder="İçerik başlığı..." />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Platform</label>
+                    <select value={eventForm.platform} onChange={e => setEventForm({ ...eventForm, platform: e.target.value })}>
+                      <option value="instagram">📸 Instagram</option>
+                      <option value="tiktok">🎵 TikTok</option>
+                      <option value="youtube">🎬 YouTube</option>
+                      <option value="twitter">🐦 X (Twitter)</option>
+                      <option value="linkedin">💼 LinkedIn</option>
+                      <option value="facebook">📘 Facebook</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>İçerik Türü</label>
+                    <select value={eventForm.type} onChange={e => setEventForm({ ...eventForm, type: e.target.value })}>
+                      <option value="post">Gönderi</option>
+                      <option value="story">Story</option>
+                      <option value="reel">Reels</option>
+                      <option value="video">Video</option>
+                      <option value="live">Canlı Yayın</option>
+                      <option value="ad">Reklam</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Tarih</label>
+                    <input type="date" value={eventForm.date || ''} onChange={e => setEventForm({ ...eventForm, date: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>Saat</label>
+                    <input type="time" value={eventForm.time || '10:00'} onChange={e => setEventForm({ ...eventForm, time: e.target.value })} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Durum</label>
+                  <select value={eventForm.status} onChange={e => setEventForm({ ...eventForm, status: e.target.value })}>
+                    <option value="planned">📋 Planlandı</option>
+                    <option value="ready">✅ Hazır</option>
+                    <option value="published">🚀 Yayınlandı</option>
+                    <option value="cancelled">❌ İptal</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Açıklama</label>
+                  <textarea rows={3} value={eventForm.description || ''} onChange={e => setEventForm({ ...eventForm, description: e.target.value })} placeholder="İçerik detayları, notlar..." />
+                </div>
+                <div className="admin-form-actions">
+                  <button className="btn btn-outline" onClick={() => setShowEventForm(false)}>İptal</button>
+                  <button className="btn btn-primary" onClick={handleSaveEvent}>
+                    <HiOutlineSave size={16} /> {editingEvent ? 'Güncelle' : 'Kaydet'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 // ========== MAIN ADMIN COMPONENT ==========
 export default function Admin() {
   const [isAuth, setIsAuth] = useState(false)
@@ -1811,6 +2171,7 @@ export default function Admin() {
     { id: 'content', label: 'İçerik Yönetimi', icon: HiOutlinePencilAlt },
     { id: 'partners', label: 'Partnerler', icon: HiOutlineUsers },
     { id: 'messages', label: 'Mesajlar', icon: HiOutlineMail, badge: unreadCount },
+    { id: 'calendar', label: 'İçerik Takvimi', icon: HiOutlineCalendar },
     { id: 'settings', label: 'Ayarlar', icon: HiOutlineCog },
   ]
 
@@ -1874,6 +2235,7 @@ export default function Admin() {
           {activeSection === 'content' && <ContentSection showToast={showToast} />}
           {activeSection === 'partners' && <PartnersSection showToast={showToast} />}
           {activeSection === 'messages' && <MessagesSection showToast={showToast} onNewMessageCount={(count) => setUnreadCount(count)} />}
+          {activeSection === 'calendar' && <CalendarSection showToast={showToast} />}
           {activeSection === 'settings' && <SettingsSection showToast={showToast} />}
         </main>
 

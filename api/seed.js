@@ -190,11 +190,11 @@ export default async function handler(req, res) {
     const db = await getDb();
 
     // Create admin user
-    const existingAdmin = await db.collection('users').findOne({ username: 'admin' });
+    const existingAdmin = await db.collection('users').findOne({ username: 'kade' });
     if (!existingAdmin) {
-      const hashedPassword = await bcrypt.hash('admin', 10);
+      const hashedPassword = await bcrypt.hash('kade', 10);
       await db.collection('users').insertOne({
-        username: 'admin',
+        username: 'kade',
         password: hashedPassword,
         role: 'admin',
         createdAt: new Date(),
@@ -225,7 +225,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       message: 'Veritabanı başarıyla oluşturuldu!',
       seeded: {
-        admin: !existingAdmin ? 'Oluşturuldu (admin/admin)' : 'Zaten mevcut',
+        admin: !existingAdmin ? 'Oluşturuldu (kade/kade)' : 'Zaten mevcut',
         partners: partnerCount === 0 ? `${defaultPartners.length} partner eklendi` : 'Zaten mevcut',
         blogs: blogCount === 0 ? `${defaultBlogs.length} blog eklendi` : 'Zaten mevcut',
         content: contentCount === 0 ? `${defaultContent.length} içerik eklendi` : 'Zaten mevcut',

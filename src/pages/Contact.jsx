@@ -44,7 +44,7 @@ export default function Contact() {
     email: '',
     phone: '',
     company: '',
-    service: '',
+    services: [],
     message: '',
   })
   const [submitted, setSubmitted] = useState(false)
@@ -55,14 +55,23 @@ export default function Contact() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
+  const handleServiceToggle = (value) => {
+    setFormData(prev => ({
+      ...prev,
+      services: prev.services.includes(value)
+        ? prev.services.filter(s => s !== value)
+        : [...prev.services, value]
+    }))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSending(true)
     setError('')
     try {
-      await sendContactApi(formData)
+      await sendContactApi({ ...formData, service: formData.services.join(', ') })
       setSubmitted(true)
-      setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+      setFormData({ name: '', email: '', phone: '', company: '', services: [], message: '' })
       setTimeout(() => setSubmitted(false), 6000)
     } catch {
       setError(t('contact.errorMsg') || 'Mesaj gönderilemedi. Lütfen tekrar deneyin.')
@@ -236,21 +245,30 @@ export default function Contact() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="service">{t('contact.service')}</label>
-                  <select
-                    id="service"
-                    name="service"
-                    value={formData.service}
-                    onChange={handleChange}
-                  >
-                    <option value="">{t('contact.selectService')}</option>
-                    <option value="sosyal-medya">{t('servicesSection.smm')}</option>
-                    <option value="icerik">{t('servicesSection.content')}</option>
-                    <option value="reklam">{t('servicesSection.ads')}</option>
-                    <option value="influencer">{t('servicesSection.influencer')}</option>
-                    <option value="video">{t('contact.videoProduction')}</option>
-                    <option value="danismanlik">{t('contact.consultingOption')}</option>
-                  </select>
+                  <label>{t('contact.service')}</label>
+                  <div className="service-checkbox-group">
+                    {[
+                      { value: 'sosyal-medya', label: t('servicesSection.smm') },
+                      { value: 'icerik', label: t('servicesSection.content') },
+                      { value: 'reklam', label: t('servicesSection.ads') },
+                      { value: 'influencer', label: t('servicesSection.influencer') },
+                      { value: 'video', label: t('contact.videoProduction') },
+                      { value: 'danismanlik', label: t('contact.consultingOption') },
+                    ].map(opt => (
+                      <label
+                        key={opt.value}
+                        className={`service-checkbox-item ${formData.services.includes(opt.value) ? 'checked' : ''}`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.services.includes(opt.value)}
+                          onChange={() => handleServiceToggle(opt.value)}
+                        />
+                        <span className="checkbox-mark" />
+                        <span>{opt.label}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 <div className="form-group">
                   <label htmlFor="message">{t('contact.message')} *</label>

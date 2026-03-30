@@ -166,6 +166,40 @@ export async function sendContactApi(data) {
   return handleResponse(res);
 }
 
+// Users (admin only)
+export async function getUsersApi() {
+  const res = await fetch(`${API_BASE}/users`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function createUserApi(data) {
+  const res = await fetch(`${API_BASE}/users`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateUserApi(data) {
+  const res = await fetch(`${API_BASE}/users`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteUserApi(id) {
+  const res = await fetch(`${API_BASE}/users?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
 // Seed
 export async function seedApi() {
   const res = await fetch(`${API_BASE}/seed`, {
