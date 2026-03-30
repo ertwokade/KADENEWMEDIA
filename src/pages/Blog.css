@@ -147,6 +147,103 @@
   opacity: 0.8;
 }
 
+/* Share Section */
+.blog-share-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  margin-top: 40px;
+}
+
+.blog-share-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--gray-lighter);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.blog-share-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.blog-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--gray-lighter);
+  transition: all 0.3s ease;
+}
+
+.blog-share-btn:hover {
+  background: rgba(234, 195, 33, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+/* Blog CTA Section */
+.blog-cta-section {
+  margin-top: 32px;
+  padding: 48px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.blog-cta-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
+}
+
+.blog-cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(234, 195, 33, 0.1);
+  color: var(--primary);
+  margin-bottom: 20px;
+}
+
+.blog-cta-section h3 {
+  font-size: 1.5rem;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.blog-cta-section p {
+  font-size: 0.95rem;
+  color: var(--gray-light);
+  max-width: 500px;
+  margin: 0 auto 28px;
+  line-height: 1.7;
+}
+
+.blog-cta-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 900px) {
   .blog-featured {
     grid-template-columns: 1fr;
@@ -160,5 +257,15 @@
 @media (max-width: 600px) {
   .blog-grid {
     grid-template-columns: 1fr;
+  }
+
+  .blog-share-section {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .blog-cta-section {
+    padding: 36px 24px;
   }
 }

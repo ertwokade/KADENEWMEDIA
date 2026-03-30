@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { HiOutlinePencilAlt, HiOutlineArrowRight, HiOutlineClock } from 'react-icons/hi'
+import { HiOutlinePencilAlt, HiOutlineArrowRight, HiOutlineClock, HiOutlineShare, HiOutlineLightningBolt } from 'react-icons/hi'
+import { FaXTwitter, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { blogPosts as staticBlogPosts } from '../data/content'
@@ -128,6 +130,69 @@ export default function Blog() {
               </StaggerItem>
             ))}
           </StaggerContainer>
+
+          {/* Share Section */}
+          <FadeIn delay={0.2}>
+            <div className="blog-share-section glass-card">
+              <div className="blog-share-left">
+                <HiOutlineShare size={20} />
+                <span>{lang === 'tr' ? 'İçeriklerimizi paylaşın' : 'Share our content'}</span>
+              </div>
+              <div className="blog-share-buttons">
+                <a
+                  href="https://x.com/intent/tweet?text=Kade%20Media%20Blog%20-%20Dijital%20Pazarlama%20İpuçları&url=https://kademedia.com.tr/blog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="blog-share-btn"
+                  aria-label="Share on X"
+                >
+                  <FaXTwitter size={16} />
+                </a>
+                <a
+                  href="https://www.linkedin.com/sharing/share-offsite/?url=https://kademedia.com.tr/blog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="blog-share-btn"
+                  aria-label="Share on LinkedIn"
+                >
+                  <FaLinkedinIn size={16} />
+                </a>
+                <a
+                  href="https://wa.me/?text=Kade%20Media%20Blog%20-%20https://kademedia.com.tr/blog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="blog-share-btn"
+                  aria-label="Share on WhatsApp"
+                >
+                  <FaWhatsapp size={16} />
+                </a>
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* CTA Section */}
+          <FadeIn delay={0.3}>
+            <div className="blog-cta-section glass-card">
+              <div className="blog-cta-icon">
+                <HiOutlineLightningBolt size={28} />
+              </div>
+              <h3>{lang === 'tr' ? 'Markanızı Büyütmeye Hazır mısınız?' : 'Ready to Grow Your Brand?'}</h3>
+              <p>
+                {lang === 'tr'
+                  ? 'Sosyal medya stratejinizi profesyonel ekibimizle bir üst seviyeye taşıyın. Ücretsiz keşif görüşmesi için hemen iletişime geçin.'
+                  : 'Take your social media strategy to the next level with our professional team. Contact us for a free discovery call.'}
+              </p>
+              <div className="blog-cta-actions">
+                <Link to="/iletisim" className="btn btn-primary">
+                  {lang === 'tr' ? 'Ücretsiz Teklif Alın' : 'Get a Free Quote'}
+                  <HiOutlineArrowRight size={16} />
+                </Link>
+                <Link to="/paketler" className="btn btn-outline">
+                  {lang === 'tr' ? 'Paketleri İncele' : 'View Packages'}
+                </Link>
+              </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
     </PageTransition>

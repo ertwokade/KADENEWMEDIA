@@ -77,17 +77,28 @@
 }
 
 .hero-gradient-text {
-  background: linear-gradient(to right, #eac321, #FDE047);
+  background: linear-gradient(90deg, #eac321 0%, #ffffff 25%, #eac321 50%, #ffffff 75%, #eac321 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  background-size: 200% 100%;
+  animation: heroGradientShift 4s ease infinite;
 }
 
 .hero-highlight {
-  background: var(--gradient-primary);
+  background: linear-gradient(90deg, #ffffff 0%, #eac321 25%, #ffffff 50%, #eac321 75%, #ffffff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  background-size: 200% 100%;
+  animation: heroGradientShift 4s ease infinite;
+  animation-delay: -2s;
+}
+
+@keyframes heroGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .hero-subtitle {
