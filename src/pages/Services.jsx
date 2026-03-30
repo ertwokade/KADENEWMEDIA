@@ -101,6 +101,17 @@ export default function Services() {
     },
   ]
 
+  // Map dynamic services from admin API, falling back to default
+  const services = dynamicServices
+    ? dynamicServices.map((item, i) => ({
+        icon: iconMap[item.icon] || defaultIcons[i % defaultIcons.length],
+        title: lang === 'en' ? (item.titleEn || item.titleTr) : (item.titleTr || item.titleEn),
+        desc: lang === 'en' ? (item.descEn || item.descTr) : (item.descTr || item.descEn),
+        features: (lang === 'en' ? item.featuresEn : item.featuresTr || '').split(',').map(f => f.trim()).filter(Boolean),
+        platforms: [FaInstagram, FaTiktok, FaYoutube],
+      }))
+    : defaultServices
+
   const process = [
     { step: '01', title: t('services.processStep1'), desc: t('services.processStep1Desc') },
     { step: '02', title: t('services.processStep2'), desc: t('services.processStep2Desc') },
