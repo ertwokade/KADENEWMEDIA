@@ -95,9 +95,9 @@ export default function Contact() {
       setFormData({ name: '', email: '', phone: '', company: '', services: [], message: '' })
       setKvkkAccepted(false)
       setTimeout(() => setSubmitted(false), 6000)
-    } catch {
-      setError(t('contact.errorMsg') || 'Mesaj gönderilemedi. Lütfen tekrar deneyin.')
-      setTimeout(() => setError(''), 6000)
+    } catch (err) {
+      setError(err.message || t('contact.errorMsg') || 'Mesaj gönderilemedi. Lütfen tekrar deneyin.')
+      setTimeout(() => setError(''), 8000)
     } finally {
       setSending(false)
     }

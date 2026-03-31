@@ -4,7 +4,7 @@
 const requests = new Map();
 
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
-const MAX_REQUESTS = 5; // max requests per IP per window
+const MAX_REQUESTS = process.env.NODE_ENV === 'production' ? 5 : 50; // relaxed in dev
 
 function getIP(req) {
   return (

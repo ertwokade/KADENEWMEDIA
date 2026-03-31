@@ -54,20 +54,24 @@ export default async function handler(req, res) {
     // Determine lead source from referer or service selection
     const source = service ? 'iletisim-formu' : 'iletisim-formu';
 
-    // Save to MongoDB
-    const db = await getDb();
-    await db.collection('messages').insertOne({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone?.trim() || '-',
-      company: company?.trim() || '-',
-      service: service || '-',
-      message: message.trim(),
-      source,
-      status: 'yeni',
-      read: false,
-      createdAt: new Date(),
-    });
+    // Save to MongoDB (non-blocking — email still sent even if DB fails)
+    try {
+      const db = await getDb();
+      await db.collection('messages').insertOne({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone?.trim() || '-',
+        company: company?.trim() || '-',
+        service: service || '-',
+        message: message.trim(),
+        source,
+        status: 'yeni',
+        read: false,
+        createdAt: new Date(),
+      });
+    } catch (dbErr) {
+      console.error('MongoDB save failed (non-critical):', dbErr.message);
+    }
 
     // Send notification email to team
     const smtpHost = process.env.SMTP_HOST;
