@@ -17,6 +17,7 @@ import {
   getPartnersApi, createPartnerApi, updatePartnerApi, deletePartnerApi,
   getMessagesApi, markMessageReadApi, deleteMessageApi,
   seedApi,
+  updateMessageStatusApi,
 } from '../api'
 import './Admin.css'
 
@@ -1479,10 +1480,28 @@ function PartnersSection({ showToast }) {
 }
 
 // ========== MESSAGES ==========
+const LEAD_STATUSES = [
+  { value: 'yeni', label: 'Yeni', color: '#6C63FF' },
+  { value: 'gorusme-bekliyor', label: 'Görüşme Bekliyor', color: '#eac321' },
+  { value: 'teklif-gonderildi', label: 'Teklif Gönderildi', color: '#00BCD4' },
+  { value: 'kazanildi', label: 'Kazanıldı', color: '#2ECC71' },
+  { value: 'kaybedildi', label: 'Kaybedildi', color: '#ff4444' },
+]
+
+function LeadStatusBadge({ status }) {
+  const s = LEAD_STATUSES.find((x) => x.value === status) || LEAD_STATUSES[0]
+  return (
+    <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 20, background: `${s.color}20`, color: s.color, fontSize: '0.75rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+      {s.label}
+    </span>
+  )
+}
+
 function MessagesSection({ showToast, onNewMessageCount }) {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedMessage, setSelectedMessage] = useState(null)
+  const [filterStatus, setFilterStatus] = useState('all')
 
   const fetchMessages = async () => {
     try {
@@ -1512,8 +1531,17 @@ function MessagesSection({ showToast, onNewMessageCount }) {
     }
   }
 
+  const handleStatusChange = async (id, status) => {
+    try {
+      await updateMessageStatusApi(id, status)
+      setMessages((prev) => prev.map((m) => m._id === id ? { ...m, status } : m))
+      if (selectedMessage?._id === id) setSelectedMessage((p) => ({ ...p, status }))
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
   const handleDelete = async (id) => {
-    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
     if (!window.confirm('Bu mesajı silmek istediğinize emin misiniz?')) return
     try {
       await deleteMessageApi(id)
@@ -1525,13 +1553,46 @@ function MessagesSection({ showToast, onNewMessageCount }) {
     }
   }
 
+  const filteredMessages = filterStatus === 'all'
+    ? messages
+    : messages.filter((m) => (m.status || 'yeni') === filterStatus)
+
+  const counts = LEAD_STATUSES.reduce((acc, s) => {
+    acc[s.value] = messages.filter((m) => (m.status || 'yeni') === s.value).length
+    return acc
+  }, {})
+
   return (
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>İletişim <span>Mesajları</span></h1>
-          <p>İletişim formundan gelen mesajları görüntüleyin</p>
+          <h1>İletişim <span>& CRM</span></h1>
+          <p>Leadleri takip edin, durumlarını güncelleyin</p>
         </div>
+      </div>
+
+      {/* CRM Status Counters */}
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+        <button
+          className={`table-action-btn ${filterStatus === 'all' ? 'primary' : ''}`}
+          onClick={() => setFilterStatus('all')}
+          style={{ padding: '8px 16px', borderRadius: 8 }}
+        >
+          Tümü ({messages.length})
+        </button>
+        {LEAD_STATUSES.map((s) => (
+          <button
+            key={s.value}
+            onClick={() => setFilterStatus(s.value)}
+            style={{
+              padding: '8px 16px', borderRadius: 8, border: `1px solid ${s.color}40`,
+              background: filterStatus === s.value ? `${s.color}20` : 'transparent',
+              color: s.color, cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600
+            }}
+          >
+            {s.label} ({counts[s.value] || 0})
+          </button>
+        ))}
       </div>
 
       {/* Message Detail Modal */}
@@ -1540,7 +1601,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
           <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedMessage(null)}>
             <motion.div className="admin-modal" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
               <div className="admin-modal-header">
-                <h3>Mesaj Detayı</h3>
+                <h3>Lead Detayı</h3>
                 <button className="admin-modal-close" onClick={() => setSelectedMessage(null)}><HiOutlineX size={18} /></button>
               </div>
               <div style={{ display: 'grid', gap: 12 }}>
@@ -1549,9 +1610,20 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                 <div><strong style={{ color: 'var(--accent)' }}>Telefon:</strong> {selectedMessage.phone}</div>
                 <div><strong style={{ color: 'var(--accent)' }}>Şirket:</strong> {selectedMessage.company}</div>
                 <div><strong style={{ color: 'var(--accent)' }}>Hizmet:</strong> {selectedMessage.service}</div>
+                <div><strong style={{ color: 'var(--accent)' }}>Kaynak:</strong> {selectedMessage.source || 'iletisim-formu'}</div>
                 <div style={{ background: 'var(--bg-secondary)', padding: 16, borderRadius: 12, marginTop: 8 }}>
                   <strong style={{ color: 'var(--accent)' }}>Mesaj:</strong>
                   <p style={{ marginTop: 8, lineHeight: 1.6 }}>{selectedMessage.message}</p>
+                </div>
+                <div>
+                  <strong style={{ color: 'var(--accent)' }}>Lead Durumu:</strong>
+                  <select
+                    value={selectedMessage.status || 'yeni'}
+                    onChange={(e) => handleStatusChange(selectedMessage._id, e.target.value)}
+                    style={{ marginLeft: 12, padding: '4px 10px', borderRadius: 6, background: 'var(--bg-secondary)', color: 'var(--white)', border: '1px solid var(--border-color)' }}
+                  >
+                    {LEAD_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  </select>
                 </div>
                 <div style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>
                   {new Date(selectedMessage.createdAt).toLocaleString('tr-TR')}
@@ -1572,38 +1644,36 @@ function MessagesSection({ showToast, onNewMessageCount }) {
 
       <div className="admin-table-wrapper">
         <div className="admin-table-header">
-          <h3>Tüm Mesajlar ({messages.length})</h3>
+          <h3>Mesajlar ({filteredMessages.length})</h3>
         </div>
         {loading ? (
           <div className="admin-empty-state"><p>Yükleniyor...</p></div>
-        ) : messages.length === 0 ? (
+        ) : filteredMessages.length === 0 ? (
           <div className="admin-empty-state">
             <div className="empty-icon">✉️</div>
-            <h3>Henüz mesaj yok</h3>
+            <h3>Mesaj bulunamadı</h3>
           </div>
         ) : (
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Durum</th>
+                <th>Lead Durumu</th>
                 <th>Ad</th>
                 <th>E-posta</th>
-                <th>Mesaj</th>
+                <th>Hizmet</th>
                 <th>Tarih</th>
                 <th>İşlem</th>
               </tr>
             </thead>
             <tbody>
-              {messages.map((msg) => (
+              {filteredMessages.map((msg) => (
                 <tr key={msg._id} className={!msg.read ? 'message-unread' : ''}>
                   <td>
-                    <span className={`status-badge ${msg.read ? 'read' : 'unread'}`}>
-                      {msg.read ? 'Okundu' : 'Yeni'}
-                    </span>
+                    <LeadStatusBadge status={msg.status || 'yeni'} />
                   </td>
-                  <td><strong>{msg.name}</strong></td>
+                  <td><strong>{msg.name}</strong><br /><span style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem' }}>{msg.company !== '-' ? msg.company : ''}</span></td>
                   <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{msg.email}</td>
-                  <td><span className="message-preview">{msg.message}</span></td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>{msg.service !== '-' ? msg.service : '—'}</td>
                   <td style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
                     {new Date(msg.createdAt).toLocaleDateString('tr-TR')}
                   </td>

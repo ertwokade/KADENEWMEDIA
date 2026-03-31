@@ -7,6 +7,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { blogPosts as staticBlogPosts } from '../data/content'
 import { getBlogsApi } from '../api'
+import { analytics } from '../utils/analytics'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -36,10 +37,15 @@ export default function BlogDetail() {
   const category = post ? (lang === 'tr' ? post.category : post.categoryEn) : ''
 
   useSEO({
-    title: title ? `${title} | Kade Media Blog` : 'Blog | Kade Media',
+    title: title || 'Blog | Kade Media',
     description: excerpt || '',
     path: `/blog/${slug}`,
+    type: 'article',
   })
+
+  useEffect(() => {
+    if (post) analytics.blogRead(slug, title)
+  }, [post])
 
   if (notFound) return <Navigate to="/blog" replace />
   if (!post) return null
@@ -137,6 +143,30 @@ export default function BlogDetail() {
               </div>
             </FadeIn>
           </div>
+
+          {/* Lead CTA */}
+          <FadeIn delay={0.2}>
+            <div className="blog-cta-section glass-card" style={{ marginTop: '32px' }}>
+              <div className="blog-cta-icon">
+                <HiOutlineArrowRight size={28} />
+              </div>
+              <h3>{lang === 'tr' ? 'Markanız İçin Ücretsiz Strateji Analizi' : 'Free Strategy Analysis for Your Brand'}</h3>
+              <p>
+                {lang === 'tr'
+                  ? 'Bu yazıda anlattıklarımızı markanıza nasıl uygulayacağınızı merak ediyorsanız, 30 dakikalık ücretsiz keşif görüşmesiyle somut öneriler alın.'
+                  : 'Wondering how to apply what you read here to your brand? Get concrete recommendations with a free 30-minute discovery call.'}
+              </p>
+              <div className="blog-cta-actions">
+                <Link to="/iletisim" className="btn btn-primary" onClick={() => analytics.ctaClick('blog-cta', '/iletisim')}>
+                  {lang === 'tr' ? 'Ücretsiz Görüşme Al' : 'Get a Free Consultation'}
+                  <HiOutlineArrowRight size={16} />
+                </Link>
+                <Link to="/hizmetler" className="btn btn-outline" onClick={() => analytics.ctaClick('blog-services', '/hizmetler')}>
+                  {lang === 'tr' ? 'Hizmetleri İncele' : 'View Services'}
+                </Link>
+              </div>
+            </div>
+          </FadeIn>
 
           {/* More Posts */}
           {otherPosts.length > 0 && (

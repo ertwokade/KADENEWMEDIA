@@ -1,6 +1,18 @@
 import nodemailer from 'nodemailer';
 import { getDb } from './_lib/mongodb.js';
 import { cors } from './_lib/cors.js';
+import { rateLimitCheck } from './_lib/rateLimit.js';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -9,27 +21,55 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    const { name, email, phone, company, service, message } = req.body;
+  // Rate limiting
+  const rl = rateLimitCheck(req);
+  if (!rl.allowed) {
+    return res.status(429).json({
+      error: `Çok fazla istek. Lütfen ${rl.retryAfter} dakika sonra tekrar deneyin.`,
+    });
+  }
 
+  try {
+    const { name, email, phone, company, service, message, website } = req.body || {};
+
+    // Honeypot check
+    if (website) {
+      return res.status(200).json({ message: 'Mesajınız alındı.' });
+    }
+
+    // Validation
     if (!name || !email || !message) {
       return res.status(400).json({ error: 'Ad, e-posta ve mesaj gerekli' });
     }
+    if (!EMAIL_RE.test(email)) {
+      return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
+    }
+    if (message.trim().length < 20) {
+      return res.status(400).json({ error: 'Mesajınız en az 20 karakter olmalıdır.' });
+    }
+    if (name.trim().length < 2) {
+      return res.status(400).json({ error: 'Ad en az 2 karakter olmalıdır.' });
+    }
+
+    // Determine lead source from referer or service selection
+    const source = service ? 'iletisim-formu' : 'iletisim-formu';
 
     // Save to MongoDB
     const db = await getDb();
     await db.collection('messages').insertOne({
-      name,
-      email,
-      phone: phone || '-',
-      company: company || '-',
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone?.trim() || '-',
+      company: company?.trim() || '-',
       service: service || '-',
-      message,
+      message: message.trim(),
+      source,
+      status: 'yeni',
       read: false,
       createdAt: new Date(),
     });
 
-    // Send email via SMTP
+    // Send notification email to team
     const smtpHost = process.env.SMTP_HOST;
     const smtpPort = process.env.SMTP_PORT;
     const smtpUser = process.env.SMTP_USER;
@@ -41,54 +81,76 @@ export default async function handler(req, res) {
         host: smtpHost,
         port: parseInt(smtpPort) || 587,
         secure: parseInt(smtpPort) === 465,
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
+        auth: { user: smtpUser, pass: smtpPass },
       });
 
-      const mailOptions = {
+      // Team notification email
+      await transporter.sendMail({
         from: `"Kade Media İletişim" <${smtpUser}>`,
         to: mailTo,
-        subject: `Yeni İletişim Formu - ${name}`,
+        subject: `🔔 Yeni Lead: ${escapeHtml(name)} — ${escapeHtml(service || 'Genel')}`,
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #1a1a2e; color: #fff; border-radius: 12px;">
-            <div style="text-align: center; padding: 20px 0; border-bottom: 1px solid #333;">
-              <h1 style="color: #FFEE00; margin: 0;">Kade Media</h1>
-              <p style="color: #aaa; margin: 5px 0 0;">Yeni İletişim Formu Mesajı</p>
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px;">
+            <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
+              <h1 style="color:#eac321;margin:0;">Kade Media</h1>
+              <p style="color:#aaa;margin:5px 0 0;">Yeni İletişim Formu Mesajı</p>
             </div>
-            <div style="padding: 20px 0;">
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">Ad Soyad:</td><td style="padding: 10px; color: #fff;">${name}</td></tr>
-                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">E-posta:</td><td style="padding: 10px; color: #fff;"><a href="mailto:${email}" style="color: #FFEE00;">${email}</a></td></tr>
-                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">Telefon:</td><td style="padding: 10px; color: #fff;">${phone || '-'}</td></tr>
-                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">Şirket:</td><td style="padding: 10px; color: #fff;">${company || '-'}</td></tr>
-                <tr><td style="padding: 10px; color: #FFEE00; font-weight: bold;">Hizmet:</td><td style="padding: 10px; color: #fff;">${service || '-'}</td></tr>
+            <div style="padding:20px 0;">
+              <table style="width:100%;border-collapse:collapse;">
+                <tr><td style="padding:10px;color:#eac321;font-weight:bold;width:120px;">Ad Soyad:</td><td style="padding:10px;color:#fff;">${escapeHtml(name)}</td></tr>
+                <tr><td style="padding:10px;color:#eac321;font-weight:bold;">E-posta:</td><td style="padding:10px;"><a href="mailto:${escapeHtml(email)}" style="color:#eac321;">${escapeHtml(email)}</a></td></tr>
+                <tr><td style="padding:10px;color:#eac321;font-weight:bold;">Telefon:</td><td style="padding:10px;color:#fff;">${escapeHtml(phone || '-')}</td></tr>
+                <tr><td style="padding:10px;color:#eac321;font-weight:bold;">Şirket:</td><td style="padding:10px;color:#fff;">${escapeHtml(company || '-')}</td></tr>
+                <tr><td style="padding:10px;color:#eac321;font-weight:bold;">Hizmet:</td><td style="padding:10px;color:#fff;">${escapeHtml(service || '-')}</td></tr>
               </table>
-              <div style="padding: 20px; background: #16213e; border-radius: 8px; margin-top: 15px;">
-                <p style="color: #FFEE00; font-weight: bold; margin: 0 0 10px;">Mesaj:</p>
-                <p style="color: #fff; line-height: 1.6; margin: 0;">${message}</p>
+              <div style="padding:20px;background:#16213e;border-radius:8px;margin-top:15px;">
+                <p style="color:#eac321;font-weight:bold;margin:0 0 10px;">Mesaj:</p>
+                <p style="color:#fff;line-height:1.6;margin:0;">${escapeHtml(message)}</p>
               </div>
             </div>
-            <div style="text-align: center; padding: 15px 0; border-top: 1px solid #333; color: #666; font-size: 12px;">
-              Bu e-posta kademedia.com iletişim formu üzerinden gönderilmiştir.
+            <div style="text-align:center;padding:15px 0;border-top:1px solid #333;color:#666;font-size:12px;">
+              kademedia.com.tr iletişim formu • Lead durumu: <strong style="color:#eac321;">Yeni</strong>
             </div>
           </div>
         `,
-      };
+      });
 
-      await transporter.sendMail(mailOptions);
+      // Thank-you email to user
+      try {
+        await transporter.sendMail({
+          from: `"Kade Media" <${smtpUser}>`,
+          to: email,
+          subject: 'Mesajınız Alındı — Kade Media',
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px;">
+              <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
+                <h1 style="color:#eac321;margin:0;">Kade Media</h1>
+              </div>
+              <div style="padding:30px 20px;">
+                <h2 style="color:#fff;">Merhaba ${escapeHtml(name)},</h2>
+                <p style="color:#ccc;line-height:1.8;">Mesajınız başarıyla alındı. Ekibimiz en kısa sürede sizinle iletişime geçecek — genellikle 1 iş günü içinde yanıt veriyoruz.</p>
+                <p style="color:#ccc;line-height:1.8;">Acil bir konunuz varsa WhatsApp üzerinden ulaşabilirsiniz:</p>
+                <div style="text-align:center;margin:24px 0;">
+                  <a href="https://wa.me/905067293423" style="display:inline-block;padding:14px 32px;background:#eac321;color:#000;text-decoration:none;border-radius:8px;font-weight:bold;">WhatsApp'tan Yaz</a>
+                </div>
+                <hr style="border:none;border-top:1px solid #333;margin:24px 0;" />
+                <p style="color:#888;font-size:13px;">Kade Media | Biruni Teknopark, Zeytinburnu/İstanbul<br/>hello@kademedia.com | +90 506 729 34 23</p>
+              </div>
+            </div>
+          `,
+        });
+      } catch (thankYouErr) {
+        console.log('Thank-you email failed (non-critical):', thankYouErr.message);
+      }
     }
 
-    // Send WhatsApp notification via Callmebot (free)
-    // Setup: WhatsApp'ta +34 644 62 75 56 numarasına "I allow callmebot to send me messages" yazın
-    // API key alacaksınız, WA_APIKEY olarak .env'e ekleyin
+    // WhatsApp notification
     const waPhone = process.env.WA_PHONE;
     const waApiKey = process.env.WA_APIKEY;
     if (waPhone && waApiKey) {
       try {
         const waText = encodeURIComponent(
-          `🔔 Yeni Teklif Talebi!\n👤 ${name}\n📧 ${email}\n📞 ${phone || '-'}\n🏢 ${company || '-'}\n🎯 ${service || '-'}\n💬 ${message.substring(0, 100)}${message.length > 100 ? '...' : ''}`
+          `🔔 Yeni Lead!\n👤 ${name}\n📧 ${email}\n📞 ${phone || '-'}\n🏢 ${company || '-'}\n🎯 ${service || '-'}\n💬 ${message.substring(0, 100)}${message.length > 100 ? '...' : ''}`
         );
         await fetch(`https://api.callmebot.com/whatsapp.php?phone=${waPhone}&text=${waText}&apikey=${waApiKey}`);
       } catch (waError) {

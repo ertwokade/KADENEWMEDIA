@@ -182,6 +182,30 @@
   flex-shrink: 0;
 }
 
+.partner-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.partner-kpi-card {
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.partner-kpi-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.partner-kpi-label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
 @media (max-width: 768px) {
   .partners-grid {
     grid-template-columns: 1fr;
@@ -194,5 +218,9 @@
   .partner-detail-header {
     flex-direction: column;
     text-align: center;
+  }
+
+  .partner-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
+import { analytics } from '../utils/analytics'
 import './WhatsAppButton.css'
 
 export default function WhatsAppButton() {
@@ -13,7 +14,8 @@ export default function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       className="whatsapp-float"
-      aria-label="WhatsApp"
+      aria-label="WhatsApp'tan iletişime geç"
+      onClick={() => analytics.whatsappClick('floating-button')}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: 1, type: 'spring', stiffness: 260, damping: 20 }}

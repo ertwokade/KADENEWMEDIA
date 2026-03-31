@@ -13,6 +13,7 @@ import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { sendContactApi } from '../api'
+import { analytics } from '../utils/analytics'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -89,6 +90,7 @@ export default function Contact() {
     setError('')
     try {
       await sendContactApi({ ...formData, service: formData.services.join(', ') })
+      analytics.formSubmit(formData.services.join(', '))
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', company: '', services: [], message: '' })
       setKvkkAccepted(false)
@@ -374,6 +376,7 @@ export default function Contact() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-outline map-directions-btn"
+                  onClick={() => analytics.mapDirections()}
                 >
                   {t('contact.getDirections')}
                   <HiOutlineExternalLink size={16} />

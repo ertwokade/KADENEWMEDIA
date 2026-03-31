@@ -3,6 +3,8 @@ import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { ObjectId } from 'mongodb';
 
+const VALID_STATUSES = ['yeni', 'gorusme-bekliyor', 'teklif-gonderildi', 'kazanildi', 'kaybedildi'];
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
@@ -25,15 +27,26 @@ export default async function handler(req, res) {
     }
   }
 
-  // PUT - Mark as read
+  // PUT - Mark as read OR update status
   if (req.method === 'PUT') {
     try {
-      const { id } = req.body;
+      const { id, status } = req.body;
+      const update = {};
+
+      if (status !== undefined) {
+        if (!VALID_STATUSES.includes(status)) {
+          return res.status(400).json({ error: 'Geçersiz durum değeri' });
+        }
+        update.status = status;
+      } else {
+        update.read = true;
+      }
+
       await collection.updateOne(
         { _id: new ObjectId(id) },
-        { $set: { read: true } }
+        { $set: update }
       );
-      return res.status(200).json({ message: 'Okundu olarak işaretlendi' });
+      return res.status(200).json({ message: 'Güncellendi' });
     } catch (error) {
       console.error('Messages PUT error:', error);
       return res.status(500).json({ error: 'Sunucu hatası' });

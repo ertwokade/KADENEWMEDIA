@@ -144,6 +144,15 @@ export async function markMessageReadApi(id) {
   return handleResponse(res);
 }
 
+export async function updateMessageStatusApi(id, status) {
+  const res = await fetch(`${API_BASE}/messages`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ id, status }),
+  });
+  return handleResponse(res);
+}
+
 export async function deleteMessageApi(id) {
   const res = await fetch(`${API_BASE}/messages?id=${id}`, {
     method: 'DELETE',

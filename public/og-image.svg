@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#eac321"/>
+      <stop offset="100%" style="stop-color:#f5d86e"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Decorative circles -->
+  <circle cx="1050" cy="100" r="200" fill="#eac321" opacity="0.06"/>
+  <circle cx="150" cy="530" r="150" fill="#6C63FF" opacity="0.05"/>
+  <!-- Brand name -->
+  <text x="100" y="220" font-family="Arial, sans-serif" font-size="88" font-weight="800" fill="url(#accent)">kade</text>
+  <text x="380" y="220" font-family="Arial, sans-serif" font-size="88" font-weight="300" fill="white" opacity="0.9">media</text>
+  <!-- Tagline -->
+  <text x="100" y="290" font-family="Arial, sans-serif" font-size="28" fill="white" opacity="0.6">Sosyal Medya &amp; Dijital Pazarlama Ajansı</text>
+  <!-- Divider -->
+  <rect x="100" y="330" width="80" height="4" fill="#eac321" rx="2"/>
+  <!-- Description -->
+  <text x="100" y="390" font-family="Arial, sans-serif" font-size="22" fill="white" opacity="0.5">İstanbul · Biruni Teknopark</text>
+  <text x="100" y="430" font-family="Arial, sans-serif" font-size="22" fill="white" opacity="0.5">kademedia.com.tr</text>
+</svg>

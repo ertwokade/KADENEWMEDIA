@@ -105,6 +105,35 @@ export const blogPosts = [
     titleEn: '2025 Instagram Algorithm Update: New Rules for Getting on Explore',
     excerptTr: 'Instagram, 2025\'te orijinal içeriklere öncelik veren büyük bir algoritma güncellemesi yaptı. Repost ve düşük kaliteli paylaşımlar artık geri plana atılıyor. İşte markanızın keşfet sayfasına düşmesi için bilmeniz gereken yeni kurallar ve stratejiler.',
     excerptEn: 'Instagram rolled out a major algorithm update in 2025 prioritizing original content. Reposts and low-quality shares are now deprioritized. Here are the new rules and strategies your brand needs to know to land on the Explore page.',
+    contentTr: `<h2>Instagram Algoritması 2025'te Ne Değişti?</h2>
+<p>Instagram, 2025 başında gerçekleştirdiği algoritma güncellemesiyle içerik dağıtım mantığını köklü biçimde değiştirdi. En büyük dönüşüm, <strong>orijinal içeriklerin diğer hesapların paylaşımlarına göre 3 kat daha fazla erişim</strong> almasıdır.</p>
+<h2>Yeni Algoritmada Öne Çıkan 5 Kural</h2>
+<ul>
+<li><strong>Özgün içerik önceliği:</strong> Repost, yeniden paylaşım ve kopyalı içerikler artık çok daha az dağıtım alıyor.</li>
+<li><strong>Kaydet ve paylaş oranı:</strong> Beğeni sayısından çok "kaydet" ve "paylaş" eylemleri algoritmayı tetikliyor.</li>
+<li><strong>İlk 30 dakika kritik:</strong> Paylaşımın ilk yarım saatindeki etkileşim oranı, geniş kitleye ulaşıp ulaşmayacağını belirliyor.</li>
+<li><strong>Hesap tutarlılığı:</strong> Belli bir nişte sürekli içerik üretenler keşfet sayfasında daha sık yer alıyor.</li>
+<li><strong>Carousel performansı:</strong> Çok sayfalı carousel paylaşımları tekrar izlenme oranı sayesinde algoritma puanı kazanıyor.</li>
+</ul>
+<h2>Keşfet Sayfasına Düşmek İçin Pratik Adımlar</h2>
+<p>Keşfet sayfası artık yalnızca takip ettiklerinizle aynı ilgi alanlarını paylaşan kullanıcılara içerik gösteriyor. Bu nedenle <strong>niche hedefleme</strong> kritik hale geldi.</p>
+<p>Paylaşımlarınızda şu unsurları bulundurun: net bir konu odağı, güçlü bir görsel kanca, ilk saniyeden itibaren değer sunan bir anlatı ve aksiyona yönlendiren bir son.</p>
+<h2>Sonuç</h2>
+<p>2025 Instagram algoritması, içerik kalitesini miktarın önüne koyuyor. Haftada 7 vasat içerik yerine 3 güçlü içerik üretmek artık çok daha mantıklı bir strateji. <a href="/hizmetler">Sosyal medya yönetimi hizmetlerimiz</a> hakkında bilgi almak için bize ulaşın.</p>`,
+    contentEn: `<h2>What Changed in the Instagram Algorithm in 2025?</h2>
+<p>Instagram fundamentally changed its content distribution logic with its early-2025 algorithm update. The biggest shift: <strong>original content now gets 3x more reach</strong> compared to reposts and reshared content.</p>
+<h2>5 Key Rules in the New Algorithm</h2>
+<ul>
+<li><strong>Original content priority:</strong> Reposts and copied content receive significantly less distribution.</li>
+<li><strong>Save and share rates:</strong> The "save" and "share" actions now matter more than likes.</li>
+<li><strong>First 30 minutes are critical:</strong> Engagement rate in the first half-hour determines whether your post reaches a wider audience.</li>
+<li><strong>Account consistency:</strong> Accounts that consistently produce content in a specific niche appear more frequently on the Explore page.</li>
+<li><strong>Carousel performance:</strong> Multi-slide carousels earn algorithm points through re-viewing rates.</li>
+</ul>
+<h2>Practical Steps to Land on the Explore Page</h2>
+<p>The Explore page now shows content to users who share interests with the accounts they follow. This makes <strong>niche targeting</strong> critical.</p>
+<h2>Conclusion</h2>
+<p>The 2025 Instagram algorithm puts content quality before quantity. Producing 3 strong pieces of content per week is now a far smarter strategy than 7 mediocre ones. Learn about our <a href="/hizmetler">social media management services</a>.</p>`,
     category: 'Instagram',
     categoryEn: 'Instagram',
     date: '28 Mar 2025',

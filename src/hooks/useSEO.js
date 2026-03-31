@@ -24,16 +24,25 @@ function setCanonical(url) {
   el.setAttribute('href', url)
 }
 
-export function useSEO({ title, description, keywords, path = '/', image }) {
+export function useSEO({ title, description, keywords, path = '/', image, type = 'website' }) {
   useEffect(() => {
-    const fullTitle = title ? `${title} | Kade Media` : 'Kade Media | Sosyal Medya Ajansı'
+    // Avoid double-appending "Kade Media"
+    let fullTitle
+    if (!title) {
+      fullTitle = 'Kade Media | Sosyal Medya Ajansı'
+    } else if (title.includes('Kade Media')) {
+      fullTitle = title
+    } else {
+      fullTitle = `${title} | Kade Media`
+    }
+
     const canonicalUrl = `${BASE_URL}${path}`
-    const ogImage = image || `${BASE_URL}/og-image.jpg`
+    const ogImage = image || `${BASE_URL}/og-image.svg`
 
     document.title = fullTitle
 
     setMeta('description', description)
-    setMeta('keywords', keywords)
+    if (keywords) setMeta('keywords', keywords)
     setMeta('robots', 'index, follow')
     setMeta('author', 'Kade Media')
 
@@ -42,7 +51,7 @@ export function useSEO({ title, description, keywords, path = '/', image }) {
     setMeta('og:description', description, true)
     setMeta('og:url', canonicalUrl, true)
     setMeta('og:image', ogImage, true)
-    setMeta('og:type', 'website', true)
+    setMeta('og:type', type, true)
     setMeta('og:site_name', 'Kade Media', true)
     setMeta('og:locale', 'tr_TR', true)
 
@@ -54,5 +63,5 @@ export function useSEO({ title, description, keywords, path = '/', image }) {
     setMeta('twitter:site', '@kademediacom')
 
     setCanonical(canonicalUrl)
-  }, [title, description, keywords, path, image])
+  }, [title, description, keywords, path, image, type])
 }

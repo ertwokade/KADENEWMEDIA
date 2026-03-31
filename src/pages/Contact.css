@@ -266,6 +266,20 @@ a.contact-card-value:hover {
   display: block;
 }
 
+/* KVKK consent row */
+.kvkk-consent .service-checkbox-item {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  align-items: flex-start;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.kvkk-consent .service-checkbox-item span:last-child {
+  color: var(--text-secondary);
+}
+
 /* Service Checkbox Group */
 .service-checkbox-group {
   display: grid;

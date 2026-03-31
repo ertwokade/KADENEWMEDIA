@@ -9,6 +9,7 @@ import {
 } from 'react-icons/hi'
 import { getContentApi } from '../api'
 import { useLanguage } from '../i18n/LanguageContext'
+import { analytics } from '../utils/analytics'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
@@ -191,6 +192,7 @@ export default function Packages() {
                   <Link
                     to="/iletisim"
                     className={`btn ${pkg.popular ? 'btn-primary' : 'btn-outline'} package-btn`}
+                    onClick={() => analytics.packageClick(pkg.name)}
                   >
                     {pkg.tier === 'starter' ? t('packages.startNow') : t('packages.discoveryCall')}
                     <HiOutlineArrowRight size={16} />

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { HiOutlineChartBar, HiOutlineArrowRight } from 'react-icons/hi'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
+import { analytics } from '../utils/analytics'
 import { FadeIn } from './Animations'
 import './AuditScore.css'
 
@@ -140,12 +141,16 @@ export default function AuditScore() {
     const newAnswers = [...answers, points]
     setAnswers(newAnswers)
 
+    if (currentStep === 0) analytics.auditStart()
+
     if (currentStep < totalQuestions - 1) {
       setCurrentStep(currentStep + 1)
     } else {
       // Last question — calculate score
       setIsCalculating(true)
       setTimeout(() => {
+        const score = newAnswers.reduce((sum, pts) => sum + pts, 0)
+        analytics.auditComplete(score, '')
         setIsCalculating(false)
         setShowResult(true)
       }, 1500)
