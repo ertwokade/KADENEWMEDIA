@@ -1,0 +1,10 @@
+/* ServiceDetail reuses Services.css classes */
+/* Additional styles specific to service detail pages */
+
+.service-detail-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
