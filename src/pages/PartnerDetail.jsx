@@ -21,45 +21,51 @@ export default function PartnerDetail() {
   const { id } = useParams()
   const { lang, t } = useLanguage()
   const [partner, setPartner] = useState(() => staticPartners.find((p) => p.id === id))
-  const [notFound, setNotFound] = useState(false)
+  const [apiDone, setApiDone] = useState(false)
 
   useEffect(() => {
-    const fetchPartner = async () => {
-      try {
-        const data = await getPartnersApi()
+    getPartnersApi()
+      .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           const found = data.find((p) => p.id === id)
-          if (found) {
-            setPartner(found)
-          } else if (!partner) {
-            setNotFound(true)
-          }
+          if (found) setPartner(found)
         }
-      } catch {
-        if (!partner) setNotFound(true)
-      }
-    }
-    fetchPartner()
+      })
+      .catch(() => {})
+      .finally(() => setApiDone(true))
   }, [id])
 
   useEffect(() => {
     if (partner) analytics.caseStudyView(partner.name)
   }, [partner])
 
-  if (notFound) return <Navigate to="/partnerler" replace />
-  if (!partner) return null
+  const name = partner?.name || ''
+  const desc = partner ? (lang === 'tr' ? partner.longDescTr : partner.longDescEn) : ''
+  const shortDesc = partner ? (lang === 'tr' ? partner.descTr : partner.descEn) : ''
+  const services = partner ? ((lang === 'tr' ? partner.servicesTr : partner.servicesEn) || []) : []
+  const results = partner ? ((lang === 'tr' ? partner.resultsTr : partner.resultsEn) || []) : []
+  const category = partner ? (lang === 'tr' ? partner.category : partner.categoryEn) : ''
 
-  const name = partner.name
-  const desc = lang === 'tr' ? partner.longDescTr : partner.longDescEn
-  const shortDesc = lang === 'tr' ? partner.descTr : partner.descEn
-  const services = (lang === 'tr' ? partner.servicesTr : partner.servicesEn) || []
-  const results = (lang === 'tr' ? partner.resultsTr : partner.resultsEn) || []
-  const category = lang === 'tr' ? partner.category : partner.categoryEn
-
-  const metaTitle = `${name} Vaka Çalışması | Kade Media`
-  const metaDesc = shortDesc || `${name} için gerçekleştirdiğimiz dijital pazarlama çalışması ve elde ettiğimiz sonuçlar.`
+  const metaTitle = name ? `${name} Vaka Çalışması | Kade Media` : 'Partner | Kade Media'
+  const metaDesc = shortDesc || (name ? `${name} için gerçekleştirdiğimiz dijital pazarlama çalışması ve elde ettiğimiz sonuçlar.` : '')
 
   useSEO({ title: metaTitle, description: metaDesc, path: `/partnerler/${id}` })
+
+  if (!partner && apiDone) return <Navigate to="/partnerler" replace />
+  if (!partner) {
+    return (
+      <PageTransition>
+        <section className="partner-detail-hero">
+          <div className="container" style={{ textAlign: 'center', padding: '120px 0' }}>
+            <div className="loading-spinner" />
+            <p style={{ color: 'var(--text-secondary)', marginTop: 16 }}>
+              {lang === 'tr' ? 'Yükleniyor...' : 'Loading...'}
+            </p>
+          </div>
+        </section>
+      </PageTransition>
+    )
+  }
 
   return (
     <PageTransition>

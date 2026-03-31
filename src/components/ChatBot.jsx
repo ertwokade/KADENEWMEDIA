@@ -113,56 +113,19 @@ function findFallbackResponse(message, lang) {
 }
 
 async function getAIResponse(message, lang, history) {
-  // Try Gemini API (free tier)
-  const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY
-  
-  if (!GEMINI_KEY) {
-    return findFallbackResponse(message, lang)
-  }
-  
   try {
-    const systemPrompt = lang === 'en' ? KADE_CONTEXT_EN : KADE_CONTEXT
-    
-    const contents = [
-      {
-        role: 'user',
-        parts: [{ text: systemPrompt + '\n\nKullanıcı mesajı: ' + message }]
-      }
-    ]
-    
-    // Add conversation history (last 6 messages)
-    if (history.length > 1) {
-      const recentHistory = history.slice(-6)
-      const historyText = recentHistory
-        .map(m => `${m.type === 'user' ? 'Kullanıcı' : 'Asistan'}: ${m.text}`)
-        .join('\n')
-      contents[0].parts[0].text = systemPrompt + '\n\nÖnceki konuşma:\n' + historyText + '\n\nKullanıcının son mesajı: ' + message
-    }
-    
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents,
-          generationConfig: {
-            maxOutputTokens: 300,
-            temperature: 0.7,
-          },
-        }),
-      }
-    )
-    
-    if (!res.ok) throw new Error('API error')
-    
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, lang, history: history.slice(-6) }),
+    })
+
+    if (!res.ok) return findFallbackResponse(message, lang)
+
     const data = await res.json()
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text
-    
-    if (text) return text.trim()
+    if (data.reply) return data.reply
     return findFallbackResponse(message, lang)
-  } catch (err) {
-    console.log('Gemini API unavailable, using fallback:', err.message)
+  } catch {
     return findFallbackResponse(message, lang)
   }
 }

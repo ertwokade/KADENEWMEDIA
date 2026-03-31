@@ -65,22 +65,24 @@ function AboutBg() {
 }
 
 export default function PageBgAnimation({ type = 'home' }) {
-  if (type === 'about') return <AboutBg />
-
   const cfg = CONFIGS[type] || CONFIGS.home
 
   const elements = useMemo(
     () =>
-      Array.from({ length: cfg.count }, (_, i) => ({
-        label: cfg.items[i % cfg.items.length],
-        x: sr(i * 7.31) * 90,
-        y: sr(i * 3.91) * 90,
-        delay: sr(i * 5.71) * 8,
-        dur: 10 + sr(i * 2.31) * 15,
-        op: 0.12 + sr(i * 1.91) * 0.2,
-      })),
-    [cfg]
+      type === 'about'
+        ? []
+        : Array.from({ length: cfg.count }, (_, i) => ({
+            label: cfg.items[i % cfg.items.length],
+            x: sr(i * 7.31) * 90,
+            y: sr(i * 3.91) * 90,
+            delay: sr(i * 5.71) * 8,
+            dur: 10 + sr(i * 2.31) * 15,
+            op: 0.12 + sr(i * 1.91) * 0.2,
+          })),
+    [type, cfg]
   )
+
+  if (type === 'about') return <AboutBg />
 
   return (
     <div className="page-bg-anim" aria-hidden="true">

@@ -28,8 +28,8 @@ export default function Partners() {
         if (data && data.length > 0) {
           setPartnersData(data)
         }
-      } catch (err) {
-        console.log('Using static partners data')
+      } catch {
+        // static data fallback
       }
     }
     fetchPartners()

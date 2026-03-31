@@ -54,6 +54,9 @@ app.delete('/api/messages', apiRoute('messages.js'))
 // Contact
 app.post('/api/contact', apiRoute('contact.js'))
 
+// Chat (AI chatbot)
+app.post('/api/chat', apiRoute('chat.js'))
+
 // Seed
 app.post('/api/seed', apiRoute('seed.js'))
 

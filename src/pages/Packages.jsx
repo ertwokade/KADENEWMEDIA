@@ -26,26 +26,28 @@ export default function Packages() {
   })
   const isEN = lang === 'en'
 
-  const [dynamicPackages, setDynamicPackages] = useState(null)
+  const [dynamicItems, setDynamicItems] = useState(null)
 
   useEffect(() => {
     getContentApi('packages')
       .then(res => {
-        if (res?.data?.items?.length) {
-          setDynamicPackages(res.data.items.map(item => ({
-            name: isEN ? item.nameEn : item.nameTr,
-            tier: (item.nameTr || item.nameEn || '').toLowerCase().replace(/\s+/g, '-'),
-            priceTRY: item.priceTRY,
-            priceUSD: item.priceUSD,
-            desc: isEN ? item.descEn : item.descTr,
-            popular: !!item.popular,
-            features: (isEN ? item.featuresEn : item.featuresTr || '').split(',').map(f => f.trim()).filter(Boolean),
-            notIncluded: [],
-          })))
-        }
+        if (res?.data?.items?.length) setDynamicItems(res.data.items)
       })
       .catch(() => {})
   }, [])
+
+  const dynamicPackages = dynamicItems
+    ? dynamicItems.map(item => ({
+        name: isEN ? item.nameEn : item.nameTr,
+        tier: (item.nameTr || item.nameEn || '').toLowerCase().replace(/\s+/g, '-'),
+        priceTRY: item.priceTRY,
+        priceUSD: item.priceUSD,
+        desc: isEN ? item.descEn : item.descTr,
+        popular: !!item.popular,
+        features: ((isEN ? item.featuresEn : item.featuresTr) || '').split(',').map(f => f.trim()).filter(Boolean),
+        notIncluded: [],
+      }))
+    : null
 
   const packages = [
     {

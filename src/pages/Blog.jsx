@@ -29,8 +29,8 @@ export default function Blog() {
         if (data && data.length > 0) {
           setBlogPosts(data)
         }
-      } catch (err) {
-        console.log('Using static blog data')
+      } catch {
+        // static data fallback
       }
     }
     fetchBlogs()

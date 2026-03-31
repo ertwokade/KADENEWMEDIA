@@ -15,7 +15,7 @@ export function createToken(payload) {
 export function verifyToken(token) {
   try {
     return jwt.verify(token, getSecret());
-  } catch (e) {
+  } catch {
     return null;
   }
 }

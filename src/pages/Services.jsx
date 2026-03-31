@@ -11,8 +11,6 @@ import {
   HiOutlineSpeakerphone,
   HiOutlineCode,
 } from 'react-icons/hi'
-import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
-import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { getContentApi } from '../api'
