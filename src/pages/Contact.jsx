@@ -50,6 +50,9 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
+  const [kvkkAccepted, setKvkkAccepted] = useState(false)
+  // Honeypot: should remain empty — bots fill it
+  const [honeypot, setHoneypot] = useState('')
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -66,12 +69,29 @@ export default function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    // Honeypot check
+    if (honeypot) return
+    // Email format validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError('Geçerli bir e-posta adresi giriniz.')
+      return
+    }
+    // Minimum message length
+    if (formData.message.trim().length < 20) {
+      setError('Mesajınız en az 20 karakter olmalıdır.')
+      return
+    }
+    if (!kvkkAccepted) {
+      setError('Devam etmek için KVKK onayını işaretlemeniz gerekmektedir.')
+      return
+    }
     setSending(true)
     setError('')
     try {
       await sendContactApi({ ...formData, service: formData.services.join(', ') })
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', company: '', services: [], message: '' })
+      setKvkkAccepted(false)
       setTimeout(() => setSubmitted(false), 6000)
     } catch {
       setError(t('contact.errorMsg') || 'Mesaj gönderilemedi. Lütfen tekrar deneyin.')
@@ -193,6 +213,17 @@ export default function Contact() {
 
             <FadeIn direction="right" className="contact-form-wrapper">
               <form className="contact-form glass-card" onSubmit={handleSubmit}>
+                {/* Honeypot — hidden from users, filled only by bots */}
+                <div style={{ display: 'none' }} aria-hidden="true">
+                  <input
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
                 <h3>{t('contact.formTitle')}</h3>
                 <div className="form-row">
                   <div className="form-group">
@@ -281,6 +312,22 @@ export default function Contact() {
                     onChange={handleChange}
                     required
                   />
+                </div>
+
+                <div className="form-group kvkk-consent">
+                  <label className={`service-checkbox-item ${kvkkAccepted ? 'checked' : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={kvkkAccepted}
+                      onChange={(e) => setKvkkAccepted(e.target.checked)}
+                      required
+                    />
+                    <span className="checkbox-mark" />
+                    <span>
+                      <a href="/kvkk" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>KVKK Aydınlatma Metni</a>'ni ve{' '}
+                      <a href="/gizlilik" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>Gizlilik Politikası</a>'nı okudum, kişisel verilerimin işlenmesine onay veriyorum.
+                    </span>
+                  </label>
                 </div>
 
                 <motion.button

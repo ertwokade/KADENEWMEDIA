@@ -112,6 +112,11 @@ export default function Footer() {
 
         <div className="footer-bottom">
           <p>{t('footer.rights')}</p>
+          <div className="footer-legal-links">
+            <Link to="/kvkk">KVKK</Link>
+            <Link to="/gizlilik">Gizlilik Politikası</Link>
+            <Link to="/cerez-politikasi">Çerez Politikası</Link>
+          </div>
           <motion.button
             className="scroll-top-btn"
             onClick={scrollToTop}

@@ -66,67 +66,71 @@ export default function Blog() {
         <div className="container">
           {/* Featured Post */}
           <FadeIn>
-            <motion.div className="blog-featured glass-card" whileHover={{ y: -4 }}>
-              <div className="blog-featured-image" style={{ background: `${blogPosts[0].color}15` }}>
-                {blogPosts[0].image && blogPosts[0].image.startsWith('http') ? (
-                  <img src={blogPosts[0].image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <span>{blogPosts[0].image}</span>
-                )}
-              </div>
-              <div className="blog-featured-content">
-                <div className="blog-meta">
-                  <span className="blog-category" style={{ color: blogPosts[0].color }}>
-                    {lang === 'tr' ? blogPosts[0].category : blogPosts[0].categoryEn}
-                  </span>
-                  <span className="blog-date">{blogPosts[0].date}</span>
-                  <span className="blog-read">
-                    <HiOutlineClock size={14} />
-                    {blogPosts[0].readTime} {t('blog.min')}
+            <Link to={`/blog/${blogPosts[0].slug}`} style={{ textDecoration: 'none' }}>
+              <motion.div className="blog-featured glass-card" whileHover={{ y: -4 }}>
+                <div className="blog-featured-image" style={{ background: `${blogPosts[0].color}15` }}>
+                  {blogPosts[0].image && blogPosts[0].image.startsWith('http') ? (
+                    <img src={blogPosts[0].image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span>{blogPosts[0].image}</span>
+                  )}
+                </div>
+                <div className="blog-featured-content">
+                  <div className="blog-meta">
+                    <span className="blog-category" style={{ color: blogPosts[0].color }}>
+                      {lang === 'tr' ? blogPosts[0].category : blogPosts[0].categoryEn}
+                    </span>
+                    <span className="blog-date">{blogPosts[0].date}</span>
+                    <span className="blog-read">
+                      <HiOutlineClock size={14} />
+                      {blogPosts[0].readTime} {t('blog.min')}
+                    </span>
+                  </div>
+                  <h2>{lang === 'tr' ? blogPosts[0].titleTr : blogPosts[0].titleEn}</h2>
+                  <p>{lang === 'tr' ? blogPosts[0].excerptTr : blogPosts[0].excerptEn}</p>
+                  <span className="btn btn-primary blog-read-btn">
+                    {t('blog.readMore')}
+                    <HiOutlineArrowRight size={16} />
                   </span>
                 </div>
-                <h2>{lang === 'tr' ? blogPosts[0].titleTr : blogPosts[0].titleEn}</h2>
-                <p>{lang === 'tr' ? blogPosts[0].excerptTr : blogPosts[0].excerptEn}</p>
-                <button className="btn btn-primary blog-read-btn">
-                  {t('blog.readMore')}
-                  <HiOutlineArrowRight size={16} />
-                </button>
-              </div>
-            </motion.div>
+              </motion.div>
+            </Link>
           </FadeIn>
 
           {/* Blog Grid */}
           <StaggerContainer className="blog-grid" staggerDelay={0.1}>
             {blogPosts.slice(1).map((post, idx) => (
-              <StaggerItem key={post._id || post.id || idx}>
-                <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
-                  <div className="blog-card-image" style={{ background: `${post.color}15` }}>
-                    {post.image && post.image.startsWith('http') ? (
-                      <img src={post.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <span>{post.image}</span>
-                    )}
-                  </div>
-                  <div className="blog-card-content">
-                    <div className="blog-meta">
-                      <span className="blog-category" style={{ color: post.color }}>
-                        {lang === 'tr' ? post.category : post.categoryEn}
-                      </span>
-                      <span className="blog-date">{post.date}</span>
+              <StaggerItem key={post._id || post.slug || idx}>
+                <Link to={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>
+                  <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
+                    <div className="blog-card-image" style={{ background: `${post.color}15` }}>
+                      {post.image && post.image.startsWith('http') ? (
+                        <img src={post.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <span>{post.image}</span>
+                      )}
                     </div>
-                    <h3>{lang === 'tr' ? post.titleTr : post.titleEn}</h3>
-                    <p>{lang === 'tr' ? post.excerptTr : post.excerptEn}</p>
-                    <div className="blog-card-footer">
-                      <span className="blog-read">
-                        <HiOutlineClock size={14} />
-                        {post.readTime} {t('blog.min')}
-                      </span>
-                      <span className="blog-read-link">
-                        {t('blog.readMore')} →
-                      </span>
+                    <div className="blog-card-content">
+                      <div className="blog-meta">
+                        <span className="blog-category" style={{ color: post.color }}>
+                          {lang === 'tr' ? post.category : post.categoryEn}
+                        </span>
+                        <span className="blog-date">{post.date}</span>
+                      </div>
+                      <h3>{lang === 'tr' ? post.titleTr : post.titleEn}</h3>
+                      <p>{lang === 'tr' ? post.excerptTr : post.excerptEn}</p>
+                      <div className="blog-card-footer">
+                        <span className="blog-read">
+                          <HiOutlineClock size={14} />
+                          {post.readTime} {t('blog.min')}
+                        </span>
+                        <span className="blog-read-link">
+                          {t('blog.readMore')} →
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </Link>
               </StaggerItem>
             ))}
           </StaggerContainer>

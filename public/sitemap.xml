@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main pages -->
   <url>
     <loc>https://kademedia.com.tr/</loc>
     <changefreq>weekly</changefreq>
@@ -39,5 +40,83 @@
     <loc>https://kademedia.com.tr/iletisim</loc>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <!-- Legal pages -->
+  <url>
+    <loc>https://kademedia.com.tr/kvkk</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/gizlilik</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/cerez-politikasi</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <!-- Partner detail pages -->
+  <url>
+    <loc>https://kademedia.com.tr/partnerler/flavora</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/partnerler/techvibe</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/partnerler/greenlife</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/partnerler/urbanstyle</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/partnerler/petpal</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/partnerler/fitzone</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <!-- Blog posts -->
+  <url>
+    <loc>https://kademedia.com.tr/blog/2025-sosyal-medya-trendleri</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/instagram-reels-stratejisi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/meta-ads-optimizasyon</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/tiktok-marka-buyutme</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/influencer-marketing-rehberi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/icerik-takvimi-olusturma</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

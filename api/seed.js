@@ -176,14 +176,27 @@ const defaultContent = [
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ error: 'Seed endpoint is disabled in production' });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Use POST to seed the database' });
   }
 
-  // Simple secret check
+  const seedSecret = process.env.SEED_SECRET;
+  if (!seedSecret) {
+    return res.status(500).json({ error: 'SEED_SECRET environment variable is not set' });
+  }
+
   const { secret } = req.body || {};
-  if (secret !== 'kademedia-seed-2026') {
+  if (secret !== seedSecret) {
     return res.status(403).json({ error: 'Invalid seed secret' });
+  }
+
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  if (!adminPassword) {
+    return res.status(500).json({ error: 'SEED_ADMIN_PASSWORD environment variable is not set' });
   }
 
   try {
@@ -192,7 +205,7 @@ export default async function handler(req, res) {
     // Create admin user
     const existingAdmin = await db.collection('users').findOne({ username: 'kade' });
     if (!existingAdmin) {
-      const hashedPassword = await bcrypt.hash('kade', 10);
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
       await db.collection('users').insertOne({
         username: 'kade',
         password: hashedPassword,
@@ -225,7 +238,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       message: 'Veritabanı başarıyla oluşturuldu!',
       seeded: {
-        admin: !existingAdmin ? 'Oluşturuldu (kade/kade)' : 'Zaten mevcut',
+        admin: !existingAdmin ? 'Oluşturuldu' : 'Zaten mevcut',
         partners: partnerCount === 0 ? `${defaultPartners.length} partner eklendi` : 'Zaten mevcut',
         blogs: blogCount === 0 ? `${defaultBlogs.length} blog eklendi` : 'Zaten mevcut',
         content: contentCount === 0 ? `${defaultContent.length} içerik eklendi` : 'Zaten mevcut',

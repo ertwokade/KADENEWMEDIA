@@ -16,9 +16,12 @@ import {
   getContentApi, updateContentApi,
   getPartnersApi, createPartnerApi, updatePartnerApi, deletePartnerApi,
   getMessagesApi, markMessageReadApi, deleteMessageApi,
-  seedApi, isLocalMode,
+  seedApi,
 } from '../api'
 import './Admin.css'
+
+// Local mode is no longer supported — always returns false
+function isLocalMode() { return false }
 
 // Toast component
 function Toast({ message, type, onClose }) {
@@ -47,18 +50,7 @@ function LoginScreen({ onLogin }) {
       localStorage.setItem('kade_admin_user', JSON.stringify(data.user))
       onLogin(data)
     } catch (err) {
-      // Fallback: local login when backend API is unavailable
-      if (username === 'kade' && password === 'kade') {
-        const localData = {
-          token: 'local-dev-token-' + Date.now(),
-          user: { username: 'kade', role: 'admin' }
-        }
-        localStorage.setItem('kade_admin_token', localData.token)
-        localStorage.setItem('kade_admin_user', JSON.stringify(localData.user))
-        onLogin(localData)
-      } else {
-        setError(err.message || 'Geçersiz kullanıcı adı veya şifre')
-      }
+      setError(err.message || 'Geçersiz kullanıcı adı veya şifre')
     } finally {
       setLoading(false)
     }
@@ -1642,6 +1634,7 @@ function SettingsSection({ showToast }) {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [seedLoading, setSeedLoading] = useState(false)
+  const [seedSecret, setSeedSecret] = useState('')
 
   const handleChangePassword = async (e) => {
     e.preventDefault()
@@ -1669,10 +1662,12 @@ function SettingsSection({ showToast }) {
   }
 
   const handleSeed = async () => {
+    if (!seedSecret) { showToast('Seed secret giriniz', 'error'); return }
     setSeedLoading(true)
     try {
-      const result = await seedApi()
+      const result = await seedApi(seedSecret)
       showToast('Veritabanı başarıyla oluşturuldu!', 'success')
+      setSeedSecret('')
       console.log('Seed result:', result)
     } catch (err) {
       showToast(err.message, 'error')
@@ -1693,7 +1688,16 @@ function SettingsSection({ showToast }) {
       {/* Seed Database */}
       <div className="seed-section">
         <h3>🗄️ Veritabanı Başlat</h3>
-        <p>İlk kurulumda veritabanına varsayılan verileri yüklemek için kullanın. Zaten veri varsa tekrar yüklemez.</p>
+        <p>İlk kurulumda veritabanına varsayılan verileri yüklemek için kullanın. Zaten veri varsa tekrar yüklemez. SEED_SECRET ortam değişkenini giriniz.</p>
+        <div className="form-group" style={{ marginBottom: '1rem' }}>
+          <input
+            type="password"
+            value={seedSecret}
+            onChange={(e) => setSeedSecret(e.target.value)}
+            placeholder="Seed secret..."
+            className="form-input"
+          />
+        </div>
         <button className="btn btn-primary" onClick={handleSeed} disabled={seedLoading}>
           <HiOutlineDatabase size={16} /> {seedLoading ? 'Yükleniyor...' : 'Veritabanını Başlat'}
         </button>

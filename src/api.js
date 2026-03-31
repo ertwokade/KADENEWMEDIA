@@ -8,10 +8,6 @@ function getAuthHeaders() {
   };
 }
 
-export function isLocalMode() {
-  const token = localStorage.getItem('kade_admin_token');
-  return token && token.startsWith('local-dev-token-');
-}
 
 async function handleResponse(res) {
   let data;
@@ -200,12 +196,12 @@ export async function deleteUserApi(id) {
   return handleResponse(res);
 }
 
-// Seed
-export async function seedApi() {
+// Seed (dev only — requires SEED_SECRET env var)
+export async function seedApi(secret) {
   const res = await fetch(`${API_BASE}/seed`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ secret: 'kademedia-seed-2026' }),
+    body: JSON.stringify({ secret }),
   });
   return handleResponse(res);
 }

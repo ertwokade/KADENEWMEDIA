@@ -11,6 +11,10 @@ import Careers from './pages/Careers'
 import Partners from './pages/Partners'
 import PartnerDetail from './pages/PartnerDetail'
 import Blog from './pages/Blog'
+import BlogDetail from './pages/BlogDetail'
+import KVKK from './pages/KVKK'
+import Gizlilik from './pages/Gizlilik'
+import CerezPolitikasi from './pages/CerezPolitikasi'
 import Admin from './pages/Admin'
 import ScrollToTop from './components/ScrollToTop'
 import WhatsAppButton from './components/WhatsAppButton'
@@ -34,7 +38,11 @@ function App() {
           <Route path="/partnerler/:id" element={<PartnerDetail />} />
           <Route path="/kariyer" element={<Careers />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/iletisim" element={<Contact />} />
+          <Route path="/kvkk" element={<KVKK />} />
+          <Route path="/gizlilik" element={<Gizlilik />} />
+          <Route path="/cerez-politikasi" element={<CerezPolitikasi />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </AnimatePresence>

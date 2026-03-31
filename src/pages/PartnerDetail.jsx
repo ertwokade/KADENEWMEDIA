@@ -38,8 +38,8 @@ export default function PartnerDetail() {
   if (!partner) return null
 
   const desc = lang === 'tr' ? partner.longDescTr : partner.longDescEn
-  const services = lang === 'tr' ? partner.servicesTr : partner.servicesEn
-  const results = lang === 'tr' ? partner.resultsTr : partner.resultsEn
+  const services = (lang === 'tr' ? partner.servicesTr : partner.servicesEn) || []
+  const results = (lang === 'tr' ? partner.resultsTr : partner.resultsEn) || []
   const category = lang === 'tr' ? partner.category : partner.categoryEn
 
   return (

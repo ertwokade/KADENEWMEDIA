@@ -1,7 +1,11 @@
 import jwt from 'jsonwebtoken';
 
 function getSecret() {
-  return process.env.JWT_SECRET || 'kademedia-default-secret-2026';
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable must be set in production');
+  }
+  return 'dev-only-unsafe-secret-change-me';
 }
 
 export function createToken(payload) {

@@ -111,6 +111,23 @@
   color: var(--gray-light);
 }
 
+.footer-legal-links {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-legal-links a {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-legal-links a:hover {
+  color: var(--primary);
+}
+
 .scroll-top-btn {
   display: flex;
   align-items: center;
