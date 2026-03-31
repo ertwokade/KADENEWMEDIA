@@ -2,6 +2,8 @@
 // Replace G-XXXXXXXXXX with your actual GA4 Measurement ID in index.html
 
 export function trackEvent(eventName, params = {}) {
+  const consent = localStorage.getItem('cookie_consent')
+  if (consent !== 'accepted') return
   if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
     window.gtag('event', eventName, params);
   }

@@ -623,7 +623,6 @@ function HeroEditor({ data, onSave }) {
   const [langTab, setLangTab] = useState('tr')
 
   useEffect(() => { setForm(data) }, [data])
-
   return (
     <div className="admin-form">
       <h3>Hero Section Metinleri</h3>
@@ -668,7 +667,6 @@ function StatsEditor({ data, onSave }) {
   const [form, setForm] = useState(data)
 
   useEffect(() => { setForm(data) }, [data])
-
   return (
     <div className="admin-form">
       <h3>Anasayfa İstatistikler</h3>
@@ -705,7 +703,6 @@ function FooterEditor({ data, onSave }) {
   const [form, setForm] = useState(data)
 
   useEffect(() => { setForm(data) }, [data])
-
   return (
     <div className="admin-form">
       <h3>Footer & İletişim Bilgileri</h3>
@@ -769,7 +766,6 @@ function ServicesEditor({ data, onSave }) {
   const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
 
   useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
-
   const updateItem = (index, field, value) => {
     const updated = [...items]
     updated[index] = { ...updated[index], [field]: value }
@@ -841,7 +837,6 @@ function FAQEditor({ data, onSave }) {
     if (data.tr?.length) setTrItems(data.tr)
     if (data.en?.length) setEnItems(data.en)
   }, [data])
-
   const items = langTab === 'tr' ? trItems : enItems
   const setItems = langTab === 'tr' ? setTrItems : setEnItems
 
@@ -895,7 +890,6 @@ function TestimonialsEditor({ data, onSave }) {
   const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
 
   useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
-
   const updateItem = (index, field, value) => {
     const updated = [...items]
     updated[index] = { ...updated[index], [field]: value }
@@ -981,7 +975,6 @@ function PackagesEditor({ data, onSave }) {
   const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
 
   useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
-
   const updateItem = (index, field, value) => {
     const updated = [...items]
     updated[index] = { ...updated[index], [field]: value }
@@ -1069,6 +1062,7 @@ function AboutEditor({ data, onSave }) {
     team: data.team || [],
   })
   const [langTab, setLangTab] = useState('tr')
+
 
   useEffect(() => {
     setForm({
@@ -1172,7 +1166,6 @@ function CareersEditor({ data, onSave }) {
   const [langTab, setLangTab] = useState('tr')
 
   useEffect(() => { setForm(data) }, [data])
-
   const jobs = form[langTab] || []
 
   const updateJob = (index, field, value) => {
@@ -1517,7 +1510,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
     }
   }
 
-  useEffect(() => { fetchMessages() }, [])
+  useEffect(() => { fetchMessages() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRead = async (msg) => {
     setSelectedMessage(msg)
@@ -2184,18 +2177,10 @@ export default function Admin() {
   const [toast, setToast] = useState(null)
   const [unreadCount, setUnreadCount] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [localMode, setLocalMode] = useState(false)
 
   // Stats for dashboard
   const [stats, setStats] = useState({ blogs: 0, partners: 0, messages: 0, unreadMessages: 0 })
-
-  useEffect(() => {
-    const token = localStorage.getItem('kade_admin_token')
-    if (token) {
-      setIsAuth(true)
-      setLocalMode(isLocalMode())
-      loadStats()
-    }
-  }, [])
 
   const loadStats = async () => {
     try {
@@ -2224,9 +2209,17 @@ export default function Admin() {
     setToast({ message, type })
   }
 
-  const [localMode, setLocalMode] = useState(false)
 
-  const handleLogin = (data) => {
+  useEffect(() => {
+    const token = localStorage.getItem('kade_admin_token')
+    if (token) {
+      setIsAuth(true)
+      setLocalMode(isLocalMode())
+      loadStats()
+    }
+  }, [])
+
+  const handleLogin = () => {
     setIsAuth(true)
     setLocalMode(isLocalMode())
     loadStats()

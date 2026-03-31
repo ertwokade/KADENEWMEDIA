@@ -58,13 +58,40 @@ export default function CookieBanner() {
     }
   }, [])
 
+  const enableAnalytics = () => {
+    // Enable GA4 if consent given
+    if (typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', {
+        analytics_storage: 'granted',
+      })
+    }
+  }
+
+  const disableAnalytics = () => {
+    // Disable GA4 tracking
+    if (typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', {
+        analytics_storage: 'denied',
+      })
+    }
+    // Remove GA cookies
+    document.cookie.split(';').forEach(c => {
+      const name = c.trim().split('=')[0]
+      if (name.startsWith('_ga') || name.startsWith('_gid')) {
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
+      }
+    })
+  }
+
   const handleAccept = () => {
     localStorage.setItem('cookie_consent', 'accepted')
+    enableAnalytics()
     setVisible(false)
   }
 
   const handleDecline = () => {
     localStorage.setItem('cookie_consent', 'declined')
+    disableAnalytics()
     setVisible(false)
   }
 

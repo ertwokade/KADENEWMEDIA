@@ -143,7 +143,6 @@ export default function Home() {
       subtitle: t('hero.subtitle'),
     }
 
-    // Set defaults immediately so language switch is instant
     setHeroTexts(defaults)
 
     const loadFromApi = async () => {
@@ -156,32 +155,22 @@ export default function Home() {
             subtitle: heroData.data[lang].subtitle || defaults.subtitle,
           })
         }
-      } catch {
-        // already set defaults above
-      }
+      } catch { /* fallback already set */ }
 
       try {
         const statsData = await getContentApi('stats')
-        if (statsData?.data) {
-          setDynamicStats(statsData.data)
-        }
-      } catch {
-        // use defaults
-      }
+        if (statsData?.data) setDynamicStats(statsData.data)
+      } catch { /* use defaults */ }
 
       try {
         const faqData = await getContentApi('faq')
-        if (faqData?.data?.tr?.length) {
-          setDynamicFaq(faqData.data)
-        }
-      } catch {}
+        if (faqData?.data?.tr?.length) setDynamicFaq(faqData.data)
+      } catch { /* use defaults */ }
 
       try {
         const testimonialsData = await getContentApi('testimonials')
-        if (testimonialsData?.data?.items?.length) {
-          setDynamicTestimonials(testimonialsData.data.items)
-        }
-      } catch {}
+        if (testimonialsData?.data?.items?.length) setDynamicTestimonials(testimonialsData.data.items)
+      } catch { /* use defaults */ }
     }
 
     loadFromApi()

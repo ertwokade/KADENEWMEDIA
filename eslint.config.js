@@ -25,6 +25,8 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]|^motion$' }],
+      'react-hooks/set-state-in-effect': 'off',
+      'react-refresh/only-export-components': ['warn', { allowExportNames: ['useLanguage', 'useTheme'] }],
     },
   },
   // Server-side (api/, server.js, seed-db.js)
