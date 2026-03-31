@@ -89,7 +89,7 @@ export default async function handler(req, res) {
       });
 
       // Team notification email
-      await transporter.sendMail({
+      try { await transporter.sendMail({
         from: `"Kade Media İletişim" <${smtpUser}>`,
         to: mailTo,
         subject: `🔔 Yeni Lead: ${escapeHtml(name)} — ${escapeHtml(service || 'Genel')}`,
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
             </div>
           </div>
         `,
-      });
+      }); } catch (teamMailErr) { console.error('Team email failed (non-critical):', teamMailErr.message); }
 
       // Thank-you email to user
       try {
