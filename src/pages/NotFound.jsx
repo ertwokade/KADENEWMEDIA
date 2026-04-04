@@ -13,6 +13,7 @@ export default function NotFound() {
     title: lang === 'tr' ? 'Sayfa Bulunamadı | Kade Media' : 'Page Not Found | Kade Media',
     description: lang === 'tr' ? 'Aradığınız sayfa bulunamadı.' : 'The page you are looking for was not found.',
     path: '/404',
+    noindex: true,
   })
 
   return (

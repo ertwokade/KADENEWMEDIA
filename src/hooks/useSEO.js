@@ -24,7 +24,7 @@ function setCanonical(url) {
   el.setAttribute('href', url)
 }
 
-export function useSEO({ title, description, keywords, path = '/', image, type = 'website' }) {
+export function useSEO({ title, description, keywords, path = '/', image, type = 'website', noindex = false }) {
   useEffect(() => {
     // Avoid double-appending "Kade Media"
     let fullTitle
@@ -37,13 +37,13 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
     }
 
     const canonicalUrl = `${BASE_URL}${path}`
-    const ogImage = image || `${BASE_URL}/og-image.svg`
+    const ogImage = image || `${BASE_URL}/logo.png`
 
     document.title = fullTitle
 
     setMeta('description', description)
     if (keywords) setMeta('keywords', keywords)
-    setMeta('robots', 'index, follow')
+    setMeta('robots', noindex ? 'noindex, nofollow' : 'index, follow')
     setMeta('author', 'Kade Media')
 
     // Open Graph
@@ -63,5 +63,5 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
     setMeta('twitter:site', '@kademediacom')
 
     setCanonical(canonicalUrl)
-  }, [title, description, keywords, path, image, type])
+  }, [title, description, keywords, path, image, type, noindex])
 }

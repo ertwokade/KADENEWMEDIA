@@ -107,7 +107,7 @@ export default function Services() {
         icon: iconMap[item.icon] || defaultIcons[i % defaultIcons.length],
         title: lang === 'en' ? (item.titleEn || item.titleTr) : (item.titleTr || item.titleEn),
         desc: lang === 'en' ? (item.descEn || item.descTr) : (item.descTr || item.descEn),
-        features: (lang === 'en' ? item.featuresEn : item.featuresTr || '').split(',').map(f => f.trim()).filter(Boolean),
+        features: ((lang === 'en' ? item.featuresEn : item.featuresTr) || '').split(',').map(f => f.trim()).filter(Boolean),
         platforms: [FaInstagram, FaTiktok, FaYoutube],
       }))
     : defaultServices

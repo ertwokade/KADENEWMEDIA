@@ -96,7 +96,18 @@ export default function Contact() {
       setKvkkAccepted(false)
       setTimeout(() => setSubmitted(false), 6000)
     } catch (err) {
-      setError(err.message || t('contact.errorMsg') || 'Mesaj gönderilemedi. Lütfen tekrar deneyin.')
+      const errorMsg = err.message || ''
+      if (errorMsg === 'API unavailable' || errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
+        // API unreachable — open mailto fallback
+        const subject = encodeURIComponent(`Teklif Talebi — ${formData.name}`)
+        const body = encodeURIComponent(
+          `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.services.join(', ') || '-'}\n\nMesaj:\n${formData.message}`
+        )
+        window.open(`mailto:hello@kademedia.com?subject=${subject}&body=${body}`, '_self')
+        setError(t('contact.fallbackMsg') || 'Sunucu şu an erişilemez. E-posta uygulamanız açılacak.')
+      } else {
+        setError(errorMsg || t('contact.errorMsg') || 'Mesaj gönderilemedi. Lütfen tekrar deneyin.')
+      }
       setTimeout(() => setError(''), 8000)
     } finally {
       setSending(false)

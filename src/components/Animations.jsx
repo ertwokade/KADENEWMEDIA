@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 
 const defaultVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -104,27 +104,36 @@ export function ScaleIn({ children, delay = 0, className, style }) {
 export function CountUp({ target, duration = 2, suffix = '' }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true })
+  const hasAnimated = useRef(false)
+
+  useEffect(() => {
+    if (!isInView || hasAnimated.current || !ref.current) return
+    hasAnimated.current = true
+
+    const start = 0
+    const end = typeof target === 'number' ? target : parseInt(target, 10) || 0
+    const startTime = performance.now()
+
+    function update(currentTime) {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / (duration * 1000), 1)
+      // easeOut curve
+      const eased = 1 - Math.pow(1 - progress, 3)
+      const current = Math.round(start + (end - start) * eased)
+      if (ref.current) {
+        ref.current.textContent = current + suffix
+      }
+      if (progress < 1) {
+        requestAnimationFrame(update)
+      }
+    }
+
+    requestAnimationFrame(update)
+  }, [isInView, target, duration, suffix])
 
   return (
-    <motion.span
-      ref={ref}
-      initial={{ opacity: 0 }}
-      animate={isInView ? { opacity: 1 } : {}}
-    >
-      {isInView ? (
-        <motion.span
-          initial={{ textContent: 0 }}
-          animate={{ textContent: target }}
-          transition={{ duration, ease: 'easeOut' }}
-          onUpdate={(latest) => {
-            if (ref.current) {
-              ref.current.textContent = Math.round(latest.textContent) + suffix
-            }
-          }}
-        />
-      ) : (
-        `0${suffix}`
-      )}
-    </motion.span>
+    <span ref={ref}>
+      {`0${suffix}`}
+    </span>
   )
 }

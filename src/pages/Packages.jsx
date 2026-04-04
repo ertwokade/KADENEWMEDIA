@@ -16,6 +16,43 @@ import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Packages.css'
 
+// Exchange rate cache
+const RATE_CACHE_KEY = 'kade_usd_try_rate'
+const RATE_CACHE_TTL = 6 * 60 * 60 * 1000 // 6 hours
+
+async function fetchExchangeRate() {
+  try {
+    const cached = localStorage.getItem(RATE_CACHE_KEY)
+    if (cached) {
+      const { rate, ts } = JSON.parse(cached)
+      if (Date.now() - ts < RATE_CACHE_TTL && rate > 0) return rate
+    }
+    const res = await fetch('https://open.er-api.com/v6/latest/USD')
+    if (!res.ok) return null
+    const data = await res.json()
+    const rate = data?.rates?.TRY
+    if (rate && rate > 0) {
+      localStorage.setItem(RATE_CACHE_KEY, JSON.stringify({ rate, ts: Date.now() }))
+      return rate
+    }
+  } catch { /* fallback */ }
+  return null
+}
+
+function convertTRYtoUSD(tryAmount, rate) {
+  if (!rate || !tryAmount) return null
+  const num = parseFloat(String(tryAmount).replace(/\./g, '').replace(',', '.'))
+  if (isNaN(num)) return null
+  return Math.round(num / rate)
+}
+
+function convertUSDtoTRY(usdAmount, rate) {
+  if (!rate || !usdAmount) return null
+  const num = parseFloat(String(usdAmount).replace(/\./g, '').replace(',', '.'))
+  if (isNaN(num)) return null
+  return Math.round(num * rate).toLocaleString('tr-TR')
+}
+
 export default function Packages() {
   const { lang, t } = useLanguage()
   useSEO({
@@ -27,6 +64,7 @@ export default function Packages() {
   const isEN = lang === 'en'
 
   const [dynamicItems, setDynamicItems] = useState(null)
+  const [exchangeRate, setExchangeRate] = useState(null)
 
   useEffect(() => {
     getContentApi('packages')
@@ -34,6 +72,7 @@ export default function Packages() {
         if (res?.data?.items?.length) setDynamicItems(res.data.items)
       })
       .catch(() => {})
+    fetchExchangeRate().then(rate => { if (rate) setExchangeRate(rate) })
   }, [])
 
   const dynamicPackages = dynamicItems
@@ -157,12 +196,13 @@ export default function Packages() {
                     ) : (
                       <>
                         <div className="package-price">
-                          <span className="currency">{isEN ? '$' : '₺'}</span>
-                          <span className="amount">{isEN ? pkg.priceUSD : pkg.priceTRY}</span>
+                          <span className="currency">₺</span>
+                          <span className="amount">{pkg.priceTRY}</span>
                           <span className="period">{t('packages.month')}</span>
                         </div>
                         <div className="package-price-alt">
-                          ≈ {isEN ? `₺${pkg.priceTRY}` : `$${pkg.priceUSD}`} {t('packages.month')}
+                          ≈ ${exchangeRate ? convertTRYtoUSD(pkg.priceTRY, exchangeRate) : pkg.priceUSD} {t('packages.month')}
+                          {exchangeRate && <span style={{ fontSize: '0.7rem', opacity: 0.6, marginLeft: 4 }}>(1$≈{exchangeRate.toFixed(1)}₺)</span>}
                         </div>
                       </>
                     )}

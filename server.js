@@ -51,6 +51,15 @@ app.get('/api/messages', apiRoute('messages.js'))
 app.put('/api/messages', apiRoute('messages.js'))
 app.delete('/api/messages', apiRoute('messages.js'))
 
+// Users
+app.get('/api/users', apiRoute('users.js'))
+app.post('/api/users', apiRoute('users.js'))
+app.put('/api/users', apiRoute('users.js'))
+app.delete('/api/users', apiRoute('users.js'))
+
+// Calendar Invite
+app.post('/api/calendar-invite', apiRoute('calendar-invite.js'))
+
 // Contact
 app.post('/api/contact', apiRoute('contact.js'))
 

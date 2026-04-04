@@ -205,6 +205,16 @@ export async function deleteUserApi(id) {
   return handleResponse(res);
 }
 
+// Calendar Invite
+export async function sendCalendarInviteApi(data) {
+  const res = await fetch(`${API_BASE}/calendar-invite`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
 // Seed (dev only — requires SEED_SECRET env var)
 export async function seedApi(secret) {
   const res = await fetch(`${API_BASE}/seed`, {

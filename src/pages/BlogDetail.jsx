@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlineClock, HiOutlineArrowLeft, HiOutlineArrowRight, HiOutlineShare } from 'react-icons/hi'
-import { FaXTwitter, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa6'
+import { FaXTwitter, FaLinkedinIn } from 'react-icons/fa6'
+import { FaWhatsapp } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { blogPosts as staticBlogPosts } from '../data/content'
 import { getBlogsApi } from '../api'
+import DOMPurify from 'dompurify'
 import { analytics } from '../utils/analytics'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
@@ -124,7 +126,7 @@ export default function BlogDetail() {
             <FadeIn delay={0.1}>
               <div className="blog-detail-content glass-card">
                 {content ? (
-                  <div className="blog-body" dangerouslySetInnerHTML={{ __html: content }} />
+                  <div className="blog-body" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }} />
                 ) : (
                   <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
                     {lang === 'tr' ? 'İçerik yakında eklenecek.' : 'Content coming soon.'}

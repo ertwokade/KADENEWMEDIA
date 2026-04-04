@@ -41,6 +41,16 @@
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://kademedia.com.tr/portfolio</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/ekip</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
   <!-- Legal pages -->
   <url>
     <loc>https://kademedia.com.tr/kvkk</loc>
@@ -56,6 +66,42 @@
     <loc>https://kademedia.com.tr/cerez-politikasi</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <!-- Service detail pages -->
+  <url>
+    <loc>https://kademedia.com.tr/hizmetler/sosyal-medya-yonetimi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/hizmetler/icerik-uretimi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/hizmetler/reklam-yonetimi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/hizmetler/influencer-marketing</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/hizmetler/video-produksiyon</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/hizmetler/strateji-danismanlik</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/hizmetler/web-sitesi-tasarimi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <!-- Partner detail pages -->
   <url>
@@ -90,32 +136,42 @@
   </url>
   <!-- Blog posts -->
   <url>
-    <loc>https://kademedia.com.tr/blog/2025-sosyal-medya-trendleri</loc>
+    <loc>https://kademedia.com.tr/blog/instagram-algoritma-2025-guncelleme</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kademedia.com.tr/blog/instagram-reels-stratejisi</loc>
+    <loc>https://kademedia.com.tr/blog/yapay-zeka-sosyal-medya-icerik-uretimi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kademedia.com.tr/blog/meta-ads-optimizasyon</loc>
+    <loc>https://kademedia.com.tr/blog/tiktok-shop-turkiye-e-ticaret</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kademedia.com.tr/blog/tiktok-marka-buyutme</loc>
+    <loc>https://kademedia.com.tr/blog/kisa-video-stratejisi-reels-shorts-tiktok</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kademedia.com.tr/blog/influencer-marketing-rehberi</loc>
+    <loc>https://kademedia.com.tr/blog/ugc-kullanici-icerigi-marka-guveni</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kademedia.com.tr/blog/icerik-takvimi-olusturma</loc>
+    <loc>https://kademedia.com.tr/blog/meta-ads-optimizasyon-2025</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/influencer-marketing-mikro-nano-2025</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/sosyal-medya-kriz-yonetimi</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

@@ -16,6 +16,8 @@ import {
   getContentApi, updateContentApi,
   getPartnersApi, createPartnerApi, updatePartnerApi, deletePartnerApi,
   getMessagesApi, markMessageReadApi, deleteMessageApi,
+  getUsersApi, createUserApi, updateUserApi, deleteUserApi,
+  sendCalendarInviteApi,
   seedApi,
   updateMessageStatusApi,
 } from '../api'
@@ -1825,16 +1827,26 @@ function CalendarSection({ showToast }) {
     description: '',
     status: 'planned',
   })
+  const [adminUsers, setAdminUsers] = useState([])
+  const [showInvitePanel, setShowInvitePanel] = useState(false)
+  const [inviteRecipients, setInviteRecipients] = useState([])
+  const [inviteCustomEmail, setInviteCustomEmail] = useState('')
+  const [inviteCustomEmails, setInviteCustomEmails] = useState([])
+  const [inviteMessage, setInviteMessage] = useState('')
+  const [inviteSending, setInviteSending] = useState(false)
 
   const currentYear = selectedDate.getFullYear()
   const currentMonth = selectedDate.getMonth()
 
-  // Load events from API
+  // Load events and admin users
   useEffect(() => {
     getContentApi('calendar')
       .then(res => {
         if (res?.data?.events) setEvents(res.data.events)
       })
+      .catch(() => {})
+    getUsersApi()
+      .then(data => { if (Array.isArray(data)) setAdminUsers(data) })
       .catch(() => {})
   }, [])
 
@@ -1905,6 +1917,49 @@ function CalendarSection({ showToast }) {
   const handleDeleteEvent = (id) => {
     if (!window.confirm('Bu etkinliği silmek istediğinize emin misiniz?')) return
     saveEvents(events.filter(e => e.id !== id))
+  }
+
+  const toggleRecipient = (userId) => {
+    setInviteRecipients(prev =>
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    )
+  }
+
+  const addCustomEmail = () => {
+    const email = inviteCustomEmail.trim()
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast('Geçerli bir e-posta adresi girin', 'error')
+      return
+    }
+    if (!inviteCustomEmails.includes(email)) {
+      setInviteCustomEmails(prev => [...prev, email])
+    }
+    setInviteCustomEmail('')
+  }
+
+  const handleSendInvite = async (eventData) => {
+    if (inviteRecipients.length === 0 && inviteCustomEmails.length === 0) {
+      showToast('En az bir alıcı seçin', 'error')
+      return
+    }
+    setInviteSending(true)
+    try {
+      const result = await sendCalendarInviteApi({
+        event: eventData || eventForm,
+        recipients: inviteRecipients,
+        customEmails: inviteCustomEmails,
+        message: inviteMessage,
+      })
+      showToast(result.message || 'Davet gönderildi!', 'success')
+      setShowInvitePanel(false)
+      setInviteRecipients([])
+      setInviteCustomEmails([])
+      setInviteMessage('')
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setInviteSending(false)
+    }
   }
 
   // Auto-generate suggestions
@@ -2155,8 +2210,132 @@ function CalendarSection({ showToast }) {
                   <label>Açıklama</label>
                   <textarea rows={3} value={eventForm.description || ''} onChange={e => setEventForm({ ...eventForm, description: e.target.value })} placeholder="İçerik detayları, notlar..." />
                 </div>
-                <div className="admin-form-actions">
-                  <button className="btn btn-outline" onClick={() => setShowEventForm(false)}>İptal</button>
+
+                {/* Invite Panel Toggle */}
+                <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 16, marginTop: 8 }}>
+                  <button
+                    type="button"
+                    className={`btn ${showInvitePanel ? 'btn-primary' : 'btn-outline'}`}
+                    style={{ width: '100%', justifyContent: 'center' }}
+                    onClick={() => setShowInvitePanel(!showInvitePanel)}
+                  >
+                    <HiOutlineMail size={16} /> {showInvitePanel ? 'Davet Panelini Kapat' : 'Takvim Daveti Gönder'}
+                  </button>
+
+                  <AnimatePresence>
+                    {showInvitePanel && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <div style={{ marginTop: 16, padding: 16, background: 'var(--bg-secondary)', borderRadius: 12 }}>
+                          <h4 style={{ color: 'var(--white)', marginBottom: 12, fontSize: '0.95rem' }}>Alıcıları Seçin</h4>
+
+                          {/* Admin Users */}
+                          {adminUsers.length > 0 && (
+                            <div style={{ marginBottom: 12 }}>
+                              <label style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', display: 'block', marginBottom: 8 }}>Ekip Üyeleri</label>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                {adminUsers.filter(u => u.email).map(u => (
+                                  <button
+                                    key={u._id}
+                                    type="button"
+                                    onClick={() => toggleRecipient(u._id)}
+                                    style={{
+                                      padding: '6px 12px',
+                                      borderRadius: 8,
+                                      border: `1px solid ${inviteRecipients.includes(u._id) ? '#eac321' : 'var(--border-color)'}`,
+                                      background: inviteRecipients.includes(u._id) ? 'rgba(234,195,33,0.15)' : 'transparent',
+                                      color: inviteRecipients.includes(u._id) ? '#eac321' : 'var(--text-secondary)',
+                                      cursor: 'pointer',
+                                      fontSize: '0.82rem',
+                                      fontWeight: 600,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: 6,
+                                    }}
+                                  >
+                                    {inviteRecipients.includes(u._id) && <HiOutlineCheck size={14} />}
+                                    {u.username} ({u.email})
+                                  </button>
+                                ))}
+                                {adminUsers.filter(u => u.email).length === 0 && (
+                                  <p style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                                    Kullanıcılara e-posta adresi ekleyin (Kullanıcı Yönetimi)
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Custom Emails */}
+                          <div style={{ marginBottom: 12 }}>
+                            <label style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', display: 'block', marginBottom: 8 }}>Harici E-posta Ekle</label>
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              <input
+                                type="email"
+                                value={inviteCustomEmail}
+                                onChange={e => setInviteCustomEmail(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustomEmail() } }}
+                                placeholder="ornek@email.com"
+                                style={{ flex: 1 }}
+                              />
+                              <button type="button" className="btn btn-outline" onClick={addCustomEmail} style={{ padding: '8px 12px' }}>
+                                <HiOutlinePlus size={16} />
+                              </button>
+                            </div>
+                            {inviteCustomEmails.length > 0 && (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                                {inviteCustomEmails.map(email => (
+                                  <span key={email} style={{
+                                    padding: '4px 10px', borderRadius: 6, background: 'rgba(108,99,255,0.15)',
+                                    color: '#6C63FF', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 6,
+                                  }}>
+                                    {email}
+                                    <button
+                                      type="button"
+                                      onClick={() => setInviteCustomEmails(prev => prev.filter(e => e !== email))}
+                                      style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', padding: 0 }}
+                                    >
+                                      <HiOutlineX size={12} />
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Message */}
+                          <div className="form-group" style={{ marginBottom: 12 }}>
+                            <label style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Mesaj (Opsiyonel)</label>
+                            <textarea
+                              rows={2}
+                              value={inviteMessage}
+                              onChange={e => setInviteMessage(e.target.value)}
+                              placeholder="Ek notunuz varsa yazabilirsiniz..."
+                            />
+                          </div>
+
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => handleSendInvite(eventForm)}
+                            disabled={inviteSending || (inviteRecipients.length === 0 && inviteCustomEmails.length === 0)}
+                            style={{ width: '100%', justifyContent: 'center' }}
+                          >
+                            <HiOutlineMail size={16} />
+                            {inviteSending ? 'Gönderiliyor...' : `Davet Gönder (${inviteRecipients.length + inviteCustomEmails.length} kişi)`}
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="admin-form-actions" style={{ marginTop: 16 }}>
+                  <button className="btn btn-outline" onClick={() => { setShowEventForm(false); setShowInvitePanel(false) }}>İptal</button>
                   <button className="btn btn-primary" onClick={handleSaveEvent}>
                     <HiOutlineSave size={16} /> {editingEvent ? 'Güncelle' : 'Kaydet'}
                   </button>
@@ -2166,6 +2345,241 @@ function CalendarSection({ showToast }) {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  )
+}
+
+// ========== USERS MANAGEMENT ==========
+function UsersSection({ showToast }) {
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
+  const [form, setForm] = useState({
+    username: '', password: '', email: '', role: 'editor',
+  })
+
+  const roleLabels = { admin: 'Admin', editor: 'Editör', viewer: 'İzleyici' }
+  const roleColors = { admin: '#E91E63', editor: '#eac321', viewer: '#6C63FF' }
+
+  const fetchUsers = async () => {
+    try {
+      const data = await getUsersApi()
+      setUsers(Array.isArray(data) ? data : [])
+    } catch {
+      setUsers([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchUsers() }, [])
+
+  const resetForm = () => {
+    setForm({ username: '', password: '', email: '', role: 'editor' })
+    setEditingUser(null)
+    setShowForm(false)
+  }
+
+  const handleEdit = (u) => {
+    setForm({
+      username: u.username || '',
+      password: '',
+      email: u.email || '',
+      role: u.role || 'viewer',
+    })
+    setEditingUser(u)
+    setShowForm(true)
+  }
+
+  const handleSave = async () => {
+    if (!form.username.trim()) {
+      showToast('Kullanıcı adı gerekli', 'error')
+      return
+    }
+    if (!editingUser && !form.password) {
+      showToast('Şifre gerekli', 'error')
+      return
+    }
+    try {
+      if (editingUser) {
+        const payload = {
+          id: editingUser._id,
+          username: form.username,
+          role: form.role,
+          email: form.email,
+        }
+        if (form.password) payload.password = form.password
+        await updateUserApi(payload)
+        showToast('Kullanıcı güncellendi!', 'success')
+      } else {
+        await createUserApi({
+          username: form.username,
+          password: form.password,
+          role: form.role,
+          email: form.email,
+        })
+        showToast('Kullanıcı oluşturuldu!', 'success')
+      }
+      resetForm()
+      fetchUsers()
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return
+    try {
+      await deleteUserApi(id)
+      showToast('Kullanıcı silindi!', 'success')
+      fetchUsers()
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Kullanıcı <span>Yönetimi</span></h1>
+          <p>Admin paneli kullanıcılarını yönetin</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
+          <HiOutlinePlus size={18} /> Yeni Kullanıcı
+        </button>
+      </div>
+
+      {/* User Form Modal */}
+      <AnimatePresence>
+        {showForm && (
+          <motion.div
+            className="admin-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={resetForm}
+          >
+            <motion.div
+              className="admin-modal"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: 500 }}
+            >
+              <div className="admin-modal-header">
+                <h3>{editingUser ? 'Kullanıcıyı Düzenle' : 'Yeni Kullanıcı'}</h3>
+                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+              </div>
+              <div className="admin-form" style={{ border: 'none', padding: 0 }}>
+                <div className="form-group">
+                  <label>Kullanıcı Adı *</label>
+                  <input
+                    type="text"
+                    value={form.username}
+                    onChange={(e) => setForm({ ...form, username: e.target.value })}
+                    placeholder="Kullanıcı adı..."
+                  />
+                </div>
+                <div className="form-group">
+                  <label>E-posta</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="kullanici@ornek.com"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>{editingUser ? 'Yeni Şifre (boş bırakılırsa değişmez)' : 'Şifre *'}</label>
+                  <input
+                    type="password"
+                    value={form.password}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    placeholder={editingUser ? 'Değiştirmek için yazın...' : 'Şifre...'}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Rol</label>
+                  <select
+                    value={form.role}
+                    onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  >
+                    <option value="admin">Admin — Tam yetki</option>
+                    <option value="editor">Editör — İçerik yönetimi</option>
+                    <option value="viewer">İzleyici — Sadece görüntüleme</option>
+                  </select>
+                </div>
+                <div className="admin-form-actions">
+                  <button className="btn btn-outline" onClick={resetForm}>İptal</button>
+                  <button className="btn btn-primary" onClick={handleSave}>
+                    <HiOutlineSave size={16} /> {editingUser ? 'Güncelle' : 'Oluştur'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Users Table */}
+      <div className="admin-table-wrapper">
+        <div className="admin-table-header">
+          <h3>Kullanıcılar ({users.length})</h3>
+        </div>
+        {loading ? (
+          <div className="admin-empty-state"><p>Yükleniyor...</p></div>
+        ) : users.length === 0 ? (
+          <div className="admin-empty-state">
+            <div className="empty-icon">👤</div>
+            <h3>Henüz kullanıcı yok</h3>
+            <p>Yeni bir kullanıcı oluşturun</p>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Kullanıcı Adı</th>
+                <th>E-posta</th>
+                <th>Rol</th>
+                <th>Oluşturulma</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u._id}>
+                  <td><strong>{u.username}</strong></td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{u.email || '—'}</td>
+                  <td>
+                    <span
+                      className="status-badge"
+                      style={{ background: `${roleColors[u.role] || '#666'}20`, color: roleColors[u.role] || '#666' }}
+                    >
+                      {roleLabels[u.role] || u.role}
+                    </span>
+                  </td>
+                  <td style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>
+                    {u.createdAt ? new Date(u.createdAt).toLocaleDateString('tr-TR') : '—'}
+                  </td>
+                  <td>
+                    <div className="table-actions">
+                      <button className="table-action-btn" onClick={() => handleEdit(u)}>
+                        <HiOutlinePencil size={14} /> Düzenle
+                      </button>
+                      <button className="table-action-btn danger" onClick={() => handleDelete(u._id)}>
+                        <HiOutlineTrash size={14} /> Sil
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   )
 }
@@ -2239,6 +2653,7 @@ export default function Admin() {
     { id: 'partners', label: 'Partnerler', icon: HiOutlineUsers },
     { id: 'messages', label: 'Mesajlar', icon: HiOutlineMail, badge: unreadCount },
     { id: 'calendar', label: 'İçerik Takvimi', icon: HiOutlineCalendar },
+    { id: 'users', label: 'Kullanıcılar', icon: HiOutlineUsers },
     { id: 'settings', label: 'Ayarlar', icon: HiOutlineCog },
   ]
 
@@ -2303,6 +2718,7 @@ export default function Admin() {
           {activeSection === 'partners' && <PartnersSection showToast={showToast} />}
           {activeSection === 'messages' && <MessagesSection showToast={showToast} onNewMessageCount={(count) => setUnreadCount(count)} />}
           {activeSection === 'calendar' && <CalendarSection showToast={showToast} />}
+          {activeSection === 'users' && <UsersSection showToast={showToast} />}
           {activeSection === 'settings' && <SettingsSection showToast={showToast} />}
         </main>
 

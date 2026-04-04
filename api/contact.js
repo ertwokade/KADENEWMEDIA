@@ -51,8 +51,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Ad en az 2 karakter olmalıdır.' });
     }
 
-    // Determine lead source from referer or service selection
-    const source = service ? 'iletisim-formu' : 'iletisim-formu';
+    const source = service ? `iletisim-formu:${service}` : 'iletisim-formu:genel';
 
     // Save to MongoDB (non-blocking — email still sent even if DB fails)
     try {
