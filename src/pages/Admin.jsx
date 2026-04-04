@@ -107,15 +107,38 @@ function LoginScreen({ onLogin }) {
 }
 
 // ========== DASHBOARD ==========
-function DashboardSection({ stats }) {
+function DashboardSection({ stats, onNavigate }) {
+  const [recentMessages, setRecentMessages] = useState([])
+
+  useEffect(() => {
+    getMessagesApi().then(data => {
+      if (Array.isArray(data)) {
+        setRecentMessages(data.slice(0, 5))
+      }
+    }).catch(() => {})
+  }, [])
+
+  const quickActions = [
+    { label: 'Yeni Blog Yazısı', icon: '📝', section: 'blog' },
+    { label: 'Mesajları Gör', icon: '✉️', section: 'messages' },
+    { label: 'İçerik Düzenle', icon: '✏️', section: 'content' },
+    { label: 'Takvimi Aç', icon: '📅', section: 'calendar' },
+    { label: 'Partner Ekle', icon: '🤝', section: 'partners' },
+    { label: 'Kullanıcılar', icon: '👤', section: 'users' },
+  ]
+
   return (
     <div>
       <div className="admin-page-header">
         <div>
           <h1>Gösterge <span>Paneli</span></h1>
-          <p>Kade Media yönetim paneline hoş geldiniz</p>
+          <p>Kade Media yönetim paneline hoş geldiniz — {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
+        <a href="/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ gap: 8, fontSize: '0.88rem' }}>
+          🌐 Siteyi Görüntüle
+        </a>
       </div>
+
       <div className="admin-stats-grid">
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.10)', color: '#6C63FF' }}>📝</div>
@@ -130,14 +153,52 @@ function DashboardSection({ stats }) {
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>✉️</div>
           <div className="stat-number">{stats.messages || 0}</div>
-          <div className="stat-label">Mesaj</div>
+          <div className="stat-label">Toplam Mesaj</div>
         </div>
-        <div className="admin-stat-card">
+        <div className="admin-stat-card" style={{ cursor: 'pointer' }} onClick={() => onNavigate('messages')}>
           <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>📩</div>
           <div className="stat-number">{stats.unreadMessages || 0}</div>
           <div className="stat-label">Okunmamış Mesaj</div>
         </div>
       </div>
+
+      <div className="dashboard-quick-actions">
+        {quickActions.map((a) => (
+          <button key={a.section} className="dashboard-quick-action" onClick={() => onNavigate(a.section)}>
+            <span style={{ fontSize: '1.1rem' }}>{a.icon}</span>
+            {a.label}
+          </button>
+        ))}
+      </div>
+
+      {recentMessages.length > 0 && (
+        <div className="dashboard-recent">
+          <div className="dashboard-recent-header">
+            <h3>Son Mesajlar</h3>
+            <button className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '0.8rem' }} onClick={() => onNavigate('messages')}>
+              Tümünü Gör →
+            </button>
+          </div>
+          {recentMessages.map((msg) => (
+            <div key={msg._id} className="dashboard-recent-item" onClick={() => onNavigate('messages')}>
+              <div className="dashboard-recent-avatar">
+                {(msg.name || '?').charAt(0)}
+              </div>
+              <div className="dashboard-recent-info">
+                <div className="dashboard-recent-name">
+                  {!msg.read && <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#eac321', marginRight: 6, verticalAlign: 'middle' }} />}
+                  {msg.name}
+                  {msg.company && msg.company !== '-' && <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, fontSize: '0.78rem' }}> · {msg.company}</span>}
+                </div>
+                <div className="dashboard-recent-msg">{msg.message?.slice(0, 60)}{msg.message?.length > 60 ? '...' : ''}</div>
+              </div>
+              <div className="dashboard-recent-meta">
+                {msg.createdAt ? new Date(msg.createdAt).toLocaleDateString('tr-TR') : ''}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -148,6 +209,7 @@ function BlogSection({ showToast }) {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingBlog, setEditingBlog] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [form, setForm] = useState({
     titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
     contentTr: '', contentEn: '', category: '', categoryEn: '',
@@ -425,6 +487,13 @@ function BlogSection({ showToast }) {
       <div className="admin-table-wrapper">
         <div className="admin-table-header">
           <h3>Tüm Yazılar ({blogs.length})</h3>
+          <input
+            type="text"
+            placeholder="Başlık veya slug ara..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.85rem', width: 220 }}
+          />
         </div>
         {loading ? (
           <div className="admin-empty-state"><p>Yükleniyor...</p></div>
@@ -446,7 +515,7 @@ function BlogSection({ showToast }) {
               </tr>
             </thead>
             <tbody>
-              {blogs.map((blog) => (
+              {blogs.filter(b => !searchQuery || b.titleTr?.toLowerCase().includes(searchQuery.toLowerCase()) || b.slug?.includes(searchQuery.toLowerCase())).map((blog) => (
                 <tr key={blog._id}>
                   <td>
                     {blog.image && blog.image.startsWith('http') ? (
@@ -467,6 +536,9 @@ function BlogSection({ showToast }) {
                   <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{blog.date}</td>
                   <td>
                     <div className="table-actions">
+                      <a className="table-action-btn" href={`/blog/${blog.slug}`} target="_blank" rel="noopener noreferrer">
+                        <HiOutlineEye size={14} /> Önizle
+                      </a>
                       <button className="table-action-btn" onClick={() => handleEdit(blog)}>
                         <HiOutlinePencil size={14} /> Düzenle
                       </button>
@@ -777,13 +849,13 @@ function ServicesEditor({ data, onSave }) {
   return (
     <div className="admin-form">
       <h3>Hizmetler</h3>
-      <p style={{ color: 'var(--gray-light)', fontSize: '0.85rem', marginBottom: 16 }}>
+      <p style={{ color: 'var(--text-tertiary)', fontSize: '0.85rem', marginBottom: 16 }}>
         Her hizmetin başlık, açıklama ve özelliklerini düzenleyin. Özellikler virgülle ayrılır.
       </p>
       {items.map((item, i) => (
         <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <strong style={{ color: 'var(--white)' }}>Hizmet {i + 1}</strong>
+            <strong style={{ color: 'var(--text-primary)' }}>Hizmet {i + 1}</strong>
             {items.length > 1 && (
               <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
                 onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
@@ -858,7 +930,7 @@ function FAQEditor({ data, onSave }) {
       {items.map((item, i) => (
         <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <strong style={{ color: 'var(--white)' }}>Soru {i + 1}</strong>
+            <strong style={{ color: 'var(--text-primary)' }}>Soru {i + 1}</strong>
             {items.length > 1 && (
               <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
                 onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
@@ -906,7 +978,7 @@ function TestimonialsEditor({ data, onSave }) {
       {items.map((item, i) => (
         <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <strong style={{ color: 'var(--white)' }}>Referans {i + 1}</strong>
+            <strong style={{ color: 'var(--text-primary)' }}>Referans {i + 1}</strong>
             {items.length > 1 && (
               <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
                 onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
@@ -986,13 +1058,13 @@ function PackagesEditor({ data, onSave }) {
   return (
     <div className="admin-form">
       <h3>Paketler & Fiyatlandırma</h3>
-      <p style={{ color: 'var(--gray-light)', fontSize: '0.85rem', marginBottom: 16 }}>
+      <p style={{ color: 'var(--text-tertiary)', fontSize: '0.85rem', marginBottom: 16 }}>
         Paket özelliklerini virgülle ayırarak yazın.
       </p>
       {items.map((item, i) => (
         <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <strong style={{ color: 'var(--white)' }}>Paket {i + 1}</strong>
+            <strong style={{ color: 'var(--text-primary)' }}>Paket {i + 1}</strong>
             <div style={{ display: 'flex', gap: 8 }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--gray-lighter)', fontSize: '0.85rem', cursor: 'pointer' }}>
                 <input type="checkbox" checked={item.popular || false} onChange={(e) => updateItem(i, 'popular', e.target.checked)} /> Popüler
@@ -1125,7 +1197,7 @@ function AboutEditor({ data, onSave }) {
       {form.team.map((member, i) => (
         <div key={i} className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <strong style={{ color: 'var(--white)' }}>Üye {i + 1}</strong>
+            <strong style={{ color: 'var(--text-primary)' }}>Üye {i + 1}</strong>
             {form.team.length > 1 && (
               <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
                 onClick={() => setForm({ ...form, team: form.team.filter((_, idx) => idx !== i) })}>
@@ -1196,7 +1268,7 @@ function CareersEditor({ data, onSave }) {
       </div>
 
       {jobs.map((job, i) => (
-        <div key={i} className="admin-form" style={{ border: '1px solid var(--border-color)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
+        <div key={i} className="admin-form" style={{ border: '1px solid var(--border)', padding: 16, borderRadius: 12, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <strong>İlan #{i + 1}</strong>
             <button className="btn-icon danger" onClick={() => removeJob(i)} title="Sil">🗑️</button>
@@ -1492,6 +1564,24 @@ function LeadStatusBadge({ status }) {
   )
 }
 
+function exportMessagesCSV(messages) {
+  const headers = ['Ad', 'E-posta', 'Telefon', 'Şirket', 'Hizmet', 'Mesaj', 'Durum', 'Tarih']
+  const rows = messages.map(m => [
+    m.name, m.email, m.phone || '-', m.company || '-', m.service || '-',
+    (m.message || '').replace(/"/g, '""'),
+    m.status || 'yeni',
+    m.createdAt ? new Date(m.createdAt).toLocaleDateString('tr-TR') : '-'
+  ])
+  const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n')
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `kade-mesajlar-${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 function MessagesSection({ showToast, onNewMessageCount }) {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
@@ -1564,6 +1654,9 @@ function MessagesSection({ showToast, onNewMessageCount }) {
           <h1>İletişim <span>& CRM</span></h1>
           <p>Leadleri takip edin, durumlarını güncelleyin</p>
         </div>
+        <button className="btn btn-outline export-btn" onClick={() => exportMessagesCSV(messages)} disabled={messages.length === 0}>
+          📥 CSV İndir
+        </button>
       </div>
 
       {/* CRM Status Counters */}
@@ -1615,7 +1708,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                   <select
                     value={selectedMessage.status || 'yeni'}
                     onChange={(e) => handleStatusChange(selectedMessage._id, e.target.value)}
-                    style={{ marginLeft: 12, padding: '4px 10px', borderRadius: 6, background: 'var(--bg-secondary)', color: 'var(--white)', border: '1px solid var(--border-color)' }}
+                    style={{ marginLeft: 12, padding: '4px 10px', borderRadius: 6, background: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
                   >
                     {LEAD_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </select>
@@ -1760,7 +1853,6 @@ function SettingsSection({ showToast }) {
             value={seedSecret}
             onChange={(e) => setSeedSecret(e.target.value)}
             placeholder="Seed secret..."
-            className="form-input"
           />
         </div>
         <button className="btn btn-primary" onClick={handleSeed} disabled={seedLoading}>
@@ -2212,7 +2304,7 @@ function CalendarSection({ showToast }) {
                 </div>
 
                 {/* Invite Panel Toggle */}
-                <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: 16, marginTop: 8 }}>
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, marginTop: 8 }}>
                   <button
                     type="button"
                     className={`btn ${showInvitePanel ? 'btn-primary' : 'btn-outline'}`}
@@ -2231,7 +2323,7 @@ function CalendarSection({ showToast }) {
                         style={{ overflow: 'hidden' }}
                       >
                         <div style={{ marginTop: 16, padding: 16, background: 'var(--bg-secondary)', borderRadius: 12 }}>
-                          <h4 style={{ color: 'var(--white)', marginBottom: 12, fontSize: '0.95rem' }}>Alıcıları Seçin</h4>
+                          <h4 style={{ color: 'var(--text-primary)', marginBottom: 12, fontSize: '0.95rem' }}>Alıcıları Seçin</h4>
 
                           {/* Admin Users */}
                           {adminUsers.length > 0 && (
@@ -2246,7 +2338,7 @@ function CalendarSection({ showToast }) {
                                     style={{
                                       padding: '6px 12px',
                                       borderRadius: 8,
-                                      border: `1px solid ${inviteRecipients.includes(u._id) ? '#eac321' : 'var(--border-color)'}`,
+                                      border: `1px solid ${inviteRecipients.includes(u._id) ? '#eac321' : 'var(--border)'}`,
                                       background: inviteRecipients.includes(u._id) ? 'rgba(234,195,33,0.15)' : 'transparent',
                                       color: inviteRecipients.includes(u._id) ? '#eac321' : 'var(--text-secondary)',
                                       cursor: 'pointer',
@@ -2699,6 +2791,9 @@ export default function Admin() {
             ))}
           </nav>
           <div className="sidebar-footer">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="sidebar-site-link">
+              🌐 <span>Siteyi Görüntüle</span>
+            </a>
             <button className="sidebar-nav-item" onClick={handleLogout}>
               <HiOutlineLogout size={18} /> Çıkış Yap
             </button>
@@ -2712,7 +2807,7 @@ export default function Admin() {
               ⚠️ Çevrimdışı Mod — Sunucu bağlantısı yok. Veriler okunamıyor, yazma işlemleri çalışmaz.
             </div>
           )}
-          {activeSection === 'dashboard' && <DashboardSection stats={stats} />}
+          {activeSection === 'dashboard' && <DashboardSection stats={stats} onNavigate={(section) => { setActiveSection(section); setSidebarOpen(false) }} />}
           {activeSection === 'blog' && <BlogSection showToast={showToast} />}
           {activeSection === 'content' && <ContentSection showToast={showToast} />}
           {activeSection === 'partners' && <PartnersSection showToast={showToast} />}

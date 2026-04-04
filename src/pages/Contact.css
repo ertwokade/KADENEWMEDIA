@@ -230,34 +230,21 @@ a.contact-card-value:hover {
   text-align: center;
 }
 
-.form-success-banner {
+.submit-row {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px 24px;
-  border-radius: 14px;
-  background: rgba(46, 204, 113, 0.12);
-  border: 1px solid rgba(46, 204, 113, 0.35);
-  color: #6ee7b7;
-  margin-top: 4px;
+  flex-wrap: wrap;
 }
 
-.form-success-banner svg {
+.submit-row .submit-btn {
   flex-shrink: 0;
-  color: #2ECC71;
 }
 
-.form-success-banner strong {
-  display: block;
-  font-size: 1rem;
-  color: #fff;
-  margin-bottom: 2px;
-}
-
-.form-success-banner p {
-  font-size: 0.85rem;
+.submit-success-note {
+  font-size: 0.88rem;
   color: #6ee7b7;
-  margin: 0;
+  font-weight: 500;
 }
 
 /* Map Section */

@@ -95,6 +95,7 @@ export default function Contact() {
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', company: '', services: [], message: '' })
       setKvkkAccepted(false)
+      setTimeout(() => setSubmitted(false), 3000)
     } catch (err) {
       const errorMsg = err.message || ''
       if (errorMsg === 'API unavailable' || errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
@@ -343,28 +344,21 @@ export default function Contact() {
                   </label>
                 </div>
 
-                {submitted ? (
-                  <motion.div
-                    className="form-success-banner"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <HiOutlineCheck size={22} />
-                    <div>
-                      <strong>Mesajınız gönderildi!</strong>
-                      <p>Ekibimiz en kısa sürede size dönecek.</p>
-                    </div>
-                  </motion.div>
-                ) : (
+                <div className="submit-row">
                   <motion.button
                     type="submit"
                     className="btn btn-primary submit-btn"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    disabled={sending}
+                    disabled={sending || submitted}
                   >
                     {sending ? (
                       <span className="sending-loader">{t('contact.sending')}</span>
+                    ) : submitted ? (
+                      <>
+                        <HiOutlineCheck size={18} />
+                        Gönderildi
+                      </>
                     ) : (
                       <>
                         {t('contact.submit')}
@@ -372,7 +366,18 @@ export default function Contact() {
                       </>
                     )}
                   </motion.button>
-                )}
+
+                  {submitted && (
+                    <motion.span
+                      className="submit-success-note"
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      Ekibimiz en kısa sürede size dönecek.
+                    </motion.span>
+                  )}
+                </div>
 
                 {error && (
                   <motion.p
