@@ -53,6 +53,7 @@ export default async function handler(req, res) {
       const newUser = {
         username,
         password: hashedPassword,
+        email: req.body.email || '',
         role: role || 'viewer',
         permissions: permissions || getDefaultPermissions(role || 'viewer'),
         createdAt: new Date(),
@@ -72,6 +73,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Kullanıcı ID gerekli' });
       }
 
+      const { email: emailUpdate } = req.body;
       const updateData = { updatedAt: new Date() };
       if (username) updateData.username = username;
       if (role) {
@@ -80,6 +82,7 @@ export default async function handler(req, res) {
       }
       if (permissions) updateData.permissions = permissions;
       if (password) updateData.password = await bcrypt.hash(password, 10);
+      if (emailUpdate !== undefined) updateData.email = emailUpdate;
 
       await db.collection('users').updateOne(
         { _id: new ObjectId(id) },

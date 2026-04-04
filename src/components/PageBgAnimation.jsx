@@ -10,37 +10,37 @@ function sr(n) {
 const CONFIGS = {
   home: {
     items: ['⬡', '◈', '◉', '◎', '◆', '◇', '●', '○', '⬡', '◈', '◉', '◆'],
-    count: 16,
+    count: 10,
     cls: 'bg-float',
   },
   services: {
     items: ['Instagram', 'TikTok', 'YouTube', 'LinkedIn', 'X', 'Facebook', 'Reels', 'Stories', 'Meta Ads', 'Google Ads'],
-    count: 14,
+    count: 10,
     cls: 'bg-badge',
   },
   packages: {
     items: ['✦', '✧', '★', '✦', '✦', '✧', '★', '✦', '✦', '✧'],
-    count: 26,
+    count: 12,
     cls: 'bg-sparkle',
   },
   contact: {
     items: ['●', '●', '●', '●', '●', '●', '●', '●', '●', '●'],
-    count: 14,
+    count: 8,
     cls: 'bg-node',
   },
   blog: {
     items: ['#içerik', '#sosyal', '#dijital', '#marka', '#viral', '#influencer', '#pazarlama', '#reklam'],
-    count: 16,
+    count: 10,
     cls: 'bg-text',
   },
   careers: {
     items: ['↑', '↑', '↑', '●', '◆', '↑', '●', '◆'],
-    count: 20,
+    count: 10,
     cls: 'bg-rise',
   },
   partners: {
     items: ['◉', '●', '○', '◆', '◇', '◉', '●', '○'],
-    count: 14,
+    count: 10,
     cls: 'bg-float',
   },
 }
@@ -48,15 +48,15 @@ const CONFIGS = {
 function AboutBg() {
   return (
     <div className="page-bg-anim page-bg-about" aria-hidden="true">
-      {[0, 1, 2, 3, 4, 5].map((i) => (
+      {[0, 1, 2].map((i) => (
         <div
           key={i}
           className="bg-pulse-ring"
           style={{
-            width: `${160 + i * 130}px`,
-            height: `${160 + i * 130}px`,
-            '--delay': `${i * 1.1}s`,
-            '--dur': '6s',
+            width: `${200 + i * 200}px`,
+            height: `${200 + i * 200}px`,
+            '--delay': `${i * 1.5}s`,
+            '--dur': '7s',
           }}
         />
       ))}

@@ -119,27 +119,52 @@ export default function About() {
             </FadeIn>
             <FadeIn direction="right" className="story-visual">
               <div className="visual-card glass-card">
-                <div className="visual-inner">
-                  <div className="visual-logo">kade</div>
-                  <div className="visual-subtitle">media</div>
-                  <div className="visual-tagline">{t('about.visualTagline')}</div>
-                </div>
-                <div className="visual-dots">
-                  {Array.from({ length: 9 }).map((_, i) => (
+                <div className="lightning-container">
+                  {/* Outer glow rings */}
+                  {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
-                      className="visual-dot"
+                      className="lightning-ring"
                       animate={{
-                        scale: [1, 1.5, 1],
-                        opacity: [0.3, 0.8, 0.3],
+                        scale: [1, 1.6 + i * 0.3, 1],
+                        opacity: [0.3 - i * 0.08, 0, 0.3 - i * 0.08],
                       }}
                       transition={{
-                        duration: 2,
-                        delay: i * 0.2,
+                        duration: 2.5,
+                        delay: i * 0.5,
                         repeat: Infinity,
+                        ease: 'easeOut',
                       }}
                     />
                   ))}
+                  {/* Animated lightning bolt SVG */}
+                  <motion.div
+                    className="lightning-bolt-wrapper"
+                    animate={{
+                      filter: [
+                        'drop-shadow(0 0 10px #eac321) drop-shadow(0 0 30px #eac32160)',
+                        'drop-shadow(0 0 25px #eac321) drop-shadow(0 0 60px #eac32190)',
+                        'drop-shadow(0 0 10px #eac321) drop-shadow(0 0 30px #eac32160)',
+                      ],
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <svg viewBox="0 0 100 160" className="lightning-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <motion.polygon
+                        points="60,5 20,85 50,85 40,155 80,65 50,65"
+                        fill="#eac321"
+                        animate={{
+                          fill: ['#eac321', '#fff4a8', '#eac321'],
+                          opacity: [1, 0.9, 1],
+                        }}
+                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                      />
+                    </svg>
+                  </motion.div>
+                  <div className="lightning-label">
+                    <span>kade</span>media
+                  </div>
                 </div>
               </div>
             </FadeIn>

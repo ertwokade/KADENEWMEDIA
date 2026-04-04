@@ -19,6 +19,7 @@ import './Packages.css'
 // Exchange rate cache
 const RATE_CACHE_KEY = 'kade_usd_try_rate'
 const RATE_CACHE_TTL = 6 * 60 * 60 * 1000 // 6 hours
+const FALLBACK_RATE = 38.5 // fallback TRY per USD
 
 async function fetchExchangeRate() {
   try {
@@ -28,7 +29,7 @@ async function fetchExchangeRate() {
       if (Date.now() - ts < RATE_CACHE_TTL && rate > 0) return rate
     }
     const res = await fetch('https://open.er-api.com/v6/latest/USD')
-    if (!res.ok) return null
+    if (!res.ok) return FALLBACK_RATE
     const data = await res.json()
     const rate = data?.rates?.TRY
     if (rate && rate > 0) {
@@ -36,7 +37,7 @@ async function fetchExchangeRate() {
       return rate
     }
   } catch { /* fallback */ }
-  return null
+  return FALLBACK_RATE
 }
 
 function convertTRYtoUSD(tryAmount, rate) {
@@ -64,7 +65,7 @@ export default function Packages() {
   const isEN = lang === 'en'
 
   const [dynamicItems, setDynamicItems] = useState(null)
-  const [exchangeRate, setExchangeRate] = useState(null)
+  const [exchangeRate, setExchangeRate] = useState(FALLBACK_RATE)
 
   useEffect(() => {
     getContentApi('packages')
@@ -92,41 +93,64 @@ export default function Packages() {
     {
       name: t('packages.starter'),
       tier: 'starter',
-      priceTRY: '7.500',
+      priceTRY: '8.500',
       priceUSD: '220',
       desc: t('packages.starterDesc'),
       popular: false,
       features: [
-        t('packages.feat_2platform'), t('packages.feat_20content'), t('packages.feat_basicDesign'),
-        t('packages.feat_monthlyReport'), t('packages.feat_community'), t('packages.feat_calendar'),
+        t('packages.feat_2platform'),
+        t('packages.feat_20content'),
+        t('packages.feat_basicDesign'),
+        t('packages.feat_community'),
+        t('packages.feat_calendar'),
+        t('packages.feat_monthlyReport'),
       ],
       notIncluded: [
-        t('packages.feat_adManagement'), t('packages.feat_videoContent'), t('packages.feat_influencerMarketing'),
+        t('packages.feat_adManagement'),
+        t('packages.feat_videoContent'),
+        t('packages.feat_influencerMarketing'),
       ],
     },
     {
       name: t('packages.pro'),
       tier: 'pro',
-      priceTRY: '15.000',
-      priceUSD: '440',
+      priceTRY: '18.500',
+      priceUSD: '480',
       desc: t('packages.proDesc'),
       popular: true,
-      features: [],
+      features: [
+        t('packages.feat_4platform'),
+        t('packages.feat_40content'),
+        t('packages.feat_proDesign'),
+        t('packages.feat_community'),
+        t('packages.feat_calendar'),
+        t('packages.feat_weeklyReport'),
+        t('packages.feat_basicAds'),
+        t('packages.feat_4reels'),
+        t('packages.feat_competitorAnalysis'),
+      ],
       notIncluded: [],
-      isCustom: true,
     },
     {
       name: t('packages.enterprise'),
       tier: 'enterprise',
-      priceTRY: '30.000',
-      priceUSD: '880',
+      priceTRY: '35.000',
+      priceUSD: '910',
       desc: t('packages.enterpriseDesc'),
       popular: false,
       features: [
-        t('packages.feat_allPlatforms'), t('packages.feat_unlimitedContent'), t('packages.feat_premiumDesign'),
-        t('packages.feat_instantReport'), t('packages.feat_community'), t('packages.feat_calendar'),
-        t('packages.feat_advancedAds'), t('packages.feat_12reels'), t('packages.feat_competitorAnalysis'),
-        t('packages.feat_influencerMarketing'), t('packages.feat_crisisManagement'), t('packages.feat_strategist'),
+        t('packages.feat_allPlatforms'),
+        t('packages.feat_unlimitedContent'),
+        t('packages.feat_premiumDesign'),
+        t('packages.feat_community'),
+        t('packages.feat_calendar'),
+        t('packages.feat_instantReport'),
+        t('packages.feat_advancedAds'),
+        t('packages.feat_12reels'),
+        t('packages.feat_competitorAnalysis'),
+        t('packages.feat_influencerMarketing'),
+        t('packages.feat_crisisManagement'),
+        t('packages.feat_strategist'),
       ],
       notIncluded: [],
     },
@@ -186,49 +210,34 @@ export default function Packages() {
                     <h3>{pkg.name}</h3>
                     <p className="package-desc">{pkg.desc}</p>
                     
-                    {pkg.tier === 'pro' ? (
-                      <div className="package-discovery">
-                        <Link to="/iletisim" className="btn btn-primary package-discovery-btn">
-                          {t('packages.discoveryCall')}
-                          <HiOutlineArrowRight size={16} />
-                        </Link>
+                    <>
+                      <div className="package-price">
+                        <span className="currency">₺</span>
+                        <span className="amount">{pkg.priceTRY}</span>
+                        <span className="period">{t('packages.month')}</span>
                       </div>
-                    ) : (
-                      <>
-                        <div className="package-price">
-                          <span className="currency">₺</span>
-                          <span className="amount">{pkg.priceTRY}</span>
-                          <span className="period">{t('packages.month')}</span>
-                        </div>
-                        <div className="package-price-alt">
-                          ≈ ${exchangeRate ? convertTRYtoUSD(pkg.priceTRY, exchangeRate) : pkg.priceUSD} {t('packages.month')}
-                          {exchangeRate && <span style={{ fontSize: '0.7rem', opacity: 0.6, marginLeft: 4 }}>(1$≈{exchangeRate.toFixed(1)}₺)</span>}
-                        </div>
-                      </>
-                    )}
+                      <div className="package-price-alt">
+                        ≈ ${convertTRYtoUSD(pkg.priceTRY, exchangeRate) || pkg.priceUSD} {t('packages.month')}
+                        <span style={{ fontSize: '0.7rem', opacity: 0.55, marginLeft: 4 }}>(1$≈{exchangeRate.toFixed(0)}₺)</span>
+                      </div>
+                    </>
                   </div>
 
                   <div className="package-features">
-                    {pkg.isCustom ? (
-                      <div className="custom-package-info">
-                        <p>{t('packages.proCustomDesc')}</p>
-                      </div>
-                    ) : (
-                      <>
-                        {pkg.features.map((feature) => (
-                          <div key={feature} className="feature-item included">
-                            <HiOutlineCheck size={16} />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                        {pkg.notIncluded.map((feature) => (
-                          <div key={feature} className="feature-item not-included">
-                            <span className="dash">—</span>
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                      </>
-                    )}
+                    <>
+                      {pkg.features.map((feature) => (
+                        <div key={feature} className="feature-item included">
+                          <HiOutlineCheck size={16} />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                      {pkg.notIncluded.map((feature) => (
+                        <div key={feature} className="feature-item not-included">
+                          <span className="dash">—</span>
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </>
                   </div>
 
                   <Link

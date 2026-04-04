@@ -2,12 +2,12 @@ import { motion, useInView } from 'framer-motion'
 import { useRef, useEffect } from 'react'
 
 const defaultVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.6,
+      duration: 0.45,
       ease: [0.25, 0.46, 0.45, 0.94],
     },
   },
@@ -32,7 +32,7 @@ export function FadeIn({ children, delay = 0, direction = 'up', className, style
       initial={{ opacity: 0, ...directionMap[direction] }}
       animate={isInView ? { opacity: 1, x: 0, y: 0 } : {}}
       transition={{
-        duration: 0.6,
+        duration: 0.45,
         delay,
         ease: [0.25, 0.46, 0.45, 0.94],
       }}

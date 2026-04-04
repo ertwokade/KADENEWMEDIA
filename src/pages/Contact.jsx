@@ -7,6 +7,7 @@ import {
   HiOutlineClock,
   HiOutlinePaperAirplane,
   HiOutlineExternalLink,
+  HiOutlineCheck,
 } from 'react-icons/hi'
 import { FaInstagram, FaYoutube, FaTiktok, FaWhatsapp, FaLinkedinIn } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
@@ -94,7 +95,6 @@ export default function Contact() {
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', company: '', services: [], message: '' })
       setKvkkAccepted(false)
-      setTimeout(() => setSubmitted(false), 6000)
     } catch (err) {
       const errorMsg = err.message || ''
       if (errorMsg === 'API unavailable' || errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
@@ -343,24 +343,36 @@ export default function Contact() {
                   </label>
                 </div>
 
-                <motion.button
-                  type="submit"
-                  className="btn btn-primary submit-btn"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  disabled={submitted || sending}
-                >
-                  {submitted ? (
-                    t('contact.submitted')
-                  ) : sending ? (
-                    <span className="sending-loader">{t('contact.sending')}</span>
-                  ) : (
-                    <>
-                      {t('contact.submit')}
-                      <HiOutlinePaperAirplane size={18} />
-                    </>
-                  )}
-                </motion.button>
+                {submitted ? (
+                  <motion.div
+                    className="form-success-banner"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <HiOutlineCheck size={22} />
+                    <div>
+                      <strong>Mesajınız gönderildi!</strong>
+                      <p>Ekibimiz en kısa sürede size dönecek.</p>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.button
+                    type="submit"
+                    className="btn btn-primary submit-btn"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    disabled={sending}
+                  >
+                    {sending ? (
+                      <span className="sending-loader">{t('contact.sending')}</span>
+                    ) : (
+                      <>
+                        {t('contact.submit')}
+                        <HiOutlinePaperAirplane size={18} />
+                      </>
+                    )}
+                  </motion.button>
+                )}
 
                 {error && (
                   <motion.p

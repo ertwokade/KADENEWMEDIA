@@ -3,51 +3,61 @@
   <!-- Main pages -->
   <url>
     <loc>https://kademedia.com.tr/</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/hizmetler</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/paketler</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/hakkimizda</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://kademedia.com.tr/partnerler</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://kademedia.com.tr/blog</loc>
-    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://kademedia.com.tr/kariyer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://kademedia.com.tr/blog</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/iletisim</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://kademedia.com.tr/partnerler</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/kariyer</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://kademedia.com.tr/portfolio</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/ekip</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -70,36 +80,37 @@
   <!-- Service detail pages -->
   <url>
     <loc>https://kademedia.com.tr/hizmetler/sosyal-medya-yonetimi</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/hizmetler/icerik-uretimi</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/hizmetler/reklam-yonetimi</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/hizmetler/influencer-marketing</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/hizmetler/video-produksiyon</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://kademedia.com.tr/hizmetler/strateji-danismanlik</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://kademedia.com.tr/hizmetler/web-sitesi-tasarimi</loc>
+    <lastmod>2025-04-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -136,42 +147,62 @@
   </url>
   <!-- Blog posts -->
   <url>
-    <loc>https://kademedia.com.tr/blog/instagram-algoritma-2025-guncelleme</loc>
+    <loc>https://kademedia.com.tr/blog/kade-media-sosyal-medya-ajans-istanbul</loc>
+    <lastmod>2025-04-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/kade-media-ajans-neden-secmeli</loc>
+    <lastmod>2025-04-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/sosyal-medya-yonetimi-ne-kadar-tutar</loc>
+    <lastmod>2025-03-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/instagram-algoritma-2025</loc>
+    <lastmod>2025-03-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/2025-sosyal-medya-trendleri</loc>
+    <lastmod>2025-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/instagram-reels-stratejisi</loc>
+    <lastmod>2025-03-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://kademedia.com.tr/blog/meta-ads-optimizasyon</loc>
+    <lastmod>2025-03-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kademedia.com.tr/blog/yapay-zeka-sosyal-medya-icerik-uretimi</loc>
+    <loc>https://kademedia.com.tr/blog/tiktok-marka-buyutme</loc>
+    <lastmod>2025-02-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kademedia.com.tr/blog/tiktok-shop-turkiye-e-ticaret</loc>
+    <loc>https://kademedia.com.tr/blog/influencer-marketing-rehberi</loc>
+    <lastmod>2025-02-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://kademedia.com.tr/blog/kisa-video-stratejisi-reels-shorts-tiktok</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://kademedia.com.tr/blog/ugc-kullanici-icerigi-marka-guveni</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://kademedia.com.tr/blog/meta-ads-optimizasyon-2025</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://kademedia.com.tr/blog/influencer-marketing-mikro-nano-2025</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://kademedia.com.tr/blog/sosyal-medya-kriz-yonetimi</loc>
+    <loc>https://kademedia.com.tr/blog/icerik-takvimi-olusturma</loc>
+    <lastmod>2025-02-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
