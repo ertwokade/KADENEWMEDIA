@@ -18,7 +18,7 @@ import './Packages.css'
 
 // Exchange rate cache
 const RATE_CACHE_KEY = 'kade_usd_try_rate'
-const RATE_CACHE_TTL = 6 * 60 * 60 * 1000 // 6 hours
+const RATE_CACHE_TTL = 60 * 60 * 1000 // 1 hour — fresh rates
 const FALLBACK_RATE = 38.5 // fallback TRY per USD
 
 async function fetchExchangeRate() {
@@ -52,6 +52,12 @@ function convertUSDtoTRY(usdAmount, rate) {
   const num = parseFloat(String(usdAmount).replace(/\./g, '').replace(',', '.'))
   if (isNaN(num)) return null
   return Math.round(num * rate).toLocaleString('tr-TR')
+}
+
+function CompCell({ val }) {
+  if (val === true) return <span className="comp-yes">✓</span>
+  if (val === false) return <span className="comp-no">✗</span>
+  return <span className="comp-maybe">~</span>
 }
 
 export default function Packages() {
@@ -217,8 +223,11 @@ export default function Packages() {
                         <span className="period">{t('packages.month')}</span>
                       </div>
                       <div className="package-price-alt">
-                        ≈ ${convertTRYtoUSD(pkg.priceTRY, exchangeRate) || pkg.priceUSD} {t('packages.month')}
-                        <span style={{ fontSize: '0.7rem', opacity: 0.55, marginLeft: 4 }}>(1$≈{exchangeRate.toFixed(0)}₺)</span>
+                        ≈ ${convertTRYtoUSD(pkg.priceTRY, exchangeRate) || pkg.priceUSD}
+                        <span style={{ marginLeft: 4 }}>{t('packages.month')}</span>
+                        <span style={{ display: 'block', fontSize: '0.68rem', opacity: 0.5, marginTop: 2 }}>
+                          güncel kur: 1$ = {exchangeRate.toFixed(1)}₺
+                        </span>
                       </div>
                     </>
                   </div>
@@ -252,6 +261,58 @@ export default function Packages() {
               </StaggerItem>
             ))}
           </StaggerContainer>
+        </div>
+      </section>
+
+      {/* Comparison Table */}
+      <section className="section">
+        <div className="container">
+          <FadeIn>
+            <div className="section-header" style={{ marginBottom: 40 }}>
+              <h2 className="section-title">
+                {isEN ? 'Why ' : 'Neden '}<span>{isEN ? 'Kade Media?' : 'Kade Media?'}</span>
+              </h2>
+              <p className="section-subtitle">
+                {isEN ? 'See how we compare to other options.' : 'Diğer seçeneklerle nasıl karşılaştırıyoruz.'}
+              </p>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.1}>
+            <div className="comparison-table-wrapper glass-card">
+              <table className="comparison-table">
+                <thead>
+                  <tr>
+                    <th>{isEN ? 'Feature' : 'Özellik'}</th>
+                    <th className="col-kade">
+                      <span className="col-kade-label">Kade Media</span>
+                    </th>
+                    <th>{isEN ? 'Freelancer' : 'Freelancer'}</th>
+                    <th>{isEN ? 'In-house' : 'İçeride Eleman'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: isEN ? 'Professional team' : 'Profesyonel ekip', kade: true, freelancer: null, inhouse: null },
+                    { feature: isEN ? 'Content strategy' : 'İçerik stratejisi', kade: true, freelancer: null, inhouse: null },
+                    { feature: isEN ? 'Monthly reporting' : 'Aylık raporlama', kade: true, freelancer: false, inhouse: null },
+                    { feature: isEN ? 'Ad management' : 'Reklam yönetimi', kade: true, freelancer: false, inhouse: null },
+                    { feature: isEN ? 'Influencer network' : 'Influencer ağı', kade: true, freelancer: false, inhouse: false },
+                    { feature: isEN ? 'Crisis management' : 'Kriz yönetimi', kade: true, freelancer: false, inhouse: null },
+                    { feature: isEN ? 'Fixed monthly cost' : 'Sabit aylık maliyet', kade: true, freelancer: null, inhouse: false },
+                    { feature: isEN ? 'No hiring process' : 'İşe alım süreci yok', kade: true, freelancer: true, inhouse: false },
+                    { feature: isEN ? 'Scalable service' : 'Ölçeklenebilir hizmet', kade: true, freelancer: false, inhouse: false },
+                  ].map((row, i) => (
+                    <tr key={i}>
+                      <td className="feature-name">{row.feature}</td>
+                      <td className="col-kade"><CompCell val={row.kade} /></td>
+                      <td><CompCell val={row.freelancer} /></td>
+                      <td><CompCell val={row.inhouse} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </FadeIn>
         </div>
       </section>
 

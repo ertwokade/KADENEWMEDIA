@@ -6,6 +6,7 @@ import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import WhatsAppButton from './components/WhatsAppButton'
 import CookieBanner from './components/CookieBanner'
+import ExitIntentPopup from './components/ExitIntentPopup'
 
 // Route-level code splitting
 const Home = lazy(() => import('./pages/Home'))
@@ -70,6 +71,7 @@ function App() {
       {!isAdmin && <Footer />}
       {!isAdmin && <WhatsAppButton />}
       {!isAdmin && <CookieBanner />}
+      {!isAdmin && <ExitIntentPopup />}
     </>
   )
 }

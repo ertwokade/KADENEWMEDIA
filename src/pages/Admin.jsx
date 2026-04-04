@@ -1909,6 +1909,7 @@ function SettingsSection({ showToast }) {
 function CalendarSection({ showToast }) {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [events, setEvents] = useState([])
+  const [calendarLoading, setCalendarLoading] = useState(true)
   const [showEventForm, setShowEventForm] = useState(false)
   const [editingEvent, setEditingEvent] = useState(null)
   const [eventForm, setEventForm] = useState({
@@ -1926,17 +1927,22 @@ function CalendarSection({ showToast }) {
   const [inviteCustomEmails, setInviteCustomEmails] = useState([])
   const [inviteMessage, setInviteMessage] = useState('')
   const [inviteSending, setInviteSending] = useState(false)
+  const [listFilter, setListFilter] = useState('all')
 
   const currentYear = selectedDate.getFullYear()
   const currentMonth = selectedDate.getMonth()
 
   // Load events and admin users
   useEffect(() => {
+    setCalendarLoading(true)
     getContentApi('calendar')
       .then(res => {
-        if (res?.data?.events) setEvents(res.data.events)
+        if (res?.data?.events && Array.isArray(res.data.events)) {
+          setEvents(res.data.events)
+        }
       })
       .catch(() => {})
+      .finally(() => setCalendarLoading(false))
     getUsersApi()
       .then(data => { if (Array.isArray(data)) setAdminUsers(data) })
       .catch(() => {})
@@ -2091,6 +2097,33 @@ function CalendarSection({ showToast }) {
     }
   }
 
+  const thisMonthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`
+  const monthEvents = events.filter(e => e.date?.startsWith(thisMonthPrefix))
+  const monthStats = {
+    planned: monthEvents.filter(e => e.status === 'planned').length,
+    ready: monthEvents.filter(e => e.status === 'ready').length,
+    published: monthEvents.filter(e => e.status === 'published').length,
+    total: monthEvents.length,
+  }
+
+  const openNewEventForCurrentMonth = () => {
+    const now = new Date()
+    const isCurrentMonth = now.getFullYear() === currentYear && now.getMonth() === currentMonth
+    const day = isCurrentMonth ? now.getDate() : 1
+    openNewEvent(day)
+  }
+
+  if (calendarLoading) {
+    return (
+      <div>
+        <div className="admin-page-header">
+          <div><h1>İçerik <span>Takvimi</span></h1></div>
+        </div>
+        <div className="admin-empty-state"><p>Takvim yükleniyor...</p></div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="admin-page-header">
@@ -2102,14 +2135,29 @@ function CalendarSection({ showToast }) {
           <button className="btn btn-outline" onClick={generateSuggestions}>
             ✨ Otomatik Öner
           </button>
-          <button className="btn btn-primary" onClick={() => openNewEvent(today.getDate())}>
+          <button className="btn btn-primary" onClick={openNewEventForCurrentMonth}>
             <HiOutlinePlus size={16} /> Yeni İçerik
           </button>
         </div>
       </div>
 
+      {/* Monthly Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+        {[
+          { label: 'Bu Ay Toplam', value: monthStats.total, color: '#6C63FF' },
+          { label: 'Planlandı', value: monthStats.planned, color: '#6C63FF' },
+          { label: 'Hazır', value: monthStats.ready, color: '#eac321' },
+          { label: 'Yayınlandı', value: monthStats.published, color: '#2ECC71' },
+        ].map(s => (
+          <div key={s.label} className="admin-stat-card" style={{ padding: 16 }}>
+            <div className="stat-number" style={{ fontSize: '1.6rem', color: s.color, background: 'none', WebkitTextFillColor: s.color }}>{s.value}</div>
+            <div className="stat-label">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
       {/* Month Navigation */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <button className="btn btn-outline" onClick={prevMonth}>← Önceki</button>
         <h2 style={{ fontSize: '1.3rem', fontWeight: 700 }}>{monthNames[currentMonth]} {currentYear}</h2>
         <button className="btn btn-outline" onClick={nextMonth}>Sonraki →</button>
@@ -2190,25 +2238,47 @@ function CalendarSection({ showToast }) {
 
       {/* Upcoming Events List */}
       <div className="admin-form" style={{ marginTop: 24 }}>
-        <h3>📋 Bu Aydaki İçerikler ({events.filter(e => e.date?.startsWith(`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`)).length})</h3>
-        {events
-          .filter(e => e.date?.startsWith(`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`))
-          .sort((a, b) => a.date.localeCompare(b.date) || a.time?.localeCompare(b.time))
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+          <h3 style={{ margin: 0 }}>📋 {monthNames[currentMonth]} İçerikleri ({monthEvents.length})</h3>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[{ value: 'all', label: 'Tümü' }, ...LEAD_STATUSES.slice(0,4).map((_, i) => ({ value: Object.keys(statusLabels)[i], label: Object.values(statusLabels)[i] }))].map(f => (
+              <button
+                key={f.value}
+                onClick={() => setListFilter(f.value)}
+                style={{
+                  padding: '4px 12px', borderRadius: 20, border: `1px solid ${listFilter === f.value ? 'var(--accent)' : 'var(--border)'}`,
+                  background: listFilter === f.value ? 'var(--accent-alpha)' : 'none', color: listFilter === f.value ? 'var(--accent)' : 'var(--text-tertiary)',
+                  cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600
+                }}
+              >{f.label}</button>
+            ))}
+          </div>
+        </div>
+        {monthEvents
+          .filter(e => listFilter === 'all' || e.status === listFilter)
+          .sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''))
           .map(ev => (
             <div key={ev.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
-              <div style={{ width: 44, textAlign: 'center', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+              <div style={{ width: 44, textAlign: 'center', fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-primary)', flexShrink: 0 }}>
                 {ev.date?.split('-')[2]}
               </div>
               <div style={{ fontSize: '1.2rem' }}>{platformIcons[ev.platform]}</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{ev.title}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-                  {ev.time} · {typeLabels[ev.type]}
+                  {ev.time} · {typeLabels[ev.type]}{ev.description ? ` · ${ev.description.slice(0, 40)}` : ''}
                 </div>
               </div>
-              <span className="status-badge" style={{ background: `${statusColors[ev.status]}20`, color: statusColors[ev.status] }}>
-                {statusLabels[ev.status]}
-              </span>
+              <select
+                value={ev.status}
+                onChange={(e) => {
+                  const updated = events.map(x => x.id === ev.id ? { ...x, status: e.target.value } : x)
+                  saveEvents(updated)
+                }}
+                style={{ padding: '4px 8px', borderRadius: 6, border: `1px solid ${statusColors[ev.status]}50`, background: `${statusColors[ev.status]}15`, color: statusColors[ev.status], fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+              >
+                {Object.entries(statusLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
               <button className="table-action-btn" onClick={() => openEditEvent(ev)}>
                 <HiOutlinePencil size={14} />
               </button>
@@ -2217,7 +2287,7 @@ function CalendarSection({ showToast }) {
               </button>
             </div>
           ))}
-        {events.filter(e => e.date?.startsWith(`${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`)).length === 0 && (
+        {monthEvents.length === 0 && (
           <div className="admin-empty-state">
             <div className="empty-icon">📅</div>
             <h3>Bu ay için planlanmış içerik yok</h3>

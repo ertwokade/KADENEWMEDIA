@@ -224,3 +224,13 @@ export async function seedApi(secret) {
   });
   return handleResponse(res);
 }
+
+// Newsletter
+export async function subscribeNewsletterApi(email) {
+  const res = await fetch(`${API_BASE}/newsletter`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  return handleResponse(res);
+}

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { HiOutlinePencilAlt, HiOutlineArrowRight, HiOutlineClock, HiOutlineShare, HiOutlineLightningBolt } from 'react-icons/hi'
+import { HiOutlinePencilAlt, HiOutlineArrowRight, HiOutlineClock, HiOutlineShare, HiOutlineLightningBolt, HiOutlineSearch, HiOutlineX } from 'react-icons/hi'
 import { FaXTwitter, FaLinkedinIn } from 'react-icons/fa6'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -22,6 +22,8 @@ export default function Blog() {
     path: '/blog',
   })
   const [blogPosts, setBlogPosts] = useState(staticBlogPosts)
+  const [search, setSearch] = useState('')
+  const [activeCategory, setActiveCategory] = useState('all')
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -37,7 +39,26 @@ export default function Blog() {
     fetchBlogs()
   }, [])
 
+  const categories = useMemo(() => {
+    const cats = blogPosts.map(p => lang === 'tr' ? p.category : p.categoryEn).filter(Boolean)
+    return ['all', ...Array.from(new Set(cats))]
+  }, [blogPosts, lang])
+
+  const filtered = useMemo(() => {
+    return blogPosts.filter(p => {
+      const title = lang === 'tr' ? p.titleTr : p.titleEn
+      const excerpt = lang === 'tr' ? p.excerptTr : p.excerptEn
+      const cat = lang === 'tr' ? p.category : p.categoryEn
+      const matchesSearch = !search || title?.toLowerCase().includes(search.toLowerCase()) || excerpt?.toLowerCase().includes(search.toLowerCase())
+      const matchesCategory = activeCategory === 'all' || cat === activeCategory
+      return matchesSearch && matchesCategory
+    })
+  }, [blogPosts, search, activeCategory, lang])
+
   if (blogPosts.length === 0) return null
+
+  const featured = filtered[0]
+  const rest = filtered.slice(1)
 
   return (
     <PageTransition>
@@ -65,30 +86,77 @@ export default function Blog() {
 
       <section className="section">
         <div className="container">
-          {/* Featured Post */}
+
+          {/* Search + Filter Bar */}
           <FadeIn>
-            <Link to={`/blog/${blogPosts[0].slug}`} style={{ textDecoration: 'none' }}>
+            <div className="blog-filter-bar">
+              <div className="blog-search-wrapper">
+                <HiOutlineSearch size={18} className="blog-search-icon" />
+                <input
+                  type="text"
+                  placeholder={lang === 'tr' ? 'Blog yazısı ara...' : 'Search posts...'}
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="blog-search-input"
+                />
+                {search && (
+                  <button className="blog-search-clear" onClick={() => setSearch('')}>
+                    <HiOutlineX size={16} />
+                  </button>
+                )}
+              </div>
+              <div className="blog-category-chips">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    className={`blog-category-chip ${activeCategory === cat ? 'active' : ''}`}
+                    onClick={() => setActiveCategory(cat)}
+                  >
+                    {cat === 'all' ? (lang === 'tr' ? 'Tümü' : 'All') : cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+
+          {filtered.length === 0 ? (
+            <FadeIn>
+              <div className="blog-empty-state">
+                <div style={{ fontSize: '3rem', marginBottom: 16 }}>🔍</div>
+                <h3>{lang === 'tr' ? 'Sonuç bulunamadı' : 'No results found'}</h3>
+                <p>{lang === 'tr' ? 'Farklı bir arama deneyin veya filtreyi kaldırın.' : 'Try a different search or remove the filter.'}</p>
+                <button className="btn btn-outline" onClick={() => { setSearch(''); setActiveCategory('all') }} style={{ marginTop: 16 }}>
+                  {lang === 'tr' ? 'Filtreyi Temizle' : 'Clear Filter'}
+                </button>
+              </div>
+            </FadeIn>
+          ) : (
+            <>
+          {/* Featured Post */}
+          {featured && (
+          <FadeIn>
+            <Link to={`/blog/${featured.slug}`} style={{ textDecoration: 'none' }}>
               <motion.div className="blog-featured glass-card" whileHover={{ y: -4 }}>
-                <div className="blog-featured-image" style={{ background: `${blogPosts[0].color}15` }}>
-                  {blogPosts[0].image && blogPosts[0].image.startsWith('http') ? (
-                    <img src={blogPosts[0].image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div className="blog-featured-image" style={{ background: `${featured.color}15` }}>
+                  {featured.image && featured.image.startsWith('http') ? (
+                    <img src={featured.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    <span>{blogPosts[0].image}</span>
+                    <span>{featured.image}</span>
                   )}
                 </div>
                 <div className="blog-featured-content">
                   <div className="blog-meta">
-                    <span className="blog-category" style={{ color: blogPosts[0].color }}>
-                      {lang === 'tr' ? blogPosts[0].category : blogPosts[0].categoryEn}
+                    <span className="blog-category" style={{ color: featured.color }}>
+                      {lang === 'tr' ? featured.category : featured.categoryEn}
                     </span>
-                    <span className="blog-date">{blogPosts[0].date}</span>
+                    <span className="blog-date">{featured.date}</span>
                     <span className="blog-read">
                       <HiOutlineClock size={14} />
-                      {blogPosts[0].readTime} {t('blog.min')}
+                      {featured.readTime} {t('blog.min')}
                     </span>
                   </div>
-                  <h2>{lang === 'tr' ? blogPosts[0].titleTr : blogPosts[0].titleEn}</h2>
-                  <p>{lang === 'tr' ? blogPosts[0].excerptTr : blogPosts[0].excerptEn}</p>
+                  <h2>{lang === 'tr' ? featured.titleTr : featured.titleEn}</h2>
+                  <p>{lang === 'tr' ? featured.excerptTr : featured.excerptEn}</p>
                   <span className="btn btn-primary blog-read-btn">
                     {t('blog.readMore')}
                     <HiOutlineArrowRight size={16} />
@@ -97,10 +165,11 @@ export default function Blog() {
               </motion.div>
             </Link>
           </FadeIn>
+          )}
 
           {/* Blog Grid */}
           <StaggerContainer className="blog-grid" staggerDelay={0.1}>
-            {blogPosts.slice(1).map((post, idx) => (
+            {rest.map((post, idx) => (
               <StaggerItem key={post._id || post.slug || idx}>
                 <Link to={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>
                   <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
@@ -135,6 +204,8 @@ export default function Blog() {
               </StaggerItem>
             ))}
           </StaggerContainer>
+            </>
+          )}
 
           {/* Share Section */}
           <FadeIn delay={0.2}>

@@ -361,8 +361,8 @@ export default function Contact() {
                       </>
                     ) : (
                       <>
+                        <HiOutlinePaperAirplane size={18} style={{ transform: 'rotate(90deg)' }} />
                         {t('contact.submit')}
-                        <HiOutlinePaperAirplane size={18} />
                       </>
                     )}
                   </motion.button>

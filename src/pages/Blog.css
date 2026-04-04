@@ -5,6 +5,113 @@
   overflow: hidden;
 }
 
+/* Search + Filter Bar */
+.blog-filter-bar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.blog-search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+}
+
+.blog-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-light);
+  pointer-events: none;
+}
+
+.blog-search-input {
+  width: 100%;
+  padding: 12px 40px 12px 42px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--white);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.blog-search-input::placeholder {
+  color: var(--gray);
+}
+
+.blog-search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.blog-search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--gray-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.blog-search-clear:hover {
+  color: var(--primary);
+}
+
+.blog-category-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.blog-category-chip {
+  padding: 8px 16px;
+  border-radius: 100px;
+  border: 1px solid var(--border-color);
+  background: rgba(255,255,255,0.03);
+  color: var(--gray-lighter);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.blog-category-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.blog-category-chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #000;
+  font-weight: 700;
+}
+
+.blog-empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--gray-light);
+}
+
+.blog-empty-state h3 {
+  font-size: 1.3rem;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
 /* Featured Post */
 .blog-featured {
   display: grid;
