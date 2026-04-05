@@ -474,7 +474,7 @@ export default function Home() {
           <FadeIn delay={0.2}>
             <div className="location-card glass-card">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6!2d28.9080!3d41.0048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5307e731e3f%3A0x4a3e2d8c9b7f1234!2sBiruni+%C3%9Cniversitesi+Teknopark!5e0!3m2!1str!2str!4v1"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6!2d28.906!3d41.004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5307e731e3f%3A0x6b0e61f4c5c9a6e8!2sBiruni+Teknopark!5e0!3m2!1str!2str!4v1700000000000"
                 width="100%"
                 height="350"
                 style={{ border: 0, borderRadius: '16px', display: 'block' }}

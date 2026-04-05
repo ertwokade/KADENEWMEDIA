@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   HiOutlineUserGroup,
@@ -137,28 +138,72 @@ export default function About() {
                       }}
                     />
                   ))}
-                  {/* Animated lightning bolt SVG */}
+                  {/* Actual Kade Media logo icon — animated */}
                   <motion.div
                     className="lightning-bolt-wrapper"
                     animate={{
                       filter: [
-                        'drop-shadow(0 0 10px #eac321) drop-shadow(0 0 30px #eac32160)',
-                        'drop-shadow(0 0 25px #eac321) drop-shadow(0 0 60px #eac32190)',
-                        'drop-shadow(0 0 10px #eac321) drop-shadow(0 0 30px #eac32160)',
+                        'drop-shadow(0 0 8px #eac321) drop-shadow(0 0 25px #eac32150)',
+                        'drop-shadow(0 0 22px #eac321) drop-shadow(0 0 55px #eac32180)',
+                        'drop-shadow(0 0 8px #eac321) drop-shadow(0 0 25px #eac32150)',
                       ],
-                      scale: [1, 1.05, 1],
                     }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                   >
-                    <svg viewBox="0 0 100 160" className="lightning-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 54 54" className="lightning-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="logoGrad1" x1="0" y1="0" x2="1" y2="1">
+                          <motion.stop
+                            offset="0%"
+                            animate={{ stopColor: ['#f5e058', '#fff4a8', '#f5e058'] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                          />
+                          <motion.stop
+                            offset="100%"
+                            animate={{ stopColor: ['#eac321', '#f5dc5a', '#eac321'] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                          />
+                        </linearGradient>
+                        <linearGradient id="logoGrad2" x1="0" y1="0" x2="1" y2="1">
+                          <motion.stop
+                            offset="0%"
+                            animate={{ stopColor: ['#d4b820', '#eac321', '#d4b820'] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                          />
+                          <motion.stop
+                            offset="100%"
+                            animate={{ stopColor: ['#7a6010', '#b89a18', '#7a6010'] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                          />
+                        </linearGradient>
+                      </defs>
+                      {/* Top-left triangle */}
                       <motion.polygon
-                        points="60,5 20,85 50,85 40,155 80,65 50,65"
-                        fill="#eac321"
-                        animate={{
-                          fill: ['#eac321', '#fff4a8', '#eac321'],
-                          opacity: [1, 0.9, 1],
-                        }}
+                        points="2,2 26,2 2,26"
+                        fill="url(#logoGrad1)"
+                        animate={{ opacity: [0.85, 1, 0.85] }}
                         transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                      />
+                      {/* Top-right triangle */}
+                      <motion.polygon
+                        points="29,2 52,2 52,25"
+                        fill="url(#logoGrad2)"
+                        animate={{ opacity: [0.75, 0.95, 0.75] }}
+                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+                      />
+                      {/* Bottom-left triangle */}
+                      <motion.polygon
+                        points="2,29 25,52 2,52"
+                        fill="url(#logoGrad2)"
+                        animate={{ opacity: [0.75, 0.95, 0.75] }}
+                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+                      />
+                      {/* Bottom-right triangle */}
+                      <motion.polygon
+                        points="28,52 52,28 52,52"
+                        fill="url(#logoGrad2)"
+                        animate={{ opacity: [0.7, 0.92, 0.7] }}
+                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.9 }}
                       />
                     </svg>
                   </motion.div>
@@ -243,6 +288,13 @@ export default function About() {
               </StaggerItem>
             ))}
           </StaggerContainer>
+          <FadeIn delay={0.3}>
+            <div style={{ textAlign: 'center', marginTop: '40px' }}>
+              <Link to="/ekip" className="btn btn-outline">
+                {lang === 'en' ? 'Meet the Full Team' : 'Tüm Ekibi Tanıyın'} →
+              </Link>
+            </div>
+          </FadeIn>
         </div>
       </section>
     </PageTransition>

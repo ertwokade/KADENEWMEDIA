@@ -30,7 +30,7 @@ const socials = [
 ]
 
 const MAPS_LINK = 'https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7'
-const MAPS_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6!2d28.9080!3d41.0048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5307e731e3f%3A0x4a3e2d8c9b7f1234!2sBiruni+%C3%9Cniversitesi+Teknopark!5e0!3m2!1str!2str!4v1'
+const MAPS_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6!2d28.906!3d41.004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5307e731e3f%3A0x6b0e61f4c5c9a6e8!2sBiruni+Teknopark!5e0!3m2!1str!2str!4v1700000000000'
 
 export default function Contact() {
   const { t } = useLanguage()

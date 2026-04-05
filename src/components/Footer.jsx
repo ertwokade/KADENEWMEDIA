@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaInstagram, FaYoutube, FaTiktok, FaLinkedinIn } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
-import { HiArrowUp, HiOutlineMail, HiOutlineCheck } from 'react-icons/hi'
+import { HiArrowUp } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
-import { getContentApi, subscribeNewsletterApi } from '../api'
+import { getContentApi } from '../api'
 import './Footer.css'
 
 export default function Footer() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [footerData, setFooterData] = useState(null)
 
   useEffect(() => {
@@ -44,26 +44,6 @@ export default function Footer() {
     ],
   }
 
-  const [newsletterEmail, setNewsletterEmail] = useState('')
-  const [newsletterState, setNewsletterState] = useState('idle') // idle | loading | success | error
-  const [newsletterMsg, setNewsletterMsg] = useState('')
-
-  const handleNewsletter = async (e) => {
-    e.preventDefault()
-    if (!newsletterEmail) return
-    setNewsletterState('loading')
-    try {
-      const res = await subscribeNewsletterApi(newsletterEmail)
-      setNewsletterState('success')
-      setNewsletterMsg(res.message || 'Abone oldunuz!')
-      setNewsletterEmail('')
-    } catch (err) {
-      setNewsletterState('error')
-      setNewsletterMsg(err.message || 'Bir hata oluştu.')
-      setTimeout(() => setNewsletterState('idle'), 3000)
-    }
-  }
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -72,37 +52,6 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-glow" />
       <div className="container">
-
-        {/* Newsletter Strip */}
-        <div className="footer-newsletter">
-          <div className="footer-newsletter-text">
-            <HiOutlineMail size={22} />
-            <div>
-              <strong>{t('lang') === 'en' ? 'Get Social Media Tips' : 'Sosyal Medya İpuçları Alın'}</strong>
-              <p>{t('lang') === 'en' ? 'Weekly tips, trends and strategies to your inbox.' : 'Haftanın ipuçları, trendler ve stratejiler — ücretsiz.'}</p>
-            </div>
-          </div>
-          {newsletterState === 'success' ? (
-            <div className="footer-newsletter-success">
-              <HiOutlineCheck size={18} /> {newsletterMsg}
-            </div>
-          ) : (
-            <form className="footer-newsletter-form" onSubmit={handleNewsletter}>
-              <input
-                type="email"
-                placeholder="E-posta adresiniz..."
-                value={newsletterEmail}
-                onChange={e => setNewsletterEmail(e.target.value)}
-                required
-                className="footer-newsletter-input"
-              />
-              <button type="submit" className="btn btn-primary footer-newsletter-btn" disabled={newsletterState === 'loading'}>
-                {newsletterState === 'loading' ? '...' : 'Abone Ol'}
-              </button>
-            </form>
-          )}
-          {newsletterState === 'error' && <p className="footer-newsletter-error">{newsletterMsg}</p>}
-        </div>
 
         <div className="footer-top">
           <div className="footer-brand">
@@ -115,6 +64,8 @@ export default function Footer() {
                 <motion.a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="social-link"
                   aria-label={social.label}
                   whileHover={{ scale: 1.15, y: -2 }}
@@ -166,8 +117,8 @@ export default function Footer() {
           <p>{t('footer.rights')}</p>
           <div className="footer-legal-links">
             <Link to="/kvkk">KVKK</Link>
-            <Link to="/gizlilik">Gizlilik Politikası</Link>
-            <Link to="/cerez-politikasi">Çerez Politikası</Link>
+            <Link to="/gizlilik">{lang === 'en' ? 'Privacy Policy' : 'Gizlilik Politikası'}</Link>
+            <Link to="/cerez-politikasi">{lang === 'en' ? 'Cookie Policy' : 'Çerez Politikası'}</Link>
           </div>
           <motion.button
             className="scroll-top-btn"
