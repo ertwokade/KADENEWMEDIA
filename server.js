@@ -63,6 +63,9 @@ app.post('/api/calendar-invite', apiRoute('calendar-invite.js'))
 // Contact
 app.post('/api/contact', apiRoute('contact.js'))
 
+// Newsletter
+app.post('/api/newsletter', apiRoute('newsletter.js'))
+
 // Chat (AI chatbot)
 app.post('/api/chat', apiRoute('chat.js'))
 
@@ -73,4 +76,5 @@ const PORT = 3001
 app.listen(PORT, () => {
   console.log(`✅ API Server: http://localhost:${PORT}`)
   console.log(`📦 MongoDB: ${process.env.MONGODB_URI ? '✅ URI loaded' : '❌ Missing MONGODB_URI'}`)
+  console.log(`📧 SMTP: ${process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS ? `✅ ${process.env.SMTP_HOST}:${process.env.SMTP_PORT || 587}` : '❌ Missing SMTP config'}`)
 })

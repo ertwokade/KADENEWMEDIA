@@ -80,12 +80,29 @@ export default async function handler(req, res) {
     const mailTo = process.env.MAIL_TO || 'thekademedia@gmail.com';
 
     if (smtpHost && smtpUser && smtpPass) {
+      const port = parseInt(smtpPort) || 587;
       const transporter = nodemailer.createTransport({
         host: smtpHost,
-        port: parseInt(smtpPort) || 587,
-        secure: parseInt(smtpPort) === 465,
+        port,
+        secure: port === 465,
         auth: { user: smtpUser, pass: smtpPass },
+        ...(port === 587 ? { requireTLS: true } : {}),
+        tls: {
+          rejectUnauthorized: false,
+          minVersion: 'TLSv1.2',
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
       });
+
+      // Verify SMTP connection before sending
+      try {
+        await transporter.verify();
+        console.log('✅ SMTP connection verified');
+      } catch (verifyErr) {
+        console.error('❌ SMTP verification failed:', verifyErr.message);
+      }
 
       // Team notification email
       try { await transporter.sendMail({

@@ -85,11 +85,20 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'SMTP yapılandırması eksik. SMTP_HOST, SMTP_USER, SMTP_PASS ortam değişkenlerini ayarlayın.' });
     }
 
+    const port = parseInt(smtpPort) || 587;
     const transporter = nodemailer.createTransport({
       host: smtpHost,
-      port: parseInt(smtpPort) || 587,
-      secure: parseInt(smtpPort) === 465,
+      port,
+      secure: port === 465,
       auth: { user: smtpUser, pass: smtpPass },
+      ...(port === 587 ? { requireTLS: true } : {}),
+      tls: {
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2',
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
     });
 
     const icsContent = generateICS(event);
