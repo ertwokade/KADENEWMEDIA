@@ -148,6 +148,61 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Dynamic sitemap (GET /api/content?action=sitemap) — no auth ──
+  if (action === 'sitemap' && req.method === 'GET') {
+    try {
+      const db2 = await getDb();
+      const [blogs, partners] = await Promise.all([
+        db2.collection('blogs').find({ published: { $ne: false } }, { projection: { slug: 1, updatedAt: 1, createdAt: 1 } }).toArray(),
+        db2.collection('partners').find({}, { projection: { slug: 1, updatedAt: 1 } }).toArray(),
+      ]);
+      const base = 'https://kademedia.com.tr';
+      const today = new Date().toISOString().slice(0, 10);
+      const staticUrls = [
+        { loc: '/', priority: '1.0', freq: 'weekly' },
+        { loc: '/hizmetler', priority: '0.9', freq: 'monthly' },
+        { loc: '/paketler', priority: '0.9', freq: 'monthly' },
+        { loc: '/hakkimizda', priority: '0.8', freq: 'monthly' },
+        { loc: '/blog', priority: '0.9', freq: 'weekly' },
+        { loc: '/iletisim', priority: '0.8', freq: 'yearly' },
+        { loc: '/partnerler', priority: '0.7', freq: 'monthly' },
+        { loc: '/kariyer', priority: '0.7', freq: 'monthly' },
+        { loc: '/portfolio', priority: '0.7', freq: 'monthly' },
+        { loc: '/ekip', priority: '0.6', freq: 'monthly' },
+        { loc: '/hizmetler/sosyal-medya-yonetimi', priority: '0.8', freq: 'monthly' },
+        { loc: '/hizmetler/icerik-uretimi', priority: '0.8', freq: 'monthly' },
+        { loc: '/hizmetler/reklam-yonetimi', priority: '0.8', freq: 'monthly' },
+        { loc: '/hizmetler/influencer-marketing', priority: '0.8', freq: 'monthly' },
+        { loc: '/hizmetler/video-produksiyon', priority: '0.8', freq: 'monthly' },
+        { loc: '/hizmetler/strateji-danismanlik', priority: '0.8', freq: 'monthly' },
+        { loc: '/kvkk', priority: '0.3', freq: 'yearly' },
+        { loc: '/gizlilik', priority: '0.3', freq: 'yearly' },
+        { loc: '/cerez-politikasi', priority: '0.3', freq: 'yearly' },
+      ];
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+      for (const u of staticUrls) {
+        xml += `  <url>\n    <loc>${base}${u.loc}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${u.freq}</changefreq>\n    <priority>${u.priority}</priority>\n  </url>\n`;
+      }
+      for (const b of blogs) {
+        if (!b.slug) continue;
+        const lastmod = (b.updatedAt || b.createdAt || new Date()).toISOString().slice(0, 10);
+        xml += `  <url>\n    <loc>${base}/blog/${b.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+      }
+      for (const p of partners) {
+        if (!p.slug) continue;
+        const lastmod = (p.updatedAt || new Date()).toISOString().slice(0, 10);
+        xml += `  <url>\n    <loc>${base}/partnerler/${p.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
+      }
+      xml += '</urlset>';
+      res.setHeader('Content-Type', 'application/xml');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      return res.status(200).send(xml);
+    } catch (err) {
+      console.error('Sitemap error:', err);
+      return res.status(500).json({ error: 'Sunucu hatası' });
+    }
+  }
+
   const db = await getDb();
   const collection = db.collection('siteContent');
 

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -16,6 +17,7 @@ import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'rea
 import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Services.css'
@@ -105,7 +107,27 @@ const slugList = Object.keys(servicesMap)
 export default function ServiceDetail() {
   const { slug } = useParams()
   const { lang } = useLanguage()
-  const service = servicesMap[slug]
+  const [dynamicServices, setDynamicServices] = useState(null)
+
+  useEffect(() => {
+    getContentApi('services')
+      .then(res => { if (res?.data?.items?.length) setDynamicServices(res.data.items) })
+      .catch(() => {})
+  }, [])
+
+  const staticService = servicesMap[slug]
+  const slugIdx = slugList.indexOf(slug)
+  const dynamic = dynamicServices?.[slugIdx]
+
+  const service = staticService ? {
+    ...staticService,
+    titleTr: dynamic?.titleTr || staticService.titleTr,
+    titleEn: dynamic?.titleEn || staticService.titleEn,
+    descTr: dynamic?.descTr || staticService.descTr,
+    descEn: dynamic?.descEn || staticService.descEn,
+    featuresTr: dynamic?.featuresTr ? (typeof dynamic.featuresTr === 'string' ? dynamic.featuresTr.split(',').map(s => s.trim()).filter(Boolean) : dynamic.featuresTr) : staticService.featuresTr,
+    featuresEn: dynamic?.featuresEn ? (typeof dynamic.featuresEn === 'string' ? dynamic.featuresEn.split(',').map(s => s.trim()).filter(Boolean) : dynamic.featuresEn) : staticService.featuresEn,
+  } : null
 
   const title = service ? (lang === 'tr' ? service.titleTr : service.titleEn) : ''
   const desc = service ? (lang === 'tr' ? service.descTr : service.descEn) : ''
@@ -117,7 +139,7 @@ export default function ServiceDetail() {
     path: `/hizmetler/${slug}`,
   })
 
-  if (!service) return <Navigate to="/hizmetler" replace />
+  if (!staticService) return <Navigate to="/hizmetler" replace />
 
   const currentIdx = slugList.indexOf(slug)
   const prevSlug = currentIdx > 0 ? slugList[currentIdx - 1] : null

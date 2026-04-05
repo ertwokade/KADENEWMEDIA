@@ -8,8 +8,11 @@ import {
   HiOutlineChevronUp,
   HiOutlineMail,
   HiOutlineOfficeBuilding,
+  HiOutlineX,
+  HiOutlineUser,
+  HiOutlinePhone,
 } from 'react-icons/hi'
-import { getContentApi } from '../api'
+import { getContentApi, applyJobApi } from '../api'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
@@ -104,8 +107,29 @@ const jobsData = {
   ],
 }
 
-function JobCard({ job, t }) {
+function JobCard({ job, lang, t }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [showApply, setShowApply] = useState(false)
+  const [form, setForm] = useState({ name: '', email: '', phone: '', coverLetter: '' })
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleApply = async (e) => {
+    e.preventDefault()
+    if (!form.name.trim() || !form.email.trim()) return
+    setSubmitting(true)
+    setError('')
+    try {
+      await applyJobApi({ ...form, position: job.title })
+      setSubmitted(true)
+      setForm({ name: '', email: '', phone: '', coverLetter: '' })
+    } catch (err) {
+      setError(err.message || (lang === 'tr' ? 'Bir hata oluştu.' : 'An error occurred.'))
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <motion.div
@@ -153,13 +177,107 @@ function JobCard({ job, t }) {
                 ))}
               </ul>
             </div>
-            <a
-              href={`mailto:kariyer@kademedia.com?subject=Başvuru: ${job.title}`}
-              className="btn btn-primary job-apply-btn"
-            >
-              <HiOutlineMail size={16} />
-              {t('careers.apply')}
-            </a>
+
+            {/* Apply Form Toggle */}
+            <div style={{ marginTop: 16 }}>
+              {!showApply && !submitted && (
+                <button
+                  className="btn btn-primary job-apply-btn"
+                  onClick={(e) => { e.stopPropagation(); setShowApply(true) }}
+                >
+                  <HiOutlineMail size={16} />
+                  {t('careers.apply')}
+                </button>
+              )}
+
+              {submitted && (
+                <div style={{ padding: '16px 20px', background: 'rgba(46,204,113,0.12)', border: '1px solid rgba(46,204,113,0.3)', borderRadius: 12, color: '#2ECC71', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  ✅ {lang === 'tr' ? 'Başvurunuz alındı! En kısa sürede size dönüş yapacağız.' : 'Your application has been received! We will get back to you soon.'}
+                </div>
+              )}
+
+              <AnimatePresence>
+                {showApply && !submitted && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    style={{ overflow: 'hidden' }}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <div style={{ marginTop: 16, padding: '20px', background: 'rgba(255,255,255,0.04)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--accent)' }}>
+                          💼 {lang === 'tr' ? `${job.title} — Başvuru Formu` : `${job.title} — Application Form`}
+                        </h4>
+                        <button onClick={() => setShowApply(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 4 }}>
+                          <HiOutlineX size={18} />
+                        </button>
+                      </div>
+                      <form onSubmit={handleApply}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: 6 }}>
+                              {lang === 'tr' ? 'Ad Soyad *' : 'Full Name *'}
+                            </label>
+                            <input
+                              type="text" required
+                              value={form.name}
+                              onChange={e => setForm({ ...form, name: e.target.value })}
+                              placeholder={lang === 'tr' ? 'Adınız Soyadınız' : 'Your Full Name'}
+                              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.88rem', boxSizing: 'border-box' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: 6 }}>
+                              {lang === 'tr' ? 'E-posta *' : 'Email *'}
+                            </label>
+                            <input
+                              type="email" required
+                              value={form.email}
+                              onChange={e => setForm({ ...form, email: e.target.value })}
+                              placeholder="ornek@email.com"
+                              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.88rem', boxSizing: 'border-box' }}
+                            />
+                          </div>
+                        </div>
+                        <div style={{ marginBottom: 12 }}>
+                          <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: 6 }}>
+                            {lang === 'tr' ? 'Telefon' : 'Phone'}
+                          </label>
+                          <input
+                            type="tel"
+                            value={form.phone}
+                            onChange={e => setForm({ ...form, phone: e.target.value })}
+                            placeholder="+90 5XX XXX XX XX"
+                            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.88rem', boxSizing: 'border-box' }}
+                          />
+                        </div>
+                        <div style={{ marginBottom: 16 }}>
+                          <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: 6 }}>
+                            {lang === 'tr' ? 'Ön Yazı / Kendinizi Tanıtın' : 'Cover Letter / Introduce Yourself'}
+                          </label>
+                          <textarea
+                            rows={4}
+                            value={form.coverLetter}
+                            onChange={e => setForm({ ...form, coverLetter: e.target.value })}
+                            placeholder={lang === 'tr' ? 'Neden bu pozisyon için uygun olduğunuzu düşündüğünüzü yazın...' : 'Tell us why you would be a great fit for this role...'}
+                            style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.88rem', resize: 'vertical', lineHeight: 1.6, boxSizing: 'border-box', fontFamily: 'inherit' }}
+                          />
+                        </div>
+                        {error && <p style={{ color: '#E91E63', fontSize: '0.85rem', marginBottom: 12 }}>{error}</p>}
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          <button type="submit" className="btn btn-primary" disabled={submitting} style={{ flex: 1, justifyContent: 'center' }}>
+                            <HiOutlineMail size={16} />
+                            {submitting ? (lang === 'tr' ? 'Gönderiliyor...' : 'Sending...') : (lang === 'tr' ? 'Başvuruyu Gönder' : 'Submit Application')}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -262,7 +380,7 @@ export default function Careers() {
           <StaggerContainer className="jobs-list" staggerDelay={0.1}>
             {jobs.map((job) => (
               <StaggerItem key={job.id}>
-                <JobCard job={job} t={t} />
+                <JobCard job={job} lang={lang} t={t} />
               </StaggerItem>
             ))}
           </StaggerContainer>

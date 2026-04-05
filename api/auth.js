@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { getDb } from './_lib/mongodb.js';
 import { createToken, requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+import { logActivity } from './notifications.js';
 
 // Varsayılan admin bilgileri — .env'den alınır, yoksa fallback
 const DEFAULT_ADMIN_USERNAME = 'kade';
@@ -82,6 +83,8 @@ async function handleLogin(req, res) {
     }
 
     const token = createToken({ id: user._id.toString(), username: user.username, role: user.role });
+
+    logActivity(db, { action: 'Admin girişi yapıldı', detail: `${user.username} giriş yaptı`, type: 'system', icon: '🔐', user: user.username }).catch(() => {});
 
     return res.status(200).json({
       token,

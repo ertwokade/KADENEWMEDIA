@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlinePhotograph, HiOutlineArrowRight, HiOutlineExternalLink } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { partnersData } from '../data/content'
+import { getPortfolioApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -90,6 +91,13 @@ const categories = ['All', 'Social Media', 'Launch', 'E-Commerce', 'TikTok', 'Co
 export default function Portfolio() {
   const { lang } = useLanguage()
   const [activeCategory, setActiveCategory] = useState('All')
+  const [items, setItems] = useState(portfolioItems)
+
+  useEffect(() => {
+    getPortfolioApi()
+      .then(res => { if (res?.data?.items?.length) setItems(res.data.items) })
+      .catch(() => {})
+  }, [])
 
   useSEO({
     title: lang === 'tr' ? 'Portfolyo | Başarı Hikayelerimiz - Kade Media' : 'Portfolio | Our Success Stories - Kade Media',
@@ -100,8 +108,8 @@ export default function Portfolio() {
   })
 
   const filtered = activeCategory === 'All'
-    ? portfolioItems
-    : portfolioItems.filter(item => item.category === activeCategory)
+    ? items
+    : items.filter(item => item.category === activeCategory)
 
   return (
     <PageTransition>

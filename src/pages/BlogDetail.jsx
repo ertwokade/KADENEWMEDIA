@@ -46,6 +46,35 @@ export default function BlogDetail() {
     if (post) analytics.blogRead(slug, title)
   }, [post, slug, title])
 
+  useEffect(() => {
+    if (!post) return
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: title,
+      description: excerpt,
+      datePublished: post.date,
+      author: { '@type': 'Organization', name: 'Kade Media', url: 'https://kademedia.com.tr' },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Kade Media',
+        logo: { '@type': 'ImageObject', url: 'https://kademedia.com.tr/favicon.png' },
+      },
+      url: `https://kademedia.com.tr/blog/${slug}`,
+      mainEntityOfPage: { '@type': 'WebPage', '@id': `https://kademedia.com.tr/blog/${slug}` },
+      ...(post.image && post.image.startsWith('http') ? { image: post.image } : {}),
+    }
+    const el = document.getElementById('jsonld-article')
+    if (el) { el.textContent = JSON.stringify(schema) } else {
+      const s = document.createElement('script')
+      s.id = 'jsonld-article'
+      s.type = 'application/ld+json'
+      s.textContent = JSON.stringify(schema)
+      document.head.appendChild(s)
+    }
+    return () => { document.getElementById('jsonld-article')?.remove() }
+  }, [post, slug, title, excerpt])
+
   // Only redirect after both static + API data have been checked
   if (!post && apiDone) return <Navigate to="/blog" replace />
   if (!post) {

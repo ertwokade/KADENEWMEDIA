@@ -86,6 +86,48 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Kariyer Başvurusu (public, POST only) ──
+  if (action === 'apply') {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    let body = req.body;
+    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+    const { name, email, phone, position, coverLetter } = body || {};
+    if (!name?.trim() || !email?.trim() || !position?.trim()) {
+      return res.status(400).json({ error: 'Ad, e-posta ve pozisyon zorunludur.' });
+    }
+    if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
+    try {
+      const db = await getDb();
+      await db.collection('applications').insertOne({
+        name: name.trim(), email: email.trim().toLowerCase(),
+        phone: phone?.trim() || '-', position: position.trim(),
+        coverLetter: coverLetter?.trim() || '',
+        status: 'yeni', createdAt: new Date(),
+      });
+      logActivity(db, { action: 'Yeni kariyer başvurusu', detail: `${name.trim()} — ${position.trim()}`, type: 'message', icon: '💼', user: 'sistem' }).catch(() => {});
+      const transporter = makeTransporter();
+      if (transporter) {
+        const mailTo = process.env.MAIL_TO || 'thekademedia@gmail.com';
+        transporter.sendMail({
+          from: `"Kade Media Website" <${process.env.SMTP_USER}>`,
+          to: mailTo,
+          subject: `💼 Kariyer Başvurusu: ${escapeHtml(name)} — ${escapeHtml(position)}`,
+          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#fff;border-radius:12px;"><h2 style="color:#eac321;">💼 Kariyer Başvurusu</h2><table style="width:100%;border-collapse:collapse;"><tr><td style="color:#888;padding:6px 0;width:120px;">Ad Soyad</td><td style="color:#fff;font-weight:600;">${escapeHtml(name)}</td></tr><tr><td style="color:#888;padding:6px 0;">E-posta</td><td style="color:#eac321;">${escapeHtml(email)}</td></tr><tr><td style="color:#888;padding:6px 0;">Telefon</td><td style="color:#fff;">${escapeHtml(phone || '-')}</td></tr><tr><td style="color:#888;padding:6px 0;">Pozisyon</td><td style="color:#fff;">${escapeHtml(position)}</td></tr></table>${coverLetter ? `<div style="margin-top:16px;padding:14px;background:#1a1a1a;border-radius:8px;border-left:3px solid #eac321;"><p style="color:#ccc;margin:0;line-height:1.6;white-space:pre-wrap;">${escapeHtml(coverLetter)}</p></div>` : ''}</div>`,
+        }).catch(() => {});
+        transporter.sendMail({
+          from: `"Kade Media" <${process.env.SMTP_USER}>`,
+          to: email,
+          subject: 'Başvurunuz Alındı — Kade Media',
+          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px;"><h2 style="color:#eac321;">Kade Media</h2><h3>Merhaba ${escapeHtml(name)},</h3><p style="color:#ccc;line-height:1.8;"><strong style="color:#eac321;">${escapeHtml(position)}</strong> pozisyonu için başvurunuz alındı. İnceleme sonrasında sizinle iletişime geçeceğiz.</p><p style="color:#888;font-size:12px;margin-top:24px;">Kade Media | hello@kademedia.com | +90 506 729 34 23</p></div>`,
+        }).catch(() => {});
+      }
+      return res.status(200).json({ message: 'Başvurunuz başarıyla alındı!' });
+    } catch (err) {
+      console.error('Apply error:', err);
+      return res.status(500).json({ error: 'Bir hata oluştu, lütfen tekrar deneyin.' });
+    }
+  }
+
   // ── Newsletter aboneliği (public, POST only) ──
   if (action === 'newsletter') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });

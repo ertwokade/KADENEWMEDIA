@@ -24,6 +24,8 @@ export default function Blog() {
   const [blogPosts, setBlogPosts] = useState(staticBlogPosts)
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
+  const [page, setPage] = useState(1)
+  const POSTS_PER_PAGE = 6
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -46,6 +48,7 @@ export default function Blog() {
 
   const filtered = useMemo(() => {
     return blogPosts.filter(p => {
+      if (p.published === false) return false
       const title = lang === 'tr' ? p.titleTr : p.titleEn
       const excerpt = lang === 'tr' ? p.excerptTr : p.excerptEn
       const cat = lang === 'tr' ? p.category : p.categoryEn
@@ -55,10 +58,18 @@ export default function Blog() {
     })
   }, [blogPosts, search, activeCategory, lang])
 
+  // Reset page when filter/search changes
+  const totalPages = Math.ceil(Math.max(filtered.length - 1, 0) / POSTS_PER_PAGE)
+  const pagedRest = useMemo(() => {
+    const rest = filtered.slice(1)
+    const start = (page - 1) * POSTS_PER_PAGE
+    return rest.slice(start, start + POSTS_PER_PAGE)
+  }, [filtered, page, POSTS_PER_PAGE])
+
   if (blogPosts.length === 0) return null
 
-  const featured = filtered[0]
-  const rest = filtered.slice(1)
+  const featured = page === 1 ? filtered[0] : null
+  const rest = pagedRest
 
   return (
     <PageTransition>
@@ -96,7 +107,7 @@ export default function Blog() {
                   type="text"
                   placeholder={lang === 'tr' ? 'Blog yazısı ara...' : 'Search posts...'}
                   value={search}
-                  onChange={e => setSearch(e.target.value)}
+                  onChange={e => { setSearch(e.target.value); setPage(1) }}
                   className="blog-search-input"
                 />
                 {search && (
@@ -110,7 +121,7 @@ export default function Blog() {
                   <button
                     key={cat}
                     className={`blog-category-chip ${activeCategory === cat ? 'active' : ''}`}
-                    onClick={() => setActiveCategory(cat)}
+                    onClick={() => { setActiveCategory(cat); setPage(1) }}
                   >
                     {cat === 'all' ? (lang === 'tr' ? 'Tümü' : 'All') : cat}
                   </button>
@@ -204,6 +215,43 @@ export default function Blog() {
               </StaggerItem>
             ))}
           </StaggerContainer>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <FadeIn>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 40 }}>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+                >
+                  ← {lang === 'tr' ? 'Önceki' : 'Prev'}
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    style={{
+                      width: 36, height: 36, borderRadius: 8,
+                      border: `1px solid ${page === p ? 'var(--accent)' : 'var(--border)'}`,
+                      background: page === p ? 'var(--accent)' : 'transparent',
+                      color: page === p ? '#000' : 'var(--text-secondary)',
+                      cursor: 'pointer', fontWeight: 700, fontSize: '0.88rem',
+                    }}
+                  >{p}</button>
+                ))}
+                <button
+                  className="btn btn-outline"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+                >
+                  {lang === 'tr' ? 'Sonraki' : 'Next'} →
+                </button>
+              </div>
+            </FadeIn>
+          )}
             </>
           )}
 

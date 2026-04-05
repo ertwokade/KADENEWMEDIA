@@ -365,6 +365,28 @@ export async function replyToMessageApi(id, replyText, subject) {
   return handleResponse(res);
 }
 
+// Kariyer başvurusu
+export async function applyJobApi(data) {
+  const res = await fetch(`${API_BASE}/contact?action=apply`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+// Portfolio (content section)
+export async function getPortfolioApi() {
+  const res = await fetch(`${API_BASE}/content?section=portfolio`);
+  return handleResponse(res);
+}
+
+// Dynamic sitemap
+export async function getSitemapApi() {
+  const res = await fetch(`${API_BASE}/content?action=sitemap`);
+  return res.text();
+}
+
 // Site settings (stored in content collection)
 export async function getSiteSettingsApi() {
   const res = await fetch(`${API_BASE}/content?section=site-settings`);

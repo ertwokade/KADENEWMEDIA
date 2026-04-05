@@ -29,6 +29,7 @@ import {
   getNewsletterSubscribersApi, deleteNewsletterSubscriberApi,
   testSmtpApi, replyToMessageApi,
   getSiteSettingsApi, updateSiteSettingsApi,
+  getPortfolioApi,
 } from '../api'
 import './Admin.css'
 
@@ -122,11 +123,15 @@ function LoginScreen({ onLogin }) {
 // ========== DASHBOARD ==========
 function DashboardSection({ stats, onNavigate }) {
   const [recentMessages, setRecentMessages] = useState([])
+  const [allMessages, setAllMessages] = useState([])
   const [recentPartners, setRecentPartners] = useState([])
 
   useEffect(() => {
     getMessagesApi().then(data => {
-      if (Array.isArray(data)) setRecentMessages(data.slice(0, 5))
+      if (Array.isArray(data)) {
+        setAllMessages(data)
+        setRecentMessages(data.slice(0, 5))
+      }
     }).catch(() => {})
     getPartnersApi().then(data => {
       if (Array.isArray(data)) setRecentPartners(data.slice(0, 4))
@@ -142,10 +147,15 @@ function DashboardSection({ stats, onNavigate }) {
     { label: 'Portföy', icon: '📸', section: 'portfolio' },
   ]
 
-  // Mock weekly message trend data
-  const weeklyMessages = [3, 5, 2, 7, 4, 8, 6]
+  // Real weekly message trend from actual data
   const weekLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
-  const maxMsg = Math.max(...weeklyMessages)
+  const weeklyMessages = Array(7).fill(0).map((_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() - (6 - i))
+    const dateStr = d.toISOString().slice(0, 10)
+    return allMessages.filter(m => m.createdAt && new Date(m.createdAt).toISOString().slice(0, 10) === dateStr).length
+  })
+  const maxMsg = Math.max(...weeklyMessages, 1)
 
   return (
     <div>
@@ -1343,6 +1353,17 @@ function AboutEditor({ data, onSave }) {
               <input type="text" value={member.roleEn || ''} onChange={(e) => updateTeam(i, 'roleEn', e.target.value)} />
             </div>
           </div>
+          <div className="form-group"><label>Kısa Bio (TR)</label>
+            <input type="text" value={member.bioTr || ''} onChange={(e) => updateTeam(i, 'bioTr', e.target.value)} placeholder="Kısa biyografi..." />
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>LinkedIn</label>
+              <input type="url" value={member.social?.linkedin || ''} onChange={(e) => updateTeam(i, 'social', { ...(member.social || {}), linkedin: e.target.value })} placeholder="https://linkedin.com/in/..." />
+            </div>
+            <div className="form-group"><label>Instagram</label>
+              <input type="url" value={member.social?.instagram || ''} onChange={(e) => updateTeam(i, 'social', { ...(member.social || {}), instagram: e.target.value })} placeholder="https://instagram.com/..." />
+            </div>
+          </div>
         </div>
       ))}
       <div className="admin-form-actions" style={{ gap: 12 }}>
@@ -1718,6 +1739,8 @@ function MessagesSection({ showToast, onNewMessageCount }) {
   const [replyText, setReplyText] = useState('')
   const [replySubject, setReplySubject] = useState('')
   const [replySending, setReplySending] = useState(false)
+  const [selectedIds, setSelectedIds] = useState([])
+  const [bulkDeleting, setBulkDeleting] = useState(false)
 
   const loadNotes = async (messageId) => {
     setNotesLoading(true)
@@ -1812,6 +1835,22 @@ function MessagesSection({ showToast, onNewMessageCount }) {
       showToast(err.message, 'error')
     }
   }
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return
+    if (!window.confirm(`${selectedIds.length} mesajı silmek istediğinize emin misiniz?`)) return
+    setBulkDeleting(true)
+    try {
+      await Promise.all(selectedIds.map(id => deleteMessageApi(id)))
+      showToast(`${selectedIds.length} mesaj silindi!`, 'success')
+      setSelectedIds([])
+      fetchMessages()
+    } catch (err) { showToast(err.message, 'error') }
+    finally { setBulkDeleting(false) }
+  }
+
+  const toggleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  const toggleSelectAll = () => setSelectedIds(prev => prev.length === filteredMessages.length ? [] : filteredMessages.map(m => m._id))
 
   const filteredMessages = filterStatus === 'all'
     ? messages
@@ -2049,6 +2088,21 @@ function MessagesSection({ showToast, onNewMessageCount }) {
       <div className="admin-table-wrapper">
         <div className="admin-table-header">
           <h3>Mesajlar ({filteredMessages.length})</h3>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {selectedIds.length > 0 && (
+              <button
+                className="btn btn-outline"
+                style={{ color: '#E91E63', borderColor: '#E91E63', padding: '6px 14px', fontSize: '0.82rem' }}
+                onClick={handleBulkDelete}
+                disabled={bulkDeleting}
+              >
+                <HiOutlineTrash size={14} /> {bulkDeleting ? 'Siliniyor...' : `${selectedIds.length} Seçiliyi Sil`}
+              </button>
+            )}
+            <button className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesCSV(messages)} disabled={messages.length === 0}>
+              📥 CSV
+            </button>
+          </div>
         </div>
         {loading ? (
           <div className="admin-empty-state"><p>Yükleniyor...</p></div>
@@ -2061,6 +2115,9 @@ function MessagesSection({ showToast, onNewMessageCount }) {
           <table className="admin-table">
             <thead>
               <tr>
+                <th style={{ width: 36 }}>
+                  <input type="checkbox" checked={selectedIds.length === filteredMessages.length && filteredMessages.length > 0} onChange={toggleSelectAll} style={{ cursor: 'pointer' }} />
+                </th>
                 <th>Lead Durumu</th>
                 <th>Ad</th>
                 <th>E-posta</th>
@@ -2072,6 +2129,9 @@ function MessagesSection({ showToast, onNewMessageCount }) {
             <tbody>
               {filteredMessages.map((msg) => (
                 <tr key={msg._id} className={!msg.read ? 'message-unread' : ''}>
+                  <td onClick={e => e.stopPropagation()}>
+                    <input type="checkbox" checked={selectedIds.includes(msg._id)} onChange={() => toggleSelect(msg._id)} style={{ cursor: 'pointer' }} />
+                  </td>
                   <td>
                     <LeadStatusBadge status={msg.status || 'yeni'} />
                   </td>
@@ -3407,15 +3467,31 @@ function AnalyticsSection() {
 }
 
 // ========== PORTFOLIO MANAGEMENT ==========
+const DEFAULT_PORTFOLIO = [
+  { id: 1, titleTr: 'Flavora Sosyal Medya Kampanyası', titleEn: 'Flavora Social Media Campaign', category: 'Social Media', partner: 'Flavora', emoji: '🍕', color: '#FFD700', metricKey: 'reach', metricVal: '2M+' },
+  { id: 2, titleTr: 'TechVibe Ürün Lansmanı', titleEn: 'TechVibe Product Launch', category: 'Launch', partner: 'TechVibe', emoji: '💻', color: '#6C63FF', metricKey: 'downloads', metricVal: '500K+' },
+  { id: 3, titleTr: 'GreenLife E-Ticaret Büyümesi', titleEn: 'GreenLife E-Commerce Growth', category: 'E-Commerce', partner: 'GreenLife', emoji: '🌿', color: '#2ECC71', metricKey: 'sales', metricVal: '%400' },
+]
+
 function PortfolioSection({ showToast }) {
-  const [items, setItems] = useState([
-    { id: 1, titleTr: 'Flavora Sosyal Medya Kampanyası', titleEn: 'Flavora Social Media Campaign', category: 'Social Media', partner: 'Flavora', emoji: '🍕', color: '#FFD700', metricKey: 'reach', metricVal: '2M+' },
-    { id: 2, titleTr: 'TechVibe Ürün Lansmanı', titleEn: 'TechVibe Product Launch', category: 'Launch', partner: 'TechVibe', emoji: '💻', color: '#6C63FF', metricKey: 'downloads', metricVal: '500K+' },
-    { id: 3, titleTr: 'GreenLife E-Ticaret Büyümesi', titleEn: 'GreenLife E-Commerce Growth', category: 'E-Commerce', partner: 'GreenLife', emoji: '🌿', color: '#2ECC71', metricKey: 'sales', metricVal: '%400' },
-  ])
+  const [items, setItems] = useState(DEFAULT_PORTFOLIO)
+  const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({ titleTr: '', titleEn: '', category: '', partner: '', emoji: '📸', color: '#eac321', metricKey: '', metricVal: '' })
+
+  useEffect(() => {
+    getPortfolioApi()
+      .then(res => { if (res?.data?.items?.length) setItems(res.data.items) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  const saveToDb = async (updatedItems) => {
+    try {
+      await updateContentApi('portfolio', { items: updatedItems })
+    } catch (err) { showToast(err.message, 'error') }
+  }
 
   const resetForm = () => { setForm({ titleTr: '', titleEn: '', category: '', partner: '', emoji: '📸', color: '#eac321', metricKey: '', metricVal: '' }); setEditing(null); setShowForm(false) }
 
@@ -3425,21 +3501,26 @@ function PortfolioSection({ showToast }) {
     setShowForm(true)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.titleTr) { showToast('Başlık zorunludur', 'error'); return }
+    let updated
     if (editing) {
-      setItems(prev => prev.map(i => i.id === editing.id ? { ...i, ...form } : i))
+      updated = items.map(i => i.id === editing.id ? { ...i, ...form } : i)
       showToast('Portfolyo öğesi güncellendi!', 'success')
     } else {
-      setItems(prev => [...prev, { id: Date.now(), ...form }])
+      updated = [...items, { id: Date.now(), ...form }]
       showToast('Portfolyo öğesi eklendi!', 'success')
     }
+    setItems(updated)
+    await saveToDb(updated)
     resetForm()
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm('Bu öğeyi silmek istediğinize emin misiniz?')) return
-    setItems(prev => prev.filter(i => i.id !== id))
+    const updated = items.filter(i => i.id !== id)
+    setItems(updated)
+    await saveToDb(updated)
     showToast('Portfolyo öğesi silindi!', 'success')
   }
 
