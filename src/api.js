@@ -30,7 +30,7 @@ async function handleResponse(res) {
 
 // Auth
 export async function loginApi(username, password) {
-  const res = await fetch(`${API_BASE}/auth/login`, {
+  const res = await fetch(`${API_BASE}/auth`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
@@ -39,7 +39,7 @@ export async function loginApi(username, password) {
 }
 
 export async function changePasswordApi(currentPassword, newPassword) {
-  const res = await fetch(`${API_BASE}/auth/change-password`, {
+  const res = await fetch(`${API_BASE}/auth?action=change-password`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({ currentPassword, newPassword }),
@@ -227,7 +227,7 @@ export async function seedApi(secret) {
 
 // Newsletter
 export async function subscribeNewsletterApi(email) {
-  const res = await fetch(`${API_BASE}/newsletter`, {
+  const res = await fetch(`${API_BASE}/contact?action=newsletter`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),

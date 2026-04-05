@@ -21,6 +21,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Newsletter subscription handler
+  const action = req.query?.action;
+  if (action === 'newsletter') {
+    return handleNewsletter(req, res);
+  }
+
   // Rate limiting
   const rl = rateLimitCheck(req);
   if (!rl.allowed) {
@@ -182,5 +188,35 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Contact error:', error);
     return res.status(500).json({ error: 'Mesaj gönderilirken bir hata oluştu' });
+  }
+}
+
+// ========== NEWSLETTER HANDLER ==========
+async function handleNewsletter(req, res) {
+  const { email } = req.body || {};
+
+  if (!email || !EMAIL_RE.test(email)) {
+    return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
+  }
+
+  try {
+    const db = await getDb();
+    const collection = db.collection('newsletter');
+
+    const existing = await collection.findOne({ email: email.toLowerCase() });
+    if (existing) {
+      return res.status(200).json({ message: 'Bu e-posta zaten kayıtlı.' });
+    }
+
+    await collection.insertOne({
+      email: email.toLowerCase(),
+      createdAt: new Date(),
+      source: 'website',
+    });
+
+    return res.status(200).json({ message: 'Aboneliğiniz başarıyla oluşturuldu!' });
+  } catch (err) {
+    console.error('Newsletter error:', err);
+    return res.status(500).json({ error: 'Bir hata oluştu, lütfen tekrar deneyin.' });
   }
 }
