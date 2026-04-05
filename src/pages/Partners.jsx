@@ -9,6 +9,7 @@ import { getPartnersApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import PageHeroCanvas from '../components/PageHeroCanvas'
 import './Partners.css'
 
 export default function Partners() {
@@ -37,6 +38,7 @@ export default function Partners() {
 
   return (
     <PageTransition>
+      <PageHeroCanvas type="partners" />
       <section className="partners-hero">
         <PageBgAnimation type="partners" />
         <div className="grid-bg" />

@@ -19,6 +19,7 @@ import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import PageHeroCanvas from '../components/PageHeroCanvas'
 import './Services.css'
 
 const iconMap = {
@@ -121,6 +122,7 @@ export default function Services() {
 
   return (
     <PageTransition>
+      <PageHeroCanvas type="services" />
       {/* Hero */}
       <section className="services-hero">
         <PageBgAnimation type="services" />

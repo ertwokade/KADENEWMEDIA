@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   HiOutlineLogin, HiOutlineLogout, HiOutlineHome,
@@ -7,7 +7,10 @@ import {
   HiOutlinePlus, HiOutlineSave, HiOutlineEye,
   HiOutlineX, HiOutlineMenuAlt3, HiOutlineDatabase,
   HiOutlineKey, HiOutlineCheck, HiOutlinePencil,
-  HiOutlineCalendar,
+  HiOutlineCalendar, HiOutlineBell, HiOutlineMoon,
+  HiOutlineSun, HiOutlineChartBar, HiOutlineViewBoards,
+  HiOutlineMenuAlt2, HiOutlinePhone, HiOutlineAnnotation,
+  HiOutlineChatAlt2, HiOutlineChevronLeft,
 } from 'react-icons/hi'
 import PageTransition from '../components/PageTransition'
 import {
@@ -20,20 +23,27 @@ import {
   sendCalendarInviteApi,
   seedApi,
   updateMessageStatusApi,
+  getNotesApi, createNoteApi, deleteNoteApi,
+  getNotificationsApi, markNotificationReadApi, markAllNotificationsReadApi, deleteNotificationApi,
 } from '../api'
 import './Admin.css'
 
 // Local mode is no longer supported — always returns false
 function isLocalMode() { return false }
 
-// Toast component
+// Toast component with progress bar
 function Toast({ message, type, onClose }) {
   useEffect(() => {
     const timer = setTimeout(onClose, 3000)
     return () => clearTimeout(timer)
   }, [onClose])
 
-  return <div className={`admin-toast ${type}`}>{message}</div>
+  return (
+    <div className={`admin-toast ${type}`}>
+      {type === 'success' ? '✓' : '✕'} {message}
+      <div className="toast-progress" />
+    </div>
+  )
 }
 
 // ========== LOGIN SCREEN ==========
@@ -60,61 +70,62 @@ function LoginScreen({ onLogin }) {
   }
 
   return (
-    <PageTransition>
-      <div className="admin-login-container">
-        <div className="grid-bg" />
-        <motion.div
-          className="admin-login-card glass-card"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="admin-logo">kade<span>admin</span></div>
-          <h2>Yönetici Girişi</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="username">Kullanıcı Adı</label>
-              <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Kullanıcı adınız..."
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Şifre</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Şifrenizi girin..."
-                className={error ? 'error' : ''}
-                required
-              />
-              {error && <span className="error-text">{error}</span>}
-            </div>
-            <button type="submit" className="btn btn-primary login-btn" disabled={loading}>
-              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'} <HiOutlineLogin size={18} />
-            </button>
-          </form>
-        </motion.div>
-      </div>
-    </PageTransition>
+    <div className={`admin-login-container ${localStorage.getItem('kade_admin_dark') === 'true' ? 'dark' : ''}`}>
+      <div className="login-bg-pattern" />
+      <div className="login-grid-overlay" />
+      <motion.div
+        className="admin-login-card"
+        initial={{ opacity: 0, y: 30, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
+        <div className="admin-logo">kade<span>admin</span></div>
+        <h2>Yönetici Girişi</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">Kullanıcı Adı</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Kullanıcı adınız..."
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Şifre</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Şifrenizi girin..."
+              className={error ? 'error' : ''}
+              required
+            />
+            {error && <span className="error-text">{error}</span>}
+          </div>
+          <button type="submit" className="btn btn-primary login-btn" disabled={loading}>
+            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'} <HiOutlineLogin size={18} />
+          </button>
+        </form>
+      </motion.div>
+    </div>
   )
 }
 
 // ========== DASHBOARD ==========
 function DashboardSection({ stats, onNavigate }) {
   const [recentMessages, setRecentMessages] = useState([])
+  const [recentPartners, setRecentPartners] = useState([])
 
   useEffect(() => {
     getMessagesApi().then(data => {
-      if (Array.isArray(data)) {
-        setRecentMessages(data.slice(0, 5))
-      }
+      if (Array.isArray(data)) setRecentMessages(data.slice(0, 5))
+    }).catch(() => {})
+    getPartnersApi().then(data => {
+      if (Array.isArray(data)) setRecentPartners(data.slice(0, 4))
     }).catch(() => {})
   }, [])
 
@@ -123,9 +134,14 @@ function DashboardSection({ stats, onNavigate }) {
     { label: 'Mesajları Gör', icon: '✉️', section: 'messages' },
     { label: 'İçerik Düzenle', icon: '✏️', section: 'content' },
     { label: 'Takvimi Aç', icon: '📅', section: 'calendar' },
-    { label: 'Partner Ekle', icon: '🤝', section: 'partners' },
-    { label: 'Kullanıcılar', icon: '👤', section: 'users' },
+    { label: 'Analitik', icon: '📊', section: 'analytics' },
+    { label: 'Portföy', icon: '📸', section: 'portfolio' },
   ]
+
+  // Mock weekly message trend data
+  const weeklyMessages = [3, 5, 2, 7, 4, 8, 6]
+  const weekLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+  const maxMsg = Math.max(...weeklyMessages)
 
   return (
     <div>
@@ -169,6 +185,57 @@ function DashboardSection({ stats, onNavigate }) {
             {a.label}
           </button>
         ))}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20 }}>
+        {/* Weekly Message Trend Chart */}
+        <div className="admin-form">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h3>📈 Haftalık Mesaj Trendi</h3>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>Son 7 gün</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 120 }}>
+            {weeklyMessages.map((val, i) => (
+              <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>{val}</span>
+                <div
+                  style={{
+                    width: '100%', maxWidth: 32,
+                    height: `${Math.max((val / maxMsg) * 80, 8)}px`,
+                    background: 'linear-gradient(180deg, #eac321 0%, rgba(234,195,33,0.25) 100%)',
+                    borderRadius: '4px 4px 2px 2px',
+                    transition: 'height 0.4s ease',
+                  }}
+                />
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)' }}>{weekLabels[i]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Partners Widget */}
+        <div className="admin-form">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h3>🤝 Son Eklenen Partnerler</h3>
+            <button className="btn btn-outline" style={{ padding: '4px 10px', fontSize: '0.75rem' }} onClick={() => onNavigate('partners')}>Tümü →</button>
+          </div>
+          {recentPartners.length === 0 ? (
+            <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.85rem' }}>Henüz partner yok</div>
+          ) : recentPartners.map((p, i) => (
+            <div key={p._id || i} style={{
+              display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0',
+              borderBottom: i < recentPartners.length - 1 ? '1px solid var(--border)' : 'none',
+            }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: `${p.color || '#eac321'}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>
+                {p.logo || '🤝'}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{p.name}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{p.category || '—'}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {recentMessages.length > 0 && (
@@ -1587,6 +1654,37 @@ function MessagesSection({ showToast, onNewMessageCount }) {
   const [loading, setLoading] = useState(true)
   const [selectedMessage, setSelectedMessage] = useState(null)
   const [filterStatus, setFilterStatus] = useState('all')
+  const [viewMode, setViewMode] = useState('table') // 'table' | 'kanban'
+  const [notes, setNotes] = useState([])
+  const [noteText, setNoteText] = useState('')
+  const [noteType, setNoteType] = useState('note')
+  const [notesLoading, setNotesLoading] = useState(false)
+
+  const loadNotes = async (messageId) => {
+    setNotesLoading(true)
+    try {
+      const data = await getNotesApi(messageId)
+      setNotes(Array.isArray(data) ? data : [])
+    } catch { setNotes([]) }
+    finally { setNotesLoading(false) }
+  }
+
+  const handleAddNote = async () => {
+    if (!noteText.trim() || !selectedMessage) return
+    try {
+      await createNoteApi({ messageId: selectedMessage._id, text: noteText, type: noteType })
+      setNoteText('')
+      loadNotes(selectedMessage._id)
+      showToast('Not eklendi!', 'success')
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const handleDeleteNote = async (id) => {
+    try {
+      await deleteNoteApi(id)
+      setNotes(prev => prev.filter(n => n._id !== id))
+    } catch (err) { showToast(err.message, 'error') }
+  }
 
   const fetchMessages = async () => {
     try {
@@ -1606,6 +1704,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
 
   const handleRead = async (msg) => {
     setSelectedMessage(msg)
+    loadNotes(msg._id)
     if (!msg.read) {
       try {
         await markMessageReadApi(msg._id)
@@ -1654,9 +1753,19 @@ function MessagesSection({ showToast, onNewMessageCount }) {
           <h1>İletişim <span>& CRM</span></h1>
           <p>Leadleri takip edin, durumlarını güncelleyin</p>
         </div>
-        <button className="btn btn-outline export-btn" onClick={() => exportMessagesCSV(messages)} disabled={messages.length === 0}>
-          📥 CSV İndir
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div className="view-toggle">
+            <button className={viewMode === 'table' ? 'active' : ''} onClick={() => setViewMode('table')}>
+              <HiOutlineMenuAlt2 size={14} /> Tablo
+            </button>
+            <button className={viewMode === 'kanban' ? 'active' : ''} onClick={() => setViewMode('kanban')}>
+              <HiOutlineViewBoards size={14} /> Kanban
+            </button>
+          </div>
+          <button className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesCSV(messages)} disabled={messages.length === 0}>
+            📥 CSV İndir
+          </button>
+        </div>
       </div>
 
       {/* CRM Status Counters */}
@@ -1717,8 +1826,44 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                   {new Date(selectedMessage.createdAt).toLocaleString('tr-TR')}
                 </div>
               </div>
+
+              {/* Notes Timeline */}
+              <div style={{ marginTop: 20, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 12 }}>📝 Notlar</h4>
+                <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                  <select value={noteType} onChange={e => setNoteType(e.target.value)} style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}>
+                    <option value="note">📝 Not</option>
+                    <option value="call">📞 Telefon</option>
+                    <option value="email">✉️ E-posta</option>
+                    <option value="meeting">🤝 Toplantı</option>
+                  </select>
+                  <input type="text" value={noteText} onChange={e => setNoteText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleAddNote() }} placeholder="Not ekle..." style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.85rem', fontFamily: 'var(--font)' }} />
+                  <button className="btn btn-primary" style={{ padding: '8px 14px' }} onClick={handleAddNote}><HiOutlinePlus size={16} /></button>
+                </div>
+                {notesLoading ? (
+                  <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.82rem', padding: 12 }}>Yükleniyor...</div>
+                ) : notes.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.82rem', padding: 12 }}>Henüz not eklenmemiş</div>
+                ) : (
+                  <div className="notes-timeline">
+                    {notes.map(n => (
+                      <div key={n._id} className="note-item">
+                        <div className="note-header">
+                          <span className="note-type-badge" style={{ background: n.type === 'call' ? 'rgba(46,204,113,0.15)' : n.type === 'email' ? 'rgba(108,99,255,0.15)' : n.type === 'meeting' ? 'rgba(234,195,33,0.15)' : 'rgba(156,163,175,0.15)', color: n.type === 'call' ? '#2ECC71' : n.type === 'email' ? '#6C63FF' : n.type === 'meeting' ? '#EAC321' : 'var(--text-tertiary)' }}>
+                            {n.type === 'call' ? '📞' : n.type === 'email' ? '✉️' : n.type === 'meeting' ? '🤝' : '📝'} {n.type === 'call' ? 'Telefon' : n.type === 'email' ? 'E-posta' : n.type === 'meeting' ? 'Toplantı' : 'Not'}
+                          </span>
+                          <button className="btn-icon danger" onClick={() => handleDeleteNote(n._id)} style={{ width: 24, height: 24, fontSize: '0.7rem' }}>✕</button>
+                        </div>
+                        <div className="note-text">{n.text}</div>
+                        <div className="note-meta">{n.createdBy} · {n.createdAt ? new Date(n.createdAt).toLocaleString('tr-TR') : ''}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="admin-form-actions" style={{ marginTop: 16 }}>
-                <button className="btn btn-outline" style={{ color: '#ff4444', borderColor: '#ff4444' }} onClick={() => handleDelete(selectedMessage._id)}>
+                <button className="btn btn-outline" style={{ color: '#EF4444', borderColor: '#EF4444' }} onClick={() => handleDelete(selectedMessage._id)}>
                   <HiOutlineTrash size={16} /> Sil
                 </button>
                 <a href={`mailto:${selectedMessage.email}`} className="btn btn-primary">
@@ -1730,6 +1875,43 @@ function MessagesSection({ showToast, onNewMessageCount }) {
         )}
       </AnimatePresence>
 
+      {/* Kanban View */}
+      {viewMode === 'kanban' && (
+        <div className="kanban-board">
+          {LEAD_STATUSES.map(status => {
+            const columnMessages = messages.filter(m => (m.status || 'yeni') === status.value)
+            return (
+              <div key={status.value} className="kanban-column">
+                <div className="kanban-column-header">
+                  <div className="kanban-column-title" style={{ color: status.color }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: status.color, display: 'inline-block' }} />
+                    {status.label}
+                  </div>
+                  <span className="kanban-column-count" style={{ background: `${status.color}15`, color: status.color }}>{columnMessages.length}</span>
+                </div>
+                <div className="kanban-cards">
+                  {columnMessages.map(msg => (
+                    <div key={msg._id} className="kanban-card" onClick={() => handleRead(msg)}>
+                      <div className="kanban-card-name">{msg.name}</div>
+                      <div className="kanban-card-company">{msg.company && msg.company !== '-' ? msg.company : ''}</div>
+                      <div className="kanban-card-meta">
+                        {msg.service && msg.service !== '-' && <span className="kanban-card-service">{msg.service}</span>}
+                        <span>{msg.createdAt ? new Date(msg.createdAt).toLocaleDateString('tr-TR') : ''}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {columnMessages.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: 20, color: 'var(--text-tertiary)', fontSize: '0.78rem' }}>Boş</div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Table View */}
+      {viewMode === 'table' && (
       <div className="admin-table-wrapper">
         <div className="admin-table-header">
           <h3>Mesajlar ({filteredMessages.length})</h3>
@@ -1781,6 +1963,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
           </table>
         )}
       </div>
+      )}
     </div>
   )
 }
@@ -2746,6 +2929,433 @@ function UsersSection({ showToast }) {
   )
 }
 
+// ========== NOTIFICATION DROPDOWN ==========
+function NotificationDropdown({ show, onClose }) {
+  const [notifications, setNotifications] = useState([])
+  const [loading, setLoading] = useState(true)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (show) {
+      setLoading(true)
+      getNotificationsApi()
+        .then(data => setNotifications(Array.isArray(data) ? data : []))
+        .catch(() => setNotifications([]))
+        .finally(() => setLoading(false))
+    }
+  }, [show])
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) onClose()
+    }
+    if (show) document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [show, onClose])
+
+  const handleMarkAllRead = async () => {
+    await markAllNotificationsReadApi().catch(() => {})
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+  }
+
+  const typeIcons = { message: '✉️', calendar: '📅', system: '⚙️', info: 'ℹ️' }
+
+  if (!show) return null
+
+  return (
+    <div className="notification-dropdown" ref={ref}>
+      <div className="notification-header">
+        <h4>Bildirimler</h4>
+        {notifications.some(n => !n.read) && (
+          <button className="btn btn-outline" style={{ padding: '4px 10px', fontSize: '0.72rem' }} onClick={handleMarkAllRead}>
+            Tümünü Okundu Yap
+          </button>
+        )}
+      </div>
+      <div className="notification-list">
+        {loading ? (
+          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.85rem' }}>Yükleniyor...</div>
+        ) : notifications.length === 0 ? (
+          <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.85rem' }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: 8, opacity: 0.5 }}>🔔</div>
+            Bildirim yok
+          </div>
+        ) : notifications.slice(0, 15).map(n => (
+          <div key={n._id} className={`notification-item ${!n.read ? 'unread' : ''}`}>
+            <div className="notification-icon-wrap" style={{ background: 'var(--accent-alpha)' }}>
+              {typeIcons[n.type] || 'ℹ️'}
+            </div>
+            <div className="notification-content">
+              <div className="notification-title">{n.title}</div>
+              <div className="notification-message">{n.message}</div>
+              <div className="notification-time">{n.createdAt ? new Date(n.createdAt).toLocaleString('tr-TR') : ''}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ========== ANALYTICS SECTION ==========
+function AnalyticsSection() {
+  const [period, setPeriod] = useState('week')
+
+  // Mock analytics data
+  const weeklyVisits = [320, 450, 280, 510, 390, 620, 480]
+  const weekLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+  const monthlyVisits = [2100, 2800, 3200, 2500, 3800, 4200, 3100, 3900, 4500, 3600, 4800, 5200]
+  const monthLabels = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+
+  const data = period === 'week' ? weeklyVisits : monthlyVisits
+  const labels = period === 'week' ? weekLabels : monthLabels
+  const maxVal = Math.max(...data)
+
+  const pageStats = [
+    { page: 'Ana Sayfa', views: 12450, percent: 100 },
+    { page: 'Hizmetler', views: 4320, percent: 35 },
+    { page: 'Paketler', views: 3890, percent: 31 },
+    { page: 'Blog', views: 2950, percent: 24 },
+    { page: 'İletişim', views: 2100, percent: 17 },
+    { page: 'Hakkımızda', views: 1850, percent: 15 },
+  ]
+
+  const channelData = [
+    { name: 'Organik', value: 42, color: '#2ECC71' },
+    { name: 'Sosyal Medya', value: 28, color: '#6C63FF' },
+    { name: 'Direkt', value: 18, color: '#eac321' },
+    { name: 'Referans', value: 12, color: '#E91E63' },
+  ]
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Analitik <span>Paneli</span></h1>
+          <p>Site performansı ve ziyaretçi istatistikleri</p>
+        </div>
+        <div className="admin-tabs" style={{ margin: 0 }}>
+          <button className={`admin-tab ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>Haftalık</button>
+          <button className={`admin-tab ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>Aylık</button>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.10)', color: '#6C63FF' }}>👁️</div>
+          <div className="stat-number">{period === 'week' ? '3.05K' : '42.3K'}</div>
+          <div className="stat-label">Toplam Ziyaret</div>
+          <div style={{ fontSize: '0.75rem', color: '#2ECC71', marginTop: 4 }}>↑ 12.5%</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="stat-icon" style={{ background: 'rgba(234, 195, 33, 0.10)', color: '#eac321' }}>👤</div>
+          <div className="stat-number">{period === 'week' ? '1.2K' : '15.8K'}</div>
+          <div className="stat-label">Tekil Ziyaretçi</div>
+          <div style={{ fontSize: '0.75rem', color: '#2ECC71', marginTop: 4 }}>↑ 8.3%</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>⏱️</div>
+          <div className="stat-number">2:45</div>
+          <div className="stat-label">Ort. Oturum Süresi</div>
+          <div style={{ fontSize: '0.75rem', color: '#2ECC71', marginTop: 4 }}>↑ 5.1%</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>📊</div>
+          <div className="stat-number">32%</div>
+          <div className="stat-label">Hemen Çıkma Oranı</div>
+          <div style={{ fontSize: '0.75rem', color: '#2ECC71', marginTop: 4 }}>↓ 3.2%</div>
+        </div>
+      </div>
+
+      {/* Bar Chart */}
+      <div className="admin-form" style={{ marginTop: 24 }}>
+        <h3>📈 Ziyaret Trendi ({period === 'week' ? 'Son 7 Gün' : 'Son 12 Ay'})</h3>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 200, marginTop: 20, padding: '0 8px' }}>
+          {data.map((val, i) => (
+            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>{val}</span>
+              <div
+                style={{
+                  width: '100%',
+                  maxWidth: 40,
+                  height: `${(val / maxVal) * 150}px`,
+                  background: `linear-gradient(180deg, #eac321 0%, rgba(234,195,33,0.3) 100%)`,
+                  borderRadius: '6px 6px 2px 2px',
+                  transition: 'height 0.5s ease',
+                }}
+              />
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>{labels[i]}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20 }}>
+        {/* Popular Pages */}
+        <div className="admin-form">
+          <h3>🏆 En Popüler Sayfalar</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+            {pageStats.map((p, i) => (
+              <div key={i}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{p.page}</span>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.views.toLocaleString()}</span>
+                </div>
+                <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ width: `${p.percent}%`, height: '100%', background: 'var(--accent)', borderRadius: 3, transition: 'width 0.5s ease' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Traffic Channels */}
+        <div className="admin-form">
+          <h3>🌐 Trafik Kaynakları</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
+            {channelData.map((ch, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 12, height: 12, borderRadius: '50%', background: ch.color, flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{ch.name}</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: ch.color }}>%{ch.value}</span>
+                  </div>
+                  <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
+                    <div style={{ width: `${ch.value}%`, height: '100%', background: ch.color, borderRadius: 3 }} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ========== PORTFOLIO MANAGEMENT ==========
+function PortfolioSection({ showToast }) {
+  const [items, setItems] = useState([
+    { id: 1, titleTr: 'Flavora Sosyal Medya Kampanyası', titleEn: 'Flavora Social Media Campaign', category: 'Social Media', partner: 'Flavora', emoji: '🍕', color: '#FFD700', metricKey: 'reach', metricVal: '2M+' },
+    { id: 2, titleTr: 'TechVibe Ürün Lansmanı', titleEn: 'TechVibe Product Launch', category: 'Launch', partner: 'TechVibe', emoji: '💻', color: '#6C63FF', metricKey: 'downloads', metricVal: '500K+' },
+    { id: 3, titleTr: 'GreenLife E-Ticaret Büyümesi', titleEn: 'GreenLife E-Commerce Growth', category: 'E-Commerce', partner: 'GreenLife', emoji: '🌿', color: '#2ECC71', metricKey: 'sales', metricVal: '%400' },
+  ])
+  const [showForm, setShowForm] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState({ titleTr: '', titleEn: '', category: '', partner: '', emoji: '📸', color: '#eac321', metricKey: '', metricVal: '' })
+
+  const resetForm = () => { setForm({ titleTr: '', titleEn: '', category: '', partner: '', emoji: '📸', color: '#eac321', metricKey: '', metricVal: '' }); setEditing(null); setShowForm(false) }
+
+  const handleEdit = (item) => {
+    setForm({ titleTr: item.titleTr, titleEn: item.titleEn, category: item.category, partner: item.partner, emoji: item.emoji, color: item.color, metricKey: item.metricKey, metricVal: item.metricVal })
+    setEditing(item)
+    setShowForm(true)
+  }
+
+  const handleSave = () => {
+    if (!form.titleTr) { showToast('Başlık zorunludur', 'error'); return }
+    if (editing) {
+      setItems(prev => prev.map(i => i.id === editing.id ? { ...i, ...form } : i))
+      showToast('Portfolyo öğesi güncellendi!', 'success')
+    } else {
+      setItems(prev => [...prev, { id: Date.now(), ...form }])
+      showToast('Portfolyo öğesi eklendi!', 'success')
+    }
+    resetForm()
+  }
+
+  const handleDelete = (id) => {
+    if (!window.confirm('Bu öğeyi silmek istediğinize emin misiniz?')) return
+    setItems(prev => prev.filter(i => i.id !== id))
+    showToast('Portfolyo öğesi silindi!', 'success')
+  }
+
+  const emojis = ['📸', '🍕', '💻', '🌿', '👗', '🐾', '💪', '🎬', '🎨', '🚀', '📱', '🛒']
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Portföy <span>Yönetimi</span></h1>
+          <p>Başarı hikayelerinizi yönetin</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
+          <HiOutlinePlus size={18} /> Yeni Proje
+        </button>
+      </div>
+
+      {/* Form Modal */}
+      <AnimatePresence>
+        {showForm && (
+          <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
+            <motion.div className="admin-modal" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={e => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <h3>{editing ? 'Projeyi Düzenle' : 'Yeni Proje Ekle'}</h3>
+                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+              </div>
+              <div className="admin-form" style={{ border: 'none', padding: 0 }}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Başlık (TR) *</label>
+                    <input type="text" value={form.titleTr} onChange={e => setForm({ ...form, titleTr: e.target.value })} placeholder="Proje başlığı..." />
+                  </div>
+                  <div className="form-group">
+                    <label>Başlık (EN)</label>
+                    <input type="text" value={form.titleEn} onChange={e => setForm({ ...form, titleEn: e.target.value })} placeholder="Project title..." />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Kategori</label>
+                    <input type="text" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Social Media" />
+                  </div>
+                  <div className="form-group">
+                    <label>Partner</label>
+                    <input type="text" value={form.partner} onChange={e => setForm({ ...form, partner: e.target.value })} placeholder="Marka adı" />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Ana Metrik Adı</label>
+                    <input type="text" value={form.metricKey} onChange={e => setForm({ ...form, metricKey: e.target.value })} placeholder="reach, sales, followers..." />
+                  </div>
+                  <div className="form-group">
+                    <label>Ana Metrik Değeri</label>
+                    <input type="text" value={form.metricVal} onChange={e => setForm({ ...form, metricVal: e.target.value })} placeholder="2M+, %400..." />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>İkon</label>
+                  <div className="emoji-grid">
+                    {emojis.map(e => (
+                      <button key={e} type="button" className={`emoji-btn ${form.emoji === e ? 'selected' : ''}`} onClick={() => setForm({ ...form, emoji: e })}>{e}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="admin-form-actions">
+                  <button className="btn btn-outline" onClick={resetForm}>İptal</button>
+                  <button className="btn btn-primary" onClick={handleSave}><HiOutlineSave size={16} /> {editing ? 'Güncelle' : 'Ekle'}</button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Portfolio List */}
+      <div className="admin-table-wrapper">
+        <div className="admin-table-header"><h3>Tüm Projeler ({items.length})</h3></div>
+        {items.length === 0 ? (
+          <div className="admin-empty-state">
+            <div className="empty-icon">📸</div>
+            <h3>Henüz portfolyo öğesi yok</h3>
+            <p>Yeni bir proje ekleyerek başlayın</p>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead><tr><th>İkon</th><th>Başlık</th><th>Kategori</th><th>Partner</th><th>Metrik</th><th>İşlem</th></tr></thead>
+            <tbody>
+              {items.map(item => (
+                <tr key={item.id}>
+                  <td><span style={{ fontSize: '1.5rem' }}>{item.emoji}</span></td>
+                  <td><strong>{item.titleTr}</strong></td>
+                  <td><span className="status-badge" style={{ background: `${item.color}20`, color: item.color }}>{item.category}</span></td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{item.partner}</td>
+                  <td><span style={{ fontWeight: 700, color: item.color }}>{item.metricVal}</span> <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{item.metricKey}</span></td>
+                  <td>
+                    <div className="table-actions">
+                      <button className="table-action-btn" onClick={() => handleEdit(item)}><HiOutlinePencil size={14} /> Düzenle</button>
+                      <button className="table-action-btn danger" onClick={() => handleDelete(item.id)}><HiOutlineTrash size={14} /> Sil</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ========== ACTIVITY LOG ==========
+function ActivityLogSection() {
+  const [logs] = useState([
+    { id: 1, action: 'Blog yazısı oluşturuldu', detail: '"Instagram Algoritması 2025"', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 15), type: 'create', icon: '📝' },
+    { id: 2, action: 'Yeni mesaj alındı', detail: 'Ahmet Yılmaz - Teklif talebi', user: 'sistem', time: new Date(Date.now() - 1000 * 60 * 45), type: 'message', icon: '✉️' },
+    { id: 3, action: 'Partner güncellendi', detail: 'Flavora - Metrikler güncellendi', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 120), type: 'update', icon: '🤝' },
+    { id: 4, action: 'Kullanıcı oluşturuldu', detail: 'editor - Editor rolü', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 180), type: 'create', icon: '👤' },
+    { id: 5, action: 'İçerik güncellendi', detail: 'Hero section metinleri', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 240), type: 'update', icon: '✏️' },
+    { id: 6, action: 'Blog yazısı silindi', detail: '"Eski Yazı"', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 360), type: 'delete', icon: '🗑️' },
+    { id: 7, action: 'Yeni mesaj alındı', detail: 'Zeynep Kara - Sosyal medya paketi', user: 'sistem', time: new Date(Date.now() - 1000 * 60 * 420), type: 'message', icon: '✉️' },
+    { id: 8, action: 'Paket fiyatları güncellendi', detail: 'Pro paket - ₺18.500', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 600), type: 'update', icon: '💰' },
+    { id: 9, action: 'Partner eklendi', detail: 'TechVibe - Teknoloji', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 720), type: 'create', icon: '🤝' },
+    { id: 10, action: 'Sistem güncellemesi', detail: 'Veritabanı bakımı tamamlandı', user: 'sistem', time: new Date(Date.now() - 1000 * 60 * 1440), type: 'system', icon: '⚙️' },
+  ])
+
+  const [filter, setFilter] = useState('all')
+  const filtered = filter === 'all' ? logs : logs.filter(l => l.type === filter)
+
+  const formatTime = (date) => {
+    const diff = Date.now() - date.getTime()
+    const mins = Math.floor(diff / 60000)
+    if (mins < 60) return `${mins} dk önce`
+    const hours = Math.floor(mins / 60)
+    if (hours < 24) return `${hours} saat önce`
+    return `${Math.floor(hours / 24)} gün önce`
+  }
+
+  const typeColors = { create: '#2ECC71', update: '#eac321', delete: '#E91E63', message: '#6C63FF', system: '#607D8B' }
+  const typeLabels = { create: 'Oluşturma', update: 'Güncelleme', delete: 'Silme', message: 'Mesaj', system: 'Sistem' }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Aktivite <span>Logu</span></h1>
+          <p>Panelde yapılan son işlemler</p>
+        </div>
+      </div>
+
+      <div className="admin-tabs" style={{ marginBottom: 20 }}>
+        {['all', 'create', 'update', 'delete', 'message', 'system'].map(t => (
+          <button key={t} className={`admin-tab ${filter === t ? 'active' : ''}`} onClick={() => setFilter(t)}>
+            {t === 'all' ? 'Tümü' : typeLabels[t]}
+          </button>
+        ))}
+      </div>
+
+      <div className="admin-form" style={{ padding: 0 }}>
+        {filtered.length === 0 ? (
+          <div className="admin-empty-state"><p>Bu kategoride log bulunamadı.</p></div>
+        ) : filtered.map((log, i) => (
+          <div key={log.id} style={{
+            display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px',
+            borderBottom: i < filtered.length - 1 ? '1px solid var(--border)' : 'none',
+          }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: `${typeColors[log.type]}15`, fontSize: '1.1rem', flexShrink: 0,
+            }}>{log.icon}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{log.action}</div>
+              <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{log.detail}</div>
+            </div>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>{formatTime(log.time)}</div>
+              <span className="status-badge" style={{ background: `${typeColors[log.type]}15`, color: typeColors[log.type], marginTop: 4, display: 'inline-block', fontSize: '0.7rem' }}>
+                {log.user}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ========== MAIN ADMIN COMPONENT ==========
 export default function Admin() {
   const [isAuth, setIsAuth] = useState(false)
@@ -2753,7 +3363,12 @@ export default function Admin() {
   const [toast, setToast] = useState(null)
   const [unreadCount, setUnreadCount] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('kade_admin_dark') === 'true')
   const [localMode, setLocalMode] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [notifCount, setNotifCount] = useState(0)
+  const [currentUser, setCurrentUser] = useState(null)
 
   // Stats for dashboard
   const [stats, setStats] = useState({ blogs: 0, partners: 0, messages: 0, unreadMessages: 0 })
@@ -2781,10 +3396,22 @@ export default function Admin() {
     }
   }
 
+  const loadNotifCount = async () => {
+    try {
+      const data = await getNotificationsApi()
+      if (Array.isArray(data)) setNotifCount(data.filter(n => !n.read).length)
+    } catch { /* ignore */ }
+  }
+
   const showToast = (message, type = 'success') => {
     setToast({ message, type })
   }
 
+  const toggleDarkMode = () => {
+    const next = !darkMode
+    setDarkMode(next)
+    localStorage.setItem('kade_admin_dark', String(next))
+  }
 
   useEffect(() => {
     const token = localStorage.getItem('kade_admin_token')
@@ -2792,13 +3419,20 @@ export default function Admin() {
       setIsAuth(true)
       setLocalMode(isLocalMode())
       loadStats()
+      loadNotifCount()
+      try {
+        const u = JSON.parse(localStorage.getItem('kade_admin_user') || '{}')
+        setCurrentUser(u)
+      } catch { /* ignore */ }
     }
   }, [])
 
-  const handleLogin = () => {
+  const handleLogin = (data) => {
     setIsAuth(true)
     setLocalMode(isLocalMode())
+    setCurrentUser(data?.user || null)
     loadStats()
+    loadNotifCount()
   }
 
   const handleLogout = () => {
@@ -2806,16 +3440,26 @@ export default function Admin() {
     localStorage.removeItem('kade_admin_user')
     setIsAuth(false)
     setLocalMode(false)
+    setCurrentUser(null)
   }
 
-  const navItems = [
+  const mainNavItems = [
     { id: 'dashboard', label: 'Gösterge Paneli', icon: HiOutlineHome },
+    { id: 'analytics', label: 'Analitik', icon: HiOutlineChartBar },
+    { id: 'messages', label: 'İletişim & CRM', icon: HiOutlineMail, badge: unreadCount },
+    { id: 'calendar', label: 'İçerik Takvimi', icon: HiOutlineCalendar },
+  ]
+
+  const contentNavItems = [
     { id: 'blog', label: 'Blog Yazıları', icon: HiOutlineNewspaper },
     { id: 'content', label: 'İçerik Yönetimi', icon: HiOutlinePencilAlt },
     { id: 'partners', label: 'Partnerler', icon: HiOutlineUsers },
-    { id: 'messages', label: 'Mesajlar', icon: HiOutlineMail, badge: unreadCount },
-    { id: 'calendar', label: 'İçerik Takvimi', icon: HiOutlineCalendar },
+    { id: 'portfolio', label: 'Portföy', icon: HiOutlineViewBoards },
+  ]
+
+  const systemNavItems = [
     { id: 'users', label: 'Kullanıcılar', icon: HiOutlineUsers },
+    { id: 'activity', label: 'Aktivite Logu', icon: HiOutlineAnnotation },
     { id: 'settings', label: 'Ayarlar', icon: HiOutlineCog },
   ]
 
@@ -2823,75 +3467,120 @@ export default function Admin() {
     return <LoginScreen onLogin={handleLogin} />
   }
 
+  const renderNavItem = (item) => (
+    <button
+      key={item.id}
+      className={`sidebar-nav-item ${activeSection === item.id ? 'active' : ''}`}
+      onClick={() => {
+        setActiveSection(item.id)
+        setSidebarOpen(false)
+        if (item.id === 'dashboard') loadStats()
+      }}
+      title={sidebarCollapsed ? item.label : undefined}
+    >
+      <item.icon size={18} />
+      <span>{item.label}</span>
+      {item.badge > 0 && <span className="nav-badge">{item.badge}</span>}
+    </button>
+  )
+
   return (
-    <PageTransition>
-      <div className="admin-dashboard">
-        <div className="grid-bg" />
+    <div className={`admin-dashboard ${darkMode ? 'dark' : ''}`}>
+      <div className="admin-grid-bg" />
 
-        {/* Mobile Menu Button */}
-        <button
-          className="mobile-menu-btn"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          style={{ position: 'fixed', top: 12, left: 12, zIndex: 300 }}
-        >
-          <HiOutlineMenuAlt3 size={20} />
-        </button>
+      {/* Mobile Menu Button */}
+      <button
+        className="mobile-menu-btn"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        <HiOutlineMenuAlt3 size={20} />
+      </button>
 
-        {/* Sidebar */}
-        <aside className={`admin-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
-          <div className="sidebar-header">
+      {/* Sidebar */}
+      <aside className={`admin-sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${sidebarOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="sidebar-brand">
             <div className="admin-logo">kade<span>admin</span></div>
-            <p>Yönetim Paneli</p>
           </div>
-          <nav className="sidebar-nav">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                className={`sidebar-nav-item ${activeSection === item.id ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveSection(item.id)
-                  setSidebarOpen(false)
-                  if (item.id === 'dashboard') loadStats()
-                }}
-              >
-                <item.icon size={18} />
-                {item.label}
-                {item.badge > 0 && <span className="nav-badge">{item.badge}</span>}
-              </button>
-            ))}
-          </nav>
-          <div className="sidebar-footer">
-            <a href="/" target="_blank" rel="noopener noreferrer" className="sidebar-site-link">
-              🌐 <span>Siteyi Görüntüle</span>
-            </a>
-            <button className="sidebar-nav-item" onClick={handleLogout}>
-              <HiOutlineLogout size={18} /> Çıkış Yap
-            </button>
+          <button className="sidebar-collapse-btn" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} title={sidebarCollapsed ? 'Genişlet' : 'Daralt'}>
+            <HiOutlineChevronLeft size={16} style={{ transform: sidebarCollapsed ? 'rotate(180deg)' : 'none', transition: 'var(--transition)' }} />
+          </button>
+        </div>
+
+        {/* Profile */}
+        <div className="sidebar-profile">
+          <div className="sidebar-avatar">
+            {(currentUser?.username || 'K').charAt(0)}
           </div>
-        </aside>
+          <div className="sidebar-profile-info">
+            <div className="sidebar-profile-name">{currentUser?.username || 'Admin'}</div>
+            <div className="sidebar-profile-role">{currentUser?.role || 'admin'}</div>
+          </div>
+        </div>
 
-        {/* Main Content */}
-        <main className="admin-main">
-          {localMode && (
-            <div className="local-mode-banner">
-              ⚠️ Çevrimdışı Mod — Sunucu bağlantısı yok. Veriler okunamıyor, yazma işlemleri çalışmaz.
-            </div>
-          )}
-          {activeSection === 'dashboard' && <DashboardSection stats={stats} onNavigate={(section) => { setActiveSection(section); setSidebarOpen(false) }} />}
-          {activeSection === 'blog' && <BlogSection showToast={showToast} />}
-          {activeSection === 'content' && <ContentSection showToast={showToast} />}
-          {activeSection === 'partners' && <PartnersSection showToast={showToast} />}
-          {activeSection === 'messages' && <MessagesSection showToast={showToast} onNewMessageCount={(count) => setUnreadCount(count)} />}
-          {activeSection === 'calendar' && <CalendarSection showToast={showToast} />}
-          {activeSection === 'users' && <UsersSection showToast={showToast} />}
-          {activeSection === 'settings' && <SettingsSection showToast={showToast} />}
-        </main>
+        <nav className="sidebar-nav">
+          <div className="sidebar-nav-group">
+            <div className="sidebar-nav-label">ANA MENÜ</div>
+            {mainNavItems.map(renderNavItem)}
+          </div>
+          <div className="sidebar-nav-group">
+            <div className="sidebar-nav-label">İÇERİK</div>
+            {contentNavItems.map(renderNavItem)}
+          </div>
+          <div className="sidebar-nav-group">
+            <div className="sidebar-nav-label">SİSTEM</div>
+            {systemNavItems.map(renderNavItem)}
+          </div>
+        </nav>
 
-        {/* Toast */}
-        <AnimatePresence>
-          {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-        </AnimatePresence>
-      </div>
-    </PageTransition>
+        <div className="sidebar-footer">
+          <button className="dark-mode-toggle" onClick={toggleDarkMode}>
+            {darkMode ? <HiOutlineSun size={18} /> : <HiOutlineMoon size={18} />}
+            <span>{darkMode ? 'Açık Mod' : 'Koyu Mod'}</span>
+          </button>
+          <a href="/" target="_blank" rel="noopener noreferrer" className="sidebar-site-link">
+            🌐 <span>Siteyi Görüntüle</span>
+          </a>
+          <button className="sidebar-logout" onClick={handleLogout}>
+            <HiOutlineLogout size={18} /> <span>Çıkış Yap</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="admin-main">
+        {/* Top Bar with Notifications */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16, position: 'relative' }}>
+          <div className="notification-bell" onClick={() => setShowNotifications(!showNotifications)}>
+            <HiOutlineBell size={22} style={{ color: 'var(--text-secondary)', cursor: 'pointer' }} />
+            {notifCount > 0 && <div className="notification-dot" />}
+          </div>
+          <NotificationDropdown show={showNotifications} onClose={() => setShowNotifications(false)} />
+        </div>
+
+        {localMode && (
+          <div className="local-mode-banner">
+            ⚠️ Çevrimdışı Mod — Sunucu bağlantısı yok. Veriler okunamıyor, yazma işlemleri çalışmaz.
+          </div>
+        )}
+        {activeSection === 'dashboard' && <DashboardSection stats={stats} onNavigate={(section) => { setActiveSection(section); setSidebarOpen(false) }} />}
+        {activeSection === 'analytics' && <AnalyticsSection />}
+        {activeSection === 'blog' && <BlogSection showToast={showToast} />}
+        {activeSection === 'content' && <ContentSection showToast={showToast} />}
+        {activeSection === 'partners' && <PartnersSection showToast={showToast} />}
+        {activeSection === 'portfolio' && <PortfolioSection showToast={showToast} />}
+        {activeSection === 'messages' && <MessagesSection showToast={showToast} onNewMessageCount={(count) => setUnreadCount(count)} />}
+        {activeSection === 'calendar' && <CalendarSection showToast={showToast} />}
+        {activeSection === 'users' && <UsersSection showToast={showToast} />}
+        {activeSection === 'activity' && <ActivityLogSection />}
+        {activeSection === 'settings' && <SettingsSection showToast={showToast} />}
+      </main>
+
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      </AnimatePresence>
+    </div>
   )
 }
+

@@ -9,6 +9,7 @@ import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import PageHeroCanvas from '../components/PageHeroCanvas'
 import './Team.css'
 
 const defaultTeam = [
@@ -82,6 +83,7 @@ export default function Team() {
 
   return (
     <PageTransition>
+      <PageHeroCanvas type="team" />
       <section className="team-hero">
         <PageBgAnimation type="about" />
         <div className="grid-bg" />

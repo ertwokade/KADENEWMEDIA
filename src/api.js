@@ -234,3 +234,62 @@ export async function subscribeNewsletterApi(email) {
   });
   return handleResponse(res);
 }
+
+// Notes (CRM)
+export async function getNotesApi(messageId) {
+  const res = await fetch(`${API_BASE}/notes?messageId=${messageId}`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function createNoteApi(data) {
+  const res = await fetch(`${API_BASE}/notes`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteNoteApi(id) {
+  const res = await fetch(`${API_BASE}/notes?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// Notifications
+export async function getNotificationsApi() {
+  const res = await fetch(`${API_BASE}/notifications`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function markNotificationReadApi(id) {
+  const res = await fetch(`${API_BASE}/notifications`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ id }),
+  });
+  return handleResponse(res);
+}
+
+export async function markAllNotificationsReadApi() {
+  const res = await fetch(`${API_BASE}/notifications`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ markAllRead: true }),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteNotificationApi(id) {
+  const res = await fetch(`${API_BASE}/notifications?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}

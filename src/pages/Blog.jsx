@@ -11,6 +11,7 @@ import { getBlogsApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import PageHeroCanvas from '../components/PageHeroCanvas'
 import './Blog.css'
 
 export default function Blog() {
@@ -62,6 +63,7 @@ export default function Blog() {
 
   return (
     <PageTransition>
+      <PageHeroCanvas type="blog" />
       <section className="blog-hero">
         <PageBgAnimation type="blog" />
         <div className="grid-bg" />

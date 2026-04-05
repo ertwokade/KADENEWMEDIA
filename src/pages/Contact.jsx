@@ -18,6 +18,7 @@ import { analytics } from '../utils/analytics'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import PageHeroCanvas from '../components/PageHeroCanvas'
 import './Contact.css'
 
 const socials = [
@@ -144,6 +145,7 @@ export default function Contact() {
 
   return (
     <PageTransition>
+      <PageHeroCanvas type="contact" />
       <section className="contact-hero">
         <PageBgAnimation type="contact" />
         <div className="grid-bg" />

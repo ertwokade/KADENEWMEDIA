@@ -128,6 +128,8 @@ input, textarea {
   padding: var(--section-padding);
   position: relative;
   transform: translateZ(0);
+  background: transparent;
+  z-index: 1;
 }
 
 .section-header {

@@ -14,6 +14,7 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import PageHeroCanvas from '../components/PageHeroCanvas'
 import './Packages.css'
 
 // Exchange rate cache
@@ -171,6 +172,7 @@ export default function Packages() {
 
   return (
     <PageTransition>
+      <PageHeroCanvas type="packages" />
       {/* Hero */}
       <section className="packages-hero">
         <PageBgAnimation type="packages" />
