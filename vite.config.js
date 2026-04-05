@@ -16,8 +16,25 @@ export default defineConfig({
     },
   },
   build: {
+    chunkSizeWarningLimit: 1600,
     rollupOptions: {
       external: [/^api\//],
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/three') || id.includes('node_modules/@react-three')) {
+            return 'vendor-three';
+          }
+          if (id.includes('node_modules/framer-motion')) {
+            return 'vendor-motion';
+          }
+          if (id.includes('node_modules/react-icons')) {
+            return 'vendor-icons';
+          }
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'vendor-react';
+          }
+        },
+      },
     },
   },
   optimizeDeps: {
