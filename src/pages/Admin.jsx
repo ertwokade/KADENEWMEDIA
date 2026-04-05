@@ -26,6 +26,9 @@ import {
   getNotesApi, createNoteApi, deleteNoteApi,
   getNotificationsApi, markNotificationReadApi, markAllNotificationsReadApi, deleteNotificationApi,
   getAnalyticsApi, getActivityLogApi,
+  getNewsletterSubscribersApi, deleteNewsletterSubscriberApi,
+  testSmtpApi, replyToMessageApi,
+  getSiteSettingsApi, updateSiteSettingsApi,
 } from '../api'
 import './Admin.css'
 
@@ -177,6 +180,11 @@ function DashboardSection({ stats, onNavigate }) {
           <div className="stat-number">{stats.unreadMessages || 0}</div>
           <div className="stat-label">Okunmamış Mesaj</div>
         </div>
+        <div className="admin-stat-card" style={{ cursor: 'pointer' }} onClick={() => onNavigate('newsletter')}>
+          <div className="stat-icon" style={{ background: 'rgba(0, 188, 212, 0.10)', color: '#00BCD4' }}>📧</div>
+          <div className="stat-number">{stats.subscribers || 0}</div>
+          <div className="stat-label">Newsletter Abone</div>
+        </div>
       </div>
 
       <div className="dashboard-quick-actions">
@@ -278,10 +286,11 @@ function BlogSection({ showToast }) {
   const [showForm, setShowForm] = useState(false)
   const [editingBlog, setEditingBlog] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [filterStatus, setFilterStatus] = useState('all')
   const [form, setForm] = useState({
     titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
     contentTr: '', contentEn: '', category: '', categoryEn: '',
-    slug: '', image: '', color: '#eac321', readTime: 5,
+    slug: '', image: '', color: '#eac321', readTime: 5, published: true,
   })
 
   const colors = ['#6C63FF', '#E91E63', '#eac321', '#2ECC71', '#00BCD4', '#9C27B0', '#FF9800', '#607D8B']
@@ -303,7 +312,7 @@ function BlogSection({ showToast }) {
     setForm({
       titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
       contentTr: '', contentEn: '', category: '', categoryEn: '',
-      slug: '', image: '', color: '#eac321', readTime: 5,
+      slug: '', image: '', color: '#eac321', readTime: 5, published: true,
     })
     setEditingBlog(null)
     setShowForm(false)
@@ -317,6 +326,7 @@ function BlogSection({ showToast }) {
       category: blog.category || '', categoryEn: blog.categoryEn || '',
       slug: blog.slug || '', image: blog.image || '',
       color: blog.color || '#eac321', readTime: blog.readTime || 5,
+      published: blog.published !== false,
     })
     setEditingBlog(blog)
     setShowForm(true)
@@ -539,6 +549,30 @@ function BlogSection({ showToast }) {
                   </div>
                 </div>
 
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', userSelect: 'none' }}>
+                    <div
+                      onClick={() => setForm({ ...form, published: !form.published })}
+                      style={{
+                        width: 44, height: 24, borderRadius: 12,
+                        background: form.published ? '#2ECC71' : 'var(--border)',
+                        position: 'relative', cursor: 'pointer', transition: 'background 0.2s',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <div style={{
+                        width: 18, height: 18, borderRadius: '50%', background: '#fff',
+                        position: 'absolute', top: 3,
+                        left: form.published ? 23 : 3, transition: 'left 0.2s',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                      }} />
+                    </div>
+                    <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+                      {form.published ? '✅ Yayında' : '📝 Taslak'}
+                    </span>
+                  </label>
+                </div>
+
                 <div className="admin-form-actions">
                   <button className="btn btn-outline" onClick={resetForm}>İptal</button>
                   <button className="btn btn-primary" onClick={handleSave}>
@@ -578,6 +612,7 @@ function BlogSection({ showToast }) {
                 <th>İkon</th>
                 <th>Başlık</th>
                 <th>Kategori</th>
+                <th>Durum</th>
                 <th>Tarih</th>
                 <th>İşlem</th>
               </tr>
@@ -600,6 +635,25 @@ function BlogSection({ showToast }) {
                     <span className="status-badge" style={{ background: `${blog.color}20`, color: blog.color }}>
                       {blog.category}
                     </span>
+                  </td>
+                  <td>
+                    <button
+                      onClick={async () => {
+                        const newPub = blog.published === false ? true : false
+                        try {
+                          await updateBlogApi({ id: blog._id, published: newPub })
+                          fetchBlogs()
+                          showToast(newPub ? 'Yazı yayına alındı!' : 'Yazı taslağa alındı!', 'success')
+                        } catch (err) { showToast(err.message, 'error') }
+                      }}
+                      style={{
+                        padding: '4px 10px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600,
+                        background: blog.published !== false ? 'rgba(46,204,113,0.15)' : 'rgba(156,163,175,0.12)',
+                        color: blog.published !== false ? '#2ECC71' : 'var(--text-tertiary)',
+                      }}
+                    >
+                      {blog.published !== false ? '● Yayında' : '○ Taslak'}
+                    </button>
                   </td>
                   <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{blog.date}</td>
                   <td>
@@ -1660,6 +1714,10 @@ function MessagesSection({ showToast, onNewMessageCount }) {
   const [noteText, setNoteText] = useState('')
   const [noteType, setNoteType] = useState('note')
   const [notesLoading, setNotesLoading] = useState(false)
+  const [showReplyForm, setShowReplyForm] = useState(false)
+  const [replyText, setReplyText] = useState('')
+  const [replySubject, setReplySubject] = useState('')
+  const [replySending, setReplySending] = useState(false)
 
   const loadNotes = async (messageId) => {
     setNotesLoading(true)
@@ -1703,8 +1761,25 @@ function MessagesSection({ showToast, onNewMessageCount }) {
 
   useEffect(() => { fetchMessages() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleReply = async () => {
+    if (!replyText.trim() || !selectedMessage) return
+    setReplySending(true)
+    try {
+      await replyToMessageApi(selectedMessage._id, replyText, replySubject || undefined)
+      showToast('E-posta başarıyla gönderildi!', 'success')
+      setReplyText('')
+      setReplySubject('')
+      setShowReplyForm(false)
+      loadNotes(selectedMessage._id)
+    } catch (err) { showToast(err.message, 'error') }
+    finally { setReplySending(false) }
+  }
+
   const handleRead = async (msg) => {
     setSelectedMessage(msg)
+    setShowReplyForm(false)
+    setReplyText('')
+    setReplySubject('')
     loadNotes(msg._id)
     if (!msg.read) {
       try {
@@ -1863,12 +1938,70 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                 )}
               </div>
 
+              {/* Email Reply Panel */}
+              <div style={{ marginTop: 20, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: showReplyForm ? 12 : 0 }}>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 600, margin: 0 }}>📤 E-posta Yanıtla</h4>
+                  <button
+                    className={`btn ${showReplyForm ? 'btn-outline' : 'btn-primary'}`}
+                    style={{ padding: '6px 14px', fontSize: '0.82rem' }}
+                    onClick={() => setShowReplyForm(!showReplyForm)}
+                  >
+                    {showReplyForm ? 'İptal' : 'Yanıt Yaz'}
+                  </button>
+                </div>
+                <AnimatePresence>
+                  {showReplyForm && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      <div style={{ marginTop: 12 }}>
+                        <div className="form-group" style={{ marginBottom: 10 }}>
+                          <label style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Konu (opsiyonel)</label>
+                          <input
+                            type="text"
+                            value={replySubject}
+                            onChange={e => setReplySubject(e.target.value)}
+                            placeholder={`Re: Kade Media — ${selectedMessage.service && selectedMessage.service !== '-' ? selectedMessage.service : 'İletişim'}`}
+                            style={{ fontSize: '0.85rem' }}
+                          />
+                        </div>
+                        <div className="form-group" style={{ marginBottom: 10 }}>
+                          <label style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Mesaj *</label>
+                          <textarea
+                            rows={5}
+                            value={replyText}
+                            onChange={e => setReplyText(e.target.value)}
+                            placeholder={`Merhaba ${selectedMessage.name},\n\n`}
+                            style={{ fontSize: '0.88rem', lineHeight: 1.6 }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                          <button
+                            className="btn btn-primary"
+                            onClick={handleReply}
+                            disabled={replySending || !replyText.trim()}
+                            style={{ gap: 6 }}
+                          >
+                            <HiOutlineMail size={16} />
+                            {replySending ? 'Gönderiliyor...' : `${selectedMessage.email}'e Gönder`}
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <div className="admin-form-actions" style={{ marginTop: 16 }}>
                 <button className="btn btn-outline" style={{ color: '#EF4444', borderColor: '#EF4444' }} onClick={() => handleDelete(selectedMessage._id)}>
                   <HiOutlineTrash size={16} /> Sil
                 </button>
-                <a href={`mailto:${selectedMessage.email}`} className="btn btn-primary">
-                  <HiOutlineMail size={16} /> Yanıtla
+                <a href={`mailto:${selectedMessage.email}`} className="btn btn-outline" title="Varsayılan e-posta uygulamasıyla aç">
+                  <HiOutlineMail size={16} /> Harici Yanıtla
                 </a>
               </div>
             </motion.div>
@@ -1977,30 +2110,43 @@ function SettingsSection({ showToast }) {
   const [loading, setLoading] = useState(false)
   const [seedLoading, setSeedLoading] = useState(false)
   const [seedSecret, setSeedSecret] = useState('')
+  const [smtpTesting, setSmtpTesting] = useState(false)
+  const [smtpResult, setSmtpResult] = useState(null)
+  const [siteSettings, setSiteSettings] = useState({
+    businessName: 'Kade Media',
+    phone: '+90 506 729 34 23',
+    email: 'hello@kademedia.com',
+    address: 'Biruni Teknopark, Zeytinburnu/İstanbul',
+    instagram: '',
+    twitter: '',
+    youtube: '',
+    tiktok: '',
+    linkedin: '',
+    whatsapp: 'https://wa.me/905067293423',
+  })
+  const [settingsSaving, setSettingsSaving] = useState(false)
+  const [settingsLoaded, setSettingsLoaded] = useState(false)
+
+  useEffect(() => {
+    getSiteSettingsApi()
+      .then(res => {
+        if (res?.data) setSiteSettings(prev => ({ ...prev, ...res.data }))
+        setSettingsLoaded(true)
+      })
+      .catch(() => setSettingsLoaded(true))
+  }, [])
 
   const handleChangePassword = async (e) => {
     e.preventDefault()
-    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — şifre değiştirilemez.', 'error'); return }
-    if (newPassword !== confirmPassword) {
-      showToast('Yeni şifreler eşleşmiyor!', 'error')
-      return
-    }
-    if (newPassword.length < 4) {
-      showToast('Şifre en az 4 karakter olmalı!', 'error')
-      return
-    }
+    if (newPassword !== confirmPassword) { showToast('Yeni şifreler eşleşmiyor!', 'error'); return }
+    if (newPassword.length < 4) { showToast('Şifre en az 4 karakter olmalı!', 'error'); return }
     setLoading(true)
     try {
       await changePasswordApi(currentPassword, newPassword)
       showToast('Şifre başarıyla değiştirildi!', 'success')
-      setCurrentPassword('')
-      setNewPassword('')
-      setConfirmPassword('')
-    } catch (err) {
-      showToast(err.message, 'error')
-    } finally {
-      setLoading(false)
-    }
+      setCurrentPassword(''); setNewPassword(''); setConfirmPassword('')
+    } catch (err) { showToast(err.message, 'error') }
+    finally { setLoading(false) }
   }
 
   const handleSeed = async () => {
@@ -2011,11 +2157,30 @@ function SettingsSection({ showToast }) {
       showToast('Veritabanı başarıyla oluşturuldu!', 'success')
       setSeedSecret('')
       console.log('Seed result:', result)
+    } catch (err) { showToast(err.message, 'error') }
+    finally { setSeedLoading(false) }
+  }
+
+  const handleSmtpTest = async () => {
+    setSmtpTesting(true)
+    setSmtpResult(null)
+    try {
+      const res = await testSmtpApi()
+      setSmtpResult({ success: res.success, message: res.message })
     } catch (err) {
-      showToast(err.message, 'error')
+      setSmtpResult({ success: false, message: err.message })
     } finally {
-      setSeedLoading(false)
+      setSmtpTesting(false)
     }
+  }
+
+  const handleSaveSettings = async () => {
+    setSettingsSaving(true)
+    try {
+      await updateSiteSettingsApi(siteSettings)
+      showToast('Site ayarları kaydedildi!', 'success')
+    } catch (err) { showToast(err.message, 'error') }
+    finally { setSettingsSaving(false) }
   }
 
   return (
@@ -2023,60 +2188,110 @@ function SettingsSection({ showToast }) {
       <div className="admin-page-header">
         <div>
           <h1>Ayarlar <span>& Güvenlik</span></h1>
-          <p>Şifre değiştirme ve veritabanı işlemleri</p>
+          <p>Site ayarları, SMTP ve güvenlik işlemleri</p>
         </div>
       </div>
 
-      {/* Seed Database */}
-      <div className="seed-section">
-        <h3>🗄️ Veritabanı Başlat</h3>
-        <p>İlk kurulumda veritabanına varsayılan verileri yüklemek için kullanın. Zaten veri varsa tekrar yüklemez. SEED_SECRET ortam değişkenini giriniz.</p>
-        <div className="form-group" style={{ marginBottom: '1rem' }}>
-          <input
-            type="password"
-            value={seedSecret}
-            onChange={(e) => setSeedSecret(e.target.value)}
-            placeholder="Seed secret..."
-          />
+      {/* Site Settings */}
+      <div className="admin-form">
+        <h3>⚡ Site Bilgileri</h3>
+        {!settingsLoaded ? (
+          <div style={{ color: 'var(--text-tertiary)', padding: 12 }}>Yükleniyor...</div>
+        ) : (
+          <>
+            <div className="form-row">
+              <div className="form-group">
+                <label>İşletme Adı</label>
+                <input type="text" value={siteSettings.businessName || ''} onChange={e => setSiteSettings({ ...siteSettings, businessName: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>E-posta</label>
+                <input type="email" value={siteSettings.email || ''} onChange={e => setSiteSettings({ ...siteSettings, email: e.target.value })} />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Telefon</label>
+                <input type="text" value={siteSettings.phone || ''} onChange={e => setSiteSettings({ ...siteSettings, phone: e.target.value })} />
+              </div>
+              <div className="form-group">
+                <label>Adres</label>
+                <input type="text" value={siteSettings.address || ''} onChange={e => setSiteSettings({ ...siteSettings, address: e.target.value })} />
+              </div>
+            </div>
+            <h3 style={{ marginTop: 20 }}>Sosyal Medya Linkleri</h3>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Instagram</label>
+                <input type="url" value={siteSettings.instagram || ''} onChange={e => setSiteSettings({ ...siteSettings, instagram: e.target.value })} placeholder="https://instagram.com/..." />
+              </div>
+              <div className="form-group">
+                <label>X (Twitter)</label>
+                <input type="url" value={siteSettings.twitter || ''} onChange={e => setSiteSettings({ ...siteSettings, twitter: e.target.value })} placeholder="https://x.com/..." />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>YouTube</label>
+                <input type="url" value={siteSettings.youtube || ''} onChange={e => setSiteSettings({ ...siteSettings, youtube: e.target.value })} placeholder="https://youtube.com/..." />
+              </div>
+              <div className="form-group">
+                <label>TikTok</label>
+                <input type="url" value={siteSettings.tiktok || ''} onChange={e => setSiteSettings({ ...siteSettings, tiktok: e.target.value })} placeholder="https://tiktok.com/..." />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>LinkedIn</label>
+                <input type="url" value={siteSettings.linkedin || ''} onChange={e => setSiteSettings({ ...siteSettings, linkedin: e.target.value })} placeholder="https://linkedin.com/..." />
+              </div>
+              <div className="form-group">
+                <label>WhatsApp</label>
+                <input type="url" value={siteSettings.whatsapp || ''} onChange={e => setSiteSettings({ ...siteSettings, whatsapp: e.target.value })} placeholder="https://wa.me/90..." />
+              </div>
+            </div>
+            <div className="admin-form-actions">
+              <button className="btn btn-primary" onClick={handleSaveSettings} disabled={settingsSaving}>
+                <HiOutlineSave size={16} /> {settingsSaving ? 'Kaydediliyor...' : 'Site Bilgilerini Kaydet'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* SMTP Test */}
+      <div className="admin-form" style={{ marginTop: 24 }}>
+        <h3>📧 SMTP Bağlantı Testi</h3>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: 16 }}>
+          Vercel'deki SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS ortam değişkenlerini test eder.
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button className="btn btn-outline" onClick={handleSmtpTest} disabled={smtpTesting}>
+            {smtpTesting ? '⏳ Test ediliyor...' : '🔌 SMTP Bağlantısını Test Et'}
+          </button>
+          {smtpResult && (
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: smtpResult.success ? '#2ECC71' : '#E91E63' }}>
+              {smtpResult.success ? '✓' : '✕'} {smtpResult.message}
+            </span>
+          )}
         </div>
-        <button className="btn btn-primary" onClick={handleSeed} disabled={seedLoading}>
-          <HiOutlineDatabase size={16} /> {seedLoading ? 'Yükleniyor...' : 'Veritabanını Başlat'}
-        </button>
       </div>
 
       {/* Change Password */}
-      <div className="admin-form password-section">
+      <div className="admin-form password-section" style={{ marginTop: 24 }}>
         <h3>🔐 Şifre Değiştir</h3>
         <form onSubmit={handleChangePassword}>
           <div className="form-group">
             <label>Mevcut Şifre</label>
-            <input
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Mevcut şifreniz..."
-              required
-            />
+            <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Mevcut şifreniz..." required />
           </div>
           <div className="form-group">
             <label>Yeni Şifre</label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Yeni şifreniz..."
-              required
-            />
+            <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Yeni şifreniz..." required />
           </div>
           <div className="form-group">
             <label>Yeni Şifre (Tekrar)</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Yeni şifrenizi tekrar girin..."
-              required
-            />
+            <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Yeni şifrenizi tekrar girin..." required />
           </div>
           <div className="admin-form-actions">
             <button type="submit" className="btn btn-primary" disabled={loading}>
@@ -2084,6 +2299,18 @@ function SettingsSection({ showToast }) {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Seed Database */}
+      <div className="seed-section" style={{ marginTop: 24 }}>
+        <h3>🗄️ Veritabanı Başlat</h3>
+        <p>İlk kurulumda veritabanına varsayılan verileri yüklemek için kullanın. SEED_SECRET ortam değişkenini giriniz.</p>
+        <div className="form-group" style={{ marginBottom: '1rem' }}>
+          <input type="password" value={seedSecret} onChange={e => setSeedSecret(e.target.value)} placeholder="Seed secret..." />
+        </div>
+        <button className="btn btn-primary" onClick={handleSeed} disabled={seedLoading}>
+          <HiOutlineDatabase size={16} /> {seedLoading ? 'Yükleniyor...' : 'Veritabanını Başlat'}
+        </button>
       </div>
     </div>
   )
@@ -3412,6 +3639,158 @@ function ActivityLogSection() {
   )
 }
 
+// ========== NEWSLETTER SECTION ==========
+function NewsletterSection({ showToast }) {
+  const [subscribers, setSubscribers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const fetchSubscribers = async () => {
+    setLoading(true)
+    try {
+      const data = await getNewsletterSubscribersApi()
+      setSubscribers(Array.isArray(data) ? data : [])
+    } catch { setSubscribers([]) }
+    finally { setLoading(false) }
+  }
+
+  useEffect(() => { fetchSubscribers() }, [])
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Bu aboneyi silmek istediğinize emin misiniz?')) return
+    try {
+      await deleteNewsletterSubscriberApi(id)
+      showToast('Abone silindi!', 'success')
+      fetchSubscribers()
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const exportCSV = () => {
+    const rows = [['E-posta', 'Kaynak', 'Tarih']]
+    filtered.forEach(s => rows.push([
+      s.email,
+      s.source || 'website',
+      s.createdAt ? new Date(s.createdAt).toLocaleDateString('tr-TR') : '',
+    ]))
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = 'newsletter-aboneleri.csv'; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const filtered = subscribers.filter(s =>
+    !searchQuery || s.email.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Newsletter <span>Aboneleri</span></h1>
+          <p>E-bülten abonelerini yönetin ve dışa aktarın</p>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-outline" onClick={() => fetchSubscribers()} disabled={loading}>
+            {loading ? '⏳' : '🔄'} Yenile
+          </button>
+          <button className="btn btn-primary" onClick={exportCSV} disabled={filtered.length === 0}>
+            📥 CSV İndir
+          </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+        <div className="admin-stat-card">
+          <div className="stat-icon" style={{ background: 'rgba(0,188,212,0.10)', color: '#00BCD4' }}>📧</div>
+          <div className="stat-number">{subscribers.length}</div>
+          <div className="stat-label">Toplam Abone</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="stat-icon" style={{ background: 'rgba(46,204,113,0.10)', color: '#2ECC71' }}>📅</div>
+          <div className="stat-number">
+            {subscribers.filter(s => {
+              if (!s.createdAt) return false
+              const d = new Date(s.createdAt)
+              const now = new Date()
+              return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+            }).length}
+          </div>
+          <div className="stat-label">Bu Ay Eklenen</div>
+        </div>
+        <div className="admin-stat-card">
+          <div className="stat-icon" style={{ background: 'rgba(108,99,255,0.10)', color: '#6C63FF' }}>🔍</div>
+          <div className="stat-number">{filtered.length}</div>
+          <div className="stat-label">Filtrelenmiş</div>
+        </div>
+      </div>
+
+      {/* Subscriber Table */}
+      <div className="admin-table-wrapper" style={{ marginTop: 24 }}>
+        <div className="admin-table-header">
+          <h3>Abone Listesi ({filtered.length})</h3>
+          <input
+            type="text"
+            placeholder="E-posta ara..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            style={{ padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.85rem', width: 220 }}
+          />
+        </div>
+        {loading ? (
+          <div className="admin-empty-state"><p>Yükleniyor...</p></div>
+        ) : filtered.length === 0 ? (
+          <div className="admin-empty-state">
+            <div className="empty-icon">📧</div>
+            <h3>{searchQuery ? 'Arama sonucu bulunamadı' : 'Henüz abone yok'}</h3>
+            <p>Sitedeki newsletter formundan aboneler buraya gelecek</p>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>E-posta</th>
+                <th>Kaynak</th>
+                <th>Abonelik Tarihi</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((s, i) => (
+                <tr key={s._id}>
+                  <td style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>{i + 1}</td>
+                  <td><strong style={{ color: '#00BCD4' }}>{s.email}</strong></td>
+                  <td>
+                    <span className="status-badge" style={{ background: 'rgba(0,188,212,0.1)', color: '#00BCD4' }}>
+                      {s.source || 'website'}
+                    </span>
+                  </td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                    {s.createdAt ? new Date(s.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}
+                  </td>
+                  <td>
+                    <div className="table-actions">
+                      <a className="table-action-btn" href={`mailto:${s.email}`} title="E-posta gönder">
+                        <HiOutlineMail size={14} />
+                      </a>
+                      <button className="table-action-btn danger" onClick={() => handleDelete(s._id)}>
+                        <HiOutlineTrash size={14} /> Sil
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ========== MAIN ADMIN COMPONENT ==========
 export default function Admin() {
   const [isAuth, setIsAuth] = useState(false)
@@ -3427,24 +3806,27 @@ export default function Admin() {
   const [currentUser, setCurrentUser] = useState(null)
 
   // Stats for dashboard
-  const [stats, setStats] = useState({ blogs: 0, partners: 0, messages: 0, unreadMessages: 0 })
+  const [stats, setStats] = useState({ blogs: 0, partners: 0, messages: 0, unreadMessages: 0, subscribers: 0 })
 
   const loadStats = async () => {
     try {
-      const [blogs, partners, messages] = await Promise.all([
+      const [blogs, partners, messages, subscribers] = await Promise.all([
         getBlogsApi().catch(() => []),
         getPartnersApi().catch(() => []),
         getMessagesApi().catch(() => []),
+        getNewsletterSubscribersApi().catch(() => []),
       ])
       const blogArr = Array.isArray(blogs) ? blogs : []
       const partnerArr = Array.isArray(partners) ? partners : []
       const messageArr = Array.isArray(messages) ? messages : []
+      const subArr = Array.isArray(subscribers) ? subscribers : []
       const unread = messageArr.filter((m) => !m.read).length
       setStats({
         blogs: blogArr.length,
         partners: partnerArr.length,
         messages: messageArr.length,
         unreadMessages: unread,
+        subscribers: subArr.length,
       })
       setUnreadCount(unread)
     } catch (err) {
@@ -3511,6 +3893,7 @@ export default function Admin() {
     { id: 'content', label: 'İçerik Yönetimi', icon: HiOutlinePencilAlt },
     { id: 'partners', label: 'Partnerler', icon: HiOutlineUsers },
     { id: 'portfolio', label: 'Portföy', icon: HiOutlineViewBoards },
+    { id: 'newsletter', label: 'Newsletter', icon: HiOutlineMail },
   ]
 
   const systemNavItems = [
@@ -3629,6 +4012,7 @@ export default function Admin() {
         {activeSection === 'calendar' && <CalendarSection showToast={showToast} />}
         {activeSection === 'users' && <UsersSection showToast={showToast} />}
         {activeSection === 'activity' && <ActivityLogSection />}
+        {activeSection === 'newsletter' && <NewsletterSection showToast={showToast} />}
         {activeSection === 'settings' && <SettingsSection showToast={showToast} />}
       </main>
 

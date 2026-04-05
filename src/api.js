@@ -329,3 +329,53 @@ export async function createActivityLogApi(data) {
   });
   return handleResponse(res);
 }
+
+// Newsletter subscribers (admin)
+export async function getNewsletterSubscribersApi() {
+  const res = await fetch(`${API_BASE}/contact?action=subscribers`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteNewsletterSubscriberApi(id) {
+  const res = await fetch(`${API_BASE}/contact?action=subscribers&id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// SMTP test
+export async function testSmtpApi() {
+  const res = await fetch(`${API_BASE}/contact?action=smtp-test`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// Reply to message via email
+export async function replyToMessageApi(id, replyText, subject) {
+  const res = await fetch(`${API_BASE}/messages?action=reply`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ id, replyText, subject }),
+  });
+  return handleResponse(res);
+}
+
+// Site settings (stored in content collection)
+export async function getSiteSettingsApi() {
+  const res = await fetch(`${API_BASE}/content?section=site-settings`);
+  return handleResponse(res);
+}
+
+export async function updateSiteSettingsApi(data) {
+  const res = await fetch(`${API_BASE}/content`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ section: 'site-settings', data }),
+  });
+  return handleResponse(res);
+}

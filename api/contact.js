@@ -1,7 +1,9 @@
 import nodemailer from 'nodemailer';
+import { ObjectId } from 'mongodb';
 import { getDb } from './_lib/mongodb.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
+import { requireAuth } from './_lib/auth.js';
 import { logActivity } from './notifications.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -15,17 +17,84 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+function makeTransporter() {
+  const host = process.env.SMTP_HOST;
+  const port = parseInt(process.env.SMTP_PORT) || 587;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!host || !user || !pass) return null;
+  return nodemailer.createTransport({
+    host, port, secure: port === 465,
+    auth: { user, pass },
+    ...(port === 587 ? { requireTLS: true } : {}),
+    tls: { rejectUnauthorized: false, minVersion: 'TLSv1.2' },
+    connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000,
+  });
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  if (req.method !== 'POST') {
+  const action = req.query?.action;
+
+  // ── Newsletter aboneleri (auth gerekli) ──
+  if (action === 'subscribers') {
+    const user = requireAuth(req);
+    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    const db = await getDb();
+
+    if (req.method === 'GET') {
+      try {
+        const subscribers = await db.collection('newsletter')
+          .find({})
+          .sort({ createdAt: -1 })
+          .toArray();
+        return res.status(200).json(subscribers);
+      } catch (err) {
+        return res.status(500).json({ error: 'Sunucu hatası' });
+      }
+    }
+
+    if (req.method === 'DELETE') {
+      try {
+        const id = req.query?.id;
+        if (!id) return res.status(400).json({ error: 'id gerekli' });
+        await db.collection('newsletter').deleteOne({ _id: new ObjectId(id) });
+        logActivity(db, { action: 'Newsletter abonesi silindi', detail: '', type: 'delete', icon: '📧', user: user.username }).catch(() => {});
+        return res.status(200).json({ success: true });
+      } catch (err) {
+        return res.status(500).json({ error: 'Sunucu hatası' });
+      }
+    }
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Newsletter subscription handler
-  const action = req.query?.action;
+  // ── SMTP test (auth gerekli) ──
+  if (action === 'smtp-test') {
+    const user = requireAuth(req);
+    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+    const transporter = makeTransporter();
+    if (!transporter) return res.status(400).json({ error: 'SMTP ayarları yapılandırılmamış (SMTP_HOST, SMTP_USER, SMTP_PASS gerekli)' });
+
+    try {
+      await transporter.verify();
+      return res.status(200).json({ success: true, message: 'SMTP bağlantısı başarılı!' });
+    } catch (err) {
+      return res.status(200).json({ success: false, message: `SMTP bağlantı hatası: ${err.message}` });
+    }
+  }
+
+  // ── Newsletter aboneliği (public, POST only) ──
   if (action === 'newsletter') {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
     return handleNewsletter(req, res);
+  }
+
+  // ── Normal contact form (POST only) ──
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   // Rate limiting
@@ -36,31 +105,29 @@ export default async function handler(req, res) {
     });
   }
 
+  let body = req.body;
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch { body = {}; }
+  }
+
+  const {
+    name, email, phone, company, service, message, source = 'iletisim-formu',
+  } = body || {};
+
+  if (!name?.trim() || !email?.trim() || !message?.trim()) {
+    return res.status(400).json({ error: 'Ad, e-posta ve mesaj alanları zorunludur.' });
+  }
+
+  if (!EMAIL_RE.test(email)) {
+    return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
+  }
+
+  if (message.trim().length < 10) {
+    return res.status(400).json({ error: 'Mesajınız en az 10 karakter olmalıdır.' });
+  }
+
   try {
-    const { name, email, phone, company, service, message, website } = req.body || {};
-
-    // Honeypot check
-    if (website) {
-      return res.status(200).json({ message: 'Mesajınız alındı.' });
-    }
-
-    // Validation
-    if (!name || !email || !message) {
-      return res.status(400).json({ error: 'Ad, e-posta ve mesaj gerekli' });
-    }
-    if (!EMAIL_RE.test(email)) {
-      return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
-    }
-    if (message.trim().length < 20) {
-      return res.status(400).json({ error: 'Mesajınız en az 20 karakter olmalıdır.' });
-    }
-    if (name.trim().length < 2) {
-      return res.status(400).json({ error: 'Ad en az 2 karakter olmalıdır.' });
-    }
-
-    const source = service ? `iletisim-formu:${service}` : 'iletisim-formu:genel';
-
-    // Save to MongoDB (non-blocking — email still sent even if DB fails)
+    // Save to DB
     try {
       const db = await getDb();
       await db.collection('messages').insertOne({
@@ -81,72 +148,47 @@ export default async function handler(req, res) {
     }
 
     // Send notification email to team
-    const smtpHost = process.env.SMTP_HOST;
-    const smtpPort = process.env.SMTP_PORT;
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
     const mailTo = process.env.MAIL_TO || 'thekademedia@gmail.com';
+    const transporter = makeTransporter();
 
-    if (smtpHost && smtpUser && smtpPass) {
-      const port = parseInt(smtpPort) || 587;
-      const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port,
-        secure: port === 465,
-        auth: { user: smtpUser, pass: smtpPass },
-        ...(port === 587 ? { requireTLS: true } : {}),
-        tls: {
-          rejectUnauthorized: false,
-          minVersion: 'TLSv1.2',
-        },
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 15000,
-      });
-
-      // Verify SMTP connection before sending
-      try {
-        await transporter.verify();
-        console.log('✅ SMTP connection verified');
-      } catch (verifyErr) {
-        console.error('❌ SMTP verification failed:', verifyErr.message);
-      }
-
-      // Team notification email
-      try { await transporter.sendMail({
-        from: `"Kade Media İletişim" <${smtpUser}>`,
-        to: mailTo,
-        subject: `🔔 Yeni Lead: ${escapeHtml(name)} — ${escapeHtml(service || 'Genel')}`,
-        html: `
-          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px;">
-            <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
-              <h1 style="color:#eac321;margin:0;">Kade Media</h1>
-              <p style="color:#aaa;margin:5px 0 0;">Yeni İletişim Formu Mesajı</p>
-            </div>
-            <div style="padding:20px 0;">
-              <table style="width:100%;border-collapse:collapse;">
-                <tr><td style="padding:10px;color:#eac321;font-weight:bold;width:120px;">Ad Soyad:</td><td style="padding:10px;color:#fff;">${escapeHtml(name)}</td></tr>
-                <tr><td style="padding:10px;color:#eac321;font-weight:bold;">E-posta:</td><td style="padding:10px;"><a href="mailto:${escapeHtml(email)}" style="color:#eac321;">${escapeHtml(email)}</a></td></tr>
-                <tr><td style="padding:10px;color:#eac321;font-weight:bold;">Telefon:</td><td style="padding:10px;color:#fff;">${escapeHtml(phone || '-')}</td></tr>
-                <tr><td style="padding:10px;color:#eac321;font-weight:bold;">Şirket:</td><td style="padding:10px;color:#fff;">${escapeHtml(company || '-')}</td></tr>
-                <tr><td style="padding:10px;color:#eac321;font-weight:bold;">Hizmet:</td><td style="padding:10px;color:#fff;">${escapeHtml(service || '-')}</td></tr>
-              </table>
-              <div style="padding:20px;background:#16213e;border-radius:8px;margin-top:15px;">
-                <p style="color:#eac321;font-weight:bold;margin:0 0 10px;">Mesaj:</p>
-                <p style="color:#fff;line-height:1.6;margin:0;">${escapeHtml(message)}</p>
-              </div>
-            </div>
-            <div style="text-align:center;padding:15px 0;border-top:1px solid #333;color:#666;font-size:12px;">
-              kademedia.com.tr iletişim formu • Lead durumu: <strong style="color:#eac321;">Yeni</strong>
-            </div>
-          </div>
-        `,
-      }); } catch (teamMailErr) { console.error('Team email failed (non-critical):', teamMailErr.message); }
-
-      // Thank-you email to user
+    if (transporter) {
       try {
         await transporter.sendMail({
-          from: `"Kade Media" <${smtpUser}>`,
+          from: `"Kade Media Website" <${process.env.SMTP_USER}>`,
+          to: mailTo,
+          subject: `🔔 Yeni Lead: ${escapeHtml(name)} — ${service || 'Genel'}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#fff;border-radius:12px;">
+              <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
+                <h1 style="color:#eac321;margin:0;">⚡ Kade Media</h1>
+                <p style="color:#888;margin:8px 0 0">Yeni Lead Bildirimi</p>
+              </div>
+              <div style="padding:30px 20px;">
+                <table style="width:100%;border-collapse:collapse;">
+                  <tr><td style="padding:8px 0;color:#888;width:120px;">Ad Soyad</td><td style="padding:8px 0;color:#fff;font-weight:600;">${escapeHtml(name)}</td></tr>
+                  <tr><td style="padding:8px 0;color:#888;">E-posta</td><td style="padding:8px 0;color:#eac321;">${escapeHtml(email)}</td></tr>
+                  <tr><td style="padding:8px 0;color:#888;">Telefon</td><td style="padding:8px 0;color:#fff;">${escapeHtml(phone || '-')}</td></tr>
+                  <tr><td style="padding:8px 0;color:#888;">Şirket</td><td style="padding:8px 0;color:#fff;">${escapeHtml(company || '-')}</td></tr>
+                  <tr><td style="padding:8px 0;color:#888;">Hizmet</td><td style="padding:8px 0;color:#fff;">${escapeHtml(service || '-')}</td></tr>
+                </table>
+                <div style="margin-top:20px;padding:16px;background:#1a1a1a;border-radius:8px;border-left:3px solid #eac321;">
+                  <p style="color:#ccc;margin:0;line-height:1.6;">${escapeHtml(message)}</p>
+                </div>
+                <div style="text-align:center;margin:24px 0;">
+                  <a href="mailto:${escapeHtml(email)}" style="display:inline-block;padding:14px 32px;background:#eac321;color:#000;text-decoration:none;border-radius:8px;font-weight:bold;">Yanıtla</a>
+                </div>
+              </div>
+            </div>
+          `,
+        });
+      } catch (mailErr) {
+        console.log('Team notification email failed (non-critical):', mailErr.message);
+      }
+
+      // Thank you email
+      try {
+        await transporter.sendMail({
+          from: `"Kade Media" <${process.env.SMTP_USER}>`,
           to: email,
           subject: 'Mesajınız Alındı — Kade Media',
           html: `
@@ -196,26 +238,21 @@ export default async function handler(req, res) {
 // ========== NEWSLETTER HANDLER ==========
 async function handleNewsletter(req, res) {
   const { email } = req.body || {};
-
   if (!email || !EMAIL_RE.test(email)) {
     return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
   }
-
   try {
     const db = await getDb();
     const collection = db.collection('newsletter');
-
     const existing = await collection.findOne({ email: email.toLowerCase() });
     if (existing) {
       return res.status(200).json({ message: 'Bu e-posta zaten kayıtlı.' });
     }
-
     await collection.insertOne({
       email: email.toLowerCase(),
       createdAt: new Date(),
       source: 'website',
     });
-
     return res.status(200).json({ message: 'Aboneliğiniz başarıyla oluşturuldu!' });
   } catch (err) {
     console.error('Newsletter error:', err);
