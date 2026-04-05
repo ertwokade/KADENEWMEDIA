@@ -73,7 +73,7 @@ html::-webkit-scrollbar-thumb {
 
 body {
   font-family: var(--font-secondary);
-  background-color: var(--black);
+  background-color: transparent;
   color: var(--white);
   line-height: 1.6;
   overflow-x: hidden;
@@ -324,7 +324,7 @@ input, textarea {
 }
 
 [data-theme="light"] body {
-  background-color: #F5F1EE;
+  background-color: transparent;
   color: #1A1715;
 }
 

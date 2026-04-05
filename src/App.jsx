@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
+import PageHeroCanvas from './components/PageHeroCanvas'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
@@ -36,13 +37,36 @@ function PageLoader() {
   )
 }
 
+const ROUTE_THEMES = {
+  '/': 'home',
+  '/hakkimizda': 'about',
+  '/hizmetler': 'services',
+  '/paketler': 'packages',
+  '/partnerler': 'partners',
+  '/kariyer': 'careers',
+  '/blog': 'blog',
+  '/portfolio': 'portfolio',
+  '/ekip': 'team',
+  '/iletisim': 'contact',
+}
+
+function getCanvasTheme(pathname) {
+  if (ROUTE_THEMES[pathname]) return ROUTE_THEMES[pathname]
+  if (pathname.startsWith('/hizmetler/')) return 'services'
+  if (pathname.startsWith('/partnerler/')) return 'partners'
+  if (pathname.startsWith('/blog/')) return 'blog'
+  return 'home'
+}
+
 function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
+  const canvasTheme = getCanvasTheme(location.pathname)
 
   return (
     <>
       <ScrollToTop />
+      {!isAdmin && <PageHeroCanvas type={canvasTheme} />}
       {!isAdmin && <Navbar />}
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />

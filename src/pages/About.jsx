@@ -15,7 +15,6 @@ import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
-import PageHeroCanvas from '../components/PageHeroCanvas'
 import './About.css'
 
 const defaultTeam = [
@@ -71,7 +70,6 @@ export default function About() {
 
   return (
     <PageTransition>
-      <PageHeroCanvas type="about" />
       {/* Hero */}
       <section className="about-hero">
         <PageBgAnimation type="about" />

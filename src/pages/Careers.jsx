@@ -15,7 +15,6 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
-import PageHeroCanvas from '../components/PageHeroCanvas'
 import './Careers.css'
 
 const jobsData = {
@@ -199,7 +198,6 @@ export default function Careers() {
 
   return (
     <PageTransition>
-      <PageHeroCanvas type="careers" />
       {/* Hero */}
       <section className="careers-hero">
         <PageBgAnimation type="careers" />

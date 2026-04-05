@@ -8,7 +8,6 @@ import { partnersData } from '../data/content'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
-import PageHeroCanvas from '../components/PageHeroCanvas'
 import './Portfolio.css'
 
 const portfolioItems = [
@@ -106,7 +105,6 @@ export default function Portfolio() {
 
   return (
     <PageTransition>
-      <PageHeroCanvas type="portfolio" />
       <section className="portfolio-hero">
         <PageBgAnimation type="partners" />
         <div className="grid-bg" />

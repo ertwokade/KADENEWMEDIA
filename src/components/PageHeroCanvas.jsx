@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * Rich canvas-based animated background for every page hero section.
@@ -103,6 +103,17 @@ const THEMES = {
 
 export default function PageHeroCanvas({ type = 'home' }) {
   const canvasRef = useRef(null)
+  const [isLight, setIsLight] = useState(
+    () => document.documentElement.getAttribute('data-theme') === 'light'
+  )
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsLight(document.documentElement.getAttribute('data-theme') === 'light')
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -306,7 +317,8 @@ export default function PageHeroCanvas({ type = 'home' }) {
         width: '100vw',
         height: '100vh',
         pointerEvents: 'none',
-        zIndex: 0,
+        zIndex: -1,
+        background: isLight ? '#F5F1EE' : '#0a0a0a',
       }}
     />
   )
