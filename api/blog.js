@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import { getDb } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+import { logActivity } from './notifications.js';
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -23,9 +24,7 @@ export default async function handler(req, res) {
   // POST - Create new blog post (requires auth)
   if (req.method === 'POST') {
     const user = requireAuth(req);
-    if (!user) {
-      return res.status(401).json({ error: 'Yetkisiz erişim' });
-    }
+    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
 
     try {
       const {
@@ -34,34 +33,24 @@ export default async function handler(req, res) {
         image, color, readTime, slug
       } = req.body;
 
-      if (!titleTr || !slug) {
-        return res.status(400).json({ error: 'Başlık ve slug gerekli' });
-      }
+      if (!titleTr || !slug) return res.status(400).json({ error: 'Başlık ve slug gerekli' });
 
       const existing = await collection.findOne({ slug });
-      if (existing) {
-        return res.status(400).json({ error: 'Bu slug zaten kullanılıyor' });
-      }
+      if (existing) return res.status(400).json({ error: 'Bu slug zaten kullanılıyor' });
 
       const post = {
-        titleTr: titleTr || '',
-        titleEn: titleEn || '',
-        excerptTr: excerptTr || '',
-        excerptEn: excerptEn || '',
-        contentTr: contentTr || '',
-        contentEn: contentEn || '',
-        category: category || '',
-        categoryEn: categoryEn || '',
-        image: image || '📝',
-        color: color || '#FFD700',
-        readTime: parseInt(readTime) || 5,
-        slug,
+        titleTr: titleTr || '', titleEn: titleEn || '',
+        excerptTr: excerptTr || '', excerptEn: excerptEn || '',
+        contentTr: contentTr || '', contentEn: contentEn || '',
+        category: category || '', categoryEn: categoryEn || '',
+        image: image || '📝', color: color || '#FFD700',
+        readTime: parseInt(readTime) || 5, slug,
         date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date(), updatedAt: new Date(),
       };
 
       const result = await collection.insertOne(post);
+      logActivity(db, { action: 'Blog yazısı oluşturuldu', detail: `"${titleTr}"`, type: 'create', icon: '📝', user: user.username }).catch(() => {});
       return res.status(201).json({ ...post, _id: result.insertedId });
     } catch (error) {
       console.error('Blog POST error:', error);
@@ -72,28 +61,19 @@ export default async function handler(req, res) {
   // PUT - Update blog post (requires auth)
   if (req.method === 'PUT') {
     const user = requireAuth(req);
-    if (!user) {
-      return res.status(401).json({ error: 'Yetkisiz erişim' });
-    }
+    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
 
     try {
       const { id, ...updateData } = req.body;
-      if (!id) {
-        return res.status(400).json({ error: 'Post ID gerekli' });
-      }
+      if (!id) return res.status(400).json({ error: 'Post ID gerekli' });
 
       updateData.updatedAt = new Date();
       if (updateData.readTime) updateData.readTime = parseInt(updateData.readTime);
 
-      const result = await collection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: updateData }
-      );
+      const result = await collection.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
+      if (result.matchedCount === 0) return res.status(404).json({ error: 'Post bulunamadı' });
 
-      if (result.matchedCount === 0) {
-        return res.status(404).json({ error: 'Post bulunamadı' });
-      }
-
+      logActivity(db, { action: 'Blog yazısı güncellendi', detail: `"${updateData.titleTr || id}"`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Post güncellendi' });
     } catch (error) {
       console.error('Blog PUT error:', error);
@@ -104,24 +84,17 @@ export default async function handler(req, res) {
   // DELETE - Delete blog post (requires auth)
   if (req.method === 'DELETE') {
     const user = requireAuth(req);
-    if (!user) {
-      return res.status(401).json({ error: 'Yetkisiz erişim' });
-    }
+    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
 
     try {
-      const { id } = req.body || {};
-      const queryId = id || req.query.id;
+      const queryId = req.body?.id || req.query.id;
+      if (!queryId) return res.status(400).json({ error: 'Post ID gerekli' });
 
-      if (!queryId) {
-        return res.status(400).json({ error: 'Post ID gerekli' });
-      }
-
+      const post = await collection.findOne({ _id: new ObjectId(queryId) });
       const result = await collection.deleteOne({ _id: new ObjectId(queryId) });
+      if (result.deletedCount === 0) return res.status(404).json({ error: 'Post bulunamadı' });
 
-      if (result.deletedCount === 0) {
-        return res.status(404).json({ error: 'Post bulunamadı' });
-      }
-
+      logActivity(db, { action: 'Blog yazısı silindi', detail: `"${post?.titleTr || queryId}"`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Post silindi' });
     } catch (error) {
       console.error('Blog DELETE error:', error);

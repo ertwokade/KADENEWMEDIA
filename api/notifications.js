@@ -12,6 +12,42 @@ export default async function handler(req, res) {
   }
 
   const db = await getDb();
+  const action = req.query?.action;
+
+  // ── Activity Log (GET /api/notifications?action=activity) ──
+  if (action === 'activity') {
+    if (req.method === 'GET') {
+      const filter = req.query?.type;
+      const match = filter && filter !== 'all' ? { type: filter } : {};
+      const logs = await db.collection('activity_log')
+        .find(match)
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .toArray();
+      return res.status(200).json(logs);
+    }
+
+    if (req.method === 'POST') {
+      let body = req.body;
+      if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+      const { action: logAction, detail, type, icon } = body || {};
+      if (!logAction) return res.status(400).json({ error: 'action gerekli' });
+
+      const log = {
+        action: logAction,
+        detail: detail || '',
+        type: type || 'system',
+        icon: icon || '⚙️',
+        user: user.username,
+        createdAt: new Date(),
+      };
+      await db.collection('activity_log').insertOne(log);
+      return res.status(201).json(log);
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   const collection = db.collection('notifications');
 
   // GET — bildirimleri getir
@@ -69,11 +105,23 @@ export default async function handler(req, res) {
 export async function createNotification(db, { userId, type, title, message, link }) {
   await db.collection('notifications').insertOne({
     userId,
-    type: type || 'info', // info, message, calendar, system
+    type: type || 'info',
     title,
     message,
     link: link || null,
     read: false,
+    createdAt: new Date(),
+  });
+}
+
+// Helper: Aktivite logu (diğer API'lerden çağrılabilir)
+export async function logActivity(db, { action, detail, type, icon, user }) {
+  await db.collection('activity_log').insertOne({
+    action,
+    detail: detail || '',
+    type: type || 'system',
+    icon: icon || '⚙️',
+    user: user || 'sistem',
     createdAt: new Date(),
   });
 }

@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import { getDb } from './_lib/mongodb.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
+import { logActivity } from './notifications.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -74,6 +75,7 @@ export default async function handler(req, res) {
         read: false,
         createdAt: new Date(),
       });
+      logActivity(db, { action: 'Yeni mesaj alındı', detail: `${name.trim()} - ${service || 'Genel'}`, type: 'message', icon: '✉️', user: 'sistem' }).catch(() => {});
     } catch (dbErr) {
       console.error('MongoDB save failed (non-critical):', dbErr.message);
     }

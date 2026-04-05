@@ -25,6 +25,7 @@ import {
   updateMessageStatusApi,
   getNotesApi, createNoteApi, deleteNoteApi,
   getNotificationsApi, markNotificationReadApi, markAllNotificationsReadApi, deleteNotificationApi,
+  getAnalyticsApi, getActivityLogApi,
 } from '../api'
 import './Admin.css'
 
@@ -151,7 +152,7 @@ function DashboardSection({ stats, onNavigate }) {
           <p>Kade Media yönetim paneline hoş geldiniz — {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
         <a href="/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ gap: 8, fontSize: '0.88rem' }}>
-          🌐 Siteyi Görüntüle
+          ⚡ Siteyi Görüntüle
         </a>
       </div>
 
@@ -2998,137 +2999,180 @@ function NotificationDropdown({ show, onClose }) {
 }
 
 // ========== ANALYTICS SECTION ==========
+const SOURCE_COLORS = { organic: '#2ECC71', social: '#6C63FF', direct: '#eac321', referral: '#E91E63' }
+
 function AnalyticsSection() {
   const [period, setPeriod] = useState('week')
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  // Mock analytics data
-  const weeklyVisits = [320, 450, 280, 510, 390, 620, 480]
-  const weekLabels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
-  const monthlyVisits = [2100, 2800, 3200, 2500, 3800, 4200, 3100, 3900, 4500, 3600, 4800, 5200]
-  const monthLabels = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
+  const load = useCallback(async (p) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await getAnalyticsApi(p)
+      setData(res)
+    } catch (e) {
+      setError(e.message || 'Veri alınamadı')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  const data = period === 'week' ? weeklyVisits : monthlyVisits
-  const labels = period === 'week' ? weekLabels : monthLabels
-  const maxVal = Math.max(...data)
+  useEffect(() => { load(period) }, [period, load])
 
-  const pageStats = [
-    { page: 'Ana Sayfa', views: 12450, percent: 100 },
-    { page: 'Hizmetler', views: 4320, percent: 35 },
-    { page: 'Paketler', views: 3890, percent: 31 },
-    { page: 'Blog', views: 2950, percent: 24 },
-    { page: 'İletişim', views: 2100, percent: 17 },
-    { page: 'Hakkımızda', views: 1850, percent: 15 },
-  ]
+  const PAGE_NAMES = {
+    '/': 'Ana Sayfa', '/hizmetler': 'Hizmetler', '/paketler': 'Paketler',
+    '/blog': 'Blog', '/iletisim': 'İletişim', '/hakkimizda': 'Hakkımızda',
+    '/ekip': 'Ekip', '/kariyer': 'Kariyer', '/partnerler': 'Partnerler', '/portfolio': 'Portfolio',
+  }
 
-  const channelData = [
-    { name: 'Organik', value: 42, color: '#2ECC71' },
-    { name: 'Sosyal Medya', value: 28, color: '#6C63FF' },
-    { name: 'Direkt', value: 18, color: '#eac321' },
-    { name: 'Referans', value: 12, color: '#E91E63' },
-  ]
+  const formatLabel = (date) => {
+    const d = new Date(date)
+    if (period === 'week') return ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'][d.getDay() === 0 ? 6 : d.getDay() - 1]
+    return `${d.getDate()}/${d.getMonth() + 1}`
+  }
+
+  const dailyData = data?.dailyData || []
+  const maxVal = Math.max(...dailyData.map(d => d.count), 1)
+  const totalVisits = data?.totalVisits || 0
+  const growth = data?.growth
+  const pages = data?.pages || []
+  const sources = data?.sources || []
 
   return (
     <div>
       <div className="admin-page-header">
         <div>
           <h1>Analitik <span>Paneli</span></h1>
-          <p>Site performansı ve ziyaretçi istatistikleri</p>
+          <p>Gerçek zamanlı site ziyaret istatistikleri</p>
         </div>
-        <div className="admin-tabs" style={{ margin: 0 }}>
-          <button className={`admin-tab ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>Haftalık</button>
-          <button className={`admin-tab ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>Aylık</button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button onClick={() => load(period)} className="table-action-btn" disabled={loading} style={{ marginRight: 8 }}>
+            {loading ? '⏳' : '🔄'} Yenile
+          </button>
+          <div className="admin-tabs" style={{ margin: 0 }}>
+            <button className={`admin-tab ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>Son 7 Gün</button>
+            <button className={`admin-tab ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>Son 30 Gün</button>
+          </div>
         </div>
       </div>
+
+      {error && <div className="admin-form" style={{ color: '#E91E63', padding: 16 }}>⚠️ {error}</div>}
 
       {/* Summary Cards */}
       <div className="admin-stats-grid">
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.10)', color: '#6C63FF' }}>👁️</div>
-          <div className="stat-number">{period === 'week' ? '3.05K' : '42.3K'}</div>
-          <div className="stat-label">Toplam Ziyaret</div>
-          <div style={{ fontSize: '0.75rem', color: '#2ECC71', marginTop: 4 }}>↑ 12.5%</div>
+          <div className="stat-number">{loading ? '—' : totalVisits.toLocaleString('tr-TR')}</div>
+          <div className="stat-label">Toplam Sayfa Görüntüleme</div>
+          {growth !== null && !loading && (
+            <div style={{ fontSize: '0.75rem', color: growth >= 0 ? '#2ECC71' : '#E91E63', marginTop: 4 }}>
+              {growth >= 0 ? '↑' : '↓'} {Math.abs(growth)}% önceki döneme göre
+            </div>
+          )}
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(234, 195, 33, 0.10)', color: '#eac321' }}>👤</div>
-          <div className="stat-number">{period === 'week' ? '1.2K' : '15.8K'}</div>
-          <div className="stat-label">Tekil Ziyaretçi</div>
-          <div style={{ fontSize: '0.75rem', color: '#2ECC71', marginTop: 4 }}>↑ 8.3%</div>
+          <div className="stat-icon" style={{ background: 'rgba(234, 195, 33, 0.10)', color: '#eac321' }}>📄</div>
+          <div className="stat-number">{loading ? '—' : pages.length}</div>
+          <div className="stat-label">Ziyaret Edilen Sayfa</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>⏱️</div>
-          <div className="stat-number">2:45</div>
-          <div className="stat-label">Ort. Oturum Süresi</div>
-          <div style={{ fontSize: '0.75rem', color: '#2ECC71', marginTop: 4 }}>↑ 5.1%</div>
+          <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>📅</div>
+          <div className="stat-number">{loading ? '—' : dailyData.length > 0 ? Math.round(totalVisits / dailyData.length) : 0}</div>
+          <div className="stat-label">Günlük Ortalama</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>📊</div>
-          <div className="stat-number">32%</div>
-          <div className="stat-label">Hemen Çıkma Oranı</div>
-          <div style={{ fontSize: '0.75rem', color: '#2ECC71', marginTop: 4 }}>↓ 3.2%</div>
+          <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>🔝</div>
+          <div className="stat-number">{loading ? '—' : pages[0]?.views.toLocaleString('tr-TR') || 0}</div>
+          <div className="stat-label">En Çok Ziyaret Edilen Sayfa</div>
+          {pages[0] && <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{PAGE_NAMES[pages[0].path] || pages[0].path}</div>}
         </div>
       </div>
 
       {/* Bar Chart */}
       <div className="admin-form" style={{ marginTop: 24 }}>
-        <h3>📈 Ziyaret Trendi ({period === 'week' ? 'Son 7 Gün' : 'Son 12 Ay'})</h3>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 200, marginTop: 20, padding: '0 8px' }}>
-          {data.map((val, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>{val}</span>
-              <div
-                style={{
-                  width: '100%',
-                  maxWidth: 40,
-                  height: `${(val / maxVal) * 150}px`,
-                  background: `linear-gradient(180deg, #eac321 0%, rgba(234,195,33,0.3) 100%)`,
-                  borderRadius: '6px 6px 2px 2px',
-                  transition: 'height 0.5s ease',
-                }}
-              />
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>{labels[i]}</span>
-            </div>
-          ))}
-        </div>
+        <h3>📈 Sayfa Görüntüleme Trendi ({period === 'week' ? 'Son 7 Gün' : 'Son 30 Gün'})</h3>
+        {loading ? (
+          <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)' }}>Yükleniyor...</div>
+        ) : dailyData.length === 0 || totalVisits === 0 ? (
+          <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', flexDirection: 'column', gap: 8 }}>
+            <span style={{ fontSize: '2rem' }}>📊</span>
+            <span>Henüz ziyaret verisi yok — site ziyaret edildikçe burada görünecek</span>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 180, marginTop: 20, padding: '0 4px', overflowX: 'auto' }}>
+            {dailyData.map((d, i) => (
+              <div key={i} style={{ flex: 1, minWidth: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                {d.count > 0 && <span style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)' }}>{d.count}</span>}
+                <div
+                  style={{
+                    width: '100%',
+                    height: `${Math.max((d.count / maxVal) * 140, d.count > 0 ? 4 : 2)}px`,
+                    background: d.count > 0
+                      ? 'linear-gradient(180deg, #eac321 0%, rgba(234,195,33,0.35) 100%)'
+                      : 'rgba(255,255,255,0.06)',
+                    borderRadius: '4px 4px 2px 2px',
+                    transition: 'height 0.5s ease',
+                  }}
+                />
+                <span style={{ fontSize: '0.62rem', color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{formatLabel(d.date)}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20 }}>
         {/* Popular Pages */}
         <div className="admin-form">
-          <h3>🏆 En Popüler Sayfalar</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
-            {pageStats.map((p, i) => (
-              <div key={i}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{p.page}</span>
-                  <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.views.toLocaleString()}</span>
-                </div>
-                <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
-                  <div style={{ width: `${p.percent}%`, height: '100%', background: 'var(--accent)', borderRadius: 3, transition: 'width 0.5s ease' }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Traffic Channels */}
-        <div className="admin-form">
-          <h3>🌐 Trafik Kaynakları</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
-            {channelData.map((ch, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 12, height: 12, borderRadius: '50%', background: ch.color, flexShrink: 0 }} />
-                <div style={{ flex: 1 }}>
+          <h3>🏆 En Çok Ziyaret Edilen Sayfalar</h3>
+          {loading ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Yükleniyor...</div>
+          : pages.length === 0 ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Henüz veri yok</div>
+          : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+              {pages.map((p, i) => (
+                <div key={i}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{ch.name}</span>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: ch.color }}>%{ch.value}</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{PAGE_NAMES[p.path] || p.path}</span>
+                    <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.views.toLocaleString('tr-TR')}</span>
                   </div>
                   <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
-                    <div style={{ width: `${ch.value}%`, height: '100%', background: ch.color, borderRadius: 3 }} />
+                    <div style={{ width: `${p.percent}%`, height: '100%', background: 'var(--accent)', borderRadius: 3, transition: 'width 0.6s ease' }} />
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Traffic Sources */}
+        <div className="admin-form">
+          <h3>🌐 Trafik Kaynakları</h3>
+          {loading ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Yükleniyor...</div>
+          : sources.length === 0 ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Henüz veri yok</div>
+          : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
+              {sources.map((s, i) => {
+                const color = SOURCE_COLORS[s.key] || '#888'
+                return (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: color, flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{s.name}</span>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color }}>{s.count} (%{s.value})</span>
+                      </div>
+                      <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ width: `${s.value}%`, height: '100%', background: color, borderRadius: 3, transition: 'width 0.6s ease' }} />
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -3282,25 +3326,28 @@ function PortfolioSection({ showToast }) {
 
 // ========== ACTIVITY LOG ==========
 function ActivityLogSection() {
-  const [logs] = useState([
-    { id: 1, action: 'Blog yazısı oluşturuldu', detail: '"Instagram Algoritması 2025"', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 15), type: 'create', icon: '📝' },
-    { id: 2, action: 'Yeni mesaj alındı', detail: 'Ahmet Yılmaz - Teklif talebi', user: 'sistem', time: new Date(Date.now() - 1000 * 60 * 45), type: 'message', icon: '✉️' },
-    { id: 3, action: 'Partner güncellendi', detail: 'Flavora - Metrikler güncellendi', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 120), type: 'update', icon: '🤝' },
-    { id: 4, action: 'Kullanıcı oluşturuldu', detail: 'editor - Editor rolü', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 180), type: 'create', icon: '👤' },
-    { id: 5, action: 'İçerik güncellendi', detail: 'Hero section metinleri', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 240), type: 'update', icon: '✏️' },
-    { id: 6, action: 'Blog yazısı silindi', detail: '"Eski Yazı"', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 360), type: 'delete', icon: '🗑️' },
-    { id: 7, action: 'Yeni mesaj alındı', detail: 'Zeynep Kara - Sosyal medya paketi', user: 'sistem', time: new Date(Date.now() - 1000 * 60 * 420), type: 'message', icon: '✉️' },
-    { id: 8, action: 'Paket fiyatları güncellendi', detail: 'Pro paket - ₺18.500', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 600), type: 'update', icon: '💰' },
-    { id: 9, action: 'Partner eklendi', detail: 'TechVibe - Teknoloji', user: 'admin', time: new Date(Date.now() - 1000 * 60 * 720), type: 'create', icon: '🤝' },
-    { id: 10, action: 'Sistem güncellemesi', detail: 'Veritabanı bakımı tamamlandı', user: 'sistem', time: new Date(Date.now() - 1000 * 60 * 1440), type: 'system', icon: '⚙️' },
-  ])
-
+  const [logs, setLogs] = useState([])
   const [filter, setFilter] = useState('all')
-  const filtered = filter === 'all' ? logs : logs.filter(l => l.type === filter)
+  const [loading, setLoading] = useState(true)
 
-  const formatTime = (date) => {
-    const diff = Date.now() - date.getTime()
+  const load = useCallback(async (f) => {
+    setLoading(true)
+    try {
+      const data = await getActivityLogApi(f)
+      setLogs(Array.isArray(data) ? data : [])
+    } catch {
+      setLogs([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { load(filter) }, [filter, load])
+
+  const formatTime = (dateStr) => {
+    const diff = Date.now() - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
+    if (mins < 1) return 'Az önce'
     if (mins < 60) return `${mins} dk önce`
     const hours = Math.floor(mins / 60)
     if (hours < 24) return `${hours} saat önce`
@@ -3315,8 +3362,11 @@ function ActivityLogSection() {
       <div className="admin-page-header">
         <div>
           <h1>Aktivite <span>Logu</span></h1>
-          <p>Panelde yapılan son işlemler</p>
+          <p>Panelde yapılan gerçek zamanlı işlemler</p>
         </div>
+        <button onClick={() => load(filter)} className="table-action-btn" disabled={loading}>
+          {loading ? '⏳' : '🔄'} Yenile
+        </button>
       </div>
 
       <div className="admin-tabs" style={{ marginBottom: 20 }}>
@@ -3328,24 +3378,30 @@ function ActivityLogSection() {
       </div>
 
       <div className="admin-form" style={{ padding: 0 }}>
-        {filtered.length === 0 ? (
-          <div className="admin-empty-state"><p>Bu kategoride log bulunamadı.</p></div>
-        ) : filtered.map((log, i) => (
-          <div key={log.id} style={{
+        {loading ? (
+          <div className="admin-empty-state"><p>Yükleniyor...</p></div>
+        ) : logs.length === 0 ? (
+          <div className="admin-empty-state">
+            <div className="empty-icon">📋</div>
+            <h3>Henüz aktivite logu yok</h3>
+            <p>Blog ekle, partner güncelle veya mesaj al — işlemler burada görünecek</p>
+          </div>
+        ) : logs.map((log, i) => (
+          <div key={log._id || i} style={{
             display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px',
-            borderBottom: i < filtered.length - 1 ? '1px solid var(--border)' : 'none',
+            borderBottom: i < logs.length - 1 ? '1px solid var(--border)' : 'none',
           }}>
             <div style={{
               width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: `${typeColors[log.type]}15`, fontSize: '1.1rem', flexShrink: 0,
-            }}>{log.icon}</div>
+              background: `${typeColors[log.type] || '#888'}15`, fontSize: '1.1rem', flexShrink: 0,
+            }}>{log.icon || '⚙️'}</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{log.action}</div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{log.detail}</div>
             </div>
             <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>{formatTime(log.time)}</div>
-              <span className="status-badge" style={{ background: `${typeColors[log.type]}15`, color: typeColors[log.type], marginTop: 4, display: 'inline-block', fontSize: '0.7rem' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>{formatTime(log.createdAt)}</div>
+              <span className="status-badge" style={{ background: `${typeColors[log.type] || '#888'}15`, color: typeColors[log.type] || '#888', marginTop: 4, display: 'inline-block', fontSize: '0.7rem' }}>
                 {log.user}
               </span>
             </div>
@@ -3539,7 +3595,7 @@ export default function Admin() {
             <span>{darkMode ? 'Açık Mod' : 'Koyu Mod'}</span>
           </button>
           <a href="/" target="_blank" rel="noopener noreferrer" className="sidebar-site-link">
-            🌐 <span>Siteyi Görüntüle</span>
+            ⚡ <span>Siteyi Görüntüle</span>
           </a>
           <button className="sidebar-logout" onClick={handleLogout}>
             <HiOutlineLogout size={18} /> <span>Çıkış Yap</span>

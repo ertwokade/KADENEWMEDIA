@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import { getDb } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+import { logActivity } from './notifications.js';
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -62,6 +63,7 @@ export default async function handler(req, res) {
 
       await db.collection('users').insertOne(newUser);
       const { password: _, ...safeUser } = newUser;
+      logActivity(db, { action: 'Kullanıcı oluşturuldu', detail: `${username} - ${role || 'viewer'} rolü`, type: 'create', icon: '👤', user: user.username }).catch(() => {});
       return res.status(201).json(safeUser);
     }
 
@@ -88,7 +90,7 @@ export default async function handler(req, res) {
         { _id: new ObjectId(id) },
         { $set: updateData }
       );
-
+      logActivity(db, { action: 'Kullanıcı güncellendi', detail: `${username || id}`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Kullanıcı güncellendi' });
     }
 
@@ -106,6 +108,7 @@ export default async function handler(req, res) {
       }
 
       await db.collection('users').deleteOne({ _id: new ObjectId(id) });
+      logActivity(db, { action: 'Kullanıcı silindi', detail: `${targetUser?.username || id}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Kullanıcı silindi' });
     }
 

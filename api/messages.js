@@ -1,6 +1,7 @@
 import { getDb } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+import { logActivity } from './notifications.js';
 import { ObjectId } from 'mongodb';
 
 const VALID_STATUSES = ['yeni', 'gorusme-bekliyor', 'teklif-gonderildi', 'kazanildi', 'kaybedildi'];
@@ -57,7 +58,9 @@ export default async function handler(req, res) {
   if (req.method === 'DELETE') {
     try {
       const queryId = req.body?.id || req.query.id;
+      const msg = await collection.findOne({ _id: new ObjectId(queryId) });
       await collection.deleteOne({ _id: new ObjectId(queryId) });
+      logActivity(db, { action: 'Mesaj silindi', detail: `${msg?.name || ''} - ${msg?.subject || ''}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Mesaj silindi' });
     } catch (error) {
       console.error('Messages DELETE error:', error);

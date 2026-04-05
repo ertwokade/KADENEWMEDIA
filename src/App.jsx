@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
+import { trackPageviewApi } from './api'
 import PageHeroCanvas from './components/PageHeroCanvas'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -62,6 +63,15 @@ function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
   const canvasTheme = getCanvasTheme(location.pathname)
+  const prevPath = useRef(null)
+
+  useEffect(() => {
+    // Don't track admin visits, avoid duplicate on first render
+    if (isAdmin) return
+    if (prevPath.current === location.pathname) return
+    prevPath.current = location.pathname
+    trackPageviewApi(location.pathname, document.referrer)
+  }, [location.pathname, isAdmin])
 
   return (
     <>

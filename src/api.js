@@ -293,3 +293,39 @@ export async function deleteNotificationApi(id) {
   });
   return handleResponse(res);
 }
+
+// Analytics
+export async function trackPageviewApi(path, referrer) {
+  try {
+    await fetch(`${API_BASE}/content?action=pageview`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path, referrer }),
+    });
+  } catch { /* non-critical */ }
+}
+
+export async function getAnalyticsApi(period = 'week') {
+  const res = await fetch(`${API_BASE}/content?action=analytics&period=${period}`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// Activity Log
+export async function getActivityLogApi(type) {
+  const url = type && type !== 'all'
+    ? `${API_BASE}/notifications?action=activity&type=${type}`
+    : `${API_BASE}/notifications?action=activity`;
+  const res = await fetch(url, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function createActivityLogApi(data) {
+  const res = await fetch(`${API_BASE}/notifications?action=activity`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
