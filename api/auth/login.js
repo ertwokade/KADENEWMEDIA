@@ -3,6 +3,10 @@ import { getDb } from '../_lib/mongodb.js';
 import { createToken } from '../_lib/auth.js';
 import { cors } from '../_lib/cors.js';
 
+// Varsayılan admin bilgileri — .env'den alınır, yoksa fallback
+const DEFAULT_ADMIN_USERNAME = 'kade';
+const DEFAULT_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'KadeAdmin2026!';
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
@@ -24,6 +28,21 @@ export default async function handler(req, res) {
     }
 
     const db = await getDb();
+
+    // Veritabanında hiç kullanıcı yoksa otomatik admin oluştur
+    const userCount = await db.collection('users').countDocuments();
+    if (userCount === 0) {
+      console.log('📦 Veritabanında kullanıcı yok — varsayılan admin oluşturuluyor...');
+      const hashedPassword = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10);
+      await db.collection('users').insertOne({
+        username: DEFAULT_ADMIN_USERNAME,
+        password: hashedPassword,
+        role: 'admin',
+        createdAt: new Date(),
+      });
+      console.log(`✅ Admin kullanıcısı oluşturuldu: ${DEFAULT_ADMIN_USERNAME}`);
+    }
+
     const user = await db.collection('users').findOne({ username });
 
     if (!user) {
@@ -45,7 +64,13 @@ export default async function handler(req, res) {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login hatası:', error);
+    // MongoDB authentication hatası kontrolü
+    if (error.message?.includes('bad auth') || error.code === 8000) {
+      return res.status(500).json({ 
+        error: 'Veritabanı bağlantı hatası: MongoDB Atlas kullanıcı adı veya şifresi yanlış. Lütfen MONGODB_URI ortam değişkenini kontrol edin.' 
+      });
+    }
     return res.status(500).json({ error: 'Sunucu hatası: ' + error.message });
   }
 }

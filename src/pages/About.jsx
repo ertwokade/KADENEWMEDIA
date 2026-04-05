@@ -121,95 +121,52 @@ export default function About() {
             <FadeIn direction="right" className="story-visual">
               <div className="visual-card glass-card">
                 <div className="lightning-container">
-                  {/* Outer glow rings */}
+                  {/* Dış parlama halkaları */}
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
                       className="lightning-ring"
                       animate={{
-                        scale: [1, 1.6 + i * 0.3, 1],
-                        opacity: [0.3 - i * 0.08, 0, 0.3 - i * 0.08],
+                        scale: [1, 1.8 + i * 0.4, 1],
+                        opacity: [0.25 - i * 0.06, 0, 0.25 - i * 0.06],
                       }}
                       transition={{
-                        duration: 2.5,
-                        delay: i * 0.5,
+                        duration: 3,
+                        delay: i * 0.6,
                         repeat: Infinity,
                         ease: 'easeOut',
                       }}
                     />
                   ))}
-                  {/* Actual Kade Media logo icon — animated */}
+                  {/* Logo — gerçek dosyadan yükleniyor */}
                   <motion.div
                     className="lightning-bolt-wrapper"
                     animate={{
                       filter: [
-                        'drop-shadow(0 0 8px #eac321) drop-shadow(0 0 25px #eac32150)',
-                        'drop-shadow(0 0 22px #eac321) drop-shadow(0 0 55px #eac32180)',
-                        'drop-shadow(0 0 8px #eac321) drop-shadow(0 0 25px #eac32150)',
+                        'drop-shadow(0 0 12px #eac321) drop-shadow(0 0 30px rgba(234,195,33,0.3))',
+                        'drop-shadow(0 0 28px #eac321) drop-shadow(0 0 60px rgba(234,195,33,0.5))',
+                        'drop-shadow(0 0 12px #eac321) drop-shadow(0 0 30px rgba(234,195,33,0.3))',
                       ],
+                      scale: [1, 1.04, 1],
                     }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <motion.img
+                      src="/logo-icon.svg"
+                      alt="Kade Media Logo"
+                      className="lightning-svg"
+                      animate={{ rotate: [0, 2, -2, 0] }}
+                      transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                      draggable={false}
+                    />
+                  </motion.div>
+                  <motion.div
+                    className="lightning-label"
+                    animate={{ opacity: [0.7, 1, 0.7] }}
                     transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                   >
-                    <svg viewBox="0 0 54 54" className="lightning-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <defs>
-                        <linearGradient id="logoGrad1" x1="0" y1="0" x2="1" y2="1">
-                          <motion.stop
-                            offset="0%"
-                            animate={{ stopColor: ['#f5e058', '#fff4a8', '#f5e058'] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                          />
-                          <motion.stop
-                            offset="100%"
-                            animate={{ stopColor: ['#eac321', '#f5dc5a', '#eac321'] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                          />
-                        </linearGradient>
-                        <linearGradient id="logoGrad2" x1="0" y1="0" x2="1" y2="1">
-                          <motion.stop
-                            offset="0%"
-                            animate={{ stopColor: ['#d4b820', '#eac321', '#d4b820'] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                          />
-                          <motion.stop
-                            offset="100%"
-                            animate={{ stopColor: ['#7a6010', '#b89a18', '#7a6010'] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                          />
-                        </linearGradient>
-                      </defs>
-                      {/* Top-left triangle */}
-                      <motion.polygon
-                        points="2,2 26,2 2,26"
-                        fill="url(#logoGrad1)"
-                        animate={{ opacity: [0.85, 1, 0.85] }}
-                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                      />
-                      {/* Top-right triangle */}
-                      <motion.polygon
-                        points="29,2 52,2 52,25"
-                        fill="url(#logoGrad2)"
-                        animate={{ opacity: [0.75, 0.95, 0.75] }}
-                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
-                      />
-                      {/* Bottom-left triangle */}
-                      <motion.polygon
-                        points="2,29 25,52 2,52"
-                        fill="url(#logoGrad2)"
-                        animate={{ opacity: [0.75, 0.95, 0.75] }}
-                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
-                      />
-                      {/* Bottom-right triangle */}
-                      <motion.polygon
-                        points="28,52 52,28 52,52"
-                        fill="url(#logoGrad2)"
-                        animate={{ opacity: [0.7, 0.92, 0.7] }}
-                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.9 }}
-                      />
-                    </svg>
-                  </motion.div>
-                  <div className="lightning-label">
                     <span>kade</span>media
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             </FadeIn>
