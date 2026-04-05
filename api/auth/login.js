@@ -49,7 +49,28 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Geçersiz kullanıcı adı veya şifre' });
     }
 
-    const valid = await bcrypt.compare(password, user.password);
+    let valid = false;
+    try {
+      valid = await bcrypt.compare(password, user.password);
+    } catch (bcryptErr) {
+      console.error('bcrypt compare hatası:', bcryptErr.message);
+      // Hash bozuksa valid = false kalır, aşağıda ele alınır
+    }
+
+    // Varsayılan admin kullanıcısı için: şifre hash'i uyumsuzsa ve
+    // girilen şifre beklenen varsayılan şifreyle eşleşiyorsa,
+    // hash'i yeniden oluştur ve güncelle
+    if (!valid && username === DEFAULT_ADMIN_USERNAME && password === DEFAULT_ADMIN_PASSWORD) {
+      console.log('🔄 Admin şifre hash\'i uyumsuz — yeniden oluşturuluyor...');
+      const newHash = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10);
+      await db.collection('users').updateOne(
+        { _id: user._id },
+        { $set: { password: newHash } }
+      );
+      valid = true;
+      console.log('✅ Admin şifre hash\'i güncellendi');
+    }
+
     if (!valid) {
       return res.status(401).json({ error: 'Geçersiz kullanıcı adı veya şifre' });
     }
