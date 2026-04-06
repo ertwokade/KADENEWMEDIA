@@ -228,6 +228,16 @@ export default function Home() {
             </div>
           </FadeIn>
 
+          <FadeIn delay={0.55}>
+            <div className="hero-free-audit">
+              <Link to="/iletisim" className="hero-audit-link">
+                <HiOutlineChartBar size={16} />
+                <span>{lang === 'tr' ? '🎯 Ücretsiz Sosyal Medya Analizi Al' : '🎯 Get Free Social Media Analysis'}</span>
+                <HiOutlineArrowRight size={14} />
+              </Link>
+            </div>
+          </FadeIn>
+
           <FadeIn delay={0.6}>
             <div className="hero-platforms">
               <span className="platforms-label">{t('hero.platforms')}</span>

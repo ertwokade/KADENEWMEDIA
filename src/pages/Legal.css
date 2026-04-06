@@ -17,7 +17,7 @@
 }
 
 .legal-date {
-  color: var(--text-tertiary);
+  color: var(--gray-light);
   font-size: 0.85rem;
   margin-bottom: 40px;
 }
@@ -35,14 +35,14 @@
 }
 
 .legal-content p {
-  color: var(--text-secondary);
+  color: var(--gray-light);
   line-height: 1.8;
   margin-bottom: 12px;
   font-size: 0.95rem;
 }
 
 .legal-content ul {
-  color: var(--text-secondary);
+  color: var(--gray-light);
   line-height: 1.8;
   padding-left: 24px;
   margin-bottom: 12px;
@@ -61,4 +61,20 @@
   .legal-content {
     padding: 32px 24px;
   }
+}
+
+/* Light Mode Legal */
+[data-theme="light"] .legal-content h1,
+[data-theme="light"] .legal-content h3,
+[data-theme="light"] .legal-content strong {
+  color: #1A1715;
+}
+
+[data-theme="light"] .legal-content p,
+[data-theme="light"] .legal-content ul {
+  color: #4A4540;
+}
+
+[data-theme="light"] .legal-date {
+  color: #7A7570;
 }

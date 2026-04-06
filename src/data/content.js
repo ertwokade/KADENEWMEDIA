@@ -10,8 +10,8 @@ export const partnersData = [
     descEn: 'Flavora is one of Istanbul\'s most popular fast-food chains. We increased brand awareness by 300% with our social media strategy.',
     longDescTr: 'Flavora ile 2023 yılından bu yana çalışıyoruz. Instagram, TikTok ve Facebook platformlarında kapsamlı sosyal medya yönetimi hizmeti veriyoruz. Yaratıcı içerikler, viral TikTok videoları ve hedefli reklam kampanyalarıyla Flavora\'nın dijital varlığını güçlendirdik.',
     longDescEn: 'We have been working with Flavora since 2023. We provide comprehensive social media management services on Instagram, TikTok, and Facebook. We strengthened Flavora\'s digital presence with creative content, viral TikTok videos, and targeted ad campaigns.',
-    servicesTr: ['Sosyal Medya Yönetimi', 'İçerik Üretimi', 'Reklam Yönetimi', 'Influencer Marketing'],
-    servicesEn: ['Social Media Management', 'Content Production', 'Ad Management', 'Influencer Marketing'],
+    servicesTr: ['Sosyal Medya Yönetimi', 'İçerik Üretimi', 'Reklam Yönetimi', 'Video Prodüksiyon'],
+    servicesEn: ['Social Media Management', 'Content Production', 'Ad Management', 'Video Production'],
     resultsTr: ['%300 marka bilinirliği artışı', '50K+ yeni takipçi', '%250 etkileşim artışı', '2M+ video görüntülenme'],
     resultsEn: ['300% brand awareness increase', '50K+ new followers', '250% engagement increase', '2M+ video views'],
   },
@@ -58,8 +58,8 @@ export const partnersData = [
     descEn: 'UrbanStyle is a young fashion brand. We achieved viral growth with our TikTok strategy.',
     longDescTr: 'UrbanStyle\'ın hedef kitlesi olan Z kuşağına ulaşmak için TikTok odaklı bir strateji geliştirdik. Trend içerikler, influencer iş birlikleri ve yaratıcı video prodüksiyonuyla markayı TikTok\'ta en çok konuşulan moda markalarından biri yaptık.',
     longDescEn: 'We developed a TikTok-focused strategy to reach UrbanStyle\'s target audience, Gen Z. With trending content, influencer collaborations, and creative video production, we made the brand one of the most talked-about fashion brands on TikTok.',
-    servicesTr: ['TikTok Yönetimi', 'Video Prodüksiyon', 'Influencer Marketing', 'Reklam Yönetimi'],
-    servicesEn: ['TikTok Management', 'Video Production', 'Influencer Marketing', 'Ad Management'],
+    servicesTr: ['TikTok Yönetimi', 'Video Prodüksiyon', 'Marka Stratejisi', 'Reklam Yönetimi'],
+    servicesEn: ['TikTok Management', 'Video Production', 'Brand Strategy', 'Ad Management'],
     resultsTr: ['10M+ TikTok görüntülenme', '200K+ yeni takipçi', '50+ influencer iş birliği', '%500 online satış artışı'],
     resultsEn: ['10M+ TikTok views', '200K+ new followers', '50+ influencer collaborations', '500% online sales increase'],
   },
@@ -90,8 +90,8 @@ export const partnersData = [
     descEn: 'FitZone is a premium gym chain. We increased membership sales by 250% with digital marketing.',
     longDescTr: 'FitZone\'un dijital dönüşüm sürecini yönettik. Video içerikler, dönüşüm odaklı reklam kampanyaları ve influencer iş birlikleriyle hem marka bilinirliğini hem de üyelik satışlarını önemli ölçüde artırdık.',
     longDescEn: 'We managed FitZone\'s digital transformation process. We significantly increased both brand awareness and membership sales with video content, conversion-focused ad campaigns, and influencer collaborations.',
-    servicesTr: ['Video Prodüksiyon', 'Performance Marketing', 'Influencer Marketing', 'Sosyal Medya Yönetimi'],
-    servicesEn: ['Video Production', 'Performance Marketing', 'Influencer Marketing', 'Social Media Management'],
+    servicesTr: ['Video Prodüksiyon', 'Performance Marketing', 'Marka Stratejisi', 'Sosyal Medya Yönetimi'],
+    servicesEn: ['Video Production', 'Performance Marketing', 'Brand Strategy', 'Social Media Management'],
     resultsTr: ['%250 üyelik satış artışı', '15M+ video görüntülenme', '25+ influencer iş birliği', '%180 lead artışı'],
     resultsEn: ['250% membership sales increase', '15M+ video views', '25+ influencer collaborations', '180% lead increase'],
   },
@@ -380,7 +380,7 @@ export const blogPosts = [
     categoryEn: 'Industry News',
     date: '30 Mar 2025',
     readTime: 7,
-    image: '🎵',
+    image: 'https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?w=800&q=80',
     color: '#000000',
   },
   {
@@ -422,7 +422,7 @@ export const blogPosts = [
     categoryEn: 'Industry News',
     date: '25 Mar 2025',
     readTime: 5,
-    image: '▶️',
+    image: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=800&q=80',
     color: '#FF0000',
   },
   {
@@ -467,7 +467,7 @@ export const blogPosts = [
     categoryEn: 'Industry News',
     date: '22 Mar 2025',
     readTime: 8,
-    image: '🔍',
+    image: 'https://images.unsplash.com/photo-1553484771-8bbd5e485ce0?w=800&q=80',
     color: '#4285F4',
   },
   {
@@ -510,7 +510,7 @@ export const blogPosts = [
     categoryEn: 'Industry News',
     date: '18 Mar 2025',
     readTime: 7,
-    image: '💼',
+    image: 'https://images.unsplash.com/photo-1611944212129-29977ae1398c?w=800&q=80',
     color: '#0A66C2',
   },
   {
@@ -561,8 +561,227 @@ export const blogPosts = [
     categoryEn: 'Industry News',
     date: '10 Mar 2025',
     readTime: 6,
-    image: '📊',
+    image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&q=80',
     color: '#FF9800',
+  },
+  // ─── SEO Trafik Yazıları ───
+  {
+    id: 19,
+    slug: 'sosyal-medya-yonetimi-fiyatlari-2025-turkiye',
+    titleTr: 'Sosyal Medya Yönetimi Fiyatları 2025: Türkiye Piyasa Rehberi',
+    titleEn: 'Social Media Management Prices 2025: Turkey Market Guide',
+    excerptTr: 'Türkiye\'de sosyal medya yönetimi ne kadar tutar? Başlangıç, profesyonel ve kurumsal paketlerin fiyat karşılaştırması. Ajans seçerken nelere dikkat etmelisiniz?',
+    excerptEn: 'How much does social media management cost in Turkey? Price comparison of starter, professional, and enterprise packages. What to look for when choosing an agency.',
+    contentTr: `<h2>Sosyal Medya Yönetimi Ne Kadar Tutar?</h2>
+<p>2025 yılında Türkiye'deki sosyal medya yönetimi fiyatları, ajansın deneyimine, hizmet kapsamına ve platform sayısına göre büyük farklılıklar göstermektedir.</p>
+
+<h2>2025 Fiyat Aralıkları</h2>
+<ul>
+<li><strong>Başlangıç Paketleri (5.000 - 10.000 ₺/ay):</strong> 1-2 platform, aylık 12-16 içerik, temel grafik tasarım.</li>
+<li><strong>Profesyonel Paketler (15.000 - 25.000 ₺/ay):</strong> 3-4 platform, aylık 30+ içerik, video prodüksiyon, reklam yönetimi.</li>
+<li><strong>Kurumsal Paketler (30.000 - 50.000+ ₺/ay):</strong> Tüm platformlar, sınırsız içerik, özel strateji danışmanı, kriz yönetimi.</li>
+</ul>
+
+<h2>Fiyatı Etkileyen Faktörler</h2>
+<p>Platform sayısı, içerik sıklığı, video/Reels prodüksiyonu, reklam yönetimi hizmeti, raporlama sıklığı ve ajansın portföyü fiyatı doğrudan etkiler. Reklam bütçesi genellikle yönetim ücretinin üzerine eklenir.</p>
+
+<h2>Kade Media Fiyatlandırması</h2>
+<p>Kade Media olarak şeffaf fiyatlandırma politikamızla <strong>8.900 ₺</strong>'dan başlayan paketler sunuyoruz. <a href="/paketler">Paketlerimizi</a> inceleyin veya <a href="/iletisim">ücretsiz keşif görüşmesi</a> talep edin.</p>`,
+    contentEn: `<h2>How Much Does Social Media Management Cost?</h2>
+<p>In 2025, social media management prices in Turkey vary significantly based on agency experience, service scope, and number of platforms.</p>
+
+<h2>2025 Price Ranges</h2>
+<ul>
+<li><strong>Starter Packages (5,000 - 10,000 ₺/mo):</strong> 1-2 platforms, 12-16 monthly content pieces, basic graphic design.</li>
+<li><strong>Professional Packages (15,000 - 25,000 ₺/mo):</strong> 3-4 platforms, 30+ monthly content, video production, ad management.</li>
+<li><strong>Enterprise Packages (30,000 - 50,000+ ₺/mo):</strong> All platforms, unlimited content, dedicated strategist, crisis management.</li>
+</ul>
+
+<h2>Kade Media Pricing</h2>
+<p>At Kade Media, we offer transparent pricing starting from <strong>8,900 ₺</strong>. Check out our <a href="/paketler">packages</a> or request a <a href="/iletisim">free discovery call</a>.</p>`,
+    category: 'Rehber',
+    categoryEn: 'Guide',
+    date: '5 Nis 2025',
+    readTime: 8,
+    image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80',
+    color: '#2ECC71',
+  },
+  {
+    id: 20,
+    slug: 'instagram-isletme-hesabi-acma-rehberi-2025',
+    titleTr: 'Instagram İşletme Hesabı Nasıl Açılır? 2025 Adım Adım Rehber',
+    titleEn: 'How to Create an Instagram Business Account: 2025 Step-by-Step Guide',
+    excerptTr: 'Instagram işletme hesabı açmak, profesyonel profil oluşturmak ve istatistiklere erişmek için bilmeniz gereken her şey. Yeni başlayanlar için eksiksiz rehber.',
+    excerptEn: 'Everything you need to know about creating an Instagram business account, building a professional profile, and accessing analytics. A complete guide for beginners.',
+    contentTr: `<h2>Instagram İşletme Hesabı Nedir?</h2>
+<p>Instagram işletme hesabı, markanız için profesyonel araçlar sunan özel bir hesap türüdür. İstatistikler, reklam araçları ve iletişim butonları gibi özellikler sunar.</p>
+
+<h2>Adım Adım İşletme Hesabı Açma</h2>
+<ul>
+<li><strong>Adım 1:</strong> Instagram uygulamasını açın ve Ayarlar > Hesap bölümüne gidin.</li>
+<li><strong>Adım 2:</strong> "Profesyonel hesaba geç" seçeneğine tıklayın.</li>
+<li><strong>Adım 3:</strong> İşletme kategorinizi seçin (Dijital Pazarlama, Restoran, Moda vb.).</li>
+<li><strong>Adım 4:</strong> İletişim bilgilerinizi ekleyin (telefon, e-posta, adres).</li>
+<li><strong>Adım 5:</strong> Facebook sayfanızı bağlayın (opsiyonel ama önerilir).</li>
+</ul>
+
+<h2>İşletme Hesabının Avantajları</h2>
+<p>İstatistik paneli ile takipçi demografisi, erişim ve etkileşim verilerini takip edebilirsiniz. Reklam oluşturma, mağaza özelliği ve action butonları gibi araçlara erişirsiniz.</p>
+
+<h2>Profesyonel Yardım</h2>
+<p>Instagram hesabınızı profesyonel bir şekilde yönetmek için <a href="/hizmetler">sosyal medya yönetimi hizmetlerimizi</a> inceleyin.</p>`,
+    contentEn: `<h2>What Is an Instagram Business Account?</h2>
+<p>An Instagram business account offers professional tools for your brand, including analytics, advertising tools, and contact buttons.</p>
+
+<h2>Step-by-Step Account Creation</h2>
+<ul>
+<li><strong>Step 1:</strong> Open Instagram and go to Settings > Account.</li>
+<li><strong>Step 2:</strong> Tap "Switch to Professional Account."</li>
+<li><strong>Step 3:</strong> Choose your business category.</li>
+<li><strong>Step 4:</strong> Add your contact information.</li>
+<li><strong>Step 5:</strong> Connect your Facebook page (optional but recommended).</li>
+</ul>
+
+<h2>Professional Help</h2>
+<p>Check out our <a href="/hizmetler">social media management services</a> for professional Instagram management.</p>`,
+    category: 'Instagram',
+    categoryEn: 'Instagram',
+    date: '3 Nis 2025',
+    readTime: 5,
+    image: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800&q=80',
+    color: '#E91E63',
+  },
+  {
+    id: 21,
+    slug: 'tiktok-reklam-verme-rehberi-2025',
+    titleTr: 'TikTok\'ta Reklam Nasıl Verilir? 2025 Başlangıç Rehberi',
+    titleEn: 'How to Advertise on TikTok: 2025 Beginner\'s Guide',
+    excerptTr: 'TikTok Ads Manager kullanarak ilk reklam kampanyanızı oluşturun. Bütçe ayarlama, hedefleme seçenekleri ve başarılı reklam formatları hakkında bilmeniz gereken her şey.',
+    excerptEn: 'Create your first ad campaign using TikTok Ads Manager. Everything you need to know about budget settings, targeting options, and successful ad formats.',
+    contentTr: `<h2>TikTok Reklamlarına Giriş</h2>
+<p>TikTok, 30 milyondan fazla Türkiye kullanıcısıyla en hızlı büyüyen reklam platformu. Özellikle Z kuşağı ve genç millennial hedef kitleniz varsa, TikTok reklam stratejisi kaçırılmamalı.</p>
+
+<h2>TikTok Ads Manager'da İlk Kampanya</h2>
+<ul>
+<li><strong>Hesap oluşturma:</strong> ads.tiktok.com adresinden işletme hesabı açın.</li>
+<li><strong>Kampanya hedefi:</strong> Trafik, uygulama yükleme, dönüşüm veya video görüntüleme seçin.</li>
+<li><strong>Hedefleme:</strong> Yaş, cinsiyet, konum, ilgi alanları ve davranışlara göre hedefleyin.</li>
+<li><strong>Bütçe:</strong> Günlük minimum 50 TL ile başlayabilirsiniz.</li>
+<li><strong>Kreatif:</strong> 9:16 dikey video formatında, ilk 3 saniyede dikkat çeken içerikler hazırlayın.</li>
+</ul>
+
+<h2>Başarılı TikTok Reklam İpuçları</h2>
+<p>Organik içerik gibi görünen reklamlar, geleneksel reklam formatlarından <strong>%83 daha fazla etkileşim</strong> alır. "Reklam gibi görünmeyen reklam" stratejisi TikTok'ta altın kuraldır.</p>
+
+<h2>Profesyonel TikTok Yönetimi</h2>
+<p>TikTok reklam kampanyalarınızı profesyonel ekibimizle yönetin. <a href="/iletisim">Ücretsiz danışmanlık</a> talep edin.</p>`,
+    contentEn: `<h2>Introduction to TikTok Ads</h2>
+<p>TikTok is the fastest-growing ad platform with over 30 million users in Turkey. TikTok ad strategy is a must, especially if you target Gen Z and young millennials.</p>
+
+<h2>Your First Campaign in TikTok Ads Manager</h2>
+<ul>
+<li><strong>Account creation:</strong> Create a business account at ads.tiktok.com.</li>
+<li><strong>Campaign objective:</strong> Choose traffic, app installs, conversions, or video views.</li>
+<li><strong>Targeting:</strong> Target by age, gender, location, interests, and behaviors.</li>
+<li><strong>Budget:</strong> You can start with a daily minimum of 50 TL.</li>
+</ul>
+
+<h2>Professional TikTok Management</h2>
+<p>Manage your TikTok ad campaigns with our professional team. <a href="/iletisim">Request free consultation</a>.</p>`,
+    category: 'Reklam',
+    categoryEn: 'Advertising',
+    date: '1 Nis 2025',
+    readTime: 7,
+    image: 'https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?w=800&q=80',
+    color: '#000000',
+  },
+  {
+    id: 22,
+    slug: 'facebook-sayfa-yonetimi-ipuclari-2025',
+    titleTr: 'Facebook İşletme Sayfası Yönetimi: 2025 Pratik İpuçları',
+    titleEn: 'Facebook Business Page Management: 2025 Practical Tips',
+    excerptTr: 'Facebook işletme sayfanızı optimize etmek, organik erişimi artırmak ve Meta Business Suite kullanarak verimli yönetim için 10 pratik ipucu.',
+    excerptEn: '10 practical tips for optimizing your Facebook business page, increasing organic reach, and efficient management with Meta Business Suite.',
+    contentTr: `<h2>Facebook Hâlâ Önemli mi?</h2>
+<p>Evet! Facebook, Türkiye'de hâlâ <strong>40 milyonun üzerinde aktif kullanıcıya</strong> sahip. Özellikle 30-55 yaş arası hedef kitleniz varsa, Facebook stratejisi ihmal edilmemeli.</p>
+
+<h2>Facebook Sayfa Optimizasyonu</h2>
+<ul>
+<li><strong>Profil ve kapak fotoğrafı:</strong> Markanızın logosunu ve güncel kampanyalarınızı yansıtan görseller kullanın.</li>
+<li><strong>Hakkında bölümü:</strong> Anahtar kelimeler içeren detaylı bir açıklama yazın.</li>
+<li><strong>CTA butonu:</strong> "Mesaj Gönder", "Arayın" veya "Web Sitesini Ziyaret Edin" butonunu aktifleştirin.</li>
+<li><strong>Sabitlenmiş gönderi:</strong> En önemli kampanyanızı veya tanıtımınızı üste sabitleyin.</li>
+</ul>
+
+<h2>Organik Erişim Artırma</h2>
+<p>Facebook Grupları oluşturun, canlı yayınlar yapın ve etkileşim odaklı içerikler (anketler, sorular) paylaşın. Video içerikler metin gönderilerinden <strong>%135 daha fazla</strong> organik erişim alır.</p>
+
+<h2>Kade Media ile Facebook Yönetimi</h2>
+<p>Facebook sayfanızı profesyonel ekibimizle büyütün. <a href="/paketler">Paketlerimizi</a> inceleyin.</p>`,
+    contentEn: `<h2>Is Facebook Still Important?</h2>
+<p>Yes! Facebook still has <strong>over 40 million active users</strong> in Turkey. Facebook strategy should not be neglected, especially if your target audience is 30-55 years old.</p>
+
+<h2>Facebook Page Optimization</h2>
+<ul>
+<li><strong>Profile and cover photos:</strong> Use visuals reflecting your brand logo and current campaigns.</li>
+<li><strong>About section:</strong> Write a detailed description with keywords.</li>
+<li><strong>CTA button:</strong> Activate "Send Message", "Call", or "Visit Website" button.</li>
+</ul>
+
+<h2>Grow with Kade Media</h2>
+<p>Grow your Facebook page with our professional team. Check out our <a href="/paketler">packages</a>.</p>`,
+    category: 'Strateji',
+    categoryEn: 'Strategy',
+    date: '30 Mar 2025',
+    readTime: 6,
+    image: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80',
+    color: '#1877F2',
+  },
+  {
+    id: 23,
+    slug: 'sosyal-medya-ajansi-secerken-dikkat-edilmesi-gerekenler',
+    titleTr: 'Sosyal Medya Ajansı Seçerken Dikkat Edilecek 7 Kriter',
+    titleEn: '7 Criteria to Consider When Choosing a Social Media Agency',
+    excerptTr: 'Doğru sosyal medya ajansını bulmak markanızın geleceğini belirler. Portföy değerlendirmesinden sözleşme koşullarına kadar dikkat etmeniz gereken 7 kritik faktör.',
+    excerptEn: 'Finding the right social media agency determines your brand\'s future. 7 critical factors from portfolio evaluation to contract terms.',
+    contentTr: `<h2>Doğru Ajansı Seçmek Neden Kritik?</h2>
+<p>Sosyal medya ajansı seçimi, markanızın dijital kimliğini şekillendirecek en önemli kararlardan biridir. Yanlış seçim, kayıp bütçe ve zaman demektir.</p>
+
+<h2>7 Temel Kriter</h2>
+<ul>
+<li><strong>1. Portföy ve Sonuçlar:</strong> Somut rakamlar isteyin — "%300 artış" değil, "5.000'den 20.000'e çıktı" gibi net veriler.</li>
+<li><strong>2. Sektör Deneyimi:</strong> Kendi sektörünüzde çalışmış ajanslar, hedef kitlenizi zaten tanır.</li>
+<li><strong>3. İçerik Kalitesi:</strong> Ajansın kendi sosyal medya hesaplarına bakın. Kaliteli içerik üretiyorlarsa, sizin için de üreteceklerdir.</li>
+<li><strong>4. Raporlama Şeffaflığı:</strong> Hangi metrikleri ne sıklıkla raporluyorlar? Şeffaf raporlama güven sağlar.</li>
+<li><strong>5. İletişim Hızı:</strong> Mesajlara yanıt süresi, çalışma kalitesinin göstergesidir.</li>
+<li><strong>6. Fiyatlandırma Netliği:</strong> Net fiyat veren ajanslar tercih edilmeli. Gizli maliyet olmamalı.</li>
+<li><strong>7. Sözleşme Esnekliği:</strong> Minimum süre, fesih koşulları ve fikri mülkiyet hakları netleştirilmeli.</li>
+</ul>
+
+<h2>Kade Media Farkı</h2>
+<p>Bu 7 kriterin hepsinde güçlü olduğumuzu kanıtlamak için <a href="/iletisim">ücretsiz keşif görüşmesi</a>nde tüm detayları şeffaf biçimde paylaşıyoruz. <a href="/partnerler">Referanslarımızı</a> inceleyin.</p>`,
+    contentEn: `<h2>Why Is Choosing the Right Agency Critical?</h2>
+<p>Choosing a social media agency is one of the most important decisions shaping your brand's digital identity. The wrong choice means lost budget and time.</p>
+
+<h2>7 Key Criteria</h2>
+<ul>
+<li><strong>1. Portfolio and Results:</strong> Ask for concrete numbers — clear data like "grew from 5,000 to 20,000."</li>
+<li><strong>2. Industry Experience:</strong> Agencies with experience in your sector already know your audience.</li>
+<li><strong>3. Content Quality:</strong> Look at the agency's own social media accounts.</li>
+<li><strong>4. Reporting Transparency:</strong> Which metrics do they report and how often?</li>
+<li><strong>5. Communication Speed:</strong> Response time to messages indicates work quality.</li>
+<li><strong>6. Pricing Clarity:</strong> Agencies that give clear prices should be preferred.</li>
+<li><strong>7. Contract Flexibility:</strong> Minimum duration, termination conditions must be clarified.</li>
+</ul>
+
+<h2>The Kade Media Difference</h2>
+<p>We share all details transparently in our <a href="/iletisim">free discovery call</a>. Check out our <a href="/partnerler">references</a>.</p>`,
+    category: 'Rehber',
+    categoryEn: 'Guide',
+    date: '6 Nis 2025',
+    readTime: 7,
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
+    color: '#6C63FF',
   },
 ]
 

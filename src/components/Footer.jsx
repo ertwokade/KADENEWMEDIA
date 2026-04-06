@@ -3,20 +3,43 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaInstagram, FaYoutube, FaTiktok, FaLinkedinIn } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
-import { HiArrowUp } from 'react-icons/hi'
+import { HiArrowUp, HiOutlineMail, HiOutlineCheck } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
-import { getContentApi } from '../api'
+import { getContentApi, subscribeNewsletterApi } from '../api'
 import './Footer.css'
 
 export default function Footer() {
   const { t, lang } = useLanguage()
   const [footerData, setFooterData] = useState(null)
+  const [nlEmail, setNlEmail] = useState('')
+  const [nlStatus, setNlStatus] = useState(null) // null | 'loading' | 'success' | 'error'
+  const [nlError, setNlError] = useState('')
 
   useEffect(() => {
     getContentApi('footer').then(res => {
       if (res?.data) setFooterData(res.data)
     }).catch(() => {})
   }, [])
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault()
+    if (!nlEmail || !nlEmail.includes('@')) {
+      setNlError(lang === 'tr' ? 'Geçerli bir e-posta adresi girin' : 'Please enter a valid email')
+      setNlStatus('error')
+      return
+    }
+    setNlStatus('loading')
+    setNlError('')
+    try {
+      await subscribeNewsletterApi(nlEmail)
+      setNlStatus('success')
+      setNlEmail('')
+      setTimeout(() => setNlStatus(null), 5000)
+    } catch (err) {
+      setNlError(err.message || (lang === 'tr' ? 'Bir hata oluştu' : 'An error occurred'))
+      setNlStatus('error')
+    }
+  }
 
   const socialLinks = [
     { icon: FaInstagram, href: footerData?.instagram || 'https://instagram.com/kademediacom', label: 'Instagram' },
@@ -51,6 +74,39 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-glow" />
       <div className="container">
+
+        {/* Newsletter Strip */}
+        <div className="footer-newsletter">
+          <div className="footer-newsletter-text">
+            <HiOutlineMail size={24} />
+            <div>
+              <strong>{lang === 'tr' ? 'Dijital Dünyadan Haberdar Olun' : 'Stay Updated from the Digital World'}</strong>
+              <p>{lang === 'tr' ? 'Sosyal medya trendleri ve ipuçlarını e-postanıza gönderelim' : 'Get social media trends and tips delivered to your inbox'}</p>
+            </div>
+          </div>
+          {nlStatus === 'success' ? (
+            <div className="footer-newsletter-success">
+              <HiOutlineCheck size={18} />
+              {lang === 'tr' ? 'Başarıyla abone oldunuz!' : 'Successfully subscribed!'}
+            </div>
+          ) : (
+            <form className="footer-newsletter-form" onSubmit={handleNewsletterSubmit}>
+              <input
+                type="email"
+                className="footer-newsletter-input"
+                placeholder={lang === 'tr' ? 'E-posta adresiniz...' : 'Your email address...'}
+                value={nlEmail}
+                onChange={(e) => { setNlEmail(e.target.value); setNlStatus(null) }}
+              />
+              <button type="submit" className="btn btn-primary footer-newsletter-btn" disabled={nlStatus === 'loading'}>
+                {nlStatus === 'loading'
+                  ? (lang === 'tr' ? 'Gönderiliyor...' : 'Sending...')
+                  : (lang === 'tr' ? 'Abone Ol' : 'Subscribe')}
+              </button>
+              {nlStatus === 'error' && <div className="footer-newsletter-error">{nlError}</div>}
+            </form>
+          )}
+        </div>
 
         <div className="footer-top">
           <div className="footer-brand">

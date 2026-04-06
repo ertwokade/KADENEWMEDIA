@@ -123,6 +123,30 @@
   color: var(--primary);
 }
 
+/* Benefits List */
+.exit-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.exit-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--gray-lighter);
+}
+
+.exit-benefits li svg {
+  color: #6ee7b7;
+  flex-shrink: 0;
+}
+
 @media (max-width: 480px) {
   .exit-popup {
     padding: 40px 24px 28px;
@@ -130,4 +154,46 @@
   .exit-title {
     font-size: 1.25rem;
   }
+}
+
+/* ===== Light Mode ExitIntentPopup ===== */
+[data-theme="light"] .exit-popup {
+  background: #FFFFFF;
+  border-color: rgba(234, 195, 33, 0.30);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(234, 195, 33, 0.15);
+}
+
+[data-theme="light"] .exit-close {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #7A7570;
+}
+
+[data-theme="light"] .exit-close:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1A1715;
+}
+
+[data-theme="light"] .exit-title {
+  color: #1A1715;
+}
+
+[data-theme="light"] .exit-desc {
+  color: #4A4540;
+}
+
+[data-theme="light"] .exit-benefits li {
+  color: #3A3531;
+}
+
+[data-theme="light"] .exit-dismiss {
+  color: #9E9994;
+}
+
+[data-theme="light"] .exit-dismiss:hover {
+  color: #5C5753;
+}
+
+[data-theme="light"] .exit-note {
+  color: #9E9994;
 }

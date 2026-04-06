@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HiOutlineX, HiOutlineArrowRight, HiOutlineLightningBolt } from 'react-icons/hi'
+import { HiOutlineX, HiOutlineArrowRight, HiOutlineLightningBolt, HiOutlineCheckCircle } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import './ExitIntentPopup.css'
 
@@ -39,6 +39,18 @@ export default function ExitIntentPopup() {
 
   const close = () => setVisible(false)
 
+  const benefits = lang === 'tr'
+    ? [
+        'Rakip analizi ve sektör karşılaştırması',
+        'Büyüme fırsatları ve aksiyon planı',
+        'Reklam bütçesi optimizasyon önerileri',
+      ]
+    : [
+        'Competitor analysis & industry benchmarks',
+        'Growth opportunities & action plan',
+        'Ad budget optimization suggestions',
+      ]
+
   return (
     <AnimatePresence>
       {visible && (
@@ -66,32 +78,41 @@ export default function ExitIntentPopup() {
             </div>
 
             <div className="exit-badge">
-              {lang === 'tr' ? 'Ücretsiz' : 'Free'}
+              {lang === 'tr' ? '✨ Tamamen Ücretsiz' : '✨ Completely Free'}
             </div>
 
             <h2 className="exit-title">
               {lang === 'tr'
-                ? 'Sosyal Medyanızı Ücretsiz Analiz Edelim'
-                : 'Free Social Media Analysis'}
+                ? 'Markanızın Dijital Potansiyelini Keşfedin'
+                : 'Discover Your Brand\'s Digital Potential'}
             </h2>
             <p className="exit-desc">
               {lang === 'tr'
-                ? 'Hesaplarınızı profesyonel ekibimiz incelesin, büyüme fırsatlarınızı belirleyelim. Hiçbir ücret ödemeden.'
-                : 'Let our professional team review your accounts and identify growth opportunities — at no cost.'}
+                ? '10+ markaya güç veren uzman ekibimiz, sosyal medya hesaplarınızı analiz edip size özel bir büyüme yol haritası oluştursun.'
+                : 'Our expert team, powering 10+ brands, will analyze your social media accounts and create a custom growth roadmap for you.'}
             </p>
+
+            <ul className="exit-benefits">
+              {benefits.map((b, i) => (
+                <li key={i}>
+                  <HiOutlineCheckCircle size={16} />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
 
             <div className="exit-actions">
               <Link to="/iletisim" className="btn btn-primary exit-cta" onClick={close}>
-                {lang === 'tr' ? 'Ücretsiz Teklif Al' : 'Get Free Quote'}
+                {lang === 'tr' ? 'Ücretsiz Analiz Talep Et' : 'Request Free Analysis'}
                 <HiOutlineArrowRight size={18} />
               </Link>
               <button className="exit-dismiss" onClick={close}>
-                {lang === 'tr' ? 'Hayır, teşekkürler' : 'No thanks'}
+                {lang === 'tr' ? 'Şimdi değil, teşekkürler' : 'Not now, thanks'}
               </button>
             </div>
 
             <p className="exit-note">
-              {lang === 'tr' ? '24 saat içinde geri dönüş garantisi' : '24-hour response guarantee'}
+              {lang === 'tr' ? '24 saat içinde geri dönüş garantisi • Taahhüt yok' : '24-hour response guarantee • No commitment'}
             </p>
           </motion.div>
         </motion.div>
@@ -99,3 +120,4 @@ export default function ExitIntentPopup() {
     </AnimatePresence>
   )
 }
+

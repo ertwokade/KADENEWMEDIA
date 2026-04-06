@@ -224,3 +224,54 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ===== Light Mode Partners ===== */
+[data-theme="light"] .partner-card-info h3 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .partner-card-info p {
+  color: #4A4540;
+}
+
+[data-theme="light"] .partner-card-arrow {
+  color: #9E9994;
+}
+
+[data-theme="light"] .partner-card:hover .partner-card-arrow {
+  color: var(--primary);
+}
+
+[data-theme="light"] .partner-back {
+  color: #7A7570;
+}
+
+[data-theme="light"] .partner-back:hover {
+  color: var(--primary);
+}
+
+[data-theme="light"] .partner-detail-header h1 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .partner-detail-desc {
+  color: #4A4540;
+}
+
+[data-theme="light"] .partner-detail-section h3 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .partner-service-tag {
+  background: rgba(234, 195, 33, 0.06);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #3A3531;
+}
+
+[data-theme="light"] .partner-result {
+  color: #3A3531;
+}
+
+[data-theme="light"] .partner-kpi-label {
+  color: #5C5753;
+}

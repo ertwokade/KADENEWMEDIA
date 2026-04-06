@@ -71,6 +71,14 @@ function App() {
     if (prevPath.current === location.pathname) return
     prevPath.current = location.pathname
     trackPageviewApi(location.pathname, document.referrer)
+
+    // Send page view to Google Analytics 4
+    if (typeof window.gtag === 'function') {
+      window.gtag('config', 'G-R893K1VE79', {
+        page_path: location.pathname,
+        page_title: document.title,
+      })
+    }
   }, [location.pathname, isAdmin])
 
   return (

@@ -102,9 +102,6 @@
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr 1fr;
   gap: 48px;
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  gap: 48px;
   margin-bottom: 60px;
 }
 
@@ -245,4 +242,56 @@
   .footer-top {
     grid-template-columns: 1fr;
   }
+
+  .footer-newsletter {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-newsletter-text {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-newsletter-form {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .footer-newsletter-input {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+/* ===== Light Mode Footer Newsletter ===== */
+[data-theme="light"] .footer-newsletter {
+  background: rgba(234, 195, 33, 0.08);
+  border-color: rgba(234, 195, 33, 0.18);
+}
+
+[data-theme="light"] .footer-newsletter-text strong {
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .footer-newsletter-text p {
+  color: #CCCCCC;
+}
+
+[data-theme="light"] .footer-newsletter-input {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .footer-newsletter-input::placeholder {
+  color: #999999;
+}
+
+[data-theme="light"] .footer-newsletter-success {
+  color: #6ee7b7;
+}
+
+[data-theme="light"] .footer-newsletter-error {
+  color: #fca5a5;
 }

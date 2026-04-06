@@ -231,6 +231,7 @@
   flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -436,4 +437,97 @@
   .blog-cta-section {
     padding: 36px 24px;
   }
+}
+
+/* ===== Light Mode Blog ===== */
+[data-theme="light"] .blog-search-input {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #1A1715;
+}
+
+[data-theme="light"] .blog-search-input::placeholder {
+  color: #7A7570;
+}
+
+[data-theme="light"] .blog-search-icon {
+  color: #9E9994;
+}
+
+[data-theme="light"] .blog-category-chip {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.10);
+  color: #4A4540;
+}
+
+[data-theme="light"] .blog-category-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme="light"] .blog-category-chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+[data-theme="light"] .blog-featured-content h2,
+[data-theme="light"] .blog-card-content h3 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .blog-featured-content p,
+[data-theme="light"] .blog-card-content p {
+  color: #4A4540;
+}
+
+[data-theme="light"] .blog-share-section {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .blog-share-left {
+  color: #4A4540;
+}
+
+[data-theme="light"] .blog-share-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.10);
+  color: #4A4540;
+}
+
+[data-theme="light"] .blog-share-btn:hover {
+  background: rgba(234, 195, 33, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+[data-theme="light"] .blog-cta-section h3 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .blog-cta-section p {
+  color: #4A4540;
+}
+
+[data-theme="light"] .blog-body {
+  color: #3A3531;
+}
+
+[data-theme="light"] .blog-body h2,
+[data-theme="light"] .blog-body h3,
+[data-theme="light"] .blog-body strong {
+  color: #1A1715;
+}
+
+[data-theme="light"] .blog-empty-state h3 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .blog-empty-state {
+  color: #7A7570;
+}
+
+[data-theme="light"] .blog-date,
+[data-theme="light"] .blog-read {
+  color: #7A7570;
 }

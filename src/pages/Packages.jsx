@@ -99,7 +99,7 @@ export default function Packages() {
     {
       name: isEN ? 'Starter' : 'Başlangıç',
       tier: 'starter',
-      priceTRY: '12.500',
+      priceTRY: '8.900',
       priceUSD: null,
       desc: isEN ? 'Perfect for small businesses and startups taking their first steps in social media.' : 'Sosyal medyada ilk adımlarını atan küçük işletmeler ve startuplar için ideal.',
       popular: false,
@@ -120,7 +120,7 @@ export default function Packages() {
     {
       name: isEN ? 'Professional' : 'Profesyonel',
       tier: 'professional',
-      priceTRY: '24.500',
+      priceTRY: '18.900',
       priceUSD: null,
       desc: isEN ? 'For growing brands that want comprehensive social media management and ad support.' : 'Kapsamlı sosyal medya yönetimi ve reklam desteği isteyen büyüyen markalar için.',
       popular: true,
@@ -140,7 +140,7 @@ export default function Packages() {
     {
       name: isEN ? 'Enterprise' : 'Kurumsal',
       tier: 'enterprise',
-      priceTRY: '48.000',
+      priceTRY: '38.900',
       priceUSD: null,
       desc: isEN ? 'Full-service digital marketing solution for large brands seeking maximum growth.' : 'Maksimum büyüme hedefleyen büyük markalar için tam kapsamlı dijital pazarlama çözümü.',
       popular: false,
