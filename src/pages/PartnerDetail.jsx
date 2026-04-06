@@ -20,7 +20,7 @@ import './Partners.css'
 export default function PartnerDetail() {
   const { id } = useParams()
   const { lang, t } = useLanguage()
-  const [partner, setPartner] = useState(() => staticPartners.find((p) => p.id === id))
+  const [partner, setPartner] = useState(null)
   const [apiDone, setApiDone] = useState(false)
 
   useEffect(() => {
@@ -28,10 +28,12 @@ export default function PartnerDetail() {
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           const found = data.find((p) => p.id === id)
-          if (found) setPartner(found)
+          setPartner(found || staticPartners.find((p) => p.id === id) || null)
+        } else {
+          setPartner(staticPartners.find((p) => p.id === id) || null)
         }
       })
-      .catch(() => {})
+      .catch(() => { setPartner(staticPartners.find((p) => p.id === id) || null) })
       .finally(() => setApiDone(true))
   }, [id])
 

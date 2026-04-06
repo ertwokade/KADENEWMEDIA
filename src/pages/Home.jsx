@@ -143,8 +143,6 @@ export default function Home() {
       subtitle: t('hero.subtitle'),
     }
 
-    setHeroTexts(defaults)
-
     const loadFromApi = async () => {
       try {
         const heroData = await getContentApi('hero')

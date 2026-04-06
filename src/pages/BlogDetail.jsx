@@ -18,15 +18,18 @@ import './Blog.css'
 export default function BlogDetail() {
   const { slug } = useParams()
   const { lang, t } = useLanguage()
-  const [allPosts, setAllPosts] = useState(staticBlogPosts)
+  const [allPosts, setAllPosts] = useState([])
   const [apiDone, setApiDone] = useState(false)
 
   useEffect(() => {
     getBlogsApi()
-      .then(data => { if (Array.isArray(data) && data.length > 0) setAllPosts(data) })
-      .catch(() => {})
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) setAllPosts(data)
+        else setAllPosts(staticBlogPosts)
+      })
+      .catch(() => { setAllPosts(staticBlogPosts) })
       .finally(() => setApiDone(true))
-  }, [])
+  }, [slug])
 
   const post = allPosts.find((p) => p.slug === slug)
 

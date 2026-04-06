@@ -21,7 +21,7 @@ export default function Blog() {
     keywords: 'sosyal medya blog, instagram taktikleri, tiktok algoritması, dijital pazarlama ipuçları, içerik stratejisi',
     path: '/blog',
   })
-  const [blogPosts, setBlogPosts] = useState(staticBlogPosts)
+  const [blogPosts, setBlogPosts] = useState(null)
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [page, setPage] = useState(1)
@@ -31,22 +31,22 @@ export default function Blog() {
     const fetchBlogs = async () => {
       try {
         const data = await getBlogsApi()
-        if (data && data.length > 0) {
-          setBlogPosts(data)
-        }
+        setBlogPosts(data?.length > 0 ? data : staticBlogPosts)
       } catch {
-        // static data fallback
+        setBlogPosts(staticBlogPosts)
       }
     }
     fetchBlogs()
   }, [])
 
   const categories = useMemo(() => {
+    if (!blogPosts) return ['all']
     const cats = blogPosts.map(p => lang === 'tr' ? p.category : p.categoryEn).filter(Boolean)
     return ['all', ...Array.from(new Set(cats))]
   }, [blogPosts, lang])
 
   const filtered = useMemo(() => {
+    if (!blogPosts) return []
     return blogPosts.filter(p => {
       if (p.published === false) return false
       const title = lang === 'tr' ? p.titleTr : p.titleEn
@@ -66,7 +66,15 @@ export default function Blog() {
     return rest.slice(start, start + POSTS_PER_PAGE)
   }, [filtered, page, POSTS_PER_PAGE])
 
-  if (blogPosts.length === 0) return null
+  if (!blogPosts) return (
+    <PageTransition>
+      <section className="blog-hero">
+        <div className="container" style={{ textAlign: 'center', padding: '120px 0' }}>
+          <div className="loading-spinner" />
+        </div>
+      </section>
+    </PageTransition>
+  )
 
   const featured = page === 1 ? filtered[0] : null
   const rest = pagedRest
