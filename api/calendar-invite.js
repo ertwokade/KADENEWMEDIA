@@ -10,10 +10,17 @@ function escapeHtml(str) {
 }
 
 function generateICS({ title, description, date, time, duration = 60 }) {
-  const startDate = new Date(`${date}T${time || '10:00'}:00`);
-  const endDate = new Date(startDate.getTime() + duration * 60000);
+  const timeStr = time || '10:00';
+  const [year, month, day] = date.split('-');
+  const [hours, minutes] = timeStr.split(':');
 
-  const fmt = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  const startTotal = parseInt(hours) * 60 + parseInt(minutes);
+  const endTotal = startTotal + duration;
+  const endH = String(Math.floor(endTotal / 60) % 24).padStart(2, '0');
+  const endM = String(endTotal % 60).padStart(2, '0');
+
+  const startFmt = `${year}${month}${day}T${hours.padStart(2, '0')}${minutes.padStart(2, '0')}00`;
+  const endFmt = `${year}${month}${day}T${endH}${endM}00`;
 
   return [
     'BEGIN:VCALENDAR',
@@ -21,9 +28,17 @@ function generateICS({ title, description, date, time, duration = 60 }) {
     'PRODID:-//Kade Media//Calendar//TR',
     'CALSCALE:GREGORIAN',
     'METHOD:REQUEST',
+    'BEGIN:VTIMEZONE',
+    'TZID:Europe/Istanbul',
+    'BEGIN:STANDARD',
+    'DTSTART:19700101T000000',
+    'TZOFFSETFROM:+0300',
+    'TZOFFSETTO:+0300',
+    'END:STANDARD',
+    'END:VTIMEZONE',
     'BEGIN:VEVENT',
-    `DTSTART:${fmt(startDate)}`,
-    `DTEND:${fmt(endDate)}`,
+    `DTSTART;TZID=Europe/Istanbul:${startFmt}`,
+    `DTEND;TZID=Europe/Istanbul:${endFmt}`,
     `SUMMARY:${title}`,
     `DESCRIPTION:${(description || '').replace(/\n/g, '\\n')}`,
     'ORGANIZER;CN=Kade Media:mailto:hello@kademedia.com',
