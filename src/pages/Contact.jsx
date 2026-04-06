@@ -356,7 +356,7 @@ export default function Contact() {
                     ) : submitted ? (
                       <>
                         <HiOutlineCheck size={18} />
-                        Gönderildi
+                        {t('contact.submitted') || 'Gönderildi'}
                       </>
                     ) : (
                       <>
@@ -373,7 +373,7 @@ export default function Contact() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0 }}
                     >
-                      Ekibimiz en kısa sürede size dönecek.
+                      {t('contact.successNote') || 'Ekibimiz en kısa sürede size dönecek.'}
                     </motion.span>
                   )}
                 </div>

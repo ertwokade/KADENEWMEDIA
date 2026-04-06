@@ -247,10 +247,10 @@ export default function Packages() {
                         </div>
                         {pkg.priceTRY && (
                           <div className="package-price-alt">
-                            ≈ ${convertTRYtoUSD(pkg.priceTRY, exchangeRate) || pkg.priceUSD}
+                            ≈ ${convertTRYtoUSD(pkg.priceTRY, exchangeRate) ?? pkg.priceUSD}
                             <span style={{ marginLeft: 4 }}>{t('packages.month')}</span>
                             <span style={{ display: 'block', fontSize: '0.68rem', opacity: 0.5, marginTop: 2 }}>
-                              güncel kur: 1$ = {exchangeRate.toFixed(1)}₺
+                              {t('packages.currentRate') || 'güncel kur'}: 1$ = {exchangeRate.toFixed(1)}₺
                             </span>
                           </div>
                         )}
@@ -259,20 +259,18 @@ export default function Packages() {
                   </div>
 
                   <div className="package-features">
-                    <>
-                      {pkg.features.map((feature) => (
-                        <div key={feature} className="feature-item included">
-                          <HiOutlineCheck size={16} />
-                          <span>{feature}</span>
-                        </div>
-                      ))}
-                      {pkg.notIncluded.map((feature) => (
-                        <div key={feature} className="feature-item not-included">
-                          <span className="dash">—</span>
-                          <span>{feature}</span>
-                        </div>
-                      ))}
-                    </>
+                    {pkg.features.map((feature) => (
+                      <div key={feature} className="feature-item included">
+                        <HiOutlineCheck size={16} />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                    {pkg.notIncluded.map((feature) => (
+                      <div key={feature} className="feature-item not-included">
+                        <span className="dash">—</span>
+                        <span>{feature}</span>
+                      </div>
+                    ))}
                   </div>
 
                   <Link

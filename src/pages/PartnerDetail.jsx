@@ -124,8 +124,8 @@ export default function PartnerDetail() {
                       whileHover={{ scale: 1.04, y: -3 }}
                       style={{ borderTop: `3px solid ${partner.color}` }}
                     >
-                      <div className="partner-kpi-value" style={{ color: partner.color }}>{r.split(' ')[0]}</div>
-                      <div className="partner-kpi-label">{r.split(' ').slice(1).join(' ')}</div>
+                      <div className="partner-kpi-value" style={{ color: partner.color }}>{r.split(' ')[0] || r}</div>
+                      <div className="partner-kpi-label">{r.split(' ').slice(1).join(' ') || ''}</div>
                     </motion.div>
                   </StaggerItem>
                 ))}

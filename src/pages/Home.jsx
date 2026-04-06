@@ -182,10 +182,10 @@ export default function Home() {
   ]
 
   const stats = [
-    { number: dynamicStats?.clients || '10+', label: t('stats.clients') },
-    { number: dynamicStats?.followers || '500+', label: t('stats.followers') },
-    { number: dynamicStats?.campaigns || '50+', label: t('stats.campaigns') },
-    { number: dynamicStats?.satisfaction || '98%', label: t('stats.satisfaction') },
+    { number: dynamicStats?.clients ?? '10+', label: t('stats.clients') },
+    { number: dynamicStats?.followers ?? '500+', label: t('stats.followers') },
+    { number: dynamicStats?.campaigns ?? '50+', label: t('stats.campaigns') },
+    { number: dynamicStats?.satisfaction ?? '98%', label: t('stats.satisfaction') },
   ]
 
   return (
@@ -406,7 +406,7 @@ export default function Home() {
           </div>
 
           <StaggerContainer className="testimonials-grid" staggerDelay={0.15}>
-            {(dynamicTestimonials || testimonials).map((item, i) => (
+            {(dynamicTestimonials?.length > 0 ? dynamicTestimonials : testimonials).map((item, i) => (
               <StaggerItem key={i}>
                 <motion.div className="testimonial-card glass-card" whileHover={{ y: -4 }}>
                   <FaQuoteLeft className="testimonial-quote" size={24} />
@@ -450,7 +450,7 @@ export default function Home() {
           </div>
 
           <div className="faq-list">
-            {(dynamicFaq?.[lang] || faqData[lang]).map((faq, i) => (
+            {(dynamicFaq?.[lang]?.length > 0 ? dynamicFaq[lang] : faqData[lang]).map((faq, i) => (
               <FadeIn key={i} delay={i * 0.05}>
                 <FAQItem faq={faq} />
               </FadeIn>
