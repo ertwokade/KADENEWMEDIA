@@ -293,6 +293,7 @@ function DashboardSection({ stats, onNavigate }) {
 function BlogSection({ showToast }) {
   const [blogs, setBlogs] = useState([])
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingBlog, setEditingBlog] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -301,6 +302,7 @@ function BlogSection({ showToast }) {
     titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
     contentTr: '', contentEn: '', category: '', categoryEn: '',
     slug: '', image: '', color: '#eac321', readTime: 5, published: true,
+    date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
   })
 
   const colors = ['#6C63FF', '#E91E63', '#eac321', '#2ECC71', '#00BCD4', '#9C27B0', '#FF9800', '#607D8B']
@@ -323,6 +325,7 @@ function BlogSection({ showToast }) {
       titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
       contentTr: '', contentEn: '', category: '', categoryEn: '',
       slug: '', image: '', color: '#eac321', readTime: 5, published: true,
+      date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
     })
     setEditingBlog(null)
     setShowForm(false)
@@ -337,6 +340,7 @@ function BlogSection({ showToast }) {
       slug: blog.slug || '', image: blog.image || '',
       color: blog.color || '#eac321', readTime: blog.readTime || 5,
       published: blog.published !== false,
+      date: blog.date || new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
     })
     setEditingBlog(blog)
     setShowForm(true)
@@ -344,6 +348,8 @@ function BlogSection({ showToast }) {
 
   const handleSave = async () => {
     if (isLocalMode()) { showToast('Sunucu bağlantısı yok — yazma işlemi yapılamaz.', 'error'); return }
+    if (saving) return
+    setSaving(true)
     try {
       if (editingBlog) {
         await updateBlogApi({ id: editingBlog._id, ...form })
@@ -356,6 +362,8 @@ function BlogSection({ showToast }) {
       fetchBlogs()
     } catch (err) {
       showToast(err.message, 'error')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -584,9 +592,9 @@ function BlogSection({ showToast }) {
                 </div>
 
                 <div className="admin-form-actions">
-                  <button className="btn btn-outline" onClick={resetForm}>İptal</button>
-                  <button className="btn btn-primary" onClick={handleSave}>
-                    <HiOutlineSave size={16} /> {editingBlog ? 'Güncelle' : 'Oluştur'}
+                  <button className="btn btn-outline" onClick={resetForm} disabled={saving}>İptal</button>
+                  <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+                    <HiOutlineSave size={16} /> {saving ? 'Kaydediliyor...' : (editingBlog ? 'Güncelle' : 'Oluştur')}
                   </button>
                 </div>
               </div>
@@ -1861,9 +1869,6 @@ function MessagesSection({ showToast, onNewMessageCount }) {
     finally { setBulkDeleting(false) }
   }
 
-  const toggleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
-  const toggleSelectAll = () => setSelectedIds(prev => prev.length === filteredMessages.length ? [] : filteredMessages.map(m => m._id))
-
   const filteredMessages = filterStatus === 'all'
     ? messages
     : messages.filter((m) => (m.status || 'yeni') === filterStatus)
@@ -1872,6 +1877,9 @@ function MessagesSection({ showToast, onNewMessageCount }) {
     acc[s.value] = messages.filter((m) => (m.status || 'yeni') === s.value).length
     return acc
   }, {})
+
+  const toggleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  const toggleSelectAll = () => setSelectedIds(prev => prev.length === filteredMessages.length ? [] : filteredMessages.map(m => m._id))
 
   return (
     <div>
@@ -3758,6 +3766,10 @@ function NewsletterSection({ showToast }) {
     } catch (err) { showToast(err.message, 'error') }
   }
 
+  const filtered = subscribers.filter(s =>
+    !searchQuery || s.email.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   const exportSubscribersExcel = () => {
     const headers = ['E-posta', 'Kaynak', 'Tarih']
     const rows = filtered.map(s => [
@@ -3767,10 +3779,6 @@ function NewsletterSection({ showToast }) {
     ])
     exportToExcel(headers, rows, 'newsletter-aboneleri.xls')
   }
-
-  const filtered = subscribers.filter(s =>
-    !searchQuery || s.email.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   return (
     <div>
