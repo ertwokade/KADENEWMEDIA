@@ -702,6 +702,7 @@ function ContentSection({ showToast }) {
   const [activeTab, setActiveTab] = useState('hero')
   const [content, setContent] = useState({})
   const [loading, setLoading] = useState(true)
+  const [isDirty, setIsDirty] = useState(false)
 
   const fetchContent = async () => {
     try {
@@ -725,10 +726,17 @@ function ContentSection({ showToast }) {
     try {
       await updateContentApi(section, data)
       showToast('İçerik güncellendi!', 'success')
+      setIsDirty(false)
       fetchContent()
     } catch (err) {
       showToast(err.message, 'error')
     }
+  }
+
+  const handleTabChange = (tabId) => {
+    if (isDirty && !window.confirm('Kaydedilmemiş değişiklikler var. Sekmeyi değiştirirseniz kaybolacak. Devam etmek istiyor musunuz?')) return
+    setIsDirty(false)
+    setActiveTab(tabId)
   }
 
   const tabs = [
@@ -758,14 +766,16 @@ function ContentSection({ showToast }) {
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={`admin-tab ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+            className={`admin-tab ${activeTab === tab.id ? 'active' : ''}${isDirty && activeTab !== tab.id ? '' : ''}`}
+            onClick={() => handleTabChange(tab.id)}
           >
             {tab.label}
+            {isDirty && activeTab === tab.id && <span style={{ marginLeft: 4, color: '#E91E63', fontSize: '0.65rem' }}>●</span>}
           </button>
         ))}
       </div>
 
+      <div onInput={() => setIsDirty(true)} onChange={() => setIsDirty(true)}>
       {activeTab === 'hero' && (
         <HeroEditor
           data={content.hero || { tr: { title1: '', title2: '', subtitle: '' }, en: { title1: '', title2: '', subtitle: '' } }}
@@ -828,6 +838,7 @@ function ContentSection({ showToast }) {
           onSave={(data) => handleSave('careers', data)}
         />
       )}
+      </div>
     </div>
   )
 }
@@ -2493,6 +2504,7 @@ function CalendarSection({ showToast }) {
 
   const handleSaveEvent = () => {
     if (!eventForm.title.trim()) { showToast('Başlık gerekli', 'error'); return }
+    if (!eventForm.date) { showToast('Tarih gerekli', 'error'); return }
     let updated
     if (editingEvent) {
       updated = events.map(e => e.id === editingEvent.id ? { ...eventForm, id: editingEvent.id } : e)
