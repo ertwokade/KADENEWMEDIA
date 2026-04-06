@@ -296,7 +296,6 @@ export default function Contact() {
                       { value: 'sosyal-medya', label: t('servicesSection.smm') },
                       { value: 'icerik', label: t('servicesSection.content') },
                       { value: 'reklam', label: t('servicesSection.ads') },
-                      { value: 'influencer', label: t('servicesSection.influencer') },
                       { value: 'video', label: t('contact.videoProduction') },
                       { value: 'danismanlik', label: t('contact.consultingOption') },
                     ].map(opt => (

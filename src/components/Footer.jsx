@@ -40,7 +40,6 @@ export default function Footer() {
       { name: t('servicesSection.smm'), path: '/hizmetler' },
       { name: t('servicesSection.content'), path: '/hizmetler' },
       { name: t('servicesSection.ads'), path: '/hizmetler' },
-      { name: t('servicesSection.influencer'), path: '/hizmetler' },
     ],
   }
 

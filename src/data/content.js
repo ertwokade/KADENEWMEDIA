@@ -138,7 +138,7 @@ export const blogPosts = [
     categoryEn: 'Instagram',
     date: '28 Mar 2025',
     readTime: 7,
-    image: '📸',
+    image: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800&q=80',
     color: '#E91E63',
   },
   {
@@ -152,7 +152,7 @@ export const blogPosts = [
     categoryEn: 'Artificial Intelligence',
     date: '24 Mar 2025',
     readTime: 10,
-    image: '🤖',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
     color: '#6C63FF',
   },
   {
@@ -166,7 +166,7 @@ export const blogPosts = [
     categoryEn: 'E-Commerce',
     date: '18 Mar 2025',
     readTime: 8,
-    image: '🛒',
+    image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80',
     color: '#2ECC71',
   },
   {
@@ -180,7 +180,7 @@ export const blogPosts = [
     categoryEn: 'Video Strategy',
     date: '12 Mar 2025',
     readTime: 6,
-    image: '🎬',
+    image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800&q=80',
     color: '#FFD700',
   },
   {
@@ -194,7 +194,7 @@ export const blogPosts = [
     categoryEn: 'Content Strategy',
     date: '5 Mar 2025',
     readTime: 7,
-    image: '📣',
+    image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80',
     color: '#00BCD4',
   },
   {
@@ -208,7 +208,7 @@ export const blogPosts = [
     categoryEn: 'Advertising',
     date: '28 Şub 2025',
     readTime: 9,
-    image: '📊',
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
     color: '#9C27B0',
   },
   {
@@ -222,7 +222,7 @@ export const blogPosts = [
     categoryEn: 'Influencer',
     date: '20 Şub 2025',
     readTime: 8,
-    image: '🤝',
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
     color: '#FF5722',
   },
   {
@@ -236,7 +236,7 @@ export const blogPosts = [
     categoryEn: 'Strategy',
     date: '12 Şub 2025',
     readTime: 6,
-    image: '🛡️',
+    image: 'https://images.unsplash.com/photo-1563986768609-322da13575f2?w=800&q=80',
     color: '#607D8B',
   },
   {
@@ -250,7 +250,7 @@ export const blogPosts = [
     categoryEn: 'Kade Media',
     date: '2 Nis 2025',
     readTime: 7,
-    image: '⚡',
+    image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80',
     color: '#eac321',
   },
   {
@@ -264,7 +264,7 @@ export const blogPosts = [
     categoryEn: 'Digital Marketing',
     date: '28 Mar 2025',
     readTime: 10,
-    image: '📈',
+    image: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=800&q=80',
     color: '#2ECC71',
   },
   {
@@ -278,7 +278,7 @@ export const blogPosts = [
     categoryEn: 'Advertising',
     date: '20 Mar 2025',
     readTime: 8,
-    image: '💰',
+    image: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80',
     color: '#FF9800',
   },
   {
@@ -292,7 +292,7 @@ export const blogPosts = [
     categoryEn: 'Strategy',
     date: '15 Mar 2025',
     readTime: 9,
-    image: '🎨',
+    image: 'https://images.unsplash.com/photo-1493612276216-ee3925520721?w=800&q=80',
     color: '#6C63FF',
   },
   // ─── Sektörel Haberler ───
@@ -336,7 +336,7 @@ export const blogPosts = [
     categoryEn: 'Industry News',
     date: '2 Nis 2025',
     readTime: 6,
-    image: '🧠',
+    image: 'https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&q=80',
     color: '#1877F2',
   },
   {

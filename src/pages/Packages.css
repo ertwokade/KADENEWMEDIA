@@ -11,7 +11,7 @@
 
 .packages-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -94,6 +94,10 @@
 .period {
   font-size: 0.9rem;
   color: var(--gray-light);
+}
+
+.package-price.custom-price {
+  padding: 12px 0;
 }
 
 .package-price-alt {
@@ -192,15 +196,21 @@
   line-height: 1.7;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
   .packages-grid {
-    grid-template-columns: 1fr;
-    max-width: 450px;
-    margin: 0 auto;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .package-card.popular {
     transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .packages-grid {
+    grid-template-columns: 1fr;
+    max-width: 450px;
+    margin: 0 auto;
   }
 }
 

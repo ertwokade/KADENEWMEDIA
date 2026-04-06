@@ -75,14 +75,14 @@ const testimonials = [
 
 const faqData = {
   tr: [
-    { q: 'Kade Media ne tür hizmetler sunuyor?', a: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi (Meta, Google, TikTok), influencer marketing, video prodüksiyon ve dijital strateji danışmanlığı hizmetleri sunuyoruz.' },
+    { q: 'Kade Media ne tür hizmetler sunuyor?', a: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi (Meta, Google, TikTok), video prodüksiyon ve dijital strateji danışmanlığı hizmetleri sunuyoruz.' },
     { q: 'Minimum sözleşme süresi ne kadar?', a: 'Minimum 3 aylık sözleşme yapıyoruz. Dijital pazarlamada sonuçlar zaman alır, bu süre stratejimizin etkisini görmeniz için idealdir.' },
     { q: 'Reklam bütçesi paket fiyatına dahil mi?', a: 'Hayır, reklam bütçesi paket fiyatlarına dahil değildir. Reklam yönetim hizmeti dahildir ancak reklam harcaması ayrıca faturalandırılır.' },
     { q: 'Sonuçları ne zaman görmeye başlarım?', a: 'Organik büyüme stratejilerinde 1-3 ay içinde belirgin sonuçlar görülebilir. Reklam kampanyalarında ise ilk hafta içinde sonuçlar alınmaya başlanır.' },
     { q: 'Hangi sektörlere hizmet veriyorsunuz?', a: 'Yiyecek & içecek, teknoloji, moda, sağlık, fitness, e-ticaret ve daha birçok sektörde deneyimimiz var. Her sektöre özel stratejiler geliştiriyoruz.' },
   ],
   en: [
-    { q: 'What kind of services does Kade Media offer?', a: 'We offer social media management, content production, ad management (Meta, Google, TikTok), influencer marketing, video production, and digital strategy consulting services.' },
+    { q: 'What kind of services does Kade Media offer?', a: 'We offer social media management, content production, ad management (Meta, Google, TikTok), video production, and digital strategy consulting services.' },
     { q: 'What is the minimum contract period?', a: 'We require a minimum 3-month contract. Results in digital marketing take time, and this period is ideal for seeing the impact of our strategy.' },
     { q: 'Is the ad budget included in the package price?', a: 'No, the ad budget is not included in package prices. Ad management service is included, but ad spend is billed separately.' },
     { q: 'When will I start seeing results?', a: 'Organic growth strategies can show significant results within 1-3 months. For ad campaigns, results can be seen within the first week.' },
@@ -180,7 +180,7 @@ export default function Home() {
     { icon: HiOutlineGlobe, title: t('servicesSection.smm'), desc: t('servicesSection.smmDesc') },
     { icon: HiOutlineLightningBolt, title: t('servicesSection.content'), desc: t('servicesSection.contentDesc') },
     { icon: HiOutlineChartBar, title: t('servicesSection.ads'), desc: t('servicesSection.adsDesc') },
-    { icon: HiOutlineUsers, title: t('servicesSection.influencer'), desc: t('servicesSection.influencerDesc') },
+    { icon: HiOutlinePlay, title: t('contact.videoProduction'), desc: t('services.videoDesc') },
   ]
 
   const stats = [

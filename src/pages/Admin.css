@@ -825,6 +825,21 @@
   font-size: 0.88rem;
   font-family: var(--font);
   transition: var(--transition);
+  color-scheme: inherit;
+  -webkit-appearance: none;
+}
+
+.admin-form select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239E9994' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+.admin-form select option {
+  background: var(--card-bg);
+  color: var(--text-primary);
 }
 
 .admin-form input:focus,
@@ -838,6 +853,29 @@
 .admin-form textarea {
   resize: vertical;
   min-height: 90px;
+}
+
+/* Dark mode form controls */
+.dark .admin-form input,
+.dark .admin-form textarea,
+.dark .admin-form select {
+  background: var(--bg-tertiary);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.dark .admin-form input::placeholder,
+.dark .admin-form textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.dark .admin-form select option {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.dark .admin-form input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
 
 .admin-form-actions {

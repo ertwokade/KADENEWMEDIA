@@ -42,12 +42,12 @@ export default function Services() {
   }, [])
   useSEO({
     title: 'Hizmetlerimiz | Sosyal Medya Yönetimi & Dijital Pazarlama',
-    description: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi, influencer marketing ve video prodüksiyon hizmetleri. Kade Media ile markanızı büyütün.',
-    keywords: 'sosyal medya yönetimi, instagram yönetimi, tiktok yönetimi, içerik üretimi, reklam yönetimi, influencer marketing, video prodüksiyon, dijital pazarlama hizmetleri',
+    description: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi ve video prodüksiyon hizmetleri. Kade Media ile markanızı büyütün.',
+    keywords: 'sosyal medya yönetimi, instagram yönetimi, tiktok yönetimi, içerik üretimi, reklam yönetimi, video prodüksiyon, dijital pazarlama hizmetleri',
     path: '/hizmetler',
   })
 
-  const defaultIcons = [HiOutlineGlobe, HiOutlinePencilAlt, HiOutlineChartBar, HiOutlineSpeakerphone, HiOutlineFilm, HiOutlineChatAlt2, HiOutlineCode]
+  const defaultIcons = [HiOutlineGlobe, HiOutlinePencilAlt, HiOutlineChartBar, HiOutlineFilm, HiOutlineChatAlt2, HiOutlineCode]
 
   const defaultServices = [
     {
@@ -70,13 +70,6 @@ export default function Services() {
       desc: t('services.adsDesc'),
       features: [t('services.adsFeat1'), t('services.adsFeat2'), t('services.adsFeat3'), t('services.adsFeat4')],
       platforms: [FaFacebookF, FaInstagram, FaTiktok],
-    },
-    {
-      icon: HiOutlineSpeakerphone,
-      title: t('services.influencerTitle'),
-      desc: t('services.influencerDesc'),
-      features: [t('services.influencerFeat1'), t('services.influencerFeat2'), t('services.influencerFeat3'), t('services.influencerFeat4')],
-      platforms: [FaInstagram, FaYoutube, FaTiktok],
     },
     {
       icon: HiOutlineFilm,

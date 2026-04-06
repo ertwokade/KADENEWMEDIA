@@ -12,7 +12,6 @@ HİZMETLER:
 - Sosyal Medya Yönetimi (Instagram, TikTok, Facebook, YouTube, LinkedIn, X)
 - İçerik Üretimi (Grafik Tasarım, Copywriting, Marka Kimliği)
 - Reklam Yönetimi (Meta Ads, Google Ads, TikTok Ads)
-- Influencer Marketing
 - Video Prodüksiyon (Reels, TikTok, YouTube)
 - Strateji & Danışmanlık
 - Web Sitesi Tasarımı (Responsive, SEO, UI/UX, E-ticaret)
@@ -38,7 +37,6 @@ SERVICES:
 - Social Media Management (Instagram, TikTok, Facebook, YouTube, LinkedIn, X)
 - Content Production (Graphic Design, Copywriting, Brand Identity)
 - Ad Management (Meta Ads, Google Ads, TikTok Ads)
-- Influencer Marketing
 - Video Production (Reels, TikTok, YouTube)
 - Strategy & Consulting
 - Web Design (Responsive, SEO, UI/UX, E-commerce)
@@ -61,7 +59,7 @@ Give short, friendly, helpful answers. Use emojis. Answer within the scope of th
 const fallbackResponses = {
   tr: {
     greetings: { keys: ['merhaba', 'selam', 'hey', 'merhabalar', 'günaydın'], response: 'Merhaba! 👋 Kade Media\'ya hoş geldiniz. Size hizmetlerimiz, fiyatlarımız veya iletişim bilgilerimiz hakkında yardımcı olabilirim. Ne hakkında bilgi almak istersiniz?' },
-    services: { keys: ['hizmet', 'servis', 'ne yapıyorsunuz', 'hizmetleriniz'], response: '🚀 Hizmetlerimiz:\n\n📱 Sosyal Medya Yönetimi\n🎨 İçerik Üretimi\n📊 Reklam Yönetimi (Meta, Google, TikTok)\n🤝 Influencer Marketing\n🎬 Video Prodüksiyon\n💡 Strateji & Danışmanlık\n🌐 Web Sitesi Tasarımı\n\nDetay için sormak istediğiniz hizmeti yazabilirsiniz!' },
+    services: { keys: ['hizmet', 'servis', 'ne yapıyorsunuz', 'hizmetleriniz'], response: '🚀 Hizmetlerimiz:\n\n📱 Sosyal Medya Yönetimi\n🎨 İçerik Üretimi\n📊 Reklam Yönetimi (Meta, Google, TikTok)\n🎬 Video Prodüksiyon\n💡 Strateji & Danışmanlık\n🌐 Web Sitesi Tasarımı\n\nDetay için sormak istediğiniz hizmeti yazabilirsiniz!' },
     pricing: { keys: ['fiyat', 'ücret', 'paket', 'maliyet', 'ne kadar', 'kaça'], response: '💰 Paketlerimiz:\n\n🟡 Başlangıç: ₺7.500/ay\n🟠 Profesyonel: Ücretsiz keşif görüşmesi\n🔴 Kurumsal: ₺25.000/ay\'dan\n\nDetaylı bilgi için /paketler sayfamızı ziyaret edebilirsiniz!' },
     contact: { keys: ['iletişim', 'telefon', 'mail', 'e-posta', 'adres', 'neredesiniz'], response: '📞 İletişim:\n\n📧 hello@kademedia.com\n📱 0 506 729 34 23\n📍 Biruni Teknopark, İstanbul\n⏰ Pzt-Cum 09:00-18:00' },
     web: { keys: ['web', 'site', 'website', 'tasarım'], response: '🌐 Web Sitesi Tasarımı:\n\n• Responsive (mobil uyumlu) tasarım\n• SEO optimizasyonu\n• UI/UX tasarım\n• E-ticaret çözümleri\n\nModern ve etkileyici web siteleri tasarlıyoruz!' },
@@ -74,7 +72,7 @@ const fallbackResponses = {
   },
   en: {
     greetings: { keys: ['hello', 'hi', 'hey', 'good morning'], response: 'Hello! 👋 Welcome to Kade Media. I can help you with our services, pricing, or contact info. What would you like to know?' },
-    services: { keys: ['service', 'what do you do', 'offer'], response: '🚀 Our Services:\n\n📱 Social Media Management\n🎨 Content Production\n📊 Ad Management\n🤝 Influencer Marketing\n🎬 Video Production\n💡 Strategy & Consulting\n🌐 Web Design\n\nAsk about any service for details!' },
+    services: { keys: ['service', 'what do you do', 'offer'], response: '🚀 Our Services:\n\n📱 Social Media Management\n🎨 Content Production\n📊 Ad Management\n🎬 Video Production\n💡 Strategy & Consulting\n🌐 Web Design\n\nAsk about any service for details!' },
     pricing: { keys: ['price', 'cost', 'package', 'how much'], response: '💰 Packages:\n\n🟡 Starter: $220/mo\n🟠 Professional: Free discovery call\n🔴 Enterprise: From $730/mo\n\nVisit /packages for details!' },
     contact: { keys: ['contact', 'phone', 'email', 'address'], response: '📞 Contact:\n\n📧 hello@kademedia.com\n📱 +90 506 729 34 23\n📍 Biruni Teknopark, Istanbul\n⏰ Mon-Fri 09:00-18:00' },
     web: { keys: ['web', 'site', 'website', 'design'], response: '🌐 Web Design:\n\n• Responsive design\n• SEO optimization\n• UI/UX design\n• E-commerce solutions\n\nWe create modern, impactful websites!' },

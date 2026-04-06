@@ -56,17 +56,6 @@ const servicesMap = {
     platforms: [FaFacebookF, FaInstagram, FaTiktok],
     color: '#6C63FF',
   },
-  'influencer-marketing': {
-    icon: HiOutlineSpeakerphone,
-    titleTr: 'Influencer Marketing',
-    titleEn: 'Influencer Marketing',
-    descTr: 'Markanıza uygun influencer\'ları seçiyor, kampanya süreçlerini yönetiyoruz. Mikro ve makro influencer\'larla iş birliği yapıyoruz.',
-    descEn: 'We select the right influencers for your brand and manage campaign processes. We collaborate with micro and macro influencers.',
-    featuresTr: ['Influencer Seçimi', 'Kampanya Yönetimi', 'ROI Analizi', 'İçerik Onay Süreci', 'KOL Yönetimi', 'Mikro/Nano Stratejisi'],
-    featuresEn: ['Influencer Selection', 'Campaign Management', 'ROI Analysis', 'Content Approval Process', 'KOL Management', 'Micro/Nano Strategy'],
-    platforms: [FaInstagram, FaYoutube, FaTiktok],
-    color: '#2ECC71',
-  },
   'video-produksiyon': {
     icon: HiOutlineFilm,
     titleTr: 'Video Prodüksiyon',

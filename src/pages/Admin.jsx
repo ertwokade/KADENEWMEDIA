@@ -1707,22 +1707,34 @@ function LeadStatusBadge({ status }) {
   )
 }
 
-function exportMessagesCSV(messages) {
-  const headers = ['Ad', 'E-posta', 'Telefon', 'Şirket', 'Hizmet', 'Mesaj', 'Durum', 'Tarih']
-  const rows = messages.map(m => [
-    m.name, m.email, m.phone || '-', m.company || '-', m.service || '-',
-    (m.message || '').replace(/"/g, '""'),
-    m.status || 'yeni',
-    m.createdAt ? new Date(m.createdAt).toLocaleDateString('tr-TR') : '-'
-  ])
-  const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n')
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+function exportToExcel(headers, rows, filename) {
+  const escCell = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  const headerCells = headers.map(h => `<th style="background:#1a1a2e;color:#eac321;font-weight:bold;padding:10px 14px;border:1px solid #444;font-size:13px;white-space:nowrap;">${escCell(h)}</th>`).join('')
+  const dataRows = rows.map((r, i) =>
+    '<tr>' + r.map(v => `<td style="background:${i % 2 === 0 ? '#f9f9f9' : '#fff'};padding:8px 12px;border:1px solid #ddd;font-size:12px;">${escCell(v)}</td>`).join('') + '</tr>'
+  ).join('')
+  const html = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+    <head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Sayfa1</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+    <body><table border="1" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><thead><tr>${headerCells}</tr></thead><tbody>${dataRows}</tbody></table></body></html>`
+  const blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `kade-mesajlar-${new Date().toISOString().slice(0, 10)}.csv`
+  a.download = filename
   a.click()
   URL.revokeObjectURL(url)
+}
+
+function exportMessagesExcel(messages) {
+  const headers = ['Ad', 'E-posta', 'Telefon', 'Şirket', 'Hizmet', 'Mesaj', 'Durum', 'Tarih']
+  const rows = messages.map(m => [
+    m.name, m.email, m.phone || '-', m.company || '-', m.service || '-',
+    m.message || '',
+    m.status || 'yeni',
+    m.createdAt ? new Date(m.createdAt).toLocaleDateString('tr-TR') : '-'
+  ])
+  exportToExcel(headers, rows, `kade-mesajlar-${new Date().toISOString().slice(0, 10)}.xls`)
 }
 
 function MessagesSection({ showToast, onNewMessageCount }) {
@@ -1877,8 +1889,8 @@ function MessagesSection({ showToast, onNewMessageCount }) {
               <HiOutlineViewBoards size={14} /> Kanban
             </button>
           </div>
-          <button className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesCSV(messages)} disabled={messages.length === 0}>
-            📥 CSV İndir
+          <button className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesExcel(messages)} disabled={messages.length === 0}>
+            📥 Excel İndir
           </button>
         </div>
       </div>
@@ -2099,8 +2111,8 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                 <HiOutlineTrash size={14} /> {bulkDeleting ? 'Siliniyor...' : `${selectedIds.length} Seçiliyi Sil`}
               </button>
             )}
-            <button className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesCSV(messages)} disabled={messages.length === 0}>
-              📥 CSV
+            <button className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesExcel(messages)} disabled={messages.length === 0}>
+              📥 Excel
             </button>
           </div>
         </div>
@@ -3746,19 +3758,14 @@ function NewsletterSection({ showToast }) {
     } catch (err) { showToast(err.message, 'error') }
   }
 
-  const exportCSV = () => {
-    const rows = [['E-posta', 'Kaynak', 'Tarih']]
-    filtered.forEach(s => rows.push([
+  const exportSubscribersExcel = () => {
+    const headers = ['E-posta', 'Kaynak', 'Tarih']
+    const rows = filtered.map(s => [
       s.email,
       s.source || 'website',
       s.createdAt ? new Date(s.createdAt).toLocaleDateString('tr-TR') : '',
-    ]))
-    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url; a.download = 'newsletter-aboneleri.csv'; a.click()
-    URL.revokeObjectURL(url)
+    ])
+    exportToExcel(headers, rows, 'newsletter-aboneleri.xls')
   }
 
   const filtered = subscribers.filter(s =>
@@ -3776,8 +3783,8 @@ function NewsletterSection({ showToast }) {
           <button className="btn btn-outline" onClick={() => fetchSubscribers()} disabled={loading}>
             {loading ? '⏳' : '🔄'} Yenile
           </button>
-          <button className="btn btn-primary" onClick={exportCSV} disabled={filtered.length === 0}>
-            📥 CSV İndir
+          <button className="btn btn-primary" onClick={exportSubscribersExcel} disabled={filtered.length === 0}>
+            📥 Excel İndir
           </button>
         </div>
       </div>

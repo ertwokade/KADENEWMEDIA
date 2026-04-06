@@ -64,7 +64,7 @@ export default function Packages() {
   const { lang, t } = useLanguage()
   useSEO({
     title: 'Paketler & Fiyatlar | Sosyal Medya Hizmet Paketleri',
-    description: 'Kade Media sosyal medya yönetim paketleri. Starter, Growth ve Pro paketlerimizle uygun fiyata profesyonel dijital pazarlama hizmeti alın.',
+    description: 'Kade Media sosyal medya yönetim paketleri. Başlangıç, Profesyonel, Kurumsal ve Özel olmak üzere 4 farklı paketle uygun fiyata profesyonel dijital pazarlama hizmeti alın.',
     keywords: 'sosyal medya paketleri, sosyal medya fiyatları, instagram yönetim paketi, dijital pazarlama fiyatları, sosyal medya yönetim ücreti',
     path: '/paketler',
   })
@@ -97,66 +97,84 @@ export default function Packages() {
 
   const packages = [
     {
-      name: t('packages.starter'),
+      name: isEN ? 'Starter' : 'Başlangıç',
       tier: 'starter',
-      priceTRY: '8.500',
-      priceUSD: '220',
-      desc: t('packages.starterDesc'),
+      priceTRY: '12.500',
+      priceUSD: null,
+      desc: isEN ? 'Perfect for small businesses and startups taking their first steps in social media.' : 'Sosyal medyada ilk adımlarını atan küçük işletmeler ve startuplar için ideal.',
       popular: false,
       features: [
-        t('packages.feat_2platform'),
-        t('packages.feat_20content'),
-        t('packages.feat_basicDesign'),
-        t('packages.feat_community'),
-        t('packages.feat_calendar'),
-        t('packages.feat_monthlyReport'),
+        isEN ? '2 Platforms (Instagram + 1)' : '2 Platform (Instagram + 1)',
+        isEN ? '16 posts/month' : 'Ayda 16 içerik',
+        isEN ? 'Basic graphic design' : 'Temel grafik tasarım',
+        isEN ? 'Community management' : 'Topluluk yönetimi',
+        isEN ? 'Content calendar' : 'İçerik takvimi',
+        isEN ? 'Monthly performance report' : 'Aylık performans raporu',
       ],
       notIncluded: [
-        t('packages.feat_adManagement'),
-        t('packages.feat_videoContent'),
-        t('packages.feat_influencerMarketing'),
+        isEN ? 'Ad management' : 'Reklam yönetimi',
+        isEN ? 'Video content (Reels)' : 'Video içerik (Reels)',
+        isEN ? 'Competitor analysis' : 'Rakip analizi',
       ],
     },
     {
-      name: t('packages.pro'),
-      tier: 'pro',
-      priceTRY: '18.500',
-      priceUSD: '480',
-      desc: t('packages.proDesc'),
+      name: isEN ? 'Professional' : 'Profesyonel',
+      tier: 'professional',
+      priceTRY: '24.500',
+      priceUSD: null,
+      desc: isEN ? 'For growing brands that want comprehensive social media management and ad support.' : 'Kapsamlı sosyal medya yönetimi ve reklam desteği isteyen büyüyen markalar için.',
       popular: true,
       features: [
-        t('packages.feat_4platform'),
-        t('packages.feat_40content'),
-        t('packages.feat_proDesign'),
-        t('packages.feat_community'),
-        t('packages.feat_calendar'),
-        t('packages.feat_weeklyReport'),
-        t('packages.feat_basicAds'),
-        t('packages.feat_4reels'),
-        t('packages.feat_competitorAnalysis'),
+        isEN ? '4 Platforms' : '4 Platform',
+        isEN ? '30 posts/month' : 'Ayda 30 içerik',
+        isEN ? 'Professional design' : 'Profesyonel tasarım',
+        isEN ? 'Community management' : 'Topluluk yönetimi',
+        isEN ? 'Content calendar' : 'İçerik takvimi',
+        isEN ? 'Bi-weekly reporting' : '2 haftada bir raporlama',
+        isEN ? 'Basic ad management' : 'Temel reklam yönetimi',
+        isEN ? '4 Reels/month' : 'Ayda 4 Reels',
+        isEN ? 'Competitor analysis' : 'Rakip analizi',
       ],
       notIncluded: [],
     },
     {
-      name: t('packages.enterprise'),
+      name: isEN ? 'Enterprise' : 'Kurumsal',
       tier: 'enterprise',
-      priceTRY: '35.000',
-      priceUSD: '910',
-      desc: t('packages.enterpriseDesc'),
+      priceTRY: '48.000',
+      priceUSD: null,
+      desc: isEN ? 'Full-service digital marketing solution for large brands seeking maximum growth.' : 'Maksimum büyüme hedefleyen büyük markalar için tam kapsamlı dijital pazarlama çözümü.',
       popular: false,
       features: [
-        t('packages.feat_allPlatforms'),
-        t('packages.feat_unlimitedContent'),
-        t('packages.feat_premiumDesign'),
-        t('packages.feat_community'),
-        t('packages.feat_calendar'),
-        t('packages.feat_instantReport'),
-        t('packages.feat_advancedAds'),
-        t('packages.feat_12reels'),
-        t('packages.feat_competitorAnalysis'),
-        t('packages.feat_influencerMarketing'),
-        t('packages.feat_crisisManagement'),
-        t('packages.feat_strategist'),
+        isEN ? 'All platforms' : 'Tüm platformlar',
+        isEN ? 'Unlimited content' : 'Sınırsız içerik',
+        isEN ? 'Premium design' : 'Premium tasarım',
+        isEN ? 'Community management' : 'Topluluk yönetimi',
+        isEN ? 'Content calendar' : 'İçerik takvimi',
+        isEN ? 'Weekly reporting' : 'Haftalık raporlama',
+        isEN ? 'Advanced ad management' : 'Gelişmiş reklam yönetimi',
+        isEN ? '12 Reels/month' : 'Ayda 12 Reels',
+        isEN ? 'Competitor analysis' : 'Rakip analizi',
+        isEN ? 'Crisis management' : 'Kriz yönetimi',
+        isEN ? 'Dedicated strategist' : 'Özel strateji danışmanı',
+        isEN ? 'Priority support' : 'Öncelikli destek',
+      ],
+      notIncluded: [],
+    },
+    {
+      name: isEN ? 'Custom' : 'Özel',
+      tier: 'custom',
+      priceTRY: null,
+      priceUSD: null,
+      desc: isEN ? 'Fully tailored solutions designed specifically for your brand\'s unique needs.' : 'Markanızın benzersiz ihtiyaçlarına özel tasarlanmış çözümler.',
+      popular: false,
+      isCustom: true,
+      features: [
+        isEN ? 'Everything in Enterprise' : 'Kurumsaldaki her şey',
+        isEN ? 'Custom strategy & roadmap' : 'Özel strateji ve yol haritası',
+        isEN ? 'Multi-brand management' : 'Çoklu marka yönetimi',
+        isEN ? 'International market support' : 'Uluslararası pazar desteği',
+        isEN ? 'Dedicated team' : 'Size özel ekip',
+        isEN ? 'SLA agreement' : 'SLA anlaşması',
       ],
       notIncluded: [],
     },
@@ -216,20 +234,28 @@ export default function Packages() {
                     <h3>{pkg.name}</h3>
                     <p className="package-desc">{pkg.desc}</p>
                     
-                    <>
-                      <div className="package-price">
-                        <span className="currency">₺</span>
-                        <span className="amount">{pkg.priceTRY}</span>
-                        <span className="period">{t('packages.month')}</span>
+                    {pkg.isCustom ? (
+                      <div className="package-price custom-price">
+                        <span className="amount" style={{ fontSize: '1.5rem' }}>{isEN ? 'Custom Pricing' : 'Özel Fiyatlandırma'}</span>
                       </div>
-                      <div className="package-price-alt">
-                        ≈ ${convertTRYtoUSD(pkg.priceTRY, exchangeRate) || pkg.priceUSD}
-                        <span style={{ marginLeft: 4 }}>{t('packages.month')}</span>
-                        <span style={{ display: 'block', fontSize: '0.68rem', opacity: 0.5, marginTop: 2 }}>
-                          güncel kur: 1$ = {exchangeRate.toFixed(1)}₺
-                        </span>
-                      </div>
-                    </>
+                    ) : (
+                      <>
+                        <div className="package-price">
+                          <span className="currency">₺</span>
+                          <span className="amount">{pkg.priceTRY}</span>
+                          <span className="period">{t('packages.month')}</span>
+                        </div>
+                        {pkg.priceTRY && (
+                          <div className="package-price-alt">
+                            ≈ ${convertTRYtoUSD(pkg.priceTRY, exchangeRate) || pkg.priceUSD}
+                            <span style={{ marginLeft: 4 }}>{t('packages.month')}</span>
+                            <span style={{ display: 'block', fontSize: '0.68rem', opacity: 0.5, marginTop: 2 }}>
+                              güncel kur: 1$ = {exchangeRate.toFixed(1)}₺
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
 
                   <div className="package-features">
@@ -254,7 +280,7 @@ export default function Packages() {
                     className={`btn ${pkg.popular ? 'btn-primary' : 'btn-outline'} package-btn`}
                     onClick={() => analytics.packageClick(pkg.name)}
                   >
-                    {pkg.tier === 'starter' ? t('packages.startNow') : t('packages.discoveryCall')}
+                    {pkg.isCustom ? (isEN ? 'Get Quote' : 'Teklif Al') : pkg.popular ? (isEN ? 'Get Started' : 'Hemen Başla') : (isEN ? 'Discovery Call' : 'Keşif Görüşmesi')}
                     <HiOutlineArrowRight size={16} />
                   </Link>
                 </motion.div>
@@ -296,7 +322,6 @@ export default function Packages() {
                     { feature: isEN ? 'Content strategy' : 'İçerik stratejisi', kade: true, freelancer: null, inhouse: null },
                     { feature: isEN ? 'Monthly reporting' : 'Aylık raporlama', kade: true, freelancer: false, inhouse: null },
                     { feature: isEN ? 'Ad management' : 'Reklam yönetimi', kade: true, freelancer: false, inhouse: null },
-                    { feature: isEN ? 'Influencer network' : 'Influencer ağı', kade: true, freelancer: false, inhouse: false },
                     { feature: isEN ? 'Crisis management' : 'Kriz yönetimi', kade: true, freelancer: false, inhouse: null },
                     { feature: isEN ? 'Fixed monthly cost' : 'Sabit aylık maliyet', kade: true, freelancer: null, inhouse: false },
                     { feature: isEN ? 'No hiring process' : 'İşe alım süreci yok', kade: true, freelancer: true, inhouse: false },

@@ -48,17 +48,12 @@ const jobsData = {
       requirements: ['Adobe Premiere Pro veya DaVinci Resolve deneyimi', 'Kısa form video (Reels, TikTok) düzenleme deneyimi', 'Motion graphics temel bilgisi', 'Trend takibi ve yaratıcı video fikirleri üretme', 'CapCut veya benzeri mobil araçlara hakimiyet'],
     },
     {
-      id: 6, title: 'Influencer & Marka İletişimi Uzmanı', department: 'Pazarlama', location: 'İstanbul (Hibrit)', type: 'Yarı Zamanlı',
-      description: 'Marka ve influencer iş birliklerini koordine edecek, kampanya süreçlerini takip edecek bir Influencer Marketing uzmanı arıyoruz.',
-      requirements: ['Influencer pazarlama veya PR alanında deneyim', 'Sosyal medya platformlarına hakimiyet', 'İkna edici iletişim ve müzakere becerisi', 'Kampanya takibi ve raporlama deneyimi', 'Geniş sosyal medya ağı tercih sebebidir'],
-    },
-    {
-      id: 7, title: 'Müşteri İlişkileri Yöneticisi (Account Manager)', department: 'Hesap Yönetimi', location: 'İstanbul (Hibrit)', type: 'Yarı Zamanlı',
+      id: 6, title: 'Müşteri İlişkileri Yöneticisi (Account Manager)', department: 'Hesap Yönetimi', location: 'İstanbul (Hibrit)', type: 'Yarı Zamanlı',
       description: 'Ajans müşterileriyle ilişkileri yönetecek, proje takibini yapacak ve müşteri memnuniyetini sağlayacak bir Account Manager arıyoruz.',
       requirements: ['Müşteri ilişkileri veya proje yönetimi deneyimi', 'Dijital pazarlama temel bilgisi', 'Güçlü iletişim ve sunum becerileri', 'Planlama ve organizasyon yeteneği', 'İngilizce iletişim becerisi tercih sebebidir'],
     },
     {
-      id: 8, title: 'Fotoğrafçı & İçerik Üreticisi', department: 'Kreatif', location: 'İstanbul', type: 'Yarı Zamanlı',
+      id: 7, title: 'Fotoğrafçı & İçerik Üreticisi', department: 'Kreatif', location: 'İstanbul', type: 'Yarı Zamanlı',
       description: 'Sosyal medya çekimleri, ürün fotoğrafçılığı ve sahne arkası içerikleri için proje bazlı çalışacak bir fotoğrafçı arıyoruz.',
       requirements: ['Fotoğrafçılık portföyü (sosyal medya odaklı)', 'Temel Lightroom veya Photoshop bilgisi', 'Sosyal medya estetik anlayışı', 'Çekim organizasyonu yapabilme', 'Video çekimi yapabilmek tercih sebebidir'],
     },
@@ -90,17 +85,12 @@ const jobsData = {
       requirements: ['Adobe Premiere Pro or DaVinci Resolve experience', 'Short-form video (Reels, TikTok) editing experience', 'Basic motion graphics knowledge', 'Trend tracking and creative video idea generation', 'Proficiency in CapCut or similar mobile tools'],
     },
     {
-      id: 6, title: 'Influencer & Brand Communication Specialist', department: 'Marketing', location: 'Istanbul (Hybrid)', type: 'Part-Time',
-      description: 'We are looking for an Influencer Marketing specialist to coordinate brand and influencer collaborations and manage campaign processes.',
-      requirements: ['Experience in influencer marketing or PR', 'Proficiency in social media platforms', 'Persuasive communication and negotiation skills', 'Campaign tracking and reporting experience', 'Extensive social media network is a plus'],
-    },
-    {
-      id: 7, title: 'Account Manager', department: 'Account Management', location: 'Istanbul (Hybrid)', type: 'Part-Time',
+      id: 6, title: 'Account Manager', department: 'Account Management', location: 'Istanbul (Hybrid)', type: 'Part-Time',
       description: 'We are looking for an Account Manager to manage agency client relationships, track projects, and ensure client satisfaction.',
       requirements: ['Experience in client relations or project management', 'Basic digital marketing knowledge', 'Strong communication and presentation skills', 'Planning and organizational ability', 'English communication skills are a plus'],
     },
     {
-      id: 8, title: 'Photographer & Content Creator', department: 'Creative', location: 'Istanbul', type: 'Part-Time',
+      id: 7, title: 'Photographer & Content Creator', department: 'Creative', location: 'Istanbul', type: 'Part-Time',
       description: 'We are looking for a photographer for social media shoots, product photography, and behind-the-scenes content on a project basis.',
       requirements: ['Photography portfolio (social media focused)', 'Basic Lightroom or Photoshop knowledge', 'Social media aesthetic sense', 'Ability to organize shoots', 'Video shooting capability is a plus'],
     },
