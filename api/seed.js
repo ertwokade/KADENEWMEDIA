@@ -48,8 +48,8 @@ const defaultPartners = [
     longDescEn: 'We developed a TikTok-focused strategy to reach UrbanStyle\'s target audience, Gen Z.',
     servicesTr: ['TikTok Yönetimi', 'Video Prodüksiyon', 'Marka Stratejisi', 'Reklam Yönetimi'],
     servicesEn: ['TikTok Management', 'Video Production', 'Brand Strategy', 'Ad Management'],
-    resultsTr: ['10M+ TikTok görüntülenme', '200K+ yeni takipçi', '50+ influencer iş birliği', '%500 online satış artışı'],
-    resultsEn: ['10M+ TikTok views', '200K+ new followers', '50+ influencer collaborations', '500% online sales increase'],
+    resultsTr: ['10M+ TikTok görüntülenme', '200K+ yeni takipçi', '50+ marka iş birliği', '%500 online satış artışı'],
+    resultsEn: ['10M+ TikTok views', '200K+ new followers', '50+ brand collaborations', '500% online sales increase'],
   },
   {
     id: 'petpal', name: 'PetPal', category: 'Evcil Hayvan', categoryEn: 'Pet Care',
@@ -72,8 +72,8 @@ const defaultPartners = [
     longDescEn: 'We managed FitZone\'s digital transformation process.',
     servicesTr: ['Video Prodüksiyon', 'Performance Marketing', 'Marka Stratejisi', 'Sosyal Medya Yönetimi'],
     servicesEn: ['Video Production', 'Performance Marketing', 'Brand Strategy', 'Social Media Management'],
-    resultsTr: ['%250 üyelik satış artışı', '15M+ video görüntülenme', '25+ influencer iş birliği', '%180 lead artışı'],
-    resultsEn: ['250% membership sales increase', '15M+ video views', '25+ influencer collaborations', '180% lead increase'],
+    resultsTr: ['%250 üyelik satış artışı', '15M+ video görüntülenme', '25+ marka iş birliği', '%180 lead artışı'],
+    resultsEn: ['250% membership sales increase', '15M+ video views', '25+ brand collaborations', '180% lead increase'],
   },
 ];
 
@@ -119,16 +119,6 @@ const defaultBlogs = [
     date: '28 Şub 2025', readTime: 7, image: 'https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?w=800&q=80', color: '#2ECC71',
   },
   {
-    slug: 'influencer-marketing-rehberi',
-    titleTr: 'Influencer Marketing Rehberi: Doğru İş Birliğini Nasıl Kurarsınız?',
-    titleEn: 'Influencer Marketing Guide: How to Build the Right Partnership?',
-    excerptTr: 'Influencer seçiminden kampanya yönetimine kadar her şeyi kapsayan rehber.',
-    excerptEn: 'A comprehensive guide covering everything from influencer selection to campaign management.',
-    contentTr: '', contentEn: '',
-    category: 'Influencer', categoryEn: 'Influencer',
-    date: '20 Şub 2025', readTime: 9, image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80', color: '#00BCD4',
-  },
-  {
     slug: 'icerik-takvimi-olusturma',
     titleTr: 'Etkili İçerik Takvimi Nasıl Oluşturulur?',
     titleEn: 'How to Create an Effective Content Calendar?',
@@ -145,8 +135,8 @@ const defaultBlogs = [
     titleEn: 'Kade Media: Istanbul\'s Rising Social Media Agency',
     excerptTr: 'Kade Media olarak markaları dijital dünyada büyütüyor, sosyal medya stratejileriyle fark yaratıyoruz. İstanbul\'dan Türkiye\'ye ve dünyaya.',
     excerptEn: 'At Kade Media, we grow brands in the digital world and make a difference with social media strategies. From Istanbul to Turkey and the world.',
-    contentTr: `Kade Media, 2023 yılında İstanbul Biruni Teknopark'ta kurulmuş, sosyal medya yönetimi ve dijital pazarlama alanında uzmanlaşmış bir medya ajansıdır.\n\n**Neden Kade Media?**\nSosyal medya ajansı seçimi, markanızın dijital kimliğini şekillendirecek en kritik kararlardan biridir. Kade Media olarak fark yaratan üç temel özelliğimiz var:\n\n1. **Veri Odaklı Strateji:** Her karar, veriye dayalı içgörülerle alınır. Sezgiyle değil, analizle hareket ediyoruz.\n2. **Yaratıcı İçerik Üretimi:** Takipçilerin duraksayıp izlemek isteyeceği içerikler üretiyoruz. Dikkat ekonomisinde dikkat çekmek sanatımız.\n3. **Şeffaf Raporlama:** Aylık ve haftalık raporlarla her metriği paylaşıyoruz. Paranızın nereye gittiğini her zaman biliyorsunuz.\n\n**Kade Media Hizmetleri**\n- Sosyal medya yönetimi (Instagram, TikTok, YouTube, LinkedIn)\n- İçerik üretimi (grafik tasarım, video prodüksiyon, copywriting)\n- Performance marketing (Meta Ads, Google Ads, TikTok Ads)\n- Influencer marketing\n- Marka stratejisi ve danışmanlık\n\n**Biruni Teknopark'ta Konumlanmanın Avantajı**\nİstanbul'un teknoloji üssü Biruni Teknopark'ta yer almak, bize en güncel teknoloji ve pazarlama trendlerine anında erişim sağlıyor. İnovasyon odaklı ekibimiz, markanızı geleceğe taşıyor.\n\n**Ücretsiz Keşif Görüşmesi**\nMarkanızın dijital potansiyelini keşfetmek için ücretsiz keşif görüşmesi talep edin. 30 dakikalık bu görüşmede markanız için özel bir strateji taslağı sunuyoruz.`,
-    contentEn: `Kade Media is a media agency founded in 2023 at Istanbul Biruni Technopark, specializing in social media management and digital marketing.\n\n**Why Kade Media?**\nChoosing a social media agency is one of the most critical decisions that will shape your brand's digital identity. At Kade Media, we have three key differentiating features:\n\n1. **Data-Driven Strategy:** Every decision is made with data-driven insights. We act on analysis, not intuition.\n2. **Creative Content Production:** We produce content that followers will stop to watch. Getting attention in the attention economy is our art.\n3. **Transparent Reporting:** We share every metric with monthly and weekly reports. You always know where your money is going.\n\n**Kade Media Services**\n- Social media management (Instagram, TikTok, YouTube, LinkedIn)\n- Content production (graphic design, video production, copywriting)\n- Performance marketing (Meta Ads, Google Ads, TikTok Ads)\n- Influencer marketing\n- Brand strategy and consulting\n\n**The Advantage of Being at Biruni Technopark**\nBeing located at Biruni Technopark, Istanbul's technology hub, gives us immediate access to the most up-to-date technology and marketing trends. Our innovation-focused team takes your brand into the future.\n\n**Free Discovery Meeting**\nRequest a free discovery meeting to discover your brand's digital potential. In this 30-minute meeting, we present a custom strategy outline for your brand.`,
+    contentTr: `Kade Media, 2023 yılında İstanbul Biruni Teknopark'ta kurulmuş, sosyal medya yönetimi ve dijital pazarlama alanında uzmanlaşmış bir medya ajansıdır.\n\n**Neden Kade Media?**\nSosyal medya ajansı seçimi, markanızın dijital kimliğini şekillendirecek en kritik kararlardan biridir. Kade Media olarak fark yaratan üç temel özelliğimiz var:\n\n1. **Veri Odaklı Strateji:** Her karar, veriye dayalı içgörülerle alınır. Sezgiyle değil, analizle hareket ediyoruz.\n2. **Yaratıcı İçerik Üretimi:** Takipçilerin duraksayıp izlemek isteyeceği içerikler üretiyoruz. Dikkat ekonomisinde dikkat çekmek sanatımız.\n3. **Şeffaf Raporlama:** Aylık ve haftalık raporlarla her metriği paylaşıyoruz. Paranızın nereye gittiğini her zaman biliyorsunuz.\n\n**Kade Media Hizmetleri**\n- Sosyal medya yönetimi (Instagram, TikTok, YouTube, LinkedIn)\n- İçerik üretimi (grafik tasarım, video prodüksiyon, copywriting)\n- Performance marketing (Meta Ads, Google Ads, TikTok Ads)\n- Marka stratejisi ve büyüme danışmanlığı\n- Marka stratejisi ve danışmanlık\n\n**Biruni Teknopark'ta Konumlanmanın Avantajı**\nİstanbul'un teknoloji üssü Biruni Teknopark'ta yer almak, bize en güncel teknoloji ve pazarlama trendlerine anında erişim sağlıyor. İnovasyon odaklı ekibimiz, markanızı geleceğe taşıyor.\n\n**Ücretsiz Keşif Görüşmesi**\nMarkanızın dijital potansiyelini keşfetmek için ücretsiz keşif görüşmesi talep edin. 30 dakikalık bu görüşmede markanız için özel bir strateji taslağı sunuyoruz.`,
+    contentEn: `Kade Media is a media agency founded in 2023 at Istanbul Biruni Technopark, specializing in social media management and digital marketing.\n\n**Why Kade Media?**\nChoosing a social media agency is one of the most critical decisions that will shape your brand's digital identity. At Kade Media, we have three key differentiating features:\n\n1. **Data-Driven Strategy:** Every decision is made with data-driven insights. We act on analysis, not intuition.\n2. **Creative Content Production:** We produce content that followers will stop to watch. Getting attention in the attention economy is our art.\n3. **Transparent Reporting:** We share every metric with monthly and weekly reports. You always know where your money is going.\n\n**Kade Media Services**\n- Social media management (Instagram, TikTok, YouTube, LinkedIn)\n- Content production (graphic design, video production, copywriting)\n- Performance marketing (Meta Ads, Google Ads, TikTok Ads)\n- Marka stratejisi ve büyüme danışmanlığı\n- Brand strategy and consulting\n\n**The Advantage of Being at Biruni Technopark**\nBeing located at Biruni Technopark, Istanbul's technology hub, gives us immediate access to the most up-to-date technology and marketing trends. Our innovation-focused team takes your brand into the future.\n\n**Free Discovery Meeting**\nRequest a free discovery meeting to discover your brand's digital potential. In this 30-minute meeting, we present a custom strategy outline for your brand.`,
     category: 'Kade Media', categoryEn: 'Kade Media',
     date: '1 Nis 2025', readTime: 6, image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80', color: '#eac321',
   },
@@ -156,8 +146,8 @@ const defaultBlogs = [
     titleEn: 'How Much Does Social Media Management Cost? 2025 Turkey Prices',
     excerptTr: '2025 yılında sosyal medya ajansı fiyatları, ne dahil, ne değil ve nasıl doğru ajansı seçersiniz? Kapsamlı rehber.',
     excerptEn: 'Social media agency prices in 2025, what\'s included, what\'s not, and how to choose the right agency? Comprehensive guide.',
-    contentTr: `Sosyal medya yönetimi fiyatları, hizmet kapsamı ve ajansın deneyimine göre büyük farklılıklar gösterebilir. Bu rehberde 2025 Türkiye piyasasındaki gerçek fiyatları paylaşıyoruz.\n\n**Sosyal Medya Yönetim Fiyatları (2025)**\n\n**Başlangıç Paket:** 7.000 - 10.000 ₺/ay\n- 2-3 platform yönetimi\n- Aylık 16-20 içerik\n- Temel grafik tasarım\n- Aylık rapor\n\n**Büyüme Paketi:** 12.000 - 20.000 ₺/ay\n- 3-4 platform yönetimi\n- Aylık 30-40 içerik\n- Profesyonel grafik tasarım\n- Reels/video içerik\n- Haftalık rapor\n- Temel reklam yönetimi\n\n**Kurumsal Paket:** 25.000 - 40.000+ ₺/ay\n- Tüm platformlar\n- Sınırsız içerik\n- Premium tasarım\n- Gelişmiş reklam yönetimi\n- Influencer marketing\n- Anlık raporlama\n- Özel strateji danışmanı\n\n**Dikkat: Reklam Bütçesi Ayrı!**\nTüm bu fiyatlar yönetim ücretidir. Reklam harcaması (Meta Ads, Google Ads, vb.) bunların üzerine eklenir. Küçük işletmeler için aylık 2.000-5.000 ₺ reklam bütçesi genellikle yeterli başlangıç noktasıdır.\n\n**Fiyat Dışında Ne Sormalısınız?**\n1. Kaç müşteriyle çalışıyorlar? (20'den fazla marka = dikkat)\n2. Referans verebilirler mi?\n3. Raporlama sıklığı nedir?\n4. Acil durumlarda nasıl iletişim kurulur?\n5. Sözleşme koşulları nedir?\n\n**Kade Media Fiyatları**\nBizimle çalışmak için ücretsiz keşif görüşmesi talep edin. İhtiyaçlarınıza göre özel fiyat teklifi sunuyoruz.`,
-    contentEn: `Social media management prices can vary greatly depending on the scope of service and the agency's experience. In this guide, we share real prices in the 2025 Turkey market.\n\n**Social Media Management Prices (2025)**\n\n**Starter Package:** 7,000 - 10,000 ₺/month\n- 2-3 platform management\n- 16-20 monthly content pieces\n- Basic graphic design\n- Monthly report\n\n**Growth Package:** 12,000 - 20,000 ₺/month\n- 3-4 platform management\n- 30-40 monthly content pieces\n- Professional graphic design\n- Reels/video content\n- Weekly report\n- Basic ad management\n\n**Enterprise Package:** 25,000 - 40,000+ ₺/month\n- All platforms\n- Unlimited content\n- Premium design\n- Advanced ad management\n- Influencer marketing\n- Real-time reporting\n- Dedicated strategy consultant\n\n**Note: Ad Budget is Separate!**\nAll these prices are management fees. Ad spending (Meta Ads, Google Ads, etc.) is added on top. For small businesses, a monthly ad budget of 2,000-5,000 ₺ is generally sufficient as a starting point.\n\n**What Should You Ask Beyond Price?**\n1. How many clients do they work with? (More than 20 brands = caution)\n2. Can they provide references?\n3. What is the reporting frequency?\n4. How is communication handled in emergencies?\n5. What are the contract terms?\n\n**Kade Media Prices**\nRequest a free discovery meeting to work with us. We provide custom pricing based on your needs.`,
+    contentTr: `Sosyal medya yönetimi fiyatları, hizmet kapsamı ve ajansın deneyimine göre büyük farklılıklar gösterebilir. Bu rehberde 2025 Türkiye piyasasındaki gerçek fiyatları paylaşıyoruz.\n\n**Sosyal Medya Yönetim Fiyatları (2025)**\n\n**Başlangıç Paket:** 7.000 - 10.000 ₺/ay\n- 2-3 platform yönetimi\n- Aylık 16-20 içerik\n- Temel grafik tasarım\n- Aylık rapor\n\n**Büyüme Paketi:** 12.000 - 20.000 ₺/ay\n- 3-4 platform yönetimi\n- Aylık 30-40 içerik\n- Profesyonel grafik tasarım\n- Reels/video içerik\n- Haftalık rapor\n- Temel reklam yönetimi\n\n**Kurumsal Paket:** 25.000 - 40.000+ ₺/ay\n- Tüm platformlar\n- Sınırsız içerik\n- Premium tasarım\n- Gelişmiş reklam yönetimi\n- Marka stratejisi ve büyüme danışmanlığı\n- Anlık raporlama\n- Özel strateji danışmanı\n\n**Dikkat: Reklam Bütçesi Ayrı!**\nTüm bu fiyatlar yönetim ücretidir. Reklam harcaması (Meta Ads, Google Ads, vb.) bunların üzerine eklenir. Küçük işletmeler için aylık 2.000-5.000 ₺ reklam bütçesi genellikle yeterli başlangıç noktasıdır.\n\n**Fiyat Dışında Ne Sormalısınız?**\n1. Kaç müşteriyle çalışıyorlar? (20'den fazla marka = dikkat)\n2. Referans verebilirler mi?\n3. Raporlama sıklığı nedir?\n4. Acil durumlarda nasıl iletişim kurulur?\n5. Sözleşme koşulları nedir?\n\n**Kade Media Fiyatları**\nBizimle çalışmak için ücretsiz keşif görüşmesi talep edin. İhtiyaçlarınıza göre özel fiyat teklifi sunuyoruz.`,
+    contentEn: `Social media management prices can vary greatly depending on the scope of service and the agency's experience. In this guide, we share real prices in the 2025 Turkey market.\n\n**Social Media Management Prices (2025)**\n\n**Starter Package:** 7,000 - 10,000 ₺/month\n- 2-3 platform management\n- 16-20 monthly content pieces\n- Basic graphic design\n- Monthly report\n\n**Growth Package:** 12,000 - 20,000 ₺/month\n- 3-4 platform management\n- 30-40 monthly content pieces\n- Professional graphic design\n- Reels/video content\n- Weekly report\n- Basic ad management\n\n**Enterprise Package:** 25,000 - 40,000+ ₺/month\n- All platforms\n- Unlimited content\n- Premium design\n- Advanced ad management\n- Marka stratejisi ve büyüme danışmanlığı\n- Real-time reporting\n- Dedicated strategy consultant\n\n**Note: Ad Budget is Separate!**\nAll these prices are management fees. Ad spending (Meta Ads, Google Ads, etc.) is added on top. For small businesses, a monthly ad budget of 2,000-5,000 ₺ is generally sufficient as a starting point.\n\n**What Should You Ask Beyond Price?**\n1. How many clients do they work with? (More than 20 brands = caution)\n2. Can they provide references?\n3. What is the reporting frequency?\n4. How is communication handled in emergencies?\n5. What are the contract terms?\n\n**Kade Media Prices**\nRequest a free discovery meeting to work with us. We provide custom pricing based on your needs.`,
     category: 'Rehber', categoryEn: 'Guide',
     date: '25 Mar 2025', readTime: 7, image: 'https://images.unsplash.com/photo-1553729459-uj68e2c73f3?w=800&q=80', color: '#2ECC71',
   },
@@ -243,7 +233,10 @@ export default async function handler(req, res) {
   try {
     const db = await getDb();
 
-    // Create admin user
+    // Ensure unique index on username to prevent duplicates
+    await db.collection('users').createIndex({ username: 1 }, { unique: true }).catch(() => {});
+
+    // Create admin user (only if not exists - never touches other users)
     const existingAdmin = await db.collection('users').findOne({ username: 'kade' });
     if (!existingAdmin) {
       const hashedPassword = await bcrypt.hash(adminPassword, 10);
@@ -254,6 +247,9 @@ export default async function handler(req, res) {
         createdAt: new Date(),
       });
     }
+
+    // Count existing users (for reporting only - seed never deletes users)
+    const userCount = await db.collection('users').countDocuments();
 
     // Seed partners
     const partnerCount = await db.collection('partners').countDocuments();
@@ -280,6 +276,7 @@ export default async function handler(req, res) {
       message: 'Veritabanı başarıyla oluşturuldu!',
       seeded: {
         admin: !existingAdmin ? 'Oluşturuldu' : 'Zaten mevcut',
+        users: `${userCount} kullanıcı korunuyor`,
         partners: partnerCount === 0 ? `${defaultPartners.length} partner eklendi` : 'Zaten mevcut',
         blogs: blogCount === 0 ? `${defaultBlogs.length} blog eklendi` : 'Zaten mevcut',
         content: contentCount === 0 ? `${defaultContent.length} içerik eklendi` : 'Zaten mevcut',

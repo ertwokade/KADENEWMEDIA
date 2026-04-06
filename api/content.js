@@ -172,7 +172,6 @@ export default async function handler(req, res) {
         { loc: '/hizmetler/sosyal-medya-yonetimi', priority: '0.8', freq: 'monthly' },
         { loc: '/hizmetler/icerik-uretimi', priority: '0.8', freq: 'monthly' },
         { loc: '/hizmetler/reklam-yonetimi', priority: '0.8', freq: 'monthly' },
-        { loc: '/hizmetler/influencer-marketing', priority: '0.8', freq: 'monthly' },
         { loc: '/hizmetler/video-produksiyon', priority: '0.8', freq: 'monthly' },
         { loc: '/hizmetler/strateji-danismanlik', priority: '0.8', freq: 'monthly' },
         { loc: '/kvkk', priority: '0.3', freq: 'yearly' },

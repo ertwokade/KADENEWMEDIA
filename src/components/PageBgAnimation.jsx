@@ -29,7 +29,7 @@ const CONFIGS = {
     cls: 'bg-node',
   },
   blog: {
-    items: ['#içerik', '#sosyal', '#dijital', '#marka', '#viral', '#influencer', '#pazarlama', '#reklam'],
+    items: ['#içerik', '#sosyal', '#dijital', '#marka', '#viral', '#strateji', '#pazarlama', '#reklam'],
     count: 10,
     cls: 'bg-text',
   },

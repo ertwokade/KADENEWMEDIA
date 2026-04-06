@@ -24,8 +24,8 @@ export const partnersData = [
     color: '#6C63FF',
     descTr: 'TechVibe, yenilikçi bir teknoloji startup\'ı. Lansman kampanyasıyla ilk ayda 100K kullanıcıya ulaştık.',
     descEn: 'TechVibe is an innovative tech startup. We reached 100K users in the first month with our launch campaign.',
-    longDescTr: 'TechVibe\'ın ürün lansmanı için 360 derece dijital pazarlama stratejisi oluşturduk. Sosyal medya kampanyaları, influencer iş birlikleri ve performans reklamları ile ürünün lansman sürecini başarıyla yönettik.',
-    longDescEn: 'We created a 360-degree digital marketing strategy for TechVibe\'s product launch. We successfully managed the launch process with social media campaigns, influencer collaborations, and performance ads.',
+    longDescTr: 'TechVibe\'ın ürün lansmanı için 360 derece dijital pazarlama stratejisi oluşturduk. Sosyal medya kampanyaları, stratejik iş birlikleri ve performans reklamları ile ürünün lansman sürecini başarıyla yönettik.',
+    longDescEn: 'We created a 360-degree digital marketing strategy for TechVibe\'s product launch. We successfully managed the launch process with social media campaigns, brand collaborations, and performance ads.',
     servicesTr: ['Lansman Stratejisi', 'Sosyal Medya Yönetimi', 'Performance Marketing', 'İçerik Üretimi'],
     servicesEn: ['Launch Strategy', 'Social Media Management', 'Performance Marketing', 'Content Production'],
     resultsTr: ['100K+ kullanıcı (ilk ay)', '5M+ gösterim', '%180 dönüşüm oranı artışı', '500K+ uygulama indirme'],
@@ -56,12 +56,12 @@ export const partnersData = [
     color: '#E91E63',
     descTr: 'UrbanStyle, genç moda markası. TikTok stratejisiyle viral büyüme sağladık.',
     descEn: 'UrbanStyle is a young fashion brand. We achieved viral growth with our TikTok strategy.',
-    longDescTr: 'UrbanStyle\'ın hedef kitlesi olan Z kuşağına ulaşmak için TikTok odaklı bir strateji geliştirdik. Trend içerikler, influencer iş birlikleri ve yaratıcı video prodüksiyonuyla markayı TikTok\'ta en çok konuşulan moda markalarından biri yaptık.',
-    longDescEn: 'We developed a TikTok-focused strategy to reach UrbanStyle\'s target audience, Gen Z. With trending content, influencer collaborations, and creative video production, we made the brand one of the most talked-about fashion brands on TikTok.',
+    longDescTr: 'UrbanStyle\'ın hedef kitlesi olan Z kuşağına ulaşmak için TikTok odaklı bir strateji geliştirdik. Trend içerikler, stratejik iş birlikleri ve yaratıcı video prodüksiyonuyla markayı TikTok\'ta en çok konuşulan moda markalarından biri yaptık.',
+    longDescEn: 'We developed a TikTok-focused strategy to reach UrbanStyle\'s target audience, Gen Z. With trending content, brand collaborations, and creative video production, we made the brand one of the most talked-about fashion brands on TikTok.',
     servicesTr: ['TikTok Yönetimi', 'Video Prodüksiyon', 'Marka Stratejisi', 'Reklam Yönetimi'],
     servicesEn: ['TikTok Management', 'Video Production', 'Brand Strategy', 'Ad Management'],
-    resultsTr: ['10M+ TikTok görüntülenme', '200K+ yeni takipçi', '50+ influencer iş birliği', '%500 online satış artışı'],
-    resultsEn: ['10M+ TikTok views', '200K+ new followers', '50+ influencer collaborations', '500% online sales increase'],
+    resultsTr: ['10M+ TikTok görüntülenme', '200K+ yeni takipçi', '50+ marka iş birliği', '%500 online satış artışı'],
+    resultsEn: ['10M+ TikTok views', '200K+ new followers', '50+ brand collaborations', '500% online sales increase'],
   },
   {
     id: 'petpal',
@@ -88,12 +88,12 @@ export const partnersData = [
     color: '#00BCD4',
     descTr: 'FitZone, premium spor salonu zinciri. Dijital pazarlamayla üyelik satışlarını %250 artırdık.',
     descEn: 'FitZone is a premium gym chain. We increased membership sales by 250% with digital marketing.',
-    longDescTr: 'FitZone\'un dijital dönüşüm sürecini yönettik. Video içerikler, dönüşüm odaklı reklam kampanyaları ve influencer iş birlikleriyle hem marka bilinirliğini hem de üyelik satışlarını önemli ölçüde artırdık.',
-    longDescEn: 'We managed FitZone\'s digital transformation process. We significantly increased both brand awareness and membership sales with video content, conversion-focused ad campaigns, and influencer collaborations.',
+    longDescTr: 'FitZone\'un dijital dönüşüm sürecini yönettik. Video içerikler, dönüşüm odaklı reklam kampanyaları ve stratejik iş birlikleriyle hem marka bilinirliğini hem de üyelik satışlarını önemli ölçüde artırdık.',
+    longDescEn: 'We managed FitZone\'s digital transformation process. We significantly increased both brand awareness and membership sales with video content, conversion-focused ad campaigns, and brand collaborations.',
     servicesTr: ['Video Prodüksiyon', 'Performance Marketing', 'Marka Stratejisi', 'Sosyal Medya Yönetimi'],
     servicesEn: ['Video Production', 'Performance Marketing', 'Brand Strategy', 'Social Media Management'],
-    resultsTr: ['%250 üyelik satış artışı', '15M+ video görüntülenme', '25+ influencer iş birliği', '%180 lead artışı'],
-    resultsEn: ['250% membership sales increase', '15M+ video views', '25+ influencer collaborations', '180% lead increase'],
+    resultsTr: ['%250 üyelik satış artışı', '15M+ video görüntülenme', '25+ marka iş birliği', '%180 lead artışı'],
+    resultsEn: ['250% membership sales increase', '15M+ video views', '25+ brand collaborations', '180% lead increase'],
   },
 ]
 
@@ -188,8 +188,8 @@ export const blogPosts = [
     slug: 'ugc-kullanici-icerigi-marka-guveni',
     titleTr: 'UGC (Kullanıcı İçerikleri) ile Marka Güveni Oluşturma: 2025 Stratejileri',
     titleEn: 'Building Brand Trust with UGC (User-Generated Content): 2025 Strategies',
-    excerptTr: 'Tüketicilerin %92\'si geleneksel reklamlardan çok kullanıcı içeriklerine güveniyor. UGC kampanyaları artık marka stratejisinin vazgeçilmez bir parçası. Mikro-influencer iş birlikleri ve müşteri deneyimi paylaşımlarıyla otantik bir marka algısı nasıl oluşturulur, anlatıyoruz.',
-    excerptEn: '92% of consumers trust user-generated content over traditional advertising. UGC campaigns are now an essential part of brand strategy. We explain how to build authentic brand perception through micro-influencer partnerships and customer experience sharing.',
+    excerptTr: 'Tüketicilerin %92\'si geleneksel reklamlardan çok kullanıcı içeriklerine güveniyor. UGC kampanyaları artık marka stratejisinin vazgeçilmez bir parçası. Mikro-topluluk iş birlikleri ve müşteri deneyimi paylaşımlarıyla otantik bir marka algısı nasıl oluşturulur, anlatıyoruz.',
+    excerptEn: '92% of consumers trust user-generated content over traditional advertising. UGC campaigns are now an essential part of brand strategy. We explain how to build authentic brand perception through micro-community partnerships and customer experience sharing.',
     category: 'İçerik Stratejisi',
     categoryEn: 'Content Strategy',
     date: '5 Mar 2025',
@@ -210,20 +210,6 @@ export const blogPosts = [
     readTime: 9,
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
     color: '#9C27B0',
-  },
-  {
-    id: 7,
-    slug: 'influencer-marketing-mikro-nano-2025',
-    titleTr: 'Mikro ve Nano Influencer Marketing: Düşük Bütçeyle Yüksek Dönüşüm Almanın Sırrı',
-    titleEn: 'Micro & Nano Influencer Marketing: The Secret to High Conversions on a Low Budget',
-    excerptTr: 'Büyük influencer\'lara milyon TL ödemek yerine, 1K-50K takipçili mikro ve nano influencer\'larla çalışarak %60 daha yüksek etkileşim oranları elde edebilirsiniz. Doğru influencer seçimi, kampanya yönetimi ve ROI ölçümü rehberi.',
-    excerptEn: 'Instead of paying millions to macro influencers, working with micro and nano influencers (1K-50K followers) can yield 60% higher engagement rates. A complete guide to influencer selection, campaign management, and ROI measurement.',
-    category: 'Influencer',
-    categoryEn: 'Influencer',
-    date: '20 Şub 2025',
-    readTime: 8,
-    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
-    color: '#FF5722',
   },
   {
     id: 8,
@@ -540,7 +526,7 @@ export const blogPosts = [
 <li>Dijital reklam pazarı 85 milyar TL'ye ulaşacak</li>
 <li>Video reklam formatı toplam harcamaların %50'sini aşacak</li>
 <li>AI destekli reklam optimizasyonu standart hale gelecek</li>
-<li>Influencer marketing harcamaları %60 artacak</li>
+<li>Topluluk odaklı pazarlama harcamaları %60 artacak</li>
 </ul>
 
 <h2>Kade Media ile Reklam Bütçenizi Optimize Edin</h2>
