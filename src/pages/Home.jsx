@@ -194,7 +194,6 @@ export default function Home() {
     <PageTransition>
       {/* Hero Section */}
       <section className="hero">
-        <PageBgAnimation type="home" />
         <div className="hero-3d">
           <HeroBackground />
         </div>
@@ -203,7 +202,7 @@ export default function Home() {
         <div className="hero-glow hero-glow-2" />
 
         <div className="container hero-content">
-          <FadeIn delay={0.3}>
+          <FadeIn delay={0.1}>
             <h1 className="hero-title hero-gradient-text">
               {heroTexts.title1}
               <br />
@@ -211,11 +210,11 @@ export default function Home() {
             </h1>
           </FadeIn>
 
-          <FadeIn delay={0.4}>
+          <FadeIn delay={0.15}>
             <p className="hero-subtitle">{heroTexts.subtitle}</p>
           </FadeIn>
 
-          <FadeIn delay={0.5}>
+          <FadeIn delay={0.2}>
             <div className="hero-actions">
               <Link to="/iletisim" className="btn btn-primary">
                 {t('hero.cta1')}
@@ -228,7 +227,7 @@ export default function Home() {
             </div>
           </FadeIn>
 
-          <FadeIn delay={0.55}>
+          <FadeIn delay={0.25}>
             <div className="hero-free-audit">
               <Link to="/iletisim" className="hero-audit-link">
                 <HiOutlineChartBar size={16} />
@@ -238,7 +237,7 @@ export default function Home() {
             </div>
           </FadeIn>
 
-          <FadeIn delay={0.6}>
+          <FadeIn delay={0.3}>
             <div className="hero-platforms">
               <span className="platforms-label">{t('hero.platforms')}</span>
               <div className="platform-icons">

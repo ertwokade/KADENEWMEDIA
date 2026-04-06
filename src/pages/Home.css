@@ -19,6 +19,8 @@
   z-index: 1;
   pointer-events: none;
   opacity: 0.7;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .hero-glow {
@@ -82,7 +84,8 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   background-size: 200% 100%;
-  animation: heroGradientShift 4s ease infinite;
+  animation: heroGradientShift 6s ease infinite;
+  will-change: background-position;
 }
 
 .hero-highlight {
@@ -91,8 +94,9 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   background-size: 200% 100%;
-  animation: heroGradientShift 4s ease infinite;
-  animation-delay: -2s;
+  animation: heroGradientShift 6s ease infinite;
+  animation-delay: -3s;
+  will-change: background-position;
 }
 
 @keyframes heroGradientShift {
