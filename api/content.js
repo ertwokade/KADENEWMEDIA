@@ -1,6 +1,41 @@
 import { getDb } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+import jwt from 'jsonwebtoken';
+
+// ── GA4 helpers (kept in this file to stay within Vercel 12-function limit) ──
+let _ga4Token = null;
+let _ga4Exp = 0;
+
+async function ga4Token() {
+  const email = process.env.GA4_CLIENT_EMAIL;
+  const key = (process.env.GA4_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+  if (!email || !key) return null;
+  if (_ga4Token && Date.now() < _ga4Exp - 60000) return _ga4Token;
+  const now = Math.floor(Date.now() / 1000);
+  const assertion = jwt.sign(
+    { iss: email, scope: 'https://www.googleapis.com/auth/analytics.readonly', aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600 },
+    key, { algorithm: 'RS256' }
+  );
+  const r = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${assertion}`,
+  });
+  if (!r.ok) { console.error('GA4 token error:', await r.text()); return null; }
+  const d = await r.json();
+  _ga4Token = d.access_token;
+  _ga4Exp = Date.now() + d.expires_in * 1000;
+  return _ga4Token;
+}
+
+async function ga4Report(propId, token, body) {
+  const r = await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${propId}:runReport`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) { console.error('GA4 report error:', await r.text()); return null; }
+  return r.json();
+}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -145,6 +180,50 @@ export default async function handler(req, res) {
     } catch (err) {
       console.error('Analytics error:', err);
       return res.status(500).json({ error: 'Sunucu hatası' });
+    }
+  }
+
+  // ── GA4 Data API (GET /api/content?action=ga4) — auth required ──
+  if (action === 'ga4' && req.method === 'GET') {
+    const user = requireAuth(req);
+    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+
+    const propertyId = process.env.GA4_PROPERTY_ID;
+    if (!propertyId || !process.env.GA4_CLIENT_EMAIL || !process.env.GA4_PRIVATE_KEY) {
+      return res.status(200).json({ configured: false, error: 'GA4 yapılandırılmamış' });
+    }
+    try {
+      const token = await ga4Token();
+      if (!token) return res.status(200).json({ configured: false, error: 'GA4 token alınamadı' });
+
+      const period = req.query?.period || 'week';
+      const days = period === 'month' ? 30 : 7;
+      const startDate = `${days}daysAgo`;
+
+      const [dailyReport, pageReport, sourceReport, prevReport, activeReport] = await Promise.all([
+        ga4Report(propertyId, token, { dateRanges: [{ startDate, endDate: 'today' }], dimensions: [{ name: 'date' }], metrics: [{ name: 'screenPageViews' }], orderBys: [{ dimension: { dimensionName: 'date' } }] }),
+        ga4Report(propertyId, token, { dateRanges: [{ startDate, endDate: 'today' }], dimensions: [{ name: 'pagePath' }], metrics: [{ name: 'screenPageViews' }], orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }], limit: 8 }),
+        ga4Report(propertyId, token, { dateRanges: [{ startDate, endDate: 'today' }], dimensions: [{ name: 'sessionDefaultChannelGroup' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }] }),
+        ga4Report(propertyId, token, { dateRanges: [{ startDate: `${days * 2}daysAgo`, endDate: `${days + 1}daysAgo` }], metrics: [{ name: 'screenPageViews' }] }),
+        ga4Report(propertyId, token, { dateRanges: [{ startDate: 'today', endDate: 'today' }], metrics: [{ name: 'activeUsers' }] }),
+      ]);
+
+      const dailyData = (dailyReport?.rows || []).map(r => ({ date: r.dimensionValues[0].value.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'), count: parseInt(r.metricValues[0].value, 10) || 0 }));
+      const totalVisits = dailyData.reduce((s, d) => s + d.count, 0);
+      const maxPV = parseInt(pageReport?.rows?.[0]?.metricValues?.[0]?.value || '1', 10) || 1;
+      const pages = (pageReport?.rows || []).map(r => ({ path: r.dimensionValues[0].value, views: parseInt(r.metricValues[0].value, 10) || 0, percent: Math.round((parseInt(r.metricValues[0].value, 10) / maxPV) * 100) }));
+      const srcMap = { 'Organic Search': 'organic', 'Organic Social': 'social', Direct: 'direct', Referral: 'referral', 'Paid Search': 'paid', 'Paid Social': 'paid_social' };
+      const srcNames = { organic: 'Organik Arama', social: 'Sosyal Medya', direct: 'Direkt', referral: 'Referans', paid: 'Ücretli Arama', paid_social: 'Ücretli Sosyal' };
+      const totalSess = (sourceReport?.rows || []).reduce((s, r) => s + (parseInt(r.metricValues[0].value, 10) || 0), 0) || 1;
+      const sources = (sourceReport?.rows || []).map(r => { const n = r.dimensionValues[0].value; const k = srcMap[n] || n.toLowerCase().replace(/\s+/g, '_'); const c = parseInt(r.metricValues[0].value, 10) || 0; return { name: srcNames[k] || n, key: k, count: c, value: Math.round((c / totalSess) * 100) }; });
+      const prevTotal = parseInt(prevReport?.rows?.[0]?.metricValues?.[0]?.value || '0', 10);
+      const growth = prevTotal > 0 ? Math.round(((totalVisits - prevTotal) / prevTotal) * 100) : null;
+      const activeUsers = parseInt(activeReport?.rows?.[0]?.metricValues?.[0]?.value || '0', 10);
+
+      return res.status(200).json({ configured: true, source: 'google_analytics', dailyData, totalVisits, growth, pages, sources, activeUsers, period });
+    } catch (err) {
+      console.error('GA4 error:', err);
+      return res.status(500).json({ error: 'GA4 verisi alınamadı: ' + err.message });
     }
   }
 

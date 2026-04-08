@@ -296,7 +296,7 @@ export async function deleteNotificationApi(id) {
 
 // Google Analytics 4 Data API
 export async function getGA4AnalyticsApi(period = 'week') {
-  const res = await fetch(`${API_BASE}/ga4?period=${period}`, {
+  const res = await fetch(`${API_BASE}/content?action=ga4&period=${period}`, {
     headers: getAuthHeaders(),
   });
   return handleResponse(res);

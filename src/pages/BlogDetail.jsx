@@ -22,7 +22,16 @@ export default function BlogDetail() {
 
   useEffect(() => {
     getBlogsApi()
-      .then(data => { if (Array.isArray(data) && data.length > 0) setAllPosts(data) })
+      .then(data => {
+        if (!Array.isArray(data) || !data.length) return
+        setAllPosts(prev => {
+          const slugMap = new Map(data.map(p => [p.slug, p]))
+          const merged = prev.map(p => slugMap.get(p.slug) || p)
+          const existingSlugs = new Set(prev.map(p => p.slug))
+          const newPosts = data.filter(p => !existingSlugs.has(p.slug))
+          return [...merged, ...newPosts]
+        })
+      })
       .catch(() => {})
   }, [slug])
 

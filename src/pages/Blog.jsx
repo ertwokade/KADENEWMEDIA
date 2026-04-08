@@ -29,7 +29,17 @@ export default function Blog() {
 
   useEffect(() => {
     getBlogsApi()
-      .then(data => { if (data?.length > 0) setBlogPosts(data) })
+      .then(data => {
+        if (!data?.length) return
+        // Merge: API posts override static by slug, new API posts appended
+        setBlogPosts(prev => {
+          const slugMap = new Map(data.map(p => [p.slug, p]))
+          const merged = prev.map(p => slugMap.get(p.slug) || p)
+          const existingSlugs = new Set(prev.map(p => p.slug))
+          const newPosts = data.filter(p => !existingSlugs.has(p.slug))
+          return [...merged, ...newPosts]
+        })
+      })
       .catch(() => {})
   }, [])
 
