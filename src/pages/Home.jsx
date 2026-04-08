@@ -124,55 +124,53 @@ export default function Home() {
     path: '/',
   })
   
-  // Admin Panel Overrides State
-  const [heroTexts, setHeroTexts] = useState({
+  // Hero text from translations — API can override
+  const heroDefaults = {
     title1: t('hero.title1'),
     title2: t('hero.title2'),
-    subtitle: t('hero.subtitle')
-  })
+    subtitle: t('hero.subtitle'),
+  }
+  const [heroOverride, setHeroOverride] = useState(null)
 
   const [dynamicStats, setDynamicStats] = useState(null)
   const [dynamicFaq, setDynamicFaq] = useState(null)
   const [dynamicTestimonials, setDynamicTestimonials] = useState(null)
 
-  // Load texts from API, always fallback to translation defaults
+  // Load overrides from API once
   useEffect(() => {
-    const defaults = {
-      title1: t('hero.title1'),
-      title2: t('hero.title2'),
-      subtitle: t('hero.subtitle'),
-    }
-
+    let cancelled = false
     const loadFromApi = async () => {
       try {
         const heroData = await getContentApi('hero')
-        if (heroData?.data?.[lang]) {
-          setHeroTexts({
-            title1: heroData.data[lang].title1 || defaults.title1,
-            title2: heroData.data[lang].title2 || defaults.title2,
-            subtitle: heroData.data[lang].subtitle || defaults.subtitle,
-          })
-        }
-      } catch { /* fallback already set */ }
-
-      try {
-        const statsData = await getContentApi('stats')
-        if (statsData?.data) setDynamicStats(statsData.data)
+        if (!cancelled && heroData?.data) setHeroOverride(heroData.data)
       } catch { /* use defaults */ }
 
       try {
-        const faqData = await getContentApi('faq')
-        if (faqData?.data?.tr?.length) setDynamicFaq(faqData.data)
+        const statsData = await getContentApi('stats')
+        if (!cancelled && statsData?.data) setDynamicStats(statsData.data)
+      } catch { /* use defaults */ }
+
+      try {
+        const faqRes = await getContentApi('faq')
+        if (!cancelled && faqRes?.data?.tr?.length) setDynamicFaq(faqRes.data)
       } catch { /* use defaults */ }
 
       try {
         const testimonialsData = await getContentApi('testimonials')
-        if (testimonialsData?.data?.items?.length) setDynamicTestimonials(testimonialsData.data.items)
+        if (!cancelled && testimonialsData?.data?.items?.length) setDynamicTestimonials(testimonialsData.data.items)
       } catch { /* use defaults */ }
     }
 
     loadFromApi()
-  }, [lang, t])
+    return () => { cancelled = true }
+  }, [])
+
+  // Derive hero texts: always use current translation, override only if API has data for current lang
+  const heroTexts = {
+    title1: heroOverride?.[lang]?.title1 || heroDefaults.title1,
+    title2: heroOverride?.[lang]?.title2 || heroDefaults.title2,
+    subtitle: heroOverride?.[lang]?.subtitle || heroDefaults.subtitle,
+  }
 
   const services = [
     { icon: HiOutlineGlobe, title: t('servicesSection.smm'), desc: t('servicesSection.smmDesc') },

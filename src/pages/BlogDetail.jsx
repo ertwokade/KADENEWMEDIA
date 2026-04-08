@@ -18,17 +18,12 @@ import './Blog.css'
 export default function BlogDetail() {
   const { slug } = useParams()
   const { lang, t } = useLanguage()
-  const [allPosts, setAllPosts] = useState([])
-  const [apiDone, setApiDone] = useState(false)
+  const [allPosts, setAllPosts] = useState(staticBlogPosts)
 
   useEffect(() => {
     getBlogsApi()
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) setAllPosts(data)
-        else setAllPosts(staticBlogPosts)
-      })
-      .catch(() => { setAllPosts(staticBlogPosts) })
-      .finally(() => setApiDone(true))
+      .then(data => { if (Array.isArray(data) && data.length > 0) setAllPosts(data) })
+      .catch(() => {})
   }, [slug])
 
   const post = allPosts.find((p) => p.slug === slug)
@@ -79,21 +74,7 @@ export default function BlogDetail() {
   }, [post, slug, title, excerpt])
 
   // Only redirect after both static + API data have been checked
-  if (!post && apiDone) return <Navigate to="/blog" replace />
-  if (!post) {
-    return (
-      <PageTransition>
-        <section className="blog-hero">
-          <div className="container" style={{ textAlign: 'center', padding: '120px 0' }}>
-            <div className="loading-spinner" />
-            <p style={{ color: 'var(--text-secondary)', marginTop: 16 }}>
-              {lang === 'tr' ? 'Yükleniyor...' : 'Loading...'}
-            </p>
-          </div>
-        </section>
-      </PageTransition>
-    )
-  }
+  if (!post) return <Navigate to="/blog" replace />
 
   const postUrl = `https://kademedia.com.tr/blog/${slug}`
   const encodedUrl = encodeURIComponent(postUrl)

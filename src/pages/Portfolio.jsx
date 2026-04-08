@@ -91,12 +91,12 @@ const categories = ['All', 'Social Media', 'Launch', 'E-Commerce', 'TikTok', 'Co
 export default function Portfolio() {
   const { lang } = useLanguage()
   const [activeCategory, setActiveCategory] = useState('All')
-  const [items, setItems] = useState(null)
+  const [items, setItems] = useState(portfolioItems)
 
   useEffect(() => {
     getPortfolioApi()
-      .then(res => { setItems(res?.data?.items?.length ? res.data.items : portfolioItems) })
-      .catch(() => { setItems(portfolioItems) })
+      .then(res => { if (res?.data?.items?.length) setItems(res.data.items) })
+      .catch(() => {})
   }, [])
 
   useSEO({
@@ -106,16 +106,6 @@ export default function Portfolio() {
       : 'Kade Media portfolio page. Our success stories in social media management, digital marketing, and content production.',
     path: '/portfolio',
   })
-
-  if (!items) return (
-    <PageTransition>
-      <section className="portfolio-hero">
-        <div className="container" style={{ textAlign: 'center', padding: '120px 0' }}>
-          <div className="loading-spinner" />
-        </div>
-      </section>
-    </PageTransition>
-  )
 
   const filtered = activeCategory === 'All'
     ? items

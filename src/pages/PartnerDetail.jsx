@@ -20,21 +20,17 @@ import './Partners.css'
 export default function PartnerDetail() {
   const { id } = useParams()
   const { lang, t } = useLanguage()
-  const [partner, setPartner] = useState(null)
-  const [apiDone, setApiDone] = useState(false)
+  const [partner, setPartner] = useState(() => staticPartners.find((p) => p.id === id) || null)
 
   useEffect(() => {
     getPartnersApi()
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           const found = data.find((p) => p.id === id)
-          setPartner(found || staticPartners.find((p) => p.id === id) || null)
-        } else {
-          setPartner(staticPartners.find((p) => p.id === id) || null)
+          if (found) setPartner(found)
         }
       })
-      .catch(() => { setPartner(staticPartners.find((p) => p.id === id) || null) })
-      .finally(() => setApiDone(true))
+      .catch(() => {})
   }, [id])
 
   useEffect(() => {
@@ -53,21 +49,7 @@ export default function PartnerDetail() {
 
   useSEO({ title: metaTitle, description: metaDesc, path: `/partnerler/${id}` })
 
-  if (!partner && apiDone) return <Navigate to="/partnerler" replace />
-  if (!partner) {
-    return (
-      <PageTransition>
-        <section className="partner-detail-hero">
-          <div className="container" style={{ textAlign: 'center', padding: '120px 0' }}>
-            <div className="loading-spinner" />
-            <p style={{ color: 'var(--text-secondary)', marginTop: 16 }}>
-              {lang === 'tr' ? 'Yükleniyor...' : 'Loading...'}
-            </p>
-          </div>
-        </section>
-      </PageTransition>
-    )
-  }
+  if (!partner) return <Navigate to="/partnerler" replace />
 
   return (
     <PageTransition>

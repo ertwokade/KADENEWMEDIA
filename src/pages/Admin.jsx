@@ -25,7 +25,7 @@ import {
   updateMessageStatusApi,
   getNotesApi, createNoteApi, deleteNoteApi,
   getNotificationsApi, markNotificationReadApi, markAllNotificationsReadApi, deleteNotificationApi,
-  getAnalyticsApi, getActivityLogApi,
+  getAnalyticsApi, getGA4AnalyticsApi, getActivityLogApi,
   getNewsletterSubscribersApi, deleteNewsletterSubscriberApi,
   testSmtpApi, replyToMessageApi,
   getSiteSettingsApi, updateSiteSettingsApi,
@@ -3318,22 +3318,35 @@ function NotificationDropdown({ show, onClose }) {
 }
 
 // ========== ANALYTICS SECTION ==========
-const SOURCE_COLORS = { organic: '#2ECC71', social: '#6C63FF', direct: '#eac321', referral: '#E91E63' }
+const SOURCE_COLORS = { organic: '#2ECC71', social: '#6C63FF', direct: '#eac321', referral: '#E91E63', paid: '#FF9800', paid_social: '#9C27B0' }
 
 function AnalyticsSection() {
   const [period, setPeriod] = useState('week')
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [dataSource, setDataSource] = useState(null) // 'ga4' or 'internal'
 
   const load = useCallback(async (p) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await getAnalyticsApi(p)
-      setData(res)
+      // Try Google Analytics 4 first
+      const ga4 = await getGA4AnalyticsApi(p).catch(() => null)
+      if (ga4?.configured && ga4?.source === 'google_analytics') {
+        setData(ga4)
+        setDataSource('ga4')
+      } else {
+        // Fall back to internal analytics
+        const res = await getAnalyticsApi(p)
+        setData(res)
+        setDataSource('internal')
+        if (ga4 && !ga4.configured) {
+          setError(null) // Don't show GA4 config warning as error
+        }
+      }
     } catch (e) {
-      setError(e.message || 'Veri alınamadı')
+      setError(e.message || 'Veri alinamadi')
     } finally {
       setLoading(false)
     }
@@ -3343,13 +3356,13 @@ function AnalyticsSection() {
 
   const PAGE_NAMES = {
     '/': 'Ana Sayfa', '/hizmetler': 'Hizmetler', '/paketler': 'Paketler',
-    '/blog': 'Blog', '/iletisim': 'İletişim', '/hakkimizda': 'Hakkımızda',
+    '/blog': 'Blog', '/iletisim': 'Iletisim', '/hakkimizda': 'Hakkimizda',
     '/ekip': 'Ekip', '/kariyer': 'Kariyer', '/partnerler': 'Partnerler', '/portfolio': 'Portfolio',
   }
 
   const formatLabel = (date) => {
     const d = new Date(date)
-    if (period === 'week') return ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'][d.getDay() === 0 ? 6 : d.getDay() - 1]
+    if (period === 'week') return ['Pzt','Sal','Car','Per','Cum','Cmt','Paz'][d.getDay() === 0 ? 6 : d.getDay() - 1]
     return `${d.getDate()}/${d.getMonth() + 1}`
   }
 
@@ -3359,66 +3372,108 @@ function AnalyticsSection() {
   const growth = data?.growth
   const pages = data?.pages || []
   const sources = data?.sources || []
+  const activeUsers = data?.activeUsers
 
   return (
     <div>
       <div className="admin-page-header">
         <div>
           <h1>Analitik <span>Paneli</span></h1>
-          <p>Gerçek zamanlı site ziyaret istatistikleri</p>
+          <p>
+            {dataSource === 'ga4'
+              ? 'Google Analytics 4 verileri'
+              : 'Site ziyaret istatistikleri'}
+            {dataSource === 'ga4' && (
+              <span style={{ marginLeft: 8, fontSize: '0.72rem', background: 'rgba(46,204,113,0.15)', color: '#2ECC71', padding: '2px 8px', borderRadius: 6, fontWeight: 600 }}>
+                GA4
+              </span>
+            )}
+          </p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <a
+            href="https://analytics.google.com/analytics/web/#/p/G-R893K1VE79"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="table-action-btn"
+            style={{ textDecoration: 'none', marginRight: 4 }}
+          >
+            Google Analytics
+          </a>
           <button onClick={() => load(period)} className="table-action-btn" disabled={loading} style={{ marginRight: 8 }}>
-            {loading ? '⏳' : '🔄'} Yenile
+            {loading ? '...' : 'Yenile'}
           </button>
           <div className="admin-tabs" style={{ margin: 0 }}>
-            <button className={`admin-tab ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>Son 7 Gün</button>
-            <button className={`admin-tab ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>Son 30 Gün</button>
+            <button className={`admin-tab ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>Son 7 Gun</button>
+            <button className={`admin-tab ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>Son 30 Gun</button>
           </div>
         </div>
       </div>
 
-      {error && <div className="admin-form" style={{ color: '#E91E63', padding: 16 }}>⚠️ {error}</div>}
+      {error && <div className="admin-form" style={{ color: '#E91E63', padding: 16 }}>{error}</div>}
+
+      {/* GA4 Setup Notice */}
+      {dataSource === 'internal' && !loading && (
+        <div className="admin-form" style={{ marginBottom: 16, padding: '12px 16px', background: 'rgba(234,195,33,0.06)', border: '1px solid rgba(234,195,33,0.15)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+            <span>Google Analytics 4 entegrasyonu icin <code style={{ background: 'var(--bg-tertiary)', padding: '1px 6px', borderRadius: 4, fontSize: '0.78rem' }}>.env</code> dosyasina su degiskenleri ekleyin:</span>
+          </div>
+          <div style={{ marginTop: 8, fontSize: '0.75rem', color: 'var(--text-tertiary)', fontFamily: 'monospace', lineHeight: 1.8 }}>
+            GA4_PROPERTY_ID=123456789<br />
+            GA4_CLIENT_EMAIL=xxx@xxx.iam.gserviceaccount.com<br />
+            GA4_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+          </div>
+        </div>
+      )}
 
       {/* Summary Cards */}
       <div className="admin-stats-grid">
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.10)', color: '#6C63FF' }}>👁️</div>
+          <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.10)', color: '#6C63FF' }}>
+            {dataSource === 'ga4' ? 'GA' : 'PV'}
+          </div>
           <div className="stat-number">{loading ? '—' : totalVisits.toLocaleString('tr-TR')}</div>
-          <div className="stat-label">Toplam Sayfa Görüntüleme</div>
+          <div className="stat-label">Toplam Sayfa Goruntuleme</div>
           {growth !== null && !loading && (
             <div style={{ fontSize: '0.75rem', color: growth >= 0 ? '#2ECC71' : '#E91E63', marginTop: 4 }}>
-              {growth >= 0 ? '↑' : '↓'} {Math.abs(growth)}% önceki döneme göre
+              {growth >= 0 ? '+' : ''}{growth}% onceki doneme gore
             </div>
           )}
         </div>
+        {activeUsers !== undefined && activeUsers !== null && (
+          <div className="admin-stat-card">
+            <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>AU</div>
+            <div className="stat-number">{loading ? '—' : activeUsers}</div>
+            <div className="stat-label">Bugunki Aktif Kullanici</div>
+          </div>
+        )}
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(234, 195, 33, 0.10)', color: '#eac321' }}>📄</div>
+          <div className="stat-icon" style={{ background: 'rgba(234, 195, 33, 0.10)', color: '#eac321' }}>PG</div>
           <div className="stat-number">{loading ? '—' : pages.length}</div>
           <div className="stat-label">Ziyaret Edilen Sayfa</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>📅</div>
+          <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>AV</div>
           <div className="stat-number">{loading ? '—' : dailyData.length > 0 ? Math.round(totalVisits / dailyData.length) : 0}</div>
-          <div className="stat-label">Günlük Ortalama</div>
+          <div className="stat-label">Gunluk Ortalama</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>🔝</div>
+          <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>TP</div>
           <div className="stat-number">{loading ? '—' : pages[0]?.views.toLocaleString('tr-TR') || 0}</div>
-          <div className="stat-label">En Çok Ziyaret Edilen Sayfa</div>
+          <div className="stat-label">En Cok Ziyaret</div>
           {pages[0] && <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{PAGE_NAMES[pages[0].path] || pages[0].path}</div>}
         </div>
       </div>
 
       {/* Bar Chart */}
       <div className="admin-form" style={{ marginTop: 24 }}>
-        <h3>📈 Sayfa Görüntüleme Trendi ({period === 'week' ? 'Son 7 Gün' : 'Son 30 Gün'})</h3>
+        <h3>Sayfa Goruntuleme Trendi ({period === 'week' ? 'Son 7 Gun' : 'Son 30 Gun'})</h3>
         {loading ? (
-          <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)' }}>Yükleniyor...</div>
+          <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)' }}>Veriler aliniyor...</div>
         ) : dailyData.length === 0 || totalVisits === 0 ? (
           <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', flexDirection: 'column', gap: 8 }}>
-            <span style={{ fontSize: '2rem' }}>📊</span>
-            <span>Henüz ziyaret verisi yok — site ziyaret edildikçe burada görünecek</span>
+            <span style={{ fontSize: '2rem' }}>-</span>
+            <span>Henuz ziyaret verisi yok — site ziyaret edildikce burada gorunecek</span>
           </div>
         ) : (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 180, marginTop: 20, padding: '0 4px', overflowX: 'auto' }}>
@@ -3430,7 +3485,9 @@ function AnalyticsSection() {
                     width: '100%',
                     height: `${Math.max((d.count / maxVal) * 140, d.count > 0 ? 4 : 2)}px`,
                     background: d.count > 0
-                      ? 'linear-gradient(180deg, #eac321 0%, rgba(234,195,33,0.35) 100%)'
+                      ? dataSource === 'ga4'
+                        ? 'linear-gradient(180deg, #4285F4 0%, rgba(66,133,244,0.35) 100%)'
+                        : 'linear-gradient(180deg, #eac321 0%, rgba(234,195,33,0.35) 100%)'
                       : 'rgba(255,255,255,0.06)',
                     borderRadius: '4px 4px 2px 2px',
                     transition: 'height 0.5s ease',
@@ -3446,9 +3503,9 @@ function AnalyticsSection() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20 }}>
         {/* Popular Pages */}
         <div className="admin-form">
-          <h3>🏆 En Çok Ziyaret Edilen Sayfalar</h3>
-          {loading ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Yükleniyor...</div>
-          : pages.length === 0 ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Henüz veri yok</div>
+          <h3>En Cok Ziyaret Edilen Sayfalar</h3>
+          {loading ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Veriler aliniyor...</div>
+          : pages.length === 0 ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Henuz veri yok</div>
           : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
               {pages.map((p, i) => (
@@ -3458,7 +3515,7 @@ function AnalyticsSection() {
                     <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.views.toLocaleString('tr-TR')}</span>
                   </div>
                   <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
-                    <div style={{ width: `${p.percent}%`, height: '100%', background: 'var(--accent)', borderRadius: 3, transition: 'width 0.6s ease' }} />
+                    <div style={{ width: `${p.percent}%`, height: '100%', background: dataSource === 'ga4' ? '#4285F4' : 'var(--accent)', borderRadius: 3, transition: 'width 0.6s ease' }} />
                   </div>
                 </div>
               ))}
@@ -3468,9 +3525,9 @@ function AnalyticsSection() {
 
         {/* Traffic Sources */}
         <div className="admin-form">
-          <h3>🌐 Trafik Kaynakları</h3>
-          {loading ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Yükleniyor...</div>
-          : sources.length === 0 ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Henüz veri yok</div>
+          <h3>Trafik Kaynaklari</h3>
+          {loading ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Veriler aliniyor...</div>
+          : sources.length === 0 ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Henuz veri yok</div>
           : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
               {sources.map((s, i) => {

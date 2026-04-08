@@ -19,29 +19,13 @@ export default function Partners() {
     keywords: 'kade media referanslar, sosyal medya ajansı müşterileri, dijital pazarlama partner markalar',
     path: '/partnerler',
   })
-  const [partnersData, setPartnersData] = useState(null)
+  const [partnersData, setPartnersData] = useState(staticPartners)
 
   useEffect(() => {
-    const fetchPartners = async () => {
-      try {
-        const data = await getPartnersApi()
-        setPartnersData(data?.length > 0 ? data : staticPartners)
-      } catch {
-        setPartnersData(staticPartners)
-      }
-    }
-    fetchPartners()
+    getPartnersApi()
+      .then(data => { if (data?.length > 0) setPartnersData(data) })
+      .catch(() => {})
   }, [])
-
-  if (!partnersData) return (
-    <PageTransition>
-      <section className="partners-hero">
-        <div className="container" style={{ textAlign: 'center', padding: '120px 0' }}>
-          <div className="loading-spinner" />
-        </div>
-      </section>
-    </PageTransition>
-  )
 
   return (
     <PageTransition>

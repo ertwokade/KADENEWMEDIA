@@ -21,22 +21,16 @@ export default function Blog() {
     keywords: 'sosyal medya blog, instagram taktikleri, tiktok algoritması, dijital pazarlama ipuçları, içerik stratejisi',
     path: '/blog',
   })
-  const [blogPosts, setBlogPosts] = useState(null)
+  const [blogPosts, setBlogPosts] = useState(staticBlogPosts)
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [page, setPage] = useState(1)
   const POSTS_PER_PAGE = 6
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const data = await getBlogsApi()
-        setBlogPosts(data?.length > 0 ? data : staticBlogPosts)
-      } catch {
-        setBlogPosts(staticBlogPosts)
-      }
-    }
-    fetchBlogs()
+    getBlogsApi()
+      .then(data => { if (data?.length > 0) setBlogPosts(data) })
+      .catch(() => {})
   }, [])
 
   const categories = useMemo(() => {
@@ -65,16 +59,6 @@ export default function Blog() {
     const start = (page - 1) * POSTS_PER_PAGE
     return rest.slice(start, start + POSTS_PER_PAGE)
   }, [filtered, page, POSTS_PER_PAGE])
-
-  if (!blogPosts) return (
-    <PageTransition>
-      <section className="blog-hero">
-        <div className="container" style={{ textAlign: 'center', padding: '120px 0' }}>
-          <div className="loading-spinner" />
-        </div>
-      </section>
-    </PageTransition>
-  )
 
   const featured = page === 1 ? filtered[0] : null
   const rest = pagedRest

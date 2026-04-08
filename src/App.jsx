@@ -31,11 +31,7 @@ import NotFound from './pages/NotFound'
 const Admin = lazy(() => import('./pages/Admin'))
 
 function PageLoader() {
-  return (
-    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="loading-spinner" />
-    </div>
-  )
+  return <div style={{ minHeight: '60vh' }} />
 }
 
 const ROUTE_THEMES = {

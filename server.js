@@ -38,7 +38,11 @@ app.delete('/api/blog', apiRoute('blog.js'))
 
 // Content
 app.get('/api/content', apiRoute('content.js'))
+app.post('/api/content', apiRoute('content.js'))
 app.put('/api/content', apiRoute('content.js'))
+
+// Google Analytics 4
+app.get('/api/ga4', apiRoute('ga4.js'))
 
 // Partners
 app.get('/api/partners', apiRoute('partners.js'))
