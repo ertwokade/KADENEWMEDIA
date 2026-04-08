@@ -20,13 +20,17 @@ import './Partners.css'
 export default function PartnerDetail() {
   const { id } = useParams()
   const { lang, t } = useLanguage()
-  const [partner, setPartner] = useState(() => staticPartners.find((p) => p.id === id) || null)
+  const [partner, setPartner] = useState(() =>
+    staticPartners.find((p) => p.id === id || p.slug === id) || null
+  )
 
   useEffect(() => {
     getPartnersApi()
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
-          const found = data.find((p) => p.id === id)
+          const found = data.find((p) =>
+            p.id === id || p.slug === id || p._id?.toString() === id
+          )
           if (found) setPartner(found)
         }
       })
@@ -72,7 +76,10 @@ export default function PartnerDetail() {
                 style={{ background: `${partner.color}15`, borderColor: `${partner.color}30` }}
                 aria-label={`${name} logosu`}
               >
-                {partner.logo}
+                {partner.logo && (partner.logo.startsWith('data:') || partner.logo.startsWith('http'))
+                  ? <img src={partner.logo} alt={name} style={{ width: '60px', height: '60px', objectFit: 'contain', borderRadius: 8 }} />
+                  : <span style={{ fontSize: '2.5rem' }}>{partner.logo}</span>
+                }
               </div>
               <div>
                 <div className="section-badge" style={{ justifyContent: 'flex-start', marginBottom: 8 }}>

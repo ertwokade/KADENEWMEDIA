@@ -532,14 +532,35 @@ function BlogSection({ showToast }) {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Fotoğraf URL</label>
+                    <label>Fotoğraf (URL veya Dosya Yükle)</label>
                     <input
                       type="url"
                       placeholder="https://example.com/image.jpg"
-                      value={form.image}
+                      value={form.image && !form.image.startsWith('data:') ? form.image : ''}
                       onChange={(e) => setForm({ ...form, image: e.target.value })}
                     />
-                    {form.image && form.image.startsWith('http') && (
+                    <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <label style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                        padding: '7px 14px', borderRadius: 8, border: '1px dashed var(--border)',
+                        cursor: 'pointer', fontSize: '0.82rem', color: 'var(--text-secondary)',
+                        background: 'var(--bg-secondary)',
+                      }}>
+                        📁 Dosya Seç
+                        <input type="file" accept="image/*" style={{ display: 'none' }}
+                          onChange={(e) => {
+                            const file = e.target.files[0]
+                            if (!file) return
+                            if (file.size > 2 * 1024 * 1024) { alert('Dosya 2MB\'den küçük olmalı!'); return }
+                            const reader = new FileReader()
+                            reader.onload = (ev) => setForm({ ...form, image: ev.target.result })
+                            reader.readAsDataURL(file)
+                          }}
+                        />
+                      </label>
+                      {form.image && <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Görsel seçildi ✓</span>}
+                    </div>
+                    {form.image && (
                       <img
                         src={form.image}
                         alt="Önizleme"
@@ -1606,11 +1627,34 @@ function PartnersSection({ showToast }) {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Logo (Emoji)</label>
+                  <label>Logo (Emoji veya Görsel Yükle)</label>
                   <div className="emoji-grid">
                     {emojis.map((e) => (
                       <button key={e} type="button" className={`emoji-btn ${form.logo === e ? 'selected' : ''}`} onClick={() => setForm({ ...form, logo: e })}>{e}</button>
                     ))}
+                  </div>
+                  <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <label style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      padding: '7px 14px', borderRadius: 8, border: '1px dashed var(--border)',
+                      cursor: 'pointer', fontSize: '0.82rem', color: 'var(--text-secondary)',
+                      background: 'var(--bg-secondary)',
+                    }}>
+                      📁 Logo Dosyası Yükle
+                      <input type="file" accept="image/*" style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files[0]
+                          if (!file) return
+                          if (file.size > 2 * 1024 * 1024) { alert('Dosya 2MB\'den küçük olmalı!'); return }
+                          const reader = new FileReader()
+                          reader.onload = (ev) => setForm({ ...form, logo: ev.target.result })
+                          reader.readAsDataURL(file)
+                        }}
+                      />
+                    </label>
+                    {form.logo && form.logo.startsWith('data:') && (
+                      <img src={form.logo} alt="Logo önizleme" style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6, background: 'var(--bg-secondary)', padding: 4 }} />
+                    )}
                   </div>
                 </div>
                 <div className="form-row">
@@ -1689,7 +1733,12 @@ function PartnersSection({ showToast }) {
             <tbody>
               {partners.map((p) => (
                 <tr key={p._id}>
-                  <td><span style={{ fontSize: '1.5rem' }}>{p.logo}</span></td>
+                  <td>
+                    {p.logo && (p.logo.startsWith('data:') || p.logo.startsWith('http'))
+                      ? <img src={p.logo} alt={p.name} style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 6 }} />
+                      : <span style={{ fontSize: '1.5rem' }}>{p.logo}</span>
+                    }
+                  </td>
                   <td><strong>{p.name}</strong></td>
                   <td><span className="status-badge" style={{ background: `${p.color}20`, color: p.color }}>{p.category}</span></td>
                   <td>
@@ -3094,6 +3143,13 @@ function UsersSection({ showToast }) {
   }
 
   const handleDelete = async (id) => {
+    // Son admin kullanıcısının silinmesini engelle
+    const adminUsers = users.filter(u => u.role === 'admin')
+    const targetUser = users.find(u => u._id === id)
+    if (targetUser?.role === 'admin' && adminUsers.length <= 1) {
+      showToast('Son admin kullanıcısı silinemez!', 'error')
+      return
+    }
     if (!window.confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return
     try {
       await deleteUserApi(id)

@@ -136,7 +136,7 @@ export const blogPosts = [
 <p>The 2025 Instagram algorithm puts content quality before quantity. Producing 3 strong pieces of content per week is now a far smarter strategy than 7 mediocre ones. Learn about our <a href="/hizmetler">social media management services</a>.</p>`,
     category: 'Instagram',
     categoryEn: 'Instagram',
-    date: '28 Mar 2025',
+    date: '28 Mar 2026',
     readTime: 7,
     image: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800&q=80',
     color: '#E91E63',
@@ -150,10 +150,65 @@ export const blogPosts = [
     excerptEn: 'AI tools have fundamentally transformed social media content creation. Video with OpenAI Sora, visuals with Midjourney, and copy with ChatGPT now take minutes. We walk you through integrating AI tools into your professional workflow step by step.',
     category: 'Yapay Zeka',
     categoryEn: 'Artificial Intelligence',
-    date: '24 Mar 2025',
+    date: '24 Mar 2026',
     readTime: 10,
     image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
     color: '#6C63FF',
+    contentTr: `<h2>Yapay Zeka İçerik Üretimini Nasıl Değiştirdi?</h2>
+<p>2025 itibarıyla sosyal medya içerik üretimi artık sadece insanların işi değil. <strong>ChatGPT, Midjourney ve OpenAI Sora</strong> gibi yapay zeka araçları, saatler alan işleri dakikalara indirdi. Peki bu araçları nasıl doğru kullanırsınız?</p>
+
+<h2>ChatGPT ile Metin İçerik Üretimi</h2>
+<p>ChatGPT, sosyal medya açıklamaları, blog yazıları, hashtag önerileri ve reklam metinleri konusunda oldukça güçlü. Etkili kullanım için:</p>
+<ul>
+<li><strong>Rol tanımı verin:</strong> "Sosyal medya uzmanı olarak..." diye başlayın</li>
+<li><strong>Hedef kitleyi belirtin:</strong> "25-35 yaş arası, moda sektörüne ilgi duyan kadınlara yönelik..."</li>
+<li><strong>Format isteyin:</strong> "Instagram carousel için 5 maddelik liste yaz"</li>
+<li><strong>Ton belirleyin:</strong> "Enerjik, samimi ve genç dil kullan"</li>
+</ul>
+
+<h2>Midjourney ile Görsel Üretimi</h2>
+<p>Midjourney, prompt (komut) ile saniyeler içinde profesyonel görseller oluşturabiliyor. Sosyal medya için görsel üretiminde dikkat edilmesi gerekenler:</p>
+<ul>
+<li>Marka renk paletinizi promptlara ekleyin</li>
+<li>"Aspect ratio 9:16" ile Story formatında görsel üretin</li>
+<li>Rakip markaları referans olarak kullanmayın — özgün olun</li>
+<li>AI görsellerini her zaman markanıza uygun şekilde düzenleyin</li>
+</ul>
+
+<h2>OpenAI Sora ile Video İçerik</h2>
+<p>Sora, metin açıklamalarından gerçekçi videolar oluşturabiliyor. Özellikle ürün tanıtımları, konsept videolar ve animasyon içerikler için devrim niteliğinde. 2025'te Türkiye'de de erişime açılan Sora, özellikle küçük işletmeler için büyük bir fırsat.</p>
+
+<h2>AI Araçlarını İş Akışına Entegre Etme</h2>
+<ol>
+<li><strong>İçerik takvimi:</strong> ChatGPT ile aylık içerik takvimi oluşturun</li>
+<li><strong>Görsel üretimi:</strong> Midjourney veya DALL-E ile görseller hazırlayın</li>
+<li><strong>Video klip:</strong> Sora veya Runway ile kısa videolar üretin</li>
+<li><strong>Son rötuş:</strong> İnsan dokunuşuyla marka kimliğine uyarlayın</li>
+<li><strong>Yayın:</strong> Buffer veya Meta Business Suite ile planlı yayın yapın</li>
+</ol>
+
+<h2>Dikkat Edilmesi Gerekenler</h2>
+<p>AI içerikler stratejinin yerini tutamaz. <strong>Yaratıcılık ve marka sesi</strong> hâlâ insan kararı gerektiriyor. Ayrıca AI üretimi içerikleri her zaman kontrol edip markanıza uygun hale getirin. Telif hakkı konularında dikkatli olun.</p>
+
+<h2>Sonuç</h2>
+<p>AI araçları doğru kullanıldığında içerik üretim sürenizi %70'e kadar kısaltabilir ve maliyetleri düşürebilir. Ancak strateji, hedefleme ve marka kimliği konularında profesyonel destek hâlâ kritik. <a href="/iletisim">Ücretsiz keşif görüşmesi</a> ile AI destekli sosyal medya stratejinizi birlikte oluşturalım.</p>`,
+    contentEn: `<h2>How AI Changed Content Creation</h2>
+<p>By 2025, social media content creation is no longer solely a human endeavor. <strong>ChatGPT, Midjourney, and OpenAI Sora</strong> have reduced hours of work to minutes. Here's how to use these tools effectively.</p>
+
+<h2>ChatGPT for Written Content</h2>
+<p>ChatGPT excels at social media captions, blog posts, hashtag suggestions, and ad copy. For best results: define a role, specify your target audience, request specific formats, and set the tone of voice.</p>
+
+<h2>Midjourney for Visuals</h2>
+<p>Midjourney generates professional visuals from text prompts in seconds. Include your brand color palette in prompts, generate Story-format images with "aspect ratio 9:16," and always refine outputs to match your brand identity.</p>
+
+<h2>OpenAI Sora for Video</h2>
+<p>Sora creates realistic videos from text descriptions — a game-changer for product showcases, concept videos, and animations. Now accessible in Turkey, it's a massive opportunity for small businesses.</p>
+
+<h2>Integrating AI into Your Workflow</h2>
+<p>Use ChatGPT for content calendars, Midjourney for visuals, Sora for short clips, then apply human judgment for brand voice and final polish before publishing.</p>
+
+<h2>Conclusion</h2>
+<p>AI tools can reduce your content production time by up to 70%. But strategy, targeting, and brand identity still require professional expertise. <a href="/iletisim">Book a free discovery call</a> to build your AI-powered social media strategy with us.</p>`,
   },
   {
     id: 3,
@@ -164,10 +219,64 @@ export const blogPosts = [
     excerptEn: 'TikTok Shop is transforming e-commerce with in-app shopping. With live shopping, product tagging, and creative showcase features, TikTok is no longer just entertainment — it\'s a powerful sales channel. Discover how to gain an edge in the Turkish market.',
     category: 'E-Ticaret',
     categoryEn: 'E-Commerce',
-    date: '18 Mar 2025',
+    date: '18 Mar 2026',
     readTime: 8,
     image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80',
     color: '#2ECC71',
+    contentTr: `<h2>TikTok Shop Nedir?</h2>
+<p>TikTok Shop, kullanıcıların uygulamadan çıkmadan ürün satın alabileceği entegre e-ticaret özelliğidir. 2025 itibarıyla Türkiye pazarında da aktif olan TikTok Shop, özellikle genç tüketicilere ulaşmak için büyük bir fırsat sunuyor.</p>
+
+<h2>TikTok Shop'un Temel Özellikleri</h2>
+<ul>
+<li><strong>Uygulama içi alışveriş:</strong> Ürünler direkt video veya profil üzerinden satışa sunulabiliyor</li>
+<li><strong>Canlı yayın satışı (Live Shopping):</strong> Canlı yayında ürün etiketleme ve anlık satış imkanı — Türkiye'de en hızlı büyüyen e-ticaret formatı</li>
+<li><strong>Ürün vitrinleri:</strong> Hesap profilinizde özel bir alışveriş bölümü oluşturabilirsiniz</li>
+<li><strong>Affiliate sistemi:</strong> İçerik üreticileri komisyon karşılığı ürün tanıtabilir</li>
+</ul>
+
+<h2>Türkiye Pazarında TikTok Shop Fırsatları</h2>
+<p>Türkiye'de TikTok kullanıcı sayısı 30 milyonu aştı. Z kuşağı ve genç millennial kesimde en çok kullanılan platform olan TikTok'ta alışveriş davranışı da hızla artıyor. Özellikle şu sektörler TikTok Shop'tan en çok faydalanıyor:</p>
+<ul>
+<li>Moda ve tekstil</li>
+<li>Kozmetik ve güzellik</li>
+<li>Ev dekorasyon ürünleri</li>
+<li>Sağlık ve spor ürünleri</li>
+<li>Elektronik aksesuar</li>
+</ul>
+
+<h2>TikTok Shop'ta Satışa Başlamak İçin Adımlar</h2>
+<ol>
+<li>TikTok for Business hesabı oluşturun</li>
+<li>TikTok Shop seller hesabı açın (vergi no ve hesap bilgileri gerekli)</li>
+<li>Ürün kataloğunuzu yükleyin</li>
+<li>Video içeriklerinizde ürün etiketlemeye başlayın</li>
+<li>İlk canlı yayın satışınızı planlayın</li>
+</ol>
+
+<h2>Başarı İçin İpuçları</h2>
+<p><strong>Organik içerik gibi görünen ürün tanıtımları</strong> geleneksel reklamlardan çok daha etkili. Ürünü doğal bir kullanım senaryosunda gösterin, zoraki satış dili kullanmayın. "Canlı yayın alışverişi" özelliği, anlık indirim ve sınırlı stok gibi aciliyet yaratan tekniklerle birleşince dönüşüm oranlarını dramatik şekilde artırıyor.</p>
+
+<h2>Sonuç</h2>
+<p>TikTok Shop, sosyal ticareti Türkiye pazarında yeniden tanımlıyor. Markanızı bu platforma taşımak için doğru strateji gerekiyor. <a href="/iletisim">Uzman ekibimizle görüşün</a> ve TikTok Shop stratejinizi birlikte oluşturalım.</p>`,
+    contentEn: `<h2>What is TikTok Shop?</h2>
+<p>TikTok Shop is an integrated e-commerce feature that lets users buy products without leaving the app. Now active in the Turkish market, it represents a major opportunity to reach young consumers.</p>
+
+<h2>Key Features</h2>
+<ul>
+<li><strong>In-app shopping:</strong> Products directly tagged in videos and profiles</li>
+<li><strong>Live Shopping:</strong> Product tagging and instant sales during live streams</li>
+<li><strong>Product Showcase:</strong> A dedicated shopping section on your profile</li>
+<li><strong>Affiliate system:</strong> Creators can promote products for commission</li>
+</ul>
+
+<h2>Turkish Market Opportunities</h2>
+<p>With over 30 million TikTok users in Turkey, shopping behavior is rapidly growing on the platform. Fashion, beauty, home decor, health products, and electronics accessories benefit most from TikTok Shop.</p>
+
+<h2>Getting Started</h2>
+<p>Create a TikTok for Business account, open a TikTok Shop seller account, upload your product catalog, start tagging products in your videos, and plan your first live shopping session.</p>
+
+<h2>Conclusion</h2>
+<p>TikTok Shop is redefining social commerce in Turkey. <a href="/iletisim">Contact our expert team</a> to build your TikTok Shop strategy together.</p>`,
   },
   {
     id: 4,
@@ -178,10 +287,59 @@ export const blogPosts = [
     excerptEn: 'The competition between Instagram Reels, YouTube Shorts, and TikTok is heating up. Each platform\'s algorithm works differently and reaches different audiences. We analyze which platform you should prioritize based on your brand goals, backed by data.',
     category: 'Video Stratejisi',
     categoryEn: 'Video Strategy',
-    date: '12 Mar 2025',
+    date: '12 Mar 2026',
     readTime: 6,
     image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800&q=80',
     color: '#FFD700',
+    contentTr: `<h2>Kısa Video Savaşları: 2025 Tablo</h2>
+<p>Instagram Reels, YouTube Shorts ve TikTok — üç dev platform kısa video formatında rekabet ediyor. Her biri farklı kitleye, farklı algoritmaya ve farklı içerik tüketim alışkanlığına sahip. Markanız için hangisi doğru?</p>
+
+<h2>TikTok: Keşfedilebilirlik Şampiyonu</h2>
+<p><strong>Güçlü yönleri:</strong> Organik erişim potansiyeli en yüksek platform. Takipçisi olmayan hesaplar bile milyonlarca görüntüleme alabilir. Z kuşağı ve 18-30 yaş kitlesinde baskın.</p>
+<p><strong>İdeal içerik:</strong> Eğlenceli, trend odaklı, "reklam gibi görünmeyen" içerikler. Ürün lansmanları, viral kampanyalar, genç kitleye yönelik markalar.</p>
+<p><strong>Dezavantaj:</strong> 35+ yaş kitlesine ulaşmak zor. İçerik döngüsü çok hızlı.</p>
+
+<h2>Instagram Reels: Marka Kimliği için En Güçlü Platform</h2>
+<p><strong>Güçlü yönleri:</strong> Mevcut takipçi kitlesiyle güçlü bağ. Instagram'ın genel ekosistemi (Stories, Feed, Shopping) ile entegrasyon. 25-40 yaş segmentinde çok güçlü.</p>
+<p><strong>İdeal içerik:</strong> Estetik, marka kimliği güçlü içerikler. Moda, güzellik, yaşam tarzı, yemek ve seyahat markaları için ideal.</p>
+<p><strong>Dezavantaj:</strong> Organik erişim TikTok'a göre daha sınırlı. Rekabet çok yüksek.</p>
+
+<h2>YouTube Shorts: SEO Gücü</h2>
+<p><strong>Güçlü yönleri:</strong> Google arama sonuçlarında çıkma imkanı. Uzun videolarla birlikte kullanıldığında güçlü bir ekosistem. 30+ yaş kitlede en güvenilir platform.</p>
+<p><strong>İdeal içerik:</strong> Eğitici içerikler, how-to videoları, ürün incelemeleri. B2B ve profesyonel markalar için uygun.</p>
+<p><strong>Dezavantaj:</strong> Keşfedilebilirlik TikTok ve Reels'e göre daha zayıf.</p>
+
+<h2>Hangi Platforma Yatırım Yapmalısınız?</h2>
+<table style="width:100%;border-collapse:collapse;margin:16px 0">
+<tr style="background:#ffffff15"><th style="padding:8px;text-align:left">Hedef</th><th style="padding:8px">Önerilen Platform</th></tr>
+<tr><td style="padding:8px">Viral büyüme</td><td style="padding:8px;text-align:center">TikTok</td></tr>
+<tr style="background:#ffffff08"><td style="padding:8px">Marka kimliği</td><td style="padding:8px;text-align:center">Instagram Reels</td></tr>
+<tr><td style="padding:8px">SEO + eğitim</td><td style="padding:8px;text-align:center">YouTube Shorts</td></tr>
+<tr style="background:#ffffff08"><td style="padding:8px">Maksimum erişim</td><td style="padding:8px;text-align:center">Üçü birden</td></tr>
+</table>
+
+<h2>Uzman Tavsiyesi</h2>
+<p>Kaynağınız sınırlıysa önce <strong>bir platforma odaklanın</strong> ve içerik kalitesini maksimuma çıkarın. Büyüdükçe diğer platformlara geçin. İçerikleri cross-post ederek her platforma adapte edin (watermark'sız TikTok videoları Reels'te daha iyi performans gösteriyor).</p>
+
+<h2>Sonuç</h2>
+<p>Platform seçimi markanızın hedeflerine, kaynaklarınıza ve hedef kitlenize göre değişir. <a href="/iletisim">Ücretsiz strateji görüşmesi</a> ile size özel platform planı oluşturalım.</p>`,
+    contentEn: `<h2>Short Video Wars: 2025 Breakdown</h2>
+<p>Instagram Reels, YouTube Shorts, and TikTok — three giants competing in short video. Each has a different audience, algorithm, and content culture. Which is right for your brand?</p>
+
+<h2>TikTok: The Discoverability Champion</h2>
+<p>TikTok offers the highest organic reach potential — accounts with zero followers can still get millions of views. Dominates with Gen Z and the 18-30 age group. Best for viral growth, product launches, and youth-oriented brands.</p>
+
+<h2>Instagram Reels: Best for Brand Identity</h2>
+<p>Strong connection with existing followers and integration with Instagram's full ecosystem (Stories, Feed, Shopping). Dominant in the 25-40 segment. Ideal for fashion, beauty, lifestyle, food, and travel brands.</p>
+
+<h2>YouTube Shorts: SEO Power</h2>
+<p>Appearing in Google search results is a unique advantage. Combined with long-form videos, it creates a powerful ecosystem. Best for educational content, how-to videos, and B2B brands.</p>
+
+<h2>Which Platform Should You Invest In?</h2>
+<p>If resources are limited, focus on one platform first and maximize content quality. As you grow, expand to others. Cross-post content adapted for each platform (TikTok videos without watermarks perform better on Reels).</p>
+
+<h2>Conclusion</h2>
+<p>Platform choice depends on your brand goals, resources, and target audience. <a href="/iletisim">Book a free strategy session</a> to create your personalized platform plan.</p>`,
   },
   {
     id: 5,
@@ -192,24 +350,117 @@ export const blogPosts = [
     excerptEn: '92% of consumers trust user-generated content over traditional advertising. UGC campaigns are now an essential part of brand strategy. We explain how to build authentic brand perception through micro-community partnerships and customer experience sharing.',
     category: 'İçerik Stratejisi',
     categoryEn: 'Content Strategy',
-    date: '5 Mar 2025',
+    date: '5 Mar 2026',
     readTime: 7,
     image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80',
     color: '#00BCD4',
+    contentTr: `<h2>UGC Nedir ve Neden Bu Kadar Güçlü?</h2>
+<p>UGC (User Generated Content — Kullanıcı Tarafından Oluşturulan İçerik), müşterilerin markanız hakkında kendi iradesiyle ürettiği içeriklerdir: yorumlar, fotoğraflar, videolar, değerlendirmeler. Tüketicilerin <strong>%92'si UGC'ye geleneksel reklamlardan daha fazla güveniyor.</strong></p>
+
+<h2>UGC'nin Marka Güvenine Katkısı</h2>
+<ul>
+<li><strong>Sosyal kanıt:</strong> "Gerçek insanlar kullanıyor" mesajı dönüşüm oranını %20-40 artırıyor</li>
+<li><strong>Otantiklik:</strong> Aşırı üretilmiş reklamlara karşı gerçek müşteri deneyimi çok daha ikna edici</li>
+<li><strong>Maliyet etkinliği:</strong> Ücretsiz ya da düşük maliyetle yüksek kaliteli içerik</li>
+<li><strong>SEO faydası:</strong> Kullanıcı yorumları ve içerikleri arama motorlarında organik trafik getirir</li>
+</ul>
+
+<h2>UGC Kampanyası Nasıl Başlatılır?</h2>
+<h3>1. Müşterileri Teşvik Edin</h3>
+<p>Etiketleme, yarışma ve indirim teklifleriyle müşterilerinizi içerik üretmeye yönlendirin. "Ürünümüzü kullanırken çektiğin fotoğrafı paylaş, %15 indirim kazan" gibi basit kampanyalar harikalar yaratır.</p>
+
+<h3>2. Markalı Hashtag Oluşturun</h3>
+<p>Kendi etiketinizi oluşturun (#KadeMediaMüşterileri gibi) ve bunu tüm iletişimlerinizde kullanın. Takipçilerinizin bu etiketle paylaşım yapmasını teşvik edin.</p>
+
+<h3>3. Mikro-Influencer İş Birlikleri</h3>
+<p>10K-100K takipçili mikro-influencer'lar, mega influencer'lardan <strong>7 kat daha yüksek etkileşim oranı</strong> sağlıyor. Nişinizde güçlü, gerçek topluluğu olan hesaplarla çalışın.</p>
+
+<h3>4. UGC İçerikleri Kanallarınızda Paylaşın</h3>
+<p>Müşteri fotoğraflarını, yorumlarını ve videolarını kendi sosyal medya hesaplarınızda paylaşın. Her zaman izin alın ve kaynak gösterin — bu hem etik hem de güven artırıcı.</p>
+
+<h2>2025'te UGC Trendleri</h2>
+<ul>
+<li><strong>Video UGC:</strong> Müşteri yorumu videoları, unboxing ve "before/after" içerikler patlıyor</li>
+<li><strong>AI destekli UGC:</strong> Markalar gerçek müşteri ifadelerini AI ile optimize ediyor</li>
+<li><strong>B2B'de UGC:</strong> LinkedIn'de müşteri başarı hikayeleri ve referans videoları yükseliyor</li>
+</ul>
+
+<h2>Sonuç</h2>
+<p>UGC, en pahalı reklam kampanyalarından daha etkili olabilir. Müşterilerinizi marka elçisine dönüştürmek için bugün bir UGC stratejisi oluşturun. <a href="/iletisim">Uzmanlarımızla görüşün</a> ve markanıza özel UGC kampanyası tasarlayalım.</p>`,
+    contentEn: `<h2>What Is UGC and Why Is It So Powerful?</h2>
+<p>UGC (User-Generated Content) is content voluntarily created by customers about your brand — reviews, photos, videos, testimonials. <strong>92% of consumers trust UGC more than traditional advertising.</strong></p>
+
+<h2>How UGC Builds Brand Trust</h2>
+<p>Social proof increases conversion rates by 20-40%. Authentic customer experiences are far more persuasive than over-produced ads. And UGC is cost-effective — high-quality content at little to no cost.</p>
+
+<h2>How to Launch a UGC Campaign</h2>
+<p>Incentivize customers with tagging campaigns, contests, and discounts. Create a branded hashtag. Partner with micro-influencers (10K-100K followers) who deliver 7x higher engagement than mega-influencers. Always share customer content on your own channels with proper attribution.</p>
+
+<h2>2025 UGC Trends</h2>
+<p>Video UGC (customer review videos, unboxing, before/after) is exploding. AI-assisted UGC optimization is rising. And B2B UGC on LinkedIn (success stories, reference videos) is gaining momentum.</p>
+
+<h2>Conclusion</h2>
+<p>UGC can outperform the most expensive ad campaigns. <a href="/iletisim">Talk to our experts</a> and design a custom UGC campaign for your brand.</p>`,
   },
   {
     id: 6,
-    slug: 'meta-ads-optimizasyon-2025',
+    slug: 'meta-ads-optimizasyon-2026',
     titleTr: 'Meta Ads 2025: Advantage+ Kampanyalar ve AI Hedefleme ile Reklam Bütçenizi 3x Verimli Kullanın',
     titleEn: 'Meta Ads 2025: Use Advantage+ Campaigns & AI Targeting to 3x Your Ad Budget Efficiency',
     excerptTr: 'Meta\'nın Advantage+ yapay zeka kampanyaları, reklam performansını dramatik şekilde artırıyor. Otomatik hedefleme, dinamik kreatif ve bütçe optimizasyonu ile reklam harcamalarınızdan maksimum verim almanın yollarını paylaşıyoruz.',
     excerptEn: 'Meta\'s Advantage+ AI campaigns are dramatically boosting ad performance. We share how to get maximum ROI from your ad spend with automated targeting, dynamic creatives, and budget optimization.',
     category: 'Reklam',
     categoryEn: 'Advertising',
-    date: '28 Şub 2025',
+    date: '28 Şub 2026',
     readTime: 9,
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
     color: '#9C27B0',
+    contentTr: `<h2>Meta Advantage+ Nedir?</h2>
+<p>Meta'nın Advantage+ kampanyaları, yapay zeka destekli otomatik optimizasyon sistemidir. Hedefleme, kreatif seçimi ve bütçe dağılımı gibi kararları AI otomatik olarak alır. 2025'te bu sistem, manuel kampanyalara kıyasla ortalama <strong>%32 daha düşük edinim maliyeti</strong> sağlıyor.</p>
+
+<h2>Advantage+ Kampanya Türleri</h2>
+<ul>
+<li><strong>Advantage+ Alışveriş Kampanyaları:</strong> E-ticaret satışları için optimize edilmiş — ürün kataloğuyla entegre çalışıyor</li>
+<li><strong>Advantage+ Uygulama Kampanyaları:</strong> Uygulama yüklemeleri için AI optimizasyonu</li>
+<li><strong>Advantage+ Görsel Hedefleme:</strong> Benzer kitleler otomatik genişletme</li>
+</ul>
+
+<h2>AI Hedefleme ile Reklam Performansını 3x Artırma</h2>
+<h3>1. Geniş Kitle Bırakın, AI Optimize Etsin</h3>
+<p>Advantage+ kampanyalarda aşırı dar hedefleme yapmayın. Yaş, konum ve ilgi alanı gibi temel parametreleri girin, gerisini AI'ya bırakın. Sistem, dönüşüm olasılığı yüksek kullanıcıları kendiniz belirleyemeyeceğiniz kadar iyi tespit ediyor.</p>
+
+<h3>2. Çoklu Kreatif Yükleyin</h3>
+<p>En az 5-6 farklı kreatif (görsel + metin kombinasyonu) yükleyin. AI, her kullanıcıya en uygun kombinasyonu otomatik olarak gösterir. <strong>Dinamik kreatif</strong> özelliğini açık bırakın.</p>
+
+<h3>3. Piksel ve Dönüşüm API'yi Aktif Tutun</h3>
+<p>Meta Pixel ve Dönüşüm API (CAPI) kurulu değilse, AI yeterli veri olmadan çalışır. Her ikisini de aktif hale getirin — özellikle iOS 14+ sonrası veri kalitesi için CAPI kritik.</p>
+
+<h3>4. Kampanya Bütçesi Optimizasyonu (CBO)</h3>
+<p>Reklam seti bazında bütçe yerine kampanya bazında bütçe kullanın. AI, en iyi performans gösteren reklam setlerine otomatik olarak daha fazla bütçe yönlendirir.</p>
+
+<h2>Meta Ads 2025 için Önemli Güncellemeler</h2>
+<ul>
+<li><strong>AI Sandbox:</strong> Reklam kreatifleri için yeni AI araçları (arka plan kaldırma, görsel genişletme)</li>
+<li><strong>Advantage+ Kataloğu:</strong> Ürün kataloğunu AI otomatik optimize ediyor</li>
+<li><strong>Threads reklamları:</strong> Threads platformu reklam sistemine entegre edildi</li>
+</ul>
+
+<h2>Pratik Reklam Bütçesi Rehberi</h2>
+<p>Aylık 5.000 TL reklam bütçesi için önerilen dağılım: %60 Advantage+ Alışveriş, %25 Yeniden Hedefleme, %15 Farkındalık kampanyaları. Test aşamasında minimum 2 hafta bekleyin, erken optimizasyon AI'ın öğrenme sürecini bozar.</p>
+
+<h2>Sonuç</h2>
+<p>Meta Advantage+ doğru kurgulandığında reklam bütçenizden 3 kat daha fazla verim almanızı sağlayabilir. Profesyonel Meta reklam yönetimi için <a href="/iletisim">bizimle iletişime geçin</a>.</p>`,
+    contentEn: `<h2>What is Meta Advantage+?</h2>
+<p>Meta's Advantage+ campaigns use AI-powered automatic optimization for targeting, creative selection, and budget allocation. In 2025, this system delivers an average <strong>32% lower acquisition cost</strong> compared to manual campaigns.</p>
+
+<h2>How to 3x Your Ad Budget Efficiency</h2>
+<p>Use broad audiences and let AI optimize. Upload 5-6 creative variations and enable dynamic creatives. Keep Meta Pixel and Conversion API active — especially critical for data quality post-iOS 14. Use Campaign Budget Optimization (CBO) instead of ad set-level budgets.</p>
+
+<h2>Key Meta Ads 2025 Updates</h2>
+<p>AI Sandbox tools for creatives (background removal, image expansion), Advantage+ Catalog for AI-optimized product catalogs, and Threads ad integration.</p>
+
+<h2>Conclusion</h2>
+<p>Meta Advantage+ configured correctly can deliver 3x the ROI from your ad budget. <a href="/iletisim">Contact us</a> for professional Meta ad management.</p>`,
   },
   {
     id: 8,
@@ -220,24 +471,116 @@ export const blogPosts = [
     excerptEn: 'A viral negative comment or PR crisis can damage your brand within hours. We outline the 7 critical steps you need to implement, from pre-crisis preparation to crisis response and post-crisis reputation management.',
     category: 'Strateji',
     categoryEn: 'Strategy',
-    date: '12 Şub 2025',
+    date: '12 Şub 2026',
     readTime: 6,
     image: 'https://images.unsplash.com/photo-1563986768609-322da13575f2?w=800&q=80',
     color: '#607D8B',
+    contentTr: `<h2>Sosyal Medya Krizi Neden Bu Kadar Tehlikeli?</h2>
+<p>Bir negatif yorum viral olabilir, bir hata dakikalar içinde binlerce paylaşıma ulaşabilir. Sosyal medyada kriz yönetimi yanlış yapıldığında marka değeri ciddi zarar görebilir — hatta bazı markalar hiç toparlanamadı. İşte markanızı koruyacak <strong>7 adım strateji.</strong></p>
+
+<h2>Adım 1: Kriz Planını Önceden Hazırlayın</h2>
+<p>Kriz geldiğinde plan yapmaya vakit yoktur. Önceden hazırlanmanız gerekenler:</p>
+<ul>
+<li>Olası kriz senaryolarını listeleyin (negatif yorum, yanıltıcı bilgi, personel hatası vb.)</li>
+<li>Kriz anında kimin karar alacağını belirleyin</li>
+<li>Hazır yanıt şablonları oluşturun</li>
+<li>Hesap şifrelerinin güvenli biçimde tutulduğundan emin olun</li>
+</ul>
+
+<h2>Adım 2: Krizi Erkenden Tespit Edin</h2>
+<p>Sosyal medya dinleme araçları (Mention, Brand24, Hootsuite Streams) kullanarak markanızın adı geçtiği her yeri takip edin. Kriz henüz küçükken müdahale etmek, viral olduktan sonra müdahale etmekten çok daha kolay ve etkili.</p>
+
+<h2>Adım 3: İlk 1 Saatte Tepki Verin</h2>
+<p>"Durumu inceliyoruz, en kısa sürede bilgilendireceğiz" gibi bir ilk yanıt bile sessiz kalmaktan iyidir. Sessizlik suç olarak yorumlanabilir. <strong>İlk 1 saat kritiktir.</strong></p>
+
+<h2>Adım 4: Empati ve Şeffaflıkla İletişim Kurun</h2>
+<p>Savunmacı, inkarcı veya aşırı resmi bir dil kullanmayın. Hata yapıldıysa kabul edin. Özür dileyin. İnsanlar mükemmel markaları değil, <strong>dürüst ve insani markaları</strong> affeder.</p>
+
+<h2>Adım 5: Saldırgan Yorumlara Cevap Vermeyin, Çözüm Sunun</h2>
+<p>Saldırgan veya hakaret içeren yorumlara ateşle ateşle karşılık vermeyin. Sorunu çözmek için DM'e yönlendirin, somut çözüm teklifleri sunun. Tüm iletişimleri belgeleyin.</p>
+
+<h2>Adım 6: İç Ekibinizi Bilgilendirin</h2>
+<p>Sosyal medya krizleri sadece dijital ekiple sınırlı değildir. Müşteri hizmetleri, satış ve üst yönetim de aynı mesajı bilmeli. Tutarsız iletişim krizi büyütür.</p>
+
+<h2>Adım 7: Kriz Sonrası İtibar Yönetimi</h2>
+<p>Kriz geçtikten sonra iş bitmez. Alınan dersleri yazıya dökün, süreci iyileştirin. Pozitif içerikler paylaşarak marka algısını yenileyin. Etkilenen müşterilere özel iletişim yapın.</p>
+
+<h2>Sonuç</h2>
+<p>Kriz yönetimi bir lüks değil, zorunluluktur. Markanızı koruyacak bir kriz planı ve sosyal medya stratejisi için <a href="/iletisim">uzman ekibimizle görüşün</a>.</p>`,
+    contentEn: `<h2>Why Are Social Media Crises So Dangerous?</h2>
+<p>A negative comment can go viral in minutes. Poorly managed social media crises can permanently damage brand value. Here is a <strong>7-step strategy to protect your brand.</strong></p>
+
+<h2>The 7 Steps</h2>
+<ol>
+<li><strong>Prepare a crisis plan in advance</strong> — list scenarios, assign decision-makers, create response templates</li>
+<li><strong>Detect crises early</strong> — use social media monitoring tools (Mention, Brand24, Hootsuite)</li>
+<li><strong>Respond within the first hour</strong> — even "we're looking into it" beats silence</li>
+<li><strong>Communicate with empathy and transparency</strong> — if a mistake was made, admit it and apologize</li>
+<li><strong>Don't fight back, offer solutions</strong> — direct complainers to DM and offer concrete resolutions</li>
+<li><strong>Brief your internal team</strong> — customer service, sales, and management must align on messaging</li>
+<li><strong>Post-crisis reputation management</strong> — document lessons, share positive content, follow up with affected customers</li>
+</ol>
+
+<h2>Conclusion</h2>
+<p>Crisis management is not optional — it's essential. <a href="/iletisim">Talk to our expert team</a> to build a crisis plan and social media strategy for your brand.</p>`,
   },
   {
     id: 9,
-    slug: 'kade-media-sosyal-medya-ajans-istanbul-2025',
+    slug: 'kade-media-sosyal-medya-ajans-istanbul-2026',
     titleTr: 'Kade Media: İstanbul\'un En İnovatif Sosyal Medya Ajansı',
     titleEn: 'Kade Media: Istanbul\'s Most Innovative Social Media Agency',
     excerptTr: 'Biruni Teknopark merkezli Kade Media, veri odaklı stratejiler ve yaratıcı içerik üretimiyle markaları dijital dünyada büyütüyor. Neden sektörün en hızlı büyüyen ajansıyız?',
     excerptEn: 'Based at Biruni Technopark, Kade Media grows brands in the digital world with data-driven strategies and creative content production. Why are we the fastest growing agency in the industry?',
     category: 'Kade Media',
     categoryEn: 'Kade Media',
-    date: '2 Nis 2025',
+    date: '2 Nis 2026',
     readTime: 7,
     image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80',
     color: '#eac321',
+    contentTr: `<h2>Kade Media Kimdir?</h2>
+<p><strong>Kade Media</strong>, İstanbul Biruni Teknopark merkezli, veri odaklı stratejiler ve yaratıcı içerik üretimiyle markaları dijital dünyada büyüten bir sosyal medya ajansıdır. 2023 yılında kurulan ajansımız, kısa sürede sektörün en hızlı büyüyen ajansları arasına girdi.</p>
+
+<h2>Neden Kade Media?</h2>
+<ul>
+<li><strong>Veri odaklı yaklaşım:</strong> Duyguya değil, veriye dayalı kararlar. Her kampanya detaylı analizlerle desteklenir.</li>
+<li><strong>Biruni Teknopark avantajı:</strong> Türkiye'nin önde gelen teknoloji üslerinden birinde faaliyet göstererek en güncel dijital araçlara erken erişim sağlıyoruz.</li>
+<li><strong>Genç ve dinamik ekip:</strong> Sosyal medyayı içselleştirmiş, trendi takip eden uzmanlardan oluşan bir ekiple çalışıyorsunuz.</li>
+<li><strong>Şeffaf raporlama:</strong> Aylık detaylı raporlar ve gerçek zamanlı dashboard erişimi.</li>
+<li><strong>Sonuç garantili hizmet:</strong> Hedeflenen KPI'lara ulaşamadığımızda hesap veriyoruz.</li>
+</ul>
+
+<h2>Hizmet Alanlarımız</h2>
+<p>Sosyal medya yönetimi, içerik üretimi, performance marketing (Meta, Google, TikTok Ads), video prodüksiyon, marka stratejisi ve influencer marketing alanlarında kapsamlı hizmet veriyoruz.</p>
+
+<h2>Başarı Hikayelerimiz</h2>
+<p>Flavora ile sosyal medyada %300 marka bilinirliği artışı, TechVibe ile lansmanın ilk ayında 100K kullanıcı, GreenLife ile e-ticaret satışlarında %400 artış... <a href="/partnerler">Tüm vaka çalışmalarımızı</a> inceleyin.</p>
+
+<h2>Rakamlarla Kade Media</h2>
+<ul>
+<li>150+ memnun müşteri</li>
+<li>2M+ toplam takipçi büyümesi sağlandı</li>
+<li>500+ başarıyla yönetilen kampanya</li>
+<li>%98 müşteri memnuniyet oranı</li>
+</ul>
+
+<h2>Benzer bir başarı hikayesi yazmak ister misiniz?</h2>
+<p>Markanızın dijital dönüşüm yolculuğuna Kade Media ile başlayın. <a href="/iletisim">Ücretsiz keşif görüşmesi</a> için bugün bize ulaşın.</p>`,
+    contentEn: `<h2>Who Is Kade Media?</h2>
+<p><strong>Kade Media</strong> is a social media agency based at Biruni Technopark in Istanbul, growing brands in the digital world through data-driven strategies and creative content production. Founded in 2023, we quickly became one of the fastest-growing agencies in the industry.</p>
+
+<h2>Why Kade Media?</h2>
+<ul>
+<li><strong>Data-driven approach:</strong> Decisions based on data, not intuition</li>
+<li><strong>Biruni Technopark advantage:</strong> Early access to cutting-edge digital tools</li>
+<li><strong>Young and dynamic team:</strong> Experts who live and breathe social media</li>
+<li><strong>Transparent reporting:</strong> Monthly detailed reports and real-time dashboard access</li>
+</ul>
+
+<h2>Kade Media by the Numbers</h2>
+<p>150+ satisfied clients, 2M+ total follower growth delivered, 500+ successfully managed campaigns, 98% client satisfaction rate.</p>
+
+<h2>Want to Write Your Own Success Story?</h2>
+<p>Start your brand's digital transformation journey with Kade Media. <a href="/iletisim">Contact us today</a> for a free discovery call.</p>`,
   },
   {
     id: 10,
@@ -248,24 +591,125 @@ export const blogPosts = [
     excerptEn: 'Digital marketing trends in Turkey for 2025, channel comparisons and budget allocation strategies. A practical guide for everyone from SMBs to enterprise brands.',
     category: 'Dijital Pazarlama',
     categoryEn: 'Digital Marketing',
-    date: '28 Mar 2025',
+    date: '28 Mar 2026',
     readTime: 10,
     image: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=800&q=80',
     color: '#2ECC71',
+    contentTr: `<h2>2025 Türkiye Dijital Pazarlama Ortamı</h2>
+<p>Türkiye, 85 milyon nüfusuyla Avrupa'nın en büyük dijital pazarlarından biri. İnternet penetrasyonu %83'ü geçti, sosyal medya kullanıcı sayısı 60 milyona yaklaştı. Bu tablo, markalar için hem büyük fırsat hem de yoğun rekabet anlamına geliyor.</p>
+
+<h2>2025 Türkiye'de Öne Çıkan Dijital Pazarlama Kanalları</h2>
+
+<h3>1. Sosyal Medya (%40 bütçe pay önerisi)</h3>
+<p>Instagram, TikTok ve YouTube, Türkiye'de en etkili kanallar. B2C markalar için sosyal medya birincil kanal olmaya devam ediyor.</p>
+
+<h3>2. Performance Marketing / Arama Reklamları (%30)</h3>
+<p>Google Ads, özellikle arama niyeti olan kullanıcılara ulaşmak için kritik. E-ticaret ve lokal işletmeler için vazgeçilmez.</p>
+
+<h3>3. İçerik Pazarlama ve SEO (%15)</h3>
+<p>Blog, video ve infografik içerikler uzun vadeli organik trafik sağlar. Türkçe içerik üretimi rekabeti düşük, fırsatlar yüksek.</p>
+
+<h3>4. E-posta Pazarlama (%10)</h3>
+<p>Mevcut müşteri kitlesiyle iletişimde en yüksek ROI'li kanal. Otomasyon ile kişiselleştirilmiş kampanyalar çok etkili.</p>
+
+<h3>5. Influencer Marketing (%5)</h3>
+<p>Mikro-influencer'lar (10K-100K), mega influencer'lardan daha yüksek dönüşüm sağlıyor.</p>
+
+<h2>KOBİ'ler İçin Bütçe Rehberi</h2>
+<ul>
+<li><strong>Aylık 5.000-10.000 TL:</strong> 1-2 platform, organik içerik + küçük reklam bütçesi</li>
+<li><strong>Aylık 10.000-25.000 TL:</strong> Çok platform yönetimi + performance marketing</li>
+<li><strong>Aylık 25.000+ TL:</strong> Kapsamlı dijital strateji, video prodüksiyon, influencer iş birlikleri</li>
+</ul>
+
+<h2>2025 Türkiye'ye Özgü Trendler</h2>
+<ul>
+<li><strong>TikTok patlaması:</strong> Türkiye, TikTok kullanımında Avrupa'da 1. sırada</li>
+<li><strong>Sosyal ticaret:</strong> Instagram Shopping ve TikTok Shop hızla büyüyor</li>
+<li><strong>Yapay zeka araçları:</strong> İçerik üretiminde AI kullanımı standart hale geliyor</li>
+<li><strong>Video içerik önceliği:</strong> Her platformda video erişimi metin içerikten 3x fazla</li>
+</ul>
+
+<h2>Sonuç</h2>
+<p>Doğru kanal seçimi ve bütçe dağılımı, dijital pazarlama başarısının anahtarı. Markanıza özel bir dijital pazarlama stratejisi için <a href="/iletisim">ücretsiz danışmanlık</a> alın.</p>`,
+    contentEn: `<h2>2025 Turkey Digital Marketing Landscape</h2>
+<p>Turkey, with 85 million people, is one of Europe's largest digital markets. Internet penetration exceeds 83% and social media users approach 60 million — enormous opportunity and intense competition for brands.</p>
+
+<h2>Key Channels and Budget Allocation</h2>
+<p>Social media (40%), Performance marketing/search ads (30%), Content marketing and SEO (15%), Email marketing (10%), Influencer marketing (5%).</p>
+
+<h2>Budget Guide for SMBs</h2>
+<p>5,000-10,000 TL/mo: 1-2 platforms with organic content + small ad budget. 10,000-25,000 TL/mo: Multi-platform management + performance marketing. 25,000+ TL/mo: Comprehensive digital strategy with video production and influencer partnerships.</p>
+
+<h2>Turkey-Specific 2025 Trends</h2>
+<p>TikTok dominates (Turkey ranks #1 in Europe for TikTok usage), social commerce is booming, AI content tools are becoming standard, and video content gets 3x more reach than text on every platform.</p>
+
+<h2>Conclusion</h2>
+<p>The right channel mix and budget allocation are key to digital marketing success. <a href="/iletisim">Get free consulting</a> for a digital marketing strategy tailored to your brand.</p>`,
   },
   {
     id: 11,
-    slug: 'sosyal-medya-reklam-fiyatlari-2025',
+    slug: 'sosyal-medya-reklam-fiyatlari-2026',
     titleTr: 'Sosyal Medya Reklam Fiyatları 2025: Instagram, TikTok, YouTube Karşılaştırma',
     titleEn: 'Social Media Ad Prices 2025: Instagram, TikTok, YouTube Comparison',
     excerptTr: 'Her platformda reklam vermek ne kadar tutuyor? CPC, CPM ve dönüşüm oranları karşılaştırması. Hangi platform hangi sektör için daha verimli?',
     excerptEn: 'How much does advertising cost on each platform? CPC, CPM and conversion rate comparisons. Which platform is more efficient for which industry?',
     category: 'Reklam',
     categoryEn: 'Advertising',
-    date: '20 Mar 2025',
+    date: '20 Mar 2026',
     readTime: 8,
     image: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80',
     color: '#FF9800',
+    contentTr: `<h2>Sosyal Medya Reklam Piyasası 2025</h2>
+<p>Dijital reklam harcamaları her yıl artmaya devam ediyor. Peki hangi platformda reklam vermek ne kadar tutuyor ve hangi platform markanız için daha verimli? İşte 2025 Türkiye piyasasına özel detaylı karşılaştırma.</p>
+
+<h2>Instagram Reklam Fiyatları 2025</h2>
+<ul>
+<li><strong>CPM (1.000 gösterim başına):</strong> 15-35 TL</li>
+<li><strong>CPC (tıklama başına):</strong> 2-8 TL</li>
+<li><strong>Reels reklam CPM:</strong> 20-45 TL (daha geniş erişim, yüksek maliyet)</li>
+<li><strong>Story reklamları:</strong> CPM 12-28 TL</li>
+</ul>
+<p><strong>En verimli sektörler:</strong> Moda, güzellik, yiyecek & içecek, seyahat, ev dekorasyon</p>
+
+<h2>TikTok Reklam Fiyatları 2025</h2>
+<ul>
+<li><strong>CPM:</strong> 10-25 TL (Instagram'dan daha uygun)</li>
+<li><strong>CPC:</strong> 1-5 TL</li>
+<li><strong>In-Feed reklamlar:</strong> En düşük maliyetli format</li>
+<li><strong>TopView (açılış ekranı):</strong> 50.000+ TL/gün (kurumsal bütçeler için)</li>
+</ul>
+<p><strong>En verimli sektörler:</strong> Genç moda, oyun, eğlence, hızlı tüketim ürünleri</p>
+
+<h2>YouTube Reklam Fiyatları 2025</h2>
+<ul>
+<li><strong>CPV (izlenme başına):</strong> 0.30-1.50 TL</li>
+<li><strong>CPM Display:</strong> 8-20 TL</li>
+<li><strong>Shorts reklamları:</strong> CPM 12-30 TL</li>
+<li><strong>Skippable video:</strong> İlk 5 saniye geçilmezse ücret alınır</li>
+</ul>
+<p><strong>En verimli sektörler:</strong> Teknoloji, otomotiv, B2B, eğitim</p>
+
+<h2>Platform Karşılaştırması</h2>
+<table style="width:100%;border-collapse:collapse;margin:16px 0">
+<tr style="background:#ffffff15"><th style="padding:8px;text-align:left">Platform</th><th style="padding:8px">Ortalama CPM</th><th style="padding:8px">Kitle</th><th style="padding:8px">Güçlü Yön</th></tr>
+<tr><td style="padding:8px">Instagram</td><td style="padding:8px;text-align:center">15-35 TL</td><td style="padding:8px;text-align:center">18-45 yaş</td><td style="padding:8px;text-align:center">Marka kimliği</td></tr>
+<tr style="background:#ffffff08"><td style="padding:8px">TikTok</td><td style="padding:8px;text-align:center">10-25 TL</td><td style="padding:8px;text-align:center">13-35 yaş</td><td style="padding:8px;text-align:center">Viral büyüme</td></tr>
+<tr><td style="padding:8px">YouTube</td><td style="padding:8px;text-align:center">8-20 TL</td><td style="padding:8px;text-align:center">25-55 yaş</td><td style="padding:8px;text-align:center">SEO + güven</td></tr>
+</table>
+
+<h2>Hangi Platform Sizin İçin Doğru?</h2>
+<p>Bütçenizi platformlara nasıl dağıtacağınız hedef kitlenize ve sektörünüze bağlı. Profesyonel reklam yönetimiyle bütçenizi en verimli şekilde kullanmak için <a href="/iletisim">bizimle iletişime geçin</a>.</p>`,
+    contentEn: `<h2>Social Media Ad Market 2025</h2>
+<p>Digital ad spending continues to grow every year. Here's a detailed comparison of ad costs and efficiency across platforms for the 2025 Turkish market.</p>
+
+<h2>Platform Cost Comparison</h2>
+<p><strong>Instagram:</strong> CPM 15-35 TL, CPC 2-8 TL. Best for fashion, beauty, lifestyle brands targeting 18-45 age group.</p>
+<p><strong>TikTok:</strong> CPM 10-25 TL, CPC 1-5 TL. Most cost-effective for viral reach, targeting 13-35 age group.</p>
+<p><strong>YouTube:</strong> CPV 0.30-1.50 TL, CPM Display 8-20 TL. Best for technology, automotive, B2B, and education targeting 25-55 age group.</p>
+
+<h2>Which Platform Is Right for You?</h2>
+<p>How you distribute your budget across platforms depends on your target audience and industry. <a href="/iletisim">Contact us</a> for professional ad management that maximizes your budget efficiency.</p>`,
   },
   {
     id: 12,
@@ -276,10 +720,66 @@ export const blogPosts = [
     excerptEn: '10 critical steps to creating a consistent brand identity on social media, from color palette and tone of voice to content strategy. Common traits of successful brands.',
     category: 'Strateji',
     categoryEn: 'Strategy',
-    date: '15 Mar 2025',
+    date: '15 Mar 2026',
     readTime: 9,
     image: 'https://images.unsplash.com/photo-1493612276216-ee3925520721?w=800&q=80',
     color: '#6C63FF',
+    contentTr: `<h2>Dijital Marka Kimliği Neden Kritik?</h2>
+<p>Sosyal medyada binlerce marka arasında öne çıkmak için güçlü ve tutarlı bir dijital kimlik şart. Tüketiciler bir markayla ortalama <strong>7 kez etkileşime girdikten sonra</strong> satın alma kararı veriyor. Her temas noktasında aynı kimliği yansıtmak bu süreçte belirleyici rol oynuyor.</p>
+
+<h2>10 Adımda Güçlü Dijital Marka Kimliği</h2>
+
+<h3>1. Marka Amacını Netleştirin</h3>
+<p>"Biz neden varız?" sorusunun cevabı. Logo ve renk paletinden önce bu sorunun cevabı netleştirilmelidir.</p>
+
+<h3>2. Hedef Kitleyi Tanımlayın</h3>
+<p>Yaş, ilgi alanı, davranış ve ihtiyaçlar bazında detaylı persona oluşturun. Her içerik bu persona için üretilmeli.</p>
+
+<h3>3. Ses Tonu (Tone of Voice) Belirleyin</h3>
+<p>Markanız nasıl konuşur? Resmi mi, samimi mi, esprili mi? Belirlenen ses tonu tüm platformlarda tutarlı biçimde uygulanmalı.</p>
+
+<h3>4. Görsel Kimlik Kılavuzu Oluşturun</h3>
+<p>Logo kullanım kuralları, renk kodu (HEX), tipografi seçimi ve görsel stili tanımlayan bir "Brand Guidelines" dokümanı hazırlayın.</p>
+
+<h3>5. Renk Paletinizi Seçin ve Uygulayın</h3>
+<p>3-5 renk belirleyin. Araştırmalar, tutarlı renk kullanımının marka tanınırlığını %80 artırdığını gösteriyor.</p>
+
+<h3>6. İçerik Stratejisi Oluşturun</h3>
+<p>İçerik sütunlarını (eğitici, eğlendirici, satış, topluluk) belirleyin ve içerik takvimi oluşturun. Her içerik marka amacına hizmet etmeli.</p>
+
+<h3>7. Platform Bazında Adaptasyon</h3>
+<p>Her platformun dinamiği farklı. Instagram estetik ve marka kimliği, TikTok eğlence ve trend, LinkedIn profesyonellik ve düşünce liderliği için.</p>
+
+<h3>8. Tutarlılığı Otomatize Edin</h3>
+<p>Şablon tasarımlar, marka renkleri içeren görsel kütüphaneler ve onaylı içerik havuzu oluşturun. Böylece farklı kişiler içerik üretse de kimlik tutarlı kalır.</p>
+
+<h3>9. Düzenli Marka Denetimi Yapın</h3>
+<p>Üç ayda bir tüm platformlardaki içerikleri gözden geçirin. Kimlikten sapan içerikler marka değerini zedeliyor.</p>
+
+<h3>10. Müşteri Geri Bildirimini Marka Kimliğine Entegre Edin</h3>
+<p>Müşterilerinizin markanızı nasıl algıladığını düzenli ölçün. Algı ile kimlik arasındaki farkı kapatmak sürekli bir süreç.</p>
+
+<h2>Sonuç</h2>
+<p>Güçlü bir dijital marka kimliği oluşturmak sabır, strateji ve tutarlılık gerektiriyor. Markanızın dijital kimliğini profesyonel bir ekiple oluşturmak için <a href="/iletisim">bizimle iletişime geçin</a>.</p>`,
+    contentEn: `<h2>Why Is Digital Brand Identity Critical?</h2>
+<p>To stand out among thousands of brands on social media, a strong and consistent digital identity is essential. Consumers make purchasing decisions after an average of <strong>7 interactions</strong> with a brand — consistency at every touchpoint is decisive.</p>
+
+<h2>10 Steps to a Strong Digital Brand Identity</h2>
+<ol>
+<li><strong>Clarify your brand purpose</strong> — answer "why do we exist?"</li>
+<li><strong>Define your target audience</strong> — create detailed personas</li>
+<li><strong>Set your tone of voice</strong> — formal, friendly, or witty?</li>
+<li><strong>Create a visual identity guide</strong> — logo rules, HEX colors, typography</li>
+<li><strong>Choose and apply your color palette</strong> — consistent colors boost brand recognition by 80%</li>
+<li><strong>Build a content strategy</strong> — educational, entertaining, sales, community pillars</li>
+<li><strong>Adapt per platform</strong> — Instagram for aesthetics, TikTok for trends, LinkedIn for thought leadership</li>
+<li><strong>Automate consistency</strong> — create templates and approved content libraries</li>
+<li><strong>Conduct regular brand audits</strong> — quarterly reviews of all platform content</li>
+<li><strong>Integrate customer feedback</strong> — regularly measure brand perception</li>
+</ol>
+
+<h2>Conclusion</h2>
+<p>Building a strong digital brand identity requires patience, strategy, and consistency. <a href="/iletisim">Contact us</a> to build your brand's digital identity with a professional team.</p>`,
   },
   // ─── Sektörel Haberler ───
   {
@@ -320,7 +820,7 @@ export const blogPosts = [
 <p>While AI tools make content creation easier, <strong>strategy and creativity</strong> still require a human touch. <a href="/iletisim">Contact us</a> to create your AI-powered social media strategy together.</p>`,
     category: 'Sektör Haberleri',
     categoryEn: 'Industry News',
-    date: '2 Nis 2025',
+    date: '2 Nis 2026',
     readTime: 6,
     image: 'https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&q=80',
     color: '#1877F2',
@@ -364,14 +864,14 @@ export const blogPosts = [
 <p>TikTok is no longer just an entertainment platform — it's a serious sales channel. Check out our <a href="/hizmetler">TikTok management services</a>.</p>`,
     category: 'Sektör Haberleri',
     categoryEn: 'Industry News',
-    date: '30 Mar 2025',
+    date: '30 Mar 2026',
     readTime: 7,
     image: 'https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?w=800&q=80',
     color: '#000000',
   },
   {
     id: 15,
-    slug: 'youtube-shorts-para-kazanma-2025',
+    slug: 'youtube-shorts-para-kazanma-2026',
     titleTr: 'YouTube Shorts Para Kazanma Programı Güncellendi: İçerik Üreticileri İçin Yeni Fırsatlar',
     titleEn: 'YouTube Shorts Monetization Program Updated: New Opportunities for Content Creators',
     excerptTr: 'YouTube, Shorts para kazanma programını genişletti. Reklam geliri paylaşımı, Shopping özelliği ve Super Thanks ile kısa video içerik üreticileri artık daha fazla kazanabiliyor.',
@@ -406,7 +906,7 @@ export const blogPosts = [
 <p>YouTube Shorts is particularly effective for how-to content, product showcases, and brand awareness campaigns. <a href="/iletisim">Contact us for YouTube management</a>.</p>`,
     category: 'Sektör Haberleri',
     categoryEn: 'Industry News',
-    date: '25 Mar 2025',
+    date: '25 Mar 2026',
     readTime: 5,
     image: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=800&q=80',
     color: '#FF0000',
@@ -451,14 +951,14 @@ export const blogPosts = [
 <p>As Google traffic decreases, <strong>social media platforms are rapidly rising as traffic sources</strong>. Check out our <a href="/hizmetler">digital marketing services</a>.</p>`,
     category: 'Sektör Haberleri',
     categoryEn: 'Industry News',
-    date: '22 Mar 2025',
+    date: '22 Mar 2026',
     readTime: 8,
     image: 'https://images.unsplash.com/photo-1553484771-8bbd5e485ce0?w=800&q=80',
     color: '#4285F4',
   },
   {
     id: 17,
-    slug: 'linkedin-b2b-pazarlama-2025',
+    slug: 'linkedin-b2b-pazarlama-2026',
     titleTr: 'LinkedIn B2B Pazarlama 2025: Kurumsal Markalar İçin Altın Çağ',
     titleEn: 'LinkedIn B2B Marketing 2025: The Golden Age for Corporate Brands',
     excerptTr: 'LinkedIn, B2B pazarlama için en güçlü platform olmaya devam ediyor. Thought leadership içerikler, LinkedIn Newsletter ve şirket sayfası stratejileri ile kurumsal markanızı nasıl büyütürsünüz?',
@@ -494,14 +994,14 @@ export const blogPosts = [
 <p>Build your corporate LinkedIn strategy with our professional team. <a href="/iletisim">Request a free discovery call</a>.</p>`,
     category: 'Sektör Haberleri',
     categoryEn: 'Industry News',
-    date: '18 Mar 2025',
+    date: '18 Mar 2026',
     readTime: 7,
     image: 'https://images.unsplash.com/photo-1611944212129-29977ae1398c?w=800&q=80',
     color: '#0A66C2',
   },
   {
     id: 18,
-    slug: 'turkiye-dijital-reklam-harcamalari-2025',
+    slug: 'turkiye-dijital-reklam-harcamalari-2026',
     titleTr: 'Türkiye Dijital Reklam Harcamaları 2025 Raporu: Rekor Büyüme ve Yeni Trendler',
     titleEn: 'Turkey Digital Ad Spending 2025 Report: Record Growth & New Trends',
     excerptTr: 'IAB Türkiye verilerine göre dijital reklam harcamaları 2025\'te %45 artışla 60 milyar TL\'yi aştı. En çok yatırım yapılan platformlar, sektör bazlı dağılım ve 2026 öngörüleri.',
@@ -545,7 +1045,7 @@ export const blogPosts = [
 <p>Take advantage of our professional ad management services to maximize your ad budget ROI. Check out our <a href="/paketler">packages</a> or get a <a href="/iletisim">free consultation</a>.</p>`,
     category: 'Sektör Haberleri',
     categoryEn: 'Industry News',
-    date: '10 Mar 2025',
+    date: '10 Mar 2026',
     readTime: 6,
     image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&q=80',
     color: '#FF9800',
@@ -587,14 +1087,14 @@ export const blogPosts = [
 <p>At Kade Media, we offer transparent pricing starting from <strong>8,900 ₺</strong>. Check out our <a href="/paketler">packages</a> or request a <a href="/iletisim">free discovery call</a>.</p>`,
     category: 'Rehber',
     categoryEn: 'Guide',
-    date: '5 Nis 2025',
+    date: '5 Nis 2026',
     readTime: 8,
     image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80',
     color: '#2ECC71',
   },
   {
     id: 20,
-    slug: 'instagram-isletme-hesabi-acma-rehberi-2025',
+    slug: 'instagram-isletme-hesabi-acma-rehberi-2026',
     titleTr: 'Instagram İşletme Hesabı Nasıl Açılır? 2025 Adım Adım Rehber',
     titleEn: 'How to Create an Instagram Business Account: 2025 Step-by-Step Guide',
     excerptTr: 'Instagram işletme hesabı açmak, profesyonel profil oluşturmak ve istatistiklere erişmek için bilmeniz gereken her şey. Yeni başlayanlar için eksiksiz rehber.',
@@ -632,14 +1132,14 @@ export const blogPosts = [
 <p>Check out our <a href="/hizmetler">social media management services</a> for professional Instagram management.</p>`,
     category: 'Instagram',
     categoryEn: 'Instagram',
-    date: '3 Nis 2025',
+    date: '3 Nis 2026',
     readTime: 5,
     image: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800&q=80',
     color: '#E91E63',
   },
   {
     id: 21,
-    slug: 'tiktok-reklam-verme-rehberi-2025',
+    slug: 'tiktok-reklam-verme-rehberi-2026',
     titleTr: 'TikTok\'ta Reklam Nasıl Verilir? 2025 Başlangıç Rehberi',
     titleEn: 'How to Advertise on TikTok: 2025 Beginner\'s Guide',
     excerptTr: 'TikTok Ads Manager kullanarak ilk reklam kampanyanızı oluşturun. Bütçe ayarlama, hedefleme seçenekleri ve başarılı reklam formatları hakkında bilmeniz gereken her şey.',
@@ -676,14 +1176,14 @@ export const blogPosts = [
 <p>Manage your TikTok ad campaigns with our professional team. <a href="/iletisim">Request free consultation</a>.</p>`,
     category: 'Reklam',
     categoryEn: 'Advertising',
-    date: '1 Nis 2025',
+    date: '1 Nis 2026',
     readTime: 7,
     image: 'https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?w=800&q=80',
     color: '#000000',
   },
   {
     id: 22,
-    slug: 'facebook-sayfa-yonetimi-ipuclari-2025',
+    slug: 'facebook-sayfa-yonetimi-ipuclari-2026',
     titleTr: 'Facebook İşletme Sayfası Yönetimi: 2025 Pratik İpuçları',
     titleEn: 'Facebook Business Page Management: 2025 Practical Tips',
     excerptTr: 'Facebook işletme sayfanızı optimize etmek, organik erişimi artırmak ve Meta Business Suite kullanarak verimli yönetim için 10 pratik ipucu.',
@@ -718,7 +1218,7 @@ export const blogPosts = [
 <p>Grow your Facebook page with our professional team. Check out our <a href="/paketler">packages</a>.</p>`,
     category: 'Strateji',
     categoryEn: 'Strategy',
-    date: '30 Mar 2025',
+    date: '30 Mar 2026',
     readTime: 6,
     image: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80',
     color: '#1877F2',
@@ -764,7 +1264,7 @@ export const blogPosts = [
 <p>We share all details transparently in our <a href="/iletisim">free discovery call</a>. Check out our <a href="/partnerler">references</a>.</p>`,
     category: 'Rehber',
     categoryEn: 'Guide',
-    date: '6 Nis 2025',
+    date: '6 Nis 2026',
     readTime: 7,
     image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
     color: '#6C63FF',
@@ -772,7 +1272,7 @@ export const blogPosts = [
   // ─── YENİ SEO İÇERİKLERİ (Yüksek Arama Hacimli) ───
   {
     id: 24,
-    slug: 'instagram-takipci-artirma-2025',
+    slug: 'instagram-takipci-artirma-2026',
     titleTr: 'Instagram Takipçi Artırma 2025: Organik Büyüme İçin 15 Kanıtlanmış Yöntem',
     titleEn: 'How to Grow Instagram Followers in 2025: 15 Proven Organic Methods',
     excerptTr: 'Instagram takipçi sayınızı organik olarak artırmak istiyorsanız doğru yerdesiniz. Bot ve sahte takipçi satın almadan, gerçek ve etkileşim yapan bir kitle oluşturmanın 15 kanıtlanmış yöntemini açıklıyoruz.',
@@ -837,14 +1337,14 @@ export const blogPosts = [
 <p>Organic follower growth requires patience and strategy. Brands that consistently apply these methods achieve 200-500% growth within 6 months. <a href="/iletisim">Contact us</a> for a free strategy session.</p>`,
     category: 'Instagram',
     categoryEn: 'Instagram',
-    date: '7 Nis 2025',
+    date: '7 Nis 2026',
     readTime: 12,
     image: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=800&q=80',
     color: '#E91E63',
   },
   {
     id: 25,
-    slug: 'tiktok-para-kazanma-rehberi-2025',
+    slug: 'tiktok-para-kazanma-rehberi-2026',
     titleTr: 'TikTok\'tan Para Kazanma Rehberi 2025: Yaratıcı Fon, Canlı Yayın ve Marka İş Birlikleri',
     titleEn: 'TikTok Monetization Guide 2025: Creator Fund, Live Gifts & Brand Deals',
     excerptTr: 'TikTok\'tan nasıl para kazanılır? Yaratıcı Fon, canlı yayın hediyeleri, TikTok Shop, marka iş birlikleri ve affiliate marketing ile TikTok gelir kaynağınız olabilir. Başvuru koşulları ve kazanç miktarları.',
@@ -891,7 +1391,7 @@ export const blogPosts = [
 <p>Want to grow your TikTok strategy with a professional team? Check our <a href="/hizmetler">TikTok management services</a> or <a href="/iletisim">contact us</a> for free consultation.</p>`,
     category: 'TikTok',
     categoryEn: 'TikTok',
-    date: '5 Nis 2025',
+    date: '5 Nis 2026',
     readTime: 10,
     image: 'https://images.unsplash.com/photo-1611605698335-8b1569810432?w=800&q=80',
     color: '#00F2EA',
@@ -947,7 +1447,7 @@ export const blogPosts = [
 <p>Define your audience, analyze competitors, pick 2-3 channels, create a content calendar, and measure results. For professional help, check our <a href="/paketler">packages</a>.</p>`,
     category: 'Dijital Pazarlama',
     categoryEn: 'Digital Marketing',
-    date: '4 Nis 2025',
+    date: '4 Nis 2026',
     readTime: 11,
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
     color: '#2196F3',
@@ -1005,14 +1505,14 @@ export const blogPosts = [
 <p>For professional Reels production, check our <a href="/hizmetler">video production services</a>.</p>`,
     category: 'Instagram',
     categoryEn: 'Instagram',
-    date: '3 Nis 2025',
+    date: '3 Nis 2026',
     readTime: 8,
     image: 'https://images.unsplash.com/photo-1616469829581-73993eb86b02?w=800&q=80',
     color: '#FF6F00',
   },
   {
     id: 28,
-    slug: 'e-ticaret-sosyal-medya-stratejisi-2025',
+    slug: 'e-ticaret-sosyal-medya-stratejisi-2026',
     titleTr: 'E-Ticaret İçin Sosyal Medya Stratejisi: Satışları 5x Artırmanın Yolları',
     titleEn: 'Social Media Strategy for E-Commerce: How to 5x Your Sales',
     excerptTr: 'E-ticaret sitenizin satışlarını sosyal medya ile katlamak istiyorsanız bu rehber tam size göre. Instagram Shopping, TikTok Shop, influencer pazarlama ve reklam stratejileri ile online satışlarınızı patlatın.',
@@ -1050,7 +1550,7 @@ export const blogPosts = [
 <p>Check our <a href="/paketler">packages</a> to multiply your e-commerce sales with social media.</p>`,
     category: 'E-Ticaret',
     categoryEn: 'E-Commerce',
-    date: '2 Nis 2025',
+    date: '2 Nis 2026',
     readTime: 9,
     image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80',
     color: '#4CAF50',
@@ -1095,7 +1595,7 @@ export const blogPosts = [
 <p>Work with our professional team for quality video production. Check our <a href="/hizmetler">video production services</a>.</p>`,
     category: 'YouTube',
     categoryEn: 'YouTube',
-    date: '1 Nis 2025',
+    date: '1 Nis 2026',
     readTime: 10,
     image: 'https://images.unsplash.com/photo-1611162618071-b39a2ec055fb?w=800&q=80',
     color: '#FF0000',
@@ -1148,7 +1648,7 @@ export const blogPosts = [
 <p>Starting from <strong>8,900 TL/month</strong>. Check our <a href="/paketler">detailed package comparison</a> or <a href="/iletisim">get a free quote</a>.</p>`,
     category: 'Rehber',
     categoryEn: 'Guide',
-    date: '31 Mar 2025',
+    date: '31 Mar 2026',
     readTime: 9,
     image: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&q=80',
     color: '#795548',
@@ -1193,7 +1693,7 @@ export const blogPosts = [
 <p>Check our <a href="/hizmetler">ad management services</a> for professional Google Ads management.</p>`,
     category: 'Reklam',
     categoryEn: 'Advertising',
-    date: '29 Mar 2025',
+    date: '29 Mar 2026',
     readTime: 10,
     image: 'https://images.unsplash.com/photo-1553835973-dec43bfddbeb?w=800&q=80',
     color: '#4285F4',

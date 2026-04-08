@@ -27,7 +27,12 @@ export default async function handler(req, res) {
     if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
 
     try {
-      const partner = { ...req.body, createdAt: new Date(), updatedAt: new Date() };
+      // Slug'dan id oluştur — detail sayfası URL'i için gerekli
+      const slug = req.body.slug || (req.body.name || '').toLowerCase()
+        .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+        .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const partner = { ...req.body, id: slug, createdAt: new Date(), updatedAt: new Date() };
       const result = await collection.insertOne(partner);
       logActivity(db, { action: 'Partner eklendi', detail: `${req.body.name || ''}`, type: 'create', icon: '🤝', user: user.username }).catch(() => {});
       return res.status(201).json({ ...partner, _id: result.insertedId });

@@ -22,6 +22,13 @@ async function handleResponse(res) {
   } catch (e) {
     throw new Error(e.message || 'API unavailable');
   }
+  if (res.status === 401) {
+    // Token süresi dolmuş veya geçersiz — temizle ve login ekranına dön
+    localStorage.removeItem('kade_admin_token');
+    localStorage.removeItem('kade_admin_user');
+    window.location.reload();
+    throw new Error('Oturum süresi doldu. Lütfen tekrar giriş yapın.');
+  }
   if (!res.ok) {
     throw new Error(data?.error || 'Bir hata oluştu');
   }

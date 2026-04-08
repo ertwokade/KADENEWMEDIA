@@ -13,8 +13,8 @@ export const translations = {
     },
     hero: {
       badge: '#1 Sosyal Medya Ajansı',
-      title1: 'Dijital Dünyada',
-      title2: 'Markanızı Büyütün',
+      title1: 'Dijital Dünyada Markanıza',
+      title2: 'Kademe Atlatıyoruz ⚡',
       subtitle: 'Kade Media olarak sosyal medya stratejileri, kreatif içerik üretimi ve dijital pazarlama çözümleriyle markanızı zirveye taşıyoruz.',
       cta1: 'Ücretsiz Danışmanlık',
       cta2: 'Hizmetlerimiz',
@@ -330,8 +330,8 @@ export const translations = {
     },
     hero: {
       badge: '#1 Social Media Agency',
-      title1: 'Grow Your Brand',
-      title2: 'In The Digital World',
+      title1: 'Level Up Your Brand',
+      title2: 'In The Digital World ⚡',
       subtitle: 'At Kade Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.',
       cta1: 'Free Consultation',
       cta2: 'Our Services',

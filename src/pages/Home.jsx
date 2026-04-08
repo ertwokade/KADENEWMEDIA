@@ -353,13 +353,16 @@ export default function Home() {
           <StaggerContainer className="partners-preview-grid" staggerDelay={0.08}>
             {partnersData.slice(0, 6).map((partner) => (
               <StaggerItem key={partner.id}>
-                <Link to={`/partnerler/${partner.id}`}>
+                <Link to={`/partnerler/${partner.id || partner.slug || partner._id}`}>
                   <motion.div
                     className="partner-preview-card glass-card"
                     whileHover={{ scale: 1.05, y: -5 }}
                   >
                     <div className="partner-preview-logo" style={{ background: `${partner.color}12` }}>
-                      <span>{partner.logo}</span>
+                      {partner.logo && (partner.logo.startsWith('data:') || partner.logo.startsWith('http'))
+                        ? <img src={partner.logo} alt={partner.name} style={{ width: '32px', height: '32px', objectFit: 'contain', borderRadius: 4 }} />
+                        : <span>{partner.logo}</span>
+                      }
                     </div>
                     <h4>{partner.name}</h4>
                     <span className="partner-preview-category" style={{ color: partner.color }}>

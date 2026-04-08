@@ -56,13 +56,16 @@ export default function Partners() {
           <StaggerContainer className="partners-grid" staggerDelay={0.1}>
             {partnersData.map((partner, idx) => (
               <StaggerItem key={partner.id || partner._id || idx}>
-                <Link to={`/partnerler/${partner.id}`}>
+                <Link to={`/partnerler/${partner.id || partner.slug || partner._id}`}>
                   <motion.div
                     className="partner-card glass-card"
                     whileHover={{ scale: 1.02, y: -5 }}
                   >
                     <div className="partner-logo-large" style={{ background: `${partner.color}15`, borderColor: `${partner.color}30` }}>
-                      <span style={{ fontSize: '2.5rem' }}>{partner.logo}</span>
+                      {partner.logo && (partner.logo.startsWith('data:') || partner.logo.startsWith('http'))
+                        ? <img src={partner.logo} alt={partner.name} style={{ width: '60px', height: '60px', objectFit: 'contain', borderRadius: 8 }} />
+                        : <span style={{ fontSize: '2.5rem' }}>{partner.logo}</span>
+                      }
                     </div>
                     <div className="partner-card-info">
                       <span className="partner-category" style={{ color: partner.color }}>
