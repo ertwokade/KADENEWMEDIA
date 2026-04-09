@@ -246,8 +246,11 @@ function DashboardSection({ stats, onNavigate }) {
               display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0',
               borderBottom: i < recentPartners.length - 1 ? '1px solid var(--border)' : 'none',
             }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: `${p.color || '#eac321'}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>
-                {p.logo || '🤝'}
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: `${p.color || '#eac321'}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', overflow: 'hidden', flexShrink: 0 }}>
+                {p.logo && (p.logo.startsWith('data:') || p.logo.startsWith('http'))
+                  ? <img src={p.logo} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  : <span>{p.logo || '🤝'}</span>
+                }
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{p.name}</div>

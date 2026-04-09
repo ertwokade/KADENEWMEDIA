@@ -388,6 +388,29 @@ export default async function handler(req, res) {
     if (blogCount === 0) {
       const blogs = defaultBlogs.map(b => ({ ...b, createdAt: new Date(), updatedAt: new Date() }));
       await db.collection('blogs').insertMany(blogs);
+    } else {
+      // Migrate: update any blog with 2025 date to 2026 equivalent
+      const blogsWithOldDate = await db.collection('blogs').find({ date: { $regex: '2025' } }).toArray();
+      for (const blog of blogsWithOldDate) {
+        const newDate = blog.date.replace('2025', '2026');
+        await db.collection('blogs').updateOne({ _id: blog._id }, { $set: { date: newDate, updatedAt: new Date() } });
+      }
+      // Update blog posts from defaultBlogs with newer content (slug match)
+      for (const defaultBlog of defaultBlogs) {
+        const existing = await db.collection('blogs').findOne({ slug: defaultBlog.slug });
+        if (existing) {
+          await db.collection('blogs').updateOne(
+            { slug: defaultBlog.slug },
+            { $set: {
+              contentTr: defaultBlog.contentTr || existing.contentTr,
+              contentEn: defaultBlog.contentEn || existing.contentEn,
+              date: defaultBlog.date,
+              image: defaultBlog.image || existing.image,
+              updatedAt: new Date()
+            }}
+          );
+        }
+      }
     }
 
     // Seed site content

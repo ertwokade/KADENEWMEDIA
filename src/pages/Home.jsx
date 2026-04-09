@@ -24,7 +24,8 @@ import {
 import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
-import { partnersData } from '../data/content'
+import { partnersData as staticPartnersData } from '../data/content'
+import { getPartnersApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import HeroBackground from '../components/HeroBackground'
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '../components/Animations'
@@ -135,6 +136,7 @@ export default function Home() {
   const [dynamicStats, setDynamicStats] = useState(null)
   const [dynamicFaq, setDynamicFaq] = useState(null)
   const [dynamicTestimonials, setDynamicTestimonials] = useState(null)
+  const [partnersData, setPartnersData] = useState(staticPartnersData)
 
   // Load overrides from API once
   useEffect(() => {
@@ -159,6 +161,18 @@ export default function Home() {
         const testimonialsData = await getContentApi('testimonials')
         if (!cancelled && testimonialsData?.data?.items?.length) setDynamicTestimonials(testimonialsData.data.items)
       } catch { /* use defaults */ }
+
+      try {
+        const apiPartners = await getPartnersApi()
+        if (!cancelled && Array.isArray(apiPartners) && apiPartners.length > 0) {
+          // Merge: API partners override static by id, new ones appended
+          const idMap = new Map(apiPartners.map(p => [p.id || p.slug, p]))
+          const merged = staticPartnersData.map(p => idMap.get(p.id) || p)
+          const existingIds = new Set(staticPartnersData.map(p => p.id))
+          const newPartners = apiPartners.filter(p => !existingIds.has(p.id))
+          setPartnersData([...merged, ...newPartners])
+        }
+      } catch { /* use static */ }
     }
 
     loadFromApi()
@@ -351,9 +365,9 @@ export default function Home() {
           </div>
 
           <StaggerContainer className="partners-preview-grid" staggerDelay={0.08}>
-            {partnersData.slice(0, 6).map((partner) => (
-              <StaggerItem key={partner.id}>
-                <Link to={`/partnerler/${partner.id || partner.slug || partner._id}`}>
+            {partnersData.slice(0, 6).map((partner, idx) => (
+              <StaggerItem key={partner.id || partner.slug || String(partner._id) || idx}>
+                <Link to={`/partnerler/${partner.id || partner.slug || String(partner._id)}`}>
                   <motion.div
                     className="partner-preview-card glass-card"
                     whileHover={{ scale: 1.05, y: -5 }}

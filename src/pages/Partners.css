@@ -3,6 +3,8 @@
   padding: 160px 0 60px;
   text-align: center;
   overflow: hidden;
+  min-height: 400px;
+  background: var(--bg-primary);
 }
 
 .partners-grid {

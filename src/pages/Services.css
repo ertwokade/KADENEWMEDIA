@@ -13,10 +13,13 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  align-items: stretch;
 }
 
 .service-detail-card {
   padding: 36px;
+  display: flex;
+  flex-direction: column;
 }
 
 .service-detail-header {
