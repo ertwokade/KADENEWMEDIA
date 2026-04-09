@@ -23,7 +23,16 @@ export default function Partners() {
 
   useEffect(() => {
     getPartnersApi()
-      .then(data => { if (data?.length > 0) setPartnersData(data) })
+      .then(data => {
+        if (data?.length > 0) {
+          const map = new Map(staticPartners.map(p => [p.id || p.slug, p]))
+          data.forEach(p => {
+            const key = p.id || p.slug || String(p._id)
+            map.set(key, { ...map.get(key), ...p })
+          })
+          setPartnersData(Array.from(map.values()))
+        }
+      })
       .catch(() => {})
   }, [])
 

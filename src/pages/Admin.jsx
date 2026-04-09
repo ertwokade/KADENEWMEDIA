@@ -388,6 +388,7 @@ function BlogSection({ showToast }) {
   }
 
   const handleDelete = async (id) => {
+    if (!id) { showToast('Bu kayıt henüz veritabanında değil — önce düzenleyip kaydedin.', 'error'); return }
     if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
     if (!window.confirm('Bu blog yazısını silmek istediğinize emin misiniz?')) return
     try {
@@ -678,7 +679,7 @@ function BlogSection({ showToast }) {
             </thead>
             <tbody>
               {blogs.filter(b => !searchQuery || b.titleTr?.toLowerCase().includes(searchQuery.toLowerCase()) || b.slug?.includes(searchQuery.toLowerCase())).map((blog) => (
-                <tr key={blog._id}>
+                <tr key={blog._id || blog.slug || blog.id}>
                   <td>
                     {blog.image && blog.image.startsWith('http') ? (
                       <img src={blog.image} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
@@ -723,7 +724,7 @@ function BlogSection({ showToast }) {
                       <button className="table-action-btn" onClick={() => handleEdit(blog)}>
                         <HiOutlinePencil size={14} /> Düzenle
                       </button>
-                      <button className="table-action-btn danger" onClick={() => handleDelete(blog._id)}>
+                      <button className="table-action-btn danger" onClick={() => handleDelete(blog._id || null)}>
                         <HiOutlineTrash size={14} /> Sil
                       </button>
                     </div>
@@ -1626,6 +1627,7 @@ function PartnersSection({ showToast }) {
   }
 
   const handleDelete = async (id) => {
+    if (!id) { showToast('Bu kayıt henüz veritabanında değil — önce düzenleyip kaydedin.', 'error'); return }
     if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
     if (!window.confirm('Bu partneri silmek istediğinize emin misiniz?')) return
     try {
@@ -1784,7 +1786,7 @@ function PartnersSection({ showToast }) {
             </thead>
             <tbody>
               {partners.map((p) => (
-                <tr key={p._id}>
+                <tr key={p._id || p.id || p.slug}>
                   <td>
                     {p.logo && (p.logo.startsWith('data:') || p.logo.startsWith('http'))
                       ? <img src={p.logo} alt={p.name} style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 6 }} />
@@ -1796,7 +1798,7 @@ function PartnersSection({ showToast }) {
                   <td>
                     <div className="table-actions">
                       <button className="table-action-btn" onClick={() => handleEdit(p)}><HiOutlinePencil size={14} /> Düzenle</button>
-                      <button className="table-action-btn danger" onClick={() => handleDelete(p._id)}><HiOutlineTrash size={14} /> Sil</button>
+                      <button className="table-action-btn danger" onClick={() => handleDelete(p._id || null)}><HiOutlineTrash size={14} /> Sil</button>
                     </div>
                   </td>
                 </tr>
