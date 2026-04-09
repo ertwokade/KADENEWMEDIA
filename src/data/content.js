@@ -1072,7 +1072,7 @@ export const blogPosts = [
 <p>Platform sayısı, içerik sıklığı, video/Reels prodüksiyonu, reklam yönetimi hizmeti, raporlama sıklığı ve ajansın portföyü fiyatı doğrudan etkiler. Reklam bütçesi genellikle yönetim ücretinin üzerine eklenir.</p>
 
 <h2>Kade Media Fiyatlandırması</h2>
-<p>Kade Media olarak şeffaf fiyatlandırma politikamızla <strong>8.900 ₺</strong>'dan başlayan paketler sunuyoruz. <a href="/paketler">Paketlerimizi</a> inceleyin veya <a href="/iletisim">ücretsiz keşif görüşmesi</a> talep edin.</p>`,
+<p>Kade Media olarak şeffaf fiyatlandırma politikamızla <strong>11.900 ₺</strong>'dan başlayan paketler sunuyoruz. <a href="/paketler">Paketlerimizi</a> inceleyin veya <a href="/iletisim">ücretsiz keşif görüşmesi</a> talep edin.</p>`,
     contentEn: `<h2>How Much Does Social Media Management Cost?</h2>
 <p>In 2025, social media management prices in Turkey vary significantly based on agency experience, service scope, and number of platforms.</p>
 
@@ -1084,7 +1084,7 @@ export const blogPosts = [
 </ul>
 
 <h2>Kade Media Pricing</h2>
-<p>At Kade Media, we offer transparent pricing starting from <strong>8,900 ₺</strong>. Check out our <a href="/paketler">packages</a> or request a <a href="/iletisim">free discovery call</a>.</p>`,
+<p>At Kade Media, we offer transparent pricing starting from <strong>11,900 ₺</strong>. Check out our <a href="/paketler">packages</a> or request a <a href="/iletisim">free discovery call</a>.</p>`,
     category: 'Rehber',
     categoryEn: 'Guide',
     date: '5 Nis 2026',
@@ -1134,7 +1134,7 @@ export const blogPosts = [
     categoryEn: 'Instagram',
     date: '3 Nis 2026',
     readTime: 5,
-    image: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&q=80',
     color: '#E91E63',
   },
   {
@@ -1178,7 +1178,7 @@ export const blogPosts = [
     categoryEn: 'Advertising',
     date: '1 Nis 2026',
     readTime: 7,
-    image: 'https://images.unsplash.com/photo-1611605698323-b1e99cfd37ea?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1596558450268-9c27524ba856?w=800&q=80',
     color: '#000000',
   },
   {
@@ -1220,7 +1220,7 @@ export const blogPosts = [
     categoryEn: 'Strategy',
     date: '30 Mar 2026',
     readTime: 6,
-    image: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1562577309-4932fdd64cd1?w=800&q=80',
     color: '#1877F2',
   },
   {
@@ -1339,7 +1339,7 @@ export const blogPosts = [
     categoryEn: 'Instagram',
     date: '7 Nis 2026',
     readTime: 12,
-    image: 'https://images.unsplash.com/photo-1611162616475-46b635cb6868?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=800&q=80',
     color: '#E91E63',
   },
   {
@@ -1449,7 +1449,7 @@ export const blogPosts = [
     categoryEn: 'Digital Marketing',
     date: '4 Nis 2026',
     readTime: 11,
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?w=800&q=80',
     color: '#2196F3',
   },
   {
@@ -1637,7 +1637,7 @@ export const blogPosts = [
 <p><strong>In-house:</strong> Büyük bütçeniz varsa ve tam kontrol istiyorsanız. Dezavantaj: maaş + SGK + ekipman maliyeti yüksek.</p>
 
 <h2>Kade Media Fiyatları</h2>
-<p>Başlangıç paketimiz <strong>aylık 8.900 TL</strong>'den başlıyor. Profesyonel (18.900 TL) ve Kurumsal (38.900 TL) seçeneklerimiz var. <a href="/paketler">Detaylı paket karşılaştırması</a> için tıklayın veya <a href="/iletisim">ücretsiz teklif</a> alın.</p>`,
+<p>Başlangıç paketimiz <strong>aylık 11.900 TL</strong>'den başlıyor. Profesyonel (24.900 TL) ve Kurumsal (54.900 TL) seçeneklerimiz var. <a href="/paketler">Detaylı paket karşılaştırması</a> için tıklayın veya <a href="/iletisim">ücretsiz teklif</a> alın.</p>`,
     contentEn: `<h2>What Is Social Media Management?</h2>
 <p>Social media management covers <strong>strategy creation, content planning, content production, posting, community management, ad management, and reporting</strong>.</p>
 
@@ -1645,7 +1645,7 @@ export const blogPosts = [
 <p>Freelancer: 3,000-8,000 TL/mo | Agency Starter: 8,000-15,000 TL/mo | Professional: 15,000-30,000 TL/mo | Enterprise: 30,000-75,000 TL/mo</p>
 
 <h2>Kade Media Pricing</h2>
-<p>Starting from <strong>8,900 TL/month</strong>. Check our <a href="/paketler">detailed package comparison</a> or <a href="/iletisim">get a free quote</a>.</p>`,
+<p>Starting from <strong>11,900 TL/month</strong>. Check our <a href="/paketler">detailed package comparison</a> or <a href="/iletisim">get a free quote</a>.</p>`,
     category: 'Rehber',
     categoryEn: 'Guide',
     date: '31 Mar 2026',

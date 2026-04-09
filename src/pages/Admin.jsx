@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   HiOutlineLogin, HiOutlineLogout, HiOutlineHome,
@@ -311,8 +311,8 @@ function BlogSection({ showToast }) {
     try {
       const data = await getBlogsApi()
       setBlogs(Array.isArray(data) ? data : [])
-    } catch {
-      setBlogs([])
+    } catch (err) {
+      console.warn('Bloglar yüklenemedi:', err.message)
     } finally {
       setLoading(false)
     }
@@ -772,6 +772,18 @@ function ContentSection({ showToast }) {
     { id: 'careers', label: '💼 Kariyer', desc: 'İş ilanları' },
   ]
 
+  // Memoize data props to prevent child editors from resetting form state on re-render
+  // (isDirty state change triggers re-render; inline fallback objects would create new refs each time)
+  const heroData = useMemo(() => content.hero || { tr: { title1: '', title2: '', subtitle: '' }, en: { title1: '', title2: '', subtitle: '' } }, [content.hero])
+  const statsData = useMemo(() => content.stats || { clients: '150+', followers: '2M+', campaigns: '500+', satisfaction: '98%' }, [content.stats])
+  const servicesData = useMemo(() => content.services || { items: [] }, [content.services])
+  const faqData = useMemo(() => content.faq || { tr: [], en: [] }, [content.faq])
+  const testimonialsData = useMemo(() => content.testimonials || { items: [] }, [content.testimonials])
+  const packagesData = useMemo(() => content.packages || { items: [] }, [content.packages])
+  const aboutData = useMemo(() => content.about || {}, [content.about])
+  const footerData = useMemo(() => content.footer || {}, [content.footer])
+  const careersData = useMemo(() => content.careers || { tr: [], en: [] }, [content.careers])
+
   if (loading) return <div className="admin-empty-state"><p>Yükleniyor...</p></div>
 
   return (
@@ -799,63 +811,63 @@ function ContentSection({ showToast }) {
       <div onInput={() => setIsDirty(true)} onChange={() => setIsDirty(true)}>
       {activeTab === 'hero' && (
         <HeroEditor
-          data={content.hero || { tr: { title1: '', title2: '', subtitle: '' }, en: { title1: '', title2: '', subtitle: '' } }}
+          data={heroData}
           onSave={(data) => handleSave('hero', data)}
         />
       )}
 
       {activeTab === 'stats' && (
         <StatsEditor
-          data={content.stats || { clients: '150+', followers: '2M+', campaigns: '500+', satisfaction: '98%' }}
+          data={statsData}
           onSave={(data) => handleSave('stats', data)}
         />
       )}
 
       {activeTab === 'services' && (
         <ServicesEditor
-          data={content.services || { items: [] }}
+          data={servicesData}
           onSave={(data) => handleSave('services', data)}
         />
       )}
 
       {activeTab === 'faq' && (
         <FAQEditor
-          data={content.faq || { tr: [], en: [] }}
+          data={faqData}
           onSave={(data) => handleSave('faq', data)}
         />
       )}
 
       {activeTab === 'testimonials' && (
         <TestimonialsEditor
-          data={content.testimonials || { items: [] }}
+          data={testimonialsData}
           onSave={(data) => handleSave('testimonials', data)}
         />
       )}
 
       {activeTab === 'packages' && (
         <PackagesEditor
-          data={content.packages || { items: [] }}
+          data={packagesData}
           onSave={(data) => handleSave('packages', data)}
         />
       )}
 
       {activeTab === 'about' && (
         <AboutEditor
-          data={content.about || {}}
+          data={aboutData}
           onSave={(data) => handleSave('about', data)}
         />
       )}
 
       {activeTab === 'footer' && (
         <FooterEditor
-          data={content.footer || {}}
+          data={footerData}
           onSave={(data) => handleSave('footer', data)}
         />
       )}
 
       {activeTab === 'careers' && (
         <CareersEditor
-          data={content.careers || { tr: [], en: [] }}
+          data={careersData}
           onSave={(data) => handleSave('careers', data)}
         />
       )}
@@ -1510,8 +1522,8 @@ function PartnersSection({ showToast }) {
     try {
       const data = await getPartnersApi()
       setPartners(Array.isArray(data) ? data : [])
-    } catch {
-      setPartners([])
+    } catch (err) {
+      console.warn('Partnerler yüklenemedi:', err.message)
     } finally {
       setLoading(false)
     }
@@ -1854,9 +1866,9 @@ function MessagesSection({ showToast, onNewMessageCount }) {
       const arr = Array.isArray(data) ? data : []
       setMessages(arr)
       onNewMessageCount(arr.filter((m) => !m.read).length)
-    } catch {
-      setMessages([])
-      onNewMessageCount(0)
+    } catch (err) {
+      console.warn('Mesajlar yüklenemedi:', err.message)
+      // Mevcut listeyi koruyoruz — API hatası listeyi sifirlamaz
     } finally {
       setLoading(false)
     }
@@ -3080,8 +3092,9 @@ function UsersSection({ showToast }) {
     try {
       const data = await getUsersApi()
       setUsers(Array.isArray(data) ? data : [])
-    } catch {
-      setUsers([])
+    } catch (err) {
+      console.warn('Kullanıcılar yüklenemedi:', err.message)
+      // Mevcut listeyi koruyoruz — API hatası listeyi sifirlamaz
     } finally {
       setLoading(false)
     }

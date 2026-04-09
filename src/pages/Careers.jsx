@@ -24,32 +24,32 @@ const jobsData = {
   tr: [
     {
       id: 1, title: 'Sosyal Medya Yöneticisi', department: 'Sosyal Medya', location: 'İstanbul (Hibrit)', type: 'Yarı Zamanlı',
-      description: 'Müşteri markalarının sosyal medya hesaplarını yönetecek, içerik stratejileri oluşturacak ve topluluk yönetimi yapacak deneyimli bir Social Media Manager arıyoruz. Esnek çalışma saatleri ve uzaktan çalışma imkânı.',
+      description: 'Müşteri markalarının sosyal medya hesaplarını yönetecek, içerik stratejileri oluşturacak ve topluluk yönetimi yapacak deneyimli bir sosyal medya yöneticisi arıyoruz. Esnek çalışma saatleri ve uzaktan çalışma imkânı.',
       requirements: ['En az 1 yıl sosyal medya yönetimi deneyimi', 'Instagram, Facebook, TikTok ve Twitter platformlarına hakimiyet', 'İçerik takvimi oluşturma ve yönetme becerisi', 'Analitik araçlara (Meta Business Suite, vb.) hakimiyet', 'Yaratıcı düşünme ve problem çözme yeteneği'],
     },
     {
       id: 2, title: 'Grafik Tasarımcı', department: 'Kreatif', location: 'Uzaktan', type: 'Yarı Zamanlı',
-      description: 'Sosyal medya görselleri, marka kimlikleri ve reklam kreatifleri tasarlayacak yaratıcı ve detaycı bir Grafik Tasarımcı arıyoruz. Freelance veya yarı zamanlı çalışmaya uygun esnek model.',
+      description: 'Sosyal medya görselleri, marka kimlikleri ve reklam kreatifleri tasarlayacak yaratıcı ve detay odaklı bir grafik tasarımcı arıyoruz. Serbest veya yarı zamanlı çalışmaya uygun esnek model.',
       requirements: ['Adobe Creative Suite (Photoshop, Illustrator) hakimiyeti', 'Figma veya Canva deneyimi', 'Sosyal medya görsel tasarımı konusunda portföy', 'Tipografi ve renk teorisi bilgisi', 'Motion graphics bilgisi tercih sebebidir'],
     },
     {
       id: 3, title: 'Performans Pazarlama Uzmanı', department: 'Reklam', location: 'İstanbul (Hibrit)', type: 'Yarı Zamanlı',
-      description: 'Meta Ads, Google Ads ve TikTok Ads platformlarında reklam kampanyaları yönetecek, optimizasyon yapacak bir Performance Marketing Uzmanı arıyoruz. Esnek çalışma saatleri mevcuttur.',
+      description: 'Meta Ads, Google Ads ve TikTok Ads platformlarında reklam kampanyaları yönetecek ve optimizasyon yapacak bir performans pazarlama uzmanı arıyoruz. Esnek çalışma saatleri mevcuttur.',
       requirements: ['Meta Business Manager deneyimi', 'Google Ads veya Meta Ads sertifikası tercih sebebidir', 'A/B test ve optimizasyon deneyimi', 'Veri analizi ve raporlama becerisi', 'Kampanya optimizasyonu konusunda pratik bilgi'],
     },
     {
-      id: 4, title: 'İçerik Yazarı (Metin Yazarı)', department: 'Kreatif', location: 'Uzaktan', type: 'Yarı Zamanlı',
-      description: 'Sosyal medya postları, blog yazıları, reklam metinleri ve marka iletişimi için yaratıcı içerikler üretecek bir Copywriter arıyoruz. Tamamen uzaktan çalışma imkânı.',
+      id: 4, title: 'İçerik Yazarı', department: 'Kreatif', location: 'Uzaktan', type: 'Yarı Zamanlı',
+      description: 'Sosyal medya paylaşımları, blog yazıları, reklam metinleri ve marka iletişimi için yaratıcı içerikler üretecek bir içerik yazarı arıyoruz. Tamamen uzaktan çalışma imkânı.',
       requirements: ['Mükemmel Türkçe yazım ve dilbilgisi', 'Sosyal medya içerik yazarlığı deneyimi', 'SEO temel bilgisi', 'Farklı tonlarda (resmi, samimi, eğlenceli) yazabilme', 'İngilizce yazma becerisi tercih sebebidir'],
     },
     {
-      id: 5, title: 'Video Editör', department: 'Kreatif', location: 'Uzaktan', type: 'Yarı Zamanlı',
-      description: 'Reels, TikTok videoları ve YouTube içerikleri için video düzenleme ve motion graphics yapacak bir Video Editör arıyoruz. Proje bazlı veya yarı zamanlı çalışma modeli.',
+      id: 5, title: 'Video Editörü', department: 'Kreatif', location: 'Uzaktan', type: 'Yarı Zamanlı',
+      description: 'Reels, TikTok videoları ve YouTube içerikleri için video düzenleme ve hareketli grafik çalışmaları yapacak bir video editörü arıyoruz. Proje bazlı veya yarı zamanlı çalışma modeli.',
       requirements: ['Adobe Premiere Pro veya DaVinci Resolve deneyimi', 'Kısa form video (Reels, TikTok) düzenleme deneyimi', 'Motion graphics temel bilgisi', 'Trend takibi ve yaratıcı video fikirleri üretme', 'CapCut veya benzeri mobil araçlara hakimiyet'],
     },
     {
       id: 6, title: 'Müşteri İlişkileri Yöneticisi', department: 'Hesap Yönetimi', location: 'İstanbul (Hibrit)', type: 'Yarı Zamanlı',
-      description: 'Ajans müşterileriyle ilişkileri yönetecek, proje takibini yapacak ve müşteri memnuniyetini sağlayacak bir Account Manager arıyoruz.',
+      description: 'Ajans müşterileriyle ilişkileri yönetecek, proje takibini yapacak ve müşteri memnuniyetini sağlayacak bir müşteri ilişkileri yöneticisi arıyoruz.',
       requirements: ['Müşteri ilişkileri veya proje yönetimi deneyimi', 'Dijital pazarlama temel bilgisi', 'Güçlü iletişim ve sunum becerileri', 'Planlama ve organizasyon yeteneği', 'İngilizce iletişim becerisi tercih sebebidir'],
     },
     {
