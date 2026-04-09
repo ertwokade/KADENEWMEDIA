@@ -55,8 +55,8 @@ export default function Partners() {
         <div className="container">
           <StaggerContainer className="partners-grid" staggerDelay={0.1}>
             {partnersData.map((partner, idx) => (
-              <StaggerItem key={partner.id || partner._id || idx}>
-                <Link to={`/partnerler/${partner.id || partner.slug || partner._id}`}>
+              <StaggerItem key={partner.id || partner.slug || String(partner._id) || idx}>
+                <Link to={`/partnerler/${partner.id || partner.slug || String(partner._id)}`}>
                   <motion.div
                     className="partner-card glass-card"
                     whileHover={{ scale: 1.02, y: -5 }}
