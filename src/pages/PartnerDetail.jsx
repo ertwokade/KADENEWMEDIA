@@ -20,21 +20,25 @@ import './Partners.css'
 export default function PartnerDetail() {
   const { id } = useParams()
   const { lang, t } = useLanguage()
-  const [partner, setPartner] = useState(() =>
-    staticPartners.find((p) => p.id === id || p.slug === id) || null
-  )
+
+  // Try to find in static data first
+  const staticPartner = staticPartners.find((p) => p.id === id || p.slug === id) || null
+  const [partner, setPartner] = useState(staticPartner)
+  // If not found in static, we need to wait for API before deciding to redirect
+  const [apiLoading, setApiLoading] = useState(!staticPartner)
 
   useEffect(() => {
     getPartnersApi()
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           const found = data.find((p) =>
-            p.id === id || p.slug === id || p._id?.toString() === id
+            p.id === id || p.slug === id || String(p._id) === id
           )
           if (found) setPartner(found)
         }
       })
       .catch(() => {})
+      .finally(() => setApiLoading(false))
   }, [id])
 
   useEffect(() => {
@@ -52,6 +56,20 @@ export default function PartnerDetail() {
   const metaDesc = shortDesc || (name ? `${name} için gerçekleştirdiğimiz dijital pazarlama çalışması ve elde ettiğimiz sonuçlar.` : '')
 
   useSEO({ title: metaTitle, description: metaDesc, path: `/partnerler/${id}` })
+
+  // While API is loading and no static data found, show loading
+  if (apiLoading) {
+    return (
+      <PageTransition>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+          <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+            <div style={{ fontSize: '2rem', marginBottom: 12 }}>⚡</div>
+            <p>Yükleniyor...</p>
+          </div>
+        </div>
+      </PageTransition>
+    )
+  }
 
   if (!partner) return <Navigate to="/partnerler" replace />
 

@@ -13,6 +13,7 @@ import {
   HiOutlineChatAlt2, HiOutlineChevronLeft,
 } from 'react-icons/hi'
 import PageTransition from '../components/PageTransition'
+import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
 import {
   loginApi, changePasswordApi,
   getBlogsApi, createBlogApi, updateBlogApi, deleteBlogApi,
@@ -310,9 +311,18 @@ function BlogSection({ showToast }) {
   const fetchBlogs = async () => {
     try {
       const data = await getBlogsApi()
-      setBlogs(Array.isArray(data) ? data : [])
+      const apiBlogs = Array.isArray(data) ? data : []
+      // Merge: static blogs overridden by MongoDB version if same slug exists
+      // Static blogs without a MongoDB counterpart appear as editable (no _id)
+      const slugMap = new Map(apiBlogs.map(b => [b.slug, b]))
+      const mergedStatic = staticBlogPosts.map(b => slugMap.get(b.slug) || b)
+      const existingSlugs = new Set(staticBlogPosts.map(b => b.slug))
+      const newApiBlogs = apiBlogs.filter(b => !existingSlugs.has(b.slug))
+      setBlogs([...mergedStatic, ...newApiBlogs])
     } catch (err) {
       console.warn('Bloglar yüklenemedi:', err.message)
+      // Show static blogs as fallback so admin can still manage them
+      setBlogs(staticBlogPosts)
     } finally {
       setLoading(false)
     }
@@ -352,8 +362,15 @@ function BlogSection({ showToast }) {
     setSaving(true)
     try {
       if (editingBlog) {
-        await updateBlogApi({ id: editingBlog._id, ...form })
-        showToast('Blog yazısı güncellendi!', 'success')
+        if (editingBlog._id) {
+          // Already in MongoDB — update
+          await updateBlogApi({ id: editingBlog._id, ...form })
+          showToast('Blog yazısı güncellendi!', 'success')
+        } else {
+          // Static blog being edited for the first time — create in MongoDB
+          await createBlogApi({ ...form, slug: editingBlog.slug || form.slug })
+          showToast('Blog yazısı MongoDB\'ye kaydedildi!', 'success')
+        }
       } else {
         await createBlogApi(form)
         showToast('Blog yazısı oluşturuldu!', 'success')
@@ -779,7 +796,14 @@ function ContentSection({ showToast }) {
   const servicesData = useMemo(() => content.services || { items: [] }, [content.services])
   const faqData = useMemo(() => content.faq || { tr: [], en: [] }, [content.faq])
   const testimonialsData = useMemo(() => content.testimonials || { items: [] }, [content.testimonials])
-  const packagesData = useMemo(() => content.packages || { items: [] }, [content.packages])
+  const packagesData = useMemo(() => content.packages || {
+    items: [
+      { nameTr: 'Başlangıç', nameEn: 'Starter', priceTRY: '11.900', popular: false, featuresTr: '2 Platform (Instagram + 1), Ayda 16 içerik, Temel grafik tasarım, Topluluk yönetimi, İçerik takvimi, Aylık performans raporu', featuresEn: '2 Platforms (Instagram + 1), 16 posts/month, Basic graphic design, Community management, Content calendar, Monthly performance report' },
+      { nameTr: 'Profesyonel', nameEn: 'Professional', priceTRY: '24.900', popular: true, featuresTr: '4 Platform, Ayda 30 içerik, Profesyonel tasarım, Topluluk yönetimi, İçerik takvimi, 2 haftada bir raporlama, Temel reklam yönetimi, Ayda 4 Reels, Rakip analizi', featuresEn: '4 Platforms, 30 posts/month, Professional design, Community management, Content calendar, Bi-weekly reporting, Basic ad management, 4 Reels/month, Competitor analysis' },
+      { nameTr: 'Kurumsal', nameEn: 'Enterprise', priceTRY: '54.900', popular: false, featuresTr: 'Tüm platformlar, Sınırsız içerik, Premium tasarım, Topluluk yönetimi, İçerik takvimi, Haftalık raporlama, Gelişmiş reklam yönetimi, Ayda 12 Reels, Rakip analizi, Kriz yönetimi, Özel strateji danışmanı, Öncelikli destek', featuresEn: 'All platforms, Unlimited content, Premium design, Community management, Content calendar, Weekly reporting, Advanced ad management, 12 Reels/month, Competitor analysis, Crisis management, Dedicated strategist, Priority support' },
+      { nameTr: 'Özel', nameEn: 'Custom', priceTRY: '', popular: false, featuresTr: 'Kurumsaldaki her şey, Özel strateji ve yol haritası, Çoklu marka yönetimi, Uluslararası pazar desteği, Size özel ekip, SLA anlaşması', featuresEn: 'Everything in Enterprise, Custom strategy & roadmap, Multi-brand management, International market support, Dedicated team, SLA agreement' },
+    ]
+  }, [content.packages])
   const aboutData = useMemo(() => content.about || {}, [content.about])
   const footerData = useMemo(() => content.footer || {}, [content.footer])
   const careersData = useMemo(() => content.careers || { tr: [], en: [] }, [content.careers])
@@ -1521,9 +1545,16 @@ function PartnersSection({ showToast }) {
   const fetchPartners = async () => {
     try {
       const data = await getPartnersApi()
-      setPartners(Array.isArray(data) ? data : [])
+      const apiPartners = Array.isArray(data) ? data : []
+      // Merge: static partners overridden by MongoDB version if same id/slug exists
+      const idMap = new Map(apiPartners.map(p => [p.id || p.slug, p]))
+      const mergedStatic = staticPartnersData.map(p => idMap.get(p.id) || p)
+      const existingIds = new Set(staticPartnersData.map(p => p.id))
+      const newApiPartners = apiPartners.filter(p => !existingIds.has(p.id))
+      setPartners([...mergedStatic, ...newApiPartners])
     } catch (err) {
       console.warn('Partnerler yüklenemedi:', err.message)
+      setPartners(staticPartnersData)
     } finally {
       setLoading(false)
     }
@@ -1572,8 +1603,14 @@ function PartnersSection({ showToast }) {
     }
     try {
       if (editingPartner) {
-        await updatePartnerApi({ ...payload, _id: editingPartner._id })
-        showToast('Partner güncellendi!', 'success')
+        if (editingPartner._id) {
+          await updatePartnerApi({ ...payload, _id: editingPartner._id })
+          showToast('Partner güncellendi!', 'success')
+        } else {
+          // Static partner being edited — create in MongoDB
+          await createPartnerApi(payload)
+          showToast('Partner MongoDB\'ye kaydedildi!', 'success')
+        }
       } else {
         await createPartnerApi(payload)
         showToast('Partner oluşturuldu!', 'success')
