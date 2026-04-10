@@ -12,7 +12,6 @@ import {
   HiOutlineCode,
 } from 'react-icons/hi'
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
-import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { getContentApi } from '../api'
@@ -27,7 +26,7 @@ const iconMap = {
   HiOutlinePencilAlt, HiOutlineSpeakerphone, HiOutlineCode,
 }
 
-const platformMap = { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn, FaXTwitter } // eslint-disable-line no-unused-vars
+const platformMap = { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } // eslint-disable-line no-unused-vars
 
 export default function Services() {
   const { t, lang } = useLanguage()
@@ -55,7 +54,7 @@ export default function Services() {
       title: t('services.smm'),
       desc: t('services.smmDesc'),
       features: [t('services.smmFeat1'), t('services.smmFeat2'), t('services.smmFeat3'), t('services.smmFeat4')],
-      platforms: [FaInstagram, FaFacebookF, FaXTwitter, FaTiktok],
+      platforms: [FaInstagram, FaFacebookF, FaTiktok],
     },
     {
       icon: HiOutlinePencilAlt,

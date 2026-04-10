@@ -1013,25 +1013,21 @@ function FooterEditor({ data, onSave }) {
           <input type="url" value={form.instagram || ''} onChange={(e) => setForm({ ...form, instagram: e.target.value })} />
         </div>
         <div className="form-group">
-          <label>X (Twitter)</label>
-          <input type="url" value={form.twitter || ''} onChange={(e) => setForm({ ...form, twitter: e.target.value })} />
-        </div>
-      </div>
-      <div className="form-row">
-        <div className="form-group">
           <label>YouTube</label>
           <input type="url" value={form.youtube || ''} onChange={(e) => setForm({ ...form, youtube: e.target.value })} />
         </div>
+      </div>
+      <div className="form-row">
         <div className="form-group">
           <label>TikTok</label>
           <input type="url" value={form.tiktok || ''} onChange={(e) => setForm({ ...form, tiktok: e.target.value })} />
         </div>
-      </div>
-      <div className="form-row">
         <div className="form-group">
           <label>LinkedIn</label>
           <input type="url" value={form.linkedin || ''} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} />
         </div>
+      </div>
+      <div className="form-row">
         <div className="form-group">
           <label>WhatsApp</label>
           <input type="url" value={form.whatsapp || ''} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
@@ -2312,7 +2308,6 @@ function SettingsSection({ showToast }) {
     email: 'hello@kademedia.com',
     address: 'Biruni Teknopark, Zeytinburnu/İstanbul',
     instagram: '',
-    twitter: '',
     youtube: '',
     tiktok: '',
     linkedin: '',
@@ -2420,15 +2415,11 @@ function SettingsSection({ showToast }) {
                 <input type="url" value={siteSettings.instagram || ''} onChange={e => setSiteSettings({ ...siteSettings, instagram: e.target.value })} placeholder="https://instagram.com/..." />
               </div>
               <div className="form-group">
-                <label>X (Twitter)</label>
-                <input type="url" value={siteSettings.twitter || ''} onChange={e => setSiteSettings({ ...siteSettings, twitter: e.target.value })} placeholder="https://x.com/..." />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
                 <label>YouTube</label>
                 <input type="url" value={siteSettings.youtube || ''} onChange={e => setSiteSettings({ ...siteSettings, youtube: e.target.value })} placeholder="https://youtube.com/..." />
               </div>
+            </div>
+            <div className="form-row">
               <div className="form-group">
                 <label>TikTok</label>
                 <input type="url" value={siteSettings.tiktok || ''} onChange={e => setSiteSettings({ ...siteSettings, tiktok: e.target.value })} placeholder="https://tiktok.com/..." />
@@ -2573,7 +2564,7 @@ function CalendarSection({ showToast }) {
   const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
   const dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
 
-  const platformIcons = { instagram: '📸', tiktok: '🎵', youtube: '🎬', twitter: '🐦', linkedin: '💼', facebook: '📘' }
+  const platformIcons = { instagram: '📸', tiktok: '🎵', youtube: '🎬', linkedin: '💼', facebook: '📘' }
   const statusColors = { planned: '#6C63FF', ready: '#eac321', published: '#2ECC71', cancelled: '#ff4444' }
   const statusLabels = { planned: 'Planlandı', ready: 'Hazır', published: 'Yayınlandı', cancelled: 'İptal' }
   const typeLabels = { post: 'Gönderi', story: 'Story', reel: 'Reels', video: 'Video', live: 'Canlı Yayın', ad: 'Reklam' }
@@ -2938,7 +2929,6 @@ function CalendarSection({ showToast }) {
                       <option value="instagram">📸 Instagram</option>
                       <option value="tiktok">🎵 TikTok</option>
                       <option value="youtube">🎬 YouTube</option>
-                      <option value="twitter">🐦 X (Twitter)</option>
                       <option value="linkedin">💼 LinkedIn</option>
                       <option value="facebook">📘 Facebook</option>
                     </select>

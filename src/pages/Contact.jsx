@@ -10,7 +10,6 @@ import {
   HiOutlineCheck,
 } from 'react-icons/hi'
 import { FaInstagram, FaYoutube, FaTiktok, FaWhatsapp, FaLinkedinIn } from 'react-icons/fa'
-import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { sendContactApi } from '../api'
@@ -22,7 +21,6 @@ import './Contact.css'
 
 const socials = [
   { icon: FaInstagram, href: 'https://instagram.com/kademediacom', label: 'Instagram' },
-  { icon: FaXTwitter, href: 'https://x.com/kademediacom', label: 'X' },
   { icon: FaYoutube, href: 'https://www.youtube.com/@kademediacom', label: 'YouTube' },
   { icon: FaTiktok, href: 'https://tiktok.com/@kademediacom', label: 'TikTok' },
   { icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/kademediaagency', label: 'LinkedIn' },

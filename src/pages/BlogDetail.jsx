@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlineClock, HiOutlineArrowLeft, HiOutlineArrowRight, HiOutlineShare } from 'react-icons/hi'
-import { FaXTwitter, FaLinkedinIn } from 'react-icons/fa6'
+import { FaLinkedinIn } from 'react-icons/fa6'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
@@ -165,9 +165,6 @@ export default function BlogDetail() {
                   <span>{lang === 'tr' ? 'Bu yazıyı paylaş' : 'Share this post'}</span>
                 </div>
                 <div className="blog-share-buttons">
-                  <a href={`https://x.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`} target="_blank" rel="noopener noreferrer" className="blog-share-btn" aria-label="Share on X">
-                    <FaXTwitter size={16} />
-                  </a>
                   <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`} target="_blank" rel="noopener noreferrer" className="blog-share-btn" aria-label="Share on LinkedIn">
                     <FaLinkedinIn size={16} />
                   </a>

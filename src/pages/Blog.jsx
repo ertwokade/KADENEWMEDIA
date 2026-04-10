@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlinePencilAlt, HiOutlineArrowRight, HiOutlineClock, HiOutlineShare, HiOutlineLightningBolt, HiOutlineSearch, HiOutlineX } from 'react-icons/hi'
-import { FaXTwitter, FaLinkedinIn } from 'react-icons/fa6'
+import { FaLinkedinIn } from 'react-icons/fa6'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
@@ -265,15 +265,6 @@ export default function Blog() {
                 <span>{lang === 'tr' ? 'İçeriklerimizi paylaşın' : 'Share our content'}</span>
               </div>
               <div className="blog-share-buttons">
-                <a
-                  href="https://x.com/intent/tweet?text=Kade%20Media%20Blog%20-%20Dijital%20Pazarlama%20İpuçları&url=https://kademedia.com.tr/blog"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="blog-share-btn"
-                  aria-label="Share on X"
-                >
-                  <FaXTwitter size={16} />
-                </a>
                 <a
                   href="https://www.linkedin.com/sharing/share-offsite/?url=https://kademedia.com.tr/blog"
                   target="_blank"

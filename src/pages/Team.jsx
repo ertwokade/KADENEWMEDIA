@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { HiOutlineUserGroup } from 'react-icons/hi'
 import { FaLinkedinIn, FaInstagram } from 'react-icons/fa'
-import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { getContentApi } from '../api'
@@ -19,7 +18,7 @@ const defaultTeam = [
     bioTr: 'Dijital pazarlama ve sosyal medya alanında 8+ yıl deneyim. Strateji ve büyüme odaklı liderlik.',
     bioEn: '8+ years of experience in digital marketing and social media. Strategy and growth-focused leadership.',
     image: null,
-    social: { linkedin: '#', instagram: '#', twitter: '#' },
+    social: { linkedin: '#', instagram: '#' },
     color: '#eac321',
   },
   {
@@ -39,7 +38,7 @@ const defaultTeam = [
     bioTr: 'Çok platformlu sosyal medya stratejileri ve topluluk yönetimi konusunda deneyimli.',
     bioEn: 'Experienced in multi-platform social media strategies and community management.',
     image: null,
-    social: { linkedin: '#', twitter: '#' },
+    social: { linkedin: '#' },
     color: '#6C63FF',
   },
   {
@@ -54,7 +53,7 @@ const defaultTeam = [
   },
 ]
 
-const socialIcons = { linkedin: FaLinkedinIn, instagram: FaInstagram, twitter: FaXTwitter }
+const socialIcons = { linkedin: FaLinkedinIn, instagram: FaInstagram }
 
 export default function Team() {
   const { lang } = useLanguage()

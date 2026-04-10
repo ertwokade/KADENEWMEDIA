@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaInstagram, FaYoutube, FaTiktok, FaLinkedinIn } from 'react-icons/fa'
-import { FaXTwitter } from 'react-icons/fa6'
 import { HiArrowUp, HiOutlineMail, HiOutlineCheck } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { getContentApi, subscribeNewsletterApi } from '../api'
@@ -43,7 +42,6 @@ export default function Footer() {
 
   const socialLinks = [
     { icon: FaInstagram, href: footerData?.instagram || 'https://instagram.com/kademediacom', label: 'Instagram' },
-    { icon: FaXTwitter, href: footerData?.twitter || 'https://x.com/kademediacom', label: 'X' },
     { icon: FaYoutube, href: footerData?.youtube || 'https://www.youtube.com/@kademediacom', label: 'YouTube' },
     { icon: FaTiktok, href: footerData?.tiktok || 'https://tiktok.com/@kademediacom', label: 'TikTok' },
     { icon: FaLinkedinIn, href: footerData?.linkedin || 'https://www.linkedin.com/company/kademediaagency', label: 'LinkedIn' },

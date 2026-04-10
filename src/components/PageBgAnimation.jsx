@@ -14,7 +14,7 @@ const CONFIGS = {
     cls: 'bg-float',
   },
   services: {
-    items: ['Instagram', 'TikTok', 'YouTube', 'LinkedIn', 'X', 'Facebook', 'Reels', 'Stories', 'Meta Ads', 'Google Ads'],
+    items: ['Instagram', 'TikTok', 'YouTube', 'LinkedIn', 'Facebook', 'Reels', 'Stories', 'Meta Ads', 'Google Ads'],
     count: 10,
     cls: 'bg-badge',
   },

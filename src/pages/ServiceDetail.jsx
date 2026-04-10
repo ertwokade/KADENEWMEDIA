@@ -14,7 +14,6 @@ import {
   HiOutlineCode,
 } from 'react-icons/hi'
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
-import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { getContentApi } from '../api'
@@ -27,11 +26,11 @@ const servicesMap = {
     icon: HiOutlineGlobe,
     titleTr: 'Sosyal Medya Yönetimi',
     titleEn: 'Social Media Management',
-    descTr: 'Instagram, Facebook, Twitter, TikTok ve LinkedIn hesaplarınızı profesyonel bir şekilde yönetiyoruz. İçerik planlaması, paylaşım takvimi ve topluluk yönetimi ile markanızı dijital dünyada güçlendiriyoruz.',
-    descEn: 'We professionally manage your Instagram, Facebook, Twitter, TikTok, and LinkedIn accounts. We strengthen your brand in the digital world with content planning, posting schedules, and community management.',
+    descTr: 'Instagram, Facebook, TikTok ve LinkedIn hesaplarınızı profesyonel bir şekilde yönetiyoruz. İçerik planlaması, paylaşım takvimi ve topluluk yönetimi ile markanızı dijital dünyada güçlendiriyoruz.',
+    descEn: 'We professionally manage your Instagram, Facebook, TikTok, and LinkedIn accounts. We strengthen your brand in the digital world with content planning, posting schedules, and community management.',
     featuresTr: ['İçerik Takvimi Oluşturma', 'Topluluk Yönetimi', 'Kriz Yönetimi', 'Aylık Raporlama', 'Hashtag Stratejisi', 'Rakip Analizi'],
     featuresEn: ['Content Calendar Creation', 'Community Management', 'Crisis Management', 'Monthly Reporting', 'Hashtag Strategy', 'Competitor Analysis'],
-    platforms: [FaInstagram, FaFacebookF, FaXTwitter, FaTiktok, FaLinkedinIn],
+    platforms: [FaInstagram, FaFacebookF, FaTiktok, FaLinkedinIn],
     color: '#eac321',
   },
   'icerik-uretimi': {

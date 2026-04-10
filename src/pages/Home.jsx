@@ -21,7 +21,6 @@ import {
   FaLinkedinIn,
   FaQuoteLeft,
 } from 'react-icons/fa'
-import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { partnersData as staticPartnersData } from '../data/content'
@@ -35,7 +34,6 @@ import './Home.css'
 
 const platforms = [
   { icon: FaInstagram, name: 'Instagram', url: 'https://instagram.com/kademediacom' },
-  { icon: FaXTwitter, name: 'X', url: 'https://x.com/kademediacom' },
   { icon: FaYoutube, name: 'YouTube', url: 'https://www.youtube.com/@kademediacom' },
   { icon: FaTiktok, name: 'TikTok', url: 'https://tiktok.com/@kademediacom' },
   { icon: FaLinkedinIn, name: 'LinkedIn', url: 'https://www.linkedin.com/company/kademediaagency' },
