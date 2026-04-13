@@ -77,9 +77,6 @@ app.post('/api/reminders', apiRoute('reminders.js'))
 app.put('/api/reminders', apiRoute('reminders.js'))
 app.delete('/api/reminders', apiRoute('reminders.js'))
 
-// Social Media Analyzer
-app.post('/api/social-analyzer', apiRoute('social-analyzer.js'))
-
 // Seed
 app.post('/api/seed', apiRoute('seed.js'))
 

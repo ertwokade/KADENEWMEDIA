@@ -462,7 +462,7 @@ export async function checkRemindersApi() {
 
 // Social Media Analyzer Lead
 export async function submitAnalyzerLeadApi(data) {
-  const res = await fetch(`${API_BASE}/social-analyzer`, {
+  const res = await fetch(`${API_BASE}/contact?action=analyzer-lead`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),

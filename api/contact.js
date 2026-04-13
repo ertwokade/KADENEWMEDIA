@@ -128,6 +128,35 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Sosyal Medya Analiz Aracı Lead (public, POST only) ──
+  if (action === 'analyzer-lead') {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    let body = req.body;
+    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+    const { email, score, platforms, usernames, categories } = body || {};
+    if (!email || !EMAIL_RE.test(email)) {
+      return res.status(400).json({ error: 'Geçerli bir e-posta adresi gerekli.' });
+    }
+    try {
+      const db = await getDb();
+      await db.collection('analyzer_leads').insertOne({
+        email: email.trim().toLowerCase(), score, platforms, usernames, categories,
+        createdAt: new Date(), source: 'social-media-analyzer', status: 'new',
+      });
+      await db.collection('messages').insertOne({
+        name: email.split('@')[0], email: email.trim().toLowerCase(),
+        phone: '', company: '', service: 'Sosyal Medya Analiz',
+        message: `Sosyal Medya Analiz Aracı Lead - Skor: ${score}/100\nPlatformlar: ${platforms?.join(', ')}\nKullanıcı adları: ${JSON.stringify(usernames)}`,
+        source: 'analyzer', status: 'yeni', read: false, createdAt: new Date(),
+      });
+      logActivity(db, { action: 'Yeni analiz lead', detail: `${email} — Skor: ${score}/100`, type: 'message', icon: '📊', user: 'sistem' }).catch(() => {});
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      console.error('Analyzer lead error:', err);
+      return res.status(500).json({ error: 'Sunucu hatası' });
+    }
+  }
+
   // ── Newsletter aboneliği (public, POST only) ──
   if (action === 'newsletter') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
