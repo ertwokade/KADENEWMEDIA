@@ -27,6 +27,7 @@ import Gizlilik from './pages/Gizlilik'
 import CerezPolitikasi from './pages/CerezPolitikasi'
 import CaseStudies from './pages/CaseStudies'
 import ROICalculator from './pages/ROICalculator'
+import SocialAnalyzer from './pages/SocialAnalyzer'
 import NotFound from './pages/NotFound'
 
 // Only Admin stays lazy — it's large and rarely visited
@@ -100,6 +101,7 @@ function App() {
         <Route path="/iletisim" element={<Contact />} />
         <Route path="/basari-hikayeleri" element={<CaseStudies />} />
         <Route path="/roi-hesaplayici" element={<ROICalculator />} />
+        <Route path="/sosyal-medya-analiz" element={<SocialAnalyzer />} />
         <Route path="/kvkk" element={<KVKK />} />
         <Route path="/gizlilik" element={<Gizlilik />} />
         <Route path="/cerez-politikasi" element={<CerezPolitikasi />} />

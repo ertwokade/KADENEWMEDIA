@@ -459,3 +459,13 @@ export async function checkRemindersApi() {
   });
   return handleResponse(res);
 }
+
+// Social Media Analyzer Lead
+export async function submitAnalyzerLeadApi(data) {
+  const res = await fetch(`${API_BASE}/social-analyzer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}

@@ -293,7 +293,7 @@ export default function Home() {
 
           <FadeIn delay={0.25}>
             <div className="hero-free-audit">
-              <Link to="/iletisim" className="hero-audit-link">
+              <Link to="/sosyal-medya-analiz" className="hero-audit-link">
                 <HiOutlineChartBar size={16} />
                 <span>{lang === 'tr' ? '🎯 Ücretsiz Sosyal Medya Analizi Al' : '🎯 Get Free Social Media Analysis'}</span>
                 <HiOutlineArrowRight size={14} />
