@@ -123,6 +123,18 @@ export default function Home() {
     path: '/',
   })
 
+  // Hero text from translations — API can override
+  const heroDefaults = {
+    title1: t('hero.title1'),
+    title2: t('hero.title2'),
+    subtitle: t('hero.subtitle'),
+  }
+  const [heroOverride, setHeroOverride] = useState(null)
+  const [dynamicStats, setDynamicStats] = useState(null)
+  const [dynamicFaq, setDynamicFaq] = useState(null)
+  const [dynamicTestimonials, setDynamicTestimonials] = useState(null)
+  const [partnersData, setPartnersData] = useState(staticPartnersData)
+
   // FAQ Schema Markup (Google Rich Snippets)
   useEffect(() => {
     const faqItems = dynamicFaq?.[lang]?.length > 0 ? dynamicFaq[lang] : faqData[lang]
@@ -178,19 +190,6 @@ export default function Home() {
     }
     return () => { document.getElementById('jsonld-business')?.remove() }
   }, [])
-
-  // Hero text from translations — API can override
-  const heroDefaults = {
-    title1: t('hero.title1'),
-    title2: t('hero.title2'),
-    subtitle: t('hero.subtitle'),
-  }
-  const [heroOverride, setHeroOverride] = useState(null)
-
-  const [dynamicStats, setDynamicStats] = useState(null)
-  const [dynamicFaq, setDynamicFaq] = useState(null)
-  const [dynamicTestimonials, setDynamicTestimonials] = useState(null)
-  const [partnersData, setPartnersData] = useState(staticPartnersData)
 
   // Load overrides from API once
   useEffect(() => {
