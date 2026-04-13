@@ -1,0 +1,370 @@
+/* Summary Grid */
+.case-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.case-summary-card {
+  text-align: center;
+  padding: 28px 16px;
+}
+
+.case-summary-value {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--white);
+  margin: 8px 0 4px;
+}
+
+.case-summary-label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* Case Cards Grid */
+.case-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+.case-card {
+  padding: 28px;
+  transition: all 0.3s;
+}
+
+.case-card:hover {
+  border-color: rgba(234, 195, 33, 0.3);
+}
+
+.case-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.case-card-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.case-card-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--white);
+}
+
+.case-card-industry {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.case-card-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.case-platform-tag {
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.case-duration-tag {
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(234, 195, 33, 0.1);
+  border: 1px solid rgba(234, 195, 33, 0.2);
+  font-size: 0.75rem;
+  color: var(--primary);
+}
+
+.case-card-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.case-mini-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.case-mini-change {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.case-mini-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.case-card-cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  transition: gap 0.2s;
+}
+
+.case-card:hover .case-card-cta {
+  gap: 10px;
+}
+
+/* Modal */
+.case-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.case-modal {
+  position: relative;
+  max-width: 720px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 0;
+  border-radius: 20px;
+}
+
+.case-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  z-index: 2;
+  transition: all 0.2s;
+}
+
+.case-modal-close:hover {
+  background: rgba(255,255,255,0.15);
+  color: var(--white);
+}
+
+.case-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 28px 28px 20px;
+}
+
+.case-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--white);
+}
+
+.case-modal-body {
+  padding: 0 28px 28px;
+}
+
+.case-section {
+  margin-bottom: 24px;
+}
+
+.case-section h4 {
+  font-size: 1rem;
+  color: var(--white);
+  margin: 0 0 8px;
+}
+
+.case-section p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+/* Metrics Grid */
+.case-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.case-metric-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.case-metric-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 6px 0;
+}
+
+.case-metric-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.case-metric-before {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.case-metric-arrow {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.case-metric-after {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.case-metric-change {
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* Testimonial */
+.case-testimonial {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 20px !important;
+  margin-top: 8px;
+}
+
+.case-testimonial p {
+  font-style: italic;
+  margin-bottom: 12px !important;
+  font-size: 0.95rem !important;
+  line-height: 1.7;
+}
+
+.case-testimonial strong {
+  color: var(--white);
+  display: block;
+  font-size: 0.88rem;
+}
+
+.case-testimonial span {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+/* CTA */
+.case-modal-cta {
+  text-align: center;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--border-color);
+  margin-top: 8px;
+}
+
+.case-modal-cta p {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+.case-bottom-cta {
+  text-align: center;
+  padding: 48px 32px;
+}
+
+.case-bottom-cta h2 {
+  color: var(--white);
+  margin: 16px 0 8px;
+  font-size: 1.6rem;
+}
+
+.case-bottom-cta p {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .case-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .case-grid {
+    grid-template-columns: 1fr;
+  }
+  .case-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  .case-modal-header {
+    padding: 24px 20px 16px;
+  }
+  .case-modal-body {
+    padding: 0 20px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .case-summary-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .case-summary-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* Light mode */
+[data-theme="light"] .case-summary-value,
+[data-theme="light"] .case-card-header h3,
+[data-theme="light"] .case-modal-header h2,
+[data-theme="light"] .case-section h4,
+[data-theme="light"] .case-testimonial strong,
+[data-theme="light"] .case-bottom-cta h2 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .case-metric-card,
+[data-theme="light"] .case-testimonial {
+  background: rgba(0, 0, 0, 0.03);
+}

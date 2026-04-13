@@ -147,12 +147,100 @@
   flex-shrink: 0;
 }
 
+/* Email Form */
+.exit-email-form {
+  margin-bottom: 12px;
+}
+
+.exit-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.exit-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0 14px;
+  transition: border-color 0.2s;
+}
+
+.exit-input-wrapper:focus-within {
+  border-color: var(--primary);
+}
+
+.exit-input-wrapper svg {
+  color: var(--gray);
+  flex-shrink: 0;
+}
+
+.exit-input-wrapper input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--white);
+  font-size: 0.9rem;
+  padding: 14px 0;
+}
+
+.exit-input-wrapper input::placeholder {
+  color: var(--gray);
+}
+
+.exit-email-form .exit-cta {
+  width: auto;
+  white-space: nowrap;
+  padding: 14px 20px;
+  font-size: 0.88rem;
+}
+
+.exit-error {
+  color: #ff4444;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+/* Success State */
+.exit-success {
+  padding: 20px 0;
+}
+
+.exit-success-icon {
+  color: #6ee7b7;
+  margin-bottom: 16px;
+}
+
+.exit-success h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.exit-success p {
+  font-size: 0.92rem;
+  color: var(--gray-light);
+  line-height: 1.6;
+}
+
 @media (max-width: 480px) {
   .exit-popup {
     padding: 40px 24px 28px;
   }
   .exit-title {
     font-size: 1.25rem;
+  }
+  .exit-input-row {
+    flex-direction: column;
+  }
+  .exit-email-form .exit-cta {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -196,4 +284,25 @@
 
 [data-theme="light"] .exit-note {
   color: #9E9994;
+}
+
+[data-theme="light"] .exit-input-wrapper {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .exit-input-wrapper input {
+  color: #1A1715;
+}
+
+[data-theme="light"] .exit-input-wrapper input::placeholder {
+  color: #9E9994;
+}
+
+[data-theme="light"] .exit-success h2 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .exit-success p {
+  color: #4A4540;
 }

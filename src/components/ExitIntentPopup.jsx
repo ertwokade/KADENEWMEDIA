@@ -1,15 +1,18 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HiOutlineX, HiOutlineArrowRight, HiOutlineLightningBolt, HiOutlineCheckCircle } from 'react-icons/hi'
+import { HiOutlineX, HiOutlineDownload, HiOutlineCheckCircle, HiOutlineMail } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
+import { subscribeNewsletterApi } from '../api'
 import './ExitIntentPopup.css'
 
 const SESSION_KEY = 'kade_exit_popup_seen'
-const DELAY_MS = 40000 // 40 seconds fallback for mobile
+const DELAY_MS = 40000
 
 export default function ExitIntentPopup() {
   const [visible, setVisible] = useState(false)
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState(null) // null | 'loading' | 'success' | 'error'
+  const [errorMsg, setErrorMsg] = useState('')
   const { lang } = useLanguage()
 
   const show = useCallback(() => {
@@ -19,36 +22,45 @@ export default function ExitIntentPopup() {
   }, [])
 
   useEffect(() => {
-    // Don't show on contact or admin pages
     if (window.location.pathname === '/iletisim' || window.location.pathname === '/admin') return
-
-    // Desktop: exit intent on mouse leaving viewport top
-    const onMouseLeave = (e) => {
-      if (e.clientY < 5) show()
-    }
+    const onMouseLeave = (e) => { if (e.clientY < 5) show() }
     document.addEventListener('mouseleave', onMouseLeave)
-
-    // Mobile/fallback: show after DELAY_MS
     const timer = setTimeout(show, DELAY_MS)
-
-    return () => {
-      document.removeEventListener('mouseleave', onMouseLeave)
-      clearTimeout(timer)
-    }
+    return () => { document.removeEventListener('mouseleave', onMouseLeave); clearTimeout(timer) }
   }, [show])
 
   const close = () => setVisible(false)
 
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!email || !email.includes('@')) {
+      setErrorMsg(lang === 'tr' ? 'Geçerli bir e-posta girin' : 'Enter a valid email')
+      setStatus('error')
+      return
+    }
+    setStatus('loading')
+    setErrorMsg('')
+    try {
+      await subscribeNewsletterApi(email)
+      setStatus('success')
+    } catch (err) {
+      setErrorMsg(err.message || (lang === 'tr' ? 'Bir hata oluştu' : 'An error occurred'))
+      setStatus('error')
+    }
+  }
+
   const benefits = lang === 'tr'
     ? [
-        'Rakip analizi ve sektör karşılaştırması',
-        'Büyüme fırsatları ve aksiyon planı',
-        'Reklam bütçesi optimizasyon önerileri',
+        'Platform bazlı içerik stratejileri',
+        'En iyi paylaşım saatleri ve taktikleri',
+        'Etkileşim artırma formülleri',
+        'Aylık içerik takvimi şablonu',
       ]
     : [
-        'Competitor analysis & industry benchmarks',
-        'Growth opportunities & action plan',
-        'Ad budget optimization suggestions',
+        'Platform-specific content strategies',
+        'Best posting times and tactics',
+        'Engagement boosting formulas',
+        'Monthly content calendar template',
       ]
 
   return (
@@ -73,51 +85,84 @@ export default function ExitIntentPopup() {
               <HiOutlineX size={20} />
             </button>
 
-            <div className="exit-icon">
-              <HiOutlineLightningBolt size={32} />
-            </div>
+            {status === 'success' ? (
+              <div className="exit-success">
+                <div className="exit-success-icon">
+                  <HiOutlineCheckCircle size={48} />
+                </div>
+                <h2>{lang === 'tr' ? 'Rehberiniz Yolda!' : 'Your Guide is On the Way!'}</h2>
+                <p>
+                  {lang === 'tr'
+                    ? 'Sosyal Medya Büyüme Rehberi e-posta adresinize gönderilecek. Ayrıca her hafta dijital pazarlama ipuçları alacaksınız.'
+                    : 'The Social Media Growth Guide will be sent to your email. You\'ll also receive weekly digital marketing tips.'}
+                </p>
+                <button className="btn btn-primary" onClick={close} style={{ marginTop: 16 }}>
+                  {lang === 'tr' ? 'Harika, Teşekkürler!' : 'Great, Thanks!'}
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="exit-icon">
+                  <HiOutlineDownload size={32} />
+                </div>
 
-            <div className="exit-badge">
-              {lang === 'tr' ? '✨ Tamamen Ücretsiz' : '✨ Completely Free'}
-            </div>
+                <div className="exit-badge">
+                  {lang === 'tr' ? '📘 Ücretsiz PDF Rehber' : '📘 Free PDF Guide'}
+                </div>
 
-            <h2 className="exit-title">
-              {lang === 'tr'
-                ? 'Markanızın Dijital Potansiyelini Keşfedin'
-                : 'Discover Your Brand\'s Digital Potential'}
-            </h2>
-            <p className="exit-desc">
-              {lang === 'tr'
-                ? '10+ markaya güç veren uzman ekibimiz, sosyal medya hesaplarınızı analiz edip size özel bir büyüme yol haritası oluştursun.'
-                : 'Our expert team, powering 10+ brands, will analyze your social media accounts and create a custom growth roadmap for you.'}
-            </p>
+                <h2 className="exit-title">
+                  {lang === 'tr'
+                    ? '2025 Sosyal Medya Büyüme Rehberi'
+                    : '2025 Social Media Growth Guide'}
+                </h2>
+                <p className="exit-desc">
+                  {lang === 'tr'
+                    ? '10+ markayı büyüten stratejilerimizi bir araya getirdik. Instagram, TikTok ve LinkedIn için kanıtlanmış büyüme taktikleri.'
+                    : 'We compiled the strategies that grew 10+ brands. Proven growth tactics for Instagram, TikTok, and LinkedIn.'}
+                </p>
 
-            <ul className="exit-benefits">
-              {benefits.map((b, i) => (
-                <li key={i}>
-                  <HiOutlineCheckCircle size={16} />
-                  <span>{b}</span>
-                </li>
-              ))}
-            </ul>
+                <ul className="exit-benefits">
+                  {benefits.map((b, i) => (
+                    <li key={i}>
+                      <HiOutlineCheckCircle size={16} />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
 
-            <div className="exit-actions">
-              <Link to="/iletisim" className="btn btn-primary exit-cta" onClick={close}>
-                {lang === 'tr' ? 'Ücretsiz Analiz Talep Et' : 'Request Free Analysis'}
-                <HiOutlineArrowRight size={18} />
-              </Link>
-              <button className="exit-dismiss" onClick={close}>
-                {lang === 'tr' ? 'Şimdi değil, teşekkürler' : 'Not now, thanks'}
-              </button>
-            </div>
+                <form className="exit-email-form" onSubmit={handleSubmit}>
+                  <div className="exit-input-row">
+                    <div className="exit-input-wrapper">
+                      <HiOutlineMail size={18} />
+                      <input
+                        type="email"
+                        placeholder={lang === 'tr' ? 'E-posta adresiniz' : 'Your email address'}
+                        value={email}
+                        onChange={(e) => { setEmail(e.target.value); setStatus(null) }}
+                      />
+                    </div>
+                    <button type="submit" className="btn btn-primary exit-cta" disabled={status === 'loading'}>
+                      {status === 'loading'
+                        ? (lang === 'tr' ? 'Gönderiliyor...' : 'Sending...')
+                        : (lang === 'tr' ? 'Ücretsiz İndir' : 'Download Free')}
+                      <HiOutlineDownload size={16} />
+                    </button>
+                  </div>
+                  {status === 'error' && <p className="exit-error">{errorMsg}</p>}
+                </form>
 
-            <p className="exit-note">
-              {lang === 'tr' ? '24 saat içinde geri dönüş garantisi • Taahhüt yok' : '24-hour response guarantee • No commitment'}
-            </p>
+                <button className="exit-dismiss" onClick={close}>
+                  {lang === 'tr' ? 'Şimdi değil, teşekkürler' : 'Not now, thanks'}
+                </button>
+
+                <p className="exit-note">
+                  {lang === 'tr' ? 'Spam göndermiyoruz • İstediğiniz zaman abonelikten çıkın' : 'No spam • Unsubscribe anytime'}
+                </p>
+              </>
+            )}
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
   )
 }
-

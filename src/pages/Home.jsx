@@ -122,7 +122,63 @@ export default function Home() {
     keywords: 'sosyal medya ajansı istanbul, dijital pazarlama ajansı, instagram yönetimi, tiktok yönetimi, sosyal medya yönetimi, içerik üretimi ajansı, kade media',
     path: '/',
   })
-  
+
+  // FAQ Schema Markup (Google Rich Snippets)
+  useEffect(() => {
+    const faqItems = dynamicFaq?.[lang]?.length > 0 ? dynamicFaq[lang] : faqData[lang]
+    const faqSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqItems.map(item => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      })),
+    }
+    const el = document.getElementById('jsonld-faq')
+    if (el) { el.textContent = JSON.stringify(faqSchema) } else {
+      const s = document.createElement('script')
+      s.id = 'jsonld-faq'
+      s.type = 'application/ld+json'
+      s.textContent = JSON.stringify(faqSchema)
+      document.head.appendChild(s)
+    }
+    return () => { document.getElementById('jsonld-faq')?.remove() }
+  }, [lang, dynamicFaq])
+
+  // LocalBusiness Schema
+  useEffect(() => {
+    const bizSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'ProfessionalService',
+      name: 'Kade Media',
+      description: 'İstanbul merkezli profesyonel sosyal medya yönetimi ve dijital pazarlama ajansı.',
+      url: 'https://kademedia.com.tr',
+      logo: 'https://kademedia.com.tr/logo.png',
+      telephone: '+905067293423',
+      email: 'hello@kademedia.com',
+      address: { '@type': 'PostalAddress', streetAddress: 'Biruni Teknopark', addressLocality: 'Zeytinburnu', addressRegion: 'İstanbul', addressCountry: 'TR' },
+      areaServed: { '@type': 'Country', name: 'Turkey' },
+      priceRange: '₺₺',
+      openingHours: 'Mo-Fr 09:00-18:00',
+      sameAs: [
+        'https://instagram.com/kademediacom',
+        'https://www.youtube.com/@kademediacom',
+        'https://tiktok.com/@kademediacom',
+        'https://www.linkedin.com/company/kademediaagency',
+      ],
+    }
+    const el = document.getElementById('jsonld-business')
+    if (el) { el.textContent = JSON.stringify(bizSchema) } else {
+      const s = document.createElement('script')
+      s.id = 'jsonld-business'
+      s.type = 'application/ld+json'
+      s.textContent = JSON.stringify(bizSchema)
+      document.head.appendChild(s)
+    }
+    return () => { document.getElementById('jsonld-business')?.remove() }
+  }, [])
+
   // Hero text from translations — API can override
   const heroDefaults = {
     title1: t('hero.title1'),

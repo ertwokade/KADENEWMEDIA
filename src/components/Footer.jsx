@@ -53,7 +53,7 @@ export default function Footer() {
       { name: t('nav.services'), path: '/hizmetler' },
       { name: t('nav.packages'), path: '/paketler' },
       { name: t('nav.partners'), path: '/partnerler' },
-      { name: t('nav.careers'), path: '/kariyer' },
+      { name: lang === 'tr' ? 'Başarı Hikayeleri' : 'Case Studies', path: '/basari-hikayeleri' },
       { name: t('nav.blog'), path: '/blog' },
       { name: t('nav.contact'), path: '/iletisim' },
     ],
@@ -61,6 +61,7 @@ export default function Footer() {
       { name: t('servicesSection.smm'), path: '/hizmetler' },
       { name: t('servicesSection.content'), path: '/hizmetler' },
       { name: t('servicesSection.ads'), path: '/hizmetler' },
+      { name: lang === 'tr' ? 'ROI Hesaplayıcı' : 'ROI Calculator', path: '/roi-hesaplayici' },
     ],
   }
 
