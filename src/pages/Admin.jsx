@@ -31,6 +31,7 @@ import {
   testSmtpApi, replyToMessageApi,
   getSiteSettingsApi, updateSiteSettingsApi,
   getPortfolioApi,
+  getRemindersApi, createReminderApi, updateReminderApi, deleteReminderApi, checkRemindersApi,
 } from '../api'
 import './Admin.css'
 
@@ -4057,6 +4058,288 @@ function NewsletterSection({ showToast }) {
   )
 }
 
+// ========== REMINDERS SECTION ==========
+function RemindersSection({ showToast }) {
+  const [reminders, setReminders] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [filter, setFilter] = useState('active')
+  const [checking, setChecking] = useState(false)
+  const [form, setForm] = useState({
+    title: '', description: '', remindAt: '', email: '',
+    priority: 'medium', category: '', repeat: 'none',
+  })
+
+  const loadReminders = useCallback(async () => {
+    try {
+      const data = await getRemindersApi(filter)
+      setReminders(Array.isArray(data) ? data : [])
+    } catch { setReminders([]) }
+    setLoading(false)
+  }, [filter])
+
+  useEffect(() => { loadReminders() }, [loadReminders])
+
+  const resetForm = () => {
+    setForm({ title: '', description: '', remindAt: '', email: '', priority: 'medium', category: '', repeat: 'none' })
+    setEditingId(null)
+    setShowForm(false)
+  }
+
+  const handleSubmit = async () => {
+    if (!form.title.trim() || !form.remindAt) {
+      showToast('Başlık ve tarih zorunludur', 'error')
+      return
+    }
+    try {
+      if (editingId) {
+        await updateReminderApi({ id: editingId, ...form })
+        showToast('Hatırlatıcı güncellendi', 'success')
+      } else {
+        await createReminderApi(form)
+        showToast('Hatırlatıcı oluşturuldu', 'success')
+      }
+      resetForm()
+      loadReminders()
+    } catch (err) {
+      showToast(err.message || 'Hata oluştu', 'error')
+    }
+  }
+
+  const handleEdit = (r) => {
+    setForm({
+      title: r.title || '',
+      description: r.description || '',
+      remindAt: r.remindAt ? new Date(r.remindAt).toISOString().slice(0, 16) : '',
+      email: r.email || '',
+      priority: r.priority || 'medium',
+      category: r.category || '',
+      repeat: r.repeat || 'none',
+    })
+    setEditingId(r._id)
+    setShowForm(true)
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm('Bu hatırlatıcıyı silmek istediğinize emin misiniz?')) return
+    try {
+      await deleteReminderApi(id)
+      showToast('Hatırlatıcı silindi', 'success')
+      loadReminders()
+    } catch (err) {
+      showToast(err.message || 'Hata oluştu', 'error')
+    }
+  }
+
+  const handleToggleStatus = async (r) => {
+    const newStatus = r.status === 'active' ? 'paused' : 'active'
+    try {
+      await updateReminderApi({ id: r._id, status: newStatus })
+      showToast(newStatus === 'active' ? 'Hatırlatıcı aktifleştirildi' : 'Hatırlatıcı duraklatıldı', 'success')
+      loadReminders()
+    } catch (err) {
+      showToast(err.message || 'Hata oluştu', 'error')
+    }
+  }
+
+  const handleCheckNow = async () => {
+    setChecking(true)
+    try {
+      const result = await checkRemindersApi()
+      showToast(`${result.sent || 0} hatırlatıcı e-posta gönderildi`, 'success')
+      loadReminders()
+    } catch (err) {
+      showToast(err.message || 'Kontrol hatası', 'error')
+    }
+    setChecking(false)
+  }
+
+  const priorityColors = { low: '#2ECC71', medium: '#eac321', high: '#E91E63' }
+  const priorityLabels = { low: 'Düşük', medium: 'Orta', high: 'Yüksek' }
+  const repeatLabels = { none: 'Tekrar Yok', daily: 'Günlük', weekly: 'Haftalık', monthly: 'Aylık' }
+  const statusLabels = { active: 'Aktif', paused: 'Duraklatıldı', sent: 'Gönderildi' }
+  const statusColors = { active: '#2ECC71', paused: '#eac321', sent: '#888' }
+
+  return (
+    <div className="admin-section">
+      <div className="section-header">
+        <div>
+          <h1>⏰ Hatırlatıcılar</h1>
+          <p>Hatırlatıcı oluşturun, zamanı gelince e-posta ile bildirim alın.</p>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-secondary" onClick={handleCheckNow} disabled={checking}>
+            {checking ? '⏳ Kontrol ediliyor...' : '🔄 Şimdi Kontrol Et'}
+          </button>
+          <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
+            <HiOutlinePlus size={16} /> Yeni Hatırlatıcı
+          </button>
+        </div>
+      </div>
+
+      {/* Filter */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        {['all', 'active', 'paused', 'sent'].map(f => (
+          <button
+            key={f}
+            className={`btn ${filter === f ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setFilter(f)}
+            style={{ fontSize: 13, padding: '6px 14px' }}
+          >
+            {f === 'all' ? 'Tümü' : f === 'active' ? 'Aktif' : f === 'paused' ? 'Duraklatıldı' : 'Gönderildi'}
+          </button>
+        ))}
+      </div>
+
+      {/* Form Modal */}
+      <AnimatePresence>
+        {showForm && (
+          <motion.div
+            className="modal-overlay"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => resetForm()}
+          >
+            <motion.div
+              className="modal-content glass-card"
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              style={{ maxWidth: 560, width: '95%' }}
+            >
+              <div className="modal-header">
+                <h2>{editingId ? 'Hatırlatıcı Düzenle' : 'Yeni Hatırlatıcı'}</h2>
+                <button className="modal-close" onClick={resetForm}><HiOutlineX size={20} /></button>
+              </div>
+              <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div className="form-group">
+                  <label>Başlık *</label>
+                  <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Örn: Müşteri toplantısı" />
+                </div>
+                <div className="form-group">
+                  <label>Açıklama</label>
+                  <textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Detaylar..." />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Hatırlatma Zamanı *</label>
+                    <input type="datetime-local" value={form.remindAt} onChange={e => setForm({ ...form, remindAt: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>Öncelik</label>
+                    <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}>
+                      <option value="low">🟢 Düşük</option>
+                      <option value="medium">🟡 Orta</option>
+                      <option value="high">🔴 Yüksek</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>E-posta (boş bırakılırsa varsayılan)</label>
+                    <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="ornek@mail.com" />
+                  </div>
+                  <div className="form-group">
+                    <label>Tekrar</label>
+                    <select value={form.repeat} onChange={e => setForm({ ...form, repeat: e.target.value })}>
+                      <option value="none">Tekrar Yok</option>
+                      <option value="daily">Günlük</option>
+                      <option value="weekly">Haftalık</option>
+                      <option value="monthly">Aylık</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Kategori</label>
+                  <input type="text" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Örn: Toplantı, Fatura, Kampanya..." />
+                </div>
+                <div className="admin-form-actions">
+                  <button className="btn btn-secondary" onClick={resetForm}>İptal</button>
+                  <button className="btn btn-primary" onClick={handleSubmit}>
+                    <HiOutlineSave size={16} /> {editingId ? 'Güncelle' : 'Oluştur'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* List */}
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Yükleniyor...</div>
+      ) : reminders.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>⏰</div>
+          <p>Henüz hatırlatıcı yok.</p>
+          <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={() => { resetForm(); setShowForm(true) }}>
+            <HiOutlinePlus size={16} /> İlk Hatırlatıcını Oluştur
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {reminders.map(r => {
+            const isOverdue = r.status === 'active' && new Date(r.remindAt) < new Date()
+            return (
+              <motion.div
+                key={r._id}
+                className="glass-card"
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                style={{ padding: 20, borderLeft: `3px solid ${priorityColors[r.priority] || '#eac321'}`, opacity: r.status === 'sent' ? 0.6 : 1 }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <h3 style={{ margin: 0, fontSize: 16, color: 'var(--text-primary)' }}>{r.title}</h3>
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: `${statusColors[r.status]}22`, color: statusColors[r.status] }}>
+                        {statusLabels[r.status] || r.status}
+                      </span>
+                      {r.repeat && r.repeat !== 'none' && (
+                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: '#6C63FF22', color: '#6C63FF' }}>
+                          🔁 {repeatLabels[r.repeat]}
+                        </span>
+                      )}
+                      {isOverdue && (
+                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: '#ff444422', color: '#ff4444' }}>
+                          Süresi Geçmiş
+                        </span>
+                      )}
+                    </div>
+                    {r.description && <p style={{ margin: '0 0 8px', fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{r.description}</p>}
+                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 13, color: 'var(--text-secondary)' }}>
+                      <span>📅 {new Date(r.remindAt).toLocaleString('tr-TR')}</span>
+                      <span style={{ color: priorityColors[r.priority] }}>● {priorityLabels[r.priority]}</span>
+                      {r.category && <span>🏷️ {r.category}</span>}
+                      <span>📧 {r.email}</span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {r.status !== 'sent' && (
+                      <button
+                        className="btn btn-secondary"
+                        style={{ fontSize: 12, padding: '4px 10px' }}
+                        onClick={() => handleToggleStatus(r)}
+                        title={r.status === 'active' ? 'Duraklatıcı' : 'Aktifleştir'}
+                      >
+                        {r.status === 'active' ? '⏸️' : '▶️'}
+                      </button>
+                    )}
+                    <button className="btn btn-secondary" style={{ fontSize: 12, padding: '4px 10px' }} onClick={() => handleEdit(r)}>
+                      <HiOutlinePencil size={14} />
+                    </button>
+                    <button className="btn btn-secondary" style={{ fontSize: 12, padding: '4px 10px', color: '#ff4444' }} onClick={() => handleDelete(r._id)}>
+                      <HiOutlineTrash size={14} />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ========== MAIN ADMIN COMPONENT ==========
 export default function Admin() {
   const [isAuth, setIsAuth] = useState(false)
@@ -4152,6 +4435,7 @@ export default function Admin() {
     { id: 'analytics', label: 'Analitik', icon: HiOutlineChartBar },
     { id: 'messages', label: 'İletişim & CRM', icon: HiOutlineMail, badge: unreadCount },
     { id: 'calendar', label: 'İçerik Takvimi', icon: HiOutlineCalendar },
+    { id: 'reminders', label: 'Hatırlatıcılar', icon: HiOutlineBell },
   ]
 
   const contentNavItems = [
@@ -4279,6 +4563,7 @@ export default function Admin() {
         {activeSection === 'users' && <UsersSection showToast={showToast} />}
         {activeSection === 'activity' && <ActivityLogSection />}
         {activeSection === 'newsletter' && <NewsletterSection showToast={showToast} />}
+        {activeSection === 'reminders' && <RemindersSection showToast={showToast} />}
         {activeSection === 'settings' && <SettingsSection showToast={showToast} />}
       </main>
 

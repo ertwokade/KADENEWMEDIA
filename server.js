@@ -70,6 +70,16 @@ app.post('/api/newsletter', apiRoute('newsletter.js'))
 // Chat (AI chatbot)
 app.post('/api/chat', apiRoute('chat.js'))
 
+// Reminders
+app.get('/api/reminders', apiRoute('reminders.js'))
+app.post('/api/reminders', apiRoute('reminders.js'))
+app.put('/api/reminders', apiRoute('reminders.js'))
+app.delete('/api/reminders', apiRoute('reminders.js'))
+
+// Cron: Reminder check (also callable manually)
+app.get('/api/cron-reminders', apiRoute('cron-reminders.js'))
+app.post('/api/cron-reminders', apiRoute('cron-reminders.js'))
+
 // Seed
 app.post('/api/seed', apiRoute('seed.js'))
 

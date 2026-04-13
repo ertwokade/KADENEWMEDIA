@@ -416,3 +416,46 @@ export async function updateSiteSettingsApi(data) {
   });
   return handleResponse(res);
 }
+
+// Reminders
+export async function getRemindersApi(status) {
+  const url = status && status !== 'all'
+    ? `${API_BASE}/reminders?status=${status}`
+    : `${API_BASE}/reminders`;
+  const res = await fetch(url, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function createReminderApi(data) {
+  const res = await fetch(`${API_BASE}/reminders`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateReminderApi(data) {
+  const res = await fetch(`${API_BASE}/reminders`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteReminderApi(id) {
+  const res = await fetch(`${API_BASE}/reminders?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function checkRemindersApi() {
+  const res = await fetch(`${API_BASE}/reminders?action=check`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
