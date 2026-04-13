@@ -47,8 +47,9 @@ app.post('/api/partners', apiRoute('partners.js'))
 app.put('/api/partners', apiRoute('partners.js'))
 app.delete('/api/partners', apiRoute('partners.js'))
 
-// Messages
+// Messages & Notes
 app.get('/api/messages', apiRoute('messages.js'))
+app.post('/api/messages', apiRoute('messages.js'))
 app.put('/api/messages', apiRoute('messages.js'))
 app.delete('/api/messages', apiRoute('messages.js'))
 
@@ -75,10 +76,6 @@ app.get('/api/reminders', apiRoute('reminders.js'))
 app.post('/api/reminders', apiRoute('reminders.js'))
 app.put('/api/reminders', apiRoute('reminders.js'))
 app.delete('/api/reminders', apiRoute('reminders.js'))
-
-// Cron: Reminder check (also callable manually)
-app.get('/api/cron-reminders', apiRoute('cron-reminders.js'))
-app.post('/api/cron-reminders', apiRoute('cron-reminders.js'))
 
 // Seed
 app.post('/api/seed', apiRoute('seed.js'))

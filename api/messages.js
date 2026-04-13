@@ -140,5 +140,36 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Notes (CRM) — ?action=notes ──
+  if (action === 'notes') {
+    const notesCol = db.collection('notes');
+
+    if (req.method === 'GET') {
+      const messageId = req.query?.messageId;
+      if (!messageId) return res.status(400).json({ error: 'messageId gerekli' });
+      const notes = await notesCol.find({ messageId }).sort({ createdAt: -1 }).toArray();
+      return res.status(200).json(notes);
+    }
+
+    if (req.method === 'POST') {
+      let body = req.body;
+      if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+      const { messageId, text, type } = body || {};
+      if (!messageId || !text?.trim()) return res.status(400).json({ error: 'messageId ve text gerekli' });
+      const note = { messageId, text: text.trim(), type: type || 'note', createdBy: user.username, createdAt: new Date() };
+      const result = await notesCol.insertOne(note);
+      return res.status(201).json({ ...note, _id: result.insertedId });
+    }
+
+    if (req.method === 'DELETE') {
+      const id = req.query?.id;
+      if (!id) return res.status(400).json({ error: 'id gerekli' });
+      await notesCol.deleteOne({ _id: new ObjectId(id) });
+      return res.status(200).json({ success: true });
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   return res.status(405).json({ error: 'Method not allowed' });
 }

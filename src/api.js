@@ -244,14 +244,14 @@ export async function subscribeNewsletterApi(email) {
 
 // Notes (CRM)
 export async function getNotesApi(messageId) {
-  const res = await fetch(`${API_BASE}/notes?messageId=${messageId}`, {
+  const res = await fetch(`${API_BASE}/messages?action=notes&messageId=${messageId}`, {
     headers: getAuthHeaders(),
   });
   return handleResponse(res);
 }
 
 export async function createNoteApi(data) {
-  const res = await fetch(`${API_BASE}/notes`, {
+  const res = await fetch(`${API_BASE}/messages?action=notes`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
@@ -260,7 +260,7 @@ export async function createNoteApi(data) {
 }
 
 export async function deleteNoteApi(id) {
-  const res = await fetch(`${API_BASE}/notes?id=${id}`, {
+  const res = await fetch(`${API_BASE}/messages?action=notes&id=${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });

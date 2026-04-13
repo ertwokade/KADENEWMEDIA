@@ -28,16 +28,17 @@ function escapeHtml(str) {
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const user = requireAuth(req);
-  if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
-
   const db = await getDb();
   const collection = db.collection('reminders');
   const action = req.query?.action;
 
-  // ── Cron: Zamanı gelen hatırlatıcıları gönder ──
+  // ── Cron: Zamanı gelen hatırlatıcıları gönder (auth VEYA CRON_SECRET) ──
   if (action === 'check') {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const user = requireAuth(req);
+    const cronSecret = process.env.CRON_SECRET;
+    const authHeader = req.headers.authorization;
+    const isCron = cronSecret && authHeader === `Bearer ${cronSecret}`;
+    if (!user && !isCron) return res.status(401).json({ error: 'Yetkisiz erişim' });
 
     const now = new Date();
     const pending = await collection.find({
@@ -114,6 +115,10 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ sent: sentCount, total: pending.length });
   }
+
+  // Diğer endpointler için auth zorunlu
+  const user = requireAuth(req);
+  if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
 
   // ── GET — Tüm hatırlatıcıları getir ──
   if (req.method === 'GET') {
