@@ -62,25 +62,38 @@ export default async function handler(req, res) {
         { upsert: true }
       );
 
-      // Track referrer source
-      if (referrer) {
-        let source = 'direct';
-        if (referrer.includes('google') || referrer.includes('bing') || referrer.includes('yahoo')) source = 'organic';
-        else if (referrer.includes('instagram') || referrer.includes('facebook') || referrer.includes('twitter') || referrer.includes('tiktok') || referrer.includes('linkedin')) source = 'social';
-        else if (referrer.trim()) source = 'referral';
+      // Track referrer source with platform-level detail
+      let source = 'direct';
+      let sourceDetail = null;
+      const ref = (referrer || '').toLowerCase();
 
-        await db.collection('traffic_sources').updateOne(
-          { date: today, source },
-          { $inc: { count: 1 }, $setOnInsert: { date: today, source } },
-          { upsert: true }
-        );
-      } else {
-        await db.collection('traffic_sources').updateOne(
-          { date: today, source: 'direct' },
-          { $inc: { count: 1 }, $setOnInsert: { date: today, source: 'direct' } },
-          { upsert: true }
-        );
+      if (ref.trim()) {
+        if (ref.includes('google.') || ref.includes('/search?') && ref.includes('google')) { source = 'organic'; sourceDetail = 'google'; }
+        else if (ref.includes('bing.com')) { source = 'organic'; sourceDetail = 'bing'; }
+        else if (ref.includes('yahoo.com')) { source = 'organic'; sourceDetail = 'yahoo'; }
+        else if (ref.includes('yandex.')) { source = 'organic'; sourceDetail = 'yandex'; }
+        else if (ref.includes('duckduckgo.com')) { source = 'organic'; sourceDetail = 'duckduckgo'; }
+        else if (ref.includes('instagram.com') || ref.includes('l.instagram.com')) { source = 'social'; sourceDetail = 'instagram'; }
+        else if (ref.includes('tiktok.com') || ref.includes('vm.tiktok.com')) { source = 'social'; sourceDetail = 'tiktok'; }
+        else if (ref.includes('facebook.com') || ref.includes('fb.com') || ref.includes('m.facebook.com')) { source = 'social'; sourceDetail = 'facebook'; }
+        else if (ref.includes('linkedin.com')) { source = 'social'; sourceDetail = 'linkedin'; }
+        else if (ref.includes('twitter.com') || ref.includes('t.co') || ref.includes('x.com')) { source = 'social'; sourceDetail = 'twitter'; }
+        else if (ref.includes('youtube.com') || ref.includes('youtu.be')) { source = 'social'; sourceDetail = 'youtube'; }
+        else if (ref.includes('whatsapp.com') || ref.includes('wa.me')) { source = 'social'; sourceDetail = 'whatsapp'; }
+        else {
+          source = 'referral';
+          try {
+            const u = new URL(referrer.startsWith('http') ? referrer : `https://${referrer}`);
+            sourceDetail = u.hostname.replace(/^www\./, '');
+          } catch { sourceDetail = referrer.slice(0, 100); }
+        }
       }
+
+      await db.collection('traffic_sources').updateOne(
+        { date: today, source, detail: sourceDetail },
+        { $inc: { count: 1 }, $setOnInsert: { date: today, source, detail: sourceDetail } },
+        { upsert: true }
+      );
 
       return res.status(200).json({ ok: true });
     } catch (err) {
@@ -135,22 +148,41 @@ export default async function handler(req, res) {
         ])
         .toArray();
 
-      // Traffic sources
+      // Traffic sources — grouped with platform-level detail
       const sourceRaw = await db.collection('traffic_sources')
         .aggregate([
           { $match: { date: { $gte: startDate } } },
-          { $group: { _id: '$source', total: { $sum: '$count' } } },
+          { $group: { _id: { source: '$source', detail: '$detail' }, total: { $sum: '$count' } } },
           { $sort: { total: -1 } },
         ])
         .toArray();
 
-      const totalSource = sourceRaw.reduce((s, r) => s + r.total, 0) || 1;
-      const sources = sourceRaw.map(s => ({
-        name: { organic: 'Organik', social: 'Sosyal Medya', direct: 'Direkt', referral: 'Referans' }[s._id] || s._id,
-        key: s._id,
-        value: Math.round((s.total / totalSource) * 100),
-        count: s.total,
-      }));
+      // Group by source, collect details
+      const srcGroups = {};
+      for (const r of sourceRaw) {
+        const src = r._id.source || 'direct';
+        const det = r._id.detail || null;
+        if (!srcGroups[src]) srcGroups[src] = { total: 0, details: {} };
+        srcGroups[src].total += r.total;
+        if (det) {
+          srcGroups[src].details[det] = (srcGroups[src].details[det] || 0) + r.total;
+        }
+      }
+
+      const SOURCE_NAMES = { organic: 'Organik Arama', social: 'Sosyal Medya', direct: 'Direkt', referral: 'Referans' };
+      const totalSource = Object.values(srcGroups).reduce((s, g) => s + g.total, 0) || 1;
+
+      const sources = Object.entries(srcGroups)
+        .sort((a, b) => b[1].total - a[1].total)
+        .map(([key, group]) => ({
+          name: SOURCE_NAMES[key] || key,
+          key,
+          count: group.total,
+          value: Math.round((group.total / totalSource) * 100),
+          details: Object.entries(group.details)
+            .sort((a, b) => b[1] - a[1])
+            .map(([det, cnt]) => ({ key: det, name: det, count: cnt })),
+        }));
 
       const maxPage = pageRaw[0]?.total || 1;
       const pages = pageRaw.map(p => ({

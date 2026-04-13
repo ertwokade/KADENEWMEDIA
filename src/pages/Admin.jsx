@@ -3438,7 +3438,29 @@ function NotificationDropdown({ show, onClose }) {
 }
 
 // ========== ANALYTICS SECTION ==========
-const SOURCE_COLORS = { organic: '#2ECC71', social: '#6C63FF', direct: '#eac321', referral: '#E91E63', paid: '#FF9800', paid_social: '#9C27B0' }
+const SOURCE_META = {
+  organic:     { name: 'Organik Arama',   icon: '🔍', color: '#2ECC71', desc: 'Google, Bing, Yandex gibi arama motorlarından gelen ziyaretçiler' },
+  social:      { name: 'Sosyal Medya',    icon: '📱', color: '#6C63FF', desc: 'Instagram, TikTok, Facebook gibi sosyal platformlardan gelenler' },
+  direct:      { name: 'Direkt',          icon: '🔗', color: '#eac321', desc: "URL'yi doğrudan yazan, bookmark kullanan veya kaynağı bilinmeyen ziyaretçiler" },
+  referral:    { name: 'Referans',        icon: '🌐', color: '#E91E63', desc: 'Başka bir web sitesindeki linkten tıklayarak gelenler' },
+  paid:        { name: 'Ücretli Arama',   icon: '💰', color: '#FF9800', desc: 'Google Ads gibi ücretli arama reklamlarından gelenler' },
+  paid_social: { name: 'Ücretli Sosyal',  icon: '💎', color: '#9C27B0', desc: 'Meta Ads, TikTok Ads gibi sosyal medya reklamlarından gelenler' },
+}
+
+const DETAIL_META = {
+  google:     { name: 'Google',       color: '#4285F4', icon: '🔵' },
+  bing:       { name: 'Bing',         color: '#008373', icon: '🟢' },
+  yahoo:      { name: 'Yahoo',        color: '#720E9E', icon: '🟣' },
+  yandex:     { name: 'Yandex',       color: '#FF0000', icon: '🔴' },
+  duckduckgo: { name: 'DuckDuckGo',   color: '#DE5833', icon: '🦆' },
+  instagram:  { name: 'Instagram',    color: '#E4405F', icon: '📸' },
+  tiktok:     { name: 'TikTok',       color: '#69C9D0', icon: '🎵' },
+  facebook:   { name: 'Facebook',     color: '#1877F2', icon: '📘' },
+  linkedin:   { name: 'LinkedIn',     color: '#0A66C2', icon: '💼' },
+  twitter:    { name: 'X (Twitter)',  color: '#555',    icon: '✖️' },
+  youtube:    { name: 'YouTube',      color: '#FF0000', icon: '▶️' },
+  whatsapp:   { name: 'WhatsApp',     color: '#25D366', icon: '💬' },
+}
 
 function AnalyticsSection() {
   const [period, setPeriod] = useState('week')
@@ -3553,10 +3575,10 @@ function AnalyticsSection() {
             {dataSource === 'ga4' ? 'GA' : 'PV'}
           </div>
           <div className="stat-number">{loading ? '—' : totalVisits.toLocaleString('tr-TR')}</div>
-          <div className="stat-label">Toplam Sayfa Goruntuleme</div>
+          <div className="stat-label">Toplam Sayfa Görüntüleme</div>
           {growth !== null && !loading && (
             <div style={{ fontSize: '0.75rem', color: growth >= 0 ? '#2ECC71' : '#E91E63', marginTop: 4 }}>
-              {growth >= 0 ? '+' : ''}{growth}% onceki doneme gore
+              {growth >= 0 ? '+' : ''}{growth}% önceki döneme göre
             </div>
           )}
         </div>
@@ -3564,7 +3586,7 @@ function AnalyticsSection() {
           <div className="admin-stat-card">
             <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>AU</div>
             <div className="stat-number">{loading ? '—' : activeUsers}</div>
-            <div className="stat-label">Bugunki Aktif Kullanici</div>
+            <div className="stat-label">Bugünkü Aktif Kullanıcı</div>
           </div>
         )}
         <div className="admin-stat-card">
@@ -3575,25 +3597,25 @@ function AnalyticsSection() {
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>AV</div>
           <div className="stat-number">{loading ? '—' : dailyData.length > 0 ? Math.round(totalVisits / dailyData.length) : 0}</div>
-          <div className="stat-label">Gunluk Ortalama</div>
+          <div className="stat-label">Günlük Ortalama</div>
         </div>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>TP</div>
           <div className="stat-number">{loading ? '—' : pages[0]?.views.toLocaleString('tr-TR') || 0}</div>
-          <div className="stat-label">En Cok Ziyaret</div>
+          <div className="stat-label">En Çok Ziyaret</div>
           {pages[0] && <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{PAGE_NAMES[pages[0].path] || pages[0].path}</div>}
         </div>
       </div>
 
       {/* Bar Chart */}
       <div className="admin-form" style={{ marginTop: 24 }}>
-        <h3>Sayfa Goruntuleme Trendi ({period === 'week' ? 'Son 7 Gun' : 'Son 30 Gun'})</h3>
+        <h3>Sayfa Görüntüleme Trendi ({period === 'week' ? 'Son 7 Gün' : 'Son 30 Gün'})</h3>
         {loading ? (
-          <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)' }}>Veriler aliniyor...</div>
+          <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)' }}>Veriler alınıyor...</div>
         ) : dailyData.length === 0 || totalVisits === 0 ? (
           <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', flexDirection: 'column', gap: 8 }}>
-            <span style={{ fontSize: '2rem' }}>-</span>
-            <span>Henuz ziyaret verisi yok — site ziyaret edildikce burada gorunecek</span>
+            <span style={{ fontSize: '2rem' }}>—</span>
+            <span>Henüz ziyaret verisi yok — site ziyaret edildikçe burada görünecek</span>
           </div>
         ) : (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 180, marginTop: 20, padding: '0 4px', overflowX: 'auto' }}>
@@ -3620,56 +3642,90 @@ function AnalyticsSection() {
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 20 }}>
-        {/* Popular Pages */}
-        <div className="admin-form">
-          <h3>En Cok Ziyaret Edilen Sayfalar</h3>
-          {loading ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Veriler aliniyor...</div>
-          : pages.length === 0 ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Henuz veri yok</div>
-          : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
-              {pages.map((p, i) => (
-                <div key={i}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{PAGE_NAMES[p.path] || p.path}</span>
-                    <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.views.toLocaleString('tr-TR')}</span>
-                  </div>
-                  <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
-                    <div style={{ width: `${p.percent}%`, height: '100%', background: dataSource === 'ga4' ? '#4285F4' : 'var(--accent)', borderRadius: 3, transition: 'width 0.6s ease' }} />
-                  </div>
+      {/* Popular Pages */}
+      <div className="admin-form" style={{ marginTop: 20 }}>
+        <h3>En Çok Ziyaret Edilen Sayfalar</h3>
+        {loading ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Veriler alınıyor...</div>
+        : pages.length === 0 ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Henüz veri yok</div>
+        : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+            {pages.map((p, i) => (
+              <div key={i}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{PAGE_NAMES[p.path] || p.path}</span>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.views.toLocaleString('tr-TR')} görüntüleme</span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ width: `${p.percent}%`, height: '100%', background: dataSource === 'ga4' ? '#4285F4' : 'var(--accent)', borderRadius: 3, transition: 'width 0.6s ease' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-        {/* Traffic Sources */}
-        <div className="admin-form">
-          <h3>Trafik Kaynaklari</h3>
-          {loading ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Veriler aliniyor...</div>
-          : sources.length === 0 ? <div style={{ color: 'var(--text-tertiary)', marginTop: 16 }}>Henuz veri yok</div>
-          : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
-              {sources.map((s, i) => {
-                const color = SOURCE_COLORS[s.key] || '#888'
-                return (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: color, flexShrink: 0 }} />
+      {/* Traffic Sources — detailed breakdown */}
+      <div className="admin-form" style={{ marginTop: 20 }}>
+        <div style={{ marginBottom: 20 }}>
+          <h3>Trafik Kaynakları</h3>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', marginTop: 4 }}>
+            Ziyaretçilerin nereden geldiği — platform bazında detaylı dağılım
+          </p>
+        </div>
+        {loading ? (
+          <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Veriler alınıyor...</div>
+        ) : sources.length === 0 ? (
+          <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Henüz trafik verisi yok</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {sources.map((s, i) => {
+              const meta = SOURCE_META[s.key] || { name: s.name, icon: '📊', color: '#888', desc: '' }
+              const hasDetails = s.details?.length > 0
+              return (
+                <div key={i} style={{ padding: '16px 18px', background: 'var(--bg-secondary)', borderRadius: 12, borderLeft: `3px solid ${meta.color}` }}>
+                  {/* Row header */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: '1.4rem', lineHeight: 1 }}>{meta.icon}</span>
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{s.name}</span>
-                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color }}>{s.count} (%{s.value})</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
+                        <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{meta.name}</span>
+                        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                          <span style={{ fontWeight: 700, color: meta.color, fontSize: '1rem' }}>%{s.value}</span>
+                          <span style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem' }}>{s.count.toLocaleString('tr-TR')} ziyaret</span>
+                        </div>
                       </div>
-                      <div style={{ height: 6, background: 'var(--bg-secondary)', borderRadius: 3, overflow: 'hidden' }}>
-                        <div style={{ width: `${s.value}%`, height: '100%', background: color, borderRadius: 3, transition: 'width 0.6s ease' }} />
+                      <p style={{ color: 'var(--text-tertiary)', fontSize: '0.73rem', margin: '0 0 8px' }}>{meta.desc}</p>
+                      {/* Progress bar */}
+                      <div style={{ height: 6, background: 'var(--bg-tertiary)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ width: `${s.value}%`, height: '100%', background: meta.color, borderRadius: 3, transition: 'width 0.7s ease' }} />
                       </div>
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
+                  {/* Platform/domain sub-details */}
+                  {hasDetails && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+                      {s.details.map((d, j) => {
+                        const dm = DETAIL_META[d.key] || { name: d.key, icon: '•', color: '#888' }
+                        return (
+                          <div key={j} style={{
+                            display: 'flex', alignItems: 'center', gap: 5,
+                            padding: '4px 10px', borderRadius: 20,
+                            background: `${dm.color}18`, border: `1px solid ${dm.color}30`,
+                            fontSize: '0.78rem',
+                          }}>
+                            <span style={{ fontSize: '0.9rem' }}>{dm.icon}</span>
+                            <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{dm.name}</span>
+                            <span style={{ color: dm.color, fontWeight: 700, marginLeft: 2 }}>{d.count.toLocaleString('tr-TR')}</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
     </div>
   )
