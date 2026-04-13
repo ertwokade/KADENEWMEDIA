@@ -326,7 +326,7 @@ a.contact-card-value:hover {
 .service-checkbox-item.checked {
   border-color: var(--primary);
   background: rgba(234, 195, 33, 0.08);
-  color: var(--text-primary);
+  color: var(--white);
 }
 
 .service-checkbox-item input[type="checkbox"] {
@@ -380,4 +380,24 @@ a.contact-card-value:hover {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* ===== Light Mode Contact ===== */
+[data-theme="light"] .contact-info h2,
+[data-theme="light"] .contact-form h3,
+[data-theme="light"] .contact-map-header h3 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .service-checkbox-item {
+  border-color: rgba(0, 0, 0, 0.10);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .checkbox-mark {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .job-info h3 {
+  color: #1A1715;
 }

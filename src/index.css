@@ -16,6 +16,8 @@
   --gray-lighter: #BBBBBB;
   --white: #FFFFFF;
   --white-dim: #F0F0F0;
+  --text-secondary: #888888;
+  --bg-primary: #0a0a0a;
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #d4b820 0%, #eac321 100%);
@@ -303,6 +305,8 @@ input, textarea {
   --gray-lighter: #3A3531;
   --white: #1A1715;
   --white-dim: #2C2825;
+  --text-secondary: #5C5753;
+  --bg-primary: #E8E2DC;
   --border-color: rgba(0, 0, 0, 0.07);
   --border-color-hover: rgba(234, 195, 33, 0.30);
   --shadow-glow: 0 4px 24px rgba(234, 195, 33, 0.08);

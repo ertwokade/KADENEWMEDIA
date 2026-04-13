@@ -198,3 +198,15 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== Light Mode Careers ===== */
+[data-theme="light"] .perk-card h4,
+[data-theme="light"] .job-info h3,
+[data-theme="light"] .job-requirements h4 {
+  color: #1A1715;
+}
+
+[data-theme="light"] .perk-card p,
+[data-theme="light"] .job-desc {
+  color: #4A4540;
+}
