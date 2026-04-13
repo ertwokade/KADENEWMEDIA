@@ -318,7 +318,7 @@ export default function PageHeroCanvas({ type = 'home' }) {
         height: '100vh',
         pointerEvents: 'none',
         zIndex: -1,
-        background: isLight ? '#F5F1EE' : '#0a0a0a',
+        background: isLight ? '#E8E2DC' : '#0a0a0a',
       }}
     />
   )

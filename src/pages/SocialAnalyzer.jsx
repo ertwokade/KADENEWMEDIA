@@ -18,8 +18,8 @@ import {
   FaTiktok,
   FaLinkedinIn,
   FaFacebookF,
-  FaTwitter,
 } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { submitAnalyzerLeadApi } from '../api'
@@ -34,7 +34,7 @@ const PLATFORMS = [
   { key: 'youtube', icon: FaYoutube, color: '#FF0000', label: 'YouTube', placeholder: 'https://youtube.com/@channel' },
   { key: 'linkedin', icon: FaLinkedinIn, color: '#0A66C2', label: 'LinkedIn', placeholder: 'https://linkedin.com/in/name' },
   { key: 'facebook', icon: FaFacebookF, color: '#1877F2', label: 'Facebook', placeholder: 'https://facebook.com/page' },
-  { key: 'twitter', icon: FaTwitter, color: '#1DA1F2', label: 'X (Twitter)', placeholder: 'https://x.com/username' },
+  { key: 'twitter', icon: FaXTwitter, color: '#000000', label: 'X', placeholder: 'https://x.com/username' },
 ]
 
 /* ─── Helpers ─── */
