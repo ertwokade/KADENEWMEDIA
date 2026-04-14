@@ -3419,7 +3419,7 @@ function NotificationDropdown({ show, onClose }) {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })))
   }
 
-  const typeIcons = { message: '✉️', calendar: '📅', system: '⚙️', info: 'ℹ️' }
+  const typeIcons = { message: '✉️', calendar: '📅', system: '⚙️', info: 'ℹ️', reminder: '⏰' }
 
   if (!show) return null
 
@@ -4390,7 +4390,21 @@ function RemindersSection({ showToast }) {
     setChecking(true)
     try {
       const result = await checkRemindersApi()
-      showToast(`${result.sent || 0} hatirlatici e-posta gonderildi`, 'success')
+      const parts = []
+      if (result.total === 0) {
+        parts.push('Bekleyen hatirlatici yok')
+      } else {
+        if (result.sent > 0) parts.push(`${result.sent} e-posta gonderildi`)
+        if (result.notifications > 0) parts.push(`${result.notifications} bildirim olusturuldu`)
+        if (result.sent === 0 && !result.smtpConfigured) parts.push('SMTP yapilandirilmamis — e-posta gonderilemedi')
+        if (result.sent === 0 && result.notifications === 0 && result.total > 0) parts.push(`${result.total} hatirlatici islendi`)
+      }
+      if (result.errors?.length) {
+        showToast(parts.join(' | ') + ' (hatalar var)', 'error')
+        console.warn('Reminder check errors:', result.errors)
+      } else {
+        showToast(parts.join(' | ') || 'Kontrol tamamlandi', 'success')
+      }
       loadReminders()
     } catch (err) {
       showToast(err.message || 'Kontrol hatasi', 'error')

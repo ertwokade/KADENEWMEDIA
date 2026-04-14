@@ -43,11 +43,19 @@ export default async function handler(req, res) {
 
   // ── Cron: Zamanı gelen hatırlatıcıları gönder (GET veya POST, auth VEYA CRON_SECRET) ──
   if (action === 'check') {
+    // Auth: JWT user OR cron
+    // Vercel Hobby cron sends a plain GET — no special headers.
+    // We accept: (1) valid JWT from admin, (2) CRON_SECRET via header/query, (3) any GET if no CRON_SECRET is set
     const user = requireAuth(req);
     const cronSecret = process.env.CRON_SECRET;
-    const authHeader = req.headers.authorization;
-    const isCron = cronSecret && authHeader === `Bearer ${cronSecret}`;
-    if (!user && !isCron) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    const authHeader = req.headers.authorization || req.headers.Authorization || '';
+    const isCronSecret = cronSecret && (
+      authHeader === `Bearer ${cronSecret}` ||
+      req.query?.secret === cronSecret
+    );
+    // If CRON_SECRET is not set, allow GET requests (Vercel Hobby cron compatibility)
+    const isOpenCron = !cronSecret && req.method === 'GET';
+    if (!user && !isCronSecret && !isOpenCron) return res.status(401).json({ error: 'Yetkisiz erişim' });
 
     try {
       const now = new Date();
@@ -56,10 +64,12 @@ export default async function handler(req, res) {
         remindAt: { $lte: now },
       }).toArray();
 
-      if (pending.length === 0) return res.status(200).json({ sent: 0 });
+      if (pending.length === 0) return res.status(200).json({ sent: 0, notifications: 0, total: 0, smtpConfigured: !!makeTransporter() });
 
       const transporter = makeTransporter();
       let sentCount = 0;
+      let notifCount = 0;
+      const errors = [];
 
       for (const reminder of pending) {
         const emails = getEmails(reminder);
@@ -102,12 +112,15 @@ export default async function handler(req, res) {
             });
             sentCount++;
           } catch (err) {
-            console.error('Reminder email failed:', err.message);
+            console.error('Reminder email failed:', reminder.title, err.message);
+            errors.push(`Email failed for "${reminder.title}": ${err.message}`);
           }
+        } else if (!transporter) {
+          errors.push(`SMTP not configured — skipped email for "${reminder.title}"`);
         }
 
         // Sistem içi bildirim oluştur (assignedUsers varsa)
-        if (reminder.assignedUsers && Array.isArray(reminder.assignedUsers)) {
+        if (reminder.assignedUsers && Array.isArray(reminder.assignedUsers) && reminder.assignedUsers.length > 0) {
           for (const userId of reminder.assignedUsers) {
             try {
               await createNotification(db, {
@@ -117,7 +130,11 @@ export default async function handler(req, res) {
                 message: reminder.description || 'Hatırlatıcı zamanı geldi.',
                 link: '/admin',
               });
-            } catch { /* ignore */ }
+              notifCount++;
+            } catch (err) {
+              console.error('Notification failed for user', userId, err.message);
+              errors.push(`Notification failed for user ${userId}: ${err.message}`);
+            }
           }
         }
 
@@ -140,7 +157,13 @@ export default async function handler(req, res) {
         }
       }
 
-      return res.status(200).json({ sent: sentCount, total: pending.length });
+      return res.status(200).json({
+        sent: sentCount,
+        notifications: notifCount,
+        total: pending.length,
+        smtpConfigured: !!transporter,
+        ...(errors.length > 0 ? { errors } : {}),
+      });
     } catch (err) {
       console.error('Reminder check error:', err);
       return res.status(500).json({ error: err.message });
