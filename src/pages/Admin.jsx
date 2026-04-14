@@ -924,43 +924,64 @@ function ContentSection({ showToast }) {
 }
 
 function HeroEditor({ data, onSave }) {
-  const [form, setForm] = useState(data)
+  const defaults = {
+    tr: { title1: 'Dijital Dunyada Markaniza', title2: 'Kademe Atlatiyoruz ⚡', subtitle: 'Kade Media olarak sosyal medya stratejileri, kreatif icerik uretimi ve dijital pazarlama cozumleriyle markanizi zirveye tasiyoruz.' },
+    en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
+  }
+  const ensureDefaults = (d) => ({
+    tr: { title1: d?.tr?.title1 || defaults.tr.title1, title2: d?.tr?.title2 || defaults.tr.title2, subtitle: d?.tr?.subtitle || defaults.tr.subtitle },
+    en: { title1: d?.en?.title1 || defaults.en.title1, title2: d?.en?.title2 || defaults.en.title2, subtitle: d?.en?.subtitle || defaults.en.subtitle },
+  })
+  const [form, setForm] = useState(() => ensureDefaults(data))
   const [langTab, setLangTab] = useState('tr')
 
-  useEffect(() => { setForm(data) }, [data])
+  useEffect(() => { setForm(ensureDefaults(data)) }, [data])
+
+  const handleSave = () => {
+    // Ensure both languages have values before saving
+    const toSave = ensureDefaults(form)
+    onSave(toSave)
+  }
+
   return (
     <div className="admin-form">
       <h3>Hero Section Metinleri</h3>
+      <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
+        Her iki dilde de doldurun. Bos birakilirsa varsayilan metin kullanilir.
+      </p>
       <div className="admin-tabs" style={{ marginBottom: 16 }}>
-        <button className={`admin-tab ${langTab === 'tr' ? 'active' : ''}`} onClick={() => setLangTab('tr')}>🇹🇷 Türkçe</button>
+        <button className={`admin-tab ${langTab === 'tr' ? 'active' : ''}`} onClick={() => setLangTab('tr')}>🇹🇷 Turkce</button>
         <button className={`admin-tab ${langTab === 'en' ? 'active' : ''}`} onClick={() => setLangTab('en')}>🇬🇧 English</button>
       </div>
       <div className="form-group">
-        <label>Ana Başlık (1. Satır)</label>
+        <label>{langTab === 'tr' ? 'Ana Baslik (1. Satir)' : 'Main Title (Line 1)'}</label>
         <input
           type="text"
           value={form[langTab]?.title1 || ''}
           onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], title1: e.target.value } })}
+          placeholder={defaults[langTab].title1}
         />
       </div>
       <div className="form-group">
-        <label>Ana Başlık (2. Satır - Renkli)</label>
+        <label>{langTab === 'tr' ? 'Ana Baslik (2. Satir - Renkli)' : 'Main Title (Line 2 - Highlighted)'}</label>
         <input
           type="text"
           value={form[langTab]?.title2 || ''}
           onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], title2: e.target.value } })}
+          placeholder={defaults[langTab].title2}
         />
       </div>
       <div className="form-group">
-        <label>Alt Açıklama</label>
+        <label>{langTab === 'tr' ? 'Alt Aciklama' : 'Subtitle'}</label>
         <textarea
           rows="3"
           value={form[langTab]?.subtitle || ''}
           onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], subtitle: e.target.value } })}
+          placeholder={defaults[langTab].subtitle}
         />
       </div>
       <div className="admin-form-actions">
-        <button className="btn btn-primary" onClick={() => onSave(form)}>
+        <button className="btn btn-primary" onClick={handleSave}>
           <HiOutlineSave size={16} /> Kaydet
         </button>
       </div>
@@ -3500,11 +3521,14 @@ function AnalyticsSection() {
     '/': 'Ana Sayfa', '/hizmetler': 'Hizmetler', '/paketler': 'Paketler',
     '/blog': 'Blog', '/iletisim': 'Iletisim', '/hakkimizda': 'Hakkimizda',
     '/ekip': 'Ekip', '/kariyer': 'Kariyer', '/partnerler': 'Partnerler', '/portfolio': 'Portfolio',
+    '/basari-hikayeleri': 'Basari Hikayeleri', '/roi-hesaplayici': 'ROI Hesaplayici',
+    '/kvkk': 'KVKK', '/gizlilik': 'Gizlilik', '/cerez-politikasi': 'Cerez Politikasi',
   }
 
   const formatLabel = (date) => {
     const d = new Date(date)
     if (period === 'week') return ['Pzt','Sal','Car','Per','Cum','Cmt','Paz'][d.getDay() === 0 ? 6 : d.getDay() - 1]
+    if (period === 'quarter') return `${d.getDate()}/${d.getMonth() + 1}`
     return `${d.getDate()}/${d.getMonth() + 1}`
   }
 
@@ -3546,8 +3570,9 @@ function AnalyticsSection() {
             {loading ? '...' : 'Yenile'}
           </button>
           <div className="admin-tabs" style={{ margin: 0 }}>
-            <button className={`admin-tab ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>Son 7 Gun</button>
-            <button className={`admin-tab ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>Son 30 Gun</button>
+            <button className={`admin-tab ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>7 Gun</button>
+            <button className={`admin-tab ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>30 Gun</button>
+            <button className={`admin-tab ${period === 'quarter' ? 'active' : ''}`} onClick={() => setPeriod('quarter')}>90 Gun</button>
           </div>
         </div>
       </div>
@@ -3575,10 +3600,10 @@ function AnalyticsSection() {
             {dataSource === 'ga4' ? 'GA' : 'PV'}
           </div>
           <div className="stat-number">{loading ? '—' : totalVisits.toLocaleString('tr-TR')}</div>
-          <div className="stat-label">Toplam Sayfa Görüntüleme</div>
+          <div className="stat-label">Toplam Sayfa Goruntuleme</div>
           {growth !== null && !loading && (
             <div style={{ fontSize: '0.75rem', color: growth >= 0 ? '#2ECC71' : '#E91E63', marginTop: 4 }}>
-              {growth >= 0 ? '+' : ''}{growth}% önceki döneme göre
+              {growth >= 0 ? '+' : ''}{growth}% onceki doneme gore
             </div>
           )}
         </div>
@@ -3586,7 +3611,7 @@ function AnalyticsSection() {
           <div className="admin-stat-card">
             <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>AU</div>
             <div className="stat-number">{loading ? '—' : activeUsers}</div>
-            <div className="stat-label">Bugünkü Aktif Kullanıcı</div>
+            <div className="stat-label">Bugunku Aktif Kullanici</div>
           </div>
         )}
         <div className="admin-stat-card">
@@ -3597,19 +3622,25 @@ function AnalyticsSection() {
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>AV</div>
           <div className="stat-number">{loading ? '—' : dailyData.length > 0 ? Math.round(totalVisits / dailyData.length) : 0}</div>
-          <div className="stat-label">Günlük Ortalama</div>
+          <div className="stat-label">Gunluk Ortalama</div>
         </div>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>TP</div>
           <div className="stat-number">{loading ? '—' : pages[0]?.views.toLocaleString('tr-TR') || 0}</div>
-          <div className="stat-label">En Çok Ziyaret</div>
+          <div className="stat-label">En Cok Ziyaret</div>
           {pages[0] && <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{PAGE_NAMES[pages[0].path] || pages[0].path}</div>}
+        </div>
+        <div className="admin-stat-card">
+          <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.10)', color: '#6C63FF' }}>PK</div>
+          <div className="stat-number">{loading ? '—' : (() => { const peak = dailyData.reduce((max, d) => d.count > max.count ? d : max, { count: 0, date: '' }); return peak.count > 0 ? peak.count.toLocaleString('tr-TR') : '—' })()}</div>
+          <div className="stat-label">En Yogun Gun</div>
+          {!loading && dailyData.length > 0 && (() => { const peak = dailyData.reduce((max, d) => d.count > max.count ? d : max, { count: 0, date: '' }); return peak.date ? <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{new Date(peak.date).toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' })}</div> : null })()}
         </div>
       </div>
 
       {/* Bar Chart */}
       <div className="admin-form" style={{ marginTop: 24 }}>
-        <h3>Sayfa Görüntüleme Trendi ({period === 'week' ? 'Son 7 Gün' : 'Son 30 Gün'})</h3>
+        <h3>Sayfa Goruntuleme Trendi ({period === 'week' ? 'Son 7 Gun' : period === 'month' ? 'Son 30 Gun' : 'Son 90 Gun'})</h3>
         {loading ? (
           <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)' }}>Veriler alınıyor...</div>
         ) : dailyData.length === 0 || totalVisits === 0 ? (
@@ -3664,69 +3695,174 @@ function AnalyticsSection() {
         )}
       </div>
 
-      {/* Traffic Sources — detailed breakdown */}
-      <div className="admin-form" style={{ marginTop: 20 }}>
-        <div style={{ marginBottom: 20 }}>
-          <h3>Trafik Kaynakları</h3>
-          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', marginTop: 4 }}>
-            Ziyaretçilerin nereden geldiği — platform bazında detaylı dağılım
-          </p>
+      {/* Traffic Sources — 2 column: donut + detailed list */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginTop: 20 }}>
+        {/* Donut Chart */}
+        <div className="admin-form" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+          <h3 style={{ marginBottom: 16, textAlign: 'center' }}>Kaynak Dagilimi</h3>
+          {!loading && sources.length > 0 ? (() => {
+            const r = 60, cx = 80, cy = 80, sw = 18
+            let offset = 0
+            const slices = sources.map(s => {
+              const meta = SOURCE_META[s.key] || { color: '#888' }
+              const pct = s.value / 100
+              const circumference = 2 * Math.PI * r
+              const dashLen = circumference * pct
+              const dashGap = circumference - dashLen
+              const slice = { dashLen, dashGap, offset: circumference * (offset / 100), color: meta.color, label: (SOURCE_META[s.key] || {}).name || s.name, pct: s.value }
+              offset += s.value
+              return slice
+            })
+            return (
+              <div style={{ position: 'relative' }}>
+                <svg width={160} height={160} viewBox="0 0 160 160">
+                  {slices.map((s, i) => (
+                    <circle
+                      key={i} cx={cx} cy={cy} r={r} fill="none"
+                      stroke={s.color} strokeWidth={sw}
+                      strokeDasharray={`${s.dashLen} ${s.dashGap}`}
+                      strokeDashoffset={-s.offset}
+                      style={{ transition: 'stroke-dasharray 0.6s ease, stroke-dashoffset 0.6s ease' }}
+                      transform={`rotate(-90 ${cx} ${cy})`}
+                    />
+                  ))}
+                  <text x={cx} y={cy - 6} textAnchor="middle" fill="var(--text-primary)" fontSize="18" fontWeight="700">{totalVisits.toLocaleString('tr-TR')}</text>
+                  <text x={cx} y={cy + 12} textAnchor="middle" fill="var(--text-tertiary)" fontSize="10">toplam</text>
+                </svg>
+              </div>
+            )
+          })() : <div style={{ color: 'var(--text-tertiary)', fontSize: '0.82rem' }}>{loading ? '...' : 'Veri yok'}</div>}
+          {!loading && sources.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12, width: '100%' }}>
+              {sources.map((s, i) => {
+                const meta = SOURCE_META[s.key] || { name: s.name, icon: '📊', color: '#888' }
+                return (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.78rem' }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: meta.color, flexShrink: 0 }} />
+                    <span style={{ flex: 1, color: 'var(--text-secondary)' }}>{meta.name}</span>
+                    <span style={{ fontWeight: 700, color: meta.color }}>%{s.value}</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
-        {loading ? (
-          <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Veriler alınıyor...</div>
-        ) : sources.length === 0 ? (
-          <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Henüz trafik verisi yok</div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {sources.map((s, i) => {
-              const meta = SOURCE_META[s.key] || { name: s.name, icon: '📊', color: '#888', desc: '' }
-              const hasDetails = s.details?.length > 0
-              return (
-                <div key={i} style={{ padding: '16px 18px', background: 'var(--bg-secondary)', borderRadius: 12, borderLeft: `3px solid ${meta.color}` }}>
-                  {/* Row header */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: '1.4rem', lineHeight: 1 }}>{meta.icon}</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
-                        <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{meta.name}</span>
-                        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                          <span style={{ fontWeight: 700, color: meta.color, fontSize: '1rem' }}>%{s.value}</span>
-                          <span style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem' }}>{s.count.toLocaleString('tr-TR')} ziyaret</span>
+
+        {/* Detailed Source List */}
+        <div className="admin-form">
+          <div style={{ marginBottom: 16 }}>
+            <h3>Trafik Kaynaklari</h3>
+            <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', marginTop: 4 }}>
+              Platform bazinda detayli dagilim
+            </p>
+          </div>
+          {loading ? (
+            <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Veriler aliniyor...</div>
+          ) : sources.length === 0 ? (
+            <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Henuz trafik verisi yok</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {sources.map((s, i) => {
+                const meta = SOURCE_META[s.key] || { name: s.name, icon: '📊', color: '#888', desc: '' }
+                const hasDetails = s.details?.length > 0
+                return (
+                  <div key={i} style={{ padding: '14px 16px', background: 'var(--bg-secondary)', borderRadius: 12, borderLeft: `3px solid ${meta.color}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>{meta.icon}</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
+                          <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.9rem' }}>{meta.name}</span>
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                            <span style={{ fontWeight: 700, color: meta.color, fontSize: '0.95rem' }}>%{s.value}</span>
+                            <span style={{ color: 'var(--text-tertiary)', fontSize: '0.75rem' }}>{s.count.toLocaleString('tr-TR')}</span>
+                          </div>
+                        </div>
+                        <div style={{ height: 5, background: 'var(--bg-tertiary)', borderRadius: 3, overflow: 'hidden', marginTop: 4 }}>
+                          <div style={{ width: `${s.value}%`, height: '100%', background: meta.color, borderRadius: 3, transition: 'width 0.7s ease' }} />
                         </div>
                       </div>
-                      <p style={{ color: 'var(--text-tertiary)', fontSize: '0.73rem', margin: '0 0 8px' }}>{meta.desc}</p>
-                      {/* Progress bar */}
-                      <div style={{ height: 6, background: 'var(--bg-tertiary)', borderRadius: 3, overflow: 'hidden' }}>
-                        <div style={{ width: `${s.value}%`, height: '100%', background: meta.color, borderRadius: 3, transition: 'width 0.7s ease' }} />
+                    </div>
+                    {hasDetails && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                        {s.details.map((d, j) => {
+                          const dm = DETAIL_META[d.key] || { name: d.key, icon: '•', color: '#888' }
+                          return (
+                            <div key={j} style={{
+                              display: 'flex', alignItems: 'center', gap: 4,
+                              padding: '3px 8px', borderRadius: 16,
+                              background: `${dm.color}15`, border: `1px solid ${dm.color}25`,
+                              fontSize: '0.75rem',
+                            }}>
+                              <span style={{ fontSize: '0.82rem' }}>{dm.icon}</span>
+                              <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{dm.name}</span>
+                              <span style={{ color: dm.color, fontWeight: 700 }}>{d.count.toLocaleString('tr-TR')}</span>
+                            </div>
+                          )
+                        })}
                       </div>
-                    </div>
+                    )}
                   </div>
-                  {/* Platform/domain sub-details */}
-                  {hasDetails && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-                      {s.details.map((d, j) => {
-                        const dm = DETAIL_META[d.key] || { name: d.key, icon: '•', color: '#888' }
-                        return (
-                          <div key={j} style={{
-                            display: 'flex', alignItems: 'center', gap: 5,
-                            padding: '4px 10px', borderRadius: 20,
-                            background: `${dm.color}18`, border: `1px solid ${dm.color}30`,
-                            fontSize: '0.78rem',
-                          }}>
-                            <span style={{ fontSize: '0.9rem' }}>{dm.icon}</span>
-                            <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{dm.name}</span>
-                            <span style={{ color: dm.color, fontWeight: 700, marginLeft: 2 }}>{d.count.toLocaleString('tr-TR')}</span>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
+                )
+              })}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Traffic Improvement Recommendations */}
+      {!loading && (
+        <div className="admin-form" style={{ marginTop: 20 }}>
+          <h3>Trafik Artirma Onerileri</h3>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', marginTop: 4, marginBottom: 16 }}>
+            Verilerinize gore onerilen aksiyonlar
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
+            {[
+              {
+                icon: '🔍', title: 'SEO Optimizasyonu', color: '#2ECC71',
+                desc: 'Blog yazilarina anahtar kelime odakli meta description ve baslik ekleyin. Her yazi icin hedef anahtar kelime belirleyin.',
+                action: 'Blog yazilarini SEO icin optimize edin',
+              },
+              {
+                icon: '📱', title: 'Sosyal Medya Paylasimi', color: '#6C63FF',
+                desc: 'Her yeni blog yazisini Instagram, TikTok ve LinkedIn\'de paylasin. Hikaye ve Reels formatinda icerik uretin.',
+                action: 'Haftalik sosyal medya takvimi olusturun',
+              },
+              {
+                icon: '📧', title: 'E-posta Pazarlama', color: '#E91E63',
+                desc: 'Newsletter abonelerine duzenlii icerik gonderin. Blog ozeti + CTA iceren haftalik e-posta kampanyasi baslatin.',
+                action: 'Otomatik e-posta serisi kurun',
+              },
+              {
+                icon: '🤝', title: 'Backlink ve Is Birligi', color: '#FF9800',
+                desc: 'Sektorel bloglarda misafir yazi yayin. Partner sayfalarindan karsilikli link alisveriside bulunun.',
+                action: 'Ayda 2-3 misafir yazi hedefleyin',
+              },
+              {
+                icon: '🎯', title: 'Google Ads', color: '#4285F4',
+                desc: 'Hedef anahtar kelimeler icin arama reklamlari verin. Marka aramalari icin koruyucu kampanya olusturun.',
+                action: 'Dusuk butceli test kampanyasi baslatin',
+              },
+              {
+                icon: '📊', title: 'Icerik Stratejisi', color: '#9C27B0',
+                desc: 'En cok ziyaret edilen konularda daha fazla icerik uretin. Uzun kuyruk anahtar kelimeleri hedefleyin.',
+                action: 'Populer konularda seri icerikler olusturun',
+              },
+            ].map((tip, i) => (
+              <div key={i} style={{ padding: '16px 18px', background: 'var(--bg-secondary)', borderRadius: 12, borderTop: `3px solid ${tip.color}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: '1.3rem' }}>{tip.icon}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.9rem' }}>{tip.title}</span>
+                </div>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.6, margin: '0 0 10px' }}>{tip.desc}</p>
+                <div style={{ fontSize: '0.72rem', padding: '4px 10px', background: `${tip.color}15`, color: tip.color, borderRadius: 6, display: 'inline-block', fontWeight: 600 }}>
+                  {tip.action}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -4140,9 +4276,11 @@ function RemindersSection({ showToast }) {
   const [editingId, setEditingId] = useState(null)
   const [filter, setFilter] = useState('active')
   const [checking, setChecking] = useState(false)
+  const [users, setUsers] = useState([])
+  const [emailInput, setEmailInput] = useState('')
   const [form, setForm] = useState({
-    title: '', description: '', remindAt: '', email: '',
-    priority: 'medium', category: '', repeat: 'none',
+    title: '', description: '', remindAt: '', emails: [],
+    assignedUsers: [], priority: 'medium', category: '', repeat: 'none',
   })
 
   const loadReminders = useCallback(async () => {
@@ -4155,54 +4293,85 @@ function RemindersSection({ showToast }) {
 
   useEffect(() => { loadReminders() }, [loadReminders])
 
+  useEffect(() => {
+    getUsersApi().then(data => setUsers(Array.isArray(data) ? data : [])).catch(() => {})
+  }, [])
+
   const resetForm = () => {
-    setForm({ title: '', description: '', remindAt: '', email: '', priority: 'medium', category: '', repeat: 'none' })
+    setForm({ title: '', description: '', remindAt: '', emails: [], assignedUsers: [], priority: 'medium', category: '', repeat: 'none' })
+    setEmailInput('')
     setEditingId(null)
     setShowForm(false)
   }
 
+  const addEmail = () => {
+    const email = emailInput.trim()
+    if (!email || !email.includes('@')) return
+    if (form.emails.includes(email)) { setEmailInput(''); return }
+    setForm({ ...form, emails: [...form.emails, email] })
+    setEmailInput('')
+  }
+
+  const removeEmail = (email) => {
+    setForm({ ...form, emails: form.emails.filter(e => e !== email) })
+  }
+
+  const toggleUser = (userId) => {
+    const current = form.assignedUsers || []
+    if (current.includes(userId)) {
+      setForm({ ...form, assignedUsers: current.filter(id => id !== userId) })
+    } else {
+      setForm({ ...form, assignedUsers: [...current, userId] })
+    }
+  }
+
   const handleSubmit = async () => {
     if (!form.title.trim() || !form.remindAt) {
-      showToast('Başlık ve tarih zorunludur', 'error')
+      showToast('Baslik ve tarih zorunludur', 'error')
       return
     }
     try {
       if (editingId) {
         await updateReminderApi({ id: editingId, ...form })
-        showToast('Hatırlatıcı güncellendi', 'success')
+        showToast('Hatirlatici guncellendi', 'success')
       } else {
         await createReminderApi(form)
-        showToast('Hatırlatıcı oluşturuldu', 'success')
+        showToast('Hatirlatici olusturuldu', 'success')
       }
       resetForm()
       loadReminders()
     } catch (err) {
-      showToast(err.message || 'Hata oluştu', 'error')
+      showToast(err.message || 'Hata olustu', 'error')
     }
   }
 
   const handleEdit = (r) => {
+    const existingEmails = r.emails && Array.isArray(r.emails) && r.emails.length > 0
+      ? r.emails
+      : r.email ? [r.email] : []
     setForm({
       title: r.title || '',
       description: r.description || '',
       remindAt: r.remindAt ? new Date(r.remindAt).toISOString().slice(0, 16) : '',
-      email: r.email || '',
+      emails: existingEmails,
+      assignedUsers: Array.isArray(r.assignedUsers) ? r.assignedUsers : [],
       priority: r.priority || 'medium',
       category: r.category || '',
       repeat: r.repeat || 'none',
     })
+    setEmailInput('')
     setEditingId(r._id)
     setShowForm(true)
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Bu hatırlatıcıyı silmek istediğinize emin misiniz?')) return
+    if (!confirm('Bu hatirlaticiyi silmek istediginize emin misiniz?')) return
     try {
       await deleteReminderApi(id)
-      showToast('Hatırlatıcı silindi', 'success')
+      showToast('Hatirlatici silindi', 'success')
       loadReminders()
     } catch (err) {
-      showToast(err.message || 'Hata oluştu', 'error')
+      showToast(err.message || 'Hata olustu', 'error')
     }
   }
 
@@ -4210,10 +4379,10 @@ function RemindersSection({ showToast }) {
     const newStatus = r.status === 'active' ? 'paused' : 'active'
     try {
       await updateReminderApi({ id: r._id, status: newStatus })
-      showToast(newStatus === 'active' ? 'Hatırlatıcı aktifleştirildi' : 'Hatırlatıcı duraklatıldı', 'success')
+      showToast(newStatus === 'active' ? 'Hatirlatici aktiflestirildi' : 'Hatirlatici duraklatildi', 'success')
       loadReminders()
     } catch (err) {
-      showToast(err.message || 'Hata oluştu', 'error')
+      showToast(err.message || 'Hata olustu', 'error')
     }
   }
 
@@ -4221,33 +4390,38 @@ function RemindersSection({ showToast }) {
     setChecking(true)
     try {
       const result = await checkRemindersApi()
-      showToast(`${result.sent || 0} hatırlatıcı e-posta gönderildi`, 'success')
+      showToast(`${result.sent || 0} hatirlatici e-posta gonderildi`, 'success')
       loadReminders()
     } catch (err) {
-      showToast(err.message || 'Kontrol hatası', 'error')
+      showToast(err.message || 'Kontrol hatasi', 'error')
     }
     setChecking(false)
   }
 
   const priorityColors = { low: '#2ECC71', medium: '#eac321', high: '#E91E63' }
-  const priorityLabels = { low: 'Düşük', medium: 'Orta', high: 'Yüksek' }
-  const repeatLabels = { none: 'Tekrar Yok', daily: 'Günlük', weekly: 'Haftalık', monthly: 'Aylık' }
-  const statusLabels = { active: 'Aktif', paused: 'Duraklatıldı', sent: 'Gönderildi' }
+  const priorityLabels = { low: 'Dusuk', medium: 'Orta', high: 'Yuksek' }
+  const repeatLabels = { none: 'Tekrar Yok', daily: 'Gunluk', weekly: 'Haftalik', monthly: 'Aylik' }
+  const statusLabels = { active: 'Aktif', paused: 'Duraklatildi', sent: 'Gonderildi' }
   const statusColors = { active: '#2ECC71', paused: '#eac321', sent: '#888' }
+
+  const getUserName = (userId) => {
+    const u = users.find(u => u._id === userId)
+    return u ? (u.displayName || u.username) : userId
+  }
 
   return (
     <div className="admin-section">
       <div className="section-header">
         <div>
-          <h1>⏰ Hatırlatıcılar</h1>
-          <p>Hatırlatıcı oluşturun, zamanı gelince e-posta ile bildirim alın.</p>
+          <h1>⏰ Hatirlaticilar</h1>
+          <p>Hatirlatici olusturun, zamani gelince e-posta ve sistem ici bildirim alin.</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn btn-secondary" onClick={handleCheckNow} disabled={checking}>
-            {checking ? '⏳ Kontrol ediliyor...' : '🔄 Şimdi Kontrol Et'}
+            {checking ? '⏳ Kontrol ediliyor...' : '🔄 Simdi Kontrol Et'}
           </button>
           <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
-            <HiOutlinePlus size={16} /> Yeni Hatırlatıcı
+            <HiOutlinePlus size={16} /> Yeni Hatirlatici
           </button>
         </div>
       </div>
@@ -4261,7 +4435,7 @@ function RemindersSection({ showToast }) {
             onClick={() => setFilter(f)}
             style={{ fontSize: 13, padding: '6px 14px' }}
           >
-            {f === 'all' ? 'Tümü' : f === 'active' ? 'Aktif' : f === 'paused' ? 'Duraklatıldı' : 'Gönderildi'}
+            {f === 'all' ? 'Tumu' : f === 'active' ? 'Aktif' : f === 'paused' ? 'Duraklatildi' : 'Gonderildi'}
           </button>
         ))}
       </div>
@@ -4278,58 +4452,120 @@ function RemindersSection({ showToast }) {
               className="modal-content glass-card"
               initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              style={{ maxWidth: 560, width: '95%' }}
+              style={{ maxWidth: 620, width: '95%' }}
             >
               <div className="modal-header">
-                <h2>{editingId ? 'Hatırlatıcı Düzenle' : 'Yeni Hatırlatıcı'}</h2>
+                <h2>{editingId ? 'Hatirlatici Duzenle' : 'Yeni Hatirlatici'}</h2>
                 <button className="modal-close" onClick={resetForm}><HiOutlineX size={20} /></button>
               </div>
-              <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '70vh', overflowY: 'auto' }}>
                 <div className="form-group">
-                  <label>Başlık *</label>
-                  <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Örn: Müşteri toplantısı" />
+                  <label>Baslik *</label>
+                  <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Orn: Musteri toplantisi" />
                 </div>
                 <div className="form-group">
-                  <label>Açıklama</label>
+                  <label>Aciklama</label>
                   <textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Detaylar..." />
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Hatırlatma Zamanı *</label>
+                    <label>Hatirlatma Zamani *</label>
                     <input type="datetime-local" value={form.remindAt} onChange={e => setForm({ ...form, remindAt: e.target.value })} />
                   </div>
                   <div className="form-group">
-                    <label>Öncelik</label>
+                    <label>Oncelik</label>
                     <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}>
-                      <option value="low">🟢 Düşük</option>
+                      <option value="low">🟢 Dusuk</option>
                       <option value="medium">🟡 Orta</option>
-                      <option value="high">🔴 Yüksek</option>
+                      <option value="high">🔴 Yuksek</option>
                     </select>
                   </div>
                 </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>E-posta (boş bırakılırsa varsayılan)</label>
-                    <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="ornek@mail.com" />
+
+                {/* Multiple Emails */}
+                <div className="form-group">
+                  <label>E-posta Alicilari (birden fazla eklenebilir)</label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      type="email"
+                      value={emailInput}
+                      onChange={e => setEmailInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addEmail() } }}
+                      placeholder="ornek@mail.com — Enter ile ekle"
+                      style={{ flex: 1 }}
+                    />
+                    <button type="button" className="btn btn-secondary" onClick={addEmail} style={{ padding: '6px 14px', whiteSpace: 'nowrap' }}>
+                      <HiOutlinePlus size={14} /> Ekle
+                    </button>
                   </div>
+                  {form.emails.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                      {form.emails.map(email => (
+                        <span key={email} style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px',
+                          background: 'var(--bg-tertiary, #1a1a2e)', borderRadius: 16, fontSize: 13, color: 'var(--text-primary)',
+                          border: '1px solid var(--border-color, #333)',
+                        }}>
+                          📧 {email}
+                          <button
+                            type="button"
+                            onClick={() => removeEmail(email)}
+                            style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', padding: 0, fontSize: 14, lineHeight: 1, display: 'flex' }}
+                          >
+                            <HiOutlineX size={14} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <span style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+                    Bos birakilirsa varsayilan e-posta adresine gonderilir.
+                  </span>
+                </div>
+
+                {/* Assigned Users for In-App Notifications */}
+                {users.length > 0 && (
+                  <div className="form-group">
+                    <label>Sistem Ici Bildirim Alacak Kullanicilar</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 150, overflowY: 'auto', padding: 8, background: 'var(--bg-tertiary, #1a1a2e)', borderRadius: 8, border: '1px solid var(--border-color, #333)' }}>
+                      {users.map(u => (
+                        <label key={u._id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'var(--text-primary)' }}>
+                          <input
+                            type="checkbox"
+                            checked={(form.assignedUsers || []).includes(u._id)}
+                            onChange={() => toggleUser(u._id)}
+                            style={{ accentColor: '#eac321' }}
+                          />
+                          <span>{u.displayName || u.username}</span>
+                          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>({u.role || 'user'})</span>
+                        </label>
+                      ))}
+                    </div>
+                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+                      Secilen kullanicilar zamani gelince sistem ici bildirim alir.
+                    </span>
+                  </div>
+                )}
+
+                <div className="form-row">
                   <div className="form-group">
                     <label>Tekrar</label>
                     <select value={form.repeat} onChange={e => setForm({ ...form, repeat: e.target.value })}>
                       <option value="none">Tekrar Yok</option>
-                      <option value="daily">Günlük</option>
-                      <option value="weekly">Haftalık</option>
-                      <option value="monthly">Aylık</option>
+                      <option value="daily">Gunluk</option>
+                      <option value="weekly">Haftalik</option>
+                      <option value="monthly">Aylik</option>
                     </select>
                   </div>
-                </div>
-                <div className="form-group">
-                  <label>Kategori</label>
-                  <input type="text" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Örn: Toplantı, Fatura, Kampanya..." />
+                  <div className="form-group">
+                    <label>Kategori</label>
+                    <input type="text" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Orn: Toplanti, Fatura, Kampanya..." />
+                  </div>
                 </div>
                 <div className="admin-form-actions">
-                  <button className="btn btn-secondary" onClick={resetForm}>İptal</button>
+                  <button className="btn btn-secondary" onClick={resetForm}>Iptal</button>
                   <button className="btn btn-primary" onClick={handleSubmit}>
-                    <HiOutlineSave size={16} /> {editingId ? 'Güncelle' : 'Oluştur'}
+                    <HiOutlineSave size={16} /> {editingId ? 'Guncelle' : 'Olustur'}
                   </button>
                 </div>
               </div>
@@ -4340,19 +4576,21 @@ function RemindersSection({ showToast }) {
 
       {/* List */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Yükleniyor...</div>
+        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Yukleniyor...</div>
       ) : reminders.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>⏰</div>
-          <p>Henüz hatırlatıcı yok.</p>
+          <p>Henuz hatirlatici yok.</p>
           <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={() => { resetForm(); setShowForm(true) }}>
-            <HiOutlinePlus size={16} /> İlk Hatırlatıcını Oluştur
+            <HiOutlinePlus size={16} /> Ilk Hatirlaticini Olustur
           </button>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {reminders.map(r => {
             const isOverdue = r.status === 'active' && new Date(r.remindAt) < new Date()
+            const displayEmails = (r.emails && r.emails.length > 0) ? r.emails : (r.email ? [r.email] : ['Varsayilan'])
+            const displayUsers = Array.isArray(r.assignedUsers) ? r.assignedUsers : []
             return (
               <motion.div
                 key={r._id}
@@ -4362,7 +4600,7 @@ function RemindersSection({ showToast }) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: 200 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                       <h3 style={{ margin: 0, fontSize: 16, color: 'var(--text-primary)' }}>{r.title}</h3>
                       <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: `${statusColors[r.status]}22`, color: statusColors[r.status] }}>
                         {statusLabels[r.status] || r.status}
@@ -4374,7 +4612,7 @@ function RemindersSection({ showToast }) {
                       )}
                       {isOverdue && (
                         <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: '#ff444422', color: '#ff4444' }}>
-                          Süresi Geçmiş
+                          Suresi Gecmis
                         </span>
                       )}
                     </div>
@@ -4383,8 +4621,17 @@ function RemindersSection({ showToast }) {
                       <span>📅 {new Date(r.remindAt).toLocaleString('tr-TR')}</span>
                       <span style={{ color: priorityColors[r.priority] }}>● {priorityLabels[r.priority]}</span>
                       {r.category && <span>🏷️ {r.category}</span>}
-                      <span>📧 {r.email}</span>
+                      <span>📧 {displayEmails.join(', ')}</span>
                     </div>
+                    {displayUsers.length > 0 && (
+                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                        {displayUsers.map(uid => (
+                          <span key={uid} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: '#eac32122', color: '#eac321' }}>
+                            👤 {getUserName(uid)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
                     {r.status !== 'sent' && (
@@ -4392,7 +4639,7 @@ function RemindersSection({ showToast }) {
                         className="btn btn-secondary"
                         style={{ fontSize: 12, padding: '4px 10px' }}
                         onClick={() => handleToggleStatus(r)}
-                        title={r.status === 'active' ? 'Duraklatıcı' : 'Aktifleştir'}
+                        title={r.status === 'active' ? 'Duraklat' : 'Aktiflestir'}
                       >
                         {r.status === 'active' ? '⏸️' : '▶️'}
                       </button>

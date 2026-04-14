@@ -112,8 +112,8 @@ export default function ExitIntentPopup() {
 
                 <h2 className="exit-title">
                   {lang === 'tr'
-                    ? '2025 Sosyal Medya Büyüme Rehberi'
-                    : '2025 Social Media Growth Guide'}
+                    ? '2026 Sosyal Medya Büyüme Rehberi'
+                    : '2026 Social Media Growth Guide'}
                 </h2>
                 <p className="exit-desc">
                   {lang === 'tr'

@@ -152,7 +152,7 @@ export default function Blog() {
               <motion.div className="blog-featured glass-card" whileHover={{ y: -4 }}>
                 <div className="blog-featured-image" style={{ background: `${featured.color}15` }}>
                   {featured.image && featured.image.startsWith('http') ? (
-                    <img src={featured.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={featured.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = `linear-gradient(135deg, ${featured.color}33, ${featured.color}11)` }} />
                   ) : (
                     <span>{featured.image}</span>
                   )}
@@ -188,7 +188,7 @@ export default function Blog() {
                   <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
                     <div className="blog-card-image" style={{ background: `${post.color}15` }}>
                       {post.image && post.image.startsWith('http') ? (
-                        <img src={post.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={post.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = `linear-gradient(135deg, ${post.color}33, ${post.color}11)` }} />
                       ) : (
                         <span>{post.image}</span>
                       )}

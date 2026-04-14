@@ -113,7 +113,7 @@ export default async function handler(req, res) {
 
       // Build date range
       const now = new Date();
-      const days = period === 'month' ? 30 : 7;
+      const days = period === 'quarter' ? 90 : period === 'month' ? 30 : 7;
       const dates = [];
       for (let i = days - 1; i >= 0; i--) {
         const d = new Date(now);
@@ -229,7 +229,7 @@ export default async function handler(req, res) {
       if (!token) return res.status(200).json({ configured: false, error: 'GA4 token alınamadı' });
 
       const period = req.query?.period || 'week';
-      const days = period === 'month' ? 30 : 7;
+      const days = period === 'quarter' ? 90 : period === 'month' ? 30 : 7;
       const startDate = `${days}daysAgo`;
 
       const [dailyReport, pageReport, sourceReport, prevReport, activeReport] = await Promise.all([
@@ -285,6 +285,8 @@ export default async function handler(req, res) {
         { loc: '/hizmetler/reklam-yonetimi', priority: '0.8', freq: 'monthly' },
         { loc: '/hizmetler/video-produksiyon', priority: '0.8', freq: 'monthly' },
         { loc: '/hizmetler/strateji-danismanlik', priority: '0.8', freq: 'monthly' },
+        { loc: '/basari-hikayeleri', priority: '0.7', freq: 'monthly' },
+        { loc: '/roi-hesaplayici', priority: '0.7', freq: 'monthly' },
         { loc: '/kvkk', priority: '0.3', freq: 'yearly' },
         { loc: '/gizlilik', priority: '0.3', freq: 'yearly' },
         { loc: '/cerez-politikasi', priority: '0.3', freq: 'yearly' },

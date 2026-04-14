@@ -137,7 +137,7 @@ export default function BlogDetail() {
                 style={{ background: `${post.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '240px', fontSize: '5rem', marginBottom: '32px', borderRadius: '16px' }}
               >
                 {post.image && post.image.startsWith('http') ? (
-                  <img src={post.image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
+                  <img src={post.image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = `linear-gradient(135deg, ${post.color}33, ${post.color}11)` }} />
                 ) : (
                   <span>{post.image}</span>
                 )}
@@ -213,7 +213,7 @@ export default function BlogDetail() {
                       <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
                         <div className="blog-card-image" style={{ background: `${p.color}15` }}>
                           {p.image && p.image.startsWith('http') ? (
-                            <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = `linear-gradient(135deg, ${p.color}33, ${p.color}11)` }} />
                           ) : (
                             <span>{p.image}</span>
                           )}

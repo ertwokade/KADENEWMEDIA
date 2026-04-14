@@ -100,13 +100,13 @@ export const partnersData = [
 export const blogPosts = [
   {
     id: 1,
-    slug: 'instagram-algoritma-2025-guncelleme',
-    titleTr: '2025 Instagram Algoritma Güncellemesi: Keşfet\'e Düşmenin Yeni Kuralları',
-    titleEn: '2025 Instagram Algorithm Update: New Rules for Getting on Explore',
-    excerptTr: 'Instagram, 2025\'te orijinal içeriklere öncelik veren büyük bir algoritma güncellemesi yaptı. Repost ve düşük kaliteli paylaşımlar artık geri plana atılıyor. İşte markanızın keşfet sayfasına düşmesi için bilmeniz gereken yeni kurallar ve stratejiler.',
-    excerptEn: 'Instagram rolled out a major algorithm update in 2025 prioritizing original content. Reposts and low-quality shares are now deprioritized. Here are the new rules and strategies your brand needs to know to land on the Explore page.',
-    contentTr: `<h2>Instagram Algoritması 2025'te Ne Değişti?</h2>
-<p>Instagram, 2025 başında gerçekleştirdiği algoritma güncellemesiyle içerik dağıtım mantığını köklü biçimde değiştirdi. En büyük dönüşüm, <strong>orijinal içeriklerin diğer hesapların paylaşımlarına göre 3 kat daha fazla erişim</strong> almasıdır.</p>
+    slug: 'instagram-algoritma-2026-guncelleme',
+    titleTr: '2026 Instagram Algoritma Güncellemesi: Keşfet\'e Düşmenin Yeni Kuralları',
+    titleEn: '2026 Instagram Algorithm Update: New Rules for Getting on Explore',
+    excerptTr: 'Instagram, 2026\'te orijinal içeriklere öncelik veren büyük bir algoritma güncellemesi yaptı. Repost ve düşük kaliteli paylaşımlar artık geri plana atılıyor. İşte markanızın keşfet sayfasına düşmesi için bilmeniz gereken yeni kurallar ve stratejiler.',
+    excerptEn: 'Instagram rolled out a major algorithm update in 2026 prioritizing original content. Reposts and low-quality shares are now deprioritized. Here are the new rules and strategies your brand needs to know to land on the Explore page.',
+    contentTr: `<h2>Instagram Algoritması 2026'te Ne Değişti?</h2>
+<p>Instagram, 2026 başında gerçekleştirdiği algoritma güncellemesiyle içerik dağıtım mantığını köklü biçimde değiştirdi. En büyük dönüşüm, <strong>orijinal içeriklerin diğer hesapların paylaşımlarına göre 3 kat daha fazla erişim</strong> almasıdır.</p>
 <h2>Yeni Algoritmada Öne Çıkan 5 Kural</h2>
 <ul>
 <li><strong>Özgün içerik önceliği:</strong> Repost, yeniden paylaşım ve kopyalı içerikler artık çok daha az dağıtım alıyor.</li>
@@ -119,9 +119,9 @@ export const blogPosts = [
 <p>Keşfet sayfası artık yalnızca takip ettiklerinizle aynı ilgi alanlarını paylaşan kullanıcılara içerik gösteriyor. Bu nedenle <strong>niche hedefleme</strong> kritik hale geldi.</p>
 <p>Paylaşımlarınızda şu unsurları bulundurun: net bir konu odağı, güçlü bir görsel kanca, ilk saniyeden itibaren değer sunan bir anlatı ve aksiyona yönlendiren bir son.</p>
 <h2>Sonuç</h2>
-<p>2025 Instagram algoritması, içerik kalitesini miktarın önüne koyuyor. Haftada 7 vasat içerik yerine 3 güçlü içerik üretmek artık çok daha mantıklı bir strateji. <a href="/hizmetler">Sosyal medya yönetimi hizmetlerimiz</a> hakkında bilgi almak için bize ulaşın.</p>`,
-    contentEn: `<h2>What Changed in the Instagram Algorithm in 2025?</h2>
-<p>Instagram fundamentally changed its content distribution logic with its early-2025 algorithm update. The biggest shift: <strong>original content now gets 3x more reach</strong> compared to reposts and reshared content.</p>
+<p>2026 Instagram algoritması, içerik kalitesini miktarın önüne koyuyor. Haftada 7 vasat içerik yerine 3 güçlü içerik üretmek artık çok daha mantıklı bir strateji. <a href="/hizmetler">Sosyal medya yönetimi hizmetlerimiz</a> hakkında bilgi almak için bize ulaşın.</p>`,
+    contentEn: `<h2>What Changed in the Instagram Algorithm in 2026?</h2>
+<p>Instagram fundamentally changed its content distribution logic with its early-2026 algorithm update. The biggest shift: <strong>original content now gets 3x more reach</strong> compared to reposts and reshared content.</p>
 <h2>5 Key Rules in the New Algorithm</h2>
 <ul>
 <li><strong>Original content priority:</strong> Reposts and copied content receive significantly less distribution.</li>
@@ -133,7 +133,7 @@ export const blogPosts = [
 <h2>Practical Steps to Land on the Explore Page</h2>
 <p>The Explore page now shows content to users who share interests with the accounts they follow. This makes <strong>niche targeting</strong> critical.</p>
 <h2>Conclusion</h2>
-<p>The 2025 Instagram algorithm puts content quality before quantity. Producing 3 strong pieces of content per week is now a far smarter strategy than 7 mediocre ones. Learn about our <a href="/hizmetler">social media management services</a>.</p>`,
+<p>The 2026 Instagram algorithm puts content quality before quantity. Producing 3 strong pieces of content per week is now a far smarter strategy than 7 mediocre ones. Learn about our <a href="/hizmetler">social media management services</a>.</p>`,
     category: 'Instagram',
     categoryEn: 'Instagram',
     date: '28 Mar 2026',
@@ -155,7 +155,7 @@ export const blogPosts = [
     image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
     color: '#6C63FF',
     contentTr: `<h2>Yapay Zeka İçerik Üretimini Nasıl Değiştirdi?</h2>
-<p>2025 itibarıyla sosyal medya içerik üretimi artık sadece insanların işi değil. <strong>ChatGPT, Midjourney ve OpenAI Sora</strong> gibi yapay zeka araçları, saatler alan işleri dakikalara indirdi. Peki bu araçları nasıl doğru kullanırsınız?</p>
+<p>2026 itibarıyla sosyal medya içerik üretimi artık sadece insanların işi değil. <strong>ChatGPT, Midjourney ve OpenAI Sora</strong> gibi yapay zeka araçları, saatler alan işleri dakikalara indirdi. Peki bu araçları nasıl doğru kullanırsınız?</p>
 
 <h2>ChatGPT ile Metin İçerik Üretimi</h2>
 <p>ChatGPT, sosyal medya açıklamaları, blog yazıları, hashtag önerileri ve reklam metinleri konusunda oldukça güçlü. Etkili kullanım için:</p>
@@ -176,7 +176,7 @@ export const blogPosts = [
 </ul>
 
 <h2>OpenAI Sora ile Video İçerik</h2>
-<p>Sora, metin açıklamalarından gerçekçi videolar oluşturabiliyor. Özellikle ürün tanıtımları, konsept videolar ve animasyon içerikler için devrim niteliğinde. 2025'te Türkiye'de de erişime açılan Sora, özellikle küçük işletmeler için büyük bir fırsat.</p>
+<p>Sora, metin açıklamalarından gerçekçi videolar oluşturabiliyor. Özellikle ürün tanıtımları, konsept videolar ve animasyon içerikler için devrim niteliğinde. 2026'te Türkiye'de de erişime açılan Sora, özellikle küçük işletmeler için büyük bir fırsat.</p>
 
 <h2>AI Araçlarını İş Akışına Entegre Etme</h2>
 <ol>
@@ -193,7 +193,7 @@ export const blogPosts = [
 <h2>Sonuç</h2>
 <p>AI araçları doğru kullanıldığında içerik üretim sürenizi %70'e kadar kısaltabilir ve maliyetleri düşürebilir. Ancak strateji, hedefleme ve marka kimliği konularında profesyonel destek hâlâ kritik. <a href="/iletisim">Ücretsiz keşif görüşmesi</a> ile AI destekli sosyal medya stratejinizi birlikte oluşturalım.</p>`,
     contentEn: `<h2>How AI Changed Content Creation</h2>
-<p>By 2025, social media content creation is no longer solely a human endeavor. <strong>ChatGPT, Midjourney, and OpenAI Sora</strong> have reduced hours of work to minutes. Here's how to use these tools effectively.</p>
+<p>By 2026, social media content creation is no longer solely a human endeavor. <strong>ChatGPT, Midjourney, and OpenAI Sora</strong> have reduced hours of work to minutes. Here's how to use these tools effectively.</p>
 
 <h2>ChatGPT for Written Content</h2>
 <p>ChatGPT excels at social media captions, blog posts, hashtag suggestions, and ad copy. For best results: define a role, specify your target audience, request specific formats, and set the tone of voice.</p>
@@ -221,10 +221,10 @@ export const blogPosts = [
     categoryEn: 'E-Commerce',
     date: '18 Mar 2026',
     readTime: 8,
-    image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=800&q=80',
     color: '#2ECC71',
     contentTr: `<h2>TikTok Shop Nedir?</h2>
-<p>TikTok Shop, kullanıcıların uygulamadan çıkmadan ürün satın alabileceği entegre e-ticaret özelliğidir. 2025 itibarıyla Türkiye pazarında da aktif olan TikTok Shop, özellikle genç tüketicilere ulaşmak için büyük bir fırsat sunuyor.</p>
+<p>TikTok Shop, kullanıcıların uygulamadan çıkmadan ürün satın alabileceği entegre e-ticaret özelliğidir. 2026 itibarıyla Türkiye pazarında da aktif olan TikTok Shop, özellikle genç tüketicilere ulaşmak için büyük bir fırsat sunuyor.</p>
 
 <h2>TikTok Shop'un Temel Özellikleri</h2>
 <ul>
@@ -281,8 +281,8 @@ export const blogPosts = [
   {
     id: 4,
     slug: 'kisa-video-stratejisi-reels-shorts-tiktok',
-    titleTr: 'Kısa Video Savaşları: Reels vs Shorts vs TikTok — 2025\'te Hangisine Yatırım Yapmalısınız?',
-    titleEn: 'Short Video Wars: Reels vs Shorts vs TikTok — Where Should You Invest in 2025?',
+    titleTr: 'Kısa Video Savaşları: Reels vs Shorts vs TikTok — 2026\'te Hangisine Yatırım Yapmalısınız?',
+    titleEn: 'Short Video Wars: Reels vs Shorts vs TikTok — Where Should You Invest in 2026?',
     excerptTr: 'Instagram Reels, YouTube Shorts ve TikTok arasındaki rekabet kızışıyor. Her platformun algoritması farklı çalışıyor ve farklı kitlelere ulaşıyor. Marka hedefinize göre hangi platforma öncelik vermeniz gerektiğini verilerle analiz ediyoruz.',
     excerptEn: 'The competition between Instagram Reels, YouTube Shorts, and TikTok is heating up. Each platform\'s algorithm works differently and reaches different audiences. We analyze which platform you should prioritize based on your brand goals, backed by data.',
     category: 'Video Stratejisi',
@@ -291,7 +291,7 @@ export const blogPosts = [
     readTime: 6,
     image: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800&q=80',
     color: '#FFD700',
-    contentTr: `<h2>Kısa Video Savaşları: 2025 Tablo</h2>
+    contentTr: `<h2>Kısa Video Savaşları: 2026 Tablo</h2>
 <p>Instagram Reels, YouTube Shorts ve TikTok — üç dev platform kısa video formatında rekabet ediyor. Her biri farklı kitleye, farklı algoritmaya ve farklı içerik tüketim alışkanlığına sahip. Markanız için hangisi doğru?</p>
 
 <h2>TikTok: Keşfedilebilirlik Şampiyonu</h2>
@@ -323,7 +323,7 @@ export const blogPosts = [
 
 <h2>Sonuç</h2>
 <p>Platform seçimi markanızın hedeflerine, kaynaklarınıza ve hedef kitlenize göre değişir. <a href="/iletisim">Ücretsiz strateji görüşmesi</a> ile size özel platform planı oluşturalım.</p>`,
-    contentEn: `<h2>Short Video Wars: 2025 Breakdown</h2>
+    contentEn: `<h2>Short Video Wars: 2026 Breakdown</h2>
 <p>Instagram Reels, YouTube Shorts, and TikTok — three giants competing in short video. Each has a different audience, algorithm, and content culture. Which is right for your brand?</p>
 
 <h2>TikTok: The Discoverability Champion</h2>
@@ -344,8 +344,8 @@ export const blogPosts = [
   {
     id: 5,
     slug: 'ugc-kullanici-icerigi-marka-guveni',
-    titleTr: 'UGC (Kullanıcı İçerikleri) ile Marka Güveni Oluşturma: 2025 Stratejileri',
-    titleEn: 'Building Brand Trust with UGC (User-Generated Content): 2025 Strategies',
+    titleTr: 'UGC (Kullanıcı İçerikleri) ile Marka Güveni Oluşturma: 2026 Stratejileri',
+    titleEn: 'Building Brand Trust with UGC (User-Generated Content): 2026 Strategies',
     excerptTr: 'Tüketicilerin %92\'si geleneksel reklamlardan çok kullanıcı içeriklerine güveniyor. UGC kampanyaları artık marka stratejisinin vazgeçilmez bir parçası. Mikro-topluluk iş birlikleri ve müşteri deneyimi paylaşımlarıyla otantik bir marka algısı nasıl oluşturulur, anlatıyoruz.',
     excerptEn: '92% of consumers trust user-generated content over traditional advertising. UGC campaigns are now an essential part of brand strategy. We explain how to build authentic brand perception through micro-community partnerships and customer experience sharing.',
     category: 'İçerik Stratejisi',
@@ -378,7 +378,7 @@ export const blogPosts = [
 <h3>4. UGC İçerikleri Kanallarınızda Paylaşın</h3>
 <p>Müşteri fotoğraflarını, yorumlarını ve videolarını kendi sosyal medya hesaplarınızda paylaşın. Her zaman izin alın ve kaynak gösterin — bu hem etik hem de güven artırıcı.</p>
 
-<h2>2025'te UGC Trendleri</h2>
+<h2>2026'te UGC Trendleri</h2>
 <ul>
 <li><strong>Video UGC:</strong> Müşteri yorumu videoları, unboxing ve "before/after" içerikler patlıyor</li>
 <li><strong>AI destekli UGC:</strong> Markalar gerçek müşteri ifadelerini AI ile optimize ediyor</li>
@@ -396,7 +396,7 @@ export const blogPosts = [
 <h2>How to Launch a UGC Campaign</h2>
 <p>Incentivize customers with tagging campaigns, contests, and discounts. Create a branded hashtag. Partner with micro-influencers (10K-100K followers) who deliver 7x higher engagement than mega-influencers. Always share customer content on your own channels with proper attribution.</p>
 
-<h2>2025 UGC Trends</h2>
+<h2>2026 UGC Trends</h2>
 <p>Video UGC (customer review videos, unboxing, before/after) is exploding. AI-assisted UGC optimization is rising. And B2B UGC on LinkedIn (success stories, reference videos) is gaining momentum.</p>
 
 <h2>Conclusion</h2>
@@ -405,8 +405,8 @@ export const blogPosts = [
   {
     id: 6,
     slug: 'meta-ads-optimizasyon-2026',
-    titleTr: 'Meta Ads 2025: Advantage+ Kampanyalar ve AI Hedefleme ile Reklam Bütçenizi 3x Verimli Kullanın',
-    titleEn: 'Meta Ads 2025: Use Advantage+ Campaigns & AI Targeting to 3x Your Ad Budget Efficiency',
+    titleTr: 'Meta Ads 2026: Advantage+ Kampanyalar ve AI Hedefleme ile Reklam Bütçenizi 3x Verimli Kullanın',
+    titleEn: 'Meta Ads 2026: Use Advantage+ Campaigns & AI Targeting to 3x Your Ad Budget Efficiency',
     excerptTr: 'Meta\'nın Advantage+ yapay zeka kampanyaları, reklam performansını dramatik şekilde artırıyor. Otomatik hedefleme, dinamik kreatif ve bütçe optimizasyonu ile reklam harcamalarınızdan maksimum verim almanın yollarını paylaşıyoruz.',
     excerptEn: 'Meta\'s Advantage+ AI campaigns are dramatically boosting ad performance. We share how to get maximum ROI from your ad spend with automated targeting, dynamic creatives, and budget optimization.',
     category: 'Reklam',
@@ -416,7 +416,7 @@ export const blogPosts = [
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
     color: '#9C27B0',
     contentTr: `<h2>Meta Advantage+ Nedir?</h2>
-<p>Meta'nın Advantage+ kampanyaları, yapay zeka destekli otomatik optimizasyon sistemidir. Hedefleme, kreatif seçimi ve bütçe dağılımı gibi kararları AI otomatik olarak alır. 2025'te bu sistem, manuel kampanyalara kıyasla ortalama <strong>%32 daha düşük edinim maliyeti</strong> sağlıyor.</p>
+<p>Meta'nın Advantage+ kampanyaları, yapay zeka destekli otomatik optimizasyon sistemidir. Hedefleme, kreatif seçimi ve bütçe dağılımı gibi kararları AI otomatik olarak alır. 2026'te bu sistem, manuel kampanyalara kıyasla ortalama <strong>%32 daha düşük edinim maliyeti</strong> sağlıyor.</p>
 
 <h2>Advantage+ Kampanya Türleri</h2>
 <ul>
@@ -438,7 +438,7 @@ export const blogPosts = [
 <h3>4. Kampanya Bütçesi Optimizasyonu (CBO)</h3>
 <p>Reklam seti bazında bütçe yerine kampanya bazında bütçe kullanın. AI, en iyi performans gösteren reklam setlerine otomatik olarak daha fazla bütçe yönlendirir.</p>
 
-<h2>Meta Ads 2025 için Önemli Güncellemeler</h2>
+<h2>Meta Ads 2026 için Önemli Güncellemeler</h2>
 <ul>
 <li><strong>AI Sandbox:</strong> Reklam kreatifleri için yeni AI araçları (arka plan kaldırma, görsel genişletme)</li>
 <li><strong>Advantage+ Kataloğu:</strong> Ürün kataloğunu AI otomatik optimize ediyor</li>
@@ -451,12 +451,12 @@ export const blogPosts = [
 <h2>Sonuç</h2>
 <p>Meta Advantage+ doğru kurgulandığında reklam bütçenizden 3 kat daha fazla verim almanızı sağlayabilir. Profesyonel Meta reklam yönetimi için <a href="/iletisim">bizimle iletişime geçin</a>.</p>`,
     contentEn: `<h2>What is Meta Advantage+?</h2>
-<p>Meta's Advantage+ campaigns use AI-powered automatic optimization for targeting, creative selection, and budget allocation. In 2025, this system delivers an average <strong>32% lower acquisition cost</strong> compared to manual campaigns.</p>
+<p>Meta's Advantage+ campaigns use AI-powered automatic optimization for targeting, creative selection, and budget allocation. In 2026, this system delivers an average <strong>32% lower acquisition cost</strong> compared to manual campaigns.</p>
 
 <h2>How to 3x Your Ad Budget Efficiency</h2>
 <p>Use broad audiences and let AI optimize. Upload 5-6 creative variations and enable dynamic creatives. Keep Meta Pixel and Conversion API active — especially critical for data quality post-iOS 14. Use Campaign Budget Optimization (CBO) instead of ad set-level budgets.</p>
 
-<h2>Key Meta Ads 2025 Updates</h2>
+<h2>Key Meta Ads 2026 Updates</h2>
 <p>AI Sandbox tools for creatives (background removal, image expansion), Advantage+ Catalog for AI-optimized product catalogs, and Threads ad integration.</p>
 
 <h2>Conclusion</h2>
@@ -584,21 +584,21 @@ export const blogPosts = [
   },
   {
     id: 10,
-    slug: 'dijital-pazarlama-2025-turkiye-rehberi',
-    titleTr: 'Dijital Pazarlama 2025 Türkiye Rehberi: Bütçenizi En Verimli Kullanmanın Yolları',
-    titleEn: '2025 Turkey Digital Marketing Guide: How to Use Your Budget Most Efficiently',
-    excerptTr: '2025 yılında Türkiye\'deki dijital pazarlama trendleri, kanal karşılaştırmaları ve bütçe dağılımı stratejileri. KOBİ\'lerden kurumsal markalara herkes için pratik rehber.',
-    excerptEn: 'Digital marketing trends in Turkey for 2025, channel comparisons and budget allocation strategies. A practical guide for everyone from SMBs to enterprise brands.',
+    slug: 'dijital-pazarlama-2026-turkiye-rehberi',
+    titleTr: 'Dijital Pazarlama 2026 Türkiye Rehberi: Bütçenizi En Verimli Kullanmanın Yolları',
+    titleEn: '2026 Turkey Digital Marketing Guide: How to Use Your Budget Most Efficiently',
+    excerptTr: '2026 yılında Türkiye\'deki dijital pazarlama trendleri, kanal karşılaştırmaları ve bütçe dağılımı stratejileri. KOBİ\'lerden kurumsal markalara herkes için pratik rehber.',
+    excerptEn: 'Digital marketing trends in Turkey for 2026, channel comparisons and budget allocation strategies. A practical guide for everyone from SMBs to enterprise brands.',
     category: 'Dijital Pazarlama',
     categoryEn: 'Digital Marketing',
     date: '28 Mar 2026',
     readTime: 10,
     image: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=800&q=80',
     color: '#2ECC71',
-    contentTr: `<h2>2025 Türkiye Dijital Pazarlama Ortamı</h2>
+    contentTr: `<h2>2026 Türkiye Dijital Pazarlama Ortamı</h2>
 <p>Türkiye, 85 milyon nüfusuyla Avrupa'nın en büyük dijital pazarlarından biri. İnternet penetrasyonu %83'ü geçti, sosyal medya kullanıcı sayısı 60 milyona yaklaştı. Bu tablo, markalar için hem büyük fırsat hem de yoğun rekabet anlamına geliyor.</p>
 
-<h2>2025 Türkiye'de Öne Çıkan Dijital Pazarlama Kanalları</h2>
+<h2>2026 Türkiye'de Öne Çıkan Dijital Pazarlama Kanalları</h2>
 
 <h3>1. Sosyal Medya (%40 bütçe pay önerisi)</h3>
 <p>Instagram, TikTok ve YouTube, Türkiye'de en etkili kanallar. B2C markalar için sosyal medya birincil kanal olmaya devam ediyor.</p>
@@ -622,7 +622,7 @@ export const blogPosts = [
 <li><strong>Aylık 25.000+ TL:</strong> Kapsamlı dijital strateji, video prodüksiyon, influencer iş birlikleri</li>
 </ul>
 
-<h2>2025 Türkiye'ye Özgü Trendler</h2>
+<h2>2026 Türkiye'ye Özgü Trendler</h2>
 <ul>
 <li><strong>TikTok patlaması:</strong> Türkiye, TikTok kullanımında Avrupa'da 1. sırada</li>
 <li><strong>Sosyal ticaret:</strong> Instagram Shopping ve TikTok Shop hızla büyüyor</li>
@@ -632,7 +632,7 @@ export const blogPosts = [
 
 <h2>Sonuç</h2>
 <p>Doğru kanal seçimi ve bütçe dağılımı, dijital pazarlama başarısının anahtarı. Markanıza özel bir dijital pazarlama stratejisi için <a href="/iletisim">ücretsiz danışmanlık</a> alın.</p>`,
-    contentEn: `<h2>2025 Turkey Digital Marketing Landscape</h2>
+    contentEn: `<h2>2026 Turkey Digital Marketing Landscape</h2>
 <p>Turkey, with 85 million people, is one of Europe's largest digital markets. Internet penetration exceeds 83% and social media users approach 60 million — enormous opportunity and intense competition for brands.</p>
 
 <h2>Key Channels and Budget Allocation</h2>
@@ -641,7 +641,7 @@ export const blogPosts = [
 <h2>Budget Guide for SMBs</h2>
 <p>5,000-10,000 TL/mo: 1-2 platforms with organic content + small ad budget. 10,000-25,000 TL/mo: Multi-platform management + performance marketing. 25,000+ TL/mo: Comprehensive digital strategy with video production and influencer partnerships.</p>
 
-<h2>Turkey-Specific 2025 Trends</h2>
+<h2>Turkey-Specific 2026 Trends</h2>
 <p>TikTok dominates (Turkey ranks #1 in Europe for TikTok usage), social commerce is booming, AI content tools are becoming standard, and video content gets 3x more reach than text on every platform.</p>
 
 <h2>Conclusion</h2>
@@ -650,8 +650,8 @@ export const blogPosts = [
   {
     id: 11,
     slug: 'sosyal-medya-reklam-fiyatlari-2026',
-    titleTr: 'Sosyal Medya Reklam Fiyatları 2025: Instagram, TikTok, YouTube Karşılaştırma',
-    titleEn: 'Social Media Ad Prices 2025: Instagram, TikTok, YouTube Comparison',
+    titleTr: 'Sosyal Medya Reklam Fiyatları 2026: Instagram, TikTok, YouTube Karşılaştırma',
+    titleEn: 'Social Media Ad Prices 2026: Instagram, TikTok, YouTube Comparison',
     excerptTr: 'Her platformda reklam vermek ne kadar tutuyor? CPC, CPM ve dönüşüm oranları karşılaştırması. Hangi platform hangi sektör için daha verimli?',
     excerptEn: 'How much does advertising cost on each platform? CPC, CPM and conversion rate comparisons. Which platform is more efficient for which industry?',
     category: 'Reklam',
@@ -660,10 +660,10 @@ export const blogPosts = [
     readTime: 8,
     image: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800&q=80',
     color: '#FF9800',
-    contentTr: `<h2>Sosyal Medya Reklam Piyasası 2025</h2>
-<p>Dijital reklam harcamaları her yıl artmaya devam ediyor. Peki hangi platformda reklam vermek ne kadar tutuyor ve hangi platform markanız için daha verimli? İşte 2025 Türkiye piyasasına özel detaylı karşılaştırma.</p>
+    contentTr: `<h2>Sosyal Medya Reklam Piyasası 2026</h2>
+<p>Dijital reklam harcamaları her yıl artmaya devam ediyor. Peki hangi platformda reklam vermek ne kadar tutuyor ve hangi platform markanız için daha verimli? İşte 2026 Türkiye piyasasına özel detaylı karşılaştırma.</p>
 
-<h2>Instagram Reklam Fiyatları 2025</h2>
+<h2>Instagram Reklam Fiyatları 2026</h2>
 <ul>
 <li><strong>CPM (1.000 gösterim başına):</strong> 15-35 TL</li>
 <li><strong>CPC (tıklama başına):</strong> 2-8 TL</li>
@@ -672,7 +672,7 @@ export const blogPosts = [
 </ul>
 <p><strong>En verimli sektörler:</strong> Moda, güzellik, yiyecek & içecek, seyahat, ev dekorasyon</p>
 
-<h2>TikTok Reklam Fiyatları 2025</h2>
+<h2>TikTok Reklam Fiyatları 2026</h2>
 <ul>
 <li><strong>CPM:</strong> 10-25 TL (Instagram'dan daha uygun)</li>
 <li><strong>CPC:</strong> 1-5 TL</li>
@@ -681,7 +681,7 @@ export const blogPosts = [
 </ul>
 <p><strong>En verimli sektörler:</strong> Genç moda, oyun, eğlence, hızlı tüketim ürünleri</p>
 
-<h2>YouTube Reklam Fiyatları 2025</h2>
+<h2>YouTube Reklam Fiyatları 2026</h2>
 <ul>
 <li><strong>CPV (izlenme başına):</strong> 0.30-1.50 TL</li>
 <li><strong>CPM Display:</strong> 8-20 TL</li>
@@ -700,8 +700,8 @@ export const blogPosts = [
 
 <h2>Hangi Platform Sizin İçin Doğru?</h2>
 <p>Bütçenizi platformlara nasıl dağıtacağınız hedef kitlenize ve sektörünüze bağlı. Profesyonel reklam yönetimiyle bütçenizi en verimli şekilde kullanmak için <a href="/iletisim">bizimle iletişime geçin</a>.</p>`,
-    contentEn: `<h2>Social Media Ad Market 2025</h2>
-<p>Digital ad spending continues to grow every year. Here's a detailed comparison of ad costs and efficiency across platforms for the 2025 Turkish market.</p>
+    contentEn: `<h2>Social Media Ad Market 2026</h2>
+<p>Digital ad spending continues to grow every year. Here's a detailed comparison of ad costs and efficiency across platforms for the 2026 Turkish market.</p>
 
 <h2>Platform Cost Comparison</h2>
 <p><strong>Instagram:</strong> CPM 15-35 TL, CPC 2-8 TL. Best for fashion, beauty, lifestyle brands targeting 18-45 age group.</p>
@@ -790,7 +790,7 @@ export const blogPosts = [
     excerptTr: 'Meta, Instagram ve Facebook için AI Studio platformunu tüm işletmelere açtı. Yapay zeka ile otomatik içerik oluşturma, chatbot entegrasyonu ve reklam optimizasyonu artık herkes için erişilebilir.',
     excerptEn: 'Meta has opened its AI Studio platform for Instagram and Facebook to all businesses. AI-powered content creation, chatbot integration, and ad optimization are now accessible to everyone.',
     contentTr: `<h2>Meta AI Studio Nedir?</h2>
-<p>Meta, 2025 yılının başında duyurduğu <strong>AI Studio</strong> platformunu artık tüm işletme hesaplarına açtı. Bu platform, yapay zeka kullanarak Instagram ve Facebook'ta içerik üretmenize, müşteri hizmetleri chatbot'u oluşturmanıza ve reklam performansınızı optimize etmenize olanak tanıyor.</p>
+<p>Meta, 2026 yılının başında duyurduğu <strong>AI Studio</strong> platformunu artık tüm işletme hesaplarına açtı. Bu platform, yapay zeka kullanarak Instagram ve Facebook'ta içerik üretmenize, müşteri hizmetleri chatbot'u oluşturmanıza ve reklam performansınızı optimize etmenize olanak tanıyor.</p>
 
 <h2>İşletmeler İçin Neler Değişiyor?</h2>
 <ul>
@@ -806,7 +806,7 @@ export const blogPosts = [
 <h2>Kade Media Yorumu</h2>
 <p>AI araçları içerik üretimini kolaylaştırsa da, <strong>strateji ve yaratıcılık</strong> hâlâ insan dokunuşu gerektiriyor. AI'ı bir araç olarak kullanmak, ajans çalışmasını gereksiz kılmıyor — aksine daha verimli hale getiriyor. <a href="/iletisim">Bizimle iletişime geçin</a> ve AI destekli sosyal medya stratejinizi birlikte oluşturalım.</p>`,
     contentEn: `<h2>What is Meta AI Studio?</h2>
-<p>Meta has opened its <strong>AI Studio</strong> platform, announced in early 2025, to all business accounts. This platform allows you to create content on Instagram and Facebook using AI, build customer service chatbots, and optimize your ad performance.</p>
+<p>Meta has opened its <strong>AI Studio</strong> platform, announced in early 2026, to all business accounts. This platform allows you to create content on Instagram and Facebook using AI, build customer service chatbots, and optimize your ad performance.</p>
 
 <h2>What's Changing for Businesses?</h2>
 <ul>
@@ -827,13 +827,13 @@ export const blogPosts = [
   },
   {
     id: 14,
-    slug: 'tiktok-turkiye-2025-gelismeler',
-    titleTr: 'TikTok Türkiye 2025: Yeni Düzenlemeler, E-Ticaret ve İçerik Üreticileri İçin Fırsatlar',
-    titleEn: 'TikTok Turkey 2025: New Regulations, E-Commerce & Opportunities for Content Creators',
+    slug: 'tiktok-turkiye-2026-gelismeler',
+    titleTr: 'TikTok Türkiye 2026: Yeni Düzenlemeler, E-Ticaret ve İçerik Üreticileri İçin Fırsatlar',
+    titleEn: 'TikTok Turkey 2026: New Regulations, E-Commerce & Opportunities for Content Creators',
     excerptTr: 'TikTok\'un Türkiye\'deki geleceği, yeni yasal düzenlemeler ve TikTok Shop\'un ülkeye gelişi hakkında bilmeniz gereken her şey. İçerik üreticileri ve markalar için rehber.',
     excerptEn: 'Everything you need to know about TikTok\'s future in Turkey, new regulations, and TikTok Shop\'s entry into the country. A guide for content creators and brands.',
     contentTr: `<h2>TikTok Türkiye'de Son Durum</h2>
-<p>TikTok, Türkiye'de 30 milyonu aşan kullanıcı sayısıyla en hızlı büyüyen sosyal medya platformu olmaya devam ediyor. 2025'te platformda önemli gelişmeler yaşandı.</p>
+<p>TikTok, Türkiye'de 30 milyonu aşan kullanıcı sayısıyla en hızlı büyüyen sosyal medya platformu olmaya devam ediyor. 2026'te platformda önemli gelişmeler yaşandı.</p>
 
 <h2>Yeni Düzenlemeler</h2>
 <p>BTK'nın sosyal medya platformlarına yönelik yeni düzenlemeleri, TikTok'un Türkiye'deki operasyonlarını doğrudan etkiliyor. Temsilcilik ofisinin güçlendirilmesi, yerel veri depolama gereksinimleri ve içerik moderasyonu konularında önemli adımlar atıldı.</p>
@@ -851,7 +851,7 @@ export const blogPosts = [
 <h2>Markalar Ne Yapmalı?</h2>
 <p>TikTok artık sadece eğlence platformu değil, ciddi bir satış kanalı. Özellikle Z kuşağı ve genç millennial hedef kitleniz varsa, TikTok stratejisi kaçırılmaması gereken bir fırsat. <a href="/hizmetler">TikTok yönetimi hizmetlerimizi</a> inceleyin.</p>`,
     contentEn: `<h2>TikTok in Turkey: Current Status</h2>
-<p>TikTok continues to be the fastest-growing social media platform in Turkey with over 30 million users. Significant developments occurred on the platform in 2025.</p>
+<p>TikTok continues to be the fastest-growing social media platform in Turkey with over 30 million users. Significant developments occurred on the platform in 2026.</p>
 
 <h2>TikTok Shop Turkey</h2>
 <ul>
@@ -876,7 +876,7 @@ export const blogPosts = [
     titleEn: 'YouTube Shorts Monetization Program Updated: New Opportunities for Content Creators',
     excerptTr: 'YouTube, Shorts para kazanma programını genişletti. Reklam geliri paylaşımı, Shopping özelliği ve Super Thanks ile kısa video içerik üreticileri artık daha fazla kazanabiliyor.',
     excerptEn: 'YouTube has expanded its Shorts monetization program. With ad revenue sharing, Shopping features, and Super Thanks, short video creators can now earn more.',
-    contentTr: `<h2>YouTube Shorts Para Kazanma 2025</h2>
+    contentTr: `<h2>YouTube Shorts Para Kazanma 2026</h2>
 <p>YouTube, kısa video formatı Shorts'un para kazanma programını önemli ölçüde genişletti. Artık daha fazla içerik üreticisi bu programdan faydalanabiliyor.</p>
 
 <h2>Yeni Kazanç Modelleri</h2>
@@ -892,7 +892,7 @@ export const blogPosts = [
 
 <h2>Markalar İçin YouTube Shorts Stratejisi</h2>
 <p>YouTube Shorts, özellikle how-to içerikler, ürün tanıtımları ve marka bilinirliği kampanyaları için çok etkili. <a href="/iletisim">YouTube yönetimi için bize ulaşın</a>.</p>`,
-    contentEn: `<h2>YouTube Shorts Monetization 2025</h2>
+    contentEn: `<h2>YouTube Shorts Monetization 2026</h2>
 <p>YouTube has significantly expanded its Shorts monetization program. More creators can now benefit from this program.</p>
 
 <h2>New Revenue Models</h2>
@@ -959,14 +959,14 @@ export const blogPosts = [
   {
     id: 17,
     slug: 'linkedin-b2b-pazarlama-2026',
-    titleTr: 'LinkedIn B2B Pazarlama 2025: Kurumsal Markalar İçin Altın Çağ',
-    titleEn: 'LinkedIn B2B Marketing 2025: The Golden Age for Corporate Brands',
+    titleTr: 'LinkedIn B2B Pazarlama 2026: Kurumsal Markalar İçin Altın Çağ',
+    titleEn: 'LinkedIn B2B Marketing 2026: The Golden Age for Corporate Brands',
     excerptTr: 'LinkedIn, B2B pazarlama için en güçlü platform olmaya devam ediyor. Thought leadership içerikler, LinkedIn Newsletter ve şirket sayfası stratejileri ile kurumsal markanızı nasıl büyütürsünüz?',
     excerptEn: 'LinkedIn continues to be the most powerful platform for B2B marketing. How to grow your corporate brand with thought leadership content, LinkedIn Newsletters, and company page strategies.',
     contentTr: `<h2>LinkedIn Neden B2B İçin Vazgeçilmez?</h2>
 <p>LinkedIn, dünya genelinde 1 milyardan fazla profesyonel ile B2B pazarlamanın merkezinde. Türkiye'de 15 milyonu aşan kullanıcı sayısıyla kurumsal markalar için <strong>en yüksek dönüşüm oranına sahip platform</strong>.</p>
 
-<h2>2025'te LinkedIn Stratejisi</h2>
+<h2>2026'te LinkedIn Stratejisi</h2>
 <ul>
 <li><strong>Thought Leadership:</strong> Şirket CEO'su veya uzmanlarının kişisel paylaşımları, şirket sayfasından 8x daha fazla etkileşim alıyor.</li>
 <li><strong>LinkedIn Newsletter:</strong> Abone tabanı oluşturarak düzenli içerik dağıtımı yapabilirsiniz. Açılma oranları e-posta pazarlamasının 3 katı.</li>
@@ -975,7 +975,7 @@ export const blogPosts = [
 <li><strong>Employee Advocacy:</strong> Çalışanların paylaşımları, şirket sayfasının 14x daha fazla erişimine eşdeğer.</li>
 </ul>
 
-<h2>LinkedIn Reklam Fiyatları 2025</h2>
+<h2>LinkedIn Reklam Fiyatları 2026</h2>
 <p>LinkedIn reklamları diğer platformlara göre daha pahalı (ortalama CPC: $5-8) ancak B2B dönüşüm kalitesi çok yüksek. Lead başına maliyet karşılaştırmasında Meta'dan %30 daha verimli.</p>
 
 <h2>Kade Media LinkedIn Hizmetleri</h2>
@@ -983,7 +983,7 @@ export const blogPosts = [
     contentEn: `<h2>Why LinkedIn is Essential for B2B</h2>
 <p>LinkedIn is at the center of B2B marketing with over 1 billion professionals worldwide. With more than 15 million users in Turkey, it's <strong>the platform with the highest conversion rate</strong> for corporate brands.</p>
 
-<h2>LinkedIn Strategy for 2025</h2>
+<h2>LinkedIn Strategy for 2026</h2>
 <ul>
 <li><strong>Thought Leadership:</strong> Personal posts from company CEOs or experts get 8x more engagement than company page posts.</li>
 <li><strong>LinkedIn Newsletter:</strong> Build a subscriber base for regular content distribution. Open rates are 3x that of email marketing.</li>
@@ -1002,12 +1002,12 @@ export const blogPosts = [
   {
     id: 18,
     slug: 'turkiye-dijital-reklam-harcamalari-2026',
-    titleTr: 'Türkiye Dijital Reklam Harcamaları 2025 Raporu: Rekor Büyüme ve Yeni Trendler',
-    titleEn: 'Turkey Digital Ad Spending 2025 Report: Record Growth & New Trends',
-    excerptTr: 'IAB Türkiye verilerine göre dijital reklam harcamaları 2025\'te %45 artışla 60 milyar TL\'yi aştı. En çok yatırım yapılan platformlar, sektör bazlı dağılım ve 2026 öngörüleri.',
-    excerptEn: 'According to IAB Turkey data, digital ad spending exceeded 60 billion TL in 2025 with 45% growth. Most invested platforms, sector-based distribution, and 2026 forecasts.',
-    contentTr: `<h2>2025 Dijital Reklam Pazarı</h2>
-<p>Türkiye'nin dijital reklam pazarı 2025'te <strong>60 milyar TL'yi aşarak rekor kırdı</strong>. Bu rakam, toplam reklam harcamalarının %65'ini oluşturuyor — televizyonu ilk kez bu kadar geride bırakarak.</p>
+    titleTr: 'Türkiye Dijital Reklam Harcamaları 2026 Raporu: Rekor Büyüme ve Yeni Trendler',
+    titleEn: 'Turkey Digital Ad Spending 2026 Report: Record Growth & New Trends',
+    excerptTr: 'IAB Türkiye verilerine göre dijital reklam harcamaları 2026\'te %45 artışla 60 milyar TL\'yi aştı. En çok yatırım yapılan platformlar, sektör bazlı dağılım ve 2026 öngörüleri.',
+    excerptEn: 'According to IAB Turkey data, digital ad spending exceeded 60 billion TL in 2026 with 45% growth. Most invested platforms, sector-based distribution, and 2026 forecasts.',
+    contentTr: `<h2>2026 Dijital Reklam Pazarı</h2>
+<p>Türkiye'nin dijital reklam pazarı 2026'te <strong>60 milyar TL'yi aşarak rekor kırdı</strong>. Bu rakam, toplam reklam harcamalarının %65'ini oluşturuyor — televizyonu ilk kez bu kadar geride bırakarak.</p>
 
 <h2>Platform Bazlı Dağılım</h2>
 <ul>
@@ -1031,8 +1031,8 @@ export const blogPosts = [
 
 <h2>Kade Media ile Reklam Bütçenizi Optimize Edin</h2>
 <p>Reklam bütçenizden maksimum verim almak için profesyonel reklam yönetimi hizmetlerimizden faydalanın. <a href="/paketler">Paketlerimizi</a> inceleyin veya <a href="/iletisim">ücretsiz danışmanlık</a> alın.</p>`,
-    contentEn: `<h2>2025 Digital Ad Market</h2>
-<p>Turkey's digital ad market <strong>broke records by exceeding 60 billion TL in 2025</strong>. This figure represents 65% of total ad spending — surpassing television by a wider margin than ever before.</p>
+    contentEn: `<h2>2026 Digital Ad Market</h2>
+<p>Turkey's digital ad market <strong>broke records by exceeding 60 billion TL in 2026</strong>. This figure represents 65% of total ad spending — surpassing television by a wider margin than ever before.</p>
 
 <h2>Platform Distribution</h2>
 <ul>
@@ -1053,15 +1053,15 @@ export const blogPosts = [
   // ─── SEO Trafik Yazıları ───
   {
     id: 19,
-    slug: 'sosyal-medya-yonetimi-fiyatlari-2025-turkiye',
-    titleTr: 'Sosyal Medya Yönetimi Fiyatları 2025: Türkiye Piyasa Rehberi',
-    titleEn: 'Social Media Management Prices 2025: Turkey Market Guide',
+    slug: 'sosyal-medya-yonetimi-fiyatlari-2026-turkiye',
+    titleTr: 'Sosyal Medya Yönetimi Fiyatları 2026: Türkiye Piyasa Rehberi',
+    titleEn: 'Social Media Management Prices 2026: Turkey Market Guide',
     excerptTr: 'Türkiye\'de sosyal medya yönetimi ne kadar tutar? Başlangıç, profesyonel ve kurumsal paketlerin fiyat karşılaştırması. Ajans seçerken nelere dikkat etmelisiniz?',
     excerptEn: 'How much does social media management cost in Turkey? Price comparison of starter, professional, and enterprise packages. What to look for when choosing an agency.',
     contentTr: `<h2>Sosyal Medya Yönetimi Ne Kadar Tutar?</h2>
-<p>2025 yılında Türkiye'deki sosyal medya yönetimi fiyatları, ajansın deneyimine, hizmet kapsamına ve platform sayısına göre büyük farklılıklar göstermektedir.</p>
+<p>2026 yılında Türkiye'deki sosyal medya yönetimi fiyatları, ajansın deneyimine, hizmet kapsamına ve platform sayısına göre büyük farklılıklar göstermektedir.</p>
 
-<h2>2025 Fiyat Aralıkları</h2>
+<h2>2026 Fiyat Aralıkları</h2>
 <ul>
 <li><strong>Başlangıç Paketleri (5.000 - 10.000 ₺/ay):</strong> 1-2 platform, aylık 12-16 içerik, temel grafik tasarım.</li>
 <li><strong>Profesyonel Paketler (15.000 - 25.000 ₺/ay):</strong> 3-4 platform, aylık 30+ içerik, video prodüksiyon, reklam yönetimi.</li>
@@ -1074,9 +1074,9 @@ export const blogPosts = [
 <h2>Kade Media Fiyatlandırması</h2>
 <p>Kade Media olarak şeffaf fiyatlandırma politikamızla <strong>11.900 ₺</strong>'dan başlayan paketler sunuyoruz. <a href="/paketler">Paketlerimizi</a> inceleyin veya <a href="/iletisim">ücretsiz keşif görüşmesi</a> talep edin.</p>`,
     contentEn: `<h2>How Much Does Social Media Management Cost?</h2>
-<p>In 2025, social media management prices in Turkey vary significantly based on agency experience, service scope, and number of platforms.</p>
+<p>In 2026, social media management prices in Turkey vary significantly based on agency experience, service scope, and number of platforms.</p>
 
-<h2>2025 Price Ranges</h2>
+<h2>2026 Price Ranges</h2>
 <ul>
 <li><strong>Starter Packages (5,000 - 10,000 ₺/mo):</strong> 1-2 platforms, 12-16 monthly content pieces, basic graphic design.</li>
 <li><strong>Professional Packages (15,000 - 25,000 ₺/mo):</strong> 3-4 platforms, 30+ monthly content, video production, ad management.</li>
@@ -1095,8 +1095,8 @@ export const blogPosts = [
   {
     id: 20,
     slug: 'instagram-isletme-hesabi-acma-rehberi-2026',
-    titleTr: 'Instagram İşletme Hesabı Nasıl Açılır? 2025 Adım Adım Rehber',
-    titleEn: 'How to Create an Instagram Business Account: 2025 Step-by-Step Guide',
+    titleTr: 'Instagram İşletme Hesabı Nasıl Açılır? 2026 Adım Adım Rehber',
+    titleEn: 'How to Create an Instagram Business Account: 2026 Step-by-Step Guide',
     excerptTr: 'Instagram işletme hesabı açmak, profesyonel profil oluşturmak ve istatistiklere erişmek için bilmeniz gereken her şey. Yeni başlayanlar için eksiksiz rehber.',
     excerptEn: 'Everything you need to know about creating an Instagram business account, building a professional profile, and accessing analytics. A complete guide for beginners.',
     contentTr: `<h2>Instagram İşletme Hesabı Nedir?</h2>
@@ -1140,8 +1140,8 @@ export const blogPosts = [
   {
     id: 21,
     slug: 'tiktok-reklam-verme-rehberi-2026',
-    titleTr: 'TikTok\'ta Reklam Nasıl Verilir? 2025 Başlangıç Rehberi',
-    titleEn: 'How to Advertise on TikTok: 2025 Beginner\'s Guide',
+    titleTr: 'TikTok\'ta Reklam Nasıl Verilir? 2026 Başlangıç Rehberi',
+    titleEn: 'How to Advertise on TikTok: 2026 Beginner\'s Guide',
     excerptTr: 'TikTok Ads Manager kullanarak ilk reklam kampanyanızı oluşturun. Bütçe ayarlama, hedefleme seçenekleri ve başarılı reklam formatları hakkında bilmeniz gereken her şey.',
     excerptEn: 'Create your first ad campaign using TikTok Ads Manager. Everything you need to know about budget settings, targeting options, and successful ad formats.',
     contentTr: `<h2>TikTok Reklamlarına Giriş</h2>
@@ -1184,8 +1184,8 @@ export const blogPosts = [
   {
     id: 22,
     slug: 'facebook-sayfa-yonetimi-ipuclari-2026',
-    titleTr: 'Facebook İşletme Sayfası Yönetimi: 2025 Pratik İpuçları',
-    titleEn: 'Facebook Business Page Management: 2025 Practical Tips',
+    titleTr: 'Facebook İşletme Sayfası Yönetimi: 2026 Pratik İpuçları',
+    titleEn: 'Facebook Business Page Management: 2026 Practical Tips',
     excerptTr: 'Facebook işletme sayfanızı optimize etmek, organik erişimi artırmak ve Meta Business Suite kullanarak verimli yönetim için 10 pratik ipucu.',
     excerptEn: '10 practical tips for optimizing your Facebook business page, increasing organic reach, and efficient management with Meta Business Suite.',
     contentTr: `<h2>Facebook Hâlâ Önemli mi?</h2>
@@ -1273,8 +1273,8 @@ export const blogPosts = [
   {
     id: 24,
     slug: 'instagram-takipci-artirma-2026',
-    titleTr: 'Instagram Takipçi Artırma 2025: Organik Büyüme İçin 15 Kanıtlanmış Yöntem',
-    titleEn: 'How to Grow Instagram Followers in 2025: 15 Proven Organic Methods',
+    titleTr: 'Instagram Takipçi Artırma 2026: Organik Büyüme İçin 15 Kanıtlanmış Yöntem',
+    titleEn: 'How to Grow Instagram Followers in 2026: 15 Proven Organic Methods',
     excerptTr: 'Instagram takipçi sayınızı organik olarak artırmak istiyorsanız doğru yerdesiniz. Bot ve sahte takipçi satın almadan, gerçek ve etkileşim yapan bir kitle oluşturmanın 15 kanıtlanmış yöntemini açıklıyoruz.',
     excerptEn: 'Want to grow your Instagram followers organically? You\'re in the right place. We explain 15 proven methods to build a real, engaged audience without buying bots or fake followers.',
     contentTr: `<h2>Instagram Takipçi Artırma Neden Önemli?</h2>
@@ -1284,7 +1284,7 @@ export const blogPosts = [
 <p>Tek bir konuya odaklanın. Instagram algoritması, belirli bir nişte düzenli içerik üreten hesapları ödüllendiriyor. "Her şeyden biraz" yaklaşımı artık işe yaramıyor.</p>
 
 <h2>2. Reels'i Stratejik Kullanın</h2>
-<p>2025'te Reels, Instagram'ın en çok dağıtım yapan formatı olmaya devam ediyor. <strong>3-7 saniyelik hook</strong> ile başlayan, değer sunan kısa videolar keşfet sayfasına düşme şansınızı 5 kat artırıyor.</p>
+<p>2026'te Reels, Instagram'ın en çok dağıtım yapan formatı olmaya devam ediyor. <strong>3-7 saniyelik hook</strong> ile başlayan, değer sunan kısa videolar keşfet sayfasına düşme şansınızı 5 kat artırıyor.</p>
 
 <h2>3. Carousel Paylaşımlarla Eğitin</h2>
 <p>Carousel (çoklu fotoğraf) paylaşımları en yüksek kaydetme oranına sahip format. "Swipe et ve öğren" formatı takipçi çekmenin en etkili yollarından biri.</p>
@@ -1331,7 +1331,7 @@ export const blogPosts = [
 <p>Follower count alone is meaningless on Instagram. What truly matters is <strong>real followers who engage</strong>. 1,000 genuine followers are far more valuable than 10,000 fake ones.</p>
 
 <h2>15 Proven Methods for Organic Growth</h2>
-<p>From niche content strategy to Reels optimization, carousel posts, Instagram SEO, collaboration posts, and UGC campaigns — we detail 15 battle-tested methods that actually work in 2025.</p>
+<p>From niche content strategy to Reels optimization, carousel posts, Instagram SEO, collaboration posts, and UGC campaigns — we detail 15 battle-tested methods that actually work in 2026.</p>
 
 <h2>Key Takeaway</h2>
 <p>Organic follower growth requires patience and strategy. Brands that consistently apply these methods achieve 200-500% growth within 6 months. <a href="/iletisim">Contact us</a> for a free strategy session.</p>`,
@@ -1345,12 +1345,12 @@ export const blogPosts = [
   {
     id: 25,
     slug: 'tiktok-para-kazanma-rehberi-2026',
-    titleTr: 'TikTok\'tan Para Kazanma Rehberi 2025: Yaratıcı Fon, Canlı Yayın ve Marka İş Birlikleri',
-    titleEn: 'TikTok Monetization Guide 2025: Creator Fund, Live Gifts & Brand Deals',
+    titleTr: 'TikTok\'tan Para Kazanma Rehberi 2026: Yaratıcı Fon, Canlı Yayın ve Marka İş Birlikleri',
+    titleEn: 'TikTok Monetization Guide 2026: Creator Fund, Live Gifts & Brand Deals',
     excerptTr: 'TikTok\'tan nasıl para kazanılır? Yaratıcı Fon, canlı yayın hediyeleri, TikTok Shop, marka iş birlikleri ve affiliate marketing ile TikTok gelir kaynağınız olabilir. Başvuru koşulları ve kazanç miktarları.',
     excerptEn: 'How to make money on TikTok? From Creator Fund to live gifts, TikTok Shop, brand partnerships, and affiliate marketing — TikTok can become your income source.',
     contentTr: `<h2>TikTok'tan Para Kazanmak Mümkün mü?</h2>
-<p>Evet! TikTok 2025 itibarıyla içerik üreticileri için birden fazla gelir modeli sunuyor. Türkiye'de de aktif olan bu modelleri ayrıntılarıyla açıklıyoruz.</p>
+<p>Evet! TikTok 2026 itibarıyla içerik üreticileri için birden fazla gelir modeli sunuyor. Türkiye'de de aktif olan bu modelleri ayrıntılarıyla açıklıyoruz.</p>
 
 <h2>1. TikTok Yaratıcı Fonu (Creativity Program)</h2>
 <p>10.000+ takipçi ve son 30 günde 100.000+ görüntülenme gerekiyor. Türkiye'den başvuru yapılabiliyor. Ortalama kazanç: <strong>1.000 görüntülenme başına 0.5-2 TL</strong> (içerik kalitesine göre değişir).</p>
@@ -1382,7 +1382,7 @@ export const blogPosts = [
 <h2>Profesyonel Destek</h2>
 <p>TikTok stratejinizi profesyonel bir ekiple büyütmek ister misiniz? <a href="/hizmetler">TikTok yönetim hizmetlerimize</a> göz atın veya <a href="/iletisim">ücretsiz danışmanlık</a> için bizimle iletişime geçin.</p>`,
     contentEn: `<h2>Can You Really Make Money on TikTok?</h2>
-<p>Yes! TikTok offers multiple revenue models for content creators in 2025. We explain each model in detail, including Creator Fund, Live Gifts, TikTok Shop, brand partnerships, and affiliate marketing.</p>
+<p>Yes! TikTok offers multiple revenue models for content creators in 2026. We explain each model in detail, including Creator Fund, Live Gifts, TikTok Shop, brand partnerships, and affiliate marketing.</p>
 
 <h2>Key Revenue Streams</h2>
 <p>From the Creativity Program to live stream gifts, brand deals, and selling your own products — TikTok can become a serious income source with the right strategy.</p>
@@ -1399,8 +1399,8 @@ export const blogPosts = [
   {
     id: 26,
     slug: 'dijital-pazarlama-nedir-baslangic-rehberi',
-    titleTr: 'Dijital Pazarlama Nedir? Sıfırdan Başlayanlar İçin 2025 Rehberi',
-    titleEn: 'What is Digital Marketing? A 2025 Beginner\'s Guide from Zero',
+    titleTr: 'Dijital Pazarlama Nedir? Sıfırdan Başlayanlar İçin 2026 Rehberi',
+    titleEn: 'What is Digital Marketing? A 2026 Beginner\'s Guide from Zero',
     excerptTr: 'Dijital pazarlama nedir, nasıl yapılır, nereden başlanır? SEO, sosyal medya, e-posta pazarlama, içerik pazarlama ve reklam yönetimi dahil tüm dijital pazarlama kanallarını başlangıç seviyesinden ileri seviyeye anlatıyoruz.',
     excerptEn: 'What is digital marketing and how does it work? We explain all digital marketing channels from SEO to social media, email marketing, content marketing, and ad management.',
     contentTr: `<h2>Dijital Pazarlama Nedir?</h2>
@@ -1460,7 +1460,7 @@ export const blogPosts = [
     excerptTr: 'Instagram Reels çekmek istiyorsunuz ama nereden başlayacağınızı bilmiyorsunuz? Konu bulma, çekim teknikleri, düzenleme uygulamaları ve viral olma taktiklerini adım adım anlatıyoruz.',
     excerptEn: 'Want to create Instagram Reels but don\'t know where to start? We walk you through topic ideas, filming techniques, editing apps, and viral tactics step by step.',
     contentTr: `<h2>Reels Neden Bu Kadar Önemli?</h2>
-<p>Instagram 2025'te Reels'e en yüksek organik erişimi veriyor. Bir Reels, normal bir fotoğraf paylaşımından <strong>ortalama 5-10 kat daha fazla kişiye</strong> ulaşıyor.</p>
+<p>Instagram 2026'te Reels'e en yüksek organik erişimi veriyor. Bir Reels, normal bir fotoğraf paylaşımından <strong>ortalama 5-10 kat daha fazla kişiye</strong> ulaşıyor.</p>
 
 <h2>Adım 1: Konu ve Format Belirleyin</h2>
 <p>En çok viral olan Reels formatları:</p>
@@ -1496,7 +1496,7 @@ export const blogPosts = [
 <h2>Sonuç</h2>
 <p>Reels üretmek bir beceridir ve pratik yaptıkça gelişir. Haftada en az 3 Reels paylaşmayı hedefleyin. Profesyonel Reels üretimi için <a href="/hizmetler">video prodüksiyon hizmetlerimize</a> göz atın.</p>`,
     contentEn: `<h2>Why Reels Matter So Much</h2>
-<p>Instagram gives Reels the highest organic reach in 2025 — on average <strong>5-10x more reach</strong> than regular photo posts.</p>
+<p>Instagram gives Reels the highest organic reach in 2026 — on average <strong>5-10x more reach</strong> than regular photo posts.</p>
 
 <h2>Step-by-Step Guide</h2>
 <p>From choosing topics and formats to filming tips, editing with CapCut, and viral tactics — we cover everything you need to create engaging Reels.</p>
@@ -1558,8 +1558,8 @@ export const blogPosts = [
   {
     id: 29,
     slug: 'youtube-kanal-buyutme-abone-artirma',
-    titleTr: 'YouTube Kanal Büyütme ve Abone Artırma: 2025 Strateji Rehberi',
-    titleEn: 'How to Grow a YouTube Channel & Get More Subscribers: 2025 Strategy Guide',
+    titleTr: 'YouTube Kanal Büyütme ve Abone Artırma: 2026 Strateji Rehberi',
+    titleEn: 'How to Grow a YouTube Channel & Get More Subscribers: 2026 Strategy Guide',
     excerptTr: 'YouTube kanalınızı büyütmek ve abone sayınızı artırmak istiyorsanız SEO, thumbnail tasarımı, içerik planlaması ve algoritma optimizasyonu konularında bilmeniz gereken her şey bu rehberde.',
     excerptEn: 'Everything you need to know about YouTube SEO, thumbnail design, content planning, and algorithm optimization to grow your channel and gain subscribers.',
     contentTr: `<h2>YouTube Neden Hâlâ En Güçlü Platform?</h2>
@@ -1603,8 +1603,8 @@ export const blogPosts = [
   {
     id: 30,
     slug: 'sosyal-medya-yonetimi-nedir-ne-kadar',
-    titleTr: 'Sosyal Medya Yönetimi Nedir ve Ne Kadara Mal Olur? 2025 Fiyat Rehberi',
-    titleEn: 'What Is Social Media Management & How Much Does It Cost? 2025 Pricing Guide',
+    titleTr: 'Sosyal Medya Yönetimi Nedir ve Ne Kadara Mal Olur? 2026 Fiyat Rehberi',
+    titleEn: 'What Is Social Media Management & How Much Does It Cost? 2026 Pricing Guide',
     excerptTr: 'Sosyal medya yönetimi tam olarak ne kapsar? Ajans fiyatları, freelancer ücretleri ve kendiniz yapmanın maliyeti. Türkiye\'deki güncel fiyatları karşılaştırıyoruz.',
     excerptEn: 'What exactly does social media management include? Agency prices, freelancer rates, and DIY costs. We compare current pricing in Turkey.',
     contentTr: `<h2>Sosyal Medya Yönetimi Nedir?</h2>
@@ -1621,7 +1621,7 @@ export const blogPosts = [
 <li>Strateji toplantıları düzenler</li>
 </ul>
 
-<h2>2025 Türkiye Fiyatları</h2>
+<h2>2026 Türkiye Fiyatları</h2>
 <table>
 <tr><th>Hizmet Türü</th><th>Aylık Fiyat Aralığı</th></tr>
 <tr><td>Freelancer (tek platform)</td><td>3.000 - 8.000 TL</td></tr>
@@ -1641,7 +1641,7 @@ export const blogPosts = [
     contentEn: `<h2>What Is Social Media Management?</h2>
 <p>Social media management covers <strong>strategy creation, content planning, content production, posting, community management, ad management, and reporting</strong>.</p>
 
-<h2>2025 Turkey Pricing</h2>
+<h2>2026 Turkey Pricing</h2>
 <p>Freelancer: 3,000-8,000 TL/mo | Agency Starter: 8,000-15,000 TL/mo | Professional: 15,000-30,000 TL/mo | Enterprise: 30,000-75,000 TL/mo</p>
 
 <h2>Kade Media Pricing</h2>
