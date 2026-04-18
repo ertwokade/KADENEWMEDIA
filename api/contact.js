@@ -70,6 +70,57 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // ── Newsletter toplu gönderme (auth gerekli) ──
+  if (action === 'send-newsletter') {
+    const user = requireAuth(req);
+    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+    let body = req.body;
+    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+
+    const { subject, html } = body || {};
+    if (!subject?.trim()) return res.status(400).json({ error: 'Konu gerekli' });
+    if (!html?.trim()) return res.status(400).json({ error: 'İçerik gerekli' });
+    if (subject.length > 200) return res.status(400).json({ error: 'Konu çok uzun (max 200)' });
+    if (html.length > 100000) return res.status(400).json({ error: 'İçerik çok uzun' });
+
+    const transporter = makeTransporter();
+    if (!transporter) return res.status(400).json({ error: 'SMTP yapılandırılmamış' });
+
+    try {
+      const db = await getDb();
+      const subscribers = await db.collection('newsletter').find({ status: { $ne: 'unsubscribed' } }).toArray();
+      if (subscribers.length === 0) return res.status(200).json({ sent: 0, message: 'Abone bulunamadı' });
+
+      let sent = 0;
+      const errors = [];
+
+      for (const sub of subscribers) {
+        try {
+          const unsubLink = `https://kademedia.com.tr/api/contact?action=unsubscribe&email=${encodeURIComponent(sub.email)}`;
+          const safeHtml = html + `<div style="margin-top:32px;padding-top:16px;border-top:1px solid #333;text-align:center;font-size:12px;color:#888;">
+            <a href="${unsubLink}" style="color:#888;">Abonelikten çık</a>
+          </div>`;
+          await transporter.sendMail({
+            from: `"Kade Media" <${process.env.SMTP_USER}>`,
+            to: sub.email,
+            subject: escapeHtml(subject),
+            html: safeHtml,
+          });
+          sent++;
+        } catch (err) {
+          errors.push(sub.email);
+        }
+      }
+
+      logActivity(db, { action: 'Newsletter gönderildi', detail: `${sent} aboneye: "${subject}"`, type: 'create', icon: '📧', user: user.username }).catch(() => {});
+      return res.status(200).json({ sent, total: subscribers.length, ...(errors.length ? { errors } : {}) });
+    } catch (err) {
+      return res.status(500).json({ error: 'Sunucu hatası' });
+    }
+  }
+
   // ── SMTP test (auth gerekli) ──
   if (action === 'smtp-test') {
     const user = requireAuth(req);

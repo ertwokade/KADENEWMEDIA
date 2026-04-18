@@ -27,7 +27,7 @@ import {
   getNotesApi, createNoteApi, deleteNoteApi,
   getNotificationsApi, markNotificationReadApi, markAllNotificationsReadApi, deleteNotificationApi,
   getAnalyticsApi, getGA4AnalyticsApi, getActivityLogApi,
-  getNewsletterSubscribersApi, deleteNewsletterSubscriberApi,
+  getNewsletterSubscribersApi, deleteNewsletterSubscriberApi, sendNewsletterApi,
   testSmtpApi, replyToMessageApi,
   getSiteSettingsApi, updateSiteSettingsApi,
   getPortfolioApi,
@@ -303,10 +303,11 @@ function BlogSection({ showToast }) {
   const [editingBlog, setEditingBlog] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [selectedIds, setSelectedIds] = useState(new Set())
   const [form, setForm] = useState({
     titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
     contentTr: '', contentEn: '', category: '', categoryEn: '',
-    slug: '', image: '', color: '#eac321', readTime: 5, published: true,
+    slug: '', image: '', color: '#eac321', readTime: 5, published: true, publishAt: '',
     date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
   })
 
@@ -338,7 +339,7 @@ function BlogSection({ showToast }) {
     setForm({
       titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
       contentTr: '', contentEn: '', category: '', categoryEn: '',
-      slug: '', image: '', color: '#eac321', readTime: 5, published: true,
+      slug: '', image: '', color: '#eac321', readTime: 5, published: true, publishAt: '',
       date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
     })
     setEditingBlog(null)
@@ -354,6 +355,7 @@ function BlogSection({ showToast }) {
       slug: blog.slug || '', image: blog.image || '',
       color: blog.color || '#eac321', readTime: blog.readTime || 5,
       published: blog.published !== false,
+      publishAt: blog.publishAt ? new Date(blog.publishAt).toISOString().slice(0, 16) : '',
       date: blog.date || new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
     })
     setEditingBlog(blog)
@@ -399,6 +401,26 @@ function BlogSection({ showToast }) {
     } catch (err) {
       showToast(err.message, 'error')
     }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return
+    if (!window.confirm(`${selectedIds.size} yazıyı silmek istediğinize emin misiniz?`)) return
+    let ok = 0
+    for (const id of selectedIds) {
+      try { await deleteBlogApi(id); ok++ } catch {}
+    }
+    showToast(`${ok} yazı silindi!`, 'success')
+    setSelectedIds(new Set())
+    fetchBlogs()
+  }
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
   }
 
   const generateSlug = (title) => {
@@ -594,6 +616,19 @@ function BlogSection({ showToast }) {
                 </div>
 
                 <div className="form-group">
+                  <label>Zamanlanmış Yayın (isteğe bağlı)</label>
+                  <input
+                    type="datetime-local"
+                    value={form.publishAt || ''}
+                    onChange={(e) => setForm({ ...form, publishAt: e.target.value })}
+                    style={{ maxWidth: 280 }}
+                  />
+                  <small style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem' }}>
+                    Boş bırakılırsa hemen yayınlanır. Gelecek tarih seçilirse o saate kadar gizli kalır.
+                  </small>
+                </div>
+
+                <div className="form-group">
                   <label>Renk</label>
                   <div className="emoji-grid">
                     {colors.map((c) => (
@@ -667,9 +702,22 @@ function BlogSection({ showToast }) {
             <p>Yeni bir blog yazısı oluşturarak başlayın</p>
           </div>
         ) : (
+          <>
+          {selectedIds.size > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: 'rgba(239,68,68,0.08)', borderRadius: 8, marginBottom: 12 }}>
+              <span style={{ color: '#EF4444', fontWeight: 600 }}>{selectedIds.size} yazı seçildi</span>
+              <button className="btn btn-outline" style={{ color: '#EF4444', borderColor: '#EF4444', padding: '6px 14px', fontSize: '0.82rem' }} onClick={handleBulkDelete}>
+                🗑️ Seçilenleri Sil
+              </button>
+              <button className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '0.82rem' }} onClick={() => setSelectedIds(new Set())}>
+                İptal
+              </button>
+            </div>
+          )}
           <table className="admin-table">
             <thead>
               <tr>
+                <th style={{ width: 32 }}></th>
                 <th>İkon</th>
                 <th>Başlık</th>
                 <th>Kategori</th>
@@ -681,6 +729,16 @@ function BlogSection({ showToast }) {
             <tbody>
               {blogs.filter(b => !searchQuery || b.titleTr?.toLowerCase().includes(searchQuery.toLowerCase()) || b.slug?.includes(searchQuery.toLowerCase())).map((blog) => (
                 <tr key={blog._id || blog.slug || blog.id}>
+                  <td>
+                    {blog._id && (
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(blog._id)}
+                        onChange={() => toggleSelect(blog._id)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                    )}
+                  </td>
                   <td>
                     {blog.image && blog.image.startsWith('http') ? (
                       <img src={blog.image} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} />
@@ -716,7 +774,14 @@ function BlogSection({ showToast }) {
                       {blog.published !== false ? '● Yayında' : '○ Taslak'}
                     </button>
                   </td>
-                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{blog.date}</td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                    {blog.date}
+                    {blog.publishAt && new Date(blog.publishAt) > new Date() && (
+                      <div style={{ color: '#eac321', fontSize: '0.75rem', marginTop: 2 }}>
+                        ⏰ {new Date(blog.publishAt).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    )}
+                  </td>
                   <td>
                     <div className="table-actions">
                       <a className="table-action-btn" href={`/blog/${blog.slug}`} target="_blank" rel="noopener noreferrer">
@@ -734,6 +799,7 @@ function BlogSection({ showToast }) {
               ))}
             </tbody>
           </table>
+          </>
         )}
       </div>
     </div>
@@ -4126,6 +4192,9 @@ function NewsletterSection({ showToast }) {
   const [subscribers, setSubscribers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showCompose, setShowCompose] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [composeForm, setComposeForm] = useState({ subject: '', html: '' })
 
   const fetchSubscribers = async () => {
     setLoading(true)
@@ -4134,6 +4203,25 @@ function NewsletterSection({ showToast }) {
       setSubscribers(Array.isArray(data) ? data : [])
     } catch { setSubscribers([]) }
     finally { setLoading(false) }
+  }
+
+  const handleSendNewsletter = async (e) => {
+    e.preventDefault()
+    if (!composeForm.subject.trim() || !composeForm.html.trim()) {
+      showToast('Konu ve içerik gerekli', 'error'); return
+    }
+    if (!window.confirm(`${subscribers.length} aboneye e-posta gönderilecek. Emin misiniz?`)) return
+    setSending(true)
+    try {
+      const result = await sendNewsletterApi(composeForm.subject, composeForm.html)
+      showToast(`${result.sent} aboneye başarıyla gönderildi!`, 'success')
+      setShowCompose(false)
+      setComposeForm({ subject: '', html: '' })
+    } catch (err) {
+      showToast(err.message || 'Gönderim sırasında hata oluştu', 'error')
+    } finally {
+      setSending(false)
+    }
   }
 
   useEffect(() => { fetchSubscribers() }, [])
@@ -4172,11 +4260,58 @@ function NewsletterSection({ showToast }) {
           <button className="btn btn-outline" onClick={() => fetchSubscribers()} disabled={loading}>
             {loading ? '⏳' : '🔄'} Yenile
           </button>
-          <button className="btn btn-primary" onClick={exportSubscribersExcel} disabled={filtered.length === 0}>
+          <button className="btn btn-outline" onClick={exportSubscribersExcel} disabled={filtered.length === 0}>
             📥 Excel İndir
+          </button>
+          <button className="btn btn-primary" onClick={() => setShowCompose(v => !v)} disabled={subscribers.length === 0}>
+            📨 Toplu Gönder
           </button>
         </div>
       </div>
+
+      {/* Compose newsletter */}
+      {showCompose && (
+        <div className="admin-form-section" style={{ marginBottom: 24 }}>
+          <h3 style={{ marginBottom: 16 }}>📨 Toplu Newsletter Gönder</h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: 16 }}>
+            {subscribers.length} aboneye gönderilecek. Her e-postanın altına otomatik abonelikten çık bağlantısı eklenir.
+          </p>
+          <form onSubmit={handleSendNewsletter} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div className="form-group">
+              <label className="form-label">Konu *</label>
+              <input
+                type="text"
+                className="form-input"
+                value={composeForm.subject}
+                onChange={e => setComposeForm(f => ({ ...f, subject: e.target.value }))}
+                placeholder="E-posta konusu"
+                maxLength={200}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">İçerik (HTML) *</label>
+              <textarea
+                className="form-textarea"
+                value={composeForm.html}
+                onChange={e => setComposeForm(f => ({ ...f, html: e.target.value }))}
+                placeholder="<p>Merhaba, bu ay...</p>"
+                rows={10}
+                style={{ fontFamily: 'monospace', fontSize: '0.82rem' }}
+                required
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button type="submit" className="btn btn-primary" disabled={sending}>
+                {sending ? '⏳ Gönderiliyor...' : `📨 ${subscribers.length} Aboneye Gönder`}
+              </button>
+              <button type="button" className="btn btn-outline" onClick={() => setShowCompose(false)}>
+                İptal
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>

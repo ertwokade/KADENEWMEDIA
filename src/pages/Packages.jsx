@@ -82,6 +82,30 @@ export default function Packages() {
     fetchExchangeRate().then(rate => { if (rate) setExchangeRate(rate) })
   }, [])
 
+  useEffect(() => {
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Kade Media Sosyal Medya Paketleri',
+      url: 'https://kademedia.com.tr/paketler',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Başlangıç Paketi', url: 'https://kademedia.com.tr/paketler#starter' },
+        { '@type': 'ListItem', position: 2, name: 'Profesyonel Paket', url: 'https://kademedia.com.tr/paketler#professional' },
+        { '@type': 'ListItem', position: 3, name: 'Kurumsal Paket', url: 'https://kademedia.com.tr/paketler#enterprise' },
+        { '@type': 'ListItem', position: 4, name: 'Özel Paket', url: 'https://kademedia.com.tr/paketler#custom' },
+      ],
+    }
+    let el = document.getElementById('jsonld-packages')
+    if (el) { el.textContent = JSON.stringify(schema) } else {
+      const s = document.createElement('script')
+      s.id = 'jsonld-packages'
+      s.type = 'application/ld+json'
+      s.textContent = JSON.stringify(schema)
+      document.head.appendChild(s)
+    }
+    return () => { document.getElementById('jsonld-packages')?.remove() }
+  }, [])
+
   const dynamicPackages = dynamicItems
     ? dynamicItems.map(item => ({
         name: isEN ? item.nameEn : item.nameTr,

@@ -8,6 +8,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { blogPosts as staticBlogPosts } from '../data/content'
 import { getBlogsApi } from '../api'
+import { getBlogImage } from '../utils/blogImage'
 import DOMPurify from 'dompurify'
 import { analytics } from '../utils/analytics'
 import PageTransition from '../components/PageTransition'
@@ -79,7 +80,29 @@ export default function BlogDetail() {
       s.textContent = JSON.stringify(schema)
       document.head.appendChild(s)
     }
-    return () => { document.getElementById('jsonld-article')?.remove() }
+
+    const breadcrumb = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://kademedia.com.tr' },
+        { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://kademedia.com.tr/blog' },
+        { '@type': 'ListItem', position: 3, name: title, item: `https://kademedia.com.tr/blog/${slug}` },
+      ],
+    }
+    let bcEl = document.getElementById('jsonld-breadcrumb')
+    if (bcEl) { bcEl.textContent = JSON.stringify(breadcrumb) } else {
+      const s2 = document.createElement('script')
+      s2.id = 'jsonld-breadcrumb'
+      s2.type = 'application/ld+json'
+      s2.textContent = JSON.stringify(breadcrumb)
+      document.head.appendChild(s2)
+    }
+
+    return () => {
+      document.getElementById('jsonld-article')?.remove()
+      document.getElementById('jsonld-breadcrumb')?.remove()
+    }
   }, [post, slug, title, excerpt])
 
   // Only redirect after both static + API data have been checked
@@ -134,13 +157,14 @@ export default function BlogDetail() {
             <FadeIn>
               <div
                 className="blog-detail-image glass-card"
-                style={{ background: `${post.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '240px', fontSize: '5rem', marginBottom: '32px', borderRadius: '16px' }}
+                style={{ background: `${post.color}15`, overflow: 'hidden', minHeight: '240px', marginBottom: '32px', borderRadius: '16px' }}
               >
-                {post.image && post.image.startsWith('http') ? (
-                  <img src={post.image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = `linear-gradient(135deg, ${post.color}33, ${post.color}11)` }} />
-                ) : (
-                  <span>{post.image}</span>
-                )}
+                <img
+                  src={getBlogImage(post)}
+                  alt={title}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px', display: 'block' }}
+                  onError={e => { e.target.style.display = 'none' }}
+                />
               </div>
             </FadeIn>
 
@@ -212,11 +236,13 @@ export default function BlogDetail() {
                     <Link key={p.slug} to={`/blog/${p.slug}`} style={{ textDecoration: 'none' }}>
                       <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
                         <div className="blog-card-image" style={{ background: `${p.color}15` }}>
-                          {p.image && p.image.startsWith('http') ? (
-                            <img src={p.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = `linear-gradient(135deg, ${p.color}33, ${p.color}11)` }} />
-                          ) : (
-                            <span>{p.image}</span>
-                          )}
+                          <img
+                            src={getBlogImage(p)}
+                            alt={p.titleTr || ''}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={e => { e.target.style.display = 'none' }}
+                            loading="lazy"
+                          />
                         </div>
                         <div className="blog-card-content">
                           <div className="blog-meta">

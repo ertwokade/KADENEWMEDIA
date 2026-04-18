@@ -361,6 +361,15 @@ export async function deleteNewsletterSubscriberApi(id) {
   return handleResponse(res);
 }
 
+export async function sendNewsletterApi(subject, html) {
+  const res = await fetch(`${API_BASE}/contact?action=send-newsletter`, {
+    method: 'POST',
+    headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subject, html }),
+  });
+  return handleResponse(res);
+}
+
 // SMTP test
 export async function testSmtpApi() {
   const res = await fetch(`${API_BASE}/contact?action=smtp-test`, {

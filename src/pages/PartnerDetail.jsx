@@ -55,7 +55,34 @@ export default function PartnerDetail() {
   const metaTitle = name ? `${name} Vaka Çalışması | Kade Media` : 'Partner | Kade Media'
   const metaDesc = shortDesc || (name ? `${name} için gerçekleştirdiğimiz dijital pazarlama çalışması ve elde ettiğimiz sonuçlar.` : '')
 
-  useSEO({ title: metaTitle, description: metaDesc, path: `/partnerler/${id}` })
+  useSEO({
+    title: metaTitle,
+    description: metaDesc,
+    path: `/partnerler/${id}`,
+    image: partner?.logo?.startsWith('http') ? partner.logo : 'https://kademedia.com.tr/og-partners.png',
+  })
+
+  useEffect(() => {
+    if (!partner) return
+    const breadcrumb = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://kademedia.com.tr' },
+        { '@type': 'ListItem', position: 2, name: 'Partnerler', item: 'https://kademedia.com.tr/partnerler' },
+        { '@type': 'ListItem', position: 3, name: name, item: `https://kademedia.com.tr/partnerler/${id}` },
+      ],
+    }
+    let el = document.getElementById('jsonld-breadcrumb')
+    if (el) { el.textContent = JSON.stringify(breadcrumb) } else {
+      const s = document.createElement('script')
+      s.id = 'jsonld-breadcrumb'
+      s.type = 'application/ld+json'
+      s.textContent = JSON.stringify(breadcrumb)
+      document.head.appendChild(s)
+    }
+    return () => { document.getElementById('jsonld-breadcrumb')?.remove() }
+  }, [partner, id, name])
 
   // While API is loading and no static data found, show loading
   if (apiLoading) {

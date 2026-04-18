@@ -8,6 +8,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { blogPosts as staticBlogPosts } from '../data/content'
 import { getBlogsApi } from '../api'
+import { getBlogImage } from '../utils/blogImage'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -151,11 +152,13 @@ export default function Blog() {
             <Link to={`/blog/${featured.slug}`} style={{ textDecoration: 'none' }}>
               <motion.div className="blog-featured glass-card" whileHover={{ y: -4 }}>
                 <div className="blog-featured-image" style={{ background: `${featured.color}15` }}>
-                  {featured.image && featured.image.startsWith('http') ? (
-                    <img src={featured.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = `linear-gradient(135deg, ${featured.color}33, ${featured.color}11)` }} />
-                  ) : (
-                    <span>{featured.image}</span>
-                  )}
+                  <img
+                    src={getBlogImage(featured)}
+                    alt={featured.titleTr || ''}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={e => { e.target.style.display = 'none' }}
+                    loading="lazy"
+                  />
                 </div>
                 <div className="blog-featured-content">
                   <div className="blog-meta">
@@ -187,11 +190,13 @@ export default function Blog() {
                 <Link to={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>
                   <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
                     <div className="blog-card-image" style={{ background: `${post.color}15` }}>
-                      {post.image && post.image.startsWith('http') ? (
-                        <img src={post.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = `linear-gradient(135deg, ${post.color}33, ${post.color}11)` }} />
-                      ) : (
-                        <span>{post.image}</span>
-                      )}
+                      <img
+                        src={getBlogImage(post)}
+                        alt={post.titleTr || ''}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={e => { e.target.style.display = 'none' }}
+                        loading="lazy"
+                      />
                     </div>
                     <div className="blog-card-content">
                       <div className="blog-meta">

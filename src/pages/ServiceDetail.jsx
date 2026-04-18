@@ -125,7 +125,30 @@ export default function ServiceDetail() {
     title: title ? `${title} | Kade Media` : 'Hizmet | Kade Media',
     description: desc,
     path: `/hizmetler/${slug}`,
+    image: 'https://kademedia.com.tr/og-services.png',
   })
+
+  useEffect(() => {
+    if (!service) return
+    const breadcrumb = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://kademedia.com.tr' },
+        { '@type': 'ListItem', position: 2, name: 'Hizmetler', item: 'https://kademedia.com.tr/hizmetler' },
+        { '@type': 'ListItem', position: 3, name: title, item: `https://kademedia.com.tr/hizmetler/${slug}` },
+      ],
+    }
+    let el = document.getElementById('jsonld-breadcrumb')
+    if (el) { el.textContent = JSON.stringify(breadcrumb) } else {
+      const s = document.createElement('script')
+      s.id = 'jsonld-breadcrumb'
+      s.type = 'application/ld+json'
+      s.textContent = JSON.stringify(breadcrumb)
+      document.head.appendChild(s)
+    }
+    return () => { document.getElementById('jsonld-breadcrumb')?.remove() }
+  }, [service, slug, title])
 
   if (!staticService) return <Navigate to="/hizmetler" replace />
 

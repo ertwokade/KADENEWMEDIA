@@ -13,7 +13,14 @@ export default async function handler(req, res) {
   // GET - List all blog posts (public)
   if (req.method === 'GET') {
     try {
-      const posts = await collection.find({}).sort({ createdAt: -1 }).toArray();
+      const now = new Date();
+      const posts = await collection.find({
+        $or: [
+          { publishAt: { $exists: false } },
+          { publishAt: null },
+          { publishAt: { $lte: now } },
+        ],
+      }).sort({ createdAt: -1 }).toArray();
       return res.status(200).json(posts);
     } catch (error) {
       console.error('Blog GET error:', error);
@@ -30,7 +37,7 @@ export default async function handler(req, res) {
       const {
         titleTr, titleEn, excerptTr, excerptEn,
         contentTr, contentEn, category, categoryEn,
-        image, color, readTime, slug
+        image, color, readTime, slug, publishAt
       } = req.body;
 
       if (!titleTr || !slug) return res.status(400).json({ error: 'Başlık ve slug gerekli' });
@@ -48,6 +55,7 @@ export default async function handler(req, res) {
         category: category || '', categoryEn: categoryEn || '',
         image: image || '📝', color: color || '#FFD700',
         readTime: parseInt(readTime) || 5, slug,
+        publishAt: publishAt ? new Date(publishAt) : null,
         date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }),
         createdAt: new Date(), updatedAt: new Date(),
       };
@@ -73,6 +81,9 @@ export default async function handler(req, res) {
 
       updateData.updatedAt = new Date();
       if (updateData.readTime) updateData.readTime = parseInt(updateData.readTime);
+      if (updateData.publishAt !== undefined) {
+        updateData.publishAt = updateData.publishAt ? new Date(updateData.publishAt) : null;
+      }
 
       const result = await collection.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
       if (result.matchedCount === 0) return res.status(404).json({ error: 'Post bulunamadı' });
