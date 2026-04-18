@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import { ObjectId } from 'mongodb';
-import { getDb } from './_lib/mongodb.js';
+import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import { requireAuth } from './_lib/auth.js';
@@ -59,6 +59,7 @@ export default async function handler(req, res) {
       try {
         const id = req.query?.id;
         if (!id) return res.status(400).json({ error: 'id gerekli' });
+        if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
         await db.collection('newsletter').deleteOne({ _id: new ObjectId(id) });
         logActivity(db, { action: 'Newsletter abonesi silindi', detail: '', type: 'delete', icon: '📧', user: user.username }).catch(() => {});
         return res.status(200).json({ success: true });
@@ -82,7 +83,7 @@ export default async function handler(req, res) {
       await transporter.verify();
       return res.status(200).json({ success: true, message: 'SMTP bağlantısı başarılı!' });
     } catch (err) {
-      return res.status(200).json({ success: false, message: `SMTP bağlantı hatası: ${err.message}` });
+      return res.status(200).json({ success: false, message: 'SMTP bağlantı hatası. Ayarları kontrol edin.' });
     }
   }
 

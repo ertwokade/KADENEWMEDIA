@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import { ObjectId } from 'mongodb';
-import { getDb } from './_lib/mongodb.js';
+import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
@@ -80,8 +80,9 @@ export default async function handler(req, res) {
 
     if (recipients && recipients.length > 0) {
       const db = await getDb();
+      const validIds = recipients.filter(id => isValidObjectId(id)).map(id => new ObjectId(id));
       const users = await db.collection('users')
-        .find({ _id: { $in: recipients.map(id => new ObjectId(id)) } })
+        .find({ _id: { $in: validIds } })
         .project({ username: 1, email: 1 })
         .toArray();
 

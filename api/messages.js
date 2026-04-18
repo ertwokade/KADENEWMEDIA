@@ -169,6 +169,7 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE') {
       const id = req.query?.id;
       if (!id) return res.status(400).json({ error: 'id gerekli' });
+      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
       await notesCol.deleteOne({ _id: new ObjectId(id) });
       return res.status(200).json({ success: true });
     }
