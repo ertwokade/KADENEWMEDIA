@@ -1,4 +1,5 @@
 import { cors } from './_lib/cors.js';
+import { rateLimitCheck } from './_lib/rateLimit.js';
 
 const KADE_CONTEXT_TR = `Sen Kade Media'nın AI asistanısın. Kade Media İstanbul Biruni Teknopark'ta bulunan bir dijital pazarlama ajansıdır.
 Kurucu: Kadir Demir. Şirket 8+ yıllık deneyime sahip, 5 kişilik uzman ekip, 100+ mutlu müşteri.
@@ -19,6 +20,11 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const rl = rateLimitCheck(req);
+  if (!rl.allowed) {
+    return res.status(429).json({ error: `Çok fazla istek. ${rl.retryAfter} dakika sonra tekrar deneyin.` });
   }
 
   const GEMINI_KEY = process.env.GEMINI_API_KEY;

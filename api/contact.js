@@ -90,6 +90,8 @@ export default async function handler(req, res) {
   // ── Kariyer Başvurusu (public, POST only) ──
   if (action === 'apply') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const applyRl = rateLimitCheck(req);
+    if (!applyRl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${applyRl.retryAfter} dakika sonra tekrar deneyin.` });
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
     const { name, email, phone, position, coverLetter } = body || {};
@@ -132,6 +134,8 @@ export default async function handler(req, res) {
   // ── Sosyal Medya Analiz Aracı Lead (public, POST only) ──
   if (action === 'analyzer-lead') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const analyzerRl = rateLimitCheck(req);
+    if (!analyzerRl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${analyzerRl.retryAfter} dakika sonra tekrar deneyin.` });
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
     const { email, score, platforms, usernames, categories } = body || {};
@@ -189,6 +193,8 @@ export default async function handler(req, res) {
   // ── Newsletter aboneliği (public, POST only) ──
   if (action === 'newsletter') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const nlRl = rateLimitCheck(req);
+    if (!nlRl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${nlRl.retryAfter} dakika sonra tekrar deneyin.` });
     return handleNewsletter(req, res);
   }
 
