@@ -53,9 +53,7 @@ export default async function handler(req, res) {
       authHeader === `Bearer ${cronSecret}` ||
       req.query?.secret === cronSecret
     );
-    // If CRON_SECRET is not set, allow GET requests (Vercel Hobby cron compatibility)
-    const isOpenCron = !cronSecret && req.method === 'GET';
-    if (!user && !isCronSecret && !isOpenCron) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    if (!user && !isCronSecret) return res.status(401).json({ error: 'Yetkisiz erişim' });
 
     try {
       const now = new Date();

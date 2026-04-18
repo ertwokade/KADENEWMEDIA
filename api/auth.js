@@ -4,9 +4,9 @@ import { createToken, requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
 
-// Varsayılan admin bilgileri — .env'den alınır, yoksa fallback
+// Varsayılan admin bilgileri — .env'den alınır
 const DEFAULT_ADMIN_USERNAME = 'kade';
-const DEFAULT_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'KadeAdmin2026!';
+const DEFAULT_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD;
 
 // Brute-force koruması: IP başına login denemesi sınırı
 const loginAttempts = new Map();
