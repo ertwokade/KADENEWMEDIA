@@ -131,11 +131,18 @@ async function handleLogin(req, res) {
       }
     });
   } catch (error) {
-    console.error('Login hatası:', error);
-    if (error.message?.includes('bad auth') || error.code === 8000) {
-      return res.status(500).json({ 
-        error: 'Veritabanı bağlantı hatası: MongoDB Atlas kullanıcı adı veya şifresi yanlış. Lütfen MONGODB_URI ortam değişkenini kontrol edin.' 
-      });
+    console.error('Login hatası:', error.message, 'code:', error.code);
+    const msg = error.message || '';
+    if (
+      msg.includes('bad auth') || error.code === 8000 ||
+      msg.includes('Authentication failed') ||
+      msg.includes('MONGODB_URI') ||
+      msg.includes('tanımlı değil')
+    ) {
+      return res.status(500).json({ error: 'Veritabanı bağlantı hatası. Lütfen yöneticinize başvurun.' });
+    }
+    if (msg.includes('timed out') || msg.includes('ECONNREFUSED') || msg.includes('ETIMEDOUT') || error.name === 'MongoNetworkError') {
+      return res.status(503).json({ error: 'Veritabanına ulaşılamıyor. Lütfen birkaç saniye sonra tekrar deneyin.' });
     }
     return res.status(500).json({ error: 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.' });
   }
