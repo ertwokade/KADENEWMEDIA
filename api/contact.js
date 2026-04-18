@@ -218,6 +218,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Ad, e-posta ve mesaj alanları zorunludur.' });
   }
 
+  if (name.trim().length > 100) return res.status(400).json({ error: 'Ad çok uzun (max 100 karakter).' });
+  if (email.trim().length > 254) return res.status(400).json({ error: 'E-posta çok uzun.' });
+  if (phone && phone.length > 30) return res.status(400).json({ error: 'Telefon çok uzun.' });
+  if (company && company.length > 100) return res.status(400).json({ error: 'Şirket adı çok uzun.' });
+  if (message.trim().length > 5000) return res.status(400).json({ error: 'Mesaj çok uzun (max 5000 karakter).' });
+
   if (!EMAIL_RE.test(email)) {
     return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
   }
