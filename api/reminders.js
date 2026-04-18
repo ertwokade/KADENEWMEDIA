@@ -111,7 +111,7 @@ export default async function handler(req, res) {
             sentCount++;
           } catch (err) {
             console.error('Reminder email failed:', reminder.title, err.message);
-            errors.push(`Email failed for "${reminder.title}": ${err.message}`);
+            errors.push(`Email gönderilemedi: "${reminder.title}"`);
           }
         } else if (!transporter) {
           errors.push(`SMTP not configured — skipped email for "${reminder.title}"`);
@@ -131,7 +131,7 @@ export default async function handler(req, res) {
               notifCount++;
             } catch (err) {
               console.error('Notification failed for user', userId, err.message);
-              errors.push(`Notification failed for user ${userId}: ${err.message}`);
+              errors.push(`Bildirim gönderilemedi: kullanıcı ${userId}`);
             }
           }
         }

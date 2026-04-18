@@ -34,6 +34,9 @@ export default async function handler(req, res) {
       } = req.body;
 
       if (!titleTr || !slug) return res.status(400).json({ error: 'Başlık ve slug gerekli' });
+      if (titleTr.length > 300) return res.status(400).json({ error: 'Başlık çok uzun (max 300)' });
+      if (slug.length > 200) return res.status(400).json({ error: 'Slug çok uzun (max 200)' });
+      if (contentTr && contentTr.length > 200000) return res.status(400).json({ error: 'İçerik çok uzun (max 200.000 karakter)' });
 
       const existing = await collection.findOne({ slug });
       if (existing) return res.status(400).json({ error: 'Bu slug zaten kullanılıyor' });
