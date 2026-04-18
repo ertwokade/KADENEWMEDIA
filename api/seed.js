@@ -432,6 +432,6 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('Seed error:', error);
-    return res.status(500).json({ error: 'Seed hatası: ' + error.message });
+    return res.status(500).json({ error: 'Seed hatası. Sunucu loglarını kontrol edin.' });
   }
 }

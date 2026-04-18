@@ -108,7 +108,7 @@ export default async function handler(req, res) {
       auth: { user: smtpUser, pass: smtpPass },
       ...(port === 587 ? { requireTLS: true } : {}),
       tls: {
-        rejectUnauthorized: false,
+        rejectUnauthorized: true,
         minVersion: 'TLSv1.2',
       },
       connectionTimeout: 10000,
@@ -179,6 +179,6 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('Calendar invite error:', error);
-    return res.status(500).json({ error: 'Davet gönderilirken hata oluştu: ' + error.message });
+    return res.status(500).json({ error: 'Davet gönderilirken hata oluştu. Lütfen tekrar deneyin.' });
   }
 }

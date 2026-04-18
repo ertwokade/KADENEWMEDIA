@@ -31,15 +31,22 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'message is required' });
   }
 
+  if (message.length > 1000) {
+    return res.status(400).json({ error: 'Mesaj çok uzun (max 1000 karakter).' });
+  }
+
+  const safeMessage = message.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+
   try {
     const systemPrompt = lang === 'en' ? KADE_CONTEXT_EN : KADE_CONTEXT_TR;
 
-    let promptText = systemPrompt + '\n\nKullanıcı mesajı: ' + message;
+    let promptText = systemPrompt + '\n\nKullanıcı mesajı: ' + safeMessage;
     if (Array.isArray(history) && history.length > 0) {
       const historyText = history.slice(-6)
-        .map(m => `${m.type === 'user' ? 'Kullanıcı' : 'Asistan'}: ${m.text}`)
+        .filter(m => m && typeof m.text === 'string' && m.text.length < 500)
+        .map(m => `${m.type === 'user' ? 'Kullanıcı' : 'Asistan'}: ${m.text.slice(0, 500)}`)
         .join('\n');
-      promptText = systemPrompt + '\n\nÖnceki konuşma:\n' + historyText + '\n\nKullanıcının son mesajı: ' + message;
+      promptText = systemPrompt + '\n\nÖnceki konuşma:\n' + historyText + '\n\nKullanıcının son mesajı: ' + safeMessage;
     }
 
     const apiRes = await fetch(

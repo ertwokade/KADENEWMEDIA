@@ -8,6 +8,36 @@ import { logActivity } from './notifications.js';
 const DEFAULT_ADMIN_USERNAME = 'kade';
 const DEFAULT_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'KadeAdmin2026!';
 
+// Brute-force koruması: IP başına login denemesi sınırı
+const loginAttempts = new Map();
+const LOGIN_WINDOW_MS = 15 * 60 * 1000; // 15 dakika
+const MAX_LOGIN_ATTEMPTS = 10;
+
+function checkLoginRateLimit(req) {
+  const ip =
+    req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+    req.headers['x-real-ip'] ||
+    req.socket?.remoteAddress ||
+    'unknown';
+  const now = Date.now();
+
+  for (const [key, val] of loginAttempts.entries()) {
+    if (now - val.windowStart > LOGIN_WINDOW_MS) loginAttempts.delete(key);
+  }
+
+  const entry = loginAttempts.get(ip);
+  if (!entry || now - entry.windowStart > LOGIN_WINDOW_MS) {
+    loginAttempts.set(ip, { count: 1, windowStart: now });
+    return { allowed: true };
+  }
+  if (entry.count >= MAX_LOGIN_ATTEMPTS) {
+    const retryAfter = Math.ceil((LOGIN_WINDOW_MS - (now - entry.windowStart)) / 60000);
+    return { allowed: false, retryAfter };
+  }
+  entry.count += 1;
+  return { allowed: true };
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
@@ -26,6 +56,13 @@ export default async function handler(req, res) {
 
 // ========== LOGIN ==========
 async function handleLogin(req, res) {
+  const rl = checkLoginRateLimit(req);
+  if (!rl.allowed) {
+    return res.status(429).json({
+      error: `Çok fazla giriş denemesi. Lütfen ${rl.retryAfter} dakika sonra tekrar deneyin.`,
+    });
+  }
+
   try {
     let body = req.body;
     if (typeof body === 'string') {
@@ -100,7 +137,7 @@ async function handleLogin(req, res) {
         error: 'Veritabanı bağlantı hatası: MongoDB Atlas kullanıcı adı veya şifresi yanlış. Lütfen MONGODB_URI ortam değişkenini kontrol edin.' 
       });
     }
-    return res.status(500).json({ error: 'Sunucu hatası: ' + error.message });
+    return res.status(500).json({ error: 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.' });
   }
 }
 
@@ -118,8 +155,8 @@ async function handleChangePassword(req, res) {
       return res.status(400).json({ error: 'Mevcut şifre ve yeni şifre gerekli' });
     }
 
-    if (newPassword.length < 4) {
-      return res.status(400).json({ error: 'Yeni şifre en az 4 karakter olmalı' });
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'Yeni şifre en az 8 karakter olmalı' });
     }
 
     const db = await getDb();

@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         host: smtpHost, port: smtpPort, secure: smtpPort === 465,
         auth: { user: smtpUser, pass: smtpPass },
         ...(smtpPort === 587 ? { requireTLS: true } : {}),
-        tls: { rejectUnauthorized: false, minVersion: 'TLSv1.2' },
+        tls: { rejectUnauthorized: true, minVersion: 'TLSv1.2' },
         connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000,
       });
 
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: 'E-posta başarıyla gönderildi!' });
     } catch (error) {
       console.error('Reply error:', error);
-      return res.status(500).json({ error: 'E-posta gönderilemedi: ' + error.message });
+      return res.status(500).json({ error: 'E-posta gönderilemedi. SMTP ayarlarını kontrol edin.' });
     }
   }
 
