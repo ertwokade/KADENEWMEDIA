@@ -72,8 +72,11 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'En az bir alıcı seçmelisiniz' });
     }
 
-    // Collect email addresses
-    const emails = [...(customEmails || [])];
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Collect email addresses — validate each one
+    const emails = (Array.isArray(customEmails) ? customEmails : [])
+      .filter(e => typeof e === 'string' && EMAIL_RE.test(e.trim()))
+      .map(e => e.trim());
 
     if (recipients && recipients.length > 0) {
       const db = await getDb();

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { ObjectId } from 'mongodb';
-import { getDb } from './_lib/mongodb.js';
+import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
@@ -74,6 +74,7 @@ export default async function handler(req, res) {
       if (!id) {
         return res.status(400).json({ error: 'Kullanıcı ID gerekli' });
       }
+      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
       const { email: emailUpdate } = req.body;
       const updateData = { updatedAt: new Date() };
@@ -100,6 +101,7 @@ export default async function handler(req, res) {
       if (!id) {
         return res.status(400).json({ error: 'Kullanıcı ID gerekli' });
       }
+      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
       // Prevent deleting yourself
       const targetUser = await db.collection('users').findOne({ _id: new ObjectId(id) });

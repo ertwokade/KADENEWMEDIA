@@ -48,7 +48,9 @@ export default async function handler(req, res) {
       const db = await getDb();
       let body = req.body;
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
-      const { path, referrer } = body || {};
+      const { path: rawPath, referrer: rawReferrer } = body || {};
+      const path = typeof rawPath === 'string' ? rawPath.slice(0, 200) : '/';
+      const referrer = typeof rawReferrer === 'string' ? rawReferrer.slice(0, 500) : '';
       const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
       // Increment daily counter for this path
@@ -255,7 +257,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ configured: true, source: 'google_analytics', dailyData, totalVisits, growth, pages, sources, activeUsers, period });
     } catch (err) {
       console.error('GA4 error:', err);
-      return res.status(500).json({ error: 'GA4 verisi alınamadı: ' + err.message });
+      return res.status(500).json({ error: 'GA4 verisi alınamadı.' });
     }
   }
 

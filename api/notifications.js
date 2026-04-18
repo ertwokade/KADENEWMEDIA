@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { getDb } from './_lib/mongodb.js';
+import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
@@ -78,6 +78,7 @@ export default async function handler(req, res) {
     }
 
     if (id) {
+      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
       await collection.updateOne(
         { _id: new ObjectId(id) },
         { $set: { read: true } }
@@ -94,6 +95,7 @@ export default async function handler(req, res) {
     if (!id) {
       return res.status(400).json({ error: 'id gerekli' });
     }
+    if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
     await collection.deleteOne({ _id: new ObjectId(id) });
     return res.status(200).json({ success: true });
   }

@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { getDb } from './_lib/mongodb.js';
+import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
@@ -60,6 +60,7 @@ export default async function handler(req, res) {
     try {
       const { _id, ...updateData } = req.body;
       if (!_id) return res.status(400).json({ error: 'Partner ID gerekli' });
+      if (!isValidObjectId(_id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
       updateData.updatedAt = new Date();
       const result = await collection.updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
@@ -81,6 +82,7 @@ export default async function handler(req, res) {
     try {
       const queryId = req.body?.id || req.query.id;
       if (!queryId) return res.status(400).json({ error: 'Partner ID gerekli' });
+      if (!isValidObjectId(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
 
       const partner = await collection.findOne({ _id: new ObjectId(queryId) });
       const result = await collection.deleteOne({ _id: new ObjectId(queryId) });

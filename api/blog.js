@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { getDb } from './_lib/mongodb.js';
+import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
@@ -66,6 +66,7 @@ export default async function handler(req, res) {
     try {
       const { id, ...updateData } = req.body;
       if (!id) return res.status(400).json({ error: 'Post ID gerekli' });
+      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz Post ID' });
 
       updateData.updatedAt = new Date();
       if (updateData.readTime) updateData.readTime = parseInt(updateData.readTime);
@@ -89,6 +90,7 @@ export default async function handler(req, res) {
     try {
       const queryId = req.body?.id || req.query.id;
       if (!queryId) return res.status(400).json({ error: 'Post ID gerekli' });
+      if (!isValidObjectId(queryId)) return res.status(400).json({ error: 'Geçersiz Post ID' });
 
       const post = await collection.findOne({ _id: new ObjectId(queryId) });
       const result = await collection.deleteOne({ _id: new ObjectId(queryId) });

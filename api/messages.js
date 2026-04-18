@@ -1,4 +1,4 @@
-import { getDb } from './_lib/mongodb.js';
+import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { ObjectId } from 'mongodb';
@@ -31,6 +31,7 @@ export default async function handler(req, res) {
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       const { id, replyText, subject } = body || {};
       if (!id || !replyText?.trim()) return res.status(400).json({ error: 'id ve replyText gerekli' });
+      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
       const message = await collection.findOne({ _id: new ObjectId(id) });
       if (!message) return res.status(404).json({ error: 'Mesaj bulunamadı' });
@@ -107,6 +108,8 @@ export default async function handler(req, res) {
       let body = req.body;
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       const { id, status, read } = body || {};
+      if (!id) return res.status(400).json({ error: 'id gerekli' });
+      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
       const update = {};
 
       if (status !== undefined) {
@@ -130,6 +133,8 @@ export default async function handler(req, res) {
   if (req.method === 'DELETE') {
     try {
       const queryId = req.body?.id || req.query.id;
+      if (!queryId) return res.status(400).json({ error: 'id gerekli' });
+      if (!isValidObjectId(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
       const msg = await collection.findOne({ _id: new ObjectId(queryId) });
       await collection.deleteOne({ _id: new ObjectId(queryId) });
       logActivity(db, { action: 'Mesaj silindi', detail: `${msg?.name || ''} - ${msg?.subject || ''}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});

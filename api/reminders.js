@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import nodemailer from 'nodemailer';
-import { getDb } from './_lib/mongodb.js';
+import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity, createNotification } from './notifications.js';
@@ -166,7 +166,7 @@ export default async function handler(req, res) {
       });
     } catch (err) {
       console.error('Reminder check error:', err);
-      return res.status(500).json({ error: err.message });
+      return res.status(500).json({ error: 'Hatırlatıcı kontrolü sırasında hata oluştu.' });
     }
   }
 
@@ -224,6 +224,7 @@ export default async function handler(req, res) {
 
     const { id, title, description, remindAt, emails, priority, category, repeat, status, assignedUsers } = body || {};
     if (!id) return res.status(400).json({ error: 'id gerekli' });
+    if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
     const update = {};
     if (title !== undefined) update.title = title.trim();
@@ -246,6 +247,7 @@ export default async function handler(req, res) {
   if (req.method === 'DELETE') {
     const id = req.query?.id;
     if (!id) return res.status(400).json({ error: 'id gerekli' });
+    if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
     await collection.deleteOne({ _id: new ObjectId(id) });
     logActivity(db, { action: 'Hatırlatıcı silindi', detail: id, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
     return res.status(200).json({ success: true });
