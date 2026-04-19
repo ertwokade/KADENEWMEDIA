@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
-import { logActivity, createNotification } from './notifications.js';
+import { logActivity, createNotification } from './_lib/notify.js';
 
 function makeTransporter() {
   const host = process.env.SMTP_HOST;
@@ -249,6 +249,51 @@ export default async function handler(req, res) {
     await collection.deleteOne({ _id: new ObjectId(id) });
     logActivity(db, { action: 'Hatırlatıcı silindi', detail: id, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
     return res.status(200).json({ success: true });
+  }
+
+  // ── POST ?action=send-invite — Takvim daveti gönder (calendar-invite) ──
+  if (action === 'send-invite' && req.method === 'POST') {
+    const { event, recipients, customEmails, message } = req.body;
+    if (!event || !event.title || !event.date) return res.status(400).json({ error: 'Etkinlik başlığı ve tarihi gerekli' });
+    if ((!recipients || recipients.length === 0) && (!customEmails || customEmails.length === 0)) return res.status(400).json({ error: 'En az bir alıcı seçmelisiniz' });
+
+    function generateICS({ title, description, date, time, duration = 60 }) {
+      const [year, month, day] = date.split('-');
+      const [hours, minutes] = (time || '10:00').split(':');
+      const startTotal = parseInt(hours) * 60 + parseInt(minutes);
+      const endTotal = startTotal + duration;
+      const endH = String(Math.floor(endTotal / 60) % 24).padStart(2, '0');
+      const endM = String(endTotal % 60).padStart(2, '0');
+      const startFmt = `${year}${month}${day}T${hours.padStart(2, '0')}${minutes.padStart(2, '0')}00`;
+      const endFmt = `${year}${month}${day}T${endH}${endM}00`;
+      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Kade Media//Calendar//TR','CALSCALE:GREGORIAN','METHOD:REQUEST','BEGIN:VTIMEZONE','TZID:Europe/Istanbul','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:+0300','TZOFFSETTO:+0300','END:STANDARD','END:VTIMEZONE','BEGIN:VEVENT',`DTSTART;TZID=Europe/Istanbul:${startFmt}`,`DTEND;TZID=Europe/Istanbul:${endFmt}`,`SUMMARY:${title}`,`DESCRIPTION:${(description || '').replace(/\n/g, '\\n')}`,'ORGANIZER;CN=Kade Media:mailto:hello@kademedia.com',`UID:${Date.now()}@kademedia.com`,'STATUS:CONFIRMED','END:VEVENT','END:VCALENDAR'].join('\r\n');
+    }
+
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emails = (Array.isArray(customEmails) ? customEmails : []).filter(e => typeof e === 'string' && EMAIL_RE.test(e.trim())).map(e => e.trim());
+    if (recipients && recipients.length > 0) {
+      const validIds = recipients.filter(id => isValidObjectId(id)).map(id => new ObjectId(id));
+      const users = await db.collection('users').find({ _id: { $in: validIds } }).project({ email: 1 }).toArray();
+      users.forEach(u => { if (u.email) emails.push(u.email); });
+    }
+    if (emails.length === 0) return res.status(400).json({ error: 'Geçerli e-posta adresi bulunamadı' });
+
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    if (!smtpHost || !smtpUser || !smtpPass) return res.status(500).json({ error: 'SMTP yapılandırması eksik' });
+
+    const port2 = parseInt(process.env.SMTP_PORT) || 587;
+    const transporter2 = nodemailer.createTransport({ host: smtpHost, port: port2, secure: port2 === 465, auth: { user: smtpUser, pass: smtpPass }, ...(port2 === 587 ? { requireTLS: true } : {}), tls: { rejectUnauthorized: true, minVersion: 'TLSv1.2' }, connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000 });
+    const icsContent = generateICS(event);
+    const emailBody = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px"><div style="text-align:center;padding:20px 0;border-bottom:1px solid #333"><h1 style="color:#eac321;margin:0">Kade Media</h1><p style="color:#aaa;margin:5px 0 0">İçerik Takvimi Daveti</p></div><div style="padding:20px 0"><h2 style="color:#fff;margin:0 0 16px">${escapeHtml(event.title)}</h2><p style="color:#eac321">Tarih: ${escapeHtml(event.date)} ${escapeHtml(event.time || '10:00')}</p>${message ? `<p style="color:#fff">${escapeHtml(message)}</p>` : ''}${event.description ? `<p style="color:#fff">${escapeHtml(event.description)}</p>` : ''}</div></div>`;
+
+    let sent = 0; let failed = 0;
+    for (const email of emails) {
+      try { await transporter2.sendMail({ from: `"Kade Media Takvim" <${smtpUser}>`, to: email, subject: `📅 ${event.title} — ${event.date}`, html: emailBody, icalEvent: { method: 'REQUEST', content: icsContent } }); sent++; }
+      catch (err) { console.error(`Davet hatası ${email}:`, err.message); failed++; }
+    }
+    return res.status(200).json({ message: `${sent} kişiye davet gönderildi${failed > 0 ? `, ${failed} başarısız` : ''}`, sent, failed });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
