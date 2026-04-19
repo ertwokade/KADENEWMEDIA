@@ -11,6 +11,11 @@ import {
   HiOutlineSun, HiOutlineChartBar, HiOutlineViewBoards,
   HiOutlineMenuAlt2, HiOutlinePhone, HiOutlineAnnotation,
   HiOutlineChatAlt2, HiOutlineChevronLeft,
+  HiOutlineCurrencyDollar, HiOutlineClipboardList,
+  HiOutlinePhotograph, HiOutlineSparkles, HiOutlineRefresh,
+  HiOutlineDocumentReport, HiOutlineClipboardCheck,
+  HiOutlineTemplate, HiOutlineStar, HiOutlineCollection,
+  HiOutlineUserGroup, HiOutlineGlobe,
 } from 'react-icons/hi'
 import PageTransition from '../components/PageTransition'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
@@ -32,6 +37,11 @@ import {
   getSiteSettingsApi, updateSiteSettingsApi,
   getPortfolioApi,
   getRemindersApi, createReminderApi, updateReminderApi, deleteReminderApi, checkRemindersApi,
+  getProposalsApi, createProposalApi, updateProposalApi, deleteProposalApi,
+  getTasksApi, createTaskApi, updateTaskApi, deleteTaskApi,
+  getMediaApi, uploadMediaApi, deleteMediaApi, bulkDeleteMediaApi,
+  getSubscriptionsApi, createSubscriptionApi, updateSubscriptionApi, deleteSubscriptionApi, recordPaymentApi,
+  getSurveysApi, getSurveyStatsApi, sendSurveyApi, deleteSurveyApi,
 } from '../api'
 import './Admin.css'
 
@@ -4810,6 +4820,1320 @@ function RemindersSection({ showToast }) {
   )
 }
 
+// ========== KANBAN CRM ==========
+const KANBAN_COLUMNS = [
+  { id: 'yeni', label: 'Yeni Lead', color: '#6C63FF' },
+  { id: 'gorusme-bekliyor', label: 'Görüşme Bekleniyor', color: '#eac321' },
+  { id: 'teklif-gonderildi', label: 'Teklif Gönderildi', color: '#00BCD4' },
+  { id: 'kazanildi', label: 'Kazanıldı ✅', color: '#2ECC71' },
+  { id: 'kaybedildi', label: 'Kaybedildi ❌', color: '#E91E63' },
+]
+
+function KanbanSection({ showToast }) {
+  const [messages, setMessages] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [dragOver, setDragOver] = useState(null)
+  const [dragging, setDragging] = useState(null)
+
+  useEffect(() => {
+    getMessagesApi().then(data => {
+      if (Array.isArray(data)) setMessages(data)
+    }).catch(() => {}).finally(() => setLoading(false))
+  }, [])
+
+  const grouped = useMemo(() => {
+    const g = {}
+    KANBAN_COLUMNS.forEach(c => { g[c.id] = [] })
+    messages.forEach(m => {
+      const col = m.status || 'yeni'
+      if (g[col]) g[col].push(m)
+      else g['yeni'].push(m)
+    })
+    return g
+  }, [messages])
+
+  const handleDrop = async (e, colId) => {
+    e.preventDefault()
+    setDragOver(null)
+    if (!dragging || dragging.status === colId) return
+    const updated = messages.map(m => m._id === dragging._id ? { ...m, status: colId } : m)
+    setMessages(updated)
+    setDragging(null)
+    try {
+      await updateMessageStatusApi(dragging._id, colId)
+      showToast('Durum güncellendi')
+    } catch {
+      showToast('Güncelleme başarısız', 'error')
+      setMessages(messages)
+    }
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Kanban <span>CRM</span></h1>
+          <p>Lead'lerinizi görsel pipeline ile yönetin</p>
+        </div>
+      </div>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Yükleniyor...</div>
+      ) : (
+        <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 16 }}>
+          {KANBAN_COLUMNS.map(col => (
+            <div
+              key={col.id}
+              style={{
+                minWidth: 240, flex: '0 0 240px',
+                background: dragOver === col.id ? `${col.color}10` : 'var(--card-bg)',
+                border: `1.5px solid ${dragOver === col.id ? col.color : 'var(--border)'}`,
+                borderRadius: 14, padding: 14, transition: 'all 0.15s',
+              }}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(col.id) }}
+              onDragLeave={() => setDragOver(null)}
+              onDrop={(e) => handleDrop(e, col.id)}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: col.color }} />
+                <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{col.label}</span>
+                <span style={{ marginLeft: 'auto', background: 'var(--bg-secondary)', borderRadius: 20, padding: '1px 8px', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+                  {grouped[col.id]?.length || 0}
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {grouped[col.id]?.map(msg => (
+                  <div
+                    key={msg._id}
+                    draggable
+                    onDragStart={() => setDragging(msg)}
+                    style={{
+                      background: 'var(--bg-secondary)', borderRadius: 10, padding: '10px 12px',
+                      cursor: 'grab', border: '1px solid var(--border)', fontSize: '0.82rem',
+                    }}
+                  >
+                    <div style={{ fontWeight: 700, marginBottom: 4 }}>{msg.name}</div>
+                    {msg.company && msg.company !== '-' && (
+                      <div style={{ color: 'var(--text-tertiary)', fontSize: '0.75rem' }}>{msg.company}</div>
+                    )}
+                    {msg.service && (
+                      <div style={{ color: col.color, fontSize: '0.72rem', marginTop: 4, fontWeight: 600 }}>{msg.service}</div>
+                    )}
+                    <div style={{ color: 'var(--text-tertiary)', fontSize: '0.72rem', marginTop: 6 }}>
+                      {msg.createdAt ? new Date(msg.createdAt).toLocaleDateString('tr-TR') : ''}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== TEKLIF BUILDER ==========
+function ProposalBuilderSection({ showToast }) {
+  const [proposals, setProposals] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [form, setForm] = useState({
+    clientName: '', clientEmail: '', clientPhone: '', clientCompany: '',
+    services: [{ name: '', description: '', amount: 0, quantity: 1 }],
+    currency: 'TRY', validUntil: '', notes: '', sendEmail: true,
+  })
+
+  const fetchProposals = () => {
+    setLoading(true)
+    getProposalsApi().then(d => setProposals(Array.isArray(d) ? d : [])).catch(() => {}).finally(() => setLoading(false))
+  }
+
+  useEffect(() => { fetchProposals() }, [])
+
+  const totalAmount = form.services.reduce((s, r) => s + (Number(r.amount) * Number(r.quantity || 1)), 0)
+
+  const addService = () => setForm(f => ({ ...f, services: [...f.services, { name: '', description: '', amount: 0, quantity: 1 }] }))
+  const removeService = (i) => setForm(f => ({ ...f, services: f.services.filter((_, idx) => idx !== i) }))
+  const updateService = (i, key, val) => setForm(f => {
+    const s = [...f.services]; s[i] = { ...s[i], [key]: val }; return { ...f, services: s }
+  })
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setSending(true)
+    try {
+      await createProposalApi({ ...form, totalAmount })
+      showToast(form.sendEmail ? 'Teklif oluşturuldu ve e-posta gönderildi' : 'Teklif kaydedildi')
+      setShowForm(false)
+      fetchProposals()
+      setForm({ clientName: '', clientEmail: '', clientPhone: '', clientCompany: '', services: [{ name: '', description: '', amount: 0, quantity: 1 }], currency: 'TRY', validUntil: '', notes: '', sendEmail: true })
+    } catch (err) { showToast(err.message, 'error') }
+    finally { setSending(false) }
+  }
+
+  const statusRenk = { taslak: '#888', gonderildi: '#00BCD4', onaylandi: '#2ECC71', reddedildi: '#E91E63' }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Teklif <span>Builder</span></h1>
+          <p>Müşterilere özel teklif oluştur ve e-posta ile gönder</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          <HiOutlinePlus size={16} /> Yeni Teklif
+        </button>
+      </div>
+
+      {showForm && (
+        <motion.div className="admin-form" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 24 }}>
+          <h3>Yeni Teklif Oluştur</h3>
+          <form onSubmit={handleSubmit}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+              <div className="form-group">
+                <label>Müşteri Adı *</label>
+                <input type="text" value={form.clientName} onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))} required />
+              </div>
+              <div className="form-group">
+                <label>E-posta *</label>
+                <input type="email" value={form.clientEmail} onChange={e => setForm(f => ({ ...f, clientEmail: e.target.value }))} required />
+              </div>
+              <div className="form-group">
+                <label>Telefon</label>
+                <input type="tel" value={form.clientPhone} onChange={e => setForm(f => ({ ...f, clientPhone: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label>Şirket</label>
+                <input type="text" value={form.clientCompany} onChange={e => setForm(f => ({ ...f, clientCompany: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label>Para Birimi</label>
+                <select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
+                  <option>TRY</option><option>USD</option><option>EUR</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Geçerlilik Tarihi</label>
+                <input type="date" value={form.validUntil} onChange={e => setForm(f => ({ ...f, validUntil: e.target.value }))} />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <label style={{ fontWeight: 600 }}>Hizmetler *</label>
+                <button type="button" className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }} onClick={addService}>
+                  + Hizmet Ekle
+                </button>
+              </div>
+              {form.services.map((s, i) => (
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 1fr 1fr auto', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+                  <input placeholder="Hizmet adı" value={s.name} onChange={e => updateService(i, 'name', e.target.value)} className="admin-input" />
+                  <input placeholder="Açıklama" value={s.description} onChange={e => updateService(i, 'description', e.target.value)} className="admin-input" />
+                  <input type="number" placeholder="Tutar" value={s.amount} onChange={e => updateService(i, 'amount', e.target.value)} className="admin-input" min="0" />
+                  <input type="number" placeholder="Adet" value={s.quantity} onChange={e => updateService(i, 'quantity', e.target.value)} className="admin-input" min="1" />
+                  {form.services.length > 1 && (
+                    <button type="button" onClick={() => removeService(i)} style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}>
+                      <HiOutlineX size={16} />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <div style={{ textAlign: 'right', fontWeight: 700, fontSize: '1.1rem', color: 'var(--primary)', marginTop: 8 }}>
+                Toplam: {totalAmount.toLocaleString('tr-TR')} {form.currency}
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 12 }}>
+              <label>Notlar</label>
+              <textarea rows="3" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+            </div>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer' }}>
+              <input type="checkbox" checked={form.sendEmail} onChange={e => setForm(f => ({ ...f, sendEmail: e.target.checked }))} />
+              <span style={{ fontSize: '0.88rem' }}>Teklifi müşteriye e-posta ile gönder</span>
+            </label>
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type="submit" className="btn btn-primary" disabled={sending}>
+                {sending ? 'Kaydediliyor...' : '💾 Teklifi Kaydet'}
+              </button>
+              <button type="button" className="btn btn-outline" onClick={() => setShowForm(false)}>İptal</button>
+            </div>
+          </form>
+        </motion.div>
+      )}
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Yükleniyor...</div>
+      ) : proposals.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>Henüz teklif oluşturulmadı</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {proposals.map(p => (
+            <div key={p._id} className="admin-form" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700 }}>{p.clientName} {p.clientCompany && `— ${p.clientCompany}`}</div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{p.clientEmail} · {p.proposalNumber}</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
+                  {new Date(p.createdAt).toLocaleDateString('tr-TR')}
+                </div>
+              </div>
+              <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '1.1rem' }}>
+                {p.totalAmount?.toLocaleString('tr-TR')} {p.currency}
+              </div>
+              <div style={{ padding: '3px 10px', borderRadius: 20, background: `${statusRenk[p.status] || '#888'}20`, color: statusRenk[p.status] || '#888', fontSize: '0.75rem', fontWeight: 600 }}>
+                {p.status}
+              </div>
+              <button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '0.78rem', color: '#E91E63' }}
+                onClick={async () => { await deleteProposalApi(p._id); fetchProposals(); showToast('Silindi') }}>
+                <HiOutlineTrash size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== EMAIL SABLONLARI ==========
+const defaultTemplates = [
+  {
+    id: 1, isim: 'İlk Temas', konu: 'Merhaba [İsim] — Kade Media',
+    metin: 'Merhaba [İsim],\n\nKade Media olarak sizinle iletişime geçmekten mutluluk duyuyoruz. İhtiyaçlarınızı değerlendirmek üzere 30 dakikalık ücretsiz bir keşif görüşmesi planlayabilir miyiz?\n\nSaygılarımızla,\nKade Media Ekibi',
+  },
+  {
+    id: 2, isim: 'Teklif Takip', konu: 'Teklifimiz Hakkında — [İsim]',
+    metin: 'Merhaba [İsim],\n\nGeçen hafta ilettiğimiz teklif hakkında bir güncelleme almak istedik. Herhangi bir sorunuz varsa veya teklifimizi görüşmek isterseniz lütfen bize yazın.\n\nSaygılarımızla,\nKade Media',
+  },
+  {
+    id: 3, isim: 'Hoş Geldiniz', konu: 'Kade Media\'ya Hoş Geldiniz!',
+    metin: 'Merhaba [İsim],\n\nSizi Kade Media ailesine dahil etmekten büyük mutluluk duyuyoruz! Onboarding sürecini başlatmak için ekibimiz en kısa sürede sizinle iletişime geçecek.\n\nGörüşmek üzere,\nKade Media Ekibi',
+  },
+  {
+    id: 4, isim: 'Aylık Rapor', konu: '[Ay] Aylık Performans Raporu',
+    metin: 'Merhaba [İsim],\n\n[Ay] ayı performans raporunuz hazır. Bu ay elde ettiğiniz sonuçları aşağıda bulabilirsiniz:\n\n• Takipçi büyümesi: [Rakam]\n• Erişim: [Rakam]\n• Etkileşim oranı: [Rakam]\n\nDetaylı rapor eklidir.\n\nSaygılarımızla,\nKade Media',
+  },
+]
+
+function EmailTemplatesSection({ showToast }) {
+  const [templates, setTemplates] = useState(() => {
+    try {
+      const stored = localStorage.getItem('kade_email_templates')
+      return stored ? JSON.parse(stored) : defaultTemplates
+    } catch { return defaultTemplates }
+  })
+  const [editing, setEditing] = useState(null)
+  const [showNew, setShowNew] = useState(false)
+  const [newForm, setNewForm] = useState({ isim: '', konu: '', metin: '' })
+  const [copiedId, setCopiedId] = useState(null)
+
+  const save = (updated) => {
+    setTemplates(updated)
+    localStorage.setItem('kade_email_templates', JSON.stringify(updated))
+    showToast('Şablon kaydedildi')
+  }
+
+  const handleEdit = (t) => setEditing({ ...t })
+
+  const handleSaveEdit = () => {
+    if (!editing) return
+    save(templates.map(t => t.id === editing.id ? editing : t))
+    setEditing(null)
+  }
+
+  const handleDelete = (id) => {
+    save(templates.filter(t => t.id !== id))
+    if (editing?.id === id) setEditing(null)
+  }
+
+  const handleAdd = () => {
+    if (!newForm.isim || !newForm.metin) { showToast('İsim ve metin zorunludur', 'error'); return }
+    const newT = { ...newForm, id: Date.now() }
+    save([...templates, newT])
+    setNewForm({ isim: '', konu: '', metin: '' })
+    setShowNew(false)
+  }
+
+  const handleCopy = (metin) => {
+    navigator.clipboard.writeText(metin).then(() => {
+      showToast('Şablon kopyalandı')
+    }).catch(() => showToast('Kopyalanamadı', 'error'))
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>E-posta <span>Şablonları</span></h1>
+          <p>Sık kullanılan e-posta şablonlarını yönetin</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => setShowNew(!showNew)}>
+          <HiOutlinePlus size={16} /> Yeni Şablon
+        </button>
+      </div>
+
+      {showNew && (
+        <motion.div className="admin-form" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
+          <h3>Yeni Şablon</h3>
+          <div style={{ display: 'grid', gap: 12 }}>
+            <div className="form-group"><label>Şablon Adı *</label><input value={newForm.isim} onChange={e => setNewForm(f => ({ ...f, isim: e.target.value }))} /></div>
+            <div className="form-group"><label>Konu</label><input value={newForm.konu} onChange={e => setNewForm(f => ({ ...f, konu: e.target.value }))} /></div>
+            <div className="form-group"><label>Metin *</label><textarea rows="6" value={newForm.metin} onChange={e => setNewForm(f => ({ ...f, metin: e.target.value }))} /></div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="btn btn-primary" onClick={handleAdd}>Kaydet</button>
+              <button className="btn btn-outline" onClick={() => setShowNew(false)}>İptal</button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {templates.map(t => (
+            <div
+              key={t.id}
+              onClick={() => handleEdit(t)}
+              style={{
+                padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
+                background: editing?.id === t.id ? 'var(--primary)15' : 'var(--card-bg)',
+                border: `1px solid ${editing?.id === t.id ? 'var(--primary)' : 'var(--border)'}`,
+              }}
+            >
+              <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>{t.isim}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 3 }}>{t.konu}</div>
+            </div>
+          ))}
+        </div>
+
+        {editing ? (
+          <div className="admin-form">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3>✏️ Şablon Düzenle</h3>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 12px' }} onClick={() => handleCopy(editing.metin)}>
+                  📋 Kopyala
+                </button>
+                <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 12px', color: '#E91E63' }} onClick={() => handleDelete(editing.id)}>
+                  Sil
+                </button>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gap: 12 }}>
+              <div className="form-group"><label>Şablon Adı</label><input value={editing.isim} onChange={e => setEditing(s => ({ ...s, isim: e.target.value }))} /></div>
+              <div className="form-group"><label>Konu</label><input value={editing.konu} onChange={e => setEditing(s => ({ ...s, konu: e.target.value }))} /></div>
+              <div className="form-group">
+                <label>Metin <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>([İsim], [Ay], [Rakam] gibi değişkenler kullanabilirsiniz)</span></label>
+                <textarea rows="10" value={editing.metin} onChange={e => setEditing(s => ({ ...s, metin: e.target.value }))} />
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button className="btn btn-primary" onClick={handleSaveEdit}>Kaydet</button>
+                <button className="btn btn-outline" onClick={() => setEditing(null)}>İptal</button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: '0.9rem' }}>
+            ← Düzenlemek için bir şablon seçin
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ========== MEDYA KUTUPHANESI ==========
+function MediaLibrarySection({ showToast }) {
+  const [mediaList, setMediaList] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [selected, setSelected] = useState(new Set())
+  const fileRef = useRef(null)
+
+  const fetchMedia = () => {
+    setLoading(true)
+    getMediaApi().then(d => setMediaList(Array.isArray(d) ? d : [])).catch(() => {}).finally(() => setLoading(false))
+  }
+
+  useEffect(() => { fetchMedia() }, [])
+
+  const handleUpload = async (e) => {
+    const files = Array.from(e.target.files || [])
+    if (!files.length) return
+    setUploading(true)
+    let ok = 0
+    for (const file of files) {
+      try {
+        const reader = new FileReader()
+        const data = await new Promise((resolve, reject) => {
+          reader.onload = (ev) => resolve(ev.target.result.split(',')[1])
+          reader.onerror = reject
+          reader.readAsDataURL(file)
+        })
+        await uploadMediaApi({ name: file.name, data, mimeType: file.type, alt: file.name.split('.')[0] })
+        ok++
+      } catch (err) {
+        showToast(`${file.name} yüklenemedi: ${err.message}`, 'error')
+      }
+    }
+    if (ok > 0) { showToast(`${ok} dosya yüklendi`); fetchMedia() }
+    setUploading(false)
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
+  const handleBulkDelete = async () => {
+    if (selected.size === 0) return
+    if (!confirm(`${selected.size} dosya silinsin mi?`)) return
+    try {
+      await bulkDeleteMediaApi([...selected])
+      showToast(`${selected.size} dosya silindi`)
+      setSelected(new Set())
+      fetchMedia()
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const toggleSelect = (id) => {
+    setSelected(s => {
+      const n = new Set(s)
+      n.has(id) ? n.delete(id) : n.add(id)
+      return n
+    })
+  }
+
+  const formatBytes = (bytes) => {
+    if (!bytes) return '—'
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Medya <span>Kütüphanesi</span></h1>
+          <p>Yüklenen görseller, videolar ve belgeler ({mediaList.length} dosya)</p>
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          {selected.size > 0 && (
+            <button className="btn btn-outline" style={{ color: '#E91E63' }} onClick={handleBulkDelete}>
+              <HiOutlineTrash size={16} /> {selected.size} Sil
+            </button>
+          )}
+          <button className="btn btn-primary" onClick={() => fileRef.current?.click()} disabled={uploading}>
+            {uploading ? 'Yükleniyor...' : <><HiOutlinePlus size={16} /> Dosya Yükle</>}
+          </button>
+          <input ref={fileRef} type="file" multiple accept="image/*,video/mp4,application/pdf" style={{ display: 'none' }} onChange={handleUpload} />
+        </div>
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 40 }}>Yükleniyor...</div>
+      ) : mediaList.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 80, color: 'var(--text-secondary)' }}>
+          <div style={{ fontSize: '3rem', marginBottom: 16 }}>📁</div>
+          <p>Henüz dosya yüklenmedi. Yukarıdaki butona tıklayarak dosya yükleyin.</p>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 14 }}>
+          {mediaList.map(item => (
+            <div
+              key={item._id}
+              onClick={() => toggleSelect(item._id)}
+              style={{
+                borderRadius: 12, overflow: 'hidden', cursor: 'pointer',
+                border: `2px solid ${selected.has(item._id) ? 'var(--primary)' : 'var(--border)'}`,
+                background: 'var(--card-bg)', transition: 'border-color 0.15s',
+              }}
+            >
+              <div style={{ width: '100%', height: 110, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                {item.type === 'image' ? (
+                  <span style={{ fontSize: '2.5rem' }}>🖼️</span>
+                ) : item.type === 'video' ? (
+                  <span style={{ fontSize: '2.5rem' }}>🎬</span>
+                ) : (
+                  <span style={{ fontSize: '2.5rem' }}>📄</span>
+                )}
+                {selected.has(item._id) && (
+                  <div style={{ position: 'absolute', top: 6, right: 6, width: 20, height: 20, borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: '#111' }}>✓</div>
+                )}
+              </div>
+              <div style={{ padding: '8px 10px' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{formatBytes(item.sizeBytes)}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== GOREV ATAMA ==========
+function TasksSection({ showToast, currentUser }) {
+  const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [filterStatus, setFilterStatus] = useState('all')
+  const [form, setForm] = useState({ title: '', description: '', assignedTo: '', dueDate: '', priority: 'orta', relatedClientName: '' })
+
+  const fetchTasks = () => {
+    setLoading(true)
+    getTasksApi().then(d => setTasks(Array.isArray(d) ? d : [])).catch(() => {}).finally(() => setLoading(false))
+  }
+
+  useEffect(() => { fetchTasks() }, [])
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    try {
+      await createTaskApi(form)
+      showToast('Görev oluşturuldu')
+      setShowForm(false)
+      setForm({ title: '', description: '', assignedTo: '', dueDate: '', priority: 'orta', relatedClientName: '' })
+      fetchTasks()
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const handleStatusChange = async (task, newStatus) => {
+    try {
+      await updateTaskApi({ id: task._id, status: newStatus })
+      setTasks(ts => ts.map(t => t._id === task._id ? { ...t, status: newStatus } : t))
+      showToast('Durum güncellendi')
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteTaskApi(id)
+      setTasks(ts => ts.filter(t => t._id !== id))
+      showToast('Görev silindi')
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const filtered = filterStatus === 'all' ? tasks : tasks.filter(t => t.status === filterStatus)
+
+  const priorityRenk = { dusuk: '#888', orta: '#eac321', yuksek: '#FF9800', acil: '#E91E63' }
+  const statusRenk = { beklemede: '#888', devam: '#00BCD4', tamamlandi: '#2ECC71', iptal: '#E91E63' }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Görev <span>Atama</span></h1>
+          <p>Ekip üyelerine görev ata ve takip et</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          <HiOutlinePlus size={16} /> Yeni Görev
+        </button>
+      </div>
+
+      {showForm && (
+        <motion.div className="admin-form" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
+          <h3>Yeni Görev</h3>
+          <form onSubmit={handleCreate}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="form-group" style={{ gridColumn: '1/-1' }}>
+                <label>Görev Başlığı *</label>
+                <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
+              </div>
+              <div className="form-group" style={{ gridColumn: '1/-1' }}>
+                <label>Açıklama</label>
+                <textarea rows="3" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label>Atanan Kişi</label>
+                <input value={form.assignedTo} onChange={e => setForm(f => ({ ...f, assignedTo: e.target.value }))} placeholder="Kullanıcı adı" />
+              </div>
+              <div className="form-group">
+                <label>Müşteri (İlgili)</label>
+                <input value={form.relatedClientName} onChange={e => setForm(f => ({ ...f, relatedClientName: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label>Son Tarih</label>
+                <input type="date" value={form.dueDate} onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))} />
+              </div>
+              <div className="form-group">
+                <label>Öncelik</label>
+                <select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
+                  <option value="dusuk">Düşük</option>
+                  <option value="orta">Orta</option>
+                  <option value="yuksek">Yüksek</option>
+                  <option value="acil">Acil</option>
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+              <button type="submit" className="btn btn-primary">Oluştur</button>
+              <button type="button" className="btn btn-outline" onClick={() => setShowForm(false)}>İptal</button>
+            </div>
+          </form>
+        </motion.div>
+      )}
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        {['all', 'beklemede', 'devam', 'tamamlandi'].map(s => (
+          <button key={s} onClick={() => setFilterStatus(s)}
+            style={{ padding: '5px 14px', borderRadius: 20, border: `1px solid ${filterStatus === s ? 'var(--primary)' : 'var(--border)'}`, background: filterStatus === s ? 'var(--primary)' : 'transparent', color: filterStatus === s ? '#111' : 'var(--text-secondary)', fontSize: '0.82rem', cursor: 'pointer' }}>
+            {s === 'all' ? 'Tümü' : s === 'beklemede' ? 'Beklemede' : s === 'devam' ? 'Devam Ediyor' : 'Tamamlandı'}
+          </button>
+        ))}
+      </div>
+
+      {loading ? <div style={{ textAlign: 'center', padding: 40 }}>Yükleniyor...</div> : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {filtered.length === 0 && <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Görev bulunamadı</div>}
+          {filtered.map(task => (
+            <div key={task._id} className="admin-form" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: priorityRenk[task.priority] || '#888', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, textDecoration: task.status === 'tamamlandi' ? 'line-through' : 'none', opacity: task.status === 'tamamlandi' ? 0.5 : 1 }}>{task.title}</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: 3 }}>
+                  {task.assignedTo && `→ ${task.assignedTo}`} {task.relatedClientName && `· ${task.relatedClientName}`}
+                  {task.dueDate && ` · Son: ${new Date(task.dueDate).toLocaleDateString('tr-TR')}`}
+                </div>
+              </div>
+              <select
+                value={task.status}
+                onChange={e => handleStatusChange(task, e.target.value)}
+                style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--card-bg)', color: statusRenk[task.status] || '#888', fontSize: '0.8rem', cursor: 'pointer' }}
+              >
+                <option value="beklemede">Beklemede</option>
+                <option value="devam">Devam Ediyor</option>
+                <option value="tamamlandi">Tamamlandı</option>
+                <option value="iptal">İptal</option>
+              </select>
+              <button onClick={() => handleDelete(task._id)} style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}>
+                <HiOutlineTrash size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== AI ICERIK ASISTAN ==========
+function AIContentSection({ showToast }) {
+  const [tur, setTur] = useState('blog-baslik')
+  const [konu, setKonu] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [sonuc, setSonuc] = useState('')
+  const [gecmis, setGecmis] = useState([])
+
+  const turler = [
+    { id: 'blog-baslik', label: '📝 Blog Başlığı' },
+    { id: 'blog-meta', label: '🔍 Meta Açıklaması' },
+    { id: 'sosyal-caption', label: '📱 Sosyal Medya Caption' },
+    { id: 'reklam-metin', label: '🎯 Reklam Metni' },
+    { id: 'haber-ozet', label: '📰 Haber Özeti' },
+    { id: 'email-konu', label: '✉️ E-posta Konusu' },
+  ]
+
+  const promptMap = {
+    'blog-baslik': `"${konu}" konusu için SEO uyumlu, ilgi çekici 5 blog başlığı öner. Türkçe.`,
+    'blog-meta': `"${konu}" konulu blog için 155 karakteri geçmeyen, tıklama oranı yüksek bir meta açıklaması yaz. Türkçe.`,
+    'sosyal-caption': `"${konu}" konusu için Instagram/TikTok için etkileyici, emoji içeren, harekete geçirici bir caption yaz. Türkçe. Max 150 kelime.`,
+    'reklam-metin': `"${konu}" için Meta Ads / Google Ads uyumlu, kısa ve dönüşüm odaklı bir reklam metni yaz. Başlık + açıklama formatında. Türkçe.`,
+    'haber-ozet': `"${konu}" hakkında 2-3 cümlelik profesyonel bir haber özeti yaz. Türkçe.`,
+    'email-konu': `"${konu}" konusu için açılma oranı yüksek 5 e-posta konu başlığı öner. Türkçe.`,
+  }
+
+  const generate = async () => {
+    if (!konu.trim()) { showToast('Konu giriniz', 'error'); return }
+    setLoading(true)
+    setSonuc('')
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('kade_admin_token')}` },
+        body: JSON.stringify({ message: promptMap[tur], lang: 'tr', adminMode: true }),
+      })
+      const data = await res.json()
+      const text = data.reply || 'Yanıt alınamadı'
+      setSonuc(text)
+      setGecmis(g => [{ tur: turler.find(t => t.id === tur)?.label, konu, sonuc: text, zaman: new Date() }, ...g.slice(0, 9)])
+    } catch { showToast('AI bağlantısı başarısız', 'error') }
+    setLoading(false)
+  }
+
+  const copy = () => {
+    if (!sonuc) return
+    navigator.clipboard.writeText(sonuc).then(() => showToast('Kopyalandı')).catch(() => showToast('Kopyalanamadı', 'error'))
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>AI İçerik <span>Asistanı</span></h1>
+          <p>Gemini AI ile içerik üretin, başlık önerin, caption yazın</p>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 20 }}>
+        <div>
+          <div className="admin-form">
+            <h3>İçerik Türü</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+              {turler.map(t => (
+                <button key={t.id} onClick={() => setTur(t.id)}
+                  style={{ padding: '10px 14px', borderRadius: 10, border: `1px solid ${tur === t.id ? 'var(--primary)' : 'var(--border)'}`, background: tur === t.id ? 'var(--primary)15' : 'transparent', color: 'var(--text-primary)', fontSize: '0.88rem', cursor: 'pointer', textAlign: 'left' }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="form-group">
+              <label>Konu / Anahtar Kelime</label>
+              <textarea
+                rows="3"
+                placeholder="Örn: sosyal medya pazarlamasında yapay zeka kullanımı"
+                value={konu}
+                onChange={e => setKonu(e.target.value)}
+              />
+            </div>
+
+            <button className="btn btn-primary" onClick={generate} disabled={loading} style={{ width: '100%' }}>
+              {loading ? '⏳ Üretiliyor...' : '✨ İçerik Üret'}
+            </button>
+          </div>
+
+          {gecmis.length > 0 && (
+            <div className="admin-form" style={{ marginTop: 16 }}>
+              <h3>Geçmiş ({gecmis.length})</h3>
+              <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+                {gecmis.map((g, i) => (
+                  <div key={i} onClick={() => setSonuc(g.sonuc)} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)', cursor: 'pointer' }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--primary)' }}>{g.tur}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{g.konu}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="admin-form">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h3>Üretilen İçerik</h3>
+            {sonuc && (
+              <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 12px' }} onClick={copy}>
+                📋 Kopyala
+              </button>
+            )}
+          </div>
+          {loading && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-secondary)', padding: 20 }}>
+              <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid var(--primary)', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+              Gemini AI içerik üretiyor...
+            </div>
+          )}
+          {sonuc && !loading && (
+            <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7, fontSize: '0.9rem', color: 'var(--text-primary)', padding: '4px 0' }}>
+              {sonuc}
+            </div>
+          )}
+          {!sonuc && !loading && (
+            <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-tertiary)' }}>
+              <HiOutlineSparkles size={40} style={{ opacity: 0.2, margin: '0 auto 12px', display: 'block' }} />
+              <p>Konu girin ve "İçerik Üret" butonuna tıklayın</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ========== ABONELIK / RETAINER TAKIBI ==========
+function SubscriptionsSection({ showToast }) {
+  const [subs, setSubs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({ clientName: '', clientEmail: '', clientPhone: '', clientCompany: '', services: '', monthlyAmount: '', currency: 'TRY', startDate: '', notes: '' })
+
+  const fetchSubs = () => {
+    setLoading(true)
+    getSubscriptionsApi().then(d => setSubs(Array.isArray(d) ? d : [])).catch(() => {}).finally(() => setLoading(false))
+  }
+
+  useEffect(() => { fetchSubs() }, [])
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    try {
+      await createSubscriptionApi({ ...form, services: form.services.split(',').map(s => s.trim()).filter(Boolean) })
+      showToast('Abonelik oluşturuldu')
+      setShowForm(false)
+      setForm({ clientName: '', clientEmail: '', clientPhone: '', clientCompany: '', services: '', monthlyAmount: '', currency: 'TRY', startDate: '', notes: '' })
+      fetchSubs()
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const handleRecordPayment = async (sub) => {
+    const amount = prompt('Ödeme tutarı:', sub.monthlyAmount)
+    if (!amount) return
+    try {
+      await recordPaymentApi(sub._id, { amount: Number(amount) })
+      showToast('Ödeme kaydedildi')
+      fetchSubs()
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm('Abonelik silinsin mi?')) return
+    try {
+      await deleteSubscriptionApi(id)
+      showToast('Abonelik silindi')
+      fetchSubs()
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const statusRenk = { aktif: '#2ECC71', pasif: '#888', iptal: '#E91E63' }
+
+  const today = new Date()
+  const expiringSoon = subs.filter(s => s.status === 'aktif' && s.daysUntilRenewal !== undefined && s.daysUntilRenewal <= 7 && s.daysUntilRenewal >= 0)
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Abonelik <span>Takibi</span></h1>
+          <p>Aylık retainer müşterilerini takip edin ({subs.filter(s => s.status === 'aktif').length} aktif)</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          <HiOutlinePlus size={16} /> Yeni Abonelik
+        </button>
+      </div>
+
+      {expiringSoon.length > 0 && (
+        <div style={{ background: '#eac32115', border: '1px solid #eac32140', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span>⚠️</span>
+          <div>
+            <strong>{expiringSoon.length} abonelik</strong> bu hafta yenileniyor: {expiringSoon.map(s => s.clientName).join(', ')}
+          </div>
+        </div>
+      )}
+
+      {showForm && (
+        <motion.div className="admin-form" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
+          <h3>Yeni Abonelik</h3>
+          <form onSubmit={handleCreate}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="form-group"><label>Müşteri Adı *</label><input value={form.clientName} onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))} required /></div>
+              <div className="form-group"><label>E-posta</label><input type="email" value={form.clientEmail} onChange={e => setForm(f => ({ ...f, clientEmail: e.target.value }))} /></div>
+              <div className="form-group"><label>Telefon</label><input value={form.clientPhone} onChange={e => setForm(f => ({ ...f, clientPhone: e.target.value }))} /></div>
+              <div className="form-group"><label>Şirket</label><input value={form.clientCompany} onChange={e => setForm(f => ({ ...f, clientCompany: e.target.value }))} /></div>
+              <div className="form-group" style={{ gridColumn: '1/-1' }}><label>Hizmetler (virgülle ayırın)</label><input value={form.services} onChange={e => setForm(f => ({ ...f, services: e.target.value }))} placeholder="Sosyal Medya, İçerik Üretimi" /></div>
+              <div className="form-group"><label>Aylık Tutar *</label><input type="number" value={form.monthlyAmount} onChange={e => setForm(f => ({ ...f, monthlyAmount: e.target.value }))} required /></div>
+              <div className="form-group"><label>Para Birimi</label><select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}><option>TRY</option><option>USD</option><option>EUR</option></select></div>
+              <div className="form-group"><label>Başlangıç Tarihi</label><input type="date" value={form.startDate} onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} /></div>
+              <div className="form-group"><label>Notlar</label><input value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} /></div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+              <button type="submit" className="btn btn-primary">Kaydet</button>
+              <button type="button" className="btn btn-outline" onClick={() => setShowForm(false)}>İptal</button>
+            </div>
+          </form>
+        </motion.div>
+      )}
+
+      {loading ? <div style={{ textAlign: 'center', padding: 40 }}>Yükleniyor...</div> : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {subs.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>Henüz abonelik oluşturulmadı</div>}
+          {subs.map(sub => (
+            <div key={sub._id} className="admin-form" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700 }}>{sub.clientName} {sub.clientCompany && `— ${sub.clientCompany}`}</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 3 }}>
+                  {sub.services?.join(', ')}
+                </div>
+                {sub.nextRenewalDate && (
+                  <div style={{ fontSize: '0.72rem', color: sub.daysUntilRenewal <= 7 ? '#eac321' : 'var(--text-tertiary)', marginTop: 4 }}>
+                    Yenileme: {new Date(sub.nextRenewalDate).toLocaleDateString('tr-TR')}
+                    {sub.daysUntilRenewal !== undefined && ` (${sub.daysUntilRenewal} gün)`}
+                  </div>
+                )}
+              </div>
+              <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '1rem' }}>
+                {sub.monthlyAmount?.toLocaleString('tr-TR')} {sub.currency}/ay
+              </div>
+              <div style={{ padding: '3px 10px', borderRadius: 20, background: `${statusRenk[sub.status] || '#888'}20`, color: statusRenk[sub.status] || '#888', fontSize: '0.75rem', fontWeight: 600 }}>
+                {sub.status}
+              </div>
+              <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 10px' }} onClick={() => handleRecordPayment(sub)} title="Ödeme Kaydet">
+                💳
+              </button>
+              <button onClick={() => handleDelete(sub._id)} style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}>
+                <HiOutlineTrash size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== NPS ANKET SISTEMI ==========
+function NPSSurveysSection({ showToast }) {
+  const [surveys, setSurveys] = useState([])
+  const [stats, setStats] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({ clientName: '', clientEmail: '', clientCompany: '', projectName: '' })
+
+  const fetchData = () => {
+    setLoading(true)
+    Promise.all([getSurveysApi(), getSurveyStatsApi()])
+      .then(([s, st]) => { setSurveys(Array.isArray(s) ? s : []); setStats(st) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(() => { fetchData() }, [])
+
+  const handleSend = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await sendSurveyApi(form)
+      showToast('Anket gönderildi')
+      setShowForm(false)
+      setForm({ clientName: '', clientEmail: '', clientCompany: '', projectName: '' })
+      fetchData()
+    } catch (err) { showToast(err.message, 'error') }
+  }
+
+  const categoryRenk = { destekci: '#2ECC71', pasif: '#eac321', kizgin: '#E91E63' }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>NPS <span>Anket</span> Sistemi</h1>
+          <p>Müşteri memnuniyetini ölçün ve takip edin</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          <HiOutlinePlus size={16} /> Anket Gönder
+        </button>
+      </div>
+
+      {stats && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+          {[
+            { label: 'NPS Skoru', val: stats.npsScore ?? '—', color: '#6C63FF', suffix: '' },
+            { label: 'Ort. Puan', val: stats.avgScore ?? '—', color: '#eac321', suffix: '/10' },
+            { label: 'Toplam Yanıt', val: stats.total ?? 0, color: '#2ECC71', suffix: '' },
+            { label: 'Destekçi', val: stats.categories?.destekci ?? 0, color: '#00BCD4', suffix: '' },
+          ].map(s => (
+            <div key={s.label} className="admin-stat-card">
+              <div className="stat-number" style={{ color: s.color }}>{s.val}{s.suffix}</div>
+              <div className="stat-label">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {showForm && (
+        <motion.div className="admin-form" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 20 }}>
+          <h3>Müşteriye Anket Gönder</h3>
+          <form onSubmit={handleSend}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="form-group"><label>Müşteri Adı *</label><input value={form.clientName} onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))} required /></div>
+              <div className="form-group"><label>E-posta *</label><input type="email" value={form.clientEmail} onChange={e => setForm(f => ({ ...f, clientEmail: e.target.value }))} required /></div>
+              <div className="form-group"><label>Şirket</label><input value={form.clientCompany} onChange={e => setForm(f => ({ ...f, clientCompany: e.target.value }))} /></div>
+              <div className="form-group"><label>Proje Adı</label><input value={form.projectName} onChange={e => setForm(f => ({ ...f, projectName: e.target.value }))} /></div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+              <button type="submit" className="btn btn-primary">Gönder</button>
+              <button type="button" className="btn btn-outline" onClick={() => setShowForm(false)}>İptal</button>
+            </div>
+          </form>
+        </motion.div>
+      )}
+
+      {loading ? <div style={{ textAlign: 'center', padding: 40 }}>Yükleniyor...</div> : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {surveys.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>Henüz anket gönderilmedi</div>}
+          {surveys.map(s => (
+            <div key={s._id} className="admin-form" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700 }}>{s.clientName} {s.clientCompany && `— ${s.clientCompany}`}</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 3 }}>{s.clientEmail}</div>
+                {s.comment && <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 4, fontStyle: 'italic' }}>"{s.comment}"</div>}
+              </div>
+              {s.completedAt ? (
+                <>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 800, color: s.score >= 9 ? '#2ECC71' : s.score <= 6 ? '#E91E63' : '#eac321' }}>
+                    {s.score}/10
+                  </div>
+                  <div style={{ padding: '3px 10px', borderRadius: 20, background: `${categoryRenk[s.category] || '#888'}20`, color: categoryRenk[s.category] || '#888', fontSize: '0.75rem', fontWeight: 600 }}>
+                    {s.category}
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>⏳ Yanıt bekleniyor</div>
+              )}
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
+                {new Date(s.createdAt).toLocaleDateString('tr-TR')}
+              </div>
+              <button onClick={async () => { await deleteSurveyApi(s._id); fetchData(); showToast('Silindi') }}
+                style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}>
+                <HiOutlineTrash size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== MUSTERI ONBOARDING FORMU ==========
+function OnboardingSection({ showToast }) {
+  const [forms, setForms] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('kade_onboarding_forms') || '[]') } catch { return [] }
+  })
+  const [showNew, setShowNew] = useState(false)
+  const [form, setForm] = useState({
+    clientName: '', clientEmail: '', clientCompany: '',
+    socialAccounts: '', targetAudience: '', competitors: '',
+    brandVoice: '', monthlyBudget: '', goals: '',
+    existingContent: '', designPreferences: '', notes: '',
+  })
+  const [saving, setSaving] = useState(false)
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      const newForm = { ...form, id: Date.now(), createdAt: new Date().toISOString() }
+      const updated = [newForm, ...forms]
+      localStorage.setItem('kade_onboarding_forms', JSON.stringify(updated))
+      setForms(updated)
+      showToast('Onboarding formu kaydedildi')
+      setShowNew(false)
+      setForm({ clientName: '', clientEmail: '', clientCompany: '', socialAccounts: '', targetAudience: '', competitors: '', brandVoice: '', monthlyBudget: '', goals: '', existingContent: '', designPreferences: '', notes: '' })
+    } catch { showToast('Kayıt başarısız', 'error') }
+    setSaving(false)
+  }
+
+  const handleDelete = (id) => {
+    const updated = forms.filter(f => f.id !== id)
+    localStorage.setItem('kade_onboarding_forms', JSON.stringify(updated))
+    setForms(updated)
+    showToast('Silindi')
+  }
+
+  const handleExport = (f) => {
+    const text = Object.entries(f).filter(([k]) => !['id', 'createdAt'].includes(k)).map(([k, v]) => `${k}: ${v}`).join('\n')
+    const blob = new Blob([text], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = `onboarding-${f.clientName}.txt`; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const fields = [
+    { key: 'clientName', label: 'Müşteri Adı *', required: true },
+    { key: 'clientEmail', label: 'E-posta *', type: 'email', required: true },
+    { key: 'clientCompany', label: 'Şirket Adı' },
+    { key: 'socialAccounts', label: 'Sosyal Medya Hesapları', placeholder: '@instagram, @tiktok, facebook.com/...' },
+    { key: 'targetAudience', label: 'Hedef Kitle', placeholder: 'Yaş aralığı, ilgi alanları, coğrafya...' },
+    { key: 'competitors', label: 'Rakip Hesaplar', placeholder: 'Rakip firma veya hesap linkleri' },
+    { key: 'brandVoice', label: 'Marka Sesi', placeholder: 'Ciddi, eğlenceli, kurumsal...' },
+    { key: 'monthlyBudget', label: 'Aylık Reklam Bütçesi', placeholder: '₺5.000' },
+    { key: 'goals', label: 'Hedefler', placeholder: 'Takipçi büyümesi, satış, marka bilinirliği...' },
+    { key: 'existingContent', label: 'Mevcut İçerik', placeholder: 'Fotoğraf, video, grafik var mı?' },
+    { key: 'designPreferences', label: 'Tasarım Tercihleri', placeholder: 'Renkler, font stili, referans hesaplar' },
+    { key: 'notes', label: 'Ek Notlar' },
+  ]
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Müşteri <span>Onboarding</span></h1>
+          <p>Yeni müşteri bilgi toplama formları ({forms.length} kayıt)</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => setShowNew(!showNew)}>
+          <HiOutlinePlus size={16} /> Yeni Form
+        </button>
+      </div>
+
+      {showNew && (
+        <motion.div className="admin-form" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 24 }}>
+          <h3>Yeni Onboarding Formu</h3>
+          <form onSubmit={handleCreate}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {fields.map(field => (
+                <div key={field.key} className="form-group" style={field.key === 'notes' || field.key === 'goals' ? { gridColumn: '1/-1' } : {}}>
+                  <label>{field.label}</label>
+                  <input
+                    type={field.type || 'text'}
+                    value={form[field.key]}
+                    onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
+                    placeholder={field.placeholder}
+                    required={field.required}
+                  />
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <button type="submit" className="btn btn-primary" disabled={saving}>Kaydet</button>
+              <button type="button" className="btn btn-outline" onClick={() => setShowNew(false)}>İptal</button>
+            </div>
+          </form>
+        </motion.div>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {forms.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>Henüz onboarding formu oluşturulmadı</div>}
+        {forms.map(f => (
+          <div key={f.id} className="admin-form" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700 }}>{f.clientName} {f.clientCompany && `— ${f.clientCompany}`}</div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 3 }}>
+                {f.clientEmail} · {f.targetAudience && `Hedef: ${f.targetAudience.slice(0, 40)}`}
+              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 4 }}>
+                {new Date(f.createdAt).toLocaleDateString('tr-TR')}
+              </div>
+            </div>
+            <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 10px' }} onClick={() => handleExport(f)} title="Dışa Aktar">
+              📥
+            </button>
+            <button onClick={() => handleDelete(f.id)} style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}>
+              <HiOutlineTrash size={16} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ========== RAPOR EXPORT ==========
+function ReportExportSection({ showToast }) {
+  const [loading, setLoading] = useState(false)
+  const [clientName, setClientName] = useState('')
+  const [clientEmail, setClientEmail] = useState('')
+  const [period, setPeriod] = useState('Nisan 2025')
+  const [metrics, setMetrics] = useState({
+    followers: '', reach: '', engagement: '', clicks: '', adSpend: '', adROI: '',
+    contentPieces: '', videoViews: '', newLeads: '', notes: '',
+  })
+
+  const generateReport = () => {
+    if (!clientName) { showToast('Müşteri adı giriniz', 'error'); return }
+    setLoading(true)
+
+    const html = `<!DOCTYPE html>
+<html lang="tr"><head><meta charset="UTF-8">
+<style>
+body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#111}
+h1{color:#111;border-bottom:3px solid #eac321;padding-bottom:12px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.logo{font-size:1.6rem;font-weight:900}
+.logo span{color:#eac321}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+.metric{background:#f9f9f9;border-radius:10px;padding:16px;text-align:center}
+.metric-val{font-size:1.8rem;font-weight:800;color:#111}
+.metric-lbl{font-size:0.82rem;color:#888;margin-top:4px}
+.notes{background:#f9f9f9;border-radius:10px;padding:20px;margin-top:24px}
+.footer{margin-top:40px;padding-top:16px;border-top:1px solid #eee;font-size:0.78rem;color:#999;text-align:center}
+</style></head><body>
+<div class="header">
+  <div class="logo">kade<span>media</span></div>
+  <div><strong>${period}</strong> Performans Raporu</div>
+</div>
+<h1>${clientName} — Aylık Rapor</h1>
+<p><strong>Dönem:</strong> ${period} &nbsp;|&nbsp; <strong>Hazırlayan:</strong> Kade Media Ekibi</p>
+<div class="grid">
+  ${metrics.followers ? `<div class="metric"><div class="metric-val">${metrics.followers}</div><div class="metric-lbl">Takipçi Büyümesi</div></div>` : ''}
+  ${metrics.reach ? `<div class="metric"><div class="metric-val">${metrics.reach}</div><div class="metric-lbl">Erişim</div></div>` : ''}
+  ${metrics.engagement ? `<div class="metric"><div class="metric-val">${metrics.engagement}%</div><div class="metric-lbl">Etkileşim Oranı</div></div>` : ''}
+  ${metrics.clicks ? `<div class="metric"><div class="metric-val">${metrics.clicks}</div><div class="metric-lbl">Tıklamalar</div></div>` : ''}
+  ${metrics.adSpend ? `<div class="metric"><div class="metric-val">₺${metrics.adSpend}</div><div class="metric-lbl">Reklam Harcaması</div></div>` : ''}
+  ${metrics.adROI ? `<div class="metric"><div class="metric-val">${metrics.adROI}x</div><div class="metric-lbl">Reklam ROI</div></div>` : ''}
+  ${metrics.contentPieces ? `<div class="metric"><div class="metric-val">${metrics.contentPieces}</div><div class="metric-lbl">Üretilen İçerik</div></div>` : ''}
+  ${metrics.videoViews ? `<div class="metric"><div class="metric-val">${metrics.videoViews}</div><div class="metric-lbl">Video Görüntüleme</div></div>` : ''}
+  ${metrics.newLeads ? `<div class="metric"><div class="metric-val">${metrics.newLeads}</div><div class="metric-lbl">Yeni Lead</div></div>` : ''}
+</div>
+${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong><p style="margin:8px 0 0">${metrics.notes}</p></div>` : ''}
+<div class="footer">Kade Media Dijital Pazarlama | hello@kademedia.com | 0506 729 34 23 | kademedia.com.tr</div>
+</body></html>`
+
+    const blob = new Blob([html], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `rapor-${clientName.replace(/\s+/g, '-').toLowerCase()}-${period.replace(/\s+/g, '-')}.html`
+    a.click()
+    URL.revokeObjectURL(url)
+    showToast('Rapor indirildi (HTML formatında, tarayıcıdan PDF olarak kaydedin)')
+    setLoading(false)
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Rapor <span>Export</span></h1>
+          <p>Müşteri performans raporu oluştur ve indir</p>
+        </div>
+      </div>
+
+      <div className="admin-form" style={{ maxWidth: 760 }}>
+        <h3>Rapor Bilgileri</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+          <div className="form-group"><label>Müşteri Adı *</label><input value={clientName} onChange={e => setClientName(e.target.value)} /></div>
+          <div className="form-group"><label>E-posta</label><input type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} /></div>
+          <div className="form-group"><label>Dönem</label><input value={period} onChange={e => setPeriod(e.target.value)} placeholder="Nisan 2025" /></div>
+        </div>
+
+        <h3>Metrikler</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 20 }}>
+          {[
+            { key: 'followers', label: 'Takipçi Büyümesi', placeholder: '+1.200' },
+            { key: 'reach', label: 'Erişim', placeholder: '45.000' },
+            { key: 'engagement', label: 'Etkileşim (%)', placeholder: '3.2' },
+            { key: 'clicks', label: 'Tıklamalar', placeholder: '2.100' },
+            { key: 'adSpend', label: 'Reklam Harcaması (₺)', placeholder: '5000' },
+            { key: 'adROI', label: 'Reklam ROI (x)', placeholder: '4.2' },
+            { key: 'contentPieces', label: 'Üretilen İçerik', placeholder: '28' },
+            { key: 'videoViews', label: 'Video Görüntüleme', placeholder: '12.000' },
+            { key: 'newLeads', label: 'Yeni Lead', placeholder: '8' },
+          ].map(f => (
+            <div key={f.key} className="form-group">
+              <label>{f.label}</label>
+              <input placeholder={f.placeholder} value={metrics[f.key]} onChange={e => setMetrics(m => ({ ...m, [f.key]: e.target.value }))} />
+            </div>
+          ))}
+        </div>
+
+        <div className="form-group" style={{ marginBottom: 20 }}>
+          <label>Notlar & Sonraki Adımlar</label>
+          <textarea rows="4" value={metrics.notes} onChange={e => setMetrics(m => ({ ...m, notes: e.target.value }))} placeholder="Bu ay dikkat çeken konular, öneriler ve bir sonraki ay planı..." />
+        </div>
+
+        <div style={{ background: 'var(--bg-secondary)', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+          💡 Rapor HTML formatında indirilir. Tarayıcınızda açıp <strong>Dosya → Yazdır → PDF olarak kaydet</strong> ile PDF yapabilirsiniz.
+        </div>
+
+        <button className="btn btn-primary" onClick={generateReport} disabled={loading} style={{ gap: 8 }}>
+          <HiOutlineDocumentReport size={18} />
+          {loading ? 'Oluşturuluyor...' : 'Raporu İndir'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ========== MAIN ADMIN COMPONENT ==========
 export default function Admin() {
   const [isAuth, setIsAuth] = useState(false)
@@ -4904,6 +6228,7 @@ export default function Admin() {
     { id: 'dashboard', label: 'Gösterge Paneli', icon: HiOutlineHome },
     { id: 'analytics', label: 'Analitik', icon: HiOutlineChartBar },
     { id: 'messages', label: 'İletişim & CRM', icon: HiOutlineMail, badge: unreadCount },
+    { id: 'kanban', label: 'Kanban CRM', icon: HiOutlineViewBoards },
     { id: 'calendar', label: 'İçerik Takvimi', icon: HiOutlineCalendar },
     { id: 'reminders', label: 'Hatırlatıcılar', icon: HiOutlineBell },
   ]
@@ -4914,6 +6239,18 @@ export default function Admin() {
     { id: 'partners', label: 'Partnerler', icon: HiOutlineUsers },
     { id: 'portfolio', label: 'Portföy', icon: HiOutlineViewBoards },
     { id: 'newsletter', label: 'Newsletter', icon: HiOutlineMail },
+    { id: 'media', label: 'Medya Kütüphanesi', icon: HiOutlinePhotograph },
+    { id: 'ai-content', label: 'AI İçerik Üretici', icon: HiOutlineSparkles },
+  ]
+
+  const crmNavItems = [
+    { id: 'proposals', label: 'Teklifler', icon: HiOutlineCurrencyDollar },
+    { id: 'tasks', label: 'Görevler', icon: HiOutlineClipboardList },
+    { id: 'subscriptions', label: 'Abonelikler', icon: HiOutlineRefresh },
+    { id: 'surveys', label: 'NPS Anketleri', icon: HiOutlineStar },
+    { id: 'onboarding', label: 'Onboarding', icon: HiOutlineClipboardCheck },
+    { id: 'report', label: 'Rapor Oluştur', icon: HiOutlineDocumentReport },
+    { id: 'email-templates', label: 'E-posta Şablonları', icon: HiOutlineTemplate },
   ]
 
   const systemNavItems = [
@@ -4987,6 +6324,10 @@ export default function Admin() {
             {contentNavItems.map(renderNavItem)}
           </div>
           <div className="sidebar-nav-group">
+            <div className="sidebar-nav-label">MÜŞTERİ YÖNETİMİ</div>
+            {crmNavItems.map(renderNavItem)}
+          </div>
+          <div className="sidebar-nav-group">
             <div className="sidebar-nav-label">SİSTEM</div>
             {systemNavItems.map(renderNavItem)}
           </div>
@@ -5035,6 +6376,16 @@ export default function Admin() {
         {activeSection === 'newsletter' && <NewsletterSection showToast={showToast} />}
         {activeSection === 'reminders' && <RemindersSection showToast={showToast} />}
         {activeSection === 'settings' && <SettingsSection showToast={showToast} />}
+        {activeSection === 'kanban' && <KanbanSection showToast={showToast} />}
+        {activeSection === 'proposals' && <ProposalBuilderSection showToast={showToast} />}
+        {activeSection === 'email-templates' && <EmailTemplatesSection showToast={showToast} />}
+        {activeSection === 'media' && <MediaLibrarySection showToast={showToast} />}
+        {activeSection === 'tasks' && <TasksSection showToast={showToast} currentUser={currentUser} />}
+        {activeSection === 'ai-content' && <AIContentSection showToast={showToast} />}
+        {activeSection === 'subscriptions' && <SubscriptionsSection showToast={showToast} />}
+        {activeSection === 'surveys' && <NPSSurveysSection showToast={showToast} />}
+        {activeSection === 'onboarding' && <OnboardingSection showToast={showToast} />}
+        {activeSection === 'report' && <ReportExportSection showToast={showToast} />}
       </main>
 
       {/* Toast */}

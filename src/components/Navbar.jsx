@@ -20,7 +20,8 @@ export default function Navbar() {
     { name: t('nav.services'), path: '/hizmetler' },
     { name: t('nav.packages'), path: '/paketler' },
     { name: t('nav.partners'), path: '/partnerler' },
-    { name: t('nav.careers'), path: '/kariyer' },
+    { name: lang === 'tr' ? 'Neden Biz?' : 'Why Us?', path: '/neden-biz' },
+    { name: lang === 'tr' ? 'SSS' : 'FAQ', path: '/sss' },
     { name: t('nav.blog'), path: '/blog' },
     { name: t('nav.contact'), path: '/iletisim' },
   ]

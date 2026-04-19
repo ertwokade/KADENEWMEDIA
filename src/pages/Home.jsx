@@ -521,6 +521,58 @@ export default function Home() {
       {/* Audit Score */}
       <AuditScore />
 
+      {/* Video Showreel */}
+      <section className="section video-showreel-section">
+        <div className="container">
+          <div className="section-header">
+            <FadeIn>
+              <div className="section-badge">
+                <HiOutlinePlay size={14} />
+                {lang === 'tr' ? 'Video İçeriklerimiz' : 'Our Videos'}
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <h2 className="section-title">
+                {lang === 'tr' ? <>YouTube'da <span>Kade Media</span></> : <>Kade Media on <span>YouTube</span></>}
+              </h2>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <p className="section-subtitle">
+                {lang === 'tr'
+                  ? 'Sosyal medya ipuçları, vaka çalışmaları ve ajans içeriklerimizi YouTube kanalımızda takip edin.'
+                  : 'Follow social media tips, case studies, and agency content on our YouTube channel.'}
+              </p>
+            </FadeIn>
+          </div>
+
+          <FadeIn delay={0.3}>
+            <div className="video-showreel-embed glass-card">
+              <div className="video-embed-wrapper">
+                <iframe
+                  src="https://www.youtube.com/embed?listType=user_uploads&list=kademediacom&rel=0"
+                  title="Kade Media YouTube"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                  style={{ border: 0, width: '100%', aspectRatio: '16/9', borderRadius: '12px', display: 'block' }}
+                />
+              </div>
+              <div className="video-showreel-cta">
+                <a
+                  href="https://www.youtube.com/@kademediacom"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                >
+                  <FaYoutube size={18} />
+                  {lang === 'tr' ? 'Kanalı Takip Et' : 'Subscribe to Channel'}
+                </a>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
       {/* Location */}
       <section className="section location-section">
         <div className="container">

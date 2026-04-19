@@ -478,3 +478,195 @@ export async function submitAnalyzerLeadApi(data) {
   });
   return handleResponse(res);
 }
+
+// ── Proposals (Teklifler) ──────────────────────────────────────────────────
+export async function getProposalsApi(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const url = qs ? `${API_BASE}/proposals?${qs}` : `${API_BASE}/proposals`;
+  const res = await fetch(url, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function createProposalApi(data) {
+  const res = await fetch(`${API_BASE}/proposals`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateProposalApi(data) {
+  const res = await fetch(`${API_BASE}/proposals`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteProposalApi(id) {
+  const res = await fetch(`${API_BASE}/proposals?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// ── Tasks (Görevler) ────────────────────────────────────────────────────────
+export async function getTasksApi(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const url = qs ? `${API_BASE}/tasks?${qs}` : `${API_BASE}/tasks`;
+  const res = await fetch(url, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function createTaskApi(data) {
+  const res = await fetch(`${API_BASE}/tasks`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateTaskApi(data) {
+  const res = await fetch(`${API_BASE}/tasks`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteTaskApi(id) {
+  const res = await fetch(`${API_BASE}/tasks?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// ── Media (Medya Kütüphanesi) ────────────────────────────────────────────────
+export async function getMediaApi(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const url = qs ? `${API_BASE}/media?${qs}` : `${API_BASE}/media`;
+  const res = await fetch(url, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function uploadMediaApi(data) {
+  const res = await fetch(`${API_BASE}/media`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateMediaApi(data) {
+  const res = await fetch(`${API_BASE}/media`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteMediaApi(id) {
+  const res = await fetch(`${API_BASE}/media?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function bulkDeleteMediaApi(ids) {
+  const res = await fetch(`${API_BASE}/media?ids=${ids.join(',')}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// ── Subscriptions (Abonelik/Retainer) ────────────────────────────────────────
+export async function getSubscriptionsApi(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const url = qs ? `${API_BASE}/subscriptions?${qs}` : `${API_BASE}/subscriptions`;
+  const res = await fetch(url, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function createSubscriptionApi(data) {
+  const res = await fetch(`${API_BASE}/subscriptions`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateSubscriptionApi(data) {
+  const res = await fetch(`${API_BASE}/subscriptions`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function recordPaymentApi(id, paymentData) {
+  const res = await fetch(`${API_BASE}/subscriptions`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ id, action: 'record-payment', ...paymentData }),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteSubscriptionApi(id) {
+  const res = await fetch(`${API_BASE}/subscriptions?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// ── Surveys (NPS Anketleri) ───────────────────────────────────────────────────
+export async function getSurveysApi(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const url = qs ? `${API_BASE}/surveys?${qs}` : `${API_BASE}/surveys`;
+  const res = await fetch(url, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function getSurveyStatsApi() {
+  const res = await fetch(`${API_BASE}/surveys?stats=true`, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function sendSurveyApi(data) {
+  const res = await fetch(`${API_BASE}/surveys`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function submitSurveyResponseApi(token, score, comment) {
+  const res = await fetch(`${API_BASE}/surveys?action=submit`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, score, comment }),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteSurveyApi(id) {
+  const res = await fetch(`${API_BASE}/surveys?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}

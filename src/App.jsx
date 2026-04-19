@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef } from 'react'
+import { OrganizationSchema } from './components/StructuredData'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { trackPageviewApi } from './api'
 import PageHeroCanvas from './components/PageHeroCanvas'
@@ -31,6 +32,13 @@ const CerezPolitikasi = lazy(() => import('./pages/CerezPolitikasi'))
 const CaseStudies = lazy(() => import('./pages/CaseStudies'))
 const ROICalculator = lazy(() => import('./pages/ROICalculator'))
 const Admin = lazy(() => import('./pages/Admin'))
+// New pages
+const SSS = lazy(() => import('./pages/SSS'))
+const Referanslar = lazy(() => import('./pages/Referanslar'))
+const Tesekkur = lazy(() => import('./pages/Tesekkur'))
+const Basin = lazy(() => import('./pages/Basin'))
+const Oduller = lazy(() => import('./pages/Oduller'))
+const NedenBiz = lazy(() => import('./pages/NedenBiz'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -47,6 +55,12 @@ const ROUTE_THEMES = {
   '/portfolio': 'portfolio',
   '/ekip': 'team',
   '/iletisim': 'contact',
+  '/sss': 'contact',
+  '/referanslar': 'about',
+  '/basin': 'blog',
+  '/oduller': 'services',
+  '/neden-biz': 'services',
+  '/tesekkur': 'contact',
 }
 
 function getCanvasTheme(pathname) {
@@ -81,6 +95,7 @@ function App() {
 
   return (
     <>
+      <OrganizationSchema />
       <a href="#main-content" className="skip-to-content">İçeriğe geç</a>
       <ScrollToTop />
       {!isAdmin && <PageHeroCanvas type={canvasTheme} />}
@@ -106,6 +121,12 @@ function App() {
         <Route path="/gizlilik" element={<Suspense fallback={<PageLoader />}><Gizlilik /></Suspense>} />
         <Route path="/cerez-politikasi" element={<Suspense fallback={<PageLoader />}><CerezPolitikasi /></Suspense>} />
         <Route path="/admin" element={<Suspense fallback={<PageLoader />}><Admin /></Suspense>} />
+        <Route path="/sss" element={<Suspense fallback={<PageLoader />}><SSS /></Suspense>} />
+        <Route path="/referanslar" element={<Suspense fallback={<PageLoader />}><Referanslar /></Suspense>} />
+        <Route path="/tesekkur" element={<Suspense fallback={<PageLoader />}><Tesekkur /></Suspense>} />
+        <Route path="/basin" element={<Suspense fallback={<PageLoader />}><Basin /></Suspense>} />
+        <Route path="/oduller" element={<Suspense fallback={<PageLoader />}><Oduller /></Suspense>} />
+        <Route path="/neden-biz" element={<Suspense fallback={<PageLoader />}><NedenBiz /></Suspense>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </main>

@@ -63,6 +63,13 @@ export default function Footer() {
       { name: t('servicesSection.ads'), path: '/hizmetler' },
       { name: lang === 'tr' ? 'ROI Hesaplayıcı' : 'ROI Calculator', path: '/roi-hesaplayici' },
     ],
+    kaynaklar: [
+      { name: lang === 'tr' ? 'Neden Biz?' : 'Why Us?', path: '/neden-biz' },
+      { name: lang === 'tr' ? 'Müşteri Yorumları' : 'Reviews', path: '/referanslar' },
+      { name: lang === 'tr' ? 'Ödüller & Sertifikalar' : 'Awards', path: '/oduller' },
+      { name: lang === 'tr' ? 'Sık Sorulan Sorular' : 'FAQ', path: '/sss' },
+      { name: lang === 'tr' ? 'Basın & Medya' : 'Press', path: '/basin' },
+    ],
   }
 
   const scrollToTop = () => {
@@ -146,6 +153,17 @@ export default function Footer() {
             <h4>{t('footer.servicesTitle')}</h4>
             <ul>
               {footerLinks.hizmetler.map((link) => (
+                <li key={link.name}>
+                  <Link to={link.path}>{link.name}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="footer-links-group">
+            <h4>{lang === 'tr' ? 'Kaynaklar' : 'Resources'}</h4>
+            <ul>
+              {footerLinks.kaynaklar.map((link) => (
                 <li key={link.name}>
                   <Link to={link.path}>{link.name}</Link>
                 </li>

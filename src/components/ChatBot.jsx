@@ -128,12 +128,35 @@ async function getAIResponse(message, lang, history) {
   }
 }
 
+const CHAT_HISTORY_KEY = 'kade_chat_history'
+const MAX_HISTORY = 10
+
+function loadHistory(lang) {
+  try {
+    const stored = localStorage.getItem(CHAT_HISTORY_KEY)
+    if (!stored) return null
+    const parsed = JSON.parse(stored)
+    if (parsed.lang !== lang || !Array.isArray(parsed.messages)) return null
+    // Only keep messages less than 24 hours old
+    if (Date.now() - parsed.savedAt > 24 * 60 * 60 * 1000) return null
+    return parsed.messages
+  } catch { return null }
+}
+
+function saveHistory(messages, lang) {
+  try {
+    const toSave = messages.slice(-MAX_HISTORY)
+    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify({ messages: toSave, lang, savedAt: Date.now() }))
+  } catch { /* storage quota */ }
+}
+
 export default function ChatBot({ isOpen, onClose }) {
   const { lang } = useLanguage()
   const fb = fallbackResponses[lang] || fallbackResponses.tr
-  const [messages, setMessages] = useState([
-    { type: 'bot', text: fb.welcomeMessage, showQuickReplies: true },
-  ])
+  const [messages, setMessages] = useState(() => {
+    const history = loadHistory(lang)
+    return history && history.length > 0 ? history : [{ type: 'bot', text: fb.welcomeMessage, showQuickReplies: true }]
+  })
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef(null)
@@ -150,9 +173,24 @@ export default function ChatBot({ isOpen, onClose }) {
   }, [isOpen])
 
   useEffect(() => {
+    if (messages.length > 1) saveHistory(messages, lang)
+  }, [messages, lang])
+
+  useEffect(() => {
+    const history = loadHistory(lang)
+    if (history && history.length > 0) {
+      setMessages(history)
+    } else {
+      const newFb = fallbackResponses[lang] || fallbackResponses.tr
+      setMessages([{ type: 'bot', text: newFb.welcomeMessage, showQuickReplies: true }])
+    }
+  }, [lang])
+
+  const clearHistory = () => {
+    localStorage.removeItem(CHAT_HISTORY_KEY)
     const newFb = fallbackResponses[lang] || fallbackResponses.tr
     setMessages([{ type: 'bot', text: newFb.welcomeMessage, showQuickReplies: true }])
-  }, [lang])
+  }
 
   const sendMessage = async (text) => {
     if (!text.trim()) return
@@ -209,9 +247,21 @@ export default function ChatBot({ isOpen, onClose }) {
               <span>{lang === 'tr' ? 'Akıllı Asistan' : 'Smart Assistant'}</span>
             </div>
           </div>
-          <button className="chatbot-close" onClick={onClose}>
-            <HiX size={18} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {messages.length > 1 && (
+              <button
+                className="chatbot-close"
+                onClick={clearHistory}
+                title={lang === 'tr' ? 'Geçmişi temizle' : 'Clear history'}
+                style={{ fontSize: '0.75rem', width: 28, height: 28 }}
+              >
+                🗑️
+              </button>
+            )}
+            <button className="chatbot-close" onClick={onClose}>
+              <HiX size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="chatbot-messages">

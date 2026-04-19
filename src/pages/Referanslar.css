@@ -1,0 +1,175 @@
+.referanslar-hero {
+  padding: 140px 0 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.referanslar-istatistikler {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 768px) {
+  .referanslar-istatistikler {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.referanslar-istatistik {
+  text-align: center;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ist-ikon { font-size: 1.8rem; }
+.ist-rakam { font-size: 2rem; font-weight: 800; color: var(--primary); }
+.ist-etiket { font-size: 0.85rem; color: var(--text-secondary); }
+
+.referanslar-filtreler {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.referanslar-filtre-btn {
+  padding: 7px 16px;
+  border-radius: 50px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.referanslar-filtre-btn:hover,
+.referanslar-filtre-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #111;
+}
+
+.referanslar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .referanslar-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .referanslar-grid { grid-template-columns: 1fr; }
+}
+
+.referans-kart {
+  padding: 1.8rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.referans-kart-ust {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.yildiz-puan {
+  display: flex;
+  gap: 2px;
+}
+
+.referans-yorum {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.92rem;
+  flex: 1;
+  margin: 0;
+  font-style: italic;
+}
+
+.referans-kisi {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.referans-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.referans-isim { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
+.referans-unvan { font-size: 0.8rem; color: var(--text-secondary); }
+.referans-sektor { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 2px; }
+
+.referanslar-sayfalama {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 2rem 0;
+}
+
+.sayfalama-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.sayfalama-btn:hover:not(:disabled),
+.sayfalama-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #111;
+}
+
+.sayfalama-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.referanslar-cta {
+  text-align: center;
+  padding: 3rem 2rem;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.referanslar-cta h3 { font-size: 1.5rem; margin: 0; }
+.referanslar-cta p { color: var(--text-secondary); margin: 0; }

@@ -1,0 +1,145 @@
+.sss-hero {
+  padding: 140px 0 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.sss-arama {
+  max-width: 520px;
+  margin: 2rem auto 0;
+}
+
+.sss-arama-input {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 50px;
+  border: 1.5px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sss-arama-input:focus {
+  border-color: var(--primary);
+}
+
+.sss-kategoriler {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.sss-kategori-btn {
+  padding: 8px 20px;
+  border-radius: 50px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sss-kategori-btn:hover,
+.sss-kategori-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #111;
+}
+
+.sss-liste {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sss-item {
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.sss-item.open {
+  border-color: var(--primary);
+}
+
+.sss-soru {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.sss-soru:hover {
+  color: var(--primary);
+}
+
+.sss-cevap {
+  overflow: hidden;
+}
+
+.sss-cevap p {
+  padding: 0 24px 20px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.sss-bos {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.sss-bos svg {
+  opacity: 0.3;
+}
+
+.sss-cta {
+  max-width: 600px;
+  margin: 4rem auto 0;
+  text-align: center;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.sss-cta svg {
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+.sss-cta h3 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.sss-cta p {
+  color: var(--text-secondary);
+  margin: 0;
+}

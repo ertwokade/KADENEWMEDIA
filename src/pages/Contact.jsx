@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   HiOutlineMail,
@@ -32,6 +33,7 @@ const MAPS_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30
 
 export default function Contact() {
   const { t } = useLanguage()
+  const navigate = useNavigate()
   useSEO({
     title: 'İletişim | Teklif Alın',
     description: 'Kade Media ile iletişime geçin. Sosyal medya yönetimi, dijital pazarlama veya içerik üretimi için ücretsiz teklif alın. İstanbul - Biruni Teknopark.',
@@ -93,7 +95,7 @@ export default function Contact() {
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', company: '', services: [], message: '' })
       setKvkkAccepted(false)
-      setTimeout(() => setSubmitted(false), 3000)
+      setTimeout(() => navigate('/tesekkur'), 600)
     } catch (err) {
       const errorMsg = err.message || ''
       if (errorMsg === 'API unavailable' || errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {

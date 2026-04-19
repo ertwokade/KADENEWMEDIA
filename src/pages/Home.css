@@ -417,6 +417,28 @@
   color: var(--gray-light);
 }
 
+/* Video Showreel */
+.video-showreel-section { overflow: hidden; }
+
+.video-showreel-embed {
+  padding: 2rem;
+  border-radius: 20px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.video-embed-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+.video-showreel-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
 /* FAQ Home */
 .faq-home-section {
   overflow: hidden;
