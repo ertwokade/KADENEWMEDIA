@@ -81,6 +81,8 @@
 
 .navbar-dropdown {
   position: relative;
+  padding-bottom: 12px;
+  margin-bottom: -12px;
 }
 
 .navbar-dropdown-toggle {
