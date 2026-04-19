@@ -8,7 +8,6 @@ import {
 } from 'react-icons/hi'
 import { FaInstagram, FaLinkedinIn, FaGoogle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
-import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
@@ -135,7 +134,6 @@ function YildizPuan({ puan }) {
 }
 
 export default function Referanslar() {
-  const { lang } = useLanguage()
   const [aktifSayfa, setAktifSayfa] = useState(0)
   const [aktifSektor, setAktifSektor] = useState('hepsi')
   const yorumBasina = 6

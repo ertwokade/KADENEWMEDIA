@@ -47,13 +47,6 @@ function convertTRYtoUSD(tryAmount, rate) {
   return Math.round(num / rate)
 }
 
-function convertUSDtoTRY(usdAmount, rate) {
-  if (!rate || !usdAmount) return null
-  const num = parseFloat(String(usdAmount).replace(/\./g, '').replace(',', '.'))
-  if (isNaN(num)) return null
-  return Math.round(num * rate).toLocaleString('tr-TR')
-}
-
 function CompCell({ val }) {
   if (val === true) return <span className="comp-yes">✓</span>
   if (val === false) return <span className="comp-no">✗</span>
@@ -269,6 +262,11 @@ export default function Packages() {
                           <span className="amount">{pkg.priceTRY}</span>
                           <span className="period">{t('packages.month')}</span>
                         </div>
+                        {convertTRYtoUSD(pkg.priceTRY, exchangeRate) && (
+                          <div style={{ color: 'var(--text-tertiary)', fontSize: '0.82rem', marginTop: 6 }}>
+                            ≈ ${convertTRYtoUSD(pkg.priceTRY, exchangeRate)} / mo
+                          </div>
+                        )}
                       </>
                     )}
                   </div>

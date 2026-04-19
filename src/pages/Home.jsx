@@ -30,6 +30,7 @@ import HeroBackground from '../components/HeroBackground'
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '../components/Animations'
 import AuditScore from '../components/AuditScore'
 import PageBgAnimation from '../components/PageBgAnimation'
+import LazyYouTubeEmbed from '../components/LazyYouTubeEmbed'
 import './Home.css'
 
 const platforms = [
@@ -548,13 +549,11 @@ export default function Home() {
           <FadeIn delay={0.3}>
             <div className="video-showreel-embed glass-card">
               <div className="video-embed-wrapper">
-                <iframe
-                  src="https://www.youtube.com/embed?listType=user_uploads&list=kademediacom&rel=0"
+                <LazyYouTubeEmbed
+                  embedSrc="https://www.youtube.com/embed?listType=user_uploads&list=kademediacom&rel=0&autoplay=1"
                   title="Kade Media YouTube"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  loading="lazy"
-                  style={{ border: 0, width: '100%', aspectRatio: '16/9', borderRadius: '12px', display: 'block' }}
+                  channelUrl="https://www.youtube.com/@kademediacom"
+                  thumbnail="/og-image.svg"
                 />
               </div>
               <div className="video-showreel-cta">

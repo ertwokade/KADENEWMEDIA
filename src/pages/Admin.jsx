@@ -15,7 +15,7 @@ import {
   HiOutlinePhotograph, HiOutlineSparkles, HiOutlineRefresh,
   HiOutlineDocumentReport, HiOutlineClipboardCheck,
   HiOutlineTemplate, HiOutlineStar, HiOutlineCollection,
-  HiOutlineUserGroup, HiOutlineGlobe,
+  HiOutlineUserGroup, HiOutlineGlobe, HiOutlineCalculator,
 } from 'react-icons/hi'
 import PageTransition from '../components/PageTransition'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
@@ -30,18 +30,22 @@ import {
   seedApi,
   updateMessageStatusApi,
   getNotesApi, createNoteApi, deleteNoteApi,
-  getNotificationsApi, markNotificationReadApi, markAllNotificationsReadApi, deleteNotificationApi,
+  getNotificationsApi, markAllNotificationsReadApi,
   getAnalyticsApi, getGA4AnalyticsApi, getActivityLogApi,
   getNewsletterSubscribersApi, deleteNewsletterSubscriberApi, sendNewsletterApi,
   testSmtpApi, replyToMessageApi,
   getSiteSettingsApi, updateSiteSettingsApi,
   getPortfolioApi,
   getRemindersApi, createReminderApi, updateReminderApi, deleteReminderApi, checkRemindersApi,
-  getProposalsApi, createProposalApi, updateProposalApi, deleteProposalApi,
+  getProposalsApi, createProposalApi, deleteProposalApi,
   getTasksApi, createTaskApi, updateTaskApi, deleteTaskApi,
-  getMediaApi, uploadMediaApi, deleteMediaApi, bulkDeleteMediaApi,
-  getSubscriptionsApi, createSubscriptionApi, updateSubscriptionApi, deleteSubscriptionApi, recordPaymentApi,
+  getMediaApi, uploadMediaApi, bulkDeleteMediaApi,
+  getSubscriptionsApi, createSubscriptionApi, deleteSubscriptionApi, recordPaymentApi,
   getSurveysApi, getSurveyStatsApi, sendSurveyApi, deleteSurveyApi,
+  getReferralsApi, updateReferralApi, deleteReferralApi,
+  getQuotesApi, updateQuoteApi, deleteQuoteApi,
+  getCustomerProfilesApi, getInvoicesApi, createInvoiceApi, updateInvoiceApi, deleteInvoiceApi,
+  getBackupSummaryApi, createBackupApi,
 } from '../api'
 import './Admin.css'
 
@@ -163,7 +167,7 @@ function DashboardSection({ stats, onNavigate }) {
           setTimeout(() => setVisitorPulse(false), 600)
           return
         }
-      } catch {}
+      } catch { /* use simulated fallback */ }
       // Simulated fallback: plausible range based on time of day
       const hour = new Date().getHours()
       const base = hour >= 9 && hour <= 22 ? 3 : 1
@@ -437,7 +441,6 @@ function BlogSection({ showToast }) {
   const [showForm, setShowForm] = useState(false)
   const [editingBlog, setEditingBlog] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterStatus, setFilterStatus] = useState('all')
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [form, setForm] = useState({
     titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
@@ -543,7 +546,7 @@ function BlogSection({ showToast }) {
     if (!window.confirm(`${selectedIds.size} yazıyı silmek istediğinize emin misiniz?`)) return
     let ok = 0
     for (const id of selectedIds) {
-      try { await deleteBlogApi(id); ok++ } catch {}
+      try { await deleteBlogApi(id); ok++ } catch { /* continue deleting the rest */ }
     }
     showToast(`${ok} yazı silindi!`, 'success')
     setSelectedIds(new Set())
@@ -1126,19 +1129,22 @@ function ContentSection({ showToast }) {
   )
 }
 
+const HERO_EDITOR_DEFAULTS = {
+  tr: { title1: 'Dijital Dunyada Markaniza', title2: 'Kademe Atlatiyoruz ⚡', subtitle: 'Kade Media olarak sosyal medya stratejileri, kreatif icerik uretimi ve dijital pazarlama cozumleriyle markanizi zirveye tasiyoruz.' },
+  en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
+}
+
 function HeroEditor({ data, onSave }) {
-  const defaults = {
-    tr: { title1: 'Dijital Dunyada Markaniza', title2: 'Kademe Atlatiyoruz ⚡', subtitle: 'Kade Media olarak sosyal medya stratejileri, kreatif icerik uretimi ve dijital pazarlama cozumleriyle markanizi zirveye tasiyoruz.' },
-    en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
-  }
-  const ensureDefaults = (d) => ({
-    tr: { title1: d?.tr?.title1 || defaults.tr.title1, title2: d?.tr?.title2 || defaults.tr.title2, subtitle: d?.tr?.subtitle || defaults.tr.subtitle },
-    en: { title1: d?.en?.title1 || defaults.en.title1, title2: d?.en?.title2 || defaults.en.title2, subtitle: d?.en?.subtitle || defaults.en.subtitle },
-  })
+  const ensureDefaults = useCallback((d) => {
+    return {
+      tr: { title1: d?.tr?.title1 || HERO_EDITOR_DEFAULTS.tr.title1, title2: d?.tr?.title2 || HERO_EDITOR_DEFAULTS.tr.title2, subtitle: d?.tr?.subtitle || HERO_EDITOR_DEFAULTS.tr.subtitle },
+      en: { title1: d?.en?.title1 || HERO_EDITOR_DEFAULTS.en.title1, title2: d?.en?.title2 || HERO_EDITOR_DEFAULTS.en.title2, subtitle: d?.en?.subtitle || HERO_EDITOR_DEFAULTS.en.subtitle },
+    }
+  }, [])
   const [form, setForm] = useState(() => ensureDefaults(data))
   const [langTab, setLangTab] = useState('tr')
 
-  useEffect(() => { setForm(ensureDefaults(data)) }, [data])
+  useEffect(() => { setForm(ensureDefaults(data)) }, [data, ensureDefaults])
 
   const handleSave = () => {
     // Ensure both languages have values before saving
@@ -1162,7 +1168,7 @@ function HeroEditor({ data, onSave }) {
           type="text"
           value={form[langTab]?.title1 || ''}
           onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], title1: e.target.value } })}
-          placeholder={defaults[langTab].title1}
+          placeholder={HERO_EDITOR_DEFAULTS[langTab].title1}
         />
       </div>
       <div className="form-group">
@@ -1171,7 +1177,7 @@ function HeroEditor({ data, onSave }) {
           type="text"
           value={form[langTab]?.title2 || ''}
           onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], title2: e.target.value } })}
-          placeholder={defaults[langTab].title2}
+          placeholder={HERO_EDITOR_DEFAULTS[langTab].title2}
         />
       </div>
       <div className="form-group">
@@ -1180,7 +1186,7 @@ function HeroEditor({ data, onSave }) {
           rows="3"
           value={form[langTab]?.subtitle || ''}
           onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], subtitle: e.target.value } })}
-          placeholder={defaults[langTab].subtitle}
+          placeholder={HERO_EDITOR_DEFAULTS[langTab].subtitle}
         />
       </div>
       <div className="admin-form-actions">
@@ -4203,7 +4209,9 @@ function PortfolioSection({ showToast }) {
       {/* Portfolio List */}
       <div className="admin-table-wrapper">
         <div className="admin-table-header"><h3>Tüm Projeler ({items.length})</h3></div>
-        {items.length === 0 ? (
+        {loading ? (
+          <div className="admin-empty-state"><p>Yükleniyor...</p></div>
+        ) : items.length === 0 ? (
           <div className="admin-empty-state">
             <div className="empty-icon">📸</div>
             <h3>Henüz portfolyo öğesi yok</h3>
@@ -5254,7 +5262,6 @@ function EmailTemplatesSection({ showToast }) {
   const [editing, setEditing] = useState(null)
   const [showNew, setShowNew] = useState(false)
   const [newForm, setNewForm] = useState({ isim: '', konu: '', metin: '' })
-  const [copiedId, setCopiedId] = useState(null)
 
   const save = (updated) => {
     setTemplates(updated)
@@ -5499,7 +5506,7 @@ function MediaLibrarySection({ showToast }) {
 }
 
 // ========== GOREV ATAMA ==========
-function TasksSection({ showToast, currentUser }) {
+function TasksSection({ showToast }) {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -5822,7 +5829,6 @@ function SubscriptionsSection({ showToast }) {
 
   const statusRenk = { aktif: '#2ECC71', pasif: '#888', iptal: '#E91E63' }
 
-  const today = new Date()
   const expiringSoon = subs.filter(s => s.status === 'aktif' && s.daysUntilRenewal !== undefined && s.daysUntilRenewal <= 7 && s.daysUntilRenewal >= 0)
 
   return (
@@ -5927,7 +5933,7 @@ function NPSSurveysSection({ showToast }) {
   const handleSend = async (e) => {
     e.preventDefault()
     try {
-      const res = await sendSurveyApi(form)
+      await sendSurveyApi(form)
       showToast('Anket gönderildi')
       setShowForm(false)
       setForm({ clientName: '', clientEmail: '', clientCompany: '', projectName: '' })
@@ -6016,6 +6022,472 @@ function NPSSurveysSection({ showToast }) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// ========== REFERRAL TAKIBI ==========
+function ReferralTrackingSection({ showToast }) {
+  const [referrals, setReferrals] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState('all')
+
+  const statuses = [
+    { value: 'yeni', label: 'Yeni' },
+    { value: 'iletisime-gecildi', label: 'İletişime Geçildi' },
+    { value: 'teklif', label: 'Teklif' },
+    { value: 'kazandi', label: 'Kazandı' },
+    { value: 'odendi', label: 'Ödendi' },
+    { value: 'kaybedildi', label: 'Kaybedildi' },
+  ]
+
+  const statusColor = {
+    yeni: '#eac321',
+    'iletisime-gecildi': '#00BCD4',
+    teklif: '#6C63FF',
+    kazandi: '#2ECC71',
+    odendi: '#14B8A6',
+    kaybedildi: '#E91E63',
+  }
+
+  const fetchReferrals = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await getReferralsApi(statusFilter !== 'all' ? { status: statusFilter } : {})
+      setReferrals(Array.isArray(data) ? data : [])
+    } catch (err) {
+      showToast(err.message || 'Referral kayıtları yüklenemedi', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [statusFilter, showToast])
+
+  useEffect(() => {
+    fetchReferrals()
+  }, [fetchReferrals])
+
+  const totals = useMemo(() => ({
+    total: referrals.length,
+    active: referrals.filter(r => !['kazandi', 'odendi', 'kaybedildi'].includes(r.status)).length,
+    won: referrals.filter(r => ['kazandi', 'odendi'].includes(r.status)).length,
+    reward: referrals.reduce((sum, r) => sum + (Number(r.reward) || 0), 0),
+  }), [referrals])
+
+  const handleUpdate = async (referral, updates) => {
+    try {
+      await updateReferralApi({ id: referral._id, ...updates })
+      showToast('Referral güncellendi')
+      fetchReferrals()
+    } catch (err) {
+      showToast(err.message || 'Güncelleme başarısız', 'error')
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm('Referral kaydı silinsin mi?')) return
+    try {
+      await deleteReferralApi(id)
+      showToast('Referral silindi')
+      fetchReferrals()
+    } catch (err) {
+      showToast(err.message || 'Silme başarısız', 'error')
+    }
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Referral <span>Takibi</span></h1>
+          <p>Referans programından gelen lead'leri ve ödül durumlarını yönetin</p>
+        </div>
+        <a href="/referans-programi" target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+          Sayfayı Gör
+        </a>
+      </div>
+
+      <div className="admin-stats-grid" style={{ marginBottom: 18 }}>
+        <div className="admin-stat-card"><div className="stat-number">{totals.total}</div><div className="stat-label">Toplam Kayıt</div></div>
+        <div className="admin-stat-card"><div className="stat-number">{totals.active}</div><div className="stat-label">Aktif Takip</div></div>
+        <div className="admin-stat-card"><div className="stat-number">{totals.won}</div><div className="stat-label">Kazanılan</div></div>
+        <div className="admin-stat-card"><div className="stat-number">₺{totals.reward.toLocaleString('tr-TR')}</div><div className="stat-label">Ödül Toplamı</div></div>
+      </div>
+
+      <div className="admin-form" style={{ marginBottom: 16 }}>
+        <div className="form-group" style={{ maxWidth: 260, marginBottom: 0 }}>
+          <label>Durum filtresi</label>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="all">Tüm kayıtlar</option>
+            {statuses.map(status => <option key={status.value} value={status.value}>{status.label}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 40 }}>Yükleniyor...</div>
+      ) : referrals.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>Henüz referral kaydı yok</div>
+      ) : (
+        <div style={{ display: 'grid', gap: 12 }}>
+          {referrals.map(referral => (
+            <div key={referral._id} className="admin-form" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr auto', gap: 16, alignItems: 'center' }}>
+              <div>
+                <div style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{referral.leadName}</div>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+                  {referral.leadCompany || 'Şirket yok'} · {referral.service || 'Hizmet belirtilmedi'}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: 5 }}>
+                  Öneren: {referral.referrerName} ({referral.referrerEmail})
+                </div>
+                {referral.notes && (
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 8, fontStyle: 'italic' }}>
+                    "{referral.notes}"
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: 'grid', gap: 8 }}>
+                <select
+                  value={referral.status || 'yeni'}
+                  onChange={e => handleUpdate(referral, { status: e.target.value })}
+                  style={{ borderColor: `${statusColor[referral.status || 'yeni']}70` }}
+                >
+                  {statuses.map(status => <option key={status.value} value={status.value}>{status.label}</option>)}
+                </select>
+                <input
+                  type="number"
+                  min="0"
+                  defaultValue={referral.reward || 0}
+                  onBlur={e => handleUpdate(referral, { reward: e.target.value })}
+                  placeholder="Ödül tutarı"
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>
+                  {referral.createdAt ? new Date(referral.createdAt).toLocaleDateString('tr-TR') : ''}
+                </div>
+                <button onClick={() => handleDelete(referral._id)} style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}>
+                  <HiOutlineTrash size={16} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== MUSTERI PROFIL KARTLARI ==========
+function CustomerProfilesSection({ showToast }) {
+  const [profiles, setProfiles] = useState([])
+  const [query, setQuery] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await getCustomerProfilesApi(query ? { q: query } : {})
+      setProfiles(Array.isArray(data) ? data : [])
+    } catch (err) {
+      showToast(err.message || 'Müşteri profilleri yüklenemedi', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [query, showToast])
+
+  useEffect(() => { load() }, [load])
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Müşteri <span>Profilleri</span></h1>
+          <p>Mesaj, teklif, abonelik ve fatura geçmişini tek müşteri kartında görün</p>
+        </div>
+      </div>
+
+      <div className="admin-form" style={{ marginBottom: 16 }}>
+        <div className="form-group" style={{ marginBottom: 0 }}>
+          <label>Müşteri ara</label>
+          <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Ad, e-posta veya şirket..." />
+        </div>
+      </div>
+
+      {loading ? <div style={{ textAlign: 'center', padding: 40 }}>Yükleniyor...</div> : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
+          {profiles.map(profile => (
+            <div key={profile.key} className="admin-form">
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
+                <div className="sidebar-avatar">{(profile.name || profile.email || '?').charAt(0)}</div>
+                <div>
+                  <div style={{ fontWeight: 800 }}>{profile.name}</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{profile.email || profile.company || '-'}</div>
+                </div>
+              </div>
+              <div className="admin-stats-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
+                <div className="admin-stat-card"><div className="stat-number">{profile.messages.length}</div><div className="stat-label">Mesaj</div></div>
+                <div className="admin-stat-card"><div className="stat-number">{profile.quotes.length + profile.proposals.length}</div><div className="stat-label">Teklif</div></div>
+                <div className="admin-stat-card"><div className="stat-number">{profile.subscriptions.length}</div><div className="stat-label">Abonelik</div></div>
+                <div className="admin-stat-card"><div className="stat-number">₺{Number(profile.totalValue || 0).toLocaleString('tr-TR')}</div><div className="stat-label">Değer</div></div>
+              </div>
+              <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', margin: 0 }}>
+                Son aktivite: {profile.lastActivity ? new Date(profile.lastActivity).toLocaleDateString('tr-TR') : '-'}
+              </p>
+            </div>
+          ))}
+          {profiles.length === 0 && <div style={{ color: 'var(--text-secondary)', padding: 40 }}>Kayıt bulunamadı</div>}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== ONLINE TEKLIF TALEPLERI ==========
+function QuoteLeadsSection({ showToast }) {
+  const [quotes, setQuotes] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await getQuotesApi()
+      setQuotes(Array.isArray(data) ? data : [])
+    } catch (err) {
+      showToast(err.message || 'Teklif talepleri yüklenemedi', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [showToast])
+
+  useEffect(() => { load() }, [load])
+
+  const updateStatus = async (quote, status) => {
+    try {
+      await updateQuoteApi({ id: quote._id, status })
+      showToast('Teklif durumu güncellendi')
+      load()
+    } catch (err) {
+      showToast(err.message || 'Güncellenemedi', 'error')
+    }
+  }
+
+  const remove = async (id) => {
+    if (!confirm('Teklif talebi silinsin mi?')) return
+    await deleteQuoteApi(id)
+    showToast('Teklif talebi silindi')
+    load()
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Online <span>Teklifler</span></h1>
+          <p>/teklif-al ve fiyat hesaplama akışından gelen yüksek niyetli lead'ler</p>
+        </div>
+        <a href="/teklif-al" target="_blank" rel="noopener noreferrer" className="btn btn-outline">Formu Gör</a>
+      </div>
+
+      {loading ? <div style={{ textAlign: 'center', padding: 40 }}>Yükleniyor...</div> : (
+        <div style={{ display: 'grid', gap: 12 }}>
+          {quotes.map(quote => (
+            <div key={quote._id} className="admin-form" style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 14, alignItems: 'center' }}>
+              <div>
+                <strong>{quote.name} {quote.company && `— ${quote.company}`}</strong>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', marginTop: 4 }}>{quote.email} · {quote.services?.join(', ') || '-'}</div>
+                <div style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', marginTop: 4 }}>{quote.platforms?.join(', ') || '-'} · {quote.contentCount || 0} içerik · {quote.videoCount || 0} video</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontWeight: 900, color: 'var(--primary)' }}>₺{Number(quote.estimatedPrice || 0).toLocaleString('tr-TR')}</div>
+                <select value={quote.status || 'yeni'} onChange={e => updateStatus(quote, e.target.value)}>
+                  <option value="yeni">Yeni</option>
+                  <option value="aranacak">Aranacak</option>
+                  <option value="teklif-hazirlandi">Teklif Hazırlandı</option>
+                  <option value="kazandi">Kazandı</option>
+                  <option value="kaybetti">Kaybetti</option>
+                </select>
+              </div>
+              <button onClick={() => remove(quote._id)} style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}>
+                <HiOutlineTrash size={16} />
+              </button>
+            </div>
+          ))}
+          {quotes.length === 0 && <div style={{ color: 'var(--text-secondary)', padding: 40 }}>Henüz online teklif talebi yok</div>}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== FATURA / ODEME TAKIBI ==========
+function InvoicesSection({ showToast }) {
+  const [invoices, setInvoices] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [form, setForm] = useState({ clientName: '', clientEmail: '', amount: '', currency: 'TRY', dueDate: '', description: '' })
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await getInvoicesApi()
+      setInvoices(Array.isArray(data) ? data : [])
+    } catch (err) {
+      showToast(err.message || 'Faturalar yüklenemedi', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [showToast])
+
+  useEffect(() => { load() }, [load])
+
+  const totals = useMemo(() => ({
+    waiting: invoices.filter(i => i.status !== 'odendi').reduce((sum, i) => sum + (Number(i.amount) || 0), 0),
+    paid: invoices.filter(i => i.status === 'odendi').reduce((sum, i) => sum + (Number(i.amount) || 0), 0),
+  }), [invoices])
+
+  const create = async (e) => {
+    e.preventDefault()
+    try {
+      await createInvoiceApi(form)
+      setForm({ clientName: '', clientEmail: '', amount: '', currency: 'TRY', dueDate: '', description: '' })
+      showToast('Fatura kaydı oluşturuldu')
+      load()
+    } catch (err) {
+      showToast(err.message || 'Fatura oluşturulamadı', 'error')
+    }
+  }
+
+  const markPaid = async (invoice) => {
+    try {
+      await updateInvoiceApi({ id: invoice._id, action: 'record-payment', paymentAmount: invoice.amount, status: 'odendi' })
+      showToast('Ödeme kaydedildi')
+      load()
+    } catch (err) {
+      showToast(err.message || 'Ödeme kaydedilemedi', 'error')
+    }
+  }
+
+  const remove = async (id) => {
+    if (!confirm('Fatura kaydı silinsin mi?')) return
+    await deleteInvoiceApi(id)
+    showToast('Fatura silindi')
+    load()
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Fatura & <span>Ödeme</span></h1>
+          <p>Bekleyen ve tahsil edilen müşteri ödemelerini takip edin</p>
+        </div>
+      </div>
+
+      <div className="admin-stats-grid" style={{ marginBottom: 18 }}>
+        <div className="admin-stat-card"><div className="stat-number">₺{totals.waiting.toLocaleString('tr-TR')}</div><div className="stat-label">Bekleyen</div></div>
+        <div className="admin-stat-card"><div className="stat-number">₺{totals.paid.toLocaleString('tr-TR')}</div><div className="stat-label">Tahsil Edilen</div></div>
+      </div>
+
+      <form className="admin-form" onSubmit={create} style={{ marginBottom: 18 }}>
+        <h3>Yeni Fatura Kaydı</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+          <div className="form-group"><label>Müşteri *</label><input value={form.clientName} onChange={e => setForm({ ...form, clientName: e.target.value })} required /></div>
+          <div className="form-group"><label>E-posta</label><input type="email" value={form.clientEmail} onChange={e => setForm({ ...form, clientEmail: e.target.value })} /></div>
+          <div className="form-group"><label>Tutar *</label><input type="number" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} required /></div>
+          <div className="form-group"><label>Para Birimi</label><input value={form.currency} onChange={e => setForm({ ...form, currency: e.target.value })} /></div>
+          <div className="form-group"><label>Vade</label><input type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} /></div>
+          <div className="form-group"><label>Açıklama</label><input value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
+        </div>
+        <button className="btn btn-primary">Kaydet</button>
+      </form>
+
+      {loading ? <div style={{ textAlign: 'center', padding: 40 }}>Yükleniyor...</div> : (
+        <div style={{ display: 'grid', gap: 10 }}>
+          {invoices.map(invoice => (
+            <div key={invoice._id} className="admin-form" style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'center' }}>
+              <div>
+                <strong>{invoice.clientName}</strong>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>{invoice.description || invoice.clientEmail || '-'}</div>
+              </div>
+              <div style={{ fontWeight: 900, color: invoice.status === 'odendi' ? '#2ECC71' : '#eac321' }}>
+                {invoice.currency || 'TRY'} {Number(invoice.amount || 0).toLocaleString('tr-TR')}
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {invoice.status !== 'odendi' && <button className="btn btn-outline" onClick={() => markPaid(invoice)}>Ödendi</button>}
+                <button onClick={() => remove(invoice._id)} style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}><HiOutlineTrash size={16} /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ========== YEDEKLEME PANELI ==========
+function BackupSection({ showToast }) {
+  const [summary, setSummary] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      setSummary(await getBackupSummaryApi())
+    } catch (err) {
+      showToast(err.message || 'Yedek özeti alınamadı', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [showToast])
+
+  useEffect(() => { load() }, [load])
+
+  const download = async () => {
+    setLoading(true)
+    try {
+      const backup = await createBackupApi()
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `kade-backup-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      showToast('Yedek indirildi')
+      load()
+    } catch (err) {
+      showToast(err.message || 'Yedek alınamadı', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Yedekleme <span>Paneli</span></h1>
+          <p>MongoDB koleksiyon özetini görün ve manuel JSON yedek alın</p>
+        </div>
+        <button className="btn btn-primary" onClick={download} disabled={loading}>
+          <HiOutlineDatabase size={16} /> Yedek İndir
+        </button>
+      </div>
+
+      <div className="admin-form">
+        <h3>Koleksiyon Özeti</h3>
+        {loading && !summary ? <p>Yükleniyor...</p> : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
+            {Object.entries(summary?.collections || {}).map(([name, count]) => (
+              <div key={name} className="admin-stat-card">
+                <div className="stat-number">{count}</div>
+                <div className="stat-label">{name}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -6372,9 +6844,13 @@ export default function Admin() {
 
   const crmNavItems = [
     { id: 'proposals', label: 'Teklifler', icon: HiOutlineCurrencyDollar },
+    { id: 'quote-leads', label: 'Online Teklifler', icon: HiOutlineCalculator },
+    { id: 'customer-profiles', label: 'Müşteri Profilleri', icon: HiOutlineUserGroup },
+    { id: 'invoices', label: 'Fatura & Ödeme', icon: HiOutlineCurrencyDollar },
     { id: 'tasks', label: 'Görevler', icon: HiOutlineClipboardList },
     { id: 'subscriptions', label: 'Abonelikler', icon: HiOutlineRefresh },
     { id: 'surveys', label: 'NPS Anketleri', icon: HiOutlineStar },
+    { id: 'referrals', label: 'Referral Takibi', icon: HiOutlineUserGroup },
     { id: 'onboarding', label: 'Onboarding', icon: HiOutlineClipboardCheck },
     { id: 'report', label: 'Rapor Oluştur', icon: HiOutlineDocumentReport },
     { id: 'email-templates', label: 'E-posta Şablonları', icon: HiOutlineTemplate },
@@ -6383,6 +6859,7 @@ export default function Admin() {
   const systemNavItems = [
     { id: 'users', label: 'Kullanıcılar', icon: HiOutlineUsers },
     { id: 'activity', label: 'Aktivite Logu', icon: HiOutlineAnnotation },
+    { id: 'backup', label: 'Yedekleme', icon: HiOutlineDatabase },
     { id: 'settings', label: 'Ayarlar', icon: HiOutlineCog },
   ]
 
@@ -6505,14 +6982,19 @@ export default function Admin() {
         {activeSection === 'settings' && <SettingsSection showToast={showToast} />}
         {activeSection === 'kanban' && <KanbanSection showToast={showToast} />}
         {activeSection === 'proposals' && <ProposalBuilderSection showToast={showToast} />}
+        {activeSection === 'quote-leads' && <QuoteLeadsSection showToast={showToast} />}
+        {activeSection === 'customer-profiles' && <CustomerProfilesSection showToast={showToast} />}
+        {activeSection === 'invoices' && <InvoicesSection showToast={showToast} />}
         {activeSection === 'email-templates' && <EmailTemplatesSection showToast={showToast} />}
         {activeSection === 'media' && <MediaLibrarySection showToast={showToast} />}
         {activeSection === 'tasks' && <TasksSection showToast={showToast} currentUser={currentUser} />}
         {activeSection === 'ai-content' && <AIContentSection showToast={showToast} />}
         {activeSection === 'subscriptions' && <SubscriptionsSection showToast={showToast} />}
         {activeSection === 'surveys' && <NPSSurveysSection showToast={showToast} />}
+        {activeSection === 'referrals' && <ReferralTrackingSection showToast={showToast} />}
         {activeSection === 'onboarding' && <OnboardingSection showToast={showToast} />}
         {activeSection === 'report' && <ReportExportSection showToast={showToast} />}
+        {activeSection === 'backup' && <BackupSection showToast={showToast} />}
       </main>
 
       {/* Toast */}

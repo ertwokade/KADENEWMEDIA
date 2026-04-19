@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -265,7 +265,7 @@ function RadarChart({ categories, animate }) {
 
 /* ─── Main Component ─── */
 export default function SocialAnalyzer() {
-  const { lang, t } = useLanguage()
+  const { lang } = useLanguage()
   useSEO({
     title: lang === 'tr'
       ? 'Ücretsiz Sosyal Medya Analiz Aracı | Kade Media'
@@ -286,7 +286,6 @@ export default function SocialAnalyzer() {
   const [emailSent, setEmailSent] = useState(false)
   const [emailSending, setEmailSending] = useState(false)
   const [emailError, setEmailError] = useState('')
-  const [showLeadModal, setShowLeadModal] = useState(false)
 
   const filledCount = useMemo(() =>
     Object.values(links).filter(v => v.trim()).length
@@ -341,7 +340,6 @@ export default function SocialAnalyzer() {
     setEmail('')
     setEmailSent(false)
     setEmailError('')
-    setShowLeadModal(false)
   }
 
   const handleEmailSubmit = async (e) => {
@@ -358,12 +356,32 @@ export default function SocialAnalyzer() {
         categories: result.categories,
       })
       setEmailSent(true)
-      setShowLeadModal(false)
-    } catch (err) {
+    } catch {
       setEmailError(lang === 'tr' ? 'Bir hata oluştu. Tekrar deneyin.' : 'An error occurred. Please try again.')
     } finally {
       setEmailSending(false)
     }
+  }
+
+  const handleDownloadReport = () => {
+    if (!result) return
+    const rows = result.categories.map(cat => `
+      <tr>
+        <td>${categoryLabels[cat.key] || cat.key}</td>
+        <td>${cat.score}/${cat.max}</td>
+        <td>${cat.score >= 14 ? categoryTips[cat.key]?.good : categoryTips[cat.key]?.bad}</td>
+      </tr>
+    `).join('')
+    const html = `<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"><title>Kade Media Sosyal Medya Denetim Raporu</title>
+      <style>body{font-family:Arial,sans-serif;max-width:820px;margin:0 auto;padding:40px;color:#111}h1{border-bottom:4px solid #eac321;padding-bottom:14px}.score{font-size:48px;font-weight:900;color:#eac321}table{width:100%;border-collapse:collapse;margin-top:24px}td,th{border:1px solid #ddd;padding:12px;text-align:left}th{background:#111;color:#fff}.footer{margin-top:36px;color:#777;font-size:12px}</style>
+      </head><body><h1>Kade Media Sosyal Medya Denetim Raporu</h1><p>Profil: <strong>@${result.primaryUsername}</strong></p><div class="score">${result.total}/100</div><p>${resultLevel.level}</p><table><thead><tr><th>Kategori</th><th>Skor</th><th>Öneri</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">Bu rapor otomatik ön analizdir. Detaylı strateji için kademedia.com.tr/teklif-al</div></body></html>`
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `sosyal-medya-denetim-raporu-${result.primaryUsername || 'kade'}.html`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const categoryLabels = {
@@ -750,6 +768,10 @@ export default function SocialAnalyzer() {
                     {lang === 'tr' ? 'Ücretsiz Danışmanlık Al' : 'Get Free Consultation'}
                     <HiOutlineArrowRight size={16} />
                   </Link>
+                  <button className="btn btn-outline" onClick={handleDownloadReport}>
+                    <HiOutlineClipboardCheck size={16} />
+                    {lang === 'tr' ? 'Raporu İndir' : 'Download Report'}
+                  </button>
                   <button className="btn btn-outline" onClick={handleReset}>
                     {lang === 'tr' ? 'Yeni Analiz Yap' : 'New Analysis'}
                   </button>

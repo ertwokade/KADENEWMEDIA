@@ -6,7 +6,6 @@ import {
   HiOutlineChat,
 } from 'react-icons/hi'
 import { Link } from 'react-router-dom'
-import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { FAQSchema } from '../components/StructuredData'
 import PageTransition from '../components/PageTransition'
@@ -116,7 +115,6 @@ const sssVerisi = [
 ]
 
 export default function SSS() {
-  const { lang } = useLanguage()
   const [aktifKategori, setAktifKategori] = useState('genel')
   const [acikId, setAcikId] = useState(null)
   const [arama, setArama] = useState('')

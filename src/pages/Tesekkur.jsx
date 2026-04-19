@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   HiOutlineCheckCircle,
@@ -36,8 +36,6 @@ const sonrakiAdimlar = [
 ]
 
 export default function Tesekkur() {
-  const navigate = useNavigate()
-
   useSEO({
     title: 'Teşekkürler | Kade Media',
     description: 'Formunuz alındı. En kısa sürede size dönüş yapacağız.',

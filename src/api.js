@@ -670,3 +670,143 @@ export async function deleteSurveyApi(id) {
   });
   return handleResponse(res);
 }
+
+// Referral Program
+export async function submitReferralApi(data) {
+  const res = await fetch(`${API_BASE}/referrals`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function getReferralsApi(params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const url = qs ? `${API_BASE}/referrals?${qs}` : `${API_BASE}/referrals`;
+  const res = await fetch(url, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function updateReferralApi(data) {
+  const res = await fetch(`${API_BASE}/referrals`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteReferralApi(id) {
+  const res = await fetch(`${API_BASE}/referrals?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// Operations / Growth tools
+export async function submitQuoteApi(data) {
+  const res = await fetch(`${API_BASE}/ops?resource=quotes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function getQuotesApi() {
+  const res = await fetch(`${API_BASE}/ops?resource=quotes`, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function updateQuoteApi(data) {
+  const res = await fetch(`${API_BASE}/ops?resource=quotes`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteQuoteApi(id) {
+  const res = await fetch(`${API_BASE}/ops?resource=quotes&id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function fetchOgPreviewApi(url) {
+  const res = await fetch(`${API_BASE}/ops?resource=og-preview&url=${encodeURIComponent(url)}`);
+  return handleResponse(res);
+}
+
+export async function trackClientErrorApi(data) {
+  try {
+    await fetch(`${API_BASE}/ops?resource=client-errors`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  } catch { /* non-critical */ }
+}
+
+export async function savePushSubscriptionApi(data) {
+  const res = await fetch(`${API_BASE}/ops?resource=push`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function getCustomerProfilesApi(params = {}) {
+  const qs = new URLSearchParams({ resource: 'customer-profiles', ...params }).toString();
+  const res = await fetch(`${API_BASE}/ops?${qs}`, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function getInvoicesApi() {
+  const res = await fetch(`${API_BASE}/ops?resource=invoices`, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function createInvoiceApi(data) {
+  const res = await fetch(`${API_BASE}/ops?resource=invoices`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateInvoiceApi(data) {
+  const res = await fetch(`${API_BASE}/ops?resource=invoices`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteInvoiceApi(id) {
+  const res = await fetch(`${API_BASE}/ops?resource=invoices&id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function getBackupSummaryApi() {
+  const res = await fetch(`${API_BASE}/ops?resource=backup`, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function createBackupApi() {
+  const res = await fetch(`${API_BASE}/ops?resource=backup`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}

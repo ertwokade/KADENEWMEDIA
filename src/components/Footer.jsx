@@ -56,12 +56,16 @@ export default function Footer() {
       { name: lang === 'tr' ? 'Başarı Hikayeleri' : 'Case Studies', path: '/basari-hikayeleri' },
       { name: t('nav.blog'), path: '/blog' },
       { name: t('nav.contact'), path: '/iletisim' },
+      { name: lang === 'tr' ? 'Teklif Al' : 'Get Quote', path: '/teklif-al' },
+      { name: lang === 'tr' ? 'Müşteri Paneli' : 'Client Portal', path: '/musteri-panel' },
+      { name: lang === 'tr' ? 'Proje Takip' : 'Project Tracking', path: '/proje-takip' },
     ],
     hizmetler: [
       { name: t('servicesSection.smm'), path: '/hizmetler' },
       { name: t('servicesSection.content'), path: '/hizmetler' },
       { name: t('servicesSection.ads'), path: '/hizmetler' },
       { name: lang === 'tr' ? 'ROI Hesaplayıcı' : 'ROI Calculator', path: '/roi-hesaplayici' },
+      { name: lang === 'tr' ? 'Fiyat Hesaplama' : 'Price Calculator', path: '/fiyat-hesaplama' },
     ],
     kaynaklar: [
       { name: lang === 'tr' ? 'Neden Biz?' : 'Why Us?', path: '/neden-biz' },
@@ -69,6 +73,10 @@ export default function Footer() {
       { name: lang === 'tr' ? 'Ödüller & Sertifikalar' : 'Awards', path: '/oduller' },
       { name: lang === 'tr' ? 'Sık Sorulan Sorular' : 'FAQ', path: '/sss' },
       { name: lang === 'tr' ? 'Basın & Medya' : 'Press', path: '/basin' },
+      { name: lang === 'tr' ? 'Referans Programı' : 'Referral Program', path: '/referans-programi' },
+      { name: lang === 'tr' ? 'OG Önizleme' : 'OG Preview', path: '/og-onizleme' },
+      { name: lang === 'tr' ? 'Podcast & Webinar' : 'Podcast & Webinar', path: '/podcast-webinar' },
+      { name: lang === 'tr' ? 'Bülten Arşivi' : 'Newsletter Archive', path: '/bulten-arsivi' },
     ],
   }
 

@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HiMenuAlt3, HiX } from 'react-icons/hi'
+import { HiChevronDown, HiMenuAlt3, HiX } from 'react-icons/hi'
 import { HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../i18n/ThemeContext'
+import SiteSearch from './SiteSearch'
 import './Navbar.css'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [resourcesOpen, setResourcesOpen] = useState(false)
   const location = useLocation()
   const { lang, toggleLang, t } = useLanguage()
   const { theme, toggleTheme } = useTheme()
@@ -20,11 +22,23 @@ export default function Navbar() {
     { name: t('nav.services'), path: '/hizmetler' },
     { name: t('nav.packages'), path: '/paketler' },
     { name: t('nav.partners'), path: '/partnerler' },
-    { name: lang === 'tr' ? 'Neden Biz?' : 'Why Us?', path: '/neden-biz' },
-    { name: lang === 'tr' ? 'SSS' : 'FAQ', path: '/sss' },
     { name: t('nav.blog'), path: '/blog' },
     { name: t('nav.contact'), path: '/iletisim' },
   ]
+
+  const resourceLinks = [
+    { name: lang === 'tr' ? 'Neden Biz?' : 'Why Us?', path: '/neden-biz' },
+    { name: lang === 'tr' ? 'Referanslar' : 'References', path: '/referanslar' },
+    { name: lang === 'tr' ? 'Ödüller' : 'Awards', path: '/oduller' },
+    { name: lang === 'tr' ? 'Basın' : 'Press', path: '/basin' },
+    { name: lang === 'tr' ? 'SSS' : 'FAQ', path: '/sss' },
+    { name: lang === 'tr' ? 'Fiyat Hesaplama' : 'Price Calculator', path: '/fiyat-hesaplama' },
+    { name: lang === 'tr' ? 'OG Önizleme' : 'OG Preview', path: '/og-onizleme' },
+    { name: lang === 'tr' ? 'Podcast & Webinar' : 'Podcast & Webinar', path: '/podcast-webinar' },
+    { name: lang === 'tr' ? 'Referans Programı' : 'Referral Program', path: '/referans-programi' },
+  ]
+
+  const resourcesActive = resourceLinks.some(link => location.pathname === link.path)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,6 +50,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsOpen(false)
+    setResourcesOpen(false)
   }, [location])
 
   return (
@@ -73,9 +88,37 @@ export default function Navbar() {
               )}
             </Link>
           ))}
+          <div
+            className={`navbar-dropdown ${resourcesActive ? 'active' : ''} ${resourcesOpen ? 'open' : ''}`}
+            onMouseEnter={() => setResourcesOpen(true)}
+            onMouseLeave={() => setResourcesOpen(false)}
+          >
+            <button
+              type="button"
+              className="navbar-link navbar-dropdown-toggle"
+              onClick={() => setResourcesOpen(prev => !prev)}
+            >
+              {lang === 'tr' ? 'Kaynaklar' : 'Resources'}
+              <HiChevronDown size={14} />
+              {resourcesActive && <motion.div className="active-indicator" layoutId="activeNav" />}
+            </button>
+            <div className="navbar-dropdown-menu">
+              {resourceLinks.map(link => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`navbar-dropdown-link ${location.pathname === link.path ? 'active' : ''}`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="navbar-right">
+          <SiteSearch compact />
+
           <motion.button
             className="theme-toggle"
             onClick={toggleTheme}
@@ -98,12 +141,14 @@ export default function Navbar() {
             <span className={lang === 'en' ? 'lang-active' : ''}>EN</span>
           </motion.button>
 
-          <Link to="/iletisim" className="navbar-cta btn btn-primary">
+          <Link to="/teklif-al" className="navbar-cta btn btn-primary">
             {t('nav.cta')}
           </Link>
         </div>
 
         <div className="navbar-mobile-right">
+          <SiteSearch compact onNavigate={() => setIsOpen(false)} />
+
           <motion.button
             className="theme-toggle theme-toggle-mobile"
             onClick={toggleTheme}
@@ -154,7 +199,22 @@ export default function Navbar() {
                 </Link>
               </motion.div>
             ))}
-            <Link to="/iletisim" className="btn btn-primary mobile-cta">
+            {resourceLinks.map((link, i) => (
+              <motion.div
+                key={link.path}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: (navLinks.length + i) * 0.05 }}
+              >
+                <Link
+                  to={link.path}
+                  className={`mobile-link ${location.pathname === link.path ? 'active' : ''}`}
+                >
+                  {link.name}
+                </Link>
+              </motion.div>
+            ))}
+            <Link to="/teklif-al" className="btn btn-primary mobile-cta">
               {t('nav.cta')}
             </Link>
           </motion.div>

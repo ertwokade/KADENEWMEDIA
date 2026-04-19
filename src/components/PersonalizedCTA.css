@@ -1,0 +1,66 @@
+.personalized-cta {
+  position: fixed;
+  left: 22px;
+  bottom: 28px;
+  z-index: 970;
+  width: min(340px, calc(100vw - 32px));
+  padding: 18px;
+  border: 1px solid rgba(234, 195, 33, 0.32);
+  border-radius: 12px;
+  background: rgba(12, 12, 12, 0.94);
+  color: var(--white);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(18px);
+}
+
+.personalized-cta-depth {
+  display: inline-flex;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(234, 195, 33, 0.12);
+  color: var(--primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.personalized-cta strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.personalized-cta p {
+  margin: 0 0 14px;
+  color: var(--gray-light);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.personalized-cta .btn {
+  width: 100%;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.personalized-cta-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--gray-lighter);
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .personalized-cta {
+    left: 16px;
+    bottom: 16px;
+  }
+}

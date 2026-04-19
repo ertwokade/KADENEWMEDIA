@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -107,7 +107,7 @@ export default function ServiceDetail() {
   const slugIdx = slugList.indexOf(slug)
   const dynamic = dynamicServices?.[slugIdx]
 
-  const service = staticService ? {
+  const service = useMemo(() => staticService ? {
     ...staticService,
     titleTr: dynamic?.titleTr || staticService.titleTr,
     titleEn: dynamic?.titleEn || staticService.titleEn,
@@ -115,7 +115,7 @@ export default function ServiceDetail() {
     descEn: dynamic?.descEn || staticService.descEn,
     featuresTr: dynamic?.featuresTr ? (typeof dynamic.featuresTr === 'string' ? dynamic.featuresTr.split(',').map(s => s.trim()).filter(Boolean) : dynamic.featuresTr) : staticService.featuresTr,
     featuresEn: dynamic?.featuresEn ? (typeof dynamic.featuresEn === 'string' ? dynamic.featuresEn.split(',').map(s => s.trim()).filter(Boolean) : dynamic.featuresEn) : staticService.featuresEn,
-  } : null
+  } : null, [staticService, dynamic])
 
   const title = service ? (lang === 'tr' ? service.titleTr : service.titleEn) : ''
   const desc = service ? (lang === 'tr' ? service.descTr : service.descEn) : ''

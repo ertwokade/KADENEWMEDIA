@@ -1,0 +1,67 @@
+.notification-prompt {
+  position: fixed;
+  right: 22px;
+  bottom: 104px;
+  z-index: 980;
+  width: min(360px, calc(100vw - 32px));
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: rgba(12, 12, 12, 0.94);
+  color: var(--white);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.36);
+  backdrop-filter: blur(18px);
+}
+
+.notification-prompt-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  background: rgba(234, 195, 33, 0.12);
+}
+
+.notification-prompt strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.notification-prompt p {
+  margin: 0 0 12px;
+  color: var(--gray-light);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.notification-prompt .btn {
+  padding: 8px 14px;
+  font-size: 0.82rem;
+}
+
+.notification-prompt-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--gray-lighter);
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .notification-prompt {
+    right: 16px;
+    bottom: 86px;
+  }
+}

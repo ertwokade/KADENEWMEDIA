@@ -8,6 +8,9 @@ import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import WhatsAppButton from './components/WhatsAppButton'
 import CookieBanner from './components/CookieBanner'
+import ErrorTracker from './components/ErrorTracker'
+import NotificationPrompt from './components/NotificationPrompt'
+import PersonalizedCTA from './components/PersonalizedCTA'
 
 // Core pages — direct import for instant first render
 import Home from './pages/Home'
@@ -39,6 +42,14 @@ const Tesekkur = lazy(() => import('./pages/Tesekkur'))
 const Basin = lazy(() => import('./pages/Basin'))
 const Oduller = lazy(() => import('./pages/Oduller'))
 const NedenBiz = lazy(() => import('./pages/NedenBiz'))
+const ReferralProgram = lazy(() => import('./pages/ReferralProgram'))
+const QuoteRequest = lazy(() => import('./pages/QuoteRequest'))
+const PriceCalculator = lazy(() => import('./pages/PriceCalculator'))
+const CustomerPortal = lazy(() => import('./pages/CustomerPortal'))
+const ProjectTracking = lazy(() => import('./pages/ProjectTracking'))
+const OGPreview = lazy(() => import('./pages/OGPreview'))
+const PodcastWebinar = lazy(() => import('./pages/PodcastWebinar'))
+const NewsletterArchive = lazy(() => import('./pages/NewsletterArchive'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -61,6 +72,14 @@ const ROUTE_THEMES = {
   '/oduller': 'services',
   '/neden-biz': 'services',
   '/tesekkur': 'contact',
+  '/referans-programi': 'partners',
+  '/teklif-al': 'contact',
+  '/fiyat-hesaplama': 'packages',
+  '/musteri-panel': 'about',
+  '/proje-takip': 'services',
+  '/og-onizleme': 'blog',
+  '/podcast-webinar': 'blog',
+  '/bulten-arsivi': 'blog',
 }
 
 function getCanvasTheme(pathname) {
@@ -95,6 +114,7 @@ function App() {
 
   return (
     <>
+      <ErrorTracker />
       <OrganizationSchema />
       <a href="#main-content" className="skip-to-content">İçeriğe geç</a>
       <ScrollToTop />
@@ -127,11 +147,21 @@ function App() {
         <Route path="/basin" element={<Suspense fallback={<PageLoader />}><Basin /></Suspense>} />
         <Route path="/oduller" element={<Suspense fallback={<PageLoader />}><Oduller /></Suspense>} />
         <Route path="/neden-biz" element={<Suspense fallback={<PageLoader />}><NedenBiz /></Suspense>} />
+        <Route path="/referans-programi" element={<Suspense fallback={<PageLoader />}><ReferralProgram /></Suspense>} />
+        <Route path="/teklif-al" element={<Suspense fallback={<PageLoader />}><QuoteRequest /></Suspense>} />
+        <Route path="/fiyat-hesaplama" element={<Suspense fallback={<PageLoader />}><PriceCalculator /></Suspense>} />
+        <Route path="/musteri-panel" element={<Suspense fallback={<PageLoader />}><CustomerPortal /></Suspense>} />
+        <Route path="/proje-takip" element={<Suspense fallback={<PageLoader />}><ProjectTracking /></Suspense>} />
+        <Route path="/og-onizleme" element={<Suspense fallback={<PageLoader />}><OGPreview /></Suspense>} />
+        <Route path="/podcast-webinar" element={<Suspense fallback={<PageLoader />}><PodcastWebinar /></Suspense>} />
+        <Route path="/bulten-arsivi" element={<Suspense fallback={<PageLoader />}><NewsletterArchive /></Suspense>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </main>
       {!isAdmin && <Footer />}
       {!isAdmin && <WhatsAppButton />}
+      {!isAdmin && <PersonalizedCTA />}
+      {!isAdmin && <NotificationPrompt />}
       {!isAdmin && <CookieBanner />}
     </>
   )
