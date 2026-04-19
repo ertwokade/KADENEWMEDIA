@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiChevronDown, HiMenuAlt3, HiX } from 'react-icons/hi'
@@ -12,6 +12,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [resourcesOpen, setResourcesOpen] = useState(false)
+  const dropdownRef = useRef(null)
   const location = useLocation()
   const { lang, toggleLang, t } = useLanguage()
   const { theme, toggleTheme } = useTheme()
@@ -53,6 +54,16 @@ export default function Navbar() {
     setResourcesOpen(false)
   }, [location])
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setResourcesOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   return (
     <motion.nav
       className={`navbar ${scrolled ? 'scrolled' : ''}`}
@@ -89,9 +100,8 @@ export default function Navbar() {
             </Link>
           ))}
           <div
+            ref={dropdownRef}
             className={`navbar-dropdown ${resourcesActive ? 'active' : ''} ${resourcesOpen ? 'open' : ''}`}
-            onMouseEnter={() => setResourcesOpen(true)}
-            onMouseLeave={() => setResourcesOpen(false)}
           >
             <button
               type="button"

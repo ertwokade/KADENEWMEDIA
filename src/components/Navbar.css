@@ -81,8 +81,6 @@
 
 .navbar-dropdown {
   position: relative;
-  padding-bottom: 12px;
-  margin-bottom: -12px;
 }
 
 .navbar-dropdown-toggle {
@@ -112,6 +110,7 @@
   top: calc(100% + 10px);
   left: 0;
   min-width: 220px;
+  z-index: 200;
   display: grid;
   gap: 4px;
   padding: 8px;
