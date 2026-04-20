@@ -1,110 +1,96 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  HiOutlineTrendingUp, HiOutlineEye, HiOutlineUsers,
-  HiOutlineChartBar, HiOutlineArrowRight, HiOutlineLightningBolt,
-} from 'react-icons/hi'
+import { HiOutlineTrendingUp, HiOutlineArrowRight, HiOutlineLightningBolt } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './CaseStudies.css'
 import './Blog.css'
 
-const caseStudies = [
-  {
-    id: 'flavora',
-    client: 'Flavora',
-    industry: { tr: 'Yiyecek & İçecek', en: 'Food & Beverage' },
-    logo: '🍕',
-    color: '#eac321',
-    duration: { tr: '6 Ay', en: '6 Months' },
-    platforms: ['Instagram', 'TikTok'],
-    services: { tr: ['Sosyal Medya Yönetimi', 'İçerik Üretimi', 'Reklam Yönetimi'], en: ['Social Media Management', 'Content Production', 'Ad Management'] },
-    challenge: {
-      tr: 'Flavora, yeni açılan bir restoran zinciri olarak dijital varlığını sıfırdan oluşturmak istiyordu. Marka bilinirliği düşüktü ve yerel pazarda rekabet yoğundu.',
-      en: 'Flavora, as a newly opened restaurant chain, wanted to build its digital presence from scratch. Brand awareness was low and competition in the local market was intense.',
+const DEFAULT_CONTENT = {
+  summaryStats: [
+    { value: '%300+', labelTr: 'Ortalama Etkileşim Artışı', labelEn: 'Avg Engagement Growth', ikon: '📈' },
+    { value: '10+', labelTr: 'Mutlu Marka', labelEn: 'Happy Brands', ikon: '👥' },
+    { value: '5M+', labelTr: 'Toplam Erişim', labelEn: 'Total Reach', ikon: '👁' },
+    { value: '6.8x', labelTr: 'En Yüksek ROAS', labelEn: 'Highest ROAS', ikon: '📊' },
+  ],
+  cases: [
+    {
+      id: 'flavora',
+      client: 'Flavora',
+      industryTr: 'Yiyecek & İçecek', industryEn: 'Food & Beverage',
+      logo: '🍕', color: '#eac321',
+      durationTr: '6 Ay', durationEn: '6 Months',
+      platforms: ['Instagram', 'TikTok'],
+      challengeTr: 'Flavora, yeni açılan bir restoran zinciri olarak dijital varlığını sıfırdan oluşturmak istiyordu. Marka bilinirliği düşüktü ve yerel pazarda rekabet yoğundu.',
+      challengeEn: 'Flavora, as a newly opened restaurant chain, wanted to build its digital presence from scratch. Brand awareness was low and competition in the local market was intense.',
+      solutionTr: 'Instagram ve TikTok odaklı bir strateji oluşturduk. Profesyonel fotoğraf çekimleri, viral TikTok içerikleri ve hedefli Meta Ads kampanyaları ile marka bilinirliğini hızla artırdık.',
+      solutionEn: 'We created an Instagram and TikTok-focused strategy. We rapidly increased brand awareness through professional photography, viral TikTok content, and targeted Meta Ads campaigns.',
+      metrics: [
+        { labelTr: 'Takipçi Artışı', labelEn: 'Follower Growth', before: '0', after: '45K', change: '+45K', ikon: '👥' },
+        { labelTr: 'Aylık Erişim', labelEn: 'Monthly Reach', before: '0', after: '1.2M', change: '+1.2M', ikon: '👁' },
+        { labelTr: 'Etkileşim Oranı', labelEn: 'Engagement Rate', before: '0%', after: '8.5%', change: '8.5%', ikon: '📈' },
+        { labelTr: 'Aylık Sipariş Artışı', labelEn: 'Monthly Order Growth', before: '-', after: '+320%', change: '+320%', ikon: '📊' },
+      ],
+      testimonialTextTr: 'Kade Media ile çalışmaya başladığımızdan beri sosyal medya etkileşimimiz inanılmaz arttı. İlk 6 ayda hedeflerimizin çok üzerinde sonuçlar aldık.',
+      testimonialTextEn: 'Since we started working with Kade Media, our social media engagement has increased incredibly. In the first 6 months, we got results far beyond our targets.',
+      testimonialName: 'Ahmet Yıldırım',
+      testimonialRole: 'CEO, Flavora',
     },
-    solution: {
-      tr: 'Instagram ve TikTok odaklı bir strateji oluşturduk. Profesyonel fotoğraf çekimleri, viral TikTok içerikleri ve hedefli Meta Ads kampanyaları ile marka bilinirliğini hızla artırdık.',
-      en: 'We created an Instagram and TikTok-focused strategy. We rapidly increased brand awareness through professional photography, viral TikTok content, and targeted Meta Ads campaigns.',
+    {
+      id: 'techvibe',
+      client: 'TechVibe',
+      industryTr: 'Teknoloji', industryEn: 'Technology',
+      logo: '💻', color: '#6C63FF',
+      durationTr: '4 Ay', durationEn: '4 Months',
+      platforms: ['Instagram', 'LinkedIn', 'YouTube'],
+      challengeTr: 'TechVibe, B2B SaaS ürününün lansmanında hedef kitleye ulaşmakta zorlanıyordu. Organik büyüme yavaştı ve dönüşüm oranları düşüktü.',
+      challengeEn: 'TechVibe was struggling to reach its target audience for its B2B SaaS product launch. Organic growth was slow and conversion rates were low.',
+      solutionTr: 'LinkedIn thought leadership içerikleri, YouTube ürün tanıtım videoları ve Instagram\'da marka hikayesi anlatımı ile çok kanallı bir strateji uyguladık.',
+      solutionEn: 'We implemented a multi-channel strategy with LinkedIn thought leadership content, YouTube product demo videos, and Instagram brand storytelling.',
+      metrics: [
+        { labelTr: 'Web Trafiği', labelEn: 'Web Traffic', before: '2K/ay', after: '28K/ay', change: '+1300%', ikon: '👁' },
+        { labelTr: 'Lead Sayısı', labelEn: 'Lead Count', before: '15/ay', after: '180/ay', change: '+1100%', ikon: '👥' },
+        { labelTr: 'Dönüşüm Oranı', labelEn: 'Conversion Rate', before: '0.8%', after: '4.2%', change: '+425%', ikon: '📈' },
+        { labelTr: 'Kullanıcı Sayısı', labelEn: 'User Count', before: '500', after: '5K+', change: '+900%', ikon: '📊' },
+      ],
+      testimonialTextTr: 'Ürün lansmanımız için mükemmel bir strateji oluşturdular. İlk ayda 100K kullanıcıya ulaşmamızda büyük payları var.',
+      testimonialTextEn: 'They created a perfect strategy for our product launch. They played a huge role in reaching 100K users in the first month.',
+      testimonialName: 'Elif Özkan',
+      testimonialRole: 'Marketing Director, TechVibe',
     },
-    metrics: [
-      { label: { tr: 'Takipçi Artışı', en: 'Follower Growth' }, before: '0', after: '45K', change: '+45K', icon: HiOutlineUsers },
-      { label: { tr: 'Aylık Erişim', en: 'Monthly Reach' }, before: '0', after: '1.2M', change: '+1.2M', icon: HiOutlineEye },
-      { label: { tr: 'Etkileşim Oranı', en: 'Engagement Rate' }, before: '0%', after: '8.5%', change: '8.5%', icon: HiOutlineTrendingUp },
-      { label: { tr: 'Aylık Sipariş Artışı', en: 'Monthly Order Growth' }, before: '-', after: '+320%', change: '+320%', icon: HiOutlineChartBar },
-    ],
-    testimonial: {
-      text: { tr: 'Kade Media ile çalışmaya başladığımızdan beri sosyal medya etkileşimimiz inanılmaz arttı. İlk 6 ayda hedeflerimizin çok üzerinde sonuçlar aldık.', en: 'Since we started working with Kade Media, our social media engagement has increased incredibly. In the first 6 months, we got results far beyond our targets.' },
-      name: 'Ahmet Yıldırım',
-      role: 'CEO, Flavora',
+    {
+      id: 'greenlife',
+      client: 'GreenLife',
+      industryTr: 'E-Ticaret', industryEn: 'E-Commerce',
+      logo: '🌿', color: '#2ECC71',
+      durationTr: '8 Ay', durationEn: '8 Months',
+      platforms: ['Instagram', 'TikTok', 'Facebook'],
+      challengeTr: 'GreenLife, organik ürünlerini online satmak istiyordu ancak dijital reklam deneyimi yoktu. Reklam harcamaları verimsizdi ve ROAS düşüktü.',
+      challengeEn: 'GreenLife wanted to sell their organic products online but had no digital advertising experience. Ad spend was inefficient and ROAS was low.',
+      solutionTr: 'Kapsamlı bir funnel stratejisi oluşturduk. TikTok viral içerikleri ile farkındalık, Instagram retargeting ile değerlendirme ve Meta Ads ile dönüşüm aşamalarını optimize ettik.',
+      solutionEn: 'We created a comprehensive funnel strategy. We optimized awareness through TikTok viral content, consideration through Instagram retargeting, and conversion through Meta Ads.',
+      metrics: [
+        { labelTr: 'E-Ticaret Satışları', labelEn: 'E-Commerce Sales', before: '₺25K/ay', after: '₺125K/ay', change: '+400%', ikon: '📊' },
+        { labelTr: 'ROAS', labelEn: 'ROAS', before: '1.2x', after: '6.8x', change: '+467%', ikon: '📈' },
+        { labelTr: 'Takipçi Artışı', labelEn: 'Follower Growth', before: '3K', after: '65K', change: '+2067%', ikon: '👥' },
+        { labelTr: 'Aylık Site Trafiği', labelEn: 'Monthly Site Traffic', before: '5K', after: '80K', change: '+1500%', ikon: '👁' },
+      ],
+      testimonialTextTr: 'E-ticaret satışlarımız %400 arttı! Kade Media\'nın veri odaklı yaklaşımı ve yaratıcı içerikleri sayesinde organik büyüme hedeflerimize çok kısa sürede ulaştık.',
+      testimonialTextEn: 'Our e-commerce sales increased by 400%! Thanks to Kade Media\'s data-driven approach and creative content, we reached our organic growth targets in a very short time.',
+      testimonialName: 'Mehmet Kara',
+      testimonialRole: 'Founder, GreenLife',
     },
-  },
-  {
-    id: 'techvibe',
-    client: 'TechVibe',
-    industry: { tr: 'Teknoloji', en: 'Technology' },
-    logo: '💻',
-    color: '#6C63FF',
-    duration: { tr: '4 Ay', en: '4 Months' },
-    platforms: ['Instagram', 'LinkedIn', 'YouTube'],
-    services: { tr: ['Dijital Strateji', 'İçerik Pazarlama', 'Video Prodüksiyon'], en: ['Digital Strategy', 'Content Marketing', 'Video Production'] },
-    challenge: {
-      tr: 'TechVibe, B2B SaaS ürününün lansmanında hedef kitleye ulaşmakta zorlanıyordu. Organik büyüme yavaştı ve dönüşüm oranları düşüktü.',
-      en: 'TechVibe was struggling to reach its target audience for its B2B SaaS product launch. Organic growth was slow and conversion rates were low.',
-    },
-    solution: {
-      tr: 'LinkedIn thought leadership içerikleri, YouTube ürün tanıtım videoları ve Instagram\'da marka hikayesi anlatımı ile çok kanallı bir strateji uyguladık.',
-      en: 'We implemented a multi-channel strategy with LinkedIn thought leadership content, YouTube product demo videos, and Instagram brand storytelling.',
-    },
-    metrics: [
-      { label: { tr: 'Web Trafiği', en: 'Web Traffic' }, before: '2K/ay', after: '28K/ay', change: '+1300%', icon: HiOutlineEye },
-      { label: { tr: 'Lead Sayısı', en: 'Lead Count' }, before: '15/ay', after: '180/ay', change: '+1100%', icon: HiOutlineUsers },
-      { label: { tr: 'Dönüşüm Oranı', en: 'Conversion Rate' }, before: '0.8%', after: '4.2%', change: '+425%', icon: HiOutlineTrendingUp },
-      { label: { tr: 'Kullanıcı Sayısı', en: 'User Count' }, before: '500', after: '5K+', change: '+900%', icon: HiOutlineChartBar },
-    ],
-    testimonial: {
-      text: { tr: 'Ürün lansmanımız için mükemmel bir strateji oluşturdular. İlk ayda 100K kullanıcıya ulaşmamızda büyük payları var.', en: 'They created a perfect strategy for our product launch. They played a huge role in reaching 100K users in the first month.' },
-      name: 'Elif Özkan',
-      role: 'Marketing Director, TechVibe',
-    },
-  },
-  {
-    id: 'greenlife',
-    client: 'GreenLife',
-    industry: { tr: 'E-Ticaret', en: 'E-Commerce' },
-    logo: '🌿',
-    color: '#2ECC71',
-    duration: { tr: '8 Ay', en: '8 Months' },
-    platforms: ['Instagram', 'TikTok', 'Facebook'],
-    services: { tr: ['Reklam Yönetimi', 'Sosyal Medya Yönetimi', 'İçerik Üretimi'], en: ['Ad Management', 'Social Media Management', 'Content Production'] },
-    challenge: {
-      tr: 'GreenLife, organik ürünlerini online satmak istiyordu ancak dijital reklam deneyimi yoktu. Reklam harcamaları verimsizdi ve ROAS düşüktü.',
-      en: 'GreenLife wanted to sell their organic products online but had no digital advertising experience. Ad spend was inefficient and ROAS was low.',
-    },
-    solution: {
-      tr: 'Kapsamlı bir funnel stratejisi oluşturduk. TikTok viral içerikleri ile farkındalık, Instagram retargeting ile değerlendirme ve Meta Ads ile dönüşüm aşamalarını optimize ettik.',
-      en: 'We created a comprehensive funnel strategy. We optimized awareness through TikTok viral content, consideration through Instagram retargeting, and conversion through Meta Ads.',
-    },
-    metrics: [
-      { label: { tr: 'E-Ticaret Satışları', en: 'E-Commerce Sales' }, before: '₺25K/ay', after: '₺125K/ay', change: '+400%', icon: HiOutlineChartBar },
-      { label: { tr: 'ROAS', en: 'ROAS' }, before: '1.2x', after: '6.8x', change: '+467%', icon: HiOutlineTrendingUp },
-      { label: { tr: 'Takipçi Artışı', en: 'Follower Growth' }, before: '3K', after: '65K', change: '+2067%', icon: HiOutlineUsers },
-      { label: { tr: 'Aylık Site Trafiği', en: 'Monthly Site Traffic' }, before: '5K', after: '80K', change: '+1500%', icon: HiOutlineEye },
-    ],
-    testimonial: {
-      text: { tr: 'E-ticaret satışlarımız %400 arttı! Kade Media\'nın veri odaklı yaklaşımı ve yaratıcı içerikleri sayesinde organik büyüme hedeflerimize çok kısa sürede ulaştık.', en: 'Our e-commerce sales increased by 400%! Thanks to Kade Media\'s data-driven approach and creative content, we reached our organic growth targets in a very short time.' },
-      name: 'Mehmet Kara',
-      role: 'Founder, GreenLife',
-    },
-  },
-]
+  ],
+}
 
 export default function CaseStudies() {
   const { lang } = useLanguage()
+  const [content, setContent] = useState(DEFAULT_CONTENT)
   const [activeCase, setActiveCase] = useState(null)
 
   useSEO({
@@ -116,11 +102,30 @@ export default function CaseStudies() {
     path: '/basari-hikayeleri',
   })
 
-  const selectedCase = activeCase ? caseStudies.find(c => c.id === activeCase) : null
+  useEffect(() => {
+    let cancelled = false
+    getContentApi('caseStudies')
+      .then(res => {
+        if (cancelled) return
+        const data = res?.data || res
+        if (data && typeof data === 'object') {
+          setContent(prev => ({
+            ...prev,
+            ...data,
+            summaryStats: Array.isArray(data.summaryStats) && data.summaryStats.length ? data.summaryStats : prev.summaryStats,
+            cases: Array.isArray(data.cases) && data.cases.length ? data.cases : prev.cases,
+          }))
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
+
+  const selectedCase = activeCase ? content.cases.find(c => c.id === activeCase) : null
+  const pickLang = (tr, en) => (lang === 'tr' ? tr : en) || tr || en || ''
 
   return (
     <PageTransition>
-      {/* Hero */}
       <section className="blog-hero">
         <PageBgAnimation type="home" />
         <div className="grid-bg" />
@@ -148,21 +153,15 @@ export default function CaseStudies() {
         </div>
       </section>
 
-      {/* Summary Stats */}
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="container">
           <StaggerContainer className="case-summary-grid">
-            {[
-              { value: '%300+', label: { tr: 'Ortalama Etkileşim Artışı', en: 'Avg Engagement Growth' }, icon: HiOutlineTrendingUp },
-              { value: '10+', label: { tr: 'Mutlu Marka', en: 'Happy Brands' }, icon: HiOutlineUsers },
-              { value: '5M+', label: { tr: 'Toplam Erişim', en: 'Total Reach' }, icon: HiOutlineEye },
-              { value: '6.8x', label: { tr: 'En Yüksek ROAS', en: 'Highest ROAS' }, icon: HiOutlineChartBar },
-            ].map((stat, i) => (
+            {content.summaryStats.map((stat, i) => (
               <StaggerItem key={i}>
                 <div className="case-summary-card glass-card">
-                  <stat.icon size={24} style={{ color: '#eac321' }} />
+                  <span style={{ fontSize: '1.6rem' }}>{stat.ikon || '📊'}</span>
                   <div className="case-summary-value">{stat.value}</div>
-                  <div className="case-summary-label">{stat.label[lang]}</div>
+                  <div className="case-summary-label">{pickLang(stat.labelTr, stat.labelEn)}</div>
                 </div>
               </StaggerItem>
             ))}
@@ -170,12 +169,11 @@ export default function CaseStudies() {
         </div>
       </section>
 
-      {/* Case Study Cards */}
       <section className="section">
         <div className="container">
           <div className="case-grid">
-            {caseStudies.map((cs, i) => (
-              <FadeIn key={cs.id} delay={i * 0.1}>
+            {content.cases.map((cs, i) => (
+              <FadeIn key={cs.id || i} delay={i * 0.1}>
                 <motion.div
                   className="case-card glass-card"
                   whileHover={{ y: -4 }}
@@ -186,20 +184,20 @@ export default function CaseStudies() {
                     <div className="case-card-logo" style={{ background: `${cs.color}20`, color: cs.color }}>{cs.logo}</div>
                     <div>
                       <h3>{cs.client}</h3>
-                      <span className="case-card-industry">{cs.industry[lang]}</span>
+                      <span className="case-card-industry">{pickLang(cs.industryTr, cs.industryEn)}</span>
                     </div>
                   </div>
 
                   <div className="case-card-platforms">
-                    {cs.platforms.map(p => <span key={p} className="case-platform-tag">{p}</span>)}
-                    <span className="case-duration-tag">{cs.duration[lang]}</span>
+                    {(cs.platforms || []).map(p => <span key={p} className="case-platform-tag">{p}</span>)}
+                    <span className="case-duration-tag">{pickLang(cs.durationTr, cs.durationEn)}</span>
                   </div>
 
                   <div className="case-card-metrics">
-                    {cs.metrics.slice(0, 2).map((m, mi) => (
+                    {(cs.metrics || []).slice(0, 2).map((m, mi) => (
                       <div key={mi} className="case-mini-metric">
                         <span className="case-mini-change" style={{ color: cs.color }}>{m.change}</span>
-                        <span className="case-mini-label">{m.label[lang]}</span>
+                        <span className="case-mini-label">{pickLang(m.labelTr, m.labelEn)}</span>
                       </div>
                     ))}
                   </div>
@@ -214,7 +212,6 @@ export default function CaseStudies() {
         </div>
       </section>
 
-      {/* Case Study Modal */}
       <AnimatePresence>
         {selectedCase && (
           <motion.div
@@ -233,28 +230,28 @@ export default function CaseStudies() {
                 <div className="case-card-logo" style={{ background: `${selectedCase.color}20`, color: selectedCase.color, fontSize: 32, width: 64, height: 64 }}>{selectedCase.logo}</div>
                 <div>
                   <h2>{selectedCase.client}</h2>
-                  <p style={{ color: 'var(--text-secondary)', margin: 0 }}>{selectedCase.industry[lang]} • {selectedCase.duration[lang]}</p>
+                  <p style={{ color: 'var(--text-secondary)', margin: 0 }}>{pickLang(selectedCase.industryTr, selectedCase.industryEn)} • {pickLang(selectedCase.durationTr, selectedCase.durationEn)}</p>
                 </div>
               </div>
 
               <div className="case-modal-body">
                 <div className="case-section">
                   <h4>{lang === 'tr' ? '🎯 Zorluk' : '🎯 Challenge'}</h4>
-                  <p>{selectedCase.challenge[lang]}</p>
+                  <p>{pickLang(selectedCase.challengeTr, selectedCase.challengeEn)}</p>
                 </div>
 
                 <div className="case-section">
                   <h4>{lang === 'tr' ? '💡 Çözümümüz' : '💡 Our Solution'}</h4>
-                  <p>{selectedCase.solution[lang]}</p>
+                  <p>{pickLang(selectedCase.solutionTr, selectedCase.solutionEn)}</p>
                 </div>
 
                 <div className="case-section">
                   <h4>{lang === 'tr' ? '📊 Sonuçlar' : '📊 Results'}</h4>
                   <div className="case-metrics-grid">
-                    {selectedCase.metrics.map((m, i) => (
+                    {(selectedCase.metrics || []).map((m, i) => (
                       <div key={i} className="case-metric-card" style={{ borderLeft: `3px solid ${selectedCase.color}` }}>
-                        <m.icon size={20} style={{ color: selectedCase.color }} />
-                        <div className="case-metric-label">{m.label[lang]}</div>
+                        <span style={{ fontSize: '1.3rem' }}>{m.ikon || '📈'}</span>
+                        <div className="case-metric-label">{pickLang(m.labelTr, m.labelEn)}</div>
                         <div className="case-metric-row">
                           <span className="case-metric-before">{m.before}</span>
                           <span className="case-metric-arrow">→</span>
@@ -266,11 +263,13 @@ export default function CaseStudies() {
                   </div>
                 </div>
 
-                <div className="case-section case-testimonial" style={{ borderLeft: `3px solid ${selectedCase.color}` }}>
-                  <p>"{selectedCase.testimonial.text[lang]}"</p>
-                  <strong>{selectedCase.testimonial.name}</strong>
-                  <span>{selectedCase.testimonial.role}</span>
-                </div>
+                {(selectedCase.testimonialTextTr || selectedCase.testimonialTextEn) && (
+                  <div className="case-section case-testimonial" style={{ borderLeft: `3px solid ${selectedCase.color}` }}>
+                    <p>"{pickLang(selectedCase.testimonialTextTr, selectedCase.testimonialTextEn)}"</p>
+                    <strong>{selectedCase.testimonialName}</strong>
+                    <span>{selectedCase.testimonialRole}</span>
+                  </div>
+                )}
 
                 <div className="case-modal-cta">
                   <p>{lang === 'tr' ? 'Sıradaki başarı hikayesi sizinki olsun.' : 'Let the next success story be yours.'}</p>
@@ -285,7 +284,6 @@ export default function CaseStudies() {
         )}
       </AnimatePresence>
 
-      {/* CTA */}
       <section className="section">
         <div className="container">
           <FadeIn>

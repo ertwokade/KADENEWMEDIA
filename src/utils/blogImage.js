@@ -23,8 +23,24 @@ const CATEGORY_IMAGES = {
 
 const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80'
 
+function isValidImage(src) {
+  if (!src || typeof src !== 'string') return false
+  const s = src.trim()
+  if (!s) return false
+  return s.startsWith('http://') || s.startsWith('https://') || s.startsWith('data:') || s.startsWith('/')
+}
+
 export function getBlogImage(post) {
-  if (post?.image && post.image.startsWith('http')) return post.image
+  if (post?.image && isValidImage(post.image)) return post.image
+  if (post?.coverImage && isValidImage(post.coverImage)) return post.coverImage
+  const cat = (post?.category || post?.categoryEn || '').toLowerCase()
+  for (const [key, url] of Object.entries(CATEGORY_IMAGES)) {
+    if (cat.includes(key)) return url
+  }
+  return DEFAULT_IMAGE
+}
+
+export function getBlogFallback(post) {
   const cat = (post?.category || post?.categoryEn || '').toLowerCase()
   for (const [key, url] of Object.entries(CATEGORY_IMAGES)) {
     if (cat.includes(key)) return url

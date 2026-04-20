@@ -10,7 +10,7 @@ import {
   HiOutlineCalendar, HiOutlineBell, HiOutlineMoon,
   HiOutlineSun, HiOutlineChartBar, HiOutlineViewBoards,
   HiOutlineMenuAlt2, HiOutlinePhone, HiOutlineAnnotation,
-  HiOutlineChatAlt2, HiOutlineChevronLeft,
+  HiOutlineChatAlt2, HiOutlineChevronLeft, HiOutlineChevronDown,
   HiOutlineCurrencyDollar, HiOutlineClipboardList,
   HiOutlinePhotograph, HiOutlineSparkles, HiOutlineRefresh,
   HiOutlineDocumentReport, HiOutlineClipboardCheck,
@@ -22,6 +22,8 @@ import BasinEditor from './admin/editors/BasinEditor'
 import NedenBizEditor from './admin/editors/NedenBizEditor'
 import TesekkurEditor from './admin/editors/TesekkurEditor'
 import ReferralEditor from './admin/editors/ReferralEditor'
+import PodcastWebinarEditor from './admin/editors/PodcastWebinarEditor'
+import CaseStudiesEditor from './admin/editors/CaseStudiesEditor'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
 import {
   loginApi, changePasswordApi,
@@ -1007,6 +1009,8 @@ function ContentSection({ showToast }) {
     { id: 'nedenBiz', label: '💡 Neden Biz', desc: '/neden-biz sayfası içeriği' },
     { id: 'tesekkur', label: '🙏 Teşekkür', desc: '/tesekkur sayfası içeriği' },
     { id: 'referralProgram', label: '🎁 Referans Programı', desc: '/referans-programi sayfası içeriği' },
+    { id: 'podcastWebinar', label: '🎙️ Podcast & Webinar', desc: '/podcast-webinar sayfası içeriği' },
+    { id: 'caseStudies', label: '🏆 Başarı Hikayeleri', desc: '/basari-hikayeleri sayfası içeriği' },
   ]
 
   // Memoize data props to prevent child editors from resetting form state on re-render
@@ -1049,6 +1053,8 @@ function ContentSection({ showToast }) {
   const nedenBizData = useMemo(() => content.nedenBiz || {}, [content.nedenBiz])
   const tesekkurData = useMemo(() => content.tesekkur || {}, [content.tesekkur])
   const referralProgramData = useMemo(() => content.referralProgram || {}, [content.referralProgram])
+  const podcastWebinarData = useMemo(() => content.podcastWebinar || {}, [content.podcastWebinar])
+  const caseStudiesData = useMemo(() => content.caseStudies || {}, [content.caseStudies])
   const priceCalculatorData = useMemo(() => content.priceCalculator || {
     base: 3000,
     perPlatform: 1800,
@@ -1180,6 +1186,20 @@ function ContentSection({ showToast }) {
         <ReferralEditor
           data={referralProgramData}
           onSave={(data) => handleSave('referralProgram', data)}
+        />
+      )}
+
+      {activeTab === 'podcastWebinar' && (
+        <PodcastWebinarEditor
+          data={podcastWebinarData}
+          onSave={(data) => handleSave('podcastWebinar', data)}
+        />
+      )}
+
+      {activeTab === 'caseStudies' && (
+        <CaseStudiesEditor
+          data={caseStudiesData}
+          onSave={(data) => handleSave('caseStudies', data)}
         />
       )}
       </div>
@@ -6886,6 +6906,20 @@ export default function Admin() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [navGroupsOpen, setNavGroupsOpen] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kade_admin_nav_groups')
+      if (saved) return JSON.parse(saved)
+    } catch { /* ignore */ }
+    return { main: true, content: false, crm: false, system: false }
+  })
+  const toggleNavGroup = (key) => {
+    setNavGroupsOpen(prev => {
+      const next = { ...prev, [key]: !prev[key] }
+      try { localStorage.setItem('kade_admin_nav_groups', JSON.stringify(next)) } catch { /* ignore */ }
+      return next
+    })
+  }
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('kade_admin_dark') === 'true')
   const [localMode, setLocalMode] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
@@ -7008,6 +7042,26 @@ export default function Admin() {
     { id: 'settings', label: 'Ayarlar', icon: HiOutlineCog },
   ]
 
+  // Auto-open the nav group containing the active section so the active item is always visible
+  useEffect(() => {
+    const groupFor = (id) => {
+      if (mainNavItems.some(i => i.id === id)) return 'main'
+      if (contentNavItems.some(i => i.id === id)) return 'content'
+      if (crmNavItems.some(i => i.id === id)) return 'crm'
+      if (systemNavItems.some(i => i.id === id)) return 'system'
+      return null
+    }
+    const g = groupFor(activeSection)
+    if (g) {
+      setNavGroupsOpen(prev => prev[g] ? prev : (() => {
+        const next = { ...prev, [g]: true }
+        try { localStorage.setItem('kade_admin_nav_groups', JSON.stringify(next)) } catch { /* ignore */ }
+        return next
+      })())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSection])
+
   if (!isAuth) {
     return <LoginScreen onLogin={handleLogin} />
   }
@@ -7064,21 +7118,33 @@ export default function Admin() {
         </div>
 
         <nav className="sidebar-nav">
-          <div className="sidebar-nav-group">
-            <div className="sidebar-nav-label">ANA MENÜ</div>
-            {mainNavItems.map(renderNavItem)}
+          <div className={`sidebar-nav-group ${navGroupsOpen.main ? 'open' : ''}`}>
+            <button type="button" className="sidebar-nav-label" onClick={() => toggleNavGroup('main')}>
+              <span>ANA MENÜ</span>
+              <HiOutlineChevronDown size={14} className="nav-chevron" />
+            </button>
+            {navGroupsOpen.main && <div className="sidebar-nav-items">{mainNavItems.map(renderNavItem)}</div>}
           </div>
-          <div className="sidebar-nav-group">
-            <div className="sidebar-nav-label">İÇERİK</div>
-            {contentNavItems.map(renderNavItem)}
+          <div className={`sidebar-nav-group ${navGroupsOpen.content ? 'open' : ''}`}>
+            <button type="button" className="sidebar-nav-label" onClick={() => toggleNavGroup('content')}>
+              <span>İÇERİK</span>
+              <HiOutlineChevronDown size={14} className="nav-chevron" />
+            </button>
+            {navGroupsOpen.content && <div className="sidebar-nav-items">{contentNavItems.map(renderNavItem)}</div>}
           </div>
-          <div className="sidebar-nav-group">
-            <div className="sidebar-nav-label">MÜŞTERİ YÖNETİMİ</div>
-            {crmNavItems.map(renderNavItem)}
+          <div className={`sidebar-nav-group ${navGroupsOpen.crm ? 'open' : ''}`}>
+            <button type="button" className="sidebar-nav-label" onClick={() => toggleNavGroup('crm')}>
+              <span>MÜŞTERİ YÖNETİMİ</span>
+              <HiOutlineChevronDown size={14} className="nav-chevron" />
+            </button>
+            {navGroupsOpen.crm && <div className="sidebar-nav-items">{crmNavItems.map(renderNavItem)}</div>}
           </div>
-          <div className="sidebar-nav-group">
-            <div className="sidebar-nav-label">SİSTEM</div>
-            {systemNavItems.map(renderNavItem)}
+          <div className={`sidebar-nav-group ${navGroupsOpen.system ? 'open' : ''}`}>
+            <button type="button" className="sidebar-nav-label" onClick={() => toggleNavGroup('system')}>
+              <span>SİSTEM</span>
+              <HiOutlineChevronDown size={14} className="nav-chevron" />
+            </button>
+            {navGroupsOpen.system && <div className="sidebar-nav-items">{systemNavItems.map(renderNavItem)}</div>}
           </div>
         </nav>
 

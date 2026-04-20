@@ -8,7 +8,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { blogPosts as staticBlogPosts } from '../data/content'
 import { getBlogsApi } from '../api'
-import { getBlogImage } from '../utils/blogImage'
+import { getBlogImage, getBlogFallback } from '../utils/blogImage'
 import DOMPurify from 'dompurify'
 import { analytics } from '../utils/analytics'
 import PageTransition from '../components/PageTransition'
@@ -163,7 +163,7 @@ export default function BlogDetail() {
                   src={getBlogImage(post)}
                   alt={title}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px', display: 'block' }}
-                  onError={e => { e.target.style.display = 'none' }}
+                  onError={e => { if (!e.target.dataset.fallback) { e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(post) } }}
                 />
               </div>
             </FadeIn>
@@ -240,7 +240,7 @@ export default function BlogDetail() {
                             src={getBlogImage(p)}
                             alt={p.titleTr || ''}
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            onError={e => { e.target.style.display = 'none' }}
+                            onError={e => { if (!e.target.dataset.fallback) { e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(p) } }}
                             loading="lazy"
                           />
                         </div>

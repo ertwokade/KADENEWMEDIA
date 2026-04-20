@@ -8,7 +8,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { blogPosts as staticBlogPosts } from '../data/content'
 import { getBlogsApi } from '../api'
-import { getBlogImage } from '../utils/blogImage'
+import { getBlogImage, getBlogFallback } from '../utils/blogImage'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -156,7 +156,7 @@ export default function Blog() {
                     src={getBlogImage(featured)}
                     alt={featured.titleTr || ''}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={e => { e.target.style.display = 'none' }}
+                    onError={e => { if (!e.target.dataset.fallback) { e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(featured) } }}
                     loading="lazy"
                   />
                 </div>
@@ -194,7 +194,7 @@ export default function Blog() {
                         src={getBlogImage(post)}
                         alt={post.titleTr || ''}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={e => { e.target.style.display = 'none' }}
+                        onError={e => { if (!e.target.dataset.fallback) { e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(post) } }}
                         loading="lazy"
                       />
                     </div>
