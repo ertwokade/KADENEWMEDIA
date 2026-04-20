@@ -69,6 +69,7 @@ export default function Footer() {
     ],
     kaynaklar: [
       { name: lang === 'tr' ? 'Neden Biz?' : 'Why Us?', path: '/neden-biz' },
+      { name: lang === 'tr' ? 'Kariyer' : 'Careers', path: '/kariyer' },
       { name: lang === 'tr' ? 'Müşteri Yorumları' : 'Reviews', path: '/referanslar' },
       { name: lang === 'tr' ? 'Sık Sorulan Sorular' : 'FAQ', path: '/sss' },
       { name: lang === 'tr' ? 'Basın & Medya' : 'Press', path: '/basin' },

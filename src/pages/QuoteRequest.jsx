@@ -344,14 +344,14 @@ export default function QuoteRequest() {
                     </label>
 
                     <label className="quote-consent">
-                      <input type="checkbox" checked={form.consent} onChange={e => setForm({ ...form, consent: e.target.checked })} />
+                      <input type="checkbox" checked={form.consent} onChange={e => setForm({ ...form, consent: e.target.checked })} required />
                       <span>
                         {T(
                           'Verilerimin teklif süreci için işlenmesini ve bana iletişim kurulmasını ',
                           'I consent to processing my data for the quote process and being contacted '
                         )}
                         <a href="/kvkk" target="_blank" rel="noopener noreferrer">KVKK</a>
-                        {T(' kapsamında onaylıyorum.', ' policy.')}
+                        {T(' kapsamında onaylıyorum. (Zorunlu)', ' policy. (Required)')}
                       </span>
                     </label>
                   </motion.div>
@@ -367,12 +367,12 @@ export default function QuoteRequest() {
                   </button>
                 )}
                 {step < 3 && (
-                  <button type="button" className="btn btn-primary quote-next-btn" onClick={next} disabled={!canNext()}>
+                  <button type="button" className="btn btn-primary quote-next-btn" onClick={next}>
                     {T('Devam', 'Continue')} <HiOutlineArrowRight size={16} />
                   </button>
                 )}
                 {step === 3 && (
-                  <button type="submit" className="btn btn-primary quote-next-btn" disabled={sending || !canNext()}>
+                  <button type="submit" className="btn btn-primary quote-next-btn" disabled={sending}>
                     <HiOutlinePaperAirplane size={18} />
                     {sending
                       ? T('Gönderiliyor...', 'Sending...')

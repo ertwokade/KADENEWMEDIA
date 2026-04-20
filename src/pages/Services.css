@@ -16,10 +16,15 @@
   align-items: stretch;
 }
 
+.services-detail-grid > * {
+  height: 100%;
+}
+
 .service-detail-card {
   padding: 36px;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .service-detail-header {

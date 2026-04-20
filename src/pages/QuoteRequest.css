@@ -1,8 +1,11 @@
 .quote-hero {
   position: relative;
-  padding: 140px 0 50px;
+  padding: 140px 0 60px;
   overflow: hidden;
   text-align: center;
+  min-height: 42vh;
+  display: flex;
+  align-items: center;
 }
 
 .quote-hero-title {
@@ -26,8 +29,12 @@
   align-items: center;
   justify-content: center;
   gap: 0;
-  margin-bottom: 8px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
+  padding: 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
 }
 
 .quote-step {
@@ -109,7 +116,7 @@
 }
 
 .quote-form {
-  padding: 32px;
+  padding: 36px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -426,15 +433,21 @@
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  padding: 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
   background: var(--bg-secondary);
   cursor: pointer;
   font-size: 0.84rem;
   color: var(--text-secondary);
-  margin-top: 14px;
+  margin-top: 20px;
   line-height: 1.5;
+  transition: border-color 0.2s ease;
+}
+
+.quote-consent:has(input:checked) {
+  border-color: rgba(234, 195, 33, 0.5);
+  background: rgba(234, 195, 33, 0.04);
 }
 
 .quote-consent input {

@@ -30,14 +30,14 @@ export default async function handler(req, res) {
       const {
         name, category, categoryEn, logo, color,
         descTr, descEn, longDescTr, longDescEn,
-        servicesTr, servicesEn, resultsTr, resultsEn, slug: bodySlug,
+        servicesTr, servicesEn, resultsTr, resultsEn, slug: bodySlug, id: bodyId,
       } = req.body;
       if (!name?.trim()) return res.status(400).json({ error: 'Partner adı gerekli' });
       if (name.length > 100) return res.status(400).json({ error: 'Ad çok uzun (max 100)' });
       if (descTr && descTr.length > 500) return res.status(400).json({ error: 'Kısa açıklama çok uzun (max 500)' });
       if (longDescTr && longDescTr.length > 5000) return res.status(400).json({ error: 'Uzun açıklama çok uzun (max 5000)' });
       // Slug'dan id oluştur — detail sayfası URL'i için gerekli
-      const slug = bodySlug || (name || '').toLowerCase()
+      const slug = bodySlug || bodyId || (name || '').toLowerCase()
         .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
         .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
         .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

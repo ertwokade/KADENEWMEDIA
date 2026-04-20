@@ -1,0 +1,282 @@
+/* ── Hero ───────────────────────────────────── */
+.pt-hero {
+  position: relative;
+  padding: 100px 0 60px;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* ── Entry Layout ───────────────────────────── */
+.pt-entry-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+@media (max-width: 680px) { .pt-entry-wrap { grid-template-columns: 1fr; } }
+
+.pt-entry-card {
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pt-entry-card h2 { font-size: 1.35rem; margin: 0; }
+.pt-entry-card > p { color: var(--text-secondary); font-size: 0.9rem; margin: 0; }
+
+.pt-entry-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: rgba(108,99,255,0.12);
+  color: #6C63FF;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.pt-field { display: flex; flex-direction: column; gap: 6px; }
+
+.pt-field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pt-field input {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.pt-field input:focus { border-color: var(--brand); }
+
+.pt-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* ── Preview List ───────────────────────────── */
+.pt-preview {
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pt-preview h3 { font-size: 1rem; margin: 0; color: var(--text-secondary); }
+
+.pt-preview-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.pt-preview-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+}
+
+.pt-preview-list li svg { color: #2ECC71; flex-shrink: 0; }
+
+/* ── Dashboard Header ───────────────────────── */
+.pt-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.pt-code {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6C63FF;
+  background: rgba(108,99,255,0.12);
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.pt-header-meta h2 { font-size: 1.3rem; margin: 0 0 4px; }
+.pt-header-meta p { color: var(--text-secondary); font-size: 0.87rem; margin: 0 0 2px; }
+.pt-dates { font-size: 0.82rem !important; }
+
+.pt-overall { display: flex; flex-direction: column; gap: 8px; min-width: 220px; }
+.pt-ring-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+
+.pt-progress-bar {
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.pt-progress-bar.wide { height: 10px; }
+
+.pt-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6C63FF, var(--brand));
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+.pt-progress-pct { font-size: 0.85rem; font-weight: 700; color: var(--brand); }
+
+/* ── Main Grid ──────────────────────────────── */
+.pt-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+@media (max-width: 780px) { .pt-grid { grid-template-columns: 1fr; } }
+
+.pt-section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin: 0 0 14px;
+}
+
+/* ── Timeline ───────────────────────────────── */
+.pt-timeline { display: flex; flex-direction: column; position: relative; }
+
+.pt-phase {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 24px;
+  position: relative;
+}
+
+.pt-phase:last-child { padding-bottom: 0; }
+
+.pt-phase::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 28px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.pt-phase:last-child::before { display: none; }
+
+.pt-phase-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+  flex-shrink: 0;
+  position: relative; z-index: 1;
+  border: 2px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+.pt-phase.done .pt-phase-dot {
+  background: rgba(46,204,113,0.15);
+  border-color: #2ECC71;
+  color: #2ECC71;
+}
+
+.pt-phase.active .pt-phase-dot {
+  background: rgba(108,99,255,0.15);
+  border-color: #6C63FF;
+  color: #6C63FF;
+  box-shadow: 0 0 0 4px rgba(108,99,255,0.12);
+}
+
+.pt-phase-body { flex: 1; padding-top: 4px; }
+
+.pt-phase-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.pt-phase-title strong { font-size: 0.92rem; }
+
+.pt-phase-date {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.pt-phase-body p { font-size: 0.82rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+
+.pt-phase.pending .pt-phase-body { opacity: 0.55; }
+
+/* ── Tasks ──────────────────────────────────── */
+.pt-tasks { display: flex; flex-direction: column; gap: 10px; }
+
+.pt-task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.pt-task-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pt-task-title { flex: 1; font-size: 0.88rem; }
+
+.pt-task-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── Deliverables ───────────────────────────── */
+.pt-deliverables { padding: 4px 0; }
+
+.pt-deliverable-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pt-deliverable-row:last-child { border-bottom: none; }
+.pt-deliverable-row > svg { color: var(--brand); flex-shrink: 0; }
+
+.pt-deliverable-info { flex: 1; }
+.pt-deliverable-info strong { font-size: 0.88rem; display: block; margin-bottom: 2px; }
+.pt-deliverable-info span { font-size: 0.78rem; color: var(--text-secondary); }
+
+.pt-soon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}

@@ -70,14 +70,14 @@ export default function Partners() {
                     className="partner-card glass-card"
                     whileHover={{ scale: 1.02, y: -5 }}
                   >
-                    <div className="partner-logo-large" style={{ background: `${partner.color}15`, borderColor: `${partner.color}30` }}>
+                    <div className="partner-logo-large" style={{ background: `${partner.color || '#eac321'}15`, borderColor: `${partner.color || '#eac321'}30` }}>
                       {partner.logo && (partner.logo.startsWith('data:') || partner.logo.startsWith('http'))
                         ? <img src={partner.logo} alt={partner.name} style={{ width: '60px', height: '60px', objectFit: 'contain', borderRadius: 8 }} />
-                        : <span style={{ fontSize: '2.5rem' }}>{partner.logo}</span>
+                        : <span style={{ fontSize: '2.5rem' }}>{partner.logo || '🏢'}</span>
                       }
                     </div>
                     <div className="partner-card-info">
-                      <span className="partner-category" style={{ color: partner.color }}>
+                      <span className="partner-category" style={{ color: partner.color || '#eac321' }}>
                         {lang === 'tr' ? partner.category : partner.categoryEn}
                       </span>
                       <h3>{partner.name}</h3>

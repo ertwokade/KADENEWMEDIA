@@ -496,7 +496,8 @@ function BlogSection({ showToast }) {
       excerptTr: blog.excerptTr || '', excerptEn: blog.excerptEn || '',
       contentTr: blog.contentTr || '', contentEn: blog.contentEn || '',
       category: blog.category || '', categoryEn: blog.categoryEn || '',
-      slug: blog.slug || '', image: blog.image || '',
+      slug: blog.slug || '',
+      image: (blog.image && (blog.image.startsWith('http') || blog.image.startsWith('data:') || blog.image.startsWith('/'))) ? blog.image : '',
       color: blog.color || '#eac321', readTime: blog.readTime || 5,
       published: blog.published !== false,
       publishAt: blog.publishAt ? new Date(blog.publishAt).toISOString().slice(0, 16) : '',
@@ -2090,6 +2091,27 @@ function PartnersSection({ showToast }) {
                     <input type="text" value={form.categoryEn} onChange={(e) => setForm({ ...form, categoryEn: e.target.value })} />
                   </div>
                 </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Marka Rengi</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <input
+                        type="color"
+                        value={form.color}
+                        onChange={(e) => setForm({ ...form, color: e.target.value })}
+                        style={{ width: 48, height: 36, border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', background: 'none', padding: 2 }}
+                      />
+                      <input
+                        type="text"
+                        value={form.color}
+                        onChange={(e) => setForm({ ...form, color: e.target.value })}
+                        placeholder="#eac321"
+                        style={{ flex: 1, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.88rem' }}
+                      />
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: form.color, border: '1px solid var(--border)', flexShrink: 0 }} />
+                    </div>
+                  </div>
+                </div>
                 <div className="form-group">
                   <label>Logo (Emoji veya Görsel Yükle)</label>
                   <div className="emoji-grid">
@@ -2203,12 +2225,18 @@ function PartnersSection({ showToast }) {
                       : <span style={{ fontSize: '1.5rem' }}>{p.logo}</span>
                     }
                   </td>
-                  <td><strong>{p.name}</strong></td>
-                  <td><span className="status-badge" style={{ background: `${p.color}20`, color: p.color }}>{p.category}</span></td>
+                  <td>
+                    <strong>{p.name}</strong>
+                    {!p._id && <span style={{ marginLeft: 6, fontSize: '0.7rem', color: 'var(--text-tertiary)', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 4, padding: '1px 5px' }}>statik</span>}
+                  </td>
+                  <td><span className="status-badge" style={{ background: `${p.color || '#eac321'}20`, color: p.color || '#eac321' }}>{p.category}</span></td>
                   <td>
                     <div className="table-actions">
                       <button className="table-action-btn" onClick={() => handleEdit(p)}><HiOutlinePencil size={14} /> Düzenle</button>
-                      <button className="table-action-btn danger" onClick={() => handleDelete(p._id || null)}><HiOutlineTrash size={14} /> Sil</button>
+                      {p._id
+                        ? <button className="table-action-btn danger" onClick={() => handleDelete(p._id)}><HiOutlineTrash size={14} /> Sil</button>
+                        : <button className="table-action-btn" style={{ opacity: 0.4, cursor: 'not-allowed' }} title="Önce düzenleyip kaydedin" disabled><HiOutlineTrash size={14} /> Sil</button>
+                      }
                     </div>
                   </td>
                 </tr>

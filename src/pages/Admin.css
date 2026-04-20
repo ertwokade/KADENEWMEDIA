@@ -312,7 +312,7 @@
 /* ===== SIDEBAR ===== */
 .admin-sidebar {
   width: var(--sidebar-width);
-  min-height: 100vh;
+  height: 100vh;
   background: var(--card-bg);
   border-right: 1px solid var(--border);
   position: fixed;

@@ -53,7 +53,7 @@ export default async function handler(req, res) {
         excerptTr: excerptTr || '', excerptEn: excerptEn || '',
         contentTr: contentTr || '', contentEn: contentEn || '',
         category: category || '', categoryEn: categoryEn || '',
-        image: image || '📝', color: color || '#FFD700',
+        image: image || '', color: color || '#eac321',
         readTime: parseInt(readTime) || 5, slug,
         publishAt: publishAt ? new Date(publishAt) : null,
         date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }),
