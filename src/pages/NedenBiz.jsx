@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   HiOutlineCheckCircle,
@@ -7,123 +8,72 @@ import {
 } from 'react-icons/hi'
 import { Link } from 'react-router-dom'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './NedenBiz.css'
 
-const karsilastirmaVerisi = [
-  {
-    kriter: 'İçerik Onay Süreci',
-    biz: 'Aylık takvim, 3-5 gün önceden onay',
-    diger: 'Genellikle son dakika',
-    bizVar: true,
-    digerVar: false,
-  },
-  {
-    kriter: 'Aylık Raporlama',
-    biz: 'Detaylı PDF rapor + görüşme',
-    diger: 'Excel veya sözlü bilgilendirme',
-    bizVar: true,
-    digerVar: false,
-  },
-  {
-    kriter: 'Dedicated Uzman',
-    biz: 'Her müşteriye 1 dedicated yönetici',
-    diger: 'Hesap paylaşımlı, anonim ekip',
-    bizVar: true,
-    digerVar: false,
-  },
-  {
-    kriter: 'Sertifikalı Ekip',
-    biz: 'Meta, Google, TikTok sertifikalı',
-    diger: 'Çoğunlukla sertifikasız',
-    bizVar: true,
-    digerVar: false,
-  },
-  {
-    kriter: 'Şeffaf Fiyatlandırma',
-    biz: 'Sabit aylık paket, gizli ücret yok',
-    diger: 'Değişken, belirsiz fiyat',
-    bizVar: true,
-    digerVar: false,
-  },
-  {
-    kriter: 'Video Prodüksiyon',
-    biz: 'Stüdyo + lokasyon çekim',
-    diger: 'Genellikle dış kaynak, pahalı',
-    bizVar: true,
-    digerVar: false,
-  },
-  {
-    kriter: 'AI Destekli İçerik',
-    biz: 'AI + insan editöryal süreç',
-    diger: 'Tamamen manuel veya tamamen AI',
-    bizVar: true,
-    digerVar: false,
-  },
-  {
-    kriter: 'KVKK Uyumlu Süreç',
-    biz: 'Sözleşme + veri işleme taahhütü',
-    diger: 'Belirsiz veri politikası',
-    bizVar: true,
-    digerVar: false,
-  },
-]
-
-const avantajlar = [
-  {
-    ikon: '🎯',
-    baslik: 'Sektöre Özel Strateji',
-    aciklama: '15+ sektörde deneyimle her markanın dinamiklerine özel içerik ve reklam stratejisi.',
-    renk: '#6C63FF',
-  },
-  {
-    ikon: '⚡',
-    baslik: '5 Günde Başlangıç',
-    aciklama: 'Onboarding\'den ilk içeriğe kadar 5-7 iş günü. Diğer ajanslar haftalar alır.',
-    renk: '#eac321',
-  },
-  {
-    ikon: '📊',
-    baslik: 'Data-Driven Kararlar',
-    aciklama: 'Tüm kararlar veriye dayalı. Haftalık metrik takibi, aylık strateji revizyonu.',
-    renk: '#2ECC71',
-  },
-  {
-    ikon: '🤝',
-    baslik: 'Uzun Vadeli Ortaklık',
-    aciklama: '%94 müşteri tutma oranımız, yaptığımız işin kalitesini gösteriyor.',
-    renk: '#E91E63',
-  },
-  {
-    ikon: '🔒',
-    baslik: 'Tam Şeffaflık',
-    aciklama: 'Şifre paylaşımı yok. İzin tabanlı erişim, geri alınabilir yetkiler.',
-    renk: '#00BCD4',
-  },
-  {
-    ikon: '🚀',
-    baslik: 'Ölçeklenebilir Model',
-    aciklama: 'Startup\'tan kurumsal markaya uyumlu paket yapısı. Büyüdükçe birlikte büyürüz.',
-    renk: '#FF9800',
-  },
-]
-
-const rakamlar = [
-  { sayi: '150+', etiket: 'Yönetilen Hesap', ikon: '📱' },
-  { sayi: '%94', etiket: 'Müşteri Tutma Oranı', ikon: '🔄' },
-  { sayi: '4.9/5', etiket: 'Ortalama Memnuniyet', ikon: '⭐' },
-  { sayi: '2x', etiket: 'Ortalama Takipçi Büyümesi', ikon: '📈' },
-]
+const DEFAULT_CONTENT = {
+  heroBadge: 'Fark Yaratan Ajans',
+  heroSubtitle: 'Her ajans "en iyiyiz" der. Biz gösteriyoruz. İşte somut farklar.',
+  ctaTitle: 'Farkı kendiniz görün',
+  ctaSubtitle: '30 dakikalık ücretsiz strateji görüşmesiyle başlayın. Taahhüt yok, baskı yok.',
+  rakamlar: [
+    { sayi: '150+', etiket: 'Yönetilen Hesap', ikon: '📱' },
+    { sayi: '%94', etiket: 'Müşteri Tutma Oranı', ikon: '🔄' },
+    { sayi: '4.9/5', etiket: 'Ortalama Memnuniyet', ikon: '⭐' },
+    { sayi: '2x', etiket: 'Ortalama Takipçi Büyümesi', ikon: '📈' },
+  ],
+  karsilastirma: [
+    { kriter: 'İçerik Onay Süreci', biz: 'Aylık takvim, 3-5 gün önceden onay', diger: 'Genellikle son dakika' },
+    { kriter: 'Aylık Raporlama', biz: 'Detaylı PDF rapor + görüşme', diger: 'Excel veya sözlü bilgilendirme' },
+    { kriter: 'Dedicated Uzman', biz: 'Her müşteriye 1 dedicated yönetici', diger: 'Hesap paylaşımlı, anonim ekip' },
+    { kriter: 'Platform Uzmanlığı', biz: 'Meta, Google, TikTok reklam yönetiminde aktif deneyim', diger: 'Sadece 1-2 platformda sınırlı deneyim' },
+    { kriter: 'Şeffaf Fiyatlandırma', biz: 'Sabit aylık paket, gizli ücret yok', diger: 'Değişken, belirsiz fiyat' },
+    { kriter: 'Video Prodüksiyon', biz: 'Stüdyo + lokasyon çekim', diger: 'Genellikle dış kaynak, pahalı' },
+    { kriter: 'AI Destekli İçerik', biz: 'AI + insan editöryal süreç', diger: 'Tamamen manuel veya tamamen AI' },
+    { kriter: 'KVKK Uyumlu Süreç', biz: 'Sözleşme + veri işleme taahhütü', diger: 'Belirsiz veri politikası' },
+  ],
+  avantajlar: [
+    { ikon: '🎯', baslik: 'Sektöre Özel Strateji', aciklama: '15+ sektörde deneyimle her markanın dinamiklerine özel içerik ve reklam stratejisi.', renk: '#6C63FF' },
+    { ikon: '⚡', baslik: '5 Günde Başlangıç', aciklama: 'Onboarding\'den ilk içeriğe kadar 5-7 iş günü. Diğer ajanslar haftalar alır.', renk: '#eac321' },
+    { ikon: '📊', baslik: 'Data-Driven Kararlar', aciklama: 'Tüm kararlar veriye dayalı. Haftalık metrik takibi, aylık strateji revizyonu.', renk: '#2ECC71' },
+    { ikon: '🤝', baslik: 'Uzun Vadeli Ortaklık', aciklama: '%94 müşteri tutma oranımız, yaptığımız işin kalitesini gösteriyor.', renk: '#E91E63' },
+    { ikon: '🔒', baslik: 'Tam Şeffaflık', aciklama: 'Şifre paylaşımı yok. İzin tabanlı erişim, geri alınabilir yetkiler.', renk: '#00BCD4' },
+    { ikon: '🚀', baslik: 'Ölçeklenebilir Model', aciklama: 'Startup\'tan kurumsal markaya uyumlu paket yapısı. Büyüdükçe birlikte büyürüz.', renk: '#FF9800' },
+  ],
+}
 
 export default function NedenBiz() {
+  const [content, setContent] = useState(DEFAULT_CONTENT)
+
   useSEO({
     title: 'Neden Kade Media? | Karşılaştırma & Avantajlar',
-    description: 'Kade Media\'yı diğer sosyal medya ajanslarından ayıran farklar. Sertifikalı ekip, şeffaf fiyatlandırma, aylık raporlama ve dedicated uzman.',
+    description: 'Kade Media\'yı diğer sosyal medya ajanslarından ayıran farklar. Uzman ekip, şeffaf fiyatlandırma, aylık raporlama ve dedicated uzman.',
     keywords: 'neden kade media, sosyal medya ajansı karşılaştırma, en iyi sosyal medya ajansı istanbul, ajans seçimi',
     path: '/neden-biz',
   })
+
+  useEffect(() => {
+    let cancelled = false
+    getContentApi('nedenBiz')
+      .then(res => {
+        if (cancelled) return
+        const data = res?.data || res
+        if (data && typeof data === 'object') {
+          setContent(prev => ({
+            ...prev,
+            ...data,
+            rakamlar: Array.isArray(data.rakamlar) && data.rakamlar.length ? data.rakamlar : prev.rakamlar,
+            karsilastirma: Array.isArray(data.karsilastirma) && data.karsilastirma.length ? data.karsilastirma : prev.karsilastirma,
+            avantajlar: Array.isArray(data.avantajlar) && data.avantajlar.length ? data.avantajlar : prev.avantajlar,
+          }))
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   return (
     <PageTransition>
@@ -135,7 +85,7 @@ export default function NedenBiz() {
           <FadeIn>
             <div className="section-badge">
               <HiOutlineLightningBolt size={14} />
-              Fark Yaratan Ajans
+              {content.heroBadge}
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
@@ -145,7 +95,7 @@ export default function NedenBiz() {
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="section-subtitle">
-              Her ajans "en iyiyiz" der. Biz gösteriyoruz. İşte somut farklar.
+              {content.heroSubtitle}
             </p>
           </FadeIn>
         </div>
@@ -154,8 +104,8 @@ export default function NedenBiz() {
       <section className="section">
         <div className="container">
           <StaggerContainer className="neden-rakamlar">
-            {rakamlar.map(r => (
-              <StaggerItem key={r.etiket}>
+            {content.rakamlar.map((r, i) => (
+              <StaggerItem key={`${r.etiket}-${i}`}>
                 <div className="neden-rakam glass-card">
                   <span className="neden-ikon">{r.ikon}</span>
                   <span className="neden-sayi">{r.sayi}</span>
@@ -178,7 +128,7 @@ export default function NedenBiz() {
                 <div className="tablo-biz">✅ Kade Media</div>
                 <div className="tablo-diger">❌ Diğer Ajanslar</div>
               </div>
-              {karsilastirmaVerisi.map((satir, i) => (
+              {content.karsilastirma.map((satir, i) => (
                 <motion.div
                   key={i}
                   className="tablo-satir"
@@ -203,12 +153,12 @@ export default function NedenBiz() {
 
           <FadeIn delay={0.2}>
             <h2 className="neden-bolum-baslik" style={{ marginTop: '3rem' }}>
-              6 Temel <span>Avantajımız</span>
+              Temel <span>Avantajlarımız</span>
             </h2>
           </FadeIn>
 
           <div className="neden-avantajlar">
-            {avantajlar.map((a, i) => (
+            {content.avantajlar.map((a, i) => (
               <motion.div
                 key={i}
                 className="neden-avantaj glass-card"
@@ -228,8 +178,8 @@ export default function NedenBiz() {
 
           <FadeIn delay={0.4}>
             <div className="neden-cta glass-card">
-              <h3>Farkı kendiniz görün</h3>
-              <p>30 dakikalık ücretsiz strateji görüşmesiyle başlayın. Taahhüt yok, baskı yok.</p>
+              <h3>{content.ctaTitle}</h3>
+              <p>{content.ctaSubtitle}</p>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Link to="/iletisim" className="btn btn-primary">
                   Görüşme Planla

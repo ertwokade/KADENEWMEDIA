@@ -1,39 +1,46 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   HiOutlineGift,
-  HiOutlineUserAdd,
-  HiOutlineClipboardCheck,
-  HiOutlineCurrencyDollar,
   HiOutlinePaperAirplane,
 } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
 import { useLanguage } from '../i18n/LanguageContext'
-import { submitReferralApi } from '../api'
+import { submitReferralApi, getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import PageBgAnimation from '../components/PageBgAnimation'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './ReferralProgram.css'
 
-const steps = [
-  { icon: HiOutlineUserAdd, title: 'Tanıdığınızı önerin', desc: 'Formdan marka veya işletme bilgisini paylaşın.' },
-  { icon: HiOutlineClipboardCheck, title: 'Ekibimiz görüşsün', desc: 'Uygun ihtiyaç varsa ücretsiz keşif görüşmesi planlayalım.' },
-  { icon: HiOutlineCurrencyDollar, title: 'Ödül kazanın', desc: 'Anlaşma başladığında referral ödülünüzü tanımlayalım.' },
-]
-
-const serviceOptions = [
-  'Sosyal Medya Yönetimi',
-  'İçerik Üretimi',
-  'Reklam Yönetimi',
-  'Video Prodüksiyon',
-  'Web Sitesi',
-  'Strateji Danışmanlığı',
-]
+const DEFAULT_CONTENT = {
+  heroBadge: 'Referans Programı',
+  heroTitleBefore: 'Bizi doğru markalarla',
+  heroTitleHighlight: 'buluşturun',
+  heroTitleAfter: ', birlikte büyüyelim',
+  heroSubtitle: 'Dijital pazarlama desteğine ihtiyaç duyan bir işletme tanıyorsanız önerin. Anlaşma başladığında referral ödülünüzü takip edilebilir şekilde panelimize kaydedelim.',
+  steps: [
+    { ikon: '👥', baslik: 'Tanıdığınızı önerin', aciklama: 'Formdan marka veya işletme bilgisini paylaşın.' },
+    { ikon: '📋', baslik: 'Ekibimiz görüşsün', aciklama: 'Uygun ihtiyaç varsa ücretsiz keşif görüşmesi planlayalım.' },
+    { ikon: '💰', baslik: 'Ödül kazanın', aciklama: 'Anlaşma başladığında referral ödülünüzü tanımlayalım.' },
+  ],
+  rewardKicker: 'Ödül modeli',
+  rewardTitle: 'İlk ay hizmet bedelinden %10\'a kadar referral ödülü',
+  rewardText: 'Ödül oranı proje kapsamına göre netleştirilir ve anlaşma aktif olduktan sonra admin panelinden takip edilir.',
+  serviceOptions: [
+    'Sosyal Medya Yönetimi',
+    'İçerik Üretimi',
+    'Reklam Yönetimi',
+    'Video Prodüksiyon',
+    'Web Sitesi',
+    'Strateji Danışmanlığı',
+  ],
+}
 
 export default function ReferralProgram() {
   const { lang } = useLanguage()
   const navigate = useNavigate()
+  const [content, setContent] = useState(DEFAULT_CONTENT)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({
@@ -44,7 +51,7 @@ export default function ReferralProgram() {
     leadEmail: '',
     leadPhone: '',
     leadCompany: '',
-    service: serviceOptions[0],
+    service: DEFAULT_CONTENT.serviceOptions[0],
     notes: '',
   })
 
@@ -54,6 +61,29 @@ export default function ReferralProgram() {
     keywords: 'referans programı, ajans referral, kade media referans, dijital pazarlama öneri',
     path: '/referans-programi',
   })
+
+  useEffect(() => {
+    let cancelled = false
+    getContentApi('referralProgram')
+      .then(res => {
+        if (cancelled) return
+        const data = res?.data || res
+        if (data && typeof data === 'object') {
+          setContent(prev => {
+            const merged = {
+              ...prev,
+              ...data,
+              steps: Array.isArray(data.steps) && data.steps.length ? data.steps : prev.steps,
+              serviceOptions: Array.isArray(data.serviceOptions) && data.serviceOptions.length ? data.serviceOptions : prev.serviceOptions,
+            }
+            setForm(f => ({ ...f, service: merged.serviceOptions[0] }))
+            return merged
+          })
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -83,17 +113,17 @@ export default function ReferralProgram() {
           <FadeIn>
             <div className="section-badge">
               <HiOutlineGift size={14} />
-              Referans Programı
+              {content.heroBadge}
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
             <h1 className="section-title">
-              Bizi doğru markalarla <span>buluşturun</span>, birlikte büyüyelim
+              {content.heroTitleBefore} <span>{content.heroTitleHighlight}</span>{content.heroTitleAfter}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="section-subtitle">
-              Dijital pazarlama desteğine ihtiyaç duyan bir işletme tanıyorsanız önerin. Anlaşma başladığında referral ödülünüzü takip edilebilir şekilde panelimize kaydedelim.
+              {content.heroSubtitle}
             </p>
           </FadeIn>
         </div>
@@ -103,15 +133,15 @@ export default function ReferralProgram() {
         <div className="container referral-layout">
           <div className="referral-info">
             <StaggerContainer className="referral-steps" staggerDelay={0.12}>
-              {steps.map(step => (
-                <StaggerItem key={step.title}>
+              {content.steps.map((step, i) => (
+                <StaggerItem key={`${step.baslik}-${i}`}>
                   <div className="referral-step glass-card">
                     <div className="referral-step-icon">
-                      <step.icon size={24} />
+                      <span style={{ fontSize: '1.4rem' }}>{step.ikon}</span>
                     </div>
                     <div>
-                      <h3>{step.title}</h3>
-                      <p>{step.desc}</p>
+                      <h3>{step.baslik}</h3>
+                      <p>{step.aciklama}</p>
                     </div>
                   </div>
                 </StaggerItem>
@@ -120,9 +150,9 @@ export default function ReferralProgram() {
 
             <FadeIn delay={0.25}>
               <div className="referral-reward glass-card">
-                <span className="referral-reward-kicker">Ödül modeli</span>
-                <strong>İlk ay hizmet bedelinden %10'a kadar referral ödülü</strong>
-                <p>Ödül oranı proje kapsamına göre netleştirilir ve anlaşma aktif olduktan sonra admin panelinden takip edilir.</p>
+                <span className="referral-reward-kicker">{content.rewardKicker}</span>
+                <strong>{content.rewardTitle}</strong>
+                <p>{content.rewardText}</p>
               </div>
             </FadeIn>
           </div>
@@ -162,7 +192,7 @@ export default function ReferralProgram() {
                 <div className="form-group">
                   <label>İlgilenilen hizmet</label>
                   <select name="service" value={form.service} onChange={handleChange}>
-                    {serviceOptions.map(option => <option key={option}>{option}</option>)}
+                    {content.serviceOptions.map(option => <option key={option}>{option}</option>)}
                   </select>
                 </div>
               </div>

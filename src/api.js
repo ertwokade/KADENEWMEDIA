@@ -737,11 +737,6 @@ export async function deleteQuoteApi(id) {
   return handleResponse(res);
 }
 
-export async function fetchOgPreviewApi(url) {
-  const res = await fetch(`${API_BASE}/ops?resource=og-preview&url=${encodeURIComponent(url)}`);
-  return handleResponse(res);
-}
-
 export async function trackClientErrorApi(data) {
   try {
     await fetch(`${API_BASE}/ops?resource=client-errors`, {

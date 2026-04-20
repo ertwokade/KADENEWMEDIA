@@ -70,11 +70,9 @@ export default function Footer() {
     kaynaklar: [
       { name: lang === 'tr' ? 'Neden Biz?' : 'Why Us?', path: '/neden-biz' },
       { name: lang === 'tr' ? 'Müşteri Yorumları' : 'Reviews', path: '/referanslar' },
-      { name: lang === 'tr' ? 'Ödüller & Sertifikalar' : 'Awards', path: '/oduller' },
       { name: lang === 'tr' ? 'Sık Sorulan Sorular' : 'FAQ', path: '/sss' },
       { name: lang === 'tr' ? 'Basın & Medya' : 'Press', path: '/basin' },
       { name: lang === 'tr' ? 'Referans Programı' : 'Referral Program', path: '/referans-programi' },
-      { name: lang === 'tr' ? 'OG Önizleme' : 'OG Preview', path: '/og-onizleme' },
       { name: lang === 'tr' ? 'Podcast & Webinar' : 'Podcast & Webinar', path: '/podcast-webinar' },
       { name: lang === 'tr' ? 'Bülten Arşivi' : 'Newsletter Archive', path: '/bulten-arsivi' },
     ],

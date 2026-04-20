@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import {
   HiOutlineNewspaper,
   HiOutlineDownload,
@@ -7,73 +7,68 @@ import {
 } from 'react-icons/hi'
 import { Link } from 'react-router-dom'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Basin.css'
 
-const haberler = [
-  {
-    id: 1,
-    tarih: 'Mart 2025',
-    kaynak: 'Dijital Pazarlama Dergisi',
-    baslik: 'Türkiye\'nin Yükselen Sosyal Medya Ajansları: Kade Media\'nın Büyüme Hikayesi',
-    ozet: 'Biruni Teknopark merkezli ajans, kuruluşundan bu yana 150+ müşteriye ulaştı. Kurucusuyla yapılan röportaj.',
-    ikon: '📰',
-    renk: '#6C63FF',
-  },
-  {
-    id: 2,
-    tarih: 'Şubat 2025',
-    kaynak: 'StartupIstanbul',
-    baslik: 'Teknopark\'tan Dünyaya: Kade Media\'nın Ajans Modeli',
-    ozet: 'İstanbul\'daki teknoloji ekosisteminde öne çıkan ajans modellerini inceleyen köşe yazısı.',
-    ikon: '🚀',
-    renk: '#eac321',
-  },
-  {
-    id: 3,
-    tarih: 'Ocak 2025',
-    kaynak: 'Reklamcılar Derneği',
-    baslik: '2025 Yılının İzlenecek Sosyal Medya Ajansları',
-    ozet: 'Yıllık raporda Türkiye genelinde öne çıkan 10 dijital ajans arasında yer aldık.',
-    ikon: '🏅',
-    renk: '#2ECC71',
-  },
-  {
-    id: 4,
-    tarih: 'Kasım 2024',
-    kaynak: 'Forbes Türkiye',
-    baslik: 'Küçük İşletmelerin Büyük Ortağı: Sosyal Medya Ajansları Nasıl Seçilir?',
-    ozet: 'Dijital dönüşüm rehberinde ajans seçimi kriterleri için görüşümüz alındı.',
-    ikon: '📊',
-    renk: '#E91E63',
-  },
-]
-
-const logoPaketleri = [
-  { isim: 'Ana Logo (SVG)', format: 'SVG', aciklama: 'Vektörel, her boyuta uyumlu', ikon: '🖼️' },
-  { isim: 'Logo Paketi (PNG)', format: 'PNG', aciklama: 'Beyaz arkaplan üzeri, 300dpi', ikon: '📦' },
-  { isim: 'Koyu Arkaplan Logo', format: 'PNG', aciklama: 'Koyu ve şeffaf arkaplan versiyonları', ikon: '🌙' },
-  { isim: 'Marka Renkleri & Tipografi', format: 'PDF', aciklama: 'Hex kodları, font aileleri, kullanım rehberi', ikon: '🎨' },
-]
-
-const sirketBilgileri = [
-  { etiket: 'Şirket Adı', deger: 'Kade Media Dijital Pazarlama A.Ş.' },
-  { etiket: 'Kuruluş', deger: '2022, İstanbul' },
-  { etiket: 'Merkez', deger: 'Biruni Teknopark, İstanbul' },
-  { etiket: 'Çalışan Sayısı', deger: '10-25 kişi' },
-  { etiket: 'Müşteri Sayısı', deger: '150+' },
-  { etiket: 'Hizmet Verilen Sektör', deger: '15+ sektör' },
-]
+const DEFAULT_CONTENT = {
+  contactEmail: 'basin@kademedia.com',
+  responseTime: '24 saat içinde',
+  ctaTitle: 'Röportaj veya iş birliği mi istiyorsunuz?',
+  ctaSubtitle: 'Sosyal medya, dijital pazarlama ve ajansçılık konularında görüş almak için bize ulaşın.',
+  companyInfo: [
+    { etiket: 'Şirket Adı', deger: 'Kade Media Dijital Pazarlama A.Ş.' },
+    { etiket: 'Kuruluş', deger: '2022, İstanbul' },
+    { etiket: 'Merkez', deger: 'Biruni Teknopark, İstanbul' },
+    { etiket: 'Çalışan Sayısı', deger: '10-25 kişi' },
+    { etiket: 'Müşteri Sayısı', deger: '150+' },
+    { etiket: 'Hizmet Verilen Sektör', deger: '15+ sektör' },
+  ],
+  logoPackages: [
+    { isim: 'Ana Logo (SVG)', format: 'SVG', aciklama: 'Vektörel, her boyuta uyumlu', ikon: '🖼️', url: '' },
+    { isim: 'Logo Paketi (PNG)', format: 'PNG', aciklama: 'Beyaz arkaplan üzeri, 300dpi', ikon: '📦', url: '' },
+    { isim: 'Koyu Arkaplan Logo', format: 'PNG', aciklama: 'Koyu ve şeffaf arkaplan versiyonları', ikon: '🌙', url: '' },
+    { isim: 'Marka Renkleri & Tipografi', format: 'PDF', aciklama: 'Hex kodları, font aileleri, kullanım rehberi', ikon: '🎨', url: '' },
+  ],
+  news: [
+    { tarih: 'Mart 2025', kaynak: 'Dijital Pazarlama Dergisi', baslik: 'Türkiye\'nin Yükselen Sosyal Medya Ajansları: Kade Media\'nın Büyüme Hikayesi', ozet: 'Biruni Teknopark merkezli ajans, kuruluşundan bu yana 150+ müşteriye ulaştı. Kurucusuyla yapılan röportaj.', ikon: '📰', renk: '#6C63FF', link: '' },
+    { tarih: 'Şubat 2025', kaynak: 'StartupIstanbul', baslik: 'Teknopark\'tan Dünyaya: Kade Media\'nın Ajans Modeli', ozet: 'İstanbul\'daki teknoloji ekosisteminde öne çıkan ajans modellerini inceleyen köşe yazısı.', ikon: '🚀', renk: '#eac321', link: '' },
+    { tarih: 'Ocak 2025', kaynak: 'Reklamcılar Derneği', baslik: '2025 Yılının İzlenecek Sosyal Medya Ajansları', ozet: 'Yıllık raporda Türkiye genelinde öne çıkan 10 dijital ajans arasında yer aldık.', ikon: '🏅', renk: '#2ECC71', link: '' },
+    { tarih: 'Kasım 2024', kaynak: 'Forbes Türkiye', baslik: 'Küçük İşletmelerin Büyük Ortağı: Sosyal Medya Ajansları Nasıl Seçilir?', ozet: 'Dijital dönüşüm rehberinde ajans seçimi kriterleri için görüşümüz alındı.', ikon: '📊', renk: '#E91E63', link: '' },
+  ],
+}
 
 export default function Basin() {
+  const [content, setContent] = useState(DEFAULT_CONTENT)
+
   useSEO({
     title: 'Basın & Medya Kiti | Kade Media',
     description: 'Kade Media hakkında medya içerikleri, logo paketi, şirket bilgileri ve basın haberleri. Gazeteci ve içerik üreticilerine özel basın kiti.',
     keywords: 'kade media basın kiti, sosyal medya ajansı medya, kade media logo indirme',
     path: '/basin',
   })
+
+  useEffect(() => {
+    let cancelled = false
+    getContentApi('basin')
+      .then(res => {
+        if (cancelled) return
+        const data = res?.data || res
+        if (data && typeof data === 'object') {
+          setContent(prev => ({
+            ...prev,
+            ...data,
+            companyInfo: Array.isArray(data.companyInfo) && data.companyInfo.length ? data.companyInfo : prev.companyInfo,
+            logoPackages: Array.isArray(data.logoPackages) && data.logoPackages.length ? data.logoPackages : prev.logoPackages,
+            news: Array.isArray(data.news) ? data.news : prev.news,
+          }))
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   return (
     <PageTransition>
@@ -109,8 +104,8 @@ export default function Basin() {
                 <div className="basin-kart glass-card">
                   <h2>Şirket Bilgileri</h2>
                   <div className="basin-bilgiler">
-                    {sirketBilgileri.map(b => (
-                      <div key={b.etiket} className="basin-bilgi-satir">
+                    {content.companyInfo.map((b, i) => (
+                      <div key={`${b.etiket}-${i}`} className="basin-bilgi-satir">
                         <span className="bilgi-etiket">{b.etiket}</span>
                         <span className="bilgi-deger">{b.deger}</span>
                       </div>
@@ -125,12 +120,12 @@ export default function Basin() {
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
                     Medya soruları, röportaj talepleri ve içerik iş birlikleri için:
                   </p>
-                  <a href="mailto:basin@kademedia.com" className="basin-iletisim-btn btn btn-primary">
+                  <a href={`mailto:${content.contactEmail}`} className="basin-iletisim-btn btn btn-primary">
                     <HiOutlineMail size={18} />
-                    basin@kademedia.com
+                    {content.contactEmail}
                   </a>
                   <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', marginTop: '0.8rem' }}>
-                    Yanıt süresi: 24 saat içinde
+                    Yanıt süresi: {content.responseTime}
                   </p>
                 </div>
               </FadeIn>
@@ -144,17 +139,23 @@ export default function Basin() {
                     Kade Media logosunu kullanırken lütfen marka rehberimize uyun. Logo rengi, boyutu veya oranı değiştirilemez.
                   </p>
                   <div className="basin-logo-liste">
-                    {logoPaketleri.map((logo) => (
-                      <div key={logo.isim} className="basin-logo-item">
+                    {content.logoPackages.map((logo, i) => (
+                      <div key={`${logo.isim}-${i}`} className="basin-logo-item">
                         <span className="logo-ikon">{logo.ikon}</span>
                         <div className="logo-bilgi">
                           <span className="logo-isim">{logo.isim}</span>
                           <span className="logo-aciklama">{logo.aciklama}</span>
                         </div>
                         <span className="logo-format">{logo.format}</span>
-                        <button className="btn btn-outline logo-indir-btn" title="İndir">
-                          <HiOutlineDownload size={16} />
-                        </button>
+                        {logo.url ? (
+                          <a href={logo.url} download className="btn btn-outline logo-indir-btn" title="İndir">
+                            <HiOutlineDownload size={16} />
+                          </a>
+                        ) : (
+                          <button className="btn btn-outline logo-indir-btn" title="Yakında" disabled>
+                            <HiOutlineDownload size={16} />
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -165,8 +166,8 @@ export default function Basin() {
                 <div className="basin-kart glass-card">
                   <h2>Hakkımızdaki Haberler</h2>
                   <StaggerContainer>
-                    {haberler.map((h) => (
-                      <StaggerItem key={h.id}>
+                    {content.news.map((h, i) => {
+                      const body = (
                         <div className="basin-haber">
                           <div className="haber-ikon" style={{ background: `${h.renk}15`, color: h.renk }}>
                             {h.ikon}
@@ -180,8 +181,17 @@ export default function Basin() {
                             <p className="haber-ozet">{h.ozet}</p>
                           </div>
                         </div>
-                      </StaggerItem>
-                    ))}
+                      )
+                      return (
+                        <StaggerItem key={`${h.baslik}-${i}`}>
+                          {h.link ? (
+                            <a href={h.link} target="_blank" rel="noreferrer" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+                              {body}
+                            </a>
+                          ) : body}
+                        </StaggerItem>
+                      )
+                    })}
                   </StaggerContainer>
                 </div>
               </FadeIn>
@@ -190,10 +200,10 @@ export default function Basin() {
 
           <FadeIn delay={0.4}>
             <div className="basin-cta glass-card">
-              <h3>Röportaj veya iş birliği mi istiyorsunuz?</h3>
-              <p>Sosyal medya, dijital pazarlama ve ajansçılık konularında görüş almak için bize ulaşın.</p>
+              <h3>{content.ctaTitle}</h3>
+              <p>{content.ctaSubtitle}</p>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <a href="mailto:basin@kademedia.com" className="btn btn-primary">
+                <a href={`mailto:${content.contactEmail}`} className="btn btn-primary">
                   <HiOutlineMail size={16} />
                   E-posta Gönderin
                 </a>

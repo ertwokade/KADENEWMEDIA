@@ -18,6 +18,10 @@ import {
   HiOutlineUserGroup, HiOutlineGlobe, HiOutlineCalculator,
 } from 'react-icons/hi'
 import PageTransition from '../components/PageTransition'
+import BasinEditor from './admin/editors/BasinEditor'
+import NedenBizEditor from './admin/editors/NedenBizEditor'
+import TesekkurEditor from './admin/editors/TesekkurEditor'
+import ReferralEditor from './admin/editors/ReferralEditor'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
 import {
   loginApi, changePasswordApi,
@@ -995,9 +999,14 @@ function ContentSection({ showToast }) {
     { id: 'faq', label: '❓ SSS', desc: 'Sıkça sorulan sorular' },
     { id: 'testimonials', label: '💬 Referanslar', desc: 'Müşteri yorumları' },
     { id: 'packages', label: '💰 Paketler', desc: 'Fiyatlandırma' },
+    { id: 'priceCalculator', label: '🧮 Fiyat Hesaplayıcı', desc: '/fiyat-hesaplama katsayıları' },
     { id: 'about', label: '👥 Hakkımızda', desc: 'Hakkımızda sayfası' },
     { id: 'footer', label: '🦶 Footer', desc: 'Alt bilgi, iletişim ve sosyal medya' },
     { id: 'careers', label: '💼 Kariyer', desc: 'İş ilanları' },
+    { id: 'basin', label: '📰 Basın', desc: '/basin sayfası içeriği' },
+    { id: 'nedenBiz', label: '💡 Neden Biz', desc: '/neden-biz sayfası içeriği' },
+    { id: 'tesekkur', label: '🙏 Teşekkür', desc: '/tesekkur sayfası içeriği' },
+    { id: 'referralProgram', label: '🎁 Referans Programı', desc: '/referans-programi sayfası içeriği' },
   ]
 
   // Memoize data props to prevent child editors from resetting form state on re-render
@@ -1036,6 +1045,20 @@ function ContentSection({ showToast }) {
   const aboutData = useMemo(() => content.about || {}, [content.about])
   const footerData = useMemo(() => content.footer || {}, [content.footer])
   const careersData = useMemo(() => content.careers || { tr: [], en: [] }, [content.careers])
+  const basinData = useMemo(() => content.basin || {}, [content.basin])
+  const nedenBizData = useMemo(() => content.nedenBiz || {}, [content.nedenBiz])
+  const tesekkurData = useMemo(() => content.tesekkur || {}, [content.tesekkur])
+  const referralProgramData = useMemo(() => content.referralProgram || {}, [content.referralProgram])
+  const priceCalculatorData = useMemo(() => content.priceCalculator || {
+    base: 3000,
+    perPlatform: 1800,
+    perPost: 300,
+    perReel: 1500,
+    adsFlat: 4500,
+    reportBiweekly: 1500,
+    reportWeekly: 3000,
+    disclaimer: 'Bu tutar reklam harcamasını içermez. Reklam bütçesi platformlara ayrıca ödenir. Paketlerde aynı hizmetler indirimli sunulur.',
+  }, [content.priceCalculator])
 
   if (loading) return <div className="admin-empty-state"><p>Yükleniyor...</p></div>
 
@@ -1104,6 +1127,13 @@ function ContentSection({ showToast }) {
         />
       )}
 
+      {activeTab === 'priceCalculator' && (
+        <PriceCalculatorEditor
+          data={priceCalculatorData}
+          onSave={(data) => handleSave('priceCalculator', data)}
+        />
+      )}
+
       {activeTab === 'about' && (
         <AboutEditor
           data={aboutData}
@@ -1122,6 +1152,34 @@ function ContentSection({ showToast }) {
         <CareersEditor
           data={careersData}
           onSave={(data) => handleSave('careers', data)}
+        />
+      )}
+
+      {activeTab === 'basin' && (
+        <BasinEditor
+          data={basinData}
+          onSave={(data) => handleSave('basin', data)}
+        />
+      )}
+
+      {activeTab === 'nedenBiz' && (
+        <NedenBizEditor
+          data={nedenBizData}
+          onSave={(data) => handleSave('nedenBiz', data)}
+        />
+      )}
+
+      {activeTab === 'tesekkur' && (
+        <TesekkurEditor
+          data={tesekkurData}
+          onSave={(data) => handleSave('tesekkur', data)}
+        />
+      )}
+
+      {activeTab === 'referralProgram' && (
+        <ReferralEditor
+          data={referralProgramData}
+          onSave={(data) => handleSave('referralProgram', data)}
         />
       )}
       </div>
@@ -1225,6 +1283,93 @@ function StatsEditor({ data, onSave }) {
           <input type="text" value={form.satisfaction || ''} onChange={(e) => setForm({ ...form, satisfaction: e.target.value })} />
         </div>
       </div>
+      <div className="admin-form-actions">
+        <button className="btn btn-primary" onClick={() => onSave(form)}>
+          <HiOutlineSave size={16} /> Kaydet
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function PriceCalculatorEditor({ data, onSave }) {
+  const [form, setForm] = useState(data)
+  useEffect(() => { setForm(data) }, [data])
+
+  const num = (key) => (e) => setForm({ ...form, [key]: Number(e.target.value) })
+  const preview = useMemo(() => {
+    const base = Number(form.base) || 0
+    const perPlatform = Number(form.perPlatform) || 0
+    const perPost = Number(form.perPost) || 0
+    const perReel = Number(form.perReel) || 0
+    const adsFlat = Number(form.adsFlat) || 0
+    const reportBiweekly = Number(form.reportBiweekly) || 0
+    const reportWeekly = Number(form.reportWeekly) || 0
+    return {
+      starter: base + 2 * perPlatform + 16 * perPost, // Başlangıç: 2 platform, 16 post
+      pro: base + 4 * perPlatform + 30 * perPost + 4 * perReel + adsFlat + reportBiweekly,
+      enterprise: base + 6 * perPlatform + 80 * perPost + 12 * perReel + adsFlat + reportWeekly,
+    }
+  }, [form])
+  const fmt = (n) => `₺${n.toLocaleString('tr-TR')}`
+
+  return (
+    <div className="admin-form">
+      <h3>Fiyat Hesaplayıcı Katsayıları</h3>
+      <p style={{ color: 'var(--text-secondary)', marginTop: -8, marginBottom: 16, fontSize: '0.88rem' }}>
+        /fiyat-hesaplama sayfasındaki tahmini bedel hesabı. Paket fiyatlarıyla yaklaşık uyumlu olması için aşağıdaki ön izlemeyi kontrol edin.
+      </p>
+
+      <div className="form-row">
+        <div className="form-group">
+          <label>Temel yönetim ücreti (₺)</label>
+          <input type="number" min="0" value={form.base || 0} onChange={num('base')} />
+        </div>
+        <div className="form-group">
+          <label>Platform başı (₺)</label>
+          <input type="number" min="0" value={form.perPlatform || 0} onChange={num('perPlatform')} />
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label>Post başı (₺)</label>
+          <input type="number" min="0" value={form.perPost || 0} onChange={num('perPost')} />
+        </div>
+        <div className="form-group">
+          <label>Reels/video başı (₺)</label>
+          <input type="number" min="0" value={form.perReel || 0} onChange={num('perReel')} />
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label>Reklam yönetimi (sabit, ₺)</label>
+          <input type="number" min="0" value={form.adsFlat || 0} onChange={num('adsFlat')} />
+        </div>
+        <div className="form-group">
+          <label>2 haftada bir rapor (₺)</label>
+          <input type="number" min="0" value={form.reportBiweekly || 0} onChange={num('reportBiweekly')} />
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label>Haftalık rapor (₺)</label>
+          <input type="number" min="0" value={form.reportWeekly || 0} onChange={num('reportWeekly')} />
+        </div>
+        <div className="form-group">
+          <label>Açıklama (fiyatın altında)</label>
+          <input type="text" value={form.disclaimer || ''} onChange={(e) => setForm({ ...form, disclaimer: e.target.value })} />
+        </div>
+      </div>
+
+      <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', marginTop: 12 }}>
+        <strong style={{ display: 'block', marginBottom: 10 }}>Paket fiyat kıyaslaması (otomatik)</strong>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10, fontSize: '0.88rem' }}>
+          <div>Başlangıç (2 plat, 16 post, aylık rapor): <strong>{fmt(preview.starter)}</strong> <span style={{ color: 'var(--text-tertiary)' }}>(paket: ₺11.900)</span></div>
+          <div>Profesyonel (4 plat, 30 post, 4 reels, ads, 2 haftalık): <strong>{fmt(preview.pro)}</strong> <span style={{ color: 'var(--text-tertiary)' }}>(paket: ₺24.900)</span></div>
+          <div>Kurumsal (6 plat, 80 post, 12 reels, ads, haftalık): <strong>{fmt(preview.enterprise)}</strong> <span style={{ color: 'var(--text-tertiary)' }}>(paket: ₺54.900)</span></div>
+        </div>
+      </div>
+
       <div className="admin-form-actions">
         <button className="btn btn-primary" onClick={() => onSave(form)}>
           <HiOutlineSave size={16} /> Kaydet

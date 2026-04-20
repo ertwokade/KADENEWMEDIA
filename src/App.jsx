@@ -9,8 +9,6 @@ import ScrollToTop from './components/ScrollToTop'
 import WhatsAppButton from './components/WhatsAppButton'
 import CookieBanner from './components/CookieBanner'
 import ErrorTracker from './components/ErrorTracker'
-import NotificationPrompt from './components/NotificationPrompt'
-import PersonalizedCTA from './components/PersonalizedCTA'
 
 // Core pages — direct import for instant first render
 import Home from './pages/Home'
@@ -40,14 +38,12 @@ const SSS = lazy(() => import('./pages/SSS'))
 const Referanslar = lazy(() => import('./pages/Referanslar'))
 const Tesekkur = lazy(() => import('./pages/Tesekkur'))
 const Basin = lazy(() => import('./pages/Basin'))
-const Oduller = lazy(() => import('./pages/Oduller'))
 const NedenBiz = lazy(() => import('./pages/NedenBiz'))
 const ReferralProgram = lazy(() => import('./pages/ReferralProgram'))
 const QuoteRequest = lazy(() => import('./pages/QuoteRequest'))
 const PriceCalculator = lazy(() => import('./pages/PriceCalculator'))
 const CustomerPortal = lazy(() => import('./pages/CustomerPortal'))
 const ProjectTracking = lazy(() => import('./pages/ProjectTracking'))
-const OGPreview = lazy(() => import('./pages/OGPreview'))
 const PodcastWebinar = lazy(() => import('./pages/PodcastWebinar'))
 const NewsletterArchive = lazy(() => import('./pages/NewsletterArchive'))
 
@@ -69,7 +65,6 @@ const ROUTE_THEMES = {
   '/sss': 'contact',
   '/referanslar': 'about',
   '/basin': 'blog',
-  '/oduller': 'services',
   '/neden-biz': 'services',
   '/tesekkur': 'contact',
   '/referans-programi': 'partners',
@@ -77,7 +72,6 @@ const ROUTE_THEMES = {
   '/fiyat-hesaplama': 'packages',
   '/musteri-panel': 'about',
   '/proje-takip': 'services',
-  '/og-onizleme': 'blog',
   '/podcast-webinar': 'blog',
   '/bulten-arsivi': 'blog',
 }
@@ -145,14 +139,12 @@ function App() {
         <Route path="/referanslar" element={<Suspense fallback={<PageLoader />}><Referanslar /></Suspense>} />
         <Route path="/tesekkur" element={<Suspense fallback={<PageLoader />}><Tesekkur /></Suspense>} />
         <Route path="/basin" element={<Suspense fallback={<PageLoader />}><Basin /></Suspense>} />
-        <Route path="/oduller" element={<Suspense fallback={<PageLoader />}><Oduller /></Suspense>} />
         <Route path="/neden-biz" element={<Suspense fallback={<PageLoader />}><NedenBiz /></Suspense>} />
         <Route path="/referans-programi" element={<Suspense fallback={<PageLoader />}><ReferralProgram /></Suspense>} />
         <Route path="/teklif-al" element={<Suspense fallback={<PageLoader />}><QuoteRequest /></Suspense>} />
         <Route path="/fiyat-hesaplama" element={<Suspense fallback={<PageLoader />}><PriceCalculator /></Suspense>} />
         <Route path="/musteri-panel" element={<Suspense fallback={<PageLoader />}><CustomerPortal /></Suspense>} />
         <Route path="/proje-takip" element={<Suspense fallback={<PageLoader />}><ProjectTracking /></Suspense>} />
-        <Route path="/og-onizleme" element={<Suspense fallback={<PageLoader />}><OGPreview /></Suspense>} />
         <Route path="/podcast-webinar" element={<Suspense fallback={<PageLoader />}><PodcastWebinar /></Suspense>} />
         <Route path="/bulten-arsivi" element={<Suspense fallback={<PageLoader />}><NewsletterArchive /></Suspense>} />
         <Route path="*" element={<NotFound />} />
@@ -160,8 +152,6 @@ function App() {
       </main>
       {!isAdmin && <Footer />}
       {!isAdmin && <WhatsAppButton />}
-      {!isAdmin && <PersonalizedCTA />}
-      {!isAdmin && <NotificationPrompt />}
       {!isAdmin && <CookieBanner />}
     </>
   )

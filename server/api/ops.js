@@ -277,29 +277,6 @@ async function handleClientErrors(req, res, db) {
   return res.status(200).json(errors)
 }
 
-async function handleOgPreview(req, res) {
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
-  const url = clean(req.query?.url, 500)
-  if (!/^https?:\/\//i.test(url)) return res.status(400).json({ error: 'Geçerli bir URL giriniz.' })
-
-  const response = await fetch(url, {
-    headers: { 'User-Agent': 'KadeMediaPreviewBot/1.0' },
-    signal: AbortSignal.timeout(8000),
-  })
-  const html = await response.text()
-  const pick = (pattern) => html.match(pattern)?.[1]?.trim() || ''
-  const preview = {
-    url,
-    status: response.status,
-    title: pick(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i) || pick(/<title[^>]*>([^<]+)<\/title>/i),
-    description: pick(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i) || pick(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i),
-    image: pick(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i),
-    siteName: pick(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i),
-    hasTwitterCard: /name=["']twitter:card["']/i.test(html),
-  }
-  return res.status(200).json(preview)
-}
-
 async function handlePush(req, res, db) {
   if (req.method !== 'POST') {
     const user = requireAdmin(req, res)
@@ -337,7 +314,6 @@ export default async function handler(req, res) {
     if (resource === 'customer-profiles') return handleCustomerProfiles(req, res, db)
     if (resource === 'backup') return handleBackup(req, res, db)
     if (resource === 'client-errors') return handleClientErrors(req, res, db)
-    if (resource === 'og-preview') return handleOgPreview(req, res)
     if (resource === 'push') return handlePush(req, res, db)
 
     return res.status(400).json({ error: 'resource parametresi gerekli' })

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -8,34 +8,40 @@ import {
   HiOutlineArrowRight,
 } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Tesekkur.css'
 
-const sonrakiAdimlar = [
-  {
-    ikon: '📬',
-    baslik: 'Onay E-postası',
-    aciklama: 'Formunuz alındı. Birkaç dakika içinde otomatik bir onay e-postası alacaksınız.',
-  },
-  {
-    ikon: '👤',
-    baslik: 'Uzman Eşleştirme',
-    aciklama: '1 iş günü içinde sektörünüze uygun bir uzmanımız sizinle iletişime geçecek.',
-  },
-  {
-    ikon: '📋',
-    baslik: 'Strateji Görüşmesi',
-    aciklama: '30 dakikalık ücretsiz keşif görüşmesinde ihtiyaçlarınızı birlikte değerlendireceğiz.',
-  },
-  {
-    ikon: '🚀',
-    baslik: 'Özel Teklif',
-    aciklama: 'Görüşmenin ardından size özel bir paket ve fiyat teklifi sunulacak.',
-  },
-]
+const DEFAULT_CONTENT = {
+  baslik: 'Mesajınız iletildi!',
+  altMetin: 'İletişim formunuzu aldık. Ekibimiz en kısa sürede sizinle iletişime geçecek.',
+  yanitSuresi: '2-4 saat',
+  yanitSuresiNot: 'Hafta içi 09:00–18:00',
+  adimlarBaslik: 'Bundan sonra ne olacak?',
+  acilBaslik: 'Acil görüşme mi istiyorsunuz?',
+  acilTelefon: '0506 729 34 23',
+  acilTelefonTel: '+905067293423',
+  adimlar: [
+    { ikon: '📬', baslik: 'Onay E-postası', aciklama: 'Formunuz alındı. Birkaç dakika içinde otomatik bir onay e-postası alacaksınız.' },
+    { ikon: '👤', baslik: 'Uzman Eşleştirme', aciklama: '1 iş günü içinde sektörünüze uygun bir uzmanımız sizinle iletişime geçecek.' },
+    { ikon: '📋', baslik: 'Strateji Görüşmesi', aciklama: '30 dakikalık ücretsiz keşif görüşmesinde ihtiyaçlarınızı birlikte değerlendireceğiz.' },
+    { ikon: '🚀', baslik: 'Özel Teklif', aciklama: 'Görüşmenin ardından size özel bir paket ve fiyat teklifi sunulacak.' },
+  ],
+}
+
+// Split title at the last word to wrap it in the highlight <span>
+function splitTitle(baslik) {
+  const parts = (baslik || '').trim().split(/\s+/)
+  if (parts.length < 2) return { before: '', highlight: baslik || '' }
+  const highlight = parts[parts.length - 1]
+  const before = parts.slice(0, -1).join(' ')
+  return { before, highlight }
+}
 
 export default function Tesekkur() {
+  const [content, setContent] = useState(DEFAULT_CONTENT)
+
   useSEO({
     title: 'Teşekkürler | Kade Media',
     description: 'Formunuz alındı. En kısa sürede size dönüş yapacağız.',
@@ -44,13 +50,32 @@ export default function Tesekkur() {
   })
 
   useEffect(() => {
-    // Google Ads conversion tracking
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'conversion', {
         send_to: 'AW-CONVERSION_ID/CONVERSION_LABEL',
       })
     }
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    getContentApi('tesekkur')
+      .then(res => {
+        if (cancelled) return
+        const data = res?.data || res
+        if (data && typeof data === 'object') {
+          setContent(prev => ({
+            ...prev,
+            ...data,
+            adimlar: Array.isArray(data.adimlar) && data.adimlar.length ? data.adimlar : prev.adimlar,
+          }))
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
+
+  const { before, highlight } = splitTitle(content.baslik)
 
   return (
     <PageTransition>
@@ -69,29 +94,29 @@ export default function Tesekkur() {
 
           <FadeIn delay={0.2}>
             <h1 className="tesekkur-baslik">
-              Mesajınız <span>iletildi!</span>
+              {before ? <>{before} <span>{highlight}</span></> : <span>{highlight}</span>}
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.3}>
             <p className="tesekkur-alt">
-              İletişim formunuzu aldık. Ekibimiz en kısa sürede sizinle iletişime geçecek.
+              {content.altMetin}
             </p>
           </FadeIn>
 
           <FadeIn delay={0.35}>
             <div className="tesekkur-bekleme glass-card">
               <HiOutlineClock size={18} />
-              <span>Ortalama yanıt süresi: <strong>2-4 saat</strong> (Hafta içi 09:00–18:00)</span>
+              <span>Ortalama yanıt süresi: <strong>{content.yanitSuresi}</strong> ({content.yanitSuresiNot})</span>
             </div>
           </FadeIn>
 
           <FadeIn delay={0.4}>
-            <h2 className="tesekkur-adimlar-baslik">Bundan sonra ne olacak?</h2>
+            <h2 className="tesekkur-adimlar-baslik">{content.adimlarBaslik}</h2>
           </FadeIn>
 
           <StaggerContainer className="tesekkur-adimlar">
-            {sonrakiAdimlar.map((adim, i) => (
+            {content.adimlar.map((adim, i) => (
               <StaggerItem key={i}>
                 <div className="tesekkur-adim glass-card">
                   <div className="adim-numara">{i + 1}</div>
@@ -107,8 +132,8 @@ export default function Tesekkur() {
             <div className="tesekkur-acil glass-card">
               <HiOutlinePhone size={20} />
               <div>
-                <strong>Acil görüşme mi istiyorsunuz?</strong>
-                <p>Bizi hemen arayın: <a href="tel:+905067293423">0506 729 34 23</a></p>
+                <strong>{content.acilBaslik}</strong>
+                <p>Bizi hemen arayın: <a href={`tel:${content.acilTelefonTel}`}>{content.acilTelefon}</a></p>
               </div>
             </div>
           </FadeIn>

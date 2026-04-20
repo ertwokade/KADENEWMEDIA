@@ -30,11 +30,9 @@ export default function Navbar() {
   const resourceLinks = [
     { name: lang === 'tr' ? 'Neden Biz?' : 'Why Us?', path: '/neden-biz' },
     { name: lang === 'tr' ? 'Referanslar' : 'References', path: '/referanslar' },
-    { name: lang === 'tr' ? 'Ödüller' : 'Awards', path: '/oduller' },
     { name: lang === 'tr' ? 'Basın' : 'Press', path: '/basin' },
     { name: lang === 'tr' ? 'SSS' : 'FAQ', path: '/sss' },
     { name: lang === 'tr' ? 'Fiyat Hesaplama' : 'Price Calculator', path: '/fiyat-hesaplama' },
-    { name: lang === 'tr' ? 'OG Önizleme' : 'OG Preview', path: '/og-onizleme' },
     { name: lang === 'tr' ? 'Podcast & Webinar' : 'Podcast & Webinar', path: '/podcast-webinar' },
     { name: lang === 'tr' ? 'Referans Programı' : 'Referral Program', path: '/referans-programi' },
   ]

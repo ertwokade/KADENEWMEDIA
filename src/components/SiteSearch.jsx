@@ -16,7 +16,6 @@ const basePages = [
   { titleTr: 'Fiyat Hesaplama', titleEn: 'Price Calculator', type: 'Araç', path: '/fiyat-hesaplama', terms: 'fiyat hesaplama maliyet butce' },
   { titleTr: 'Müşteri Paneli', titleEn: 'Client Portal', type: 'Sayfa', path: '/musteri-panel', terms: 'musteri portal rapor fatura proje' },
   { titleTr: 'Proje Takip', titleEn: 'Project Tracking', type: 'Araç', path: '/proje-takip', terms: 'proje takip asama durum timeline' },
-  { titleTr: 'Open Graph Önizleme', titleEn: 'Open Graph Preview', type: 'Araç', path: '/og-onizleme', terms: 'og preview sosyal medya onizleme link' },
   { titleTr: 'Podcast & Webinar', titleEn: 'Podcast & Webinar', type: 'Sayfa', path: '/podcast-webinar', terms: 'podcast webinar egitim etkinlik' },
   { titleTr: 'Bülten Arşivi', titleEn: 'Newsletter Archive', type: 'Sayfa', path: '/bulten-arsivi', terms: 'newsletter bulten arsiv eposta' },
   { titleTr: 'Neden Biz?', titleEn: 'Why Us?', type: 'Sayfa', path: '/neden-biz', terms: 'karsilastirma ajans fark avantaj' },
@@ -26,7 +25,6 @@ const basePages = [
   { titleTr: 'Blog', titleEn: 'Blog', type: 'Sayfa', path: '/blog', terms: 'rehber yazilar trend ipucu' },
   { titleTr: 'SSS', titleEn: 'FAQ', type: 'Sayfa', path: '/sss', terms: 'soru cevap fiyat surec sozlesme' },
   { titleTr: 'Basın & Medya', titleEn: 'Press', type: 'Sayfa', path: '/basin', terms: 'logo medya kiti basin press' },
-  { titleTr: 'Ödüller & Sertifikalar', titleEn: 'Awards', type: 'Sayfa', path: '/oduller', terms: 'sertifika odul google meta' },
   { titleTr: 'Referans Programı', titleEn: 'Referral Program', type: 'Sayfa', path: '/referans-programi', terms: 'referral oner odul tavsiye' },
   { titleTr: 'İletişim', titleEn: 'Contact', type: 'Sayfa', path: '/iletisim', terms: 'telefon email adres teklif whatsapp' },
 ]
