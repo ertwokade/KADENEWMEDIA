@@ -120,7 +120,7 @@ function App() {
 
     const ping = () => { if (document.visibilityState !== 'hidden') heartbeatApi(sid, location.pathname) }
     ping()
-    const interval = setInterval(ping, 30000)
+    const interval = setInterval(ping, 15000)
     const onVisible = () => { if (document.visibilityState === 'visible') ping() }
     document.addEventListener('visibilitychange', onVisible)
     return () => { clearInterval(interval); document.removeEventListener('visibilitychange', onVisible) }

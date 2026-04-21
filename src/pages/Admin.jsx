@@ -187,7 +187,7 @@ function DashboardSection({ stats, onNavigate }) {
       }
     }
     fetchVisitors()
-    const interval = setInterval(fetchVisitors, 30000)
+    const interval = setInterval(fetchVisitors, 10000)
     return () => clearInterval(interval)
   }, [])
 

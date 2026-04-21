@@ -70,7 +70,7 @@ export default async function handler(req, res) {
   if (action === 'active-visitors' && req.method === 'GET') {
     try {
       const db = await getDb();
-      const cutoff = new Date(Date.now() - 2 * 60 * 1000);
+      const cutoff = new Date(Date.now() - 45 * 1000);
       const count = await db.collection('visitor_sessions').countDocuments({ lastSeen: { $gte: cutoff } });
       // Opportunistic cleanup: remove sessions older than 1 hour
       const purge = new Date(Date.now() - 60 * 60 * 1000);
