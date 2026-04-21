@@ -82,6 +82,41 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── AI usage stats (GET /api/content?action=ai-usage) — auth required ──
+  if (action === 'ai-usage' && req.method === 'GET') {
+    const user = requireAuth(req);
+    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    try {
+      const db = await getDb();
+      const col = db.collection('ai_usage');
+      const now = Date.now();
+      const startOfDay = new Date(new Date().setHours(0, 0, 0, 0));
+      const startOfMinute = new Date(now - 60 * 1000);
+      const startOf30d = new Date(now - 30 * 24 * 60 * 60 * 1000);
+
+      const [todayCount, lastMinute, total30d, tokenAgg] = await Promise.all([
+        col.countDocuments({ createdAt: { $gte: startOfDay } }),
+        col.countDocuments({ createdAt: { $gte: startOfMinute } }),
+        col.countDocuments({ createdAt: { $gte: startOf30d } }),
+        col.aggregate([
+          { $match: { createdAt: { $gte: startOfDay } } },
+          { $group: { _id: null, totalTokens: { $sum: '$totalTokens' } } },
+        ]).toArray(),
+      ]);
+
+      return res.status(200).json({
+        today: todayCount,
+        lastMinute,
+        last30Days: total30d,
+        tokensToday: tokenAgg?.[0]?.totalTokens || 0,
+        limits: { rpm: 10, rpd: 250, tier: 'free' },
+      });
+    } catch (err) {
+      console.error('AI usage error:', err);
+      return res.status(500).json({ error: 'Sunucu hatası' });
+    }
+  }
+
   // ── Pageview tracking (POST /api/content?action=pageview) — no auth ──
   if (action === 'pageview' && req.method === 'POST') {
     try {

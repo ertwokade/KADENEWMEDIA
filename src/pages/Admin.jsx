@@ -37,7 +37,7 @@ import {
   updateMessageStatusApi,
   getNotesApi, createNoteApi, deleteNoteApi,
   getNotificationsApi, markAllNotificationsReadApi,
-  getAnalyticsApi, getGA4AnalyticsApi, getActiveVisitorsApi, getActivityLogApi,
+  getAnalyticsApi, getGA4AnalyticsApi, getActiveVisitorsApi, getActivityLogApi, getAiUsageApi,
   getNewsletterSubscribersApi, deleteNewsletterSubscriberApi, sendNewsletterApi,
   testSmtpApi, replyToMessageApi,
   getSiteSettingsApi, updateSiteSettingsApi,
@@ -152,6 +152,7 @@ function DashboardSection({ stats, onNavigate }) {
   const [recentPartners, setRecentPartners] = useState([])
   const [liveVisitors, setLiveVisitors] = useState(null)
   const [visitorPulse, setVisitorPulse] = useState(false)
+  const [aiUsage, setAiUsage] = useState(null)
 
   useEffect(() => {
     getMessagesApi().then(data => {
@@ -189,6 +190,13 @@ function DashboardSection({ stats, onNavigate }) {
     fetchVisitors()
     const interval = setInterval(fetchVisitors, 10000)
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const fetchAi = () => { getAiUsageApi().then(d => d && setAiUsage(d)).catch(() => {}) }
+    fetchAi()
+    const i = setInterval(fetchAi, 60000)
+    return () => clearInterval(i)
   }, [])
 
   const quickActions = [
@@ -274,8 +282,42 @@ function DashboardSection({ stats, onNavigate }) {
           {' '}
           <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>aktif ziyaretçi</span>
         </div>
-        <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>30s'de bir güncellenir</span>
+        <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>10s'de bir güncellenir</span>
       </div>
+
+      {aiUsage && (() => {
+        const today = aiUsage.today || 0
+        const rpd = aiUsage.limits?.rpd || 250
+        const pct = Math.min(100, Math.round((today / rpd) * 100))
+        const remaining = Math.max(0, rpd - today)
+        const color = pct >= 90 ? '#E91E63' : pct >= 70 ? '#eac321' : '#6C63FF'
+        return (
+          <div style={{
+            padding: '14px 20px', borderRadius: 12, marginBottom: 16,
+            background: 'rgba(108,99,255,0.06)', border: '1px solid rgba(108,99,255,0.2)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexWrap: 'wrap', gap: 8 }}>
+              <div>
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 500 }}>AI Kullanımı (bugün)</span>
+                {' '}
+                <span style={{ fontSize: '1rem', fontWeight: 700, color }}>{today}</span>
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}> / {rpd} istek</span>
+                {aiUsage.tokensToday > 0 && (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginLeft: 8 }}>
+                    • {aiUsage.tokensToday.toLocaleString('tr-TR')} token
+                  </span>
+                )}
+              </div>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
+                {remaining} kaldı • son dakika: {aiUsage.lastMinute || 0}/{aiUsage.limits?.rpm || 10}
+              </span>
+            </div>
+            <div style={{ height: 6, borderRadius: 3, background: 'rgba(108,99,255,0.15)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${pct}%`, background: color, transition: 'width 0.4s ease' }} />
+            </div>
+          </div>
+        )
+      })()}
 
       <div className="dashboard-quick-actions">
         {quickActions.map((a) => (

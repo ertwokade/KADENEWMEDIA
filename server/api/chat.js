@@ -1,6 +1,21 @@
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import { requireAuth } from './_lib/auth.js';
+import { getDb } from './_lib/mongodb.js';
+
+async function logAiUsage(scope, model, usageMeta) {
+  try {
+    const db = await getDb();
+    await db.collection('ai_usage').insertOne({
+      scope,
+      model,
+      promptTokens: usageMeta?.promptTokenCount || 0,
+      outputTokens: usageMeta?.candidatesTokenCount || 0,
+      totalTokens: usageMeta?.totalTokenCount || 0,
+      createdAt: new Date(),
+    });
+  } catch (e) { /* non-fatal */ }
+}
 
 const KADE_CONTEXT_TR = `Sen Kade Media'nın AI asistanısın. Kade Media İstanbul Biruni Teknopark'ta bulunan bir dijital pazarlama ajansıdır.
 Kurucu: Kadir Demir. Şirket 8+ yıllık deneyime sahip, 5 kişilik uzman ekip, 100+ mutlu müşteri.
@@ -93,6 +108,7 @@ export default async function handler(req, res) {
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (text) {
+      logAiUsage(isAdmin ? 'admin' : 'public', 'gemini-2.5-flash', data?.usageMetadata);
       return res.status(200).json({ reply: text.trim() });
     }
     if (isAdmin) {

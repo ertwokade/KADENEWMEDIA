@@ -340,6 +340,16 @@ export async function getActiveVisitorsApi() {
   } catch { return null; }
 }
 
+export async function getAiUsageApi() {
+  try {
+    const res = await fetch(`${API_BASE}/content?action=ai-usage`, {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}
+
 export async function getAnalyticsApi(period = 'week') {
   const res = await fetch(`${API_BASE}/content?action=analytics&period=${period}`, {
     headers: getAuthHeaders(),
