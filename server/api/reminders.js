@@ -95,7 +95,7 @@ export default async function handler(req, res) {
                     ${reminder.description ? `<p style="color:#ccc;line-height:1.8;margin:0 0 16px;padding:14px;background:#1a1a1a;border-radius:8px;border-left:3px solid ${color};">${escapeHtml(reminder.description)}</p>` : ''}
                     <table style="width:100%;border-collapse:collapse;">
                       <tr><td style="padding:8px 0;color:#888;width:120px;">Öncelik</td><td style="padding:8px 0;color:${color};font-weight:600;">${label}</td></tr>
-                      <tr><td style="padding:8px 0;color:#888;">Tarih</td><td style="padding:8px 0;color:#fff;">${new Date(reminder.remindAt).toLocaleString('tr-TR')}</td></tr>
+                      <tr><td style="padding:8px 0;color:#888;">Tarih</td><td style="padding:8px 0;color:#fff;">${new Date(reminder.remindAt).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })}</td></tr>
                       ${reminder.category ? `<tr><td style="padding:8px 0;color:#888;">Kategori</td><td style="padding:8px 0;color:#fff;">${escapeHtml(reminder.category)}</td></tr>` : ''}
                     </table>
                     <div style="text-align:center;margin:24px 0;">

@@ -4850,11 +4850,14 @@ function RemindersSection({ showToast }) {
       return
     }
     try {
+      // datetime-local value is local time without TZ; convert to absolute ISO
+      // so the server doesn't reinterpret it as UTC on Vercel.
+      const payload = { ...form, remindAt: new Date(form.remindAt).toISOString() }
       if (editingId) {
-        await updateReminderApi({ id: editingId, ...form })
+        await updateReminderApi({ id: editingId, ...payload })
         showToast('Hatirlatici guncellendi', 'success')
       } else {
-        await createReminderApi(form)
+        await createReminderApi(payload)
         showToast('Hatirlatici olusturuldu', 'success')
       }
       resetForm()
@@ -4868,10 +4871,19 @@ function RemindersSection({ showToast }) {
     const existingEmails = r.emails && Array.isArray(r.emails) && r.emails.length > 0
       ? r.emails
       : r.email ? [r.email] : []
+    // Convert absolute UTC back to local "YYYY-MM-DDTHH:mm" for datetime-local input.
+    let remindAtLocal = ''
+    if (r.remindAt) {
+      const d = new Date(r.remindAt)
+      if (!isNaN(d.getTime())) {
+        const pad = (n) => String(n).padStart(2, '0')
+        remindAtLocal = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+      }
+    }
     setForm({
       title: r.title || '',
       description: r.description || '',
-      remindAt: r.remindAt ? new Date(r.remindAt).toISOString().slice(0, 16) : '',
+      remindAt: remindAtLocal,
       emails: existingEmails,
       assignedUsers: Array.isArray(r.assignedUsers) ? r.assignedUsers : [],
       priority: r.priority || 'medium',
@@ -7124,6 +7136,24 @@ export default function Admin() {
       } catch { /* ignore */ }
     }
   }, [])
+
+  // Vercel Hobby cron only fires once per day, so poll the reminder check
+  // endpoint while admin is open to trigger due reminders within ~1 minute.
+  useEffect(() => {
+    if (!isAuth) return
+    let cancelled = false
+    const runCheck = async () => {
+      try {
+        const result = await checkRemindersApi()
+        if (!cancelled && result && (result.sent > 0 || result.notifications > 0)) {
+          loadNotifCount()
+        }
+      } catch { /* ignore */ }
+    }
+    runCheck()
+    const interval = setInterval(runCheck, 60000)
+    return () => { cancelled = true; clearInterval(interval) }
+  }, [isAuth])
 
   const handleLogin = (data) => {
     setIsAuth(true)
