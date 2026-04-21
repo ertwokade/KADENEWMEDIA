@@ -14,11 +14,16 @@ export default async function handler(req, res) {
   const db = await getDb();
   const col = db.collection('media');
 
-  // GET — list media or single item
+  // GET — list media or single item (include file payload when action=file)
   if (req.method === 'GET') {
-    const { id, type, search } = req.query;
+    const { id, type, search, action } = req.query;
     if (id) {
       if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (action === 'file') {
+        const item = await col.findOne({ _id: new ObjectId(id) });
+        if (!item) return res.status(404).json({ error: 'Medya bulunamadı' });
+        return res.json({ data: item.data, mimeType: item.mimeType, name: item.name });
+      }
       const item = await col.findOne({ _id: new ObjectId(id) }, { projection: { data: 0 } });
       if (!item) return res.status(404).json({ error: 'Medya bulunamadı' });
       return res.json(item);

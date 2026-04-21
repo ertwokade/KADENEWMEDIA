@@ -320,6 +320,26 @@ export async function trackPageviewApi(path, referrer) {
   } catch { /* non-critical */ }
 }
 
+export async function heartbeatApi(sessionId, path) {
+  try {
+    await fetch(`${API_BASE}/content?action=heartbeat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, path }),
+      keepalive: true,
+    });
+  } catch { /* non-critical */ }
+}
+
+export async function getActiveVisitorsApi() {
+  try {
+    const res = await fetch(`${API_BASE}/content?action=active-visitors`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data?.activeUsers === 'number' ? data.activeUsers : null;
+  } catch { return null; }
+}
+
 export async function getAnalyticsApi(period = 'week') {
   const res = await fetch(`${API_BASE}/content?action=analytics&period=${period}`, {
     headers: getAuthHeaders(),
@@ -803,5 +823,61 @@ export async function createBackupApi() {
     method: 'POST',
     headers: getAuthHeaders(),
   });
+  return handleResponse(res);
+}
+
+// Email Templates
+export async function getEmailTemplatesApi() {
+  const res = await fetch(`${API_BASE}/ops?resource=email-templates`, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+export async function createEmailTemplateApi(data) {
+  const res = await fetch(`${API_BASE}/ops?resource=email-templates`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+export async function updateEmailTemplateApi(data) {
+  const res = await fetch(`${API_BASE}/ops?resource=email-templates`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+export async function deleteEmailTemplateApi(id) {
+  const res = await fetch(`${API_BASE}/ops?resource=email-templates&id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// Onboarding Forms
+export async function getOnboardingFormsApi() {
+  const res = await fetch(`${API_BASE}/ops?resource=onboarding`, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+export async function createOnboardingFormApi(data) {
+  const res = await fetch(`${API_BASE}/ops?resource=onboarding`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+export async function deleteOnboardingFormApi(id) {
+  const res = await fetch(`${API_BASE}/ops?resource=onboarding&id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// Media file (returns { data, mimeType } for preview)
+export async function getMediaFileApi(id) {
+  const res = await fetch(`${API_BASE}/media?id=${id}&action=file`, { headers: getAuthHeaders() });
   return handleResponse(res);
 }

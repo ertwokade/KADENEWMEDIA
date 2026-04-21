@@ -42,6 +42,46 @@ export default async function handler(req, res) {
 
   const action = req.query?.action;
 
+  // ── Heartbeat (POST /api/content?action=heartbeat) — no auth ──
+  // Tracks active visitor sessions. Frontend sends every ~30s while tab is visible.
+  if (action === 'heartbeat' && req.method === 'POST') {
+    try {
+      const db = await getDb();
+      let body = req.body;
+      if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+      const { sessionId: rawSid, path: rawPath } = body || {};
+      const sessionId = typeof rawSid === 'string' ? rawSid.slice(0, 64) : null;
+      if (!sessionId) return res.status(400).json({ error: 'sessionId required' });
+      const path = typeof rawPath === 'string' ? rawPath.slice(0, 200) : '/';
+      await db.collection('visitor_sessions').updateOne(
+        { sessionId },
+        { $set: { sessionId, lastSeen: new Date(), path } },
+        { upsert: true }
+      );
+      return res.status(200).json({ ok: true });
+    } catch (err) {
+      console.error('Heartbeat error:', err);
+      return res.status(500).json({ error: 'Sunucu hatası' });
+    }
+  }
+
+  // ── Active visitors count (GET /api/content?action=active-visitors) — public ──
+  // Counts sessions seen in the last 2 minutes. No auth: safe public metric.
+  if (action === 'active-visitors' && req.method === 'GET') {
+    try {
+      const db = await getDb();
+      const cutoff = new Date(Date.now() - 2 * 60 * 1000);
+      const count = await db.collection('visitor_sessions').countDocuments({ lastSeen: { $gte: cutoff } });
+      // Opportunistic cleanup: remove sessions older than 1 hour
+      const purge = new Date(Date.now() - 60 * 60 * 1000);
+      db.collection('visitor_sessions').deleteMany({ lastSeen: { $lt: purge } }).catch(() => {});
+      return res.status(200).json({ activeUsers: count });
+    } catch (err) {
+      console.error('Active visitors error:', err);
+      return res.status(500).json({ error: 'Sunucu hatası' });
+    }
+  }
+
   // ── Pageview tracking (POST /api/content?action=pageview) — no auth ──
   if (action === 'pageview' && req.method === 'POST') {
     try {

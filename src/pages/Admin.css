@@ -975,13 +975,13 @@
 /* ===== TABS ===== */
 .admin-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 3px;
   margin-bottom: 20px;
   background: var(--bg-secondary);
   border-radius: var(--radius-md);
   padding: 3px;
   border: 1px solid var(--border);
-  overflow-x: auto;
 }
 
 .admin-tab {

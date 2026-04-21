@@ -277,6 +277,88 @@ async function handleClientErrors(req, res, db) {
   return res.status(200).json(errors)
 }
 
+async function handleEmailTemplates(req, res, db) {
+  const user = requireAdmin(req, res)
+  if (!user) return
+  const col = db.collection('email_templates')
+
+  if (req.method === 'GET') {
+    const items = await col.find({}).sort({ createdAt: 1 }).toArray()
+    return res.status(200).json(items)
+  }
+
+  if (req.method === 'POST') {
+    const { isim, konu, metin } = req.body || {}
+    if (!clean(isim, 200) || !clean(metin, 8000)) return res.status(400).json({ error: 'isim ve metin zorunludur' })
+    const doc = {
+      isim: clean(isim, 200),
+      konu: clean(konu, 300),
+      metin: clean(metin, 8000),
+      createdBy: user.username,
+      createdAt: new Date(),
+    }
+    const result = await col.insertOne(doc)
+    return res.status(201).json({ ...doc, _id: result.insertedId })
+  }
+
+  if (req.method === 'PUT') {
+    const { id, isim, konu, metin } = req.body || {}
+    if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' })
+    const updates = { updatedAt: new Date() }
+    if (isim !== undefined) updates.isim = clean(isim, 200)
+    if (konu !== undefined) updates.konu = clean(konu, 300)
+    if (metin !== undefined) updates.metin = clean(metin, 8000)
+    await col.updateOne({ _id: new ObjectId(id) }, { $set: updates })
+    return res.status(200).json({ success: true })
+  }
+
+  if (req.method === 'DELETE') {
+    const { id } = req.query || {}
+    if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' })
+    await col.deleteOne({ _id: new ObjectId(id) })
+    return res.status(200).json({ success: true })
+  }
+
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
+async function handleOnboarding(req, res, db) {
+  const user = requireAdmin(req, res)
+  if (!user) return
+  const col = db.collection('onboarding_forms')
+
+  if (req.method === 'GET') {
+    const items = await col.find({}).sort({ createdAt: -1 }).limit(300).toArray()
+    return res.status(200).json(items)
+  }
+
+  if (req.method === 'POST') {
+    const body = req.body || {}
+    const allowed = [
+      'clientName', 'clientEmail', 'clientCompany', 'socialAccounts',
+      'targetAudience', 'competitors', 'brandVoice', 'monthlyBudget',
+      'goals', 'existingContent', 'designPreferences', 'notes',
+    ]
+    if (!clean(body.clientName, 200) || !clean(body.clientEmail, 254)) {
+      return res.status(400).json({ error: 'Müşteri adı ve e-posta zorunludur' })
+    }
+    if (!EMAIL_RE.test(body.clientEmail)) return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' })
+    const doc = { createdBy: user.username, createdAt: new Date() }
+    for (const k of allowed) doc[k] = clean(body[k], 2000)
+    const result = await col.insertOne(doc)
+    return res.status(201).json({ ...doc, _id: result.insertedId })
+  }
+
+  if (req.method === 'DELETE') {
+    const { id } = req.query || {}
+    if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' })
+    await col.deleteOne({ _id: new ObjectId(id) })
+    return res.status(200).json({ success: true })
+  }
+
+  return res.status(405).json({ error: 'Method not allowed' })
+}
+
 async function handlePush(req, res, db) {
   if (req.method !== 'POST') {
     const user = requireAdmin(req, res)
@@ -315,6 +397,8 @@ export default async function handler(req, res) {
     if (resource === 'backup') return handleBackup(req, res, db)
     if (resource === 'client-errors') return handleClientErrors(req, res, db)
     if (resource === 'push') return handlePush(req, res, db)
+    if (resource === 'email-templates') return handleEmailTemplates(req, res, db)
+    if (resource === 'onboarding') return handleOnboarding(req, res, db)
 
     return res.status(400).json({ error: 'resource parametresi gerekli' })
   } catch (err) {

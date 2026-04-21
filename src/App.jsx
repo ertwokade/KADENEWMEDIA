@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import { OrganizationSchema } from './components/StructuredData'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { trackPageviewApi } from './api'
+import { trackPageviewApi, heartbeatApi } from './api'
 import PageHeroCanvas from './components/PageHeroCanvas'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -104,6 +104,26 @@ function App() {
         page_title: document.title,
       })
     }
+  }, [location.pathname, isAdmin])
+
+  // Active visitor heartbeat — keeps our real-time counter accurate.
+  useEffect(() => {
+    if (isAdmin) return
+    let sid
+    try {
+      sid = sessionStorage.getItem('kade_visitor_sid')
+      if (!sid) {
+        sid = (crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`)
+        sessionStorage.setItem('kade_visitor_sid', sid)
+      }
+    } catch { sid = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}` }
+
+    const ping = () => { if (document.visibilityState !== 'hidden') heartbeatApi(sid, location.pathname) }
+    ping()
+    const interval = setInterval(ping, 30000)
+    const onVisible = () => { if (document.visibilityState === 'visible') ping() }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => { clearInterval(interval); document.removeEventListener('visibilitychange', onVisible) }
   }, [location.pathname, isAdmin])
 
   return (

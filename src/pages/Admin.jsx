@@ -37,7 +37,7 @@ import {
   updateMessageStatusApi,
   getNotesApi, createNoteApi, deleteNoteApi,
   getNotificationsApi, markAllNotificationsReadApi,
-  getAnalyticsApi, getGA4AnalyticsApi, getActivityLogApi,
+  getAnalyticsApi, getGA4AnalyticsApi, getActiveVisitorsApi, getActivityLogApi,
   getNewsletterSubscribersApi, deleteNewsletterSubscriberApi, sendNewsletterApi,
   testSmtpApi, replyToMessageApi,
   getSiteSettingsApi, updateSiteSettingsApi,
@@ -52,6 +52,9 @@ import {
   getQuotesApi, updateQuoteApi, deleteQuoteApi,
   getCustomerProfilesApi, getInvoicesApi, createInvoiceApi, updateInvoiceApi, deleteInvoiceApi,
   getBackupSummaryApi, createBackupApi,
+  getEmailTemplatesApi, createEmailTemplateApi, updateEmailTemplateApi, deleteEmailTemplateApi,
+  getOnboardingFormsApi, createOnboardingFormApi, deleteOnboardingFormApi,
+  getMediaFileApi,
 } from '../api'
 import './Admin.css'
 
@@ -162,7 +165,7 @@ function DashboardSection({ stats, onNavigate }) {
     }).catch(() => {})
   }, [])
 
-  // Real-time visitor widget — tries GA4 API, falls back to simulated count
+  // Real-time visitor widget — GA4 first, then our own heartbeat-based count.
   useEffect(() => {
     const fetchVisitors = async () => {
       try {
@@ -173,14 +176,15 @@ function DashboardSection({ stats, onNavigate }) {
           setTimeout(() => setVisitorPulse(false), 600)
           return
         }
-      } catch { /* use simulated fallback */ }
-      // Simulated fallback: plausible range based on time of day
-      const hour = new Date().getHours()
-      const base = hour >= 9 && hour <= 22 ? 3 : 1
-      const simulated = base + Math.floor(Math.random() * 5)
-      setLiveVisitors(simulated)
-      setVisitorPulse(true)
-      setTimeout(() => setVisitorPulse(false), 600)
+      } catch { /* try fallback */ }
+      const live = await getActiveVisitorsApi()
+      if (live != null) {
+        setLiveVisitors(live)
+        setVisitorPulse(true)
+        setTimeout(() => setVisitorPulse(false), 600)
+      } else {
+        setLiveVisitors(0)
+      }
     }
     fetchVisitors()
     const interval = setInterval(fetchVisitors, 30000)
@@ -5446,41 +5450,67 @@ const defaultTemplates = [
 ]
 
 function EmailTemplatesSection({ showToast }) {
-  const [templates, setTemplates] = useState(() => {
-    try {
-      const stored = localStorage.getItem('kade_email_templates')
-      return stored ? JSON.parse(stored) : defaultTemplates
-    } catch { return defaultTemplates }
-  })
+  const [templates, setTemplates] = useState([])
   const [editing, setEditing] = useState(null)
   const [showNew, setShowNew] = useState(false)
   const [newForm, setNewForm] = useState({ isim: '', konu: '', metin: '' })
+  const [loading, setLoading] = useState(true)
 
-  const save = (updated) => {
-    setTemplates(updated)
-    localStorage.setItem('kade_email_templates', JSON.stringify(updated))
-    showToast('Şablon kaydedildi')
-  }
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const data = await getEmailTemplatesApi()
+      const arr = Array.isArray(data) ? data : []
+      if (arr.length === 0) {
+        // Seed with defaults on first use
+        for (const t of defaultTemplates) {
+          try { await createEmailTemplateApi({ isim: t.isim, konu: t.konu, metin: t.metin }) } catch { /* ignore */ }
+        }
+        const seeded = await getEmailTemplatesApi()
+        setTemplates(Array.isArray(seeded) ? seeded : [])
+      } else {
+        setTemplates(arr)
+      }
+    } catch (err) {
+      showToast('Şablonlar yüklenemedi: ' + err.message, 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [showToast])
+
+  useEffect(() => { load() }, [load])
 
   const handleEdit = (t) => setEditing({ ...t })
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editing) return
-    save(templates.map(t => t.id === editing.id ? editing : t))
-    setEditing(null)
+    try {
+      await updateEmailTemplateApi({ id: editing._id, isim: editing.isim, konu: editing.konu, metin: editing.metin })
+      showToast('Şablon kaydedildi')
+      setEditing(null)
+      load()
+    } catch (err) { showToast(err.message, 'error') }
   }
 
-  const handleDelete = (id) => {
-    save(templates.filter(t => t.id !== id))
-    if (editing?.id === id) setEditing(null)
+  const handleDelete = async (id) => {
+    if (!confirm('Şablon silinsin mi?')) return
+    try {
+      await deleteEmailTemplateApi(id)
+      showToast('Silindi')
+      if (editing?._id === id) setEditing(null)
+      load()
+    } catch (err) { showToast(err.message, 'error') }
   }
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!newForm.isim || !newForm.metin) { showToast('İsim ve metin zorunludur', 'error'); return }
-    const newT = { ...newForm, id: Date.now() }
-    save([...templates, newT])
-    setNewForm({ isim: '', konu: '', metin: '' })
-    setShowNew(false)
+    try {
+      await createEmailTemplateApi(newForm)
+      showToast('Şablon eklendi')
+      setNewForm({ isim: '', konu: '', metin: '' })
+      setShowNew(false)
+      load()
+    } catch (err) { showToast(err.message, 'error') }
   }
 
   const handleCopy = (metin) => {
@@ -5518,14 +5548,15 @@ function EmailTemplatesSection({ showToast }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 20 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {loading && <div style={{ color: 'var(--text-tertiary)', fontSize: '0.82rem' }}>Yükleniyor...</div>}
           {templates.map(t => (
             <div
-              key={t.id}
+              key={t._id}
               onClick={() => handleEdit(t)}
               style={{
                 padding: '12px 14px', borderRadius: 10, cursor: 'pointer',
-                background: editing?.id === t.id ? 'var(--primary)15' : 'var(--card-bg)',
-                border: `1px solid ${editing?.id === t.id ? 'var(--primary)' : 'var(--border)'}`,
+                background: editing?._id === t._id ? 'var(--primary)15' : 'var(--card-bg)',
+                border: `1px solid ${editing?._id === t._id ? 'var(--primary)' : 'var(--border)'}`,
               }}
             >
               <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>{t.isim}</div>
@@ -5542,7 +5573,7 @@ function EmailTemplatesSection({ showToast }) {
                 <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 12px' }} onClick={() => handleCopy(editing.metin)}>
                   📋 Kopyala
                 </button>
-                <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 12px', color: '#E91E63' }} onClick={() => handleDelete(editing.id)}>
+                <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 12px', color: '#E91E63' }} onClick={() => handleDelete(editing._id)}>
                   Sil
                 </button>
               </div>
@@ -5576,6 +5607,7 @@ function MediaLibrarySection({ showToast }) {
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [selected, setSelected] = useState(new Set())
+  const [thumbs, setThumbs] = useState({})
   const fileRef = useRef(null)
 
   const fetchMedia = () => {
@@ -5584,6 +5616,26 @@ function MediaLibrarySection({ showToast }) {
   }
 
   useEffect(() => { fetchMedia() }, [])
+
+  // Lazy-load previews for image items that we haven't fetched yet
+  useEffect(() => {
+    let cancelled = false
+    const run = async () => {
+      const queue = mediaList.filter(m => m.type === 'image' && !thumbs[m._id])
+      for (const item of queue) {
+        if (cancelled) return
+        try {
+          const file = await getMediaFileApi(item._id)
+          if (cancelled) return
+          if (file?.data && file?.mimeType) {
+            setThumbs(prev => ({ ...prev, [item._id]: `data:${file.mimeType};base64,${file.data}` }))
+          }
+        } catch { /* ignore */ }
+      }
+    }
+    run()
+    return () => { cancelled = true }
+  }, [mediaList, thumbs])
 
   const handleUpload = async (e) => {
     const files = Array.from(e.target.files || [])
@@ -5674,9 +5726,11 @@ function MediaLibrarySection({ showToast }) {
                 background: 'var(--card-bg)', transition: 'border-color 0.15s',
               }}
             >
-              <div style={{ width: '100%', height: 110, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                {item.type === 'image' ? (
-                  <span style={{ fontSize: '2.5rem' }}>🖼️</span>
+              <div style={{ width: '100%', height: 110, background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                {item.type === 'image' && thumbs[item._id] ? (
+                  <img src={thumbs[item._id]} alt={item.alt || item.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : item.type === 'image' ? (
+                  <span style={{ fontSize: '2.5rem', opacity: 0.6 }}>🖼️</span>
                 ) : item.type === 'video' ? (
                   <span style={{ fontSize: '2.5rem' }}>🎬</span>
                 ) : (
@@ -5879,11 +5933,16 @@ function AIContentSection({ showToast }) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('kade_admin_token')}` },
         body: JSON.stringify({ message: promptMap[tur], lang: 'tr', adminMode: true }),
       })
-      const data = await res.json()
-      const text = data.reply || 'Yanıt alınamadı'
-      setSonuc(text)
-      setGecmis(g => [{ tur: turler.find(t => t.id === tur)?.label, konu, sonuc: text, zaman: new Date() }, ...g.slice(0, 9)])
-    } catch { showToast('AI bağlantısı başarısız', 'error') }
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        showToast(data?.error || `AI hatası (${res.status})`, 'error')
+      } else if (data?.reply) {
+        setSonuc(data.reply)
+        setGecmis(g => [{ tur: turler.find(t => t.id === tur)?.label, konu, sonuc: data.reply, zaman: new Date() }, ...g.slice(0, 9)])
+      } else {
+        showToast('Yanıt alınamadı — GEMINI_API_KEY eksik olabilir', 'error')
+      }
+    } catch (err) { showToast('AI bağlantısı başarısız: ' + (err.message || ''), 'error') }
     setLoading(false)
   }
 
@@ -6687,9 +6746,8 @@ function BackupSection({ showToast }) {
 
 // ========== MUSTERI ONBOARDING FORMU ==========
 function OnboardingSection({ showToast }) {
-  const [forms, setForms] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('kade_onboarding_forms') || '[]') } catch { return [] }
-  })
+  const [forms, setForms] = useState([])
+  const [loading, setLoading] = useState(true)
   const [showNew, setShowNew] = useState(false)
   const [form, setForm] = useState({
     clientName: '', clientEmail: '', clientCompany: '',
@@ -6699,30 +6757,40 @@ function OnboardingSection({ showToast }) {
   })
   const [saving, setSaving] = useState(false)
 
+  const load = useCallback(() => {
+    setLoading(true)
+    getOnboardingFormsApi()
+      .then(d => setForms(Array.isArray(d) ? d : []))
+      .catch(err => showToast('Formlar yüklenemedi: ' + err.message, 'error'))
+      .finally(() => setLoading(false))
+  }, [showToast])
+
+  useEffect(() => { load() }, [load])
+
   const handleCreate = async (e) => {
     e.preventDefault()
     setSaving(true)
     try {
-      const newForm = { ...form, id: Date.now(), createdAt: new Date().toISOString() }
-      const updated = [newForm, ...forms]
-      localStorage.setItem('kade_onboarding_forms', JSON.stringify(updated))
-      setForms(updated)
+      await createOnboardingFormApi(form)
       showToast('Onboarding formu kaydedildi')
       setShowNew(false)
       setForm({ clientName: '', clientEmail: '', clientCompany: '', socialAccounts: '', targetAudience: '', competitors: '', brandVoice: '', monthlyBudget: '', goals: '', existingContent: '', designPreferences: '', notes: '' })
-    } catch { showToast('Kayıt başarısız', 'error') }
+      load()
+    } catch (err) { showToast(err.message || 'Kayıt başarısız', 'error') }
     setSaving(false)
   }
 
-  const handleDelete = (id) => {
-    const updated = forms.filter(f => f.id !== id)
-    localStorage.setItem('kade_onboarding_forms', JSON.stringify(updated))
-    setForms(updated)
-    showToast('Silindi')
+  const handleDelete = async (id) => {
+    if (!confirm('Form silinsin mi?')) return
+    try {
+      await deleteOnboardingFormApi(id)
+      showToast('Silindi')
+      load()
+    } catch (err) { showToast(err.message, 'error') }
   }
 
   const handleExport = (f) => {
-    const text = Object.entries(f).filter(([k]) => !['id', 'createdAt'].includes(k)).map(([k, v]) => `${k}: ${v}`).join('\n')
+    const text = Object.entries(f).filter(([k]) => !['_id', 'id', 'createdAt', 'createdBy'].includes(k)).map(([k, v]) => `${k}: ${v}`).join('\n')
     const blob = new Blob([text], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -6784,9 +6852,10 @@ function OnboardingSection({ showToast }) {
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {forms.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>Henüz onboarding formu oluşturulmadı</div>}
+        {loading && <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Yükleniyor...</div>}
+        {!loading && forms.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>Henüz onboarding formu oluşturulmadı</div>}
         {forms.map(f => (
-          <div key={f.id} className="admin-form" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div key={f._id} className="admin-form" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700 }}>{f.clientName} {f.clientCompany && `— ${f.clientCompany}`}</div>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: 3 }}>
@@ -6799,7 +6868,7 @@ function OnboardingSection({ showToast }) {
             <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 10px' }} onClick={() => handleExport(f)} title="Dışa Aktar">
               📥
             </button>
-            <button onClick={() => handleDelete(f.id)} style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}>
+            <button onClick={() => handleDelete(f._id)} style={{ background: 'none', border: 'none', color: '#E91E63', cursor: 'pointer' }}>
               <HiOutlineTrash size={16} />
             </button>
           </div>
