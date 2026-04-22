@@ -31,15 +31,7 @@ import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '../components/An
 import AuditScore from '../components/AuditScore'
 import PageBgAnimation from '../components/PageBgAnimation'
 import LazyYouTubeEmbed from '../components/LazyYouTubeEmbed'
-import LiveTicker from '../components/LiveTicker'
-import ProcessTimeline from '../components/ProcessTimeline'
-import ComparisonMatrix from '../components/ComparisonMatrix'
-import Scrollytelling from '../components/Scrollytelling'
-import SectionHeading from '../components/SectionHeading'
-import SplitText from '../components/SplitText'
-import Underline from '../components/Underline'
 import CountUp from '../components/CountUp'
-import MagneticButton from '../components/MagneticButton'
 import './Home.css'
 
 const platforms = [
@@ -339,14 +331,26 @@ export default function Home() {
       <section className="stats-section">
         <div className="container">
           <StaggerContainer className="stats-grid" staggerDelay={0.1}>
-            {stats.map((stat) => (
-              <StaggerItem key={stat.label}>
-                <div className="stat-card glass-card">
-                  <div className="stat-number">{stat.number}</div>
-                  <div className="stat-label">{stat.label}</div>
-                </div>
-              </StaggerItem>
-            ))}
+            {stats.map((stat) => {
+              const raw = String(stat.number)
+              const match = raw.match(/^([\d.,]+)(.*)$/)
+              const num = match ? parseFloat(match[1].replace(',', '.')) : null
+              const suffix = match ? match[2] : ''
+              return (
+                <StaggerItem key={stat.label}>
+                  <div className="stat-card glass-card">
+                    <div className="stat-number">
+                      {num != null && !Number.isNaN(num) ? (
+                        <CountUp to={num} suffix={suffix} duration={1600} decimals={Number.isInteger(num) ? 0 : 1} />
+                      ) : (
+                        raw
+                      )}
+                    </div>
+                    <div className="stat-label">{stat.label}</div>
+                  </div>
+                </StaggerItem>
+              )
+            })}
           </StaggerContainer>
         </div>
       </section>
@@ -450,61 +454,6 @@ export default function Home() {
               </Link>
             </div>
           </FadeIn>
-        </div>
-      </section>
-
-      {/* Live ticker — aktif markalar */}
-      <LiveTicker label={lang === 'tr' ? 'Şu an çalıştığımız' : 'Currently working with'} />
-
-      {/* Process timeline */}
-      <section className="section">
-        <div className="container">
-          <SectionHeading
-            eyebrow={lang === 'tr' ? 'Nasıl çalışıyoruz' : 'How we work'}
-            number="02"
-          >
-            {lang === 'tr' ? (
-              <>Brief'ten lansmana, <Underline>5 adımda</Underline> sonuç</>
-            ) : (
-              <>From brief to launch, <Underline>results in 5 steps</Underline></>
-            )}
-          </SectionHeading>
-          <ProcessTimeline />
-        </div>
-      </section>
-
-      {/* Comparison matrix */}
-      <section className="section">
-        <div className="container">
-          <SectionHeading
-            eyebrow={lang === 'tr' ? 'Kade Media vs.' : 'Kade Media vs.'}
-            number="03"
-          >
-            {lang === 'tr' ? (
-              <>Neden <Underline variant="double">biz</Underline>?</>
-            ) : (
-              <>Why <Underline variant="double">us</Underline>?</>
-            )}
-          </SectionHeading>
-          <ComparisonMatrix />
-        </div>
-      </section>
-
-      {/* Scrollytelling case studies */}
-      <section className="section">
-        <div className="container">
-          <SectionHeading
-            eyebrow={lang === 'tr' ? 'Başarı hikayeleri' : 'Case studies'}
-            number="04"
-            align="center"
-          >
-            <SplitText
-              text={lang === 'tr' ? 'Rakamlarla konuşalım.' : 'Let the numbers talk.'}
-              by="word"
-              stagger={80}
-            />
-          </SectionHeading>
-          <Scrollytelling />
         </div>
       </section>
 

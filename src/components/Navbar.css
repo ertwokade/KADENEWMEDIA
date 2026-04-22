@@ -72,12 +72,12 @@
   overflow: hidden;
 }
 
-.navbar-link::before,
-.navbar-link::after {
+.navbar-link::before {
   content: '';
   position: absolute;
   left: 10%;
   right: 10%;
+  bottom: 4px;
   height: 1.5px;
   background: var(--primary);
   transform-origin: left center;
@@ -86,13 +86,6 @@
   pointer-events: none;
   border-radius: 2px;
 }
-.navbar-link::before {
-  bottom: 4px;
-}
-.navbar-link::after {
-  top: 4px;
-  transform-origin: right center;
-}
 
 .navbar-link:hover {
   color: var(--white);
@@ -100,10 +93,6 @@
 
 .navbar-link:hover::before {
   transform: scaleX(1);
-}
-.navbar-link:hover::after {
-  transform: scaleX(1);
-  transition-delay: 0.08s;
 }
 
 .navbar-link.active {
