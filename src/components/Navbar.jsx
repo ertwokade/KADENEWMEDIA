@@ -66,9 +66,7 @@ export default function Navbar() {
   return (
     <motion.nav
       className={`navbar ${scrolled ? 'scrolled' : ''}`}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      initial={false}
     >
       <div className="container navbar-container">
         <Link to="/" className="navbar-logo">

@@ -98,9 +98,6 @@
 .navbar-link.active {
   color: var(--primary);
 }
-.navbar-link.active::before {
-  transform: scaleX(1);
-}
 
 .navbar-dropdown {
   position: relative;
