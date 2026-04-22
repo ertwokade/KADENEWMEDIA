@@ -1,0 +1,89 @@
+.section-heading {
+  position: relative;
+  margin-bottom: 48px;
+}
+.section-heading--center { text-align: center; }
+.section-heading--right  { text-align: right; }
+
+.section-heading__number {
+  position: absolute;
+  top: -36px;
+  left: -8px;
+  font-family: var(--font-primary);
+  font-size: clamp(90px, 14vw, 220px);
+  font-weight: 900;
+  line-height: 0.85;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(234, 195, 33, 0.14);
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s;
+}
+.section-heading--visible .section-heading__number {
+  opacity: 1;
+  transform: translateY(0);
+}
+.section-heading--center .section-heading__number {
+  left: 50%;
+  transform: translate(-50%, 30px);
+}
+.section-heading--center.section-heading--visible .section-heading__number {
+  transform: translate(-50%, 0);
+}
+
+.section-heading__eyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--primary, #eac321);
+  margin-bottom: 16px;
+  z-index: 1;
+}
+
+.section-heading__stroke {
+  display: inline-block;
+  width: 0;
+  height: 1.5px;
+  background: var(--primary, #eac321);
+  transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s;
+}
+.section-heading--visible .section-heading__stroke {
+  width: 40px;
+}
+
+.section-heading__title {
+  position: relative;
+  font-family: var(--font-primary);
+  font-size: clamp(32px, 4.4vw, 56px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--white, #fff);
+  margin: 0;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease 0.25s, transform 0.7s ease 0.25s;
+}
+.section-heading--visible .section-heading__title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-heading__number,
+  .section-heading__title,
+  .section-heading__stroke {
+    transition: none;
+  }
+}

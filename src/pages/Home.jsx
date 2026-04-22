@@ -31,6 +31,15 @@ import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '../components/An
 import AuditScore from '../components/AuditScore'
 import PageBgAnimation from '../components/PageBgAnimation'
 import LazyYouTubeEmbed from '../components/LazyYouTubeEmbed'
+import LiveTicker from '../components/LiveTicker'
+import ProcessTimeline from '../components/ProcessTimeline'
+import ComparisonMatrix from '../components/ComparisonMatrix'
+import Scrollytelling from '../components/Scrollytelling'
+import SectionHeading from '../components/SectionHeading'
+import SplitText from '../components/SplitText'
+import Underline from '../components/Underline'
+import CountUp from '../components/CountUp'
+import MagneticButton from '../components/MagneticButton'
 import './Home.css'
 
 const platforms = [
@@ -441,6 +450,61 @@ export default function Home() {
               </Link>
             </div>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* Live ticker — aktif markalar */}
+      <LiveTicker label={lang === 'tr' ? 'Şu an çalıştığımız' : 'Currently working with'} />
+
+      {/* Process timeline */}
+      <section className="section">
+        <div className="container">
+          <SectionHeading
+            eyebrow={lang === 'tr' ? 'Nasıl çalışıyoruz' : 'How we work'}
+            number="02"
+          >
+            {lang === 'tr' ? (
+              <>Brief'ten lansmana, <Underline>5 adımda</Underline> sonuç</>
+            ) : (
+              <>From brief to launch, <Underline>results in 5 steps</Underline></>
+            )}
+          </SectionHeading>
+          <ProcessTimeline />
+        </div>
+      </section>
+
+      {/* Comparison matrix */}
+      <section className="section">
+        <div className="container">
+          <SectionHeading
+            eyebrow={lang === 'tr' ? 'Kade Media vs.' : 'Kade Media vs.'}
+            number="03"
+          >
+            {lang === 'tr' ? (
+              <>Neden <Underline variant="double">biz</Underline>?</>
+            ) : (
+              <>Why <Underline variant="double">us</Underline>?</>
+            )}
+          </SectionHeading>
+          <ComparisonMatrix />
+        </div>
+      </section>
+
+      {/* Scrollytelling case studies */}
+      <section className="section">
+        <div className="container">
+          <SectionHeading
+            eyebrow={lang === 'tr' ? 'Başarı hikayeleri' : 'Case studies'}
+            number="04"
+            align="center"
+          >
+            <SplitText
+              text={lang === 'tr' ? 'Rakamlarla konuşalım.' : 'Let the numbers talk.'}
+              by="word"
+              stagger={80}
+            />
+          </SectionHeading>
+          <Scrollytelling />
         </div>
       </section>
 

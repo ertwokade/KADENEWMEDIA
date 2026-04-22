@@ -1,0 +1,52 @@
+.side-label {
+  position: fixed;
+  top: 50%;
+  left: 18px;
+  transform: translate(-16px, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 60;
+  writing-mode: vertical-rl;
+  transform-origin: center;
+}
+
+.side-label--visible {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.side-label__num {
+  font-family: var(--font-primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--primary);
+  writing-mode: horizontal-tb;
+}
+
+.side-label__bar {
+  display: inline-block;
+  width: 1.5px;
+  height: 46px;
+  background: linear-gradient(180deg, var(--primary), transparent);
+  writing-mode: horizontal-tb;
+}
+
+.side-label__text {
+  font-family: var(--font-primary);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gray-lighter);
+  transform: rotate(180deg);
+}
+
+@media (max-width: 1100px) {
+  .side-label { display: none; }
+}

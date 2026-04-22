@@ -9,6 +9,10 @@ import ScrollToTop from './components/ScrollToTop'
 import WhatsAppButton from './components/WhatsAppButton'
 import CookieBanner from './components/CookieBanner'
 import ErrorTracker from './components/ErrorTracker'
+import CursorSpotlight from './components/CursorSpotlight'
+import GrainOverlay from './components/GrainOverlay'
+import AuroraBackground from './components/AuroraBackground'
+import RouteProgress from './components/RouteProgress'
 
 // Core pages — direct import for instant first render
 import Home from './pages/Home'
@@ -132,6 +136,10 @@ function App() {
       <OrganizationSchema />
       <a href="#main-content" className="skip-to-content">İçeriğe geç</a>
       <ScrollToTop />
+      {!isAdmin && <RouteProgress />}
+      {!isAdmin && <AuroraBackground />}
+      {!isAdmin && <GrainOverlay />}
+      {!isAdmin && <CursorSpotlight />}
       {!isAdmin && <PageHeroCanvas type={canvasTheme} />}
       {!isAdmin && <Navbar />}
       <main id="main-content">

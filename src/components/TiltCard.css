@@ -1,0 +1,41 @@
+.tilt-card {
+  --tilt-rx: 0deg;
+  --tilt-ry: 0deg;
+  --glare-x: 50%;
+  --glare-y: 50%;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.tilt-card__inner {
+  position: relative;
+  transform: rotateX(var(--tilt-rx)) rotateY(var(--tilt-ry));
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  height: 100%;
+  width: 100%;
+}
+
+.tilt-card__glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--glare-x) var(--glare-y),
+    rgba(234, 195, 33, 0.18) 0%,
+    rgba(234, 195, 33, 0) 40%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  mix-blend-mode: screen;
+}
+
+.tilt-card:hover .tilt-card__glare {
+  opacity: 1;
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .tilt-card__inner { transform: none !important; transition: none; }
+  .tilt-card__glare { display: none; }
+}

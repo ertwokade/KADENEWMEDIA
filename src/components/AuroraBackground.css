@@ -1,0 +1,80 @@
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: radial-gradient(ellipse at top, #151108 0%, #0a0a0a 50%, #050505 100%);
+}
+
+.aurora__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+
+.aurora__blob--1 {
+  width: 520px; height: 520px;
+  top: -10%; left: -5%;
+  background: radial-gradient(circle, rgba(234, 195, 33, 0.55) 0%, transparent 70%);
+  animation: aurora-drift-1 22s ease-in-out infinite;
+}
+.aurora__blob--2 {
+  width: 680px; height: 680px;
+  top: 20%; right: -15%;
+  background: radial-gradient(circle, rgba(255, 150, 40, 0.22) 0%, transparent 70%);
+  animation: aurora-drift-2 28s ease-in-out infinite;
+}
+.aurora__blob--3 {
+  width: 460px; height: 460px;
+  bottom: -8%; left: 15%;
+  background: radial-gradient(circle, rgba(234, 195, 33, 0.30) 0%, transparent 70%);
+  animation: aurora-drift-3 26s ease-in-out infinite;
+}
+.aurora__blob--4 {
+  width: 380px; height: 380px;
+  bottom: 10%; right: 10%;
+  background: radial-gradient(circle, rgba(120, 80, 20, 0.35) 0%, transparent 70%);
+  animation: aurora-drift-4 30s ease-in-out infinite;
+}
+
+.aurora__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(234, 195, 33, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(234, 195, 33, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+@keyframes aurora-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(80px, 60px) scale(1.15); }
+  66%      { transform: translate(-40px, 90px) scale(0.9); }
+}
+@keyframes aurora-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-90px, 70px) scale(1.1); }
+}
+@keyframes aurora-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(60px, -50px) scale(1.2); }
+  80%      { transform: translate(-30px, 30px) scale(0.95); }
+}
+@keyframes aurora-drift-4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-70px, -40px) scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora__blob { animation: none; }
+}
+
+@media (max-width: 768px) {
+  .aurora__blob { filter: blur(70px); }
+}

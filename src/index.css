@@ -26,8 +26,9 @@
   --gradient-glow: radial-gradient(circle at center, rgba(234,195,33,0.15) 0%, transparent 70%);
 
   /* Typography */
-  --font-primary: 'Graphik', 'Outfit', 'Space Grotesk', sans-serif;
-  --font-secondary: 'Graphik', 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-display: 'Clash Display', 'Outfit', 'Space Grotesk', sans-serif;
+  --font-primary: 'Satoshi', 'Graphik', 'Outfit', 'Space Grotesk', sans-serif;
+  --font-secondary: 'Satoshi', 'Graphik', 'Plus Jakarta Sans', 'Inter', sans-serif;
 
   /* Spacing */
   --section-padding: 100px 0;
@@ -109,9 +110,31 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-primary);
-  font-weight: 700;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+/* Magnetic button base */
+.magnetic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+.magnetic__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .magnetic,
+  .magnetic__inner { transform: none !important; transition: none; }
 }
 
 a {
