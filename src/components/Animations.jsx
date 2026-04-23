@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useCallback } from 'react'
 
 const defaultVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -98,6 +98,37 @@ export function ScaleIn({ children, delay = 0, className, style }) {
     >
       {children}
     </motion.div>
+  )
+}
+
+export function TiltCard({ children, className, style, strength = 8 }) {
+  const ref = useRef(null)
+
+  const onMove = useCallback((e) => {
+    const el = ref.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width - 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5
+    el.style.transform = `perspective(700px) rotateY(${x * strength}deg) rotateX(${-y * strength}deg) translateZ(4px)`
+  }, [strength])
+
+  const onLeave = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    el.style.transform = ''
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{ ...style, transition: 'transform 0.25s ease', willChange: 'transform' }}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+    >
+      {children}
+    </div>
   )
 }
 

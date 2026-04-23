@@ -40,9 +40,9 @@ export default function Services() {
       .catch(() => {})
   }, [])
   useSEO({
-    title: 'Hizmetlerimiz | Sosyal Medya Yönetimi & Dijital Pazarlama',
-    description: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi ve video prodüksiyon hizmetleri. Kade Media ile markanızı büyütün.',
-    keywords: 'sosyal medya yönetimi, instagram yönetimi, tiktok yönetimi, içerik üretimi, reklam yönetimi, video prodüksiyon, dijital pazarlama hizmetleri',
+    title: 'Hizmetlerimiz | Sosyal Medya Ajansı Hizmetleri | Kade Media',
+    description: 'Profesyonel sosyal medya yönetimi, içerik üretimi, Meta & Google reklam yönetimi, influencer marketing ve video prodüksiyon. İstanbul sosyal medya ajansı Kade Media ile markanızı büyütün.',
+    keywords: 'sosyal medya ajansı hizmetleri, sosyal medya yönetimi istanbul, instagram ajansı, tiktok ajansı, içerik üretimi, meta reklam ajansı, google ads ajansı, influencer marketing, video prodüksiyon, agency hizmetleri istanbul, dijital ajans',
     path: '/hizmetler',
   })
 

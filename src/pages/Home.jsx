@@ -27,7 +27,8 @@ import { partnersData as staticPartnersData } from '../data/content'
 import { getPartnersApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import HeroBackground from '../components/HeroBackground'
-import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from '../components/Animations'
+import MagneticButton from '../components/MagneticButton'
+import { FadeIn, StaggerContainer, StaggerItem, ScaleIn, TiltCard } from '../components/Animations'
 import AuditScore from '../components/AuditScore'
 import PageBgAnimation from '../components/PageBgAnimation'
 import LazyYouTubeEmbed from '../components/LazyYouTubeEmbed'
@@ -119,9 +120,9 @@ function FAQItem({ faq }) {
 export default function Home() {
   const { lang, t } = useLanguage()
   useSEO({
-    title: 'Sosyal Medya Ajansı İstanbul | Dijital Pazarlama',
-    description: 'Kade Media, İstanbul merkezli profesyonel sosyal medya yönetimi ve dijital pazarlama ajansı. Instagram, TikTok, YouTube yönetimi, içerik üretimi ve reklam danışmanlığı.',
-    keywords: 'sosyal medya ajansı istanbul, dijital pazarlama ajansı, instagram yönetimi, tiktok yönetimi, sosyal medya yönetimi, içerik üretimi ajansı, kade media',
+    title: 'Sosyal Medya Ajansı İstanbul | Dijital Pazarlama Ajansı | Kade Media',
+    description: 'Kade Media — İstanbul\'un öne çıkan sosyal medya ajansı. Instagram, TikTok, YouTube ve LinkedIn yönetimi, içerik üretimi, reklam yönetimi ve marka stratejisi. Profesyonel dijital pazarlama ajansı.',
+    keywords: 'sosyal medya ajansı istanbul, dijital pazarlama ajansı, social media agency istanbul, sosyal medya yönetimi, instagram ajansı, tiktok ajansı, içerik üretimi ajansı, reklam ajansı istanbul, marka stratejisi ajansı, agency istanbul, sosyal medya danışmanlığı, influencer marketing ajansı, youtube yönetimi, linkedin ajansı, kade media',
     path: '/',
   })
 
@@ -164,17 +165,34 @@ export default function Home() {
   useEffect(() => {
     const bizSchema = {
       '@context': 'https://schema.org',
-      '@type': 'ProfessionalService',
+      '@type': ['ProfessionalService', 'MarketingAgency'],
       name: 'Kade Media',
-      description: 'İstanbul merkezli profesyonel sosyal medya yönetimi ve dijital pazarlama ajansı.',
+      alternateName: 'Kade Media Sosyal Medya Ajansı',
+      description: 'İstanbul merkezli profesyonel sosyal medya yönetimi, dijital pazarlama ve içerik üretimi ajansı. Instagram, TikTok, YouTube, LinkedIn yönetimi ve reklam danışmanlığı.',
       url: 'https://kademedia.com.tr',
       logo: 'https://kademedia.com.tr/logo.png',
+      image: 'https://kademedia.com.tr/logo.png',
       telephone: '+905067293423',
       email: 'hello@kademedia.com',
-      address: { '@type': 'PostalAddress', streetAddress: 'Biruni Teknopark', addressLocality: 'Zeytinburnu', addressRegion: 'İstanbul', addressCountry: 'TR' },
-      areaServed: { '@type': 'Country', name: 'Turkey' },
+      address: { '@type': 'PostalAddress', streetAddress: 'Biruni Teknopark', addressLocality: 'Zeytinburnu', addressRegion: 'İstanbul', postalCode: '34010', addressCountry: 'TR' },
+      geo: { '@type': 'GeoCoordinates', latitude: 41.0082, longitude: 28.9784 },
+      areaServed: [
+        { '@type': 'Country', name: 'Turkey' },
+        { '@type': 'City', name: 'İstanbul' },
+      ],
+      serviceType: ['Sosyal Medya Yönetimi', 'Dijital Pazarlama', 'İçerik Üretimi', 'Reklam Yönetimi', 'Influencer Marketing', 'Marka Stratejisi'],
       priceRange: '₺₺',
       openingHours: 'Mo-Fr 09:00-18:00',
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Sosyal Medya ve Dijital Pazarlama Hizmetleri',
+        itemListElement: [
+          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Sosyal Medya Yönetimi' } },
+          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'İçerik Üretimi ve Tasarım' } },
+          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Reklam Yönetimi (Meta & Google Ads)' } },
+          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Influencer Marketing' } },
+        ],
+      },
       sameAs: [
         'https://instagram.com/kademediacom',
         'https://www.youtube.com/@kademediacom',
@@ -281,14 +299,14 @@ export default function Home() {
 
           <FadeIn delay={0.2}>
             <div className="hero-actions">
-              <Link to="/iletisim" className="btn btn-primary">
+              <MagneticButton as={Link} to="/iletisim" className="btn btn-primary" strength={0.22}>
                 {t('hero.cta1')}
                 <HiOutlineArrowRight size={18} />
-              </Link>
-              <Link to="/hizmetler" className="btn btn-outline">
+              </MagneticButton>
+              <MagneticButton as={Link} to="/hizmetler" className="btn btn-outline" strength={0.22}>
                 <HiOutlinePlay size={18} />
                 {t('hero.cta2')}
-              </Link>
+              </MagneticButton>
             </div>
           </FadeIn>
 
@@ -379,14 +397,14 @@ export default function Home() {
           <StaggerContainer className="services-grid" staggerDelay={0.1}>
             {services.map((service, index) => (
               <StaggerItem key={index}>
-                <motion.div className="service-card glass-card" whileHover={{ scale: 1.02 }}>
+                <TiltCard className="service-card glass-card" strength={6}>
                   <div className="service-icon-wrapper">
                     <service.icon size={28} />
                   </div>
                   <h3>{service.title}</h3>
                   <p>{service.desc}</p>
                   <div className="service-number">0{index + 1}</div>
-                </motion.div>
+                </TiltCard>
               </StaggerItem>
             ))}
           </StaggerContainer>
@@ -426,10 +444,7 @@ export default function Home() {
             {partnersData.slice(0, 6).map((partner, idx) => (
               <StaggerItem key={partner.id || partner.slug || String(partner._id) || idx}>
                 <Link to={`/partnerler/${partner.id || partner.slug || String(partner._id)}`}>
-                  <motion.div
-                    className="partner-preview-card glass-card"
-                    whileHover={{ scale: 1.05, y: -5 }}
-                  >
+                  <TiltCard className="partner-preview-card glass-card" strength={7}>
                     <div className="partner-preview-logo" style={{ background: `${partner.color}12` }}>
                       {partner.logo && (partner.logo.startsWith('data:') || partner.logo.startsWith('http'))
                         ? <img src={partner.logo} alt={partner.name} style={{ width: '32px', height: '32px', objectFit: 'contain', borderRadius: 4 }} />
@@ -440,7 +455,7 @@ export default function Home() {
                     <span className="partner-preview-category" style={{ color: partner.color }}>
                       {lang === 'tr' ? partner.category : partner.categoryEn}
                     </span>
-                  </motion.div>
+                  </TiltCard>
                 </Link>
               </StaggerItem>
             ))}
@@ -642,13 +657,13 @@ export default function Home() {
               </h2>
               <p>{t('cta.subtitle')}</p>
               <div className="cta-actions">
-                <Link to="/iletisim" className="btn btn-primary">
+                <MagneticButton as={Link} to="/iletisim" className="btn btn-primary" strength={0.22}>
                   {t('cta.btn1')}
                   <HiOutlineArrowRight size={18} />
-                </Link>
-                <Link to="/paketler" className="btn btn-outline">
+                </MagneticButton>
+                <MagneticButton as={Link} to="/paketler" className="btn btn-outline" strength={0.22}>
                   {t('cta.btn2')}
-                </Link>
+                </MagneticButton>
               </div>
             </div>
           </ScaleIn>

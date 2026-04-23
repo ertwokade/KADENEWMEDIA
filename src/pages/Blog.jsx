@@ -151,13 +151,16 @@ export default function Blog() {
           <FadeIn>
             <Link to={`/blog/${featured.slug}`} style={{ textDecoration: 'none' }}>
               <motion.div className="blog-featured glass-card" whileHover={{ y: -4 }}>
-                <div className="blog-featured-image" style={{ background: `${featured.color}15` }}>
+                <div className="blog-featured-image" style={{ background: `linear-gradient(135deg, ${featured.color}20 0%, ${featured.color}08 100%)` }}>
                   <img
                     src={getBlogImage(featured)}
                     alt={featured.titleTr || ''}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={e => { if (!e.target.dataset.fallback) { e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(featured) } }}
                     loading="lazy"
+                    onError={e => {
+                      if (e.target.dataset.fallback === '2') { e.target.dataset.failed = '1'; e.target.removeAttribute('src'); return }
+                      if (e.target.dataset.fallback === '1') { e.target.dataset.fallback = '2'; e.target.src = getBlogFallback(featured); return }
+                      e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(featured)
+                    }}
                   />
                 </div>
                 <div className="blog-featured-content">
@@ -189,13 +192,16 @@ export default function Blog() {
               <StaggerItem key={post._id || post.slug || idx}>
                 <Link to={`/blog/${post.slug}`} style={{ textDecoration: 'none' }}>
                   <motion.div className="blog-card glass-card" whileHover={{ y: -4 }}>
-                    <div className="blog-card-image" style={{ background: `${post.color}15` }}>
+                    <div className="blog-card-image" style={{ background: `linear-gradient(135deg, ${post.color}20 0%, ${post.color}08 100%)` }}>
                       <img
                         src={getBlogImage(post)}
                         alt={post.titleTr || ''}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        onError={e => { if (!e.target.dataset.fallback) { e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(post) } }}
                         loading="lazy"
+                        onError={e => {
+                          if (e.target.dataset.fallback === '2') { e.target.dataset.failed = '1'; e.target.removeAttribute('src'); return }
+                          if (e.target.dataset.fallback === '1') { e.target.dataset.fallback = '2'; e.target.src = getBlogFallback(post); return }
+                          e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(post)
+                        }}
                       />
                     </div>
                     <div className="blog-card-content">

@@ -163,7 +163,11 @@ export default function BlogDetail() {
                   src={getBlogImage(post)}
                   alt={title}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px', display: 'block' }}
-                  onError={e => { if (!e.target.dataset.fallback) { e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(post) } }}
+                  onError={e => {
+                    if (e.target.dataset.fallback === '2') { e.target.dataset.failed = '1'; e.target.removeAttribute('src'); return }
+                    if (e.target.dataset.fallback === '1') { e.target.dataset.fallback = '2'; e.target.src = getBlogFallback(post); return }
+                    e.target.dataset.fallback = '1'; e.target.src = getBlogFallback(post)
+                  }}
                 />
               </div>
             </FadeIn>
