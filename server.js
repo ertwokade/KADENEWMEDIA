@@ -1,10 +1,8 @@
 import 'dotenv/config'
 import express from 'express'
-import corsMiddleware from 'cors'
 import apiHandler from './api/[...path].js'
 
 const app = express()
-app.use(corsMiddleware())
 app.use(express.json({ limit: '10mb' }))
 
 // Güvenlik başlıkları

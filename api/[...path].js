@@ -19,6 +19,8 @@ import subscriptions from '../server/api/subscriptions.js'
 import surveys from '../server/api/surveys.js'
 import tasks from '../server/api/tasks.js'
 import users from '../server/api/users.js'
+import { validateCsrf } from '../server/api/_lib/csrf.js'
+import { validateQuery } from '../server/api/_lib/validation.js'
 
 const handlers = {
   auth,
@@ -72,6 +74,9 @@ function normalizeRoute(req) {
 }
 
 export default async function handler(req, res) {
+  if (!validateQuery(req, res)) return
+  if (!validateCsrf(req, res)) return
+
   const route = normalizeRoute(req)
   const routeHandler = handlers[route]
 

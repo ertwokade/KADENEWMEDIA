@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const rl = rateLimitCheck(req)
+    const rl = await rateLimitCheck(req, { namespace: 'referrals', maxRequests: 5 })
     if (!rl.allowed) {
       return res.status(429).json({ error: `Çok fazla istek. ${rl.retryAfter} dakika sonra tekrar deneyin.` })
     }

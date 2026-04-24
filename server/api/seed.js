@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { getDb } from './_lib/mongodb.js';
 import { cors } from './_lib/cors.js';
+import { rateLimitCheck } from './_lib/rateLimit.js';
 
 const defaultPartners = [
   {
@@ -333,11 +335,36 @@ const defaultContent = [
   },
 ];
 
+function isProductionRuntime() {
+  return process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+}
+
+function timingSafeEqualString(left, right) {
+  if (typeof left !== 'string' || typeof right !== 'string') return false;
+  const leftBuf = Buffer.from(left);
+  const rightBuf = Buffer.from(right);
+  if (leftBuf.length !== rightBuf.length) return false;
+  return crypto.timingSafeEqual(leftBuf, rightBuf);
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Use POST to seed the database' });
+  }
+
+  if (isProductionRuntime() && process.env.SEED_ENDPOINT_ENABLED !== 'true') {
+    return res.status(404).json({ error: 'Seed endpoint is disabled' });
+  }
+
+  const rl = await rateLimitCheck(req, {
+    namespace: 'seed',
+    windowMs: 60 * 60 * 1000,
+    maxRequests: 3,
+  });
+  if (!rl.allowed) {
+    return res.status(429).json({ error: `Too many seed attempts. Try again in ${rl.retryAfter} minutes.` });
   }
 
   const seedSecret = process.env.SEED_SECRET;
@@ -346,7 +373,7 @@ export default async function handler(req, res) {
   }
 
   const { secret } = req.body || {};
-  if (secret !== seedSecret) {
+  if (!timingSafeEqualString(secret, seedSecret)) {
     return res.status(403).json({ error: 'Invalid seed secret' });
   }
 

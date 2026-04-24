@@ -51,9 +51,18 @@ export default function ReferralProgram() {
     leadEmail: '',
     leadPhone: '',
     leadCompany: '',
-    service: DEFAULT_CONTENT.serviceOptions[0],
+    services: [],
     notes: '',
   })
+
+  const toggleService = (option) => {
+    setForm(prev => ({
+      ...prev,
+      services: prev.services.includes(option)
+        ? prev.services.filter(s => s !== option)
+        : [...prev.services, option],
+    }))
+  }
 
   useSEO({
     title: 'Referans Programı | Kade Media',
@@ -76,7 +85,7 @@ export default function ReferralProgram() {
               steps: Array.isArray(data.steps) && data.steps.length ? data.steps : prev.steps,
               serviceOptions: Array.isArray(data.serviceOptions) && data.serviceOptions.length ? data.serviceOptions : prev.serviceOptions,
             }
-            setForm(f => ({ ...f, service: merged.serviceOptions[0] }))
+            setForm(f => ({ ...f, services: [] }))
             return merged
           })
         }
@@ -95,7 +104,11 @@ export default function ReferralProgram() {
     setSending(true)
     setError('')
     try {
-      await submitReferralApi(form)
+      const payload = {
+        ...form,
+        service: form.services.length > 0 ? form.services.join(', ') : 'Belirtilmedi',
+      }
+      await submitReferralApi(payload)
       navigate('/tesekkur?source=referral')
     } catch (err) {
       setError(err.message || 'Başvuru alınamadı. Lütfen tekrar deneyin.')
@@ -189,11 +202,20 @@ export default function ReferralProgram() {
                   <label>Şirket</label>
                   <input name="leadCompany" value={form.leadCompany} onChange={handleChange} />
                 </div>
-                <div className="form-group">
-                  <label>İlgilenilen hizmet</label>
-                  <select name="service" value={form.service} onChange={handleChange}>
-                    {content.serviceOptions.map(option => <option key={option}>{option}</option>)}
-                  </select>
+                <div className="form-group referral-service-group">
+                  <label>İlgilenilen hizmet <span style={{ fontWeight: 400, color: 'var(--text-secondary)', fontSize: '0.8rem' }}>(birden fazla seçilebilir)</span></label>
+                  <div className="referral-service-chips">
+                    {content.serviceOptions.map(option => (
+                      <button
+                        key={option}
+                        type="button"
+                        className={`referral-chip ${form.services.includes(option) ? 'active' : ''}`}
+                        onClick={() => toggleService(option)}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="form-group">

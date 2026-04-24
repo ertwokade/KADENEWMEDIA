@@ -27,7 +27,7 @@ async function handleQuotes(req, res, db) {
   const col = db.collection('quotes')
 
   if (req.method === 'POST') {
-    const rl = rateLimitCheck(req)
+    const rl = await rateLimitCheck(req, { namespace: 'quotes', maxRequests: 10 })
     if (!rl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${rl.retryAfter} dakika sonra tekrar deneyin.` })
 
     const {
@@ -257,7 +257,7 @@ async function handleBackup(req, res, db) {
 
 async function handleClientErrors(req, res, db) {
   if (req.method === 'POST') {
-    const rl = rateLimitCheck(req)
+    const rl = await rateLimitCheck(req, { namespace: 'client-errors', maxRequests: 30 })
     if (!rl.allowed) return res.status(204).end()
     const { message, stack, path, source } = req.body || {}
     await db.collection('client_errors').insertOne({

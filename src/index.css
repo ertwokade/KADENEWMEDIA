@@ -42,6 +42,12 @@
   /* Borders */
   --border-color: rgba(234, 195, 33, 0.15);
   --border-color-hover: rgba(234, 195, 33, 0.40);
+  --border: rgba(234, 195, 33, 0.15);
+
+  /* Semantic tokens used across tool/form pages */
+  --text-primary: #ffffff;
+  --bg-secondary: rgba(255, 255, 255, 0.05);
+  --card-bg: rgba(255, 255, 255, 0.03);
 
   /* Shadows */
   --shadow-glow: 0 0 30px rgba(234, 195, 33, 0.12);

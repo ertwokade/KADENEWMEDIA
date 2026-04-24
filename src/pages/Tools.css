@@ -67,6 +67,11 @@
   font: inherit;
 }
 
+.tool-form select option {
+  background: #1a1a1a;
+  color: #fff;
+}
+
 .tool-check-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

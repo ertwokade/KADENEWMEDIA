@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
@@ -34,6 +35,31 @@ function getEmails(reminder) {
   return [process.env.MAIL_TO || 'thekademedia@gmail.com'];
 }
 
+function timingSafeHexEqual(left, right) {
+  if (typeof left !== 'string' || typeof right !== 'string') return false;
+  if (!/^[a-f0-9]+$/i.test(left) || !/^[a-f0-9]+$/i.test(right)) return false;
+  const leftBuf = Buffer.from(left, 'hex');
+  const rightBuf = Buffer.from(right, 'hex');
+  if (leftBuf.length !== rightBuf.length) return false;
+  return crypto.timingSafeEqual(leftBuf, rightBuf);
+}
+
+function verifyVercelSignature(req) {
+  const secret = process.env.VERCEL_WEBHOOK_SECRET || process.env.CRON_SIGNATURE_SECRET;
+  const signature =
+    req.headers['x-vercel-signature'] ||
+    req.headers['x-vercel-webhook-signature'];
+  if (!secret || typeof signature !== 'string') return false;
+
+  const rawBody = typeof req.body === 'string'
+    ? req.body
+    : req.method === 'GET'
+      ? ''
+      : JSON.stringify(req.body || {});
+  const expected = crypto.createHmac('sha1', secret).update(rawBody).digest('hex');
+  return timingSafeHexEqual(signature, expected);
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
@@ -49,11 +75,12 @@ export default async function handler(req, res) {
     const user = requireAuth(req);
     const cronSecret = process.env.CRON_SECRET;
     const authHeader = req.headers.authorization || req.headers.Authorization || '';
-    const isCronSecret = cronSecret && (
-      authHeader === `Bearer ${cronSecret}` ||
-      req.query?.secret === cronSecret
-    );
-    if (!user && !isCronSecret) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    const userAgent = String(req.headers['user-agent'] || '');
+    const isCronSecret = !!cronSecret &&
+      authHeader === `Bearer ${cronSecret}` &&
+      userAgent.startsWith('vercel-cron/');
+    const isSignedVercelRequest = verifyVercelSignature(req);
+    if (!user && !isCronSecret && !isSignedVercelRequest) return res.status(401).json({ error: 'Unauthorized' });
 
     try {
       const now = new Date();

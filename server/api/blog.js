@@ -2,7 +2,39 @@ import { ObjectId } from 'mongodb';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requireAuth } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+import { sanitizeBlogHtml, stripHtml } from './_lib/sanitize.js';
 import { logActivity } from './notifications.js';
+
+function sanitizePost(post) {
+  if (!post) return post;
+  return {
+    ...post,
+    titleTr: stripHtml(post.titleTr, 300),
+    titleEn: stripHtml(post.titleEn, 300),
+    excerptTr: stripHtml(post.excerptTr, 1000),
+    excerptEn: stripHtml(post.excerptEn, 1000),
+    category: stripHtml(post.category, 120),
+    categoryEn: stripHtml(post.categoryEn, 120),
+    contentTr: sanitizeBlogHtml(post.contentTr),
+    contentEn: sanitizeBlogHtml(post.contentEn),
+  };
+}
+
+function sanitizeBlogInput(input) {
+  const clean = { ...input };
+  for (const key of ['titleTr', 'titleEn']) {
+    if (clean[key] !== undefined) clean[key] = stripHtml(clean[key], 300);
+  }
+  for (const key of ['excerptTr', 'excerptEn']) {
+    if (clean[key] !== undefined) clean[key] = stripHtml(clean[key], 1000);
+  }
+  for (const key of ['category', 'categoryEn']) {
+    if (clean[key] !== undefined) clean[key] = stripHtml(clean[key], 120);
+  }
+  if (clean.contentTr !== undefined) clean.contentTr = sanitizeBlogHtml(clean.contentTr);
+  if (clean.contentEn !== undefined) clean.contentEn = sanitizeBlogHtml(clean.contentEn);
+  return clean;
+}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -21,7 +53,7 @@ export default async function handler(req, res) {
           { publishAt: { $lte: now } },
         ],
       }).sort({ createdAt: -1 }).toArray();
-      return res.status(200).json(posts);
+      return res.status(200).json(posts.map(sanitizePost));
     } catch (error) {
       console.error('Blog GET error:', error);
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -48,7 +80,7 @@ export default async function handler(req, res) {
       const existing = await collection.findOne({ slug });
       if (existing) return res.status(400).json({ error: 'Bu slug zaten kullanılıyor' });
 
-      const post = {
+      const post = sanitizeBlogInput({
         titleTr: titleTr || '', titleEn: titleEn || '',
         excerptTr: excerptTr || '', excerptEn: excerptEn || '',
         contentTr: contentTr || '', contentEn: contentEn || '',
@@ -58,7 +90,7 @@ export default async function handler(req, res) {
         publishAt: publishAt ? new Date(publishAt) : null,
         date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }),
         createdAt: new Date(), updatedAt: new Date(),
-      };
+      });
 
       const result = await collection.insertOne(post);
       logActivity(db, { action: 'Blog yazısı oluşturuldu', detail: `"${titleTr}"`, type: 'create', icon: '📝', user: user.username }).catch(() => {});
@@ -75,10 +107,11 @@ export default async function handler(req, res) {
     if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
 
     try {
-      const { id, ...updateData } = req.body;
+      const { id, ...rawUpdateData } = req.body;
       if (!id) return res.status(400).json({ error: 'Post ID gerekli' });
       if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz Post ID' });
 
+      const updateData = sanitizeBlogInput(rawUpdateData);
       updateData.updatedAt = new Date();
       if (updateData.readTime) updateData.readTime = parseInt(updateData.readTime);
       if (updateData.publishAt !== undefined) {

@@ -16,6 +16,18 @@ import { FadeIn } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Blog.css'
 
+const BLOG_SANITIZE_CONFIG = {
+  ALLOWED_TAGS: [
+    'p', 'br', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li', 'strong', 'b', 'em', 'i',
+    'blockquote', 'a', 'code', 'pre', 'hr', 'img',
+  ],
+  ALLOWED_ATTR: ['href', 'title', 'target', 'rel', 'src', 'alt', 'loading'],
+  ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|\/(?!\/)|#|data:image\/(?:png|gif|jpeg|webp);base64,)/i,
+  FORBID_TAGS: ['style', 'script', 'iframe', 'object', 'embed', 'form', 'input', 'button'],
+  FORBID_ATTR: ['style', 'onerror', 'onload', 'onclick'],
+}
+
 export default function BlogDetail() {
   const { slug } = useParams()
   const { lang, t } = useLanguage()
@@ -176,10 +188,14 @@ export default function BlogDetail() {
             <FadeIn delay={0.1}>
               <div className="blog-detail-content glass-card">
                 {content ? (
-                  <div className="blog-body" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }} />
+                  <div className="blog-body" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content, BLOG_SANITIZE_CONFIG) }} />
+                ) : excerpt ? (
+                  <p style={{ color: 'var(--gray-lighter)', lineHeight: 1.8, fontSize: '1.05rem' }}>{excerpt}</p>
                 ) : (
-                  <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-                    {lang === 'tr' ? 'İçerik yakında eklenecek.' : 'Content coming soon.'}
+                  <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8 }}>
+                    {lang === 'tr'
+                      ? 'Bu yazının detaylı içeriği için ekibimizle iletişime geçebilirsiniz.'
+                      : 'Feel free to contact our team for more details on this topic.'}
                   </p>
                 )}
               </div>

@@ -164,6 +164,40 @@
   font-weight: 600;
 }
 
+.referral-service-group {
+  grid-column: 1 / -1;
+}
+
+.referral-service-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.referral-chip {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gray-lighter);
+  font-size: 0.83rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.referral-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.referral-chip.active {
+  background: rgba(234, 195, 33, 0.15);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+}
+
 .referral-submit {
   width: 100%;
   justify-content: center;

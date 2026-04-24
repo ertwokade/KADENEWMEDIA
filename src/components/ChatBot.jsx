@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { HiOutlinePaperAirplane, HiX } from 'react-icons/hi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
+import { apiFetch } from '../api'
 import './ChatBot.css'
 
 const KADE_CONTEXT = `Sen Kade Media'nın AI asistanısın. Kade Media İstanbul Biruni Teknopark'ta bulunan bir dijital pazarlama ajansıdır. 
@@ -112,7 +113,7 @@ function findFallbackResponse(message, lang) {
 
 async function getAIResponse(message, lang, history) {
   try {
-    const res = await fetch('/api/chat', {
+    const res = await apiFetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, lang, history: history.slice(-6) }),

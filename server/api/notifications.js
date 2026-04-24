@@ -103,27 +103,39 @@ export default async function handler(req, res) {
   return res.status(405).json({ error: 'Method not allowed' });
 }
 
-// Helper: Bildirim oluşturma (diğer API'lerden çağrılabilir)
+// Helper: Bildirim olusturma (diger API'lerden cagrilabilir)
 export async function createNotification(db, { userId, type, title, message, link }) {
-  await db.collection('notifications').insertOne({
-    userId,
-    type: type || 'info',
-    title,
-    message,
-    link: link || null,
-    read: false,
-    createdAt: new Date(),
-  });
+  try {
+    await db.collection('notifications').insertOne({
+      userId,
+      type: type || 'info',
+      title,
+      message,
+      link: link || null,
+      read: false,
+      createdAt: new Date(),
+    });
+    return true;
+  } catch (err) {
+    console.error('Notification write failed:', err.message);
+    return false;
+  }
 }
 
-// Helper: Aktivite logu (diğer API'lerden çağrılabilir)
+// Helper: Aktivite logu (diger API'lerden cagrilabilir)
 export async function logActivity(db, { action, detail, type, icon, user }) {
-  await db.collection('activity_log').insertOne({
-    action,
-    detail: detail || '',
-    type: type || 'system',
-    icon: icon || '⚙️',
-    user: user || 'sistem',
-    createdAt: new Date(),
-  });
+  try {
+    await db.collection('activity_log').insertOne({
+      action,
+      detail: detail || '',
+      type: type || 'system',
+      icon: icon || 'system',
+      user: user || 'sistem',
+      createdAt: new Date(),
+    });
+    return true;
+  } catch (err) {
+    console.error('Activity log write failed:', err.message);
+    return false;
+  }
 }

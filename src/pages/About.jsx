@@ -24,7 +24,7 @@ const defaultTeam = [
   { name: 'Zeynep Demir', roleTr: 'İçerik Stratejisti', roleEn: 'Content Strategist', color: '#eac321' },
 ]
 
-const defaultStats = { experience: '8+', teamSize: '5+', clients: '100+' }
+const defaultStats = { experience: '3+', teamSize: '4+', clients: '20+' }
 
 export default function About() {
   const { t, lang } = useLanguage()

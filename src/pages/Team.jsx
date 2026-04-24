@@ -15,20 +15,20 @@ const defaultTeam = [
     name: 'Kadir Demir',
     roleTr: 'Kurucu & CEO',
     roleEn: 'Founder & CEO',
-    bioTr: 'Dijital pazarlama ve sosyal medya alanında 8+ yıl deneyim. Strateji ve büyüme odaklı liderlik.',
-    bioEn: '8+ years of experience in digital marketing and social media. Strategy and growth-focused leadership.',
+    bioTr: 'Dijital pazarlama ve sosyal medya stratejisi odaklı. Müşteri büyümesini ve ajans vizyonunu birlikte yönetiyor.',
+    bioEn: 'Focused on digital marketing and social media strategy. Drives client growth and agency vision.',
     image: null,
-    social: { linkedin: '#', instagram: '#' },
+    social: {},
     color: '#eac321',
   },
   {
     name: 'Ayşe Yılmaz',
     roleTr: 'Kreatif Direktör',
     roleEn: 'Creative Director',
-    bioTr: 'Görsel hikaye anlatımı ve marka kimliği konularında uzman. Yaratıcı ekibin lideri.',
-    bioEn: 'Expert in visual storytelling and brand identity. Leader of the creative team.',
+    bioTr: 'Görsel hikaye anlatımı ve marka kimliği konularında uzman. Yaratıcı süreçlerin lideri.',
+    bioEn: 'Expert in visual storytelling and brand identity. Leads the creative process.',
     image: null,
-    social: { linkedin: '#', instagram: '#' },
+    social: {},
     color: '#E91E63',
   },
   {
@@ -38,17 +38,17 @@ const defaultTeam = [
     bioTr: 'Çok platformlu sosyal medya stratejileri ve topluluk yönetimi konusunda deneyimli.',
     bioEn: 'Experienced in multi-platform social media strategies and community management.',
     image: null,
-    social: { linkedin: '#' },
+    social: {},
     color: '#6C63FF',
   },
   {
     name: 'Zeynep Demir',
     roleTr: 'İçerik Stratejisti',
     roleEn: 'Content Strategist',
-    bioTr: 'İçerik pazarlama ve SEO stratejileri ile markaların dijital büyümesini sağlıyor.',
-    bioEn: 'Drives digital growth for brands with content marketing and SEO strategies.',
+    bioTr: 'İçerik pazarlama stratejileriyle markaların dijital büyümesini ve organik erişimini artırıyor.',
+    bioEn: 'Grows brands\' digital presence and organic reach through content marketing strategies.',
     image: null,
-    social: { linkedin: '#', instagram: '#' },
+    social: {},
     color: '#2ECC71',
   },
 ]
@@ -136,7 +136,7 @@ export default function Team() {
                     <div className="team-card-socials">
                       {Object.entries(member.social).map(([platform, url]) => {
                         const Icon = socialIcons[platform]
-                        if (!Icon || !url) return null
+                        if (!Icon || !url || url === '#') return null
                         return (
                           <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="team-social-link" aria-label={platform}>
                             <Icon size={14} />

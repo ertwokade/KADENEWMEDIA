@@ -44,7 +44,7 @@ export default async function handler(req, res) {
   const isAdmin = adminMode === true && !!requireAuth(req);
 
   if (!isAdmin) {
-    const rl = rateLimitCheck(req);
+    const rl = await rateLimitCheck(req, { namespace: 'chat', maxRequests: 20 });
     if (!rl.allowed) {
       return res.status(429).json({ error: `Çok fazla istek. ${rl.retryAfter} dakika sonra tekrar deneyin.` });
     }
