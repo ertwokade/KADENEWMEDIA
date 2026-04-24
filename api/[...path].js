@@ -15,6 +15,7 @@ import proposals from '../server/api/proposals.js'
 import referrals from '../server/api/referrals.js'
 import reminders from '../server/api/reminders.js'
 import seed from '../server/api/seed.js'
+import sitemap from '../server/api/sitemap.js'
 import subscriptions from '../server/api/subscriptions.js'
 import surveys from '../server/api/surveys.js'
 import tasks from '../server/api/tasks.js'
@@ -40,6 +41,7 @@ const handlers = {
   referrals,
   reminders,
   seed,
+  sitemap,
   subscriptions,
   surveys,
   tasks,
