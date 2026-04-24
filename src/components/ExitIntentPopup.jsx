@@ -7,6 +7,7 @@ import './ExitIntentPopup.css'
 
 const SESSION_KEY = 'kade_exit_popup_seen'
 const DELAY_MS = 40000
+const MIN_TIME_BEFORE_EXIT_MS = 8000
 
 export default function ExitIntentPopup() {
   const [visible, setVisible] = useState(false)
@@ -23,10 +24,16 @@ export default function ExitIntentPopup() {
 
   useEffect(() => {
     if (window.location.pathname === '/iletisim' || window.location.pathname === '/admin') return
-    const onMouseLeave = (e) => { if (e.clientY < 5) show() }
+    let canTriggerExit = false
+    const exitGuard = setTimeout(() => { canTriggerExit = true }, MIN_TIME_BEFORE_EXIT_MS)
+    const onMouseLeave = (e) => { if (e.clientY < 5 && canTriggerExit) show() }
     document.addEventListener('mouseleave', onMouseLeave)
     const timer = setTimeout(show, DELAY_MS)
-    return () => { document.removeEventListener('mouseleave', onMouseLeave); clearTimeout(timer) }
+    return () => {
+      clearTimeout(exitGuard)
+      document.removeEventListener('mouseleave', onMouseLeave)
+      clearTimeout(timer)
+    }
   }, [show])
 
   const close = () => setVisible(false)

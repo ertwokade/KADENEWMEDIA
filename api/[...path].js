@@ -94,6 +94,10 @@ function isPublicPost(req) {
 }
 
 export default async function handler(req, res) {
+  // Strip Vercel's internal routing param before query validation
+  const { path: _path, ...queryWithoutPath } = req.query || {}
+  req.query = queryWithoutPath
+
   if (!validateQuery(req, res)) return
   if (!isPublicPost(req) && !validateCsrf(req, res)) return
 
