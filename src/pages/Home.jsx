@@ -32,6 +32,7 @@ import HeroBackground from '../components/HeroBackground'
 import MagneticButton from '../components/MagneticButton'
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn, TiltCard } from '../components/Animations'
 import AuditScore from '../components/AuditScore'
+import AnalysisForm from '../components/AnalysisForm'
 import PageBgAnimation from '../components/PageBgAnimation'
 import LazyYouTubeEmbed from '../components/LazyYouTubeEmbed'
 import { CONTACT, SITE } from '../utils/constants'
@@ -621,6 +622,39 @@ export default function Home() {
               </FadeIn>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Ücretsiz Analiz Formu */}
+      <section className="section analysis-form-section">
+        <div className="container">
+          <div className="section-header">
+            <FadeIn>
+              <div className="section-badge">
+                <HiOutlineChartBar size={14} />
+                {lang === 'tr' ? 'Ücretsiz Dijital Analiz' : 'Free Digital Analysis'}
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <h2 className="section-title">
+                {lang === 'tr'
+                  ? <>Sadece <span>2 Dakikada</span> Sosyal Medya Karneni Çıkar</>
+                  : <>Get Your Social Media <span>Report Card</span> in 2 Minutes</>}
+              </h2>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <p className="section-subtitle">
+                {lang === 'tr'
+                  ? 'Hedefini ve sektörünü paylaş — Kadir sana özel bir analiz ve büyüme planıyla geri dönsün.'
+                  : 'Share your goal and industry — Kadir will come back with a custom analysis and growth plan.'}
+              </p>
+            </FadeIn>
+          </div>
+          <FadeIn delay={0.3}>
+            <div className="analysis-form-card glass-card">
+              <AnalysisForm />
+            </div>
+          </FadeIn>
         </div>
       </section>
 

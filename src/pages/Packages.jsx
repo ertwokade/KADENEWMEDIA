@@ -114,86 +114,62 @@ export default function Packages() {
 
   const packages = [
     {
-      name: isEN ? 'Starter' : 'Başlangıç',
-      tier: 'starter',
-      priceTRY: '11.900',
-      priceUSD: null,
-      desc: isEN ? 'Perfect for small businesses and startups taking their first steps in social media.' : 'Sosyal medyada ilk adımlarını atan küçük işletmeler ve startuplar için ideal.',
-      popular: false,
+      tier: 'start',
+      tag: isEN ? 'Giriş' : 'Giriş',
+      name: isEN ? 'Start-Up' : 'Start-Up',
+      tagline: isEN ? 'Strategy & vertical video first.' : 'Strateji ve dikey video önce.',
+      desc: isEN
+        ? 'For brands just starting to build a digital presence. We define your voice, produce vertical content, and set the foundation.'
+        : 'Dijital varlığını oluşturmaya yeni başlayan markalar için. Sesini belirliyor, dikey içerik üretiyor, temeli atıyoruz.',
       features: [
-        isEN ? '2 Platforms (Instagram + 1)' : '2 Platform (Instagram + 1)',
-        isEN ? '16 posts/month' : 'Ayda 16 içerik',
-        isEN ? 'Basic graphic design' : 'Temel grafik tasarım',
-        isEN ? 'Community management' : 'Topluluk yönetimi',
-        isEN ? 'Content calendar' : 'İçerik takvimi',
-        isEN ? 'Monthly performance report' : 'Aylık performans raporu',
+        isEN ? 'Brand strategy & positioning' : 'Marka stratejisi & konumlandırma',
+        isEN ? '2 platforms (Instagram + TikTok)' : '2 platform (Instagram + TikTok)',
+        isEN ? '8 vertical videos / month' : 'Ayda 8 dikey video',
+        isEN ? 'Caption & hashtag strategy' : 'Caption & hashtag stratejisi',
+        isEN ? 'Monthly growth report' : 'Aylık büyüme raporu',
       ],
-      notIncluded: [
-        isEN ? 'Ad management' : 'Reklam yönetimi',
-        isEN ? 'Video content (Reels)' : 'Video içerik (Reels)',
-        isEN ? 'Competitor analysis' : 'Rakip analizi',
-      ],
+      popular: false,
+      color: 'rgba(255,255,255,0.06)',
     },
     {
-      name: isEN ? 'Professional' : 'Profesyonel',
-      tier: 'professional',
-      priceTRY: '24.900',
-      priceUSD: null,
-      desc: isEN ? 'For growing brands that want comprehensive social media management and ad support.' : 'Kapsamlı sosyal medya yönetimi ve reklam desteği isteyen büyüyen markalar için.',
+      tier: 'growth',
+      tag: isEN ? 'Growth' : 'Büyüme',
+      name: isEN ? 'Growth' : 'Büyüme',
+      tagline: isEN ? 'Full management + ads + 12 Reels.' : 'Tam yönetim + reklam + 12 Reels.',
+      desc: isEN
+        ? 'For brands ready to scale. Social media management, Reels production, and ad campaigns that deliver real results.'
+        : 'Ölçeklenmeye hazır markalar için. Sosyal medya yönetimi, Reels prodüksiyonu ve gerçek sonuç getiren reklam kampanyaları.',
+      features: [
+        isEN ? 'Everything in Start-Up' : 'Start-Up\'taki her şey',
+        isEN ? '4 platforms' : '4 platform',
+        isEN ? '12 Reels / month' : 'Ayda 12 Reels',
+        isEN ? 'Meta & TikTok Ads management' : 'Meta & TikTok Ads yönetimi',
+        isEN ? 'Competitor analysis' : 'Rakip analizi',
+        isEN ? 'Bi-weekly performance review' : '2 haftada bir performans inceleme',
+        isEN ? 'Community management' : 'Topluluk yönetimi',
+      ],
       popular: true,
-      features: [
-        isEN ? '4 Platforms' : '4 Platform',
-        isEN ? '30 posts/month' : 'Ayda 30 içerik',
-        isEN ? 'Professional design' : 'Profesyonel tasarım',
-        isEN ? 'Community management' : 'Topluluk yönetimi',
-        isEN ? 'Content calendar' : 'İçerik takvimi',
-        isEN ? 'Bi-weekly reporting' : '2 haftada bir raporlama',
-        isEN ? 'Basic ad management' : 'Temel reklam yönetimi',
-        isEN ? '4 Reels/month' : 'Ayda 4 Reels',
-        isEN ? 'Competitor analysis' : 'Rakip analizi',
-      ],
-      notIncluded: [],
+      color: 'rgba(234,195,33,0.06)',
     },
     {
-      name: isEN ? 'Enterprise' : 'Kurumsal',
-      tier: 'enterprise',
-      priceTRY: '54.900',
-      priceUSD: null,
-      desc: isEN ? 'Full-service digital marketing solution for large brands seeking maximum growth.' : 'Maksimum büyüme hedefleyen büyük markalar için tam kapsamlı dijital pazarlama çözümü.',
-      popular: false,
+      tier: 'premium',
+      tag: isEN ? 'Premium' : 'Premium',
+      name: isEN ? 'Premium' : 'Premium',
+      tagline: isEN ? 'Full production + influencer marketing.' : 'Tam prodüksiyon + influencer marketing.',
+      desc: isEN
+        ? 'The complete package. Studio-level production, influencer campaigns, and a dedicated strategist — the LumiFem model.'
+        : 'Tam paket. Stüdyo kalitesinde prodüksiyon, influencer kampanyaları ve özel strateji danışmanı — LumiFem modeli.',
       features: [
-        isEN ? 'All platforms' : 'Tüm platformlar',
-        isEN ? 'Unlimited content' : 'Sınırsız içerik',
-        isEN ? 'Premium design' : 'Premium tasarım',
-        isEN ? 'Community management' : 'Topluluk yönetimi',
-        isEN ? 'Content calendar' : 'İçerik takvimi',
-        isEN ? 'Weekly reporting' : 'Haftalık raporlama',
-        isEN ? 'Advanced ad management' : 'Gelişmiş reklam yönetimi',
-        isEN ? '12 Reels/month' : 'Ayda 12 Reels',
-        isEN ? 'Competitor analysis' : 'Rakip analizi',
+        isEN ? 'Everything in Growth' : 'Büyüme\'deki her şey',
+        isEN ? 'Studio-level production shoots' : 'Stüdyo kalitesinde prodüksiyon çekimleri',
+        isEN ? 'Influencer marketing campaigns' : 'Influencer marketing kampanyaları',
+        isEN ? 'Dedicated strategy consultant' : 'Özel strateji danışmanı',
+        isEN ? 'Weekly reporting & calls' : 'Haftalık rapor & görüşme',
         isEN ? 'Crisis management' : 'Kriz yönetimi',
-        isEN ? 'Dedicated strategist' : 'Özel strateji danışmanı',
-        isEN ? 'Priority support' : 'Öncelikli destek',
+        isEN ? 'Priority response (4h)' : 'Öncelikli yanıt (4 saat)',
       ],
-      notIncluded: [],
-    },
-    {
-      name: isEN ? 'Custom' : 'Özel',
-      tier: 'custom',
-      priceTRY: null,
-      priceUSD: null,
-      desc: isEN ? 'Fully tailored solutions designed specifically for your brand\'s unique needs.' : 'Markanızın benzersiz ihtiyaçlarına özel tasarlanmış çözümler.',
       popular: false,
-      isCustom: true,
-      features: [
-        isEN ? 'Everything in Enterprise' : 'Kurumsaldaki her şey',
-        isEN ? 'Custom strategy & roadmap' : 'Özel strateji ve yol haritası',
-        isEN ? 'Multi-brand management' : 'Çoklu marka yönetimi',
-        isEN ? 'International market support' : 'Uluslararası pazar desteği',
-        isEN ? 'Dedicated team' : 'Size özel ekip',
-        isEN ? 'SLA agreement' : 'SLA anlaşması',
-      ],
-      notIncluded: [],
+      color: 'rgba(108,99,255,0.06)',
     },
   ]
 
@@ -248,70 +224,81 @@ export default function Packages() {
       {/* Pricing Cards */}
       <section className="section">
         <div className="container">
-          <StaggerContainer className="packages-grid" staggerDelay={0.15}>
-            {(dynamicPackages || packages).map((pkg) => (
-              <StaggerItem key={pkg.name}>
+          <div className="section-header" style={{ marginBottom: 16 }}>
+            <FadeIn delay={0.1}>
+              <h2 className="section-title">
+                {isEN ? <>Find the <span>Right Package</span> for You</> : <>Sana <span>Uygun Paketi</span> Seçelim</>}
+              </h2>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <p className="section-subtitle" style={{ maxWidth: 540, margin: '0 auto' }}>
+                {isEN
+                  ? "Prices are personalized based on your brand's needs. Book a free call and we'll figure it out together."
+                  : 'Fiyatlar markanın ihtiyacına göre kişiselleştirilir. Ücretsiz görüşme rezerv et, birlikte belirleyelim.'}
+              </p>
+            </FadeIn>
+          </div>
+          <StaggerContainer className="packages-grid packages-grid-3" staggerDelay={0.12}>
+            {packages.map((pkg) => (
+              <StaggerItem key={pkg.tier}>
                 <motion.div
-                  className={`package-card glass-card ${pkg.popular ? 'popular' : ''}`}
-                  whileHover={{ scale: 1.02, y: -5 }}
+                  className={`package-card glass-card pkg-v2 ${pkg.popular ? 'popular' : ''}`}
+                  style={{ background: pkg.color }}
+                  whileHover={{ scale: 1.02, y: -6 }}
                 >
                   {pkg.popular && (
                     <div className="popular-badge">
                       <HiOutlineStar size={14} />
-                      {t('packages.popular')}
+                      {isEN ? 'Most Popular' : 'En Çok Tercih Edilen'}
                     </div>
                   )}
-                  <div className="package-header">
-                    <h3>{pkg.name}</h3>
-                    <p className="package-desc">{pkg.desc}</p>
-                    
-                    {pkg.isCustom ? (
-                      <div className="package-price custom-price">
-                        <span className="amount" style={{ fontSize: '1.5rem' }}>{isEN ? 'Custom Pricing' : 'Özel Fiyatlandırma'}</span>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="package-price">
-                          <span className="currency">₺</span>
-                          <span className="amount">{pkg.priceTRY}</span>
-                          <span className="period">{t('packages.month')}</span>
-                        </div>
-                        {convertTRYtoUSD(pkg.priceTRY, exchangeRate) && (
-                          <div style={{ color: 'var(--text-tertiary)', fontSize: '0.82rem', marginTop: 6 }}>
-                            ≈ ${convertTRYtoUSD(pkg.priceTRY, exchangeRate)} / mo
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
+                  <div className="pkg-tag">{pkg.tag}</div>
+                  <h3 className="pkg-name">{pkg.name}</h3>
+                  <p className="pkg-tagline">{pkg.tagline}</p>
+                  <p className="package-desc">{pkg.desc}</p>
 
                   <div className="package-features">
                     {pkg.features.map((feature) => (
                       <div key={feature} className="feature-item included">
-                        <HiOutlineCheck size={16} />
-                        <span>{feature}</span>
-                      </div>
-                    ))}
-                    {pkg.notIncluded.map((feature) => (
-                      <div key={feature} className="feature-item not-included">
-                        <span className="dash">—</span>
+                        <HiOutlineCheck size={15} />
                         <span>{feature}</span>
                       </div>
                     ))}
                   </div>
 
-                  <Link
-                    to="/iletisim"
+                  <a
+                    href={`https://wa.me/905067293423?text=${encodeURIComponent(isEN ? `Hi Kadir, I'm interested in the ${pkg.name} package. Can we talk?` : `Merhaba Kadir, ${pkg.name} paketi hakkında konuşmak istiyorum.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`btn ${pkg.popular ? 'btn-primary' : 'btn-outline'} package-btn`}
                     onClick={() => analytics.packageClick(pkg.name)}
                   >
-                    {pkg.isCustom ? (isEN ? 'Get Quote' : 'Teklif Al') : pkg.popular ? (isEN ? 'Get Started' : 'Hemen Başla') : (isEN ? 'Discovery Call' : 'Keşif Görüşmesi')}
+                    {isEN ? "Let's Find Your Package" : 'Senin Paketini Seçelim'}
                     <HiOutlineArrowRight size={16} />
-                  </Link>
+                  </a>
                 </motion.div>
               </StaggerItem>
             ))}
           </StaggerContainer>
+
+          <FadeIn delay={0.4}>
+            <div className="packages-bottom-note">
+              <p>
+                {isEN
+                  ? "Not sure which one? That's fine — we'll figure it out in a 15-minute call."
+                  : 'Hangisi uygun emin değil misin? Normal — 15 dakikalık görüşmede birlikte belirleriz.'}
+              </p>
+              <a
+                href={`https://wa.me/905067293423?text=${encodeURIComponent(isEN ? 'Hi Kadir, I need help choosing a package.' : 'Merhaba Kadir, hangi paketi seçeceğime karar veremiyorum, yardımcı olur musun?')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                {isEN ? '15-min Free Call' : '15 Dk Ücretsiz Görüşme'}
+                <HiOutlineArrowRight size={16} />
+              </a>
+            </div>
+          </FadeIn>
         </div>
       </section>
 

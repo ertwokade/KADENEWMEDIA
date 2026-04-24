@@ -9,7 +9,18 @@ import { getPortfolioApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import PortfolioGrid from '../components/PortfolioGrid'
 import './Portfolio.css'
+
+// Gerçek içeriklerini buraya ekle: image = kapak görseli, video = .mp4 / .webm yolu
+const videoPortfolioItems = [
+  { id: 'v1', title: 'İçerik Ekle', category: 'Reels', image: '', video: '' },
+  { id: 'v2', title: 'İçerik Ekle', category: 'TikTok', image: '', video: '' },
+  { id: 'v3', title: 'İçerik Ekle', category: 'Marka Hikayesi', image: '', video: '' },
+  { id: 'v4', title: 'İçerik Ekle', category: 'Reels', image: '', video: '' },
+  { id: 'v5', title: 'İçerik Ekle', category: 'Reklam', image: '', video: '' },
+  { id: 'v6', title: 'İçerik Ekle', category: 'TikTok', image: '', video: '' },
+]
 
 const portfolioItems = [
   {
@@ -196,6 +207,19 @@ export default function Portfolio() {
               )
             })}
           </StaggerContainer>
+
+          {/* Video Portfolio Grid */}
+          <FadeIn delay={0.2}>
+            <div className="section-header" style={{ marginTop: 64 }}>
+              <h2 className="section-title">
+                {lang === 'tr' ? <>Video <span>İçeriklerimiz</span></> : <>Our <span>Video Content</span></>}
+              </h2>
+              <p className="section-subtitle">
+                {lang === 'tr' ? 'Üzer üzerine gelerek videoyu izle' : 'Hover to watch the video'}
+              </p>
+            </div>
+            <PortfolioGrid items={videoPortfolioItems} />
+          </FadeIn>
 
           <FadeIn delay={0.3}>
             <div className="portfolio-cta glass-card">

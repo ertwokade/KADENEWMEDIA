@@ -2,6 +2,19 @@
    HOME PAGE STYLES
    ========================================== */
 
+/* Analysis Form Section */
+.analysis-form-section { overflow: hidden; }
+
+.analysis-form-card {
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 40px 48px;
+}
+
+@media (max-width: 640px) {
+  .analysis-form-card { padding: 28px 20px; }
+}
+
 /* Founder Section */
 .founder-section {
   padding: 48px 0 0;

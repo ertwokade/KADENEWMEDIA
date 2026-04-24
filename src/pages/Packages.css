@@ -56,6 +56,57 @@
   align-items: start;
 }
 
+.packages-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* v2 card styles */
+.pkg-v2 .pkg-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+
+.pkg-v2 .pkg-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--white);
+  margin: 0 0 4px;
+}
+
+.pkg-v2 .pkg-tagline {
+  font-size: 0.82rem;
+  color: var(--gray-light);
+  font-style: italic;
+  margin: 0 0 12px;
+}
+
+.packages-bottom-note {
+  margin-top: 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.packages-bottom-note p {
+  color: var(--gray-lighter);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 900px) {
+  .packages-grid-3 {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+  }
+}
+
 .package-card {
   padding: 36px;
   position: relative;

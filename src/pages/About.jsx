@@ -15,6 +15,7 @@ import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import ProgressTimeline from '../components/ProgressTimeline'
 import './About.css'
 
 const defaultTeam = [
@@ -251,6 +252,28 @@ export default function About() {
                 {lang === 'en' ? 'Meet the Full Team' : 'Tüm Ekibi Tanıyın'} →
               </Link>
             </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* Growth Timeline */}
+      <section className="section">
+        <div className="container">
+          <div className="section-header">
+            <FadeIn>
+              <div className="section-badge">
+                <HiOutlineLightBulb size={14} />
+                {lang === 'en' ? 'Our Journey' : 'Büyüme Hikayemiz'}
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <h2 className="section-title">
+                {lang === 'en' ? <>From <span>Day One</span> to Today</> : <><span>Başlangıçtan</span> Bugüne</>}
+              </h2>
+            </FadeIn>
+          </div>
+          <FadeIn delay={0.2}>
+            <ProgressTimeline />
           </FadeIn>
         </div>
       </section>

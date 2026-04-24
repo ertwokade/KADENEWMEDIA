@@ -221,8 +221,6 @@ export default function ChatBot({ isOpen, onClose }) {
     sendMessage(reply)
   }
 
-  if (!isOpen) return null
-
   const phoneNumber = '905067293423'
   const waMsg = encodeURIComponent(
     lang === 'tr'
@@ -233,6 +231,7 @@ export default function ChatBot({ isOpen, onClose }) {
 
   return (
     <AnimatePresence>
+      {isOpen && (
       <motion.div
         className="chatbot-overlay"
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -327,6 +326,7 @@ export default function ChatBot({ isOpen, onClose }) {
           {fb.whatsappCta}
         </a>
       </motion.div>
+      )}
     </AnimatePresence>
   )
 }
