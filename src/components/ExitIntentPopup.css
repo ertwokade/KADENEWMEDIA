@@ -101,15 +101,17 @@
 .exit-dismiss {
   background: none;
   border: none;
-  color: var(--gray);
+  color: var(--gray-lighter);
   font-size: 0.82rem;
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
   transition: color 0.2s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .exit-dismiss:hover {
-  color: var(--gray-light);
+  color: var(--white);
 }
 
 .exit-note {

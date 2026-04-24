@@ -75,9 +75,27 @@ function normalizeRoute(req) {
   return routeKey.split('/')[0]
 }
 
+// Public POST endpoints that don't require CSRF (no authenticated session)
+const PUBLIC_ACTIONS = new Set([
+  'newsletter', 'apply', 'analyzer-lead', 'submit',
+])
+
+function isPublicPost(req) {
+  if (req.method !== 'POST') return false
+  const route = normalizeRoute(req)
+  const action = req.query?.action
+  // Public contact actions
+  if (route === 'contact' && (!action || PUBLIC_ACTIONS.has(action))) return true
+  // Public referral submission
+  if (route === 'referrals' && !action) return true
+  // Public survey response
+  if (route === 'surveys' && action === 'submit') return true
+  return false
+}
+
 export default async function handler(req, res) {
   if (!validateQuery(req, res)) return
-  if (!validateCsrf(req, res)) return
+  if (!isPublicPost(req) && !validateCsrf(req, res)) return
 
   const route = normalizeRoute(req)
   const routeHandler = handlers[route]

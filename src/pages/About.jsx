@@ -19,7 +19,7 @@ import ProgressTimeline from '../components/ProgressTimeline'
 import './About.css'
 
 const defaultTeam = [
-  { name: 'Kadir Demir', roleTr: 'Kurucu & CEO', roleEn: 'Founder & CEO', color: '#eac321' },
+  { name: 'Kadir Demir', roleTr: 'Kurucu & CEO', roleEn: 'Founder & CEO', color: '#eac321', avatar: '/kadir.jpg' },
   { name: 'Ayşe Yılmaz', roleTr: 'Kreatif Direktör', roleEn: 'Creative Director', color: '#eac321' },
   { name: 'Mehmet Kaya', roleTr: 'Sosyal Medya Yöneticisi', roleEn: 'Social Media Manager', color: '#eac321' },
   { name: 'Zeynep Demir', roleTr: 'İçerik Stratejisti', roleEn: 'Content Strategist', color: '#eac321' },
