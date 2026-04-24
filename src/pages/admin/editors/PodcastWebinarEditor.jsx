@@ -100,6 +100,9 @@ export default function PodcastWebinarEditor({ data, onSave }) {
           <div className="form-group"><label>Tarih / Durum</label>
             <input type="text" value={item.date || ''} onChange={(e) => upd('items', i, 'date', e.target.value)} placeholder="30 Nisan 2026 veya Yayında" />
           </div>
+          <div className="form-group"><label>Link (YouTube, Spotify vb. — boş bırakılabilir)</label>
+            <input type="url" value={item.url || ''} onChange={(e) => upd('items', i, 'url', e.target.value)} placeholder="https://..." />
+          </div>
         </div>
       ))}
       <button className="btn btn-outline" style={{ marginBottom: 16 }} onClick={() => add('items', { type: 'Webinar', title: '', date: '', ikon: '🎥' })}>

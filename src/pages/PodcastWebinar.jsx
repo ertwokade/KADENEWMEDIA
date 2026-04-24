@@ -77,7 +77,11 @@ export default function PodcastWebinar() {
                   <span style={{ fontSize: '1.8rem' }}>{item.ikon || '🎥'}</span>
                   <p className="tool-muted">{item.type} · {item.date}</p>
                   <h3>{item.title}</h3>
-                  {isExternal ? (
+                  {item.url ? (
+                    <a href={item.url} target="_blank" rel="noreferrer" className="btn btn-outline">
+                      İzle / Dinle <HiOutlineArrowRight size={16} />
+                    </a>
+                  ) : isExternal ? (
                     <a href={content.ctaLink} target="_blank" rel="noreferrer" className="btn btn-outline">
                       {content.ctaLabel} <HiOutlineArrowRight size={16} />
                     </a>

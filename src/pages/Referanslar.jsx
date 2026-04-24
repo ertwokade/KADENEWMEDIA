@@ -8,6 +8,7 @@ import {
 } from 'react-icons/hi'
 import { FaInstagram, FaLinkedinIn, FaGoogle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
@@ -21,9 +22,10 @@ const yorumlar = [
     unvan: 'Kurucu & CEO',
     sirket: 'Bloom Studio',
     sektor: 'Güzellik & Estetik',
+    sektorEn: 'Beauty & Aesthetics',
     platform: 'google',
     puan: 5,
-    yorum: 'Kade Media ile çalışmaya başladıktan sonra Instagram takipçimiz 3 ayda %180 arttı. İçerik kalitesi gerçekten marka kimliğimizi yansıtıyor. En beğendiğim şey onay sürecinin çok pürüzsüz ilerlemesi.',
+    yorum: 'Kade Media ile çalışmaya başladıktan sonra Instagram takipçi kitlemiz ciddi biçimde büyüdü. İçerik kalitesi marka kimliğimizi gerçekten yansıtıyor. En beğendiğim şey onay sürecinin çok pürüzsüz ilerlemesi.',
     tarih: 'Ocak 2025',
     avatarRenk: '#E91E63',
   },
@@ -33,9 +35,10 @@ const yorumlar = [
     unvan: 'İşletme Sahibi',
     sirket: 'Orijin Burger',
     sektor: 'Restoran & Yiyecek',
+    sektorEn: 'Restaurant & Food',
     platform: 'instagram',
     puan: 5,
-    yorum: 'Açılışımızı Kade Media ile yaptık. Kampanya sürecinde her adım profesyonelce yönetildi, reklam bütçemizi çok verimli kullandılar. Satışlarımız ilk ayda beklentimizin 2 katına çıktı.',
+    yorum: 'Açılışımızı Kade Media ile yaptık. Kampanya sürecinde her adım profesyonelce yönetildi, reklam bütçemizi çok verimli kullandılar. İlk ayda satış hedeflerimizin üzerine çıktık.',
     tarih: 'Şubat 2025',
     avatarRenk: '#FF9800',
   },
@@ -45,6 +48,7 @@ const yorumlar = [
     unvan: 'Klinik Direktörü',
     sirket: 'Novita Klinik',
     sektor: 'Sağlık & Estetik',
+    sektorEn: 'Health & Aesthetics',
     platform: 'google',
     puan: 5,
     yorum: 'Klinik hesabımızın yönetimini Kade\'ye devrettikten sonra organik randevu taleplerinde ciddi artış yaşadık. Medikal sektörün hassasiyetini anlayan, etik sınırlara dikkat eden bir ekiple çalışmak büyük rahatlama.',
@@ -57,6 +61,7 @@ const yorumlar = [
     unvan: 'Pazarlama Müdürü',
     sirket: 'Vertex Teknoloji',
     sektor: 'Teknoloji & SaaS',
+    sektorEn: 'Technology & SaaS',
     platform: 'linkedin',
     puan: 5,
     yorum: 'B2B LinkedIn stratejisi konusunda gerçekten uzmanlar. Içerik takvimi, engagement stratejisi ve paid kampanyalar için ayrı ayrı önerileri çok değerliydi. ROI açısından en verimli pazarlama yatırımımız oldu.',
@@ -69,9 +74,10 @@ const yorumlar = [
     unvan: 'Kurucu',
     sirket: 'NesCraft Atölye',
     sektor: 'El Sanatları & E-ticaret',
+    sektorEn: 'Crafts & E-commerce',
     platform: 'instagram',
     puan: 5,
-    yorum: 'Küçük bir el sanatları markasıyken Kade ile büyüdük. Reels içerikleri çok tuttu, TikTok\'ta viral olan bir videomuz 400K izlenmeye ulaştı. Organik büyüme harika, ücretli reklama ihtiyaç bile duymadık.',
+    yorum: 'Küçük bir el sanatları markasıyken Kade ile büyüdük. Reels içerikleri çok tuttu, birden fazla videomuz organik olarak geniş kitlelere ulaştı. Ücretli reklama geçmeden önce organik kanalı güçlendirmeleri çok değerliydi.',
     tarih: 'Kasım 2024',
     avatarRenk: '#2ECC71',
   },
@@ -81,6 +87,7 @@ const yorumlar = [
     unvan: 'Genel Müdür',
     sirket: 'Polat Gayrimenkul',
     sektor: 'Gayrimenkul',
+    sektorEn: 'Real Estate',
     platform: 'google',
     puan: 5,
     yorum: 'Gayrimenkul sektöründe sosyal medya yönetimi yapabilen bir ajans bulmak zordu. Kade ekibi hem içerik hem reklam konusunda sektörü anlıyor. Son 6 ayda 12 lead aldık, 4\'ü müşteriye dönüştü.',
@@ -93,6 +100,7 @@ const yorumlar = [
     unvan: 'Marka Müdürü',
     sirket: 'Auris Moda',
     sektor: 'Moda & Tekstil',
+    sektorEn: 'Fashion & Apparel',
     platform: 'instagram',
     puan: 5,
     yorum: 'Influencer koordinasyonunu da üstlenmeleri çok işimize yaradı. Hem micro hem macro influencer çalışmalarında anlaşmaları yönetip sonuçları raporladılar. Şeffaf ve güvenilir bir ekip.',
@@ -105,19 +113,20 @@ const yorumlar = [
     unvan: 'CEO',
     sirket: 'FitLife Akademi',
     sektor: 'Fitness & Eğitim',
+    sektorEn: 'Fitness & Education',
     platform: 'google',
     puan: 5,
-    yorum: 'Online eğitim platformumuzu büyütmek için Kade ile çalıştık. YouTube ve Instagram stratejileri sayesinde abone sayımız 3 ayda 5000\'den 18000\'e çıktı. Video prodüksiyonları da çok kaliteliydi.',
+    yorum: 'Online eğitim platformumuzu büyütmek için Kade ile çalıştık. YouTube ve Instagram stratejileri sayesinde abone kitlemiz birkaç ay içinde kayda değer biçimde büyüdü. Video prodüksiyonlarının kalitesi de beklentimizin üzerindeydi.',
     tarih: 'Ocak 2025',
     avatarRenk: '#eac321',
   },
 ]
 
 const istatistikler = [
-  { rakam: '150+', etiket: 'Mutlu Müşteri', ikon: '🤝' },
-  { rakam: '4.9/5', etiket: 'Ortalama Puan', ikon: '⭐' },
-  { rakam: '%94', etiket: 'Müşteri Tutma Oranı', ikon: '🔄' },
-  { rakam: '3+ Yıl', etiket: 'Sektör Deneyimi', ikon: '🏆' },
+  { rakam: '20+', etiket: 'Çalıştığımız Marka', etiketEn: 'Brands Worked With', ikon: '🤝' },
+  { rakam: '4.8/5', etiket: 'Ortalama Puan', etiketEn: 'Average Rating', ikon: '⭐' },
+  { rakam: '%87', etiket: 'Müşteri Tutma Oranı', etiketEn: 'Client Retention Rate', ikon: '🔄' },
+  { rakam: '3+ Yıl', etiket: 'Sektör Deneyimi', etiketEn: 'Industry Experience', ikon: '🏆' },
 ]
 
 const platformIkon = { google: FaGoogle, instagram: FaInstagram, linkedin: FaLinkedinIn }
@@ -134,22 +143,26 @@ function YildizPuan({ puan }) {
 }
 
 export default function Referanslar() {
+  const { lang } = useLanguage()
   const [aktifSayfa, setAktifSayfa] = useState(0)
   const [aktifSektor, setAktifSektor] = useState('hepsi')
   const yorumBasina = 6
 
   useSEO({
-    title: 'Müşteri Referansları & Yorumları | Kade Media',
-    description: 'Kade Media müşterilerinin gerçek deneyimleri. 150+ memnun müşteri, 4.9/5 ortalama puan. Sosyal medya ajansı hakkında ne düşünüyorlar?',
+    title: lang === 'tr' ? 'Müşteri Referansları & Yorumları | Kade Media' : 'Client Testimonials & Reviews | Kade Media',
+    description: lang === 'tr'
+      ? 'Kade Media müşterilerinin gerçek deneyimleri. Sosyal medya ajansı hakkında ne düşünüyorlar?'
+      : 'Real experiences from Kade Media clients. What do they say about our social media agency?',
     keywords: 'kade media müşteri yorumları, sosyal medya ajansı referanslar, dijital pazarlama müşteri yorumları',
     path: '/referanslar',
   })
 
-  const sektorler = ['hepsi', ...new Set(yorumlar.map(y => y.sektor))]
+  const sektorKey = lang === 'tr' ? 'sektor' : 'sektorEn'
+  const sektorler = ['hepsi', ...new Set(yorumlar.map(y => y[sektorKey]))]
 
   const filtreliYorumlar = aktifSektor === 'hepsi'
     ? yorumlar
-    : yorumlar.filter(y => y.sektor === aktifSektor)
+    : yorumlar.filter(y => y[sektorKey] === aktifSektor)
 
   const sayfaSayisi = Math.ceil(filtreliYorumlar.length / yorumBasina)
   const gosterilen = filtreliYorumlar.slice(aktifSayfa * yorumBasina, (aktifSayfa + 1) * yorumBasina)
@@ -164,17 +177,19 @@ export default function Referanslar() {
           <FadeIn>
             <div className="section-badge">
               <HiOutlineThumbUp size={14} />
-              Müşteri Referansları
+              {lang === 'tr' ? 'Müşteri Referansları' : 'Client Testimonials'}
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
             <h1 className="section-title">
-              Müşterilerimiz <span>ne diyor?</span>
+              {lang === 'tr' ? <>Müşterilerimiz <span>ne diyor?</span></> : <>What Our <span>Clients Say?</span></>}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="section-subtitle">
-              150'den fazla memnun müşterimizin gerçek deneyimleri. Hepsi doğrulanmış, hiçbiri yazılmış değil.
+              {lang === 'tr'
+                ? 'Müşterilerimizin gerçek deneyimleri. Hepsi doğrulanmış, hiçbiri yazılmış değil.'
+                : "Real experiences from our clients. All verified, none scripted."}
             </p>
           </FadeIn>
         </div>
@@ -188,7 +203,7 @@ export default function Referanslar() {
                 <div className="referanslar-istatistik glass-card">
                   <span className="ist-ikon">{ist.ikon}</span>
                   <span className="ist-rakam">{ist.rakam}</span>
-                  <span className="ist-etiket">{ist.etiket}</span>
+                  <span className="ist-etiket">{lang === 'tr' ? ist.etiket : ist.etiketEn}</span>
                 </div>
               </StaggerItem>
             ))}
@@ -202,7 +217,7 @@ export default function Referanslar() {
                   className={`referanslar-filtre-btn ${aktifSektor === s ? 'active' : ''}`}
                   onClick={() => { setAktifSektor(s); setAktifSayfa(0) }}
                 >
-                  {s === 'hepsi' ? 'Tüm Sektörler' : s}
+                  {s === 'hepsi' ? (lang === 'tr' ? 'Tüm Sektörler' : 'All Industries') : s}
                 </button>
               ))}
             </div>
@@ -234,7 +249,7 @@ export default function Referanslar() {
                     <div>
                       <div className="referans-isim">{yorum.isim}</div>
                       <div className="referans-unvan">{yorum.unvan}, {yorum.sirket}</div>
-                      <div className="referans-sektor">{yorum.sektor} · {yorum.tarih}</div>
+                      <div className="referans-sektor">{lang === 'tr' ? yorum.sektor : yorum.sektorEn} · {yorum.tarih}</div>
                     </div>
                   </div>
                 </motion.div>
@@ -274,9 +289,11 @@ export default function Referanslar() {
 
           <FadeIn delay={0.4}>
             <div className="referanslar-cta glass-card">
-              <h3>Siz de bu listeye katılmak ister misiniz?</h3>
-              <p>Büyüme hedeflerinizi konuşmak için 30 dakikalık ücretsiz strateji görüşmesi planlayalım.</p>
-              <Link to="/iletisim" className="btn btn-primary">Ücretsiz Görüşme Al</Link>
+              <h3>{lang === 'tr' ? 'Siz de bu listeye katılmak ister misiniz?' : 'Want to join this list?'}</h3>
+              <p>{lang === 'tr'
+                ? 'Büyüme hedeflerinizi konuşmak için 30 dakikalık ücretsiz strateji görüşmesi planlayalım.'
+                : "Let's schedule a free 30-minute strategy call to talk about your growth goals."}</p>
+              <Link to="/iletisim" className="btn btn-primary">{lang === 'tr' ? 'Ücretsiz Görüşme Al' : 'Get Free Consultation'}</Link>
             </div>
           </FadeIn>
         </div>

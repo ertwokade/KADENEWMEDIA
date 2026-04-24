@@ -1,7 +1,9 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { getDb } from './_lib/mongodb.js';
-import { createToken, requireAuth } from './_lib/auth.js';
+import { clearAuthCookies, createToken, requireAuth, setAuthCookies, setCsrfCookie } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+import { rateLimitCheck } from './_lib/rateLimit.js';
 import { logActivity } from './notifications.js';
 
 // Varsayılan admin bilgileri — .env'den alınır
@@ -9,43 +11,36 @@ const DEFAULT_ADMIN_USERNAME = 'kade';
 const DEFAULT_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD;
 
 // Brute-force koruması: IP başına login denemesi sınırı
-const loginAttempts = new Map();
 const LOGIN_WINDOW_MS = 15 * 60 * 1000; // 15 dakika
 const MAX_LOGIN_ATTEMPTS = 10;
-
-function checkLoginRateLimit(req) {
-  const ip =
-    req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-    req.headers['x-real-ip'] ||
-    req.socket?.remoteAddress ||
-    'unknown';
-  const now = Date.now();
-
-  for (const [key, val] of loginAttempts.entries()) {
-    if (now - val.windowStart > LOGIN_WINDOW_MS) loginAttempts.delete(key);
-  }
-
-  const entry = loginAttempts.get(ip);
-  if (!entry || now - entry.windowStart > LOGIN_WINDOW_MS) {
-    loginAttempts.set(ip, { count: 1, windowStart: now });
-    return { allowed: true };
-  }
-  if (entry.count >= MAX_LOGIN_ATTEMPTS) {
-    const retryAfter = Math.ceil((LOGIN_WINDOW_MS - (now - entry.windowStart)) / 60000);
-    return { allowed: false, retryAfter };
-  }
-  entry.count += 1;
-  return { allowed: true };
-}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
+  const action = req.query?.action || 'login';
+
+  if (req.method === 'GET' && action === 'csrf') {
+    const csrfToken = setCsrfCookie(req, res);
+    return res.status(200).json({ csrfToken });
+  }
+
+  if (req.method === 'GET' && action === 'session') {
+    const user = requireAuth(req);
+    if (!user) return res.status(401).json({ authenticated: false });
+    return res.status(200).json({
+      authenticated: true,
+      user: { username: user.username, role: user.role },
+    });
+  }
+
+  if (req.method === 'POST' && action === 'logout') {
+    clearAuthCookies(req, res);
+    return res.status(200).json({ success: true });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
-
-  const action = req.query?.action || 'login';
 
   if (action === 'change-password') {
     return handleChangePassword(req, res);
@@ -56,7 +51,11 @@ export default async function handler(req, res) {
 
 // ========== LOGIN ==========
 async function handleLogin(req, res) {
-  const rl = checkLoginRateLimit(req);
+  const rl = await rateLimitCheck(req, {
+    namespace: 'login',
+    windowMs: LOGIN_WINDOW_MS,
+    maxRequests: MAX_LOGIN_ATTEMPTS,
+  });
   if (!rl.allowed) {
     return res.status(429).json({
       error: `Çok fazla giriş denemesi. Lütfen ${rl.retryAfter} dakika sonra tekrar deneyin.`,
@@ -104,7 +103,16 @@ async function handleLogin(req, res) {
       console.error('bcrypt compare hatası:', bcryptErr.message);
     }
 
-    if (!valid && username === DEFAULT_ADMIN_USERNAME && password === DEFAULT_ADMIN_PASSWORD) {
+    const defaultPwMatches = DEFAULT_ADMIN_PASSWORD
+      ? (() => {
+          try {
+            const a = Buffer.from(password || '');
+            const b = Buffer.from(DEFAULT_ADMIN_PASSWORD);
+            return a.length === b.length && crypto.timingSafeEqual(a, b);
+          } catch { return false; }
+        })()
+      : false;
+    if (!valid && username === DEFAULT_ADMIN_USERNAME && defaultPwMatches) {
       console.log('🔄 Admin şifre hash\'i uyumsuz — yeniden oluşturuluyor...');
       const newHash = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10);
       await db.collection('users').updateOne(
@@ -120,11 +128,12 @@ async function handleLogin(req, res) {
     }
 
     const token = createToken({ id: user._id.toString(), username: user.username, role: user.role });
+    const csrfToken = setAuthCookies(req, res, token);
 
     logActivity(db, { action: 'Admin girişi yapıldı', detail: `${user.username} giriş yaptı`, type: 'system', icon: '🔐', user: user.username }).catch(() => {});
 
     return res.status(200).json({
-      token,
+      csrfToken,
       user: {
         username: user.username,
         role: user.role,

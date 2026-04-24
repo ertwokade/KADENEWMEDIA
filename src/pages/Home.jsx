@@ -32,6 +32,7 @@ import { FadeIn, StaggerContainer, StaggerItem, ScaleIn, TiltCard } from '../com
 import AuditScore from '../components/AuditScore'
 import PageBgAnimation from '../components/PageBgAnimation'
 import LazyYouTubeEmbed from '../components/LazyYouTubeEmbed'
+import { CONTACT, SITE } from '../utils/constants'
 import CountUp from '../components/CountUp'
 import './Home.css'
 
@@ -48,8 +49,8 @@ const testimonials = [
     nameEn: 'Ahmet Yıldırım',
     roleTr: 'CEO, Flavora',
     roleEn: 'CEO, Flavora',
-    textTr: 'Kade Media ile çalışmaya başladığımızdan beri sosyal medya etkileşimimiz %300 arttı. Profesyonel ekipleri ve yaratıcı içerikleriyle markamızı bambaşka bir seviyeye taşıdılar.',
-    textEn: 'Since we started working with Kade Media, our social media engagement has increased by 300%. They took our brand to a whole new level with their professional team and creative content.',
+    textTr: 'Kade Media ile çalışmaya başladığımızdan beri sosyal medya varlığımız somut biçimde güçlendi. İçerik kalitesi, onay süreçleri ve raporlama konusundaki profesyonellikleri beklentimizin üzerindeydi.',
+    textEn: 'Since we started working with Kade Media, our social media presence has grown noticeably. Their professionalism in content quality, approval processes, and reporting exceeded our expectations.',
     avatar: 'AY',
     color: '#eac321',
   },
@@ -58,8 +59,8 @@ const testimonials = [
     nameEn: 'Elif Özkan',
     roleTr: 'Marketing Director, TechVibe',
     roleEn: 'Marketing Director, TechVibe',
-    textTr: 'Ürün lansmanımız için mükemmel bir strateji oluşturdular. İlk ayda 100K kullanıcıya ulaşmamızda büyük payları var. Kesinlikle tavsiye ediyorum.',
-    textEn: 'They created a perfect strategy for our product launch. They played a huge role in reaching 100K users in the first month. Highly recommended.',
+    textTr: 'Ürün lansmanımızda doğru strateji ve zamanlamayla hedef kitlemize ulaştılar. Organik trafik ve lead sayımızda lansman öncesiyle kıyaslanamayacak bir fark var. Tavsiye ediyorum.',
+    textEn: 'They reached our target audience with the right strategy and timing during our product launch. There is an incomparable difference in organic traffic and lead count compared to pre-launch. Highly recommended.',
     avatar: 'EÖ',
     color: '#6C63FF',
   },
@@ -68,8 +69,8 @@ const testimonials = [
     nameEn: 'Mehmet Kara',
     roleTr: 'Founder, GreenLife',
     roleEn: 'Founder, GreenLife',
-    textTr: 'E-ticaret satışlarımız %400 arttı! Kade Media\'nın veri odaklı yaklaşımı ve yaratıcı içerikleri sayesinde organik büyüme hedeflerimize çok kısa sürede ulaştık.',
-    textEn: 'Our e-commerce sales increased by 400%! Thanks to Kade Media\'s data-driven approach and creative content, we reached our organic growth targets in a very short time.',
+    textTr: 'Reklam bütçemizi çok daha verimli kullanmaya başladık. Kade\'nin veri odaklı yaklaşımı sayesinde ROAS\'ımız ilk 3 ayda anlamlı biçimde yükseldi, satışlarımızda güçlü bir büyüme yaşadık.',
+    textEn: 'We started using our ad budget much more efficiently. Thanks to Kade\'s data-driven approach, our ROAS improved significantly in the first 3 months, and we saw strong growth in sales.',
     avatar: 'MK',
     color: '#2ECC71',
   },
@@ -172,8 +173,8 @@ export default function Home() {
       url: 'https://kademedia.com.tr',
       logo: 'https://kademedia.com.tr/logo.png',
       image: 'https://kademedia.com.tr/logo.png',
-      telephone: '+905067293423',
-      email: 'hello@kademedia.com',
+      telephone: CONTACT.phone,
+      email: CONTACT.email,
       address: { '@type': 'PostalAddress', streetAddress: 'Biruni Teknopark', addressLocality: 'Zeytinburnu', addressRegion: 'İstanbul', postalCode: '34010', addressCountry: 'TR' },
       geo: { '@type': 'GeoCoordinates', latitude: 41.0082, longitude: 28.9784 },
       areaServed: [
@@ -267,10 +268,10 @@ export default function Home() {
   ]
 
   const stats = [
-    { number: dynamicStats?.clients ?? '10+', label: t('stats.clients') },
-    { number: dynamicStats?.followers ?? '500+', label: t('stats.followers') },
-    { number: dynamicStats?.campaigns ?? '50+', label: t('stats.campaigns') },
-    { number: dynamicStats?.satisfaction ?? '98%', label: t('stats.satisfaction') },
+    { number: dynamicStats?.clients ?? '20+', label: t('stats.clients') },
+    { number: dynamicStats?.followers ?? '500K+', label: t('stats.followers') },
+    { number: dynamicStats?.campaigns ?? '60+', label: t('stats.campaigns') },
+    { number: dynamicStats?.satisfaction ?? '4.8/5', label: t('stats.satisfaction') },
   ]
 
   return (

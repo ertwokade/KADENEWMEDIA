@@ -1,12 +1,33 @@
 import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 import { ObjectId } from 'mongodb';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import { requireAuth } from './_lib/auth.js';
+import { sanitizeNewsletterHtml } from './_lib/sanitize.js';
 import { logActivity } from './notifications.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function getUnsubSecret() {
+  return process.env.UNSUBSCRIBE_SECRET || process.env.JWT_SECRET;
+}
+
+function generateUnsubToken(email) {
+  const secret = getUnsubSecret();
+  if (!secret) return null;
+  return crypto.createHmac('sha256', secret).update(email.toLowerCase()).digest('hex');
+}
+
+function verifyUnsubToken(email, token) {
+  if (typeof token !== 'string' || !/^[a-f0-9]{64}$/.test(token)) return false;
+  const expected = generateUnsubToken(email);
+  if (!expected) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected, 'hex'), Buffer.from(token, 'hex'));
+  } catch { return false; }
+}
 
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
@@ -41,6 +62,7 @@ export default async function handler(req, res) {
   if (action === 'subscribers') {
     const user = requireAuth(req);
     if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    if (user.role !== 'admin') return res.status(403).json({ error: 'Bu işlem için admin yetkisi gerekli' });
     const db = await getDb();
 
     if (req.method === 'GET') {
@@ -84,6 +106,8 @@ export default async function handler(req, res) {
     if (!html?.trim()) return res.status(400).json({ error: 'İçerik gerekli' });
     if (subject.length > 200) return res.status(400).json({ error: 'Konu çok uzun (max 200)' });
     if (html.length > 100000) return res.status(400).json({ error: 'İçerik çok uzun' });
+    const sanitizedHtml = sanitizeNewsletterHtml(html);
+    if (!sanitizedHtml.trim()) return res.status(400).json({ error: 'Newsletter HTML guvenli icerik icermiyor' });
 
     const transporter = makeTransporter();
     if (!transporter) return res.status(400).json({ error: 'SMTP yapılandırılmamış' });
@@ -98,8 +122,9 @@ export default async function handler(req, res) {
 
       for (const sub of subscribers) {
         try {
-          const unsubLink = `https://kademedia.com.tr/api/contact?action=unsubscribe&email=${encodeURIComponent(sub.email)}`;
-          const safeHtml = html + `<div style="margin-top:32px;padding-top:16px;border-top:1px solid #333;text-align:center;font-size:12px;color:#888;">
+          const unsubToken = generateUnsubToken(sub.email);
+          const unsubLink = `https://kademedia.com.tr/api/contact?action=unsubscribe&email=${encodeURIComponent(sub.email)}${unsubToken ? `&token=${unsubToken}` : ''}`;
+          const safeHtml = sanitizedHtml + `<div style="margin-top:32px;padding-top:16px;border-top:1px solid #333;text-align:center;font-size:12px;color:#888;">
             <a href="${unsubLink}" style="color:#888;">Abonelikten çık</a>
           </div>`;
           await transporter.sendMail({
@@ -141,7 +166,7 @@ export default async function handler(req, res) {
   // ── Kariyer Başvurusu (public, POST only) ──
   if (action === 'apply') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    const applyRl = rateLimitCheck(req);
+    const applyRl = await rateLimitCheck(req, { namespace: 'career-apply', maxRequests: 5 });
     if (!applyRl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${applyRl.retryAfter} dakika sonra tekrar deneyin.` });
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
@@ -185,7 +210,7 @@ export default async function handler(req, res) {
   // ── Sosyal Medya Analiz Aracı Lead (public, POST only) ──
   if (action === 'analyzer-lead') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    const analyzerRl = rateLimitCheck(req);
+    const analyzerRl = await rateLimitCheck(req, { namespace: 'analyzer-lead', maxRequests: 10 });
     if (!analyzerRl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${analyzerRl.retryAfter} dakika sonra tekrar deneyin.` });
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
@@ -251,10 +276,32 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Abonelik iptali (GET, imzalı token gerekli) ──
+  if (action === 'unsubscribe') {
+    const email = Array.isArray(req.query?.email) ? req.query.email[0] : req.query?.email;
+    const token = Array.isArray(req.query?.token) ? req.query.token[0] : req.query?.token;
+    if (!email || !EMAIL_RE.test(email)) {
+      return res.status(400).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2>Geçersiz e-posta adresi.</h2></body></html>');
+    }
+    if (!verifyUnsubToken(email, token)) {
+      return res.status(403).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2>Geçersiz veya süresi dolmuş abonelik iptal bağlantısı.</h2></body></html>');
+    }
+    try {
+      const db = await getDb();
+      await db.collection('newsletter').updateOne(
+        { email: email.toLowerCase() },
+        { $set: { status: 'unsubscribed', unsubscribedAt: new Date() } }
+      );
+      return res.status(200).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2 style="color:#eac321">Aboneliğiniz iptal edildi.</h2><p style="color:#888">Kade Media bülteninden başarıyla çıktınız.</p></body></html>');
+    } catch {
+      return res.status(500).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2>Bir hata oluştu, lütfen tekrar deneyin.</h2></body></html>');
+    }
+  }
+
   // ── Newsletter aboneliği (public, POST only) ──
   if (action === 'newsletter') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    const nlRl = rateLimitCheck(req);
+    const nlRl = await rateLimitCheck(req, { namespace: 'newsletter-subscribe', maxRequests: 10 });
     if (!nlRl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${nlRl.retryAfter} dakika sonra tekrar deneyin.` });
     return handleNewsletter(req, res);
   }
@@ -265,7 +312,7 @@ export default async function handler(req, res) {
   }
 
   // Rate limiting
-  const rl = rateLimitCheck(req);
+  const rl = await rateLimitCheck(req, { namespace: 'contact', maxRequests: 5 });
   if (!rl.allowed) {
     return res.status(429).json({
       error: `Çok fazla istek. Lütfen ${rl.retryAfter} dakika sonra tekrar deneyin.`,
@@ -423,6 +470,7 @@ async function handleNewsletter(req, res) {
     }
     await collection.insertOne({
       email: email.toLowerCase(),
+      status: 'active',
       createdAt: new Date(),
       source: 'website',
     });

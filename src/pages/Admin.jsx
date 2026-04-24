@@ -24,9 +24,11 @@ import TesekkurEditor from './admin/editors/TesekkurEditor'
 import ReferralEditor from './admin/editors/ReferralEditor'
 import PodcastWebinarEditor from './admin/editors/PodcastWebinarEditor'
 import CaseStudiesEditor from './admin/editors/CaseStudiesEditor'
+import NewsletterArchiveEditor from './admin/editors/NewsletterArchiveEditor'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
 import {
-  loginApi, changePasswordApi,
+  apiFetch,
+  loginApi, logoutApi, getSessionApi, changePasswordApi,
   getBlogsApi, createBlogApi, updateBlogApi, deleteBlogApi,
   getContentApi, updateContentApi,
   getPartnersApi, createPartnerApi, updatePartnerApi, deletePartnerApi,
@@ -89,8 +91,7 @@ function LoginScreen({ onLogin }) {
     setError('')
     try {
       const data = await loginApi(username, password)
-      localStorage.setItem('kade_admin_token', data.token)
-      localStorage.setItem('kade_admin_user', JSON.stringify(data.user))
+      sessionStorage.setItem('kade_admin_user', JSON.stringify(data.user))
       onLogin(data)
     } catch (err) {
       setError(err.message || 'Geçersiz kullanıcı adı veya şifre')
@@ -1058,6 +1059,7 @@ function ContentSection({ showToast }) {
     { id: 'referralProgram', label: '🎁 Referans Programı', desc: '/referans-programi sayfası içeriği' },
     { id: 'podcastWebinar', label: '🎙️ Podcast & Webinar', desc: '/podcast-webinar sayfası içeriği' },
     { id: 'caseStudies', label: '🏆 Başarı Hikayeleri', desc: '/basari-hikayeleri sayfası içeriği' },
+    { id: 'newsletterArchive', label: '📧 Bülten Arşivi', desc: '/bulten-arsivi sayfası içeriği' },
   ]
 
   // Memoize data props to prevent child editors from resetting form state on re-render
@@ -1102,6 +1104,7 @@ function ContentSection({ showToast }) {
   const referralProgramData = useMemo(() => content.referralProgram || {}, [content.referralProgram])
   const podcastWebinarData = useMemo(() => content.podcastWebinar || {}, [content.podcastWebinar])
   const caseStudiesData = useMemo(() => content.caseStudies || {}, [content.caseStudies])
+  const newsletterArchiveData = useMemo(() => content.newsletterArchive || {}, [content.newsletterArchive])
   const priceCalculatorData = useMemo(() => content.priceCalculator || {
     base: 3000,
     perPlatform: 1800,
@@ -1247,6 +1250,13 @@ function ContentSection({ showToast }) {
         <CaseStudiesEditor
           data={caseStudiesData}
           onSave={(data) => handleSave('caseStudies', data)}
+        />
+      )}
+
+      {activeTab === 'newsletterArchive' && (
+        <NewsletterArchiveEditor
+          data={newsletterArchiveData}
+          onSave={(data) => handleSave('newsletterArchive', data)}
         />
       )}
       </div>
@@ -1799,9 +1809,9 @@ function AboutEditor({ data, onSave }) {
     storyEn: data.storyEn || '',
     missionTr: data.missionTr || '',
     missionEn: data.missionEn || '',
-    experience: data.experience || '8+',
-    teamSize: data.teamSize || '5+',
-    clients: data.clients || '100+',
+    experience: data.experience || '3+',
+    teamSize: data.teamSize || '4+',
+    clients: data.clients || '20+',
     team: data.team || [],
   })
   const [langTab, setLangTab] = useState('tr')
@@ -1813,9 +1823,9 @@ function AboutEditor({ data, onSave }) {
       storyEn: data.storyEn || '',
       missionTr: data.missionTr || '',
       missionEn: data.missionEn || '',
-      experience: data.experience || '8+',
-      teamSize: data.teamSize || '5+',
-      clients: data.clients || '100+',
+      experience: data.experience || '3+',
+      teamSize: data.teamSize || '4+',
+      clients: data.clients || '20+',
       team: data.team || [],
     })
   }, [data])
@@ -2833,7 +2843,6 @@ function SettingsSection({ showToast }) {
       const result = await seedApi(seedSecret)
       showToast('Veritabanı başarıyla oluşturuldu!', 'success')
       setSeedSecret('')
-      console.log('Seed result:', result)
     } catch (err) { showToast(err.message, 'error') }
     finally { setSeedLoading(false) }
   }
@@ -5982,9 +5991,9 @@ function AIContentSection({ showToast }) {
     setLoading(true)
     setSonuc('')
     try {
-      const res = await fetch('/api/chat', {
+      const res = await apiFetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('kade_admin_token')}` },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: promptMap[tur], lang: 'tr', adminMode: true }),
       })
       const data = await res.json().catch(() => ({}))
@@ -7050,8 +7059,9 @@ ${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong
 }
 
 // ========== MAIN ADMIN COMPONENT ==========
-export default function Admin() {
-  const [isAuth, setIsAuth] = useState(false)
+export default function Admin({ initialAuth = false, initialUser = null } = {}) {
+  const [authChecked, setAuthChecked] = useState(Boolean(initialAuth))
+  const [isAuth, setIsAuth] = useState(Boolean(initialAuth))
   const [activeSection, setActiveSection] = useState('dashboard')
   const [toast, setToast] = useState(null)
   const [unreadCount, setUnreadCount] = useState(0)
@@ -7075,7 +7085,7 @@ export default function Admin() {
   const [localMode, setLocalMode] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifCount, setNotifCount] = useState(0)
-  const [currentUser, setCurrentUser] = useState(null)
+  const [currentUser, setCurrentUser] = useState(initialUser)
 
   // Stats for dashboard
   const [stats, setStats] = useState({ blogs: 0, partners: 0, messages: 0, unreadMessages: 0, subscribers: 0 })
@@ -7124,17 +7134,33 @@ export default function Admin() {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('kade_admin_token')
-    if (token) {
-      setIsAuth(true)
-      setLocalMode(isLocalMode())
-      loadStats()
-      loadNotifCount()
+    let cancelled = false
+    const verifySession = async () => {
       try {
-        const u = JSON.parse(localStorage.getItem('kade_admin_user') || '{}')
-        setCurrentUser(u)
-      } catch { /* ignore */ }
+        const data = await getSessionApi()
+        if (cancelled) return
+        setIsAuth(Boolean(data?.authenticated))
+        setLocalMode(isLocalMode())
+        setCurrentUser(data?.user || null)
+        if (data?.authenticated) {
+          sessionStorage.setItem('kade_admin_user', JSON.stringify(data.user))
+          loadStats()
+          loadNotifCount()
+        } else {
+          sessionStorage.removeItem('kade_admin_user')
+        }
+      } catch {
+        if (!cancelled) {
+          setIsAuth(false)
+          setCurrentUser(null)
+          sessionStorage.removeItem('kade_admin_user')
+        }
+      } finally {
+        if (!cancelled) setAuthChecked(true)
+      }
     }
+    verifySession()
+    return () => { cancelled = true }
   }, [])
 
   // Vercel Hobby cron only fires once per day, so poll the reminder check
@@ -7159,13 +7185,14 @@ export default function Admin() {
     setIsAuth(true)
     setLocalMode(isLocalMode())
     setCurrentUser(data?.user || null)
+    if (data?.user) sessionStorage.setItem('kade_admin_user', JSON.stringify(data.user))
     loadStats()
     loadNotifCount()
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('kade_admin_token')
-    localStorage.removeItem('kade_admin_user')
+  const handleLogout = async () => {
+    try { await logoutApi() } catch { /* ignore */ }
+    sessionStorage.removeItem('kade_admin_user')
     setIsAuth(false)
     setLocalMode(false)
     setCurrentUser(null)
@@ -7230,6 +7257,10 @@ export default function Admin() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSection])
+
+  if (!authChecked) {
+    return <div className={`admin-login-container ${darkMode ? 'dark' : ''}`} />
+  }
 
   if (!isAuth) {
     return <LoginScreen onLogin={handleLogin} />

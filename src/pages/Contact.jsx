@@ -15,6 +15,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { sendContactApi } from '../api'
 import { analytics } from '../utils/analytics'
+import { CONTACT } from '../utils/constants'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -25,7 +26,7 @@ const socials = [
   { icon: FaYoutube, href: 'https://www.youtube.com/@kademediacom', label: 'YouTube' },
   { icon: FaTiktok, href: 'https://tiktok.com/@kademediacom', label: 'TikTok' },
   { icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/kademediaagency', label: 'LinkedIn' },
-  { icon: FaWhatsapp, href: 'https://wa.me/905067293423', label: 'WhatsApp' },
+  { icon: FaWhatsapp, href: CONTACT.whatsapp, label: 'WhatsApp' },
 ]
 
 const MAPS_LINK = 'https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7'
@@ -119,19 +120,19 @@ export default function Contact() {
     {
       icon: HiOutlineMail,
       title: t('contact.email'),
-      value: 'hello@kademedia.com',
-      link: 'mailto:hello@kademedia.com',
+      value: CONTACT.email,
+      link: `mailto:${CONTACT.email}`,
     },
     {
       icon: HiOutlinePhone,
       title: t('contact.phone'),
-      value: '0 506 729 34 23',
-      link: 'tel:+905067293423',
+      value: CONTACT.phoneDisplay,
+      link: `tel:${CONTACT.phone}`,
     },
     {
       icon: HiOutlineLocationMarker,
       title: t('contact.address'),
-      value: 'Biruni Teknopark, İstanbul',
+      value: CONTACT.address,
       link: MAPS_LINK,
     },
     {

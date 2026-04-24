@@ -3,5 +3,9 @@ Allow: /
 
 Disallow: /admin
 Disallow: /admin/
+Disallow: /api/
+Disallow: /tesekkur
+Disallow: /musteri-panel
+Disallow: /proje-takip
 
 Sitemap: https://kademedia.com.tr/sitemap.xml

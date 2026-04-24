@@ -1,7 +1,7 @@
-import { lazy, Suspense, useEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { OrganizationSchema } from './components/StructuredData'
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { trackPageviewApi, heartbeatApi } from './api'
+import { trackPageviewApi, heartbeatApi, getSessionApi } from './api'
 import PageHeroCanvas from './components/PageHeroCanvas'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -11,6 +11,7 @@ import CookieBanner from './components/CookieBanner'
 import ErrorTracker from './components/ErrorTracker'
 import GrainOverlay from './components/GrainOverlay'
 import AuroraBackground from './components/AuroraBackground'
+import ErrorBoundary from './components/ErrorBoundary'
 
 // Core pages — direct import for instant first render
 import Home from './pages/Home'
@@ -51,6 +52,39 @@ const NewsletterArchive = lazy(() => import('./pages/NewsletterArchive'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
+}
+
+function LazyRoute({ children }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoader />}>{children}</Suspense>
+    </ErrorBoundary>
+  )
+}
+
+function ProtectedAdminRoute() {
+  const [session, setSession] = useState({ checked: false, authenticated: false, user: null })
+
+  useEffect(() => {
+    let cancelled = false
+    getSessionApi()
+      .then((data) => {
+        if (!cancelled) {
+          setSession({ checked: true, authenticated: Boolean(data?.authenticated), user: data?.user || null })
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setSession({ checked: true, authenticated: false, user: null })
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  if (!session.checked) return <PageLoader />
+  return (
+    <LazyRoute>
+      <Admin initialAuth={session.authenticated} initialUser={session.user} />
+    </LazyRoute>
+  )
 }
 
 const ROUTE_THEMES = {
@@ -100,8 +134,9 @@ function App() {
     trackPageviewApi(location.pathname, document.referrer)
 
     // Send page view to Google Analytics 4
-    if (typeof window.gtag === 'function') {
-      window.gtag('config', 'G-R893K1VE79', {
+    const gaId = import.meta.env.VITE_GA_ID || 'G-R893K1VE79'
+    if (gaId && typeof window.gtag === 'function') {
+      window.gtag('config', gaId, {
         page_path: location.pathname,
         page_title: document.title,
       })
@@ -147,30 +182,30 @@ function App() {
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogDetail />} />
         <Route path="/iletisim" element={<Contact />} />
-        <Route path="/paketler" element={<Suspense fallback={<PageLoader />}><Packages /></Suspense>} />
-        <Route path="/partnerler" element={<Suspense fallback={<PageLoader />}><Partners /></Suspense>} />
-        <Route path="/partnerler/:id" element={<Suspense fallback={<PageLoader />}><PartnerDetail /></Suspense>} />
-        <Route path="/kariyer" element={<Suspense fallback={<PageLoader />}><Careers /></Suspense>} />
-        <Route path="/portfolio" element={<Suspense fallback={<PageLoader />}><Portfolio /></Suspense>} />
-        <Route path="/ekip" element={<Suspense fallback={<PageLoader />}><Team /></Suspense>} />
-        <Route path="/basari-hikayeleri" element={<Suspense fallback={<PageLoader />}><CaseStudies /></Suspense>} />
-        <Route path="/roi-hesaplayici" element={<Suspense fallback={<PageLoader />}><ROICalculator /></Suspense>} />
-        <Route path="/kvkk" element={<Suspense fallback={<PageLoader />}><KVKK /></Suspense>} />
-        <Route path="/gizlilik" element={<Suspense fallback={<PageLoader />}><Gizlilik /></Suspense>} />
-        <Route path="/cerez-politikasi" element={<Suspense fallback={<PageLoader />}><CerezPolitikasi /></Suspense>} />
-        <Route path="/admin" element={<Suspense fallback={<PageLoader />}><Admin /></Suspense>} />
-        <Route path="/sss" element={<Suspense fallback={<PageLoader />}><SSS /></Suspense>} />
-        <Route path="/referanslar" element={<Suspense fallback={<PageLoader />}><Referanslar /></Suspense>} />
-        <Route path="/tesekkur" element={<Suspense fallback={<PageLoader />}><Tesekkur /></Suspense>} />
-        <Route path="/basin" element={<Suspense fallback={<PageLoader />}><Basin /></Suspense>} />
-        <Route path="/neden-biz" element={<Suspense fallback={<PageLoader />}><NedenBiz /></Suspense>} />
-        <Route path="/referans-programi" element={<Suspense fallback={<PageLoader />}><ReferralProgram /></Suspense>} />
-        <Route path="/teklif-al" element={<Suspense fallback={<PageLoader />}><QuoteRequest /></Suspense>} />
-        <Route path="/fiyat-hesaplama" element={<Suspense fallback={<PageLoader />}><PriceCalculator /></Suspense>} />
-        <Route path="/musteri-panel" element={<Suspense fallback={<PageLoader />}><CustomerPortal /></Suspense>} />
-        <Route path="/proje-takip" element={<Suspense fallback={<PageLoader />}><ProjectTracking /></Suspense>} />
-        <Route path="/podcast-webinar" element={<Suspense fallback={<PageLoader />}><PodcastWebinar /></Suspense>} />
-        <Route path="/bulten-arsivi" element={<Suspense fallback={<PageLoader />}><NewsletterArchive /></Suspense>} />
+        <Route path="/paketler" element={<LazyRoute><Packages /></LazyRoute>} />
+        <Route path="/partnerler" element={<LazyRoute><Partners /></LazyRoute>} />
+        <Route path="/partnerler/:id" element={<LazyRoute><PartnerDetail /></LazyRoute>} />
+        <Route path="/kariyer" element={<LazyRoute><Careers /></LazyRoute>} />
+        <Route path="/portfolio" element={<LazyRoute><Portfolio /></LazyRoute>} />
+        <Route path="/ekip" element={<LazyRoute><Team /></LazyRoute>} />
+        <Route path="/basari-hikayeleri" element={<LazyRoute><CaseStudies /></LazyRoute>} />
+        <Route path="/roi-hesaplayici" element={<LazyRoute><ROICalculator /></LazyRoute>} />
+        <Route path="/kvkk" element={<LazyRoute><KVKK /></LazyRoute>} />
+        <Route path="/gizlilik" element={<LazyRoute><Gizlilik /></LazyRoute>} />
+        <Route path="/cerez-politikasi" element={<LazyRoute><CerezPolitikasi /></LazyRoute>} />
+        <Route path="/admin" element={<ProtectedAdminRoute />} />
+        <Route path="/sss" element={<LazyRoute><SSS /></LazyRoute>} />
+        <Route path="/referanslar" element={<LazyRoute><Referanslar /></LazyRoute>} />
+        <Route path="/tesekkur" element={<LazyRoute><Tesekkur /></LazyRoute>} />
+        <Route path="/basin" element={<LazyRoute><Basin /></LazyRoute>} />
+        <Route path="/neden-biz" element={<LazyRoute><NedenBiz /></LazyRoute>} />
+        <Route path="/referans-programi" element={<LazyRoute><ReferralProgram /></LazyRoute>} />
+        <Route path="/teklif-al" element={<LazyRoute><QuoteRequest /></LazyRoute>} />
+        <Route path="/fiyat-hesaplama" element={<LazyRoute><PriceCalculator /></LazyRoute>} />
+        <Route path="/musteri-panel" element={<LazyRoute><CustomerPortal /></LazyRoute>} />
+        <Route path="/proje-takip" element={<LazyRoute><ProjectTracking /></LazyRoute>} />
+        <Route path="/podcast-webinar" element={<LazyRoute><PodcastWebinar /></LazyRoute>} />
+        <Route path="/bulten-arsivi" element={<LazyRoute><NewsletterArchive /></LazyRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </main>

@@ -9,6 +9,7 @@ import {
 } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
 import { getContentApi } from '../api'
+import { CONTACT } from '../utils/constants'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Tesekkur.css'
@@ -20,8 +21,8 @@ const DEFAULT_CONTENT = {
   yanitSuresiNot: 'Hafta içi 09:00–18:00',
   adimlarBaslik: 'Bundan sonra ne olacak?',
   acilBaslik: 'Acil görüşme mi istiyorsunuz?',
-  acilTelefon: '0506 729 34 23',
-  acilTelefonTel: '+905067293423',
+  acilTelefon: CONTACT.phoneDisplay,
+  acilTelefonTel: CONTACT.phone,
   adimlar: [
     { ikon: '📬', baslik: 'Onay E-postası', aciklama: 'Formunuz alındı. Birkaç dakika içinde otomatik bir onay e-postası alacaksınız.' },
     { ikon: '👤', baslik: 'Uzman Eşleştirme', aciklama: '1 iş günü içinde sektörünüze uygun bir uzmanımız sizinle iletişime geçecek.' },

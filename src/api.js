@@ -1,15 +1,66 @@
 const API_BASE = '/api';
 
+const CSRF_COOKIE = 'kade_csrf';
+const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+try { localStorage.removeItem('kade_admin_token'); } catch { /* legacy cleanup */ }
+
+function getCookie(name) {
+  return document.cookie
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`))
+    ?.slice(name.length + 1) || '';
+}
+
+let csrfPromise = null;
+
+async function ensureCsrfToken() {
+  const existing = getCookie(CSRF_COOKIE);
+  if (existing) return existing;
+
+  csrfPromise ||= globalThis.fetch(`${API_BASE}/auth?action=csrf`, {
+    method: 'GET',
+    credentials: 'include',
+  })
+    .then(async (res) => {
+      if (!res.ok) throw new Error('CSRF token could not be fetched');
+      const data = await res.json().catch(() => ({}));
+      return data.csrfToken || getCookie(CSRF_COOKIE);
+    })
+    .finally(() => { csrfPromise = null; });
+
+  return csrfPromise;
+}
+
+async function fetch(input, init = {}) {
+  const method = String(init.method || 'GET').toUpperCase();
+  const headers = new Headers(init.headers || {});
+
+  if (UNSAFE_METHODS.has(method)) {
+    const csrfToken = await ensureCsrfToken();
+    if (csrfToken && !headers.has('X-CSRF-Token')) {
+      headers.set('X-CSRF-Token', csrfToken);
+    }
+  }
+
+  return globalThis.fetch(input, {
+    ...init,
+    credentials: init.credentials || 'include',
+    headers,
+  });
+}
+
+export { fetch as apiFetch };
+
 function getAuthHeaders() {
-  const token = localStorage.getItem('kade_admin_token');
   return {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 }
 
 
-async function handleResponse(res) {
+async function handleResponse(res, { reloadOnUnauthorized = true } = {}) {
   let data;
   const contentType = res.headers.get('content-type') || '';
   try {
@@ -23,11 +74,9 @@ async function handleResponse(res) {
     throw new Error(e.message || 'API unavailable');
   }
   if (res.status === 401) {
-    // Token süresi dolmuş veya geçersiz — temizle ve login ekranına dön
-    localStorage.removeItem('kade_admin_token');
-    localStorage.removeItem('kade_admin_user');
-    window.location.reload();
-    throw new Error('Oturum süresi doldu. Lütfen tekrar giriş yapın.');
+    try { sessionStorage.removeItem('kade_admin_user'); } catch { /* ignore */ }
+    if (reloadOnUnauthorized) window.location.reload();
+    throw new Error(data?.error || 'Oturum suresi doldu. Lutfen tekrar giris yapin.');
   }
   if (!res.ok) {
     throw new Error(data?.error || 'Bir hata oluştu');
@@ -42,7 +91,21 @@ export async function loginApi(username, password) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   });
-  return handleResponse(res);
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+export async function getSessionApi() {
+  const res = await fetch(`${API_BASE}/auth?action=session`);
+  if (res.status === 401) return { authenticated: false };
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+export async function logoutApi() {
+  const res = await fetch(`${API_BASE}/auth?action=logout`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res, { reloadOnUnauthorized: false });
 }
 
 export async function changePasswordApi(currentPassword, newPassword) {
