@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HiOutlineChartBar, HiOutlineArrowRight } from 'react-icons/hi'
+import { HiOutlineChartBar, HiOutlineArrowRight, HiOutlineMail, HiOutlineLockClosed } from 'react-icons/hi'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import { analytics } from '../utils/analytics'
+import { subscribeNewsletterApi } from '../api'
 import { FadeIn } from './Animations'
 import './AuditScore.css'
 
@@ -132,6 +133,10 @@ export default function AuditScore() {
   const [answers, setAnswers] = useState([])
   const [showResult, setShowResult] = useState(false)
   const [isCalculating, setIsCalculating] = useState(false)
+  const [showEmailGate, setShowEmailGate] = useState(false)
+  const [gateEmail, setGateEmail] = useState('')
+  const [gateStatus, setGateStatus] = useState(null) // null | 'loading' | 'error'
+  const [pendingScore, setPendingScore] = useState(null)
 
   const currentQuestions = questions[lang] || questions.tr
   const totalQuestions = currentQuestions.length
@@ -146,15 +151,30 @@ export default function AuditScore() {
     if (currentStep < totalQuestions - 1) {
       setCurrentStep(currentStep + 1)
     } else {
-      // Last question — calculate score
-      setIsCalculating(true)
-      setTimeout(() => {
-        const score = newAnswers.reduce((sum, pts) => sum + pts, 0)
-        analytics.auditComplete(score, '')
-        setIsCalculating(false)
-        setShowResult(true)
-      }, 1500)
+      // Last question — show email gate before result
+      const score = newAnswers.reduce((sum, pts) => sum + pts, 0)
+      setPendingScore(score)
+      setShowEmailGate(true)
     }
+  }
+
+  const handleGateSubmit = async (e) => {
+    e.preventDefault()
+    if (!gateEmail.includes('@')) { setGateStatus('error'); return }
+    setGateStatus('loading')
+    try { await subscribeNewsletterApi(gateEmail) } catch { /* proceed anyway */ }
+    analytics.auditComplete(pendingScore, gateEmail)
+    setGateStatus(null)
+    setShowEmailGate(false)
+    setIsCalculating(true)
+    setTimeout(() => { setIsCalculating(false); setShowResult(true) }, 1200)
+  }
+
+  const handleGateSkip = () => {
+    analytics.auditComplete(pendingScore, '')
+    setShowEmailGate(false)
+    setIsCalculating(true)
+    setTimeout(() => { setIsCalculating(false); setShowResult(true) }, 1200)
   }
 
   const handleReset = () => {
@@ -162,9 +182,13 @@ export default function AuditScore() {
     setAnswers([])
     setShowResult(false)
     setIsCalculating(false)
+    setShowEmailGate(false)
+    setGateEmail('')
+    setGateStatus(null)
+    setPendingScore(null)
   }
 
-  const totalScore = answers.reduce((sum, pts) => sum + pts, 0)
+  const totalScore = pendingScore ?? answers.reduce((sum, pts) => sum + pts, 0)
   const resultData = getResultData(totalScore, lang)
 
   return (
@@ -235,6 +259,58 @@ export default function AuditScore() {
                       </motion.button>
                     ))}
                   </div>
+                </motion.div>
+              )}
+
+              {showEmailGate && (
+                <motion.div
+                  key="email-gate"
+                  className="audit-email-gate"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.35 }}
+                >
+                  <div className="audit-gate-icon">
+                    <HiOutlineLockClosed size={32} />
+                  </div>
+                  <h3 className="audit-gate-title">
+                    {lang === 'tr' ? 'Skorunuzu görmek için e-postanızı girin' : 'Enter your email to see your score'}
+                  </h3>
+                  <p className="audit-gate-desc">
+                    {lang === 'tr'
+                      ? 'Sosyal medya performansınızı ve iyileştirme önerilerini ücretsiz olarak alacaksınız.'
+                      : 'You\'ll receive your social media performance score and improvement tips for free.'}
+                  </p>
+                  <form className="audit-gate-form" onSubmit={handleGateSubmit}>
+                    <div className="audit-gate-input-row">
+                      <HiOutlineMail size={18} />
+                      <input
+                        type="email"
+                        placeholder={lang === 'tr' ? 'ornek@email.com' : 'your@email.com'}
+                        value={gateEmail}
+                        onChange={e => { setGateEmail(e.target.value); setGateStatus(null) }}
+                        autoFocus
+                      />
+                    </div>
+                    {gateStatus === 'error' && (
+                      <p className="audit-gate-error">
+                        {lang === 'tr' ? 'Geçerli bir e-posta girin' : 'Enter a valid email'}
+                      </p>
+                    )}
+                    <button type="submit" className="btn btn-primary" disabled={gateStatus === 'loading'}>
+                      {gateStatus === 'loading'
+                        ? (lang === 'tr' ? 'Yükleniyor...' : 'Loading...')
+                        : (lang === 'tr' ? 'Skorum Nedir?' : 'Show My Score')}
+                      <HiOutlineArrowRight size={16} />
+                    </button>
+                  </form>
+                  <button className="audit-gate-skip" onClick={handleGateSkip}>
+                    {lang === 'tr' ? 'E-posta vermeden devam et' : 'Continue without email'}
+                  </button>
+                  <p className="audit-gate-note">
+                    {lang === 'tr' ? 'Spam göndermiyoruz • İstediğiniz zaman çıkın' : 'No spam • Unsubscribe anytime'}
+                  </p>
                 </motion.div>
               )}
 

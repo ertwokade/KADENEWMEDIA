@@ -231,6 +231,20 @@ export default function Packages() {
         </div>
       </section>
 
+      {/* Urgency Banner */}
+      <div className="packages-urgency-bar">
+        <span className="urgency-dot" />
+        <span>
+          {isEN
+            ? 'Only 3 client spots remaining this month — '
+            : 'Bu ay yalnızca 3 müşteri yerimiz kaldı — '}
+        </span>
+        <a href="/iletisim" className="urgency-link">
+          {isEN ? 'Reserve your spot now' : 'Şimdi yerinizi ayırtın'}
+          <HiOutlineArrowRight size={13} style={{ display: 'inline', marginLeft: 4, verticalAlign: 'middle' }} />
+        </a>
+      </div>
+
       {/* Pricing Cards */}
       <section className="section">
         <div className="container">

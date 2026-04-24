@@ -12,6 +12,11 @@ import ErrorTracker from './components/ErrorTracker'
 import GrainOverlay from './components/GrainOverlay'
 import AuroraBackground from './components/AuroraBackground'
 import ErrorBoundary from './components/ErrorBoundary'
+import ExitIntentPopup from './components/ExitIntentPopup'
+import PersonalizedCTA from './components/PersonalizedCTA'
+import NotificationPrompt from './components/NotificationPrompt'
+import ChatBot from './components/ChatBot'
+import ChatToggleButton from './components/ChatToggleButton'
 
 // Core pages — direct import for instant first render
 import Home from './pages/Home'
@@ -123,6 +128,7 @@ function getCanvasTheme(pathname) {
 function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
+  const [chatOpen, setChatOpen] = useState(false)
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 
@@ -212,6 +218,11 @@ function App() {
       {!isAdmin && <Footer />}
       {!isAdmin && <WhatsAppButton />}
       {!isAdmin && <CookieBanner />}
+      {!isAdmin && <ExitIntentPopup />}
+      {!isAdmin && <PersonalizedCTA />}
+      {!isAdmin && <NotificationPrompt />}
+      {!isAdmin && <ChatBot isOpen={chatOpen} onClose={() => setChatOpen(false)} />}
+      {!isAdmin && <ChatToggleButton isOpen={chatOpen} onClick={() => setChatOpen(o => !o)} />}
     </>
   )
 }

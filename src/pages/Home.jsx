@@ -13,6 +13,7 @@ import {
   HiOutlineChevronUp,
   HiOutlineOfficeBuilding,
   HiOutlineChatAlt2,
+  HiOutlineShieldCheck,
 } from 'react-icons/hi'
 import {
   FaInstagram,
@@ -20,6 +21,7 @@ import {
   FaTiktok,
   FaLinkedinIn,
   FaQuoteLeft,
+  FaWhatsapp as FaWhatsApp,
 } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
@@ -345,6 +347,80 @@ export default function Home() {
           />
         </div>
       </section>
+
+      {/* Founder Section */}
+      <section className="founder-section">
+        <div className="container">
+          <FadeIn>
+            <div className="founder-card glass-card">
+              <div className="founder-photo-wrap">
+                <img
+                  src="/kadir.jpg"
+                  alt="Kadir Demir — Kade Media Kurucu"
+                  className="founder-photo"
+                  onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }}
+                />
+                <div className="founder-photo-fallback" style={{ display: 'none' }}>KD</div>
+              </div>
+              <div className="founder-body">
+                <div className="founder-label">
+                  {lang === 'tr' ? 'Kurucudan' : 'From the Founder'}
+                </div>
+                <blockquote className="founder-quote">
+                  {lang === 'tr'
+                    ? '"Her marka farklı bir hikâye anlatır. Benim işim o hikâyeyi doğru platformda, doğru insanlara ulaştırmak. Benimle çalışmak istiyorsanız doğrudan yazın — formlar değil, gerçek konuşmalar işe yarar."'
+                    : '"Every brand tells a different story. My job is to get that story to the right people on the right platform. If you want to work with me, reach out directly — real conversations, not forms."'}
+                </blockquote>
+                <div className="founder-meta">
+                  <strong>Kadir Demir</strong>
+                  <span>{lang === 'tr' ? 'Kurucu & Strateji Direktörü, Kade Media' : 'Founder & Strategy Director, Kade Media'}</span>
+                </div>
+                <a
+                  href={`https://wa.me/905067293423?text=${encodeURIComponent(lang === 'tr' ? 'Merhaba Kadir, siteyi gördüm. Kade Media hakkında bilgi almak istiyorum.' : 'Hi Kadir, I saw your site. I\'d like to learn more about Kade Media.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary founder-cta"
+                >
+                  <FaWhatsApp size={18} />
+                  {lang === 'tr' ? 'Kadir ile Doğrudan Konuşun' : 'Talk Directly with Kadir'}
+                </a>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* Trust Bar */}
+      <div className="trust-bar">
+        <div className="container">
+          <div className="trust-bar-inner">
+            <div className="trust-item">
+              <HiOutlineUsers size={16} className="trust-icon" />
+              <span className="trust-value">20+</span>
+              <span className="trust-label">{lang === 'tr' ? 'Aktif Müşteri' : 'Active Clients'}</span>
+            </div>
+            <div className="trust-divider" />
+            <div className="trust-item">
+              <HiOutlineChartBar size={16} className="trust-icon" />
+              <span className="trust-value">500K+</span>
+              <span className="trust-label">{lang === 'tr' ? 'Yönetilen Takipçi' : 'Followers Managed'}</span>
+            </div>
+            <div className="trust-divider" />
+            <div className="trust-item">
+              <HiOutlineLightningBolt size={16} className="trust-icon" />
+              <span className="trust-value">{lang === 'tr' ? 'İstanbul merkezli' : 'Istanbul-based'}</span>
+              <span className="trust-label">{lang === 'tr' ? 'Biruni Teknopark' : 'Biruni Technopark'}</span>
+            </div>
+            <div className="trust-divider" />
+            <div className="trust-item">
+              <HiOutlineShieldCheck size={16} className="trust-icon" />
+              <span className="trust-value trust-guarantee">
+                {lang === 'tr' ? 'Ücretsiz Keşif Görüşmesi' : 'Free Discovery Call'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Stats Section */}
       <section className="stats-section">
