@@ -90,14 +90,24 @@ export default function ExitIntentPopup() {
                 <div className="exit-success-icon">
                   <HiOutlineCheckCircle size={48} />
                 </div>
-                <h2>{lang === 'tr' ? 'Rehberiniz Yolda!' : 'Your Guide is On the Way!'}</h2>
+                <h2>{lang === 'tr' ? 'Rehberiniz Hazır!' : 'Your Guide is Ready!'}</h2>
                 <p>
                   {lang === 'tr'
-                    ? 'Sosyal Medya Büyüme Rehberi e-posta adresinize gönderilecek. Ayrıca her hafta dijital pazarlama ipuçları alacaksınız.'
-                    : 'The Social Media Growth Guide will be sent to your email. You\'ll also receive weekly digital marketing tips.'}
+                    ? 'Aşağıdaki butona tıklayarak 2026 Sosyal Medya Büyüme Rehberini indirebilirsiniz.'
+                    : 'Click the button below to download the 2026 Social Media Growth Guide.'}
                 </p>
-                <button className="btn btn-primary" onClick={close} style={{ marginTop: 16 }}>
-                  {lang === 'tr' ? 'Harika, Teşekkürler!' : 'Great, Thanks!'}
+                <a
+                  href="/rehber-2026.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                  style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}
+                >
+                  <HiOutlineDownload size={18} />
+                  {lang === 'tr' ? 'Rehberi İndir' : 'Download Guide'}
+                </a>
+                <button className="exit-dismiss" onClick={close} style={{ marginTop: 12 }}>
+                  {lang === 'tr' ? 'Kapat' : 'Close'}
                 </button>
               </div>
             ) : (

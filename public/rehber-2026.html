@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>2026 Sosyal Medya Büyüme Rehberi – Kade Media</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0d0d0d;
+    color: #f0f0f0;
+    line-height: 1.7;
+  }
+
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  /* Cover */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a1500 100%);
+    border-bottom: 2px solid #eac321;
+    padding: 80px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: rgba(234,195,33,0.15);
+    border: 1px solid rgba(234,195,33,0.4);
+    color: #eac321;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 32px;
+    width: fit-content;
+  }
+
+  .cover h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 24px;
+  }
+
+  .cover h1 span { color: #eac321; }
+
+  .cover-desc {
+    font-size: 1.1rem;
+    color: #aaa;
+    max-width: 560px;
+    margin-bottom: 48px;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .cover-meta-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cover-meta-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666;
+    margin-bottom: 4px;
+  }
+
+  .cover-meta-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #eac321;
+  }
+
+  /* Sections */
+  .section {
+    padding: 64px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .section-number {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #eac321;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+
+  h2 span { color: #eac321; }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 28px 0 10px;
+    color: #fff;
+  }
+
+  p {
+    color: #bbb;
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+  }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  .card h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .card p {
+    font-size: 0.82rem;
+    color: #888;
+    margin: 0;
+  }
+
+  /* Highlight box */
+  .highlight {
+    background: rgba(234,195,33,0.07);
+    border-left: 3px solid #eac321;
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin: 20px 0;
+  }
+
+  .highlight p {
+    color: #ddd;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  /* Platform table */
+  .platform-list {
+    list-style: none;
+    margin-top: 20px;
+  }
+
+  .platform-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.9rem;
+    color: #bbb;
+  }
+
+  .platform-list li:last-child { border-bottom: none; }
+
+  .platform-name {
+    font-weight: 700;
+    color: #fff;
+    min-width: 100px;
+  }
+
+  /* Time table */
+  .time-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .time-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .time-card .platform { font-size: 0.7rem; color: #eac321; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .time-card .time { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .time-card .days { font-size: 0.75rem; color: #888; }
+
+  /* Formula */
+  .formula {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .formula-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .formula-text span { color: #eac321; }
+
+  .formula-sub {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0;
+  }
+
+  /* Checklist */
+  .checklist {
+    list-style: none;
+    margin-top: 16px;
+  }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: #bbb;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check { color: #eac321; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* Calendar */
+  .calendar-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .cal-day {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+    font-size: 0.75rem;
+  }
+
+  .cal-day .day-name { color: #666; font-weight: 600; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .cal-day .day-content { color: #ddd; line-height: 1.4; }
+  .cal-day.active { border-color: rgba(234,195,33,0.4); background: rgba(234,195,33,0.05); }
+  .cal-day.active .day-content { color: #eac321; }
+
+  /* CTA */
+  .cta-section {
+    background: linear-gradient(135deg, rgba(234,195,33,0.08), rgba(234,195,33,0.03));
+    border: 1px solid rgba(234,195,33,0.2);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    margin: 60px 40px;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-section h2 { font-size: 1.6rem; margin-bottom: 12px; }
+  .cta-section p { font-size: 0.95rem; color: #aaa; margin-bottom: 24px; }
+
+  .cta-btn {
+    display: inline-block;
+    background: #eac321;
+    color: #0d0d0d;
+    font-weight: 800;
+    font-size: 0.95rem;
+    padding: 14px 32px;
+    border-radius: 10px;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px;
+    color: #444;
+    font-size: 0.8rem;
+  }
+
+  .footer span { color: #eac321; }
+
+  @media print {
+    body { background: white; color: #111; }
+    .cover { background: white; border-bottom: 2px solid #eac321; }
+    .cover h1, h2, h3, h4 { color: #111; }
+    .cover h1 span, h2 span, .section-number, .platform-name, .check, .cta-btn, .cover-meta-value, .cover-badge { color: #c9a200; }
+    .cover-desc, p, .card p, .platform-list li, .checklist li, .cal-day .day-content { color: #444; }
+    .card, .time-card, .cal-day, .formula, .highlight { background: #f9f9f9; border-color: #ddd; }
+    .cta-section { background: #fffdf0; border-color: #c9a200; }
+    .footer { color: #999; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-badge">📘 Ücretsiz Rehber • 2026</div>
+  <h1>Sosyal Medya<br/><span>Büyüme Rehberi</span></h1>
+  <p class="cover-desc">10+ markayı büyüten stratejilerimizi bir araya getirdik. Instagram, TikTok ve LinkedIn için kanıtlanmış büyüme taktikleri.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Hazırlayan</span>
+      <span class="cover-meta-value">Kade Media</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Yıl</span>
+      <span class="cover-meta-value">2026</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Sayfa</span>
+      <span class="cover-meta-value">6 Bölüm</span>
+    </div>
+    <div class="cover-meta-item">
+      <span class="cover-meta-label">Web</span>
+      <span class="cover-meta-value">kademedia.com.tr</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1: Platform Stratejisi -->
+<div class="section">
+  <div class="section-number">Bölüm 01</div>
+  <h2>Platform Bazlı <span>İçerik Stratejisi</span></h2>
+  <p>Her platform farklı bir kitle ve içerik formatı gerektirir. Doğru platformda doğru içeriği paylaşmak, yanlış platformda mükemmel içerik paylaşmaktan çok daha değerlidir.</p>
+
+  <ul class="platform-list">
+    <li>
+      <span class="platform-name">📸 Instagram</span>
+      <span>Görsel hikaye anlatımı güçlü markalar için ideal. Reels %40 daha fazla erişim sağlar. Carousel gönderiler kaydetme oranını 3x artırır. Hedef kitle: 18–35, görsel odaklı.</span>
+    </li>
+    <li>
+      <span class="platform-name">🎵 TikTok</span>
+      <span>Organik erişim hâlâ en yüksek platform. İlk 3 saniye hook olmazsa geçilir. Trend müzikler ve challenge'lar viralliği artırır. Hedef kitle: 16–30, Z kuşağı.</span>
+    </li>
+    <li>
+      <span class="platform-name">💼 LinkedIn</span>
+      <span>B2B ve kurumsal markalar için vazgeçilmez. Düşünce liderliği içerikleri en yüksek etkileşimi alır. PDF carousel formatı organik erişimi artırır. Hedef kitle: 25–50, profesyoneller.</span>
+    </li>
+    <li>
+      <span class="platform-name">📌 Pinterest</span>
+      <span>Uzun ömürlü içerik — pinler 6 ay sonra hâlâ trafik getirebilir. Moda, yemek, ev dekorasyonu, güzellik kategorilerinde güçlü. SEO dostu pin başlıkları kritik.</span>
+    </li>
+  </ul>
+</div>
+
+<!-- SECTION 2: Paylaşım Saatleri -->
+<div class="section">
+  <div class="section-number">Bölüm 02</div>
+  <h2>En İyi <span>Paylaşım Saatleri</span></h2>
+  <p>Türkiye pazarında yapılan analizlere göre aşağıdaki saatler en yüksek etkileşim oranlarını vermektedir. Kendi hesabınız için en iyi zamanı bulmak için 4 hafta test edin.</p>
+
+  <div class="time-grid">
+    <div class="time-card">
+      <div class="platform">Instagram</div>
+      <div class="time">19:00–21:00</div>
+      <div class="days">Sal, Per, Cum</div>
+    </div>
+    <div class="time-card">
+      <div class="platform">TikTok</div>
+      <div class="time">20:00–23:00</div>
+      <div class="days">Her gün</div>
+    </div>
+    <div class="time-card">
+      <div class="platform">LinkedIn</div>
+      <div class="time">08:00–09:30</div>
+      <div class="days">Sal, Çar, Per</div>
+    </div>
+    <div class="time-card">
+      <div class="platform">Facebook</div>
+      <div class="time">13:00–16:00</div>
+      <div class="days">Çar, Per</div>
+    </div>
+    <div class="time-card">
+      <div class="platform">Stories</div>
+      <div class="time">07:00–09:00</div>
+      <div class="days">Her gün</div>
+    </div>
+    <div class="time-card">
+      <div class="platform">Reels</div>
+      <div class="time">09:00–11:00</div>
+      <div class="days">Pzt, Sal, Cum</div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <p>💡 <strong style="color:#eac321">Pro İpucu:</strong> Pazartesi sabahı ve Cuma gecesi genellikle düşük performans verir. Hafta ortası (Salı–Perşembe) ve Pazar akşamı Türkiye'de en aktif saatlerdir.</p>
+  </div>
+</div>
+
+<!-- SECTION 3: Etkileşim Formülleri -->
+<div class="section">
+  <div class="section-number">Bölüm 03</div>
+  <h2>Etkileşim Artırma <span>Formülleri</span></h2>
+  <p>Etkileşim satın alınamaz — kazanılır. Aşağıdaki kanıtlanmış formüller, organik etkileşimi %150–400 arasında artırabilir.</p>
+
+  <div class="formula">
+    <div class="formula-text">Hook + Değer + <span>CTA</span></div>
+    <p class="formula-sub">Her içeriğin 3 saniyede dikkat çekmesi, değer sunması ve harekete geçirmesi gerekir</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🪝</div>
+      <h4>Güçlü Hook Formülü</h4>
+      <p>"Bunu bilmiyorsan..." / "X yıl önce keşke..." / "[Rakam] ile [Sonuç] elde ettim" — ilk cümle her şeydir.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💬</div>
+      <h4>Yorum Tetikleyiciler</h4>
+      <p>"Siz ne düşünüyorsunuz?", soru sormak, "Bu sizi tanımlıyor mu?" gibi ifadeler yorumu 3x artırır.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h4>Carousel Stratejisi</h4>
+      <p>İlk slayt merak uyandırsın, son slayt kaydetmeye teşvik etsin. "Kaydet, sonra uygula" CTA'sı ekle.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔁</div>
+      <h4>UGC Döngüsü</h4>
+      <p>Kullanıcı içeriklerini yeniden paylaş, story'de etiketle. Bu hem etkileşim hem de güven oluşturur.</p>
+    </div>
+  </div>
+
+  <h3>Hashtag Stratejisi</h3>
+  <p>Instagram için ideal: 3–5 büyük (1M+), 5–8 orta (100K–1M), 5–8 niş (10K–100K) hashtag. TikTok için 3–5 yeterli. LinkedIn'de 3–5 profesyonel hashtag kullan.</p>
+</div>
+
+<!-- SECTION 4: İçerik Takvimi -->
+<div class="section">
+  <div class="section-number">Bölüm 04</div>
+  <h2>Aylık <span>İçerik Takvimi</span> Şablonu</h2>
+  <p>Tutarlılık, viral tek bir içerikten çok daha değerlidir. Aşağıdaki haftalık şablonu markanıza uyarlayarak kullanabilirsiniz.</p>
+
+  <div class="calendar-week">
+    <div class="cal-day active">
+      <div class="day-name">Pzt</div>
+      <div class="day-content">Motivasyon / İlham içeriği</div>
+    </div>
+    <div class="cal-day">
+      <div class="day-name">Sal</div>
+      <div class="day-content">Eğitici carousel / ipuçları</div>
+    </div>
+    <div class="cal-day active">
+      <div class="day-name">Çar</div>
+      <div class="day-content">Ürün / Hizmet tanıtımı</div>
+    </div>
+    <div class="cal-day">
+      <div class="day-name">Per</div>
+      <div class="day-content">Müşteri hikayesi / UGC</div>
+    </div>
+    <div class="cal-day active">
+      <div class="day-name">Cum</div>
+      <div class="day-content">Reels / Kısa video</div>
+    </div>
+    <div class="cal-day">
+      <div class="day-name">Cmt</div>
+      <div class="day-content">Perde arkası / Ekip</div>
+    </div>
+    <div class="cal-day">
+      <div class="day-name">Paz</div>
+      <div class="day-content">Topluluk sorusu / Anket</div>
+    </div>
+  </div>
+
+  <h3>İçerik Türleri Dağılımı (80/20 Kuralı)</h3>
+  <ul class="checklist">
+    <li><span class="check">✦</span> <span><strong style="color:#fff">%40</strong> — Eğitici ve değer katan içerikler (ipuçları, rehberler, bilgiler)</span></li>
+    <li><span class="check">✦</span> <span><strong style="color:#fff">%30</strong> — Eğlenceli ve paylaşılabilir içerikler (trendler, meme'ler, reels)</span></li>
+    <li><span class="check">✦</span> <span><strong style="color:#fff">%20</strong> — Ürün/hizmet tanıtımı ve kampanyalar</span></li>
+    <li><span class="check">✦</span> <span><strong style="color:#fff">%10</strong> — Topluluk etkileşimi (sorular, anketler, UGC)</span></li>
+  </ul>
+</div>
+
+<!-- SECTION 5: Büyüme Taktikleri -->
+<div class="section">
+  <div class="section-number">Bölüm 05</div>
+  <h2>Kanıtlanmış <span>Büyüme Taktikleri</span></h2>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🤝</div>
+      <h4>Hesap İşbirlikleri</h4>
+      <p>Benzer büyüklükteki hesaplarla collab post yapın. Birbirinin kitlesine açılmak en hızlı organik büyüme yöntemidir.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h4>Niş Topluluklara Girin</h4>
+      <p>Sektörünüzdeki büyük hesapların yorumlarında değer katın. Görünürlük ve takipçi kazanmanın en ucuz yolu.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <h4>Analitik Odaklı Çalışın</h4>
+      <p>Her hafta en iyi 3 ve en kötü 3 içeriğinizi analiz edin. Neyin işe yaradığını tekrarlayın, işe yaramayanı bırakın.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h4>Trend'i Erken Yakalayın</h4>
+      <p>Bir trend viral olmadan önce kullanmak, viral olduktan sonra kullanmaktan 10x daha etkilidir.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📧</div>
+      <h4>E-posta Listesi Kurun</h4>
+      <p>Sosyal medya algoritmaları değişir, e-posta listesi sizindir. En az 1 içerik türünü e-posta aboneleri için yapın.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌐</div>
+      <h4>Çapraz Platform Kullanın</h4>
+      <p>Her platformda ayrı strateji yerine ana platformunuzu belirleyin, diğerlerini trafik yönlendirme aracı olarak kullanın.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 6: 2026 Trendleri -->
+<div class="section">
+  <div class="section-number">Bölüm 06</div>
+  <h2>2026 <span>Dijital Pazarlama</span> Trendleri</h2>
+  <p>Önümüzdeki dönemde markaların odaklanması gereken 5 kritik trend:</p>
+
+  <ul class="checklist">
+    <li><span class="check">01</span> <span><strong style="color:#fff">AI Destekli İçerik Üretimi</strong> — ChatGPT ve Midjourney gibi araçlar içerik üretimini hızlandırıyor. Ama AI kişiselleştiremez — insan sesini koruyun.</span></li>
+    <li><span class="check">02</span> <span><strong style="color:#fff">Short-Form Video Hakimiyeti</strong> — TikTok, Reels ve YouTube Shorts 2026'da da dominant olmaya devam edecek. Video olmayan markalar görünmez olacak.</span></li>
+    <li><span class="check">03</span> <span><strong style="color:#fff">Micro-Influencer Pazarlaması</strong> — 10K–100K takipçili micro-influencer'lar büyük hesaplardan 5x daha yüksek etkileşim oranı veriyor.</span></li>
+    <li><span class="check">04</span> <span><strong style="color:#fff">Topluluk Ekonomisi</strong> — Takipçi sahibi olmak değil, topluluk sahibi olmak. Discord, WhatsApp grupları ve üyelik modelleri öne çıkıyor.</span></li>
+    <li><span class="check">05</span> <span><strong style="color:#fff">Sosyal Ticaret</strong> — Instagram Shop, TikTok Shop — sosyal medyadan direkt satış artıyor. Alışveriş adımlarını azaltın.</span></li>
+  </ul>
+
+  <div class="highlight">
+    <p>📌 <strong style="color:#eac321">2026 Özeti:</strong> Daha az platform, daha derin strateji. Herkese her şeyi yapmaya çalışmak yerine 1–2 platformda ustalaşan markalar kazanıyor.</p>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Markanız için <span style="color:#eac321">Özel Strateji</span> İster misiniz?</h2>
+  <p>Bu rehberi markanıza uyarlamak için ücretsiz 15 dakikalık keşif görüşmesi yapabiliriz. Hiçbir taahhüt gerekmez.</p>
+  <a class="cta-btn" href="https://wa.me/905067293423?text=Merhaba%2C%20sosyal%20medya%20stratejisi%20hakkında%20görüşmek%20istiyorum." target="_blank">
+    WhatsApp'tan Ulaşın →
+  </a>
+</div>
+
+<div class="footer">
+  <p>© 2026 <span>Kade Media</span> — İstanbul Biruni Teknopark | kademedia.com.tr</p>
+  <p style="margin-top:6px">Bu rehber Kade Media tarafından hazırlanmış olup ticari amaçla dağıtılamaz.</p>
+</div>
+
+</body>
+</html>

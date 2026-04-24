@@ -24,10 +24,11 @@ async function ensureCsrfToken() {
     credentials: 'include',
   })
     .then(async (res) => {
-      if (!res.ok) throw new Error('CSRF token could not be fetched');
+      if (!res.ok) return null;
       const data = await res.json().catch(() => ({}));
-      return data.csrfToken || getCookie(CSRF_COOKIE);
+      return data.csrfToken || getCookie(CSRF_COOKIE) || null;
     })
+    .catch(() => null)
     .finally(() => { csrfPromise = null; });
 
   return csrfPromise;
