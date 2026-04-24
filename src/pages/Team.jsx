@@ -17,7 +17,7 @@ const defaultTeam = [
     roleEn: 'Founder & CEO',
     bioTr: 'Dijital pazarlama ve sosyal medya stratejisi odaklı. Müşteri büyümesini ve ajans vizyonunu birlikte yönetiyor.',
     bioEn: 'Focused on digital marketing and social media strategy. Drives client growth and agency vision.',
-    image: null,
+    image: '/kadir.jpg',
     social: {},
     color: '#eac321',
   },
