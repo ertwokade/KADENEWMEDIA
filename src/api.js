@@ -232,9 +232,9 @@ export async function deleteMessageApi(id) {
   return handleResponse(res);
 }
 
-// Contact (public)
+// Contact (public — no CSRF needed)
 export async function sendContactApi(data) {
-  const res = await fetch(`${API_BASE}/contact`, {
+  const res = await globalThis.fetch(`${API_BASE}/contact`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -296,9 +296,9 @@ export async function seedApi(secret) {
   return handleResponse(res);
 }
 
-// Newsletter
+// Newsletter (public — no CSRF needed)
 export async function subscribeNewsletterApi(email) {
-  const res = await fetch(`${API_BASE}/contact?action=newsletter`, {
+  const res = await globalThis.fetch(`${API_BASE}/contact?action=newsletter`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
