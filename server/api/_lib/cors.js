@@ -8,10 +8,18 @@ function getAllowedOrigins() {
   if (process.env.ALLOWED_ORIGINS) {
     return process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean);
   }
-  if (isProductionRuntime()) {
-    throw new Error('ALLOWED_ORIGINS must be set in production');
-  }
   return LOCAL_ORIGINS;
+}
+
+function isSameOrigin(req, origin) {
+  try {
+    const originUrl = new URL(origin);
+    const host = String(req.headers.host || '').toLowerCase();
+    const forwardedHost = String(req.headers['x-forwarded-host'] || '').split(',')[0].trim().toLowerCase();
+    return originUrl.host.toLowerCase() === host || (forwardedHost && originUrl.host.toLowerCase() === forwardedHost);
+  } catch {
+    return false;
+  }
 }
 
 function setSecurityHeaders(res) {
@@ -24,18 +32,12 @@ function setSecurityHeaders(res) {
 export function cors(req, res) {
   setSecurityHeaders(res);
 
-  let allowedOrigins;
-  try {
-    allowedOrigins = getAllowedOrigins();
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-    return true;
-  }
-
   const origin = req.headers.origin;
 
   if (origin) {
+    const allowedOrigins = getAllowedOrigins();
     const isAllowed =
+      isSameOrigin(req, origin) ||
       allowedOrigins.includes(origin) ||
       (process.env.NODE_ENV !== 'production' && /^https?:\/\/localhost/.test(origin));
     if (isAllowed) {
