@@ -49,7 +49,7 @@ const handlers = {
 }
 
 function getRouteKey(req) {
-  const queryPath = req.query?.path
+  const queryPath = req.routePath ?? req.query?.path
   if (Array.isArray(queryPath)) return queryPath.join('/')
   if (typeof queryPath === 'string' && queryPath.length > 0) return queryPath
 
@@ -81,7 +81,7 @@ const PUBLIC_ACTIONS = new Set([
 ])
 
 function isPublicPost(req) {
-  if (req.method !== 'POST') return false
+  if (String(req.method || '').toUpperCase() !== 'POST') return false
   const route = normalizeRoute(req)
   const action = req.query?.action
   // Login starts an unauthenticated session and rotates the CSRF cookie after
@@ -103,6 +103,7 @@ export default async function handler(req, res) {
   // Strip Vercel's internal routing param and any unrecognised keys
   // (Vercel's infrastructure may inject dotted or internal params that would fail validation)
   const rawQuery = req.query || {};
+  req.routePath = rawQuery.path;
   const sanitizedQuery = {};
   for (const [key, value] of Object.entries(rawQuery)) {
     if (key !== 'path' && ALLOWED_KEY_RE.test(key)) {

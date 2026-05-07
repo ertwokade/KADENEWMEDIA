@@ -6,18 +6,28 @@ const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 try { localStorage.removeItem('kade_admin_token'); } catch { /* legacy cleanup */ }
 
 function getCookie(name) {
-  return document.cookie
+  const value = document.cookie
     .split(';')
     .map((part) => part.trim())
     .find((part) => part.startsWith(`${name}=`))
     ?.slice(name.length + 1) || '';
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function clearCookie(name) {
+  document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Strict`;
 }
 
 let csrfPromise = null;
 
-async function ensureCsrfToken() {
+async function ensureCsrfToken({ force = false } = {}) {
   const existing = getCookie(CSRF_COOKIE);
-  if (existing) return existing;
+  if (existing && !force) return existing;
+  if (force) clearCookie(CSRF_COOKIE);
 
   csrfPromise ||= globalThis.fetch(`${API_BASE}/auth?action=csrf`, {
     method: 'GET',
@@ -87,11 +97,28 @@ async function handleResponse(res, { reloadOnUnauthorized = true } = {}) {
 
 // Auth
 export async function loginApi(username, password) {
-  const res = await fetch(`${API_BASE}/auth`, {
+  // Refresh before login so stale CSRF cookies left from an older deploy/JWT
+  // secret do not keep the admin screen locked out.
+  await ensureCsrfToken({ force: true });
+
+  let res = await fetch(`${API_BASE}/auth`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   });
+
+  if (res.status === 403) {
+    const data = await res.clone().json().catch(() => ({}));
+    if (String(data?.error || '').toLowerCase().includes('csrf')) {
+      await ensureCsrfToken({ force: true });
+      res = await fetch(`${API_BASE}/auth`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+    }
+  }
+
   return handleResponse(res, { reloadOnUnauthorized: false });
 }
 
