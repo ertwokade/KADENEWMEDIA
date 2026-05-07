@@ -84,6 +84,10 @@ function isPublicPost(req) {
   if (req.method !== 'POST') return false
   const route = normalizeRoute(req)
   const action = req.query?.action
+  // Login starts an unauthenticated session and rotates the CSRF cookie after
+  // successful authentication, so requiring a pre-existing CSRF cookie here can
+  // lock admins out when the bootstrap cookie was dropped or expired.
+  if (route === 'auth' && (!action || action === 'login')) return true
   // Public contact actions
   if (route === 'contact' && (!action || PUBLIC_ACTIONS.has(action))) return true
   // Public referral submission

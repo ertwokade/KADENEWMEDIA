@@ -57,11 +57,13 @@ function appendSetCookie(res, cookie) {
 }
 
 function shouldUseSecureCookie(req) {
-  return (
-    process.env.NODE_ENV === 'production' ||
-    process.env.VERCEL === '1' ||
-    req.headers?.['x-forwarded-proto'] === 'https'
-  );
+  const forwardedProto = String(req.headers?.['x-forwarded-proto'] || '').split(',')[0].trim();
+  if (forwardedProto) return forwardedProto === 'https';
+
+  const host = String(req.headers?.host || '').split(':')[0].toLowerCase();
+  if (host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+
+  return process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 }
 
 function serializeCookie(req, name, value, options = {}) {
