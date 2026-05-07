@@ -2295,7 +2295,6 @@ function PartnersSection({ showToast }) {
                   </td>
                   <td>
                     <strong>{p.name}</strong>
-                    {!p._id && <span style={{ marginLeft: 6, fontSize: '0.7rem', color: 'var(--text-tertiary)', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 4, padding: '1px 5px' }}>statik</span>}
                   </td>
                   <td><span className="status-badge" style={{ background: `${p.color || '#eac321'}20`, color: p.color || '#eac321' }}>{p.category}</span></td>
                   <td>
@@ -2303,7 +2302,7 @@ function PartnersSection({ showToast }) {
                       <button className="table-action-btn" onClick={() => handleEdit(p)}><HiOutlinePencil size={14} /> Düzenle</button>
                       {p._id
                         ? <button className="table-action-btn danger" onClick={() => handleDelete(p._id)}><HiOutlineTrash size={14} /> Sil</button>
-                        : <button className="table-action-btn" style={{ opacity: 0.4, cursor: 'not-allowed' }} title="Önce düzenleyip kaydedin" disabled><HiOutlineTrash size={14} /> Sil</button>
+                        : <button className="table-action-btn danger" onClick={() => handleDelete(null)}><HiOutlineTrash size={14} /> Sil</button>
                       }
                     </div>
                   </td>
