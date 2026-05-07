@@ -74,6 +74,10 @@ async function handleLogin(req, res) {
       return res.status(400).json({ error: 'Kullanıcı adı ve şifre gerekli' });
     }
 
+    if (typeof username !== 'string' || !/^[a-zA-Z0-9_]{1,30}$/.test(username)) {
+      return res.status(400).json({ error: 'Geçersiz kullanıcı adı formatı' });
+    }
+
     const db = await getDb();
 
     // Veritabanında hiç kullanıcı yoksa otomatik admin oluştur
@@ -171,8 +175,8 @@ async function handleChangePassword(req, res) {
       return res.status(400).json({ error: 'Mevcut şifre ve yeni şifre gerekli' });
     }
 
-    if (newPassword.length < 8) {
-      return res.status(400).json({ error: 'Yeni şifre en az 8 karakter olmalı' });
+    if (newPassword.length < 12) {
+      return res.status(400).json({ error: 'Yeni şifre en az 12 karakter olmalı' });
     }
 
     const db = await getDb();

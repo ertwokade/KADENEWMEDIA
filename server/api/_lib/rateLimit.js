@@ -84,18 +84,19 @@ export async function rateLimitCheck(req, options = {}) {
   const namespace = options.namespace || 'default';
   const key = `rate:${namespace}:${getIP(req)}`;
 
-  try {
-    const redisResult = await upstashRateLimit(key, Math.ceil(windowMs / 1000), maxRequests);
-    if (redisResult) return redisResult;
-  } catch (err) {
-    console.error('Persistent rate limit error:', err.message);
-    if (isProductionRuntime()) {
-      return { allowed: false, retryAfter: Math.ceil(windowMs / 60000), error: 'Rate limit backend unavailable' };
+  if (getRedisConfig()) {
+    try {
+      const redisResult = await upstashRateLimit(key, Math.ceil(windowMs / 1000), maxRequests);
+      if (redisResult) return redisResult;
+    } catch (err) {
+      console.error('Persistent rate limit error:', err.message);
+      if (isProductionRuntime()) {
+        // Redis configured but unreachable — fail closed to prevent brute force
+        return { allowed: false, retryAfter: Math.ceil(windowMs / 60000), error: 'Rate limit backend unavailable' };
+      }
     }
-  }
-
-  if (isProductionRuntime()) {
-    return { allowed: false, retryAfter: Math.ceil(windowMs / 60000), error: 'Rate limit backend is not configured' };
+  } else if (isProductionRuntime()) {
+    console.warn('UPSTASH_REDIS not configured — falling back to in-memory rate limiting');
   }
 
   return inMemoryRateLimit(key, windowMs, maxRequests);

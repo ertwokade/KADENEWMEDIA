@@ -97,10 +97,19 @@ function isPublicPost(req) {
   return false
 }
 
+const ALLOWED_KEY_RE = /^[a-zA-Z0-9_-]{1,40}$/;
+
 export default async function handler(req, res) {
-  // Strip Vercel's internal routing param before query validation
-  const { path: _path, ...queryWithoutPath } = req.query || {}
-  req.query = queryWithoutPath
+  // Strip Vercel's internal routing param and any unrecognised keys
+  // (Vercel's infrastructure may inject dotted or internal params that would fail validation)
+  const rawQuery = req.query || {};
+  const sanitizedQuery = {};
+  for (const [key, value] of Object.entries(rawQuery)) {
+    if (key !== 'path' && ALLOWED_KEY_RE.test(key)) {
+      sanitizedQuery[key] = value;
+    }
+  }
+  req.query = sanitizedQuery;
 
   if (!validateQuery(req, res)) return
   if (!isPublicPost(req) && !validateCsrf(req, res)) return
