@@ -1,4 +1,5 @@
 const LOCAL_ORIGINS = ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:4173'];
+const PRODUCTION_ORIGINS = ['https://www.kademedia.com.tr', 'https://kademedia.com.tr'];
 
 function isProductionRuntime() {
   return process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
@@ -8,7 +9,7 @@ function getAllowedOrigins() {
   if (process.env.ALLOWED_ORIGINS) {
     return process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean);
   }
-  return LOCAL_ORIGINS;
+  return isProductionRuntime() ? PRODUCTION_ORIGINS : LOCAL_ORIGINS;
 }
 
 function isSameOrigin(req, origin) {

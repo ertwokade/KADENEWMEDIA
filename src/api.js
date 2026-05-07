@@ -90,7 +90,11 @@ async function handleResponse(res, { reloadOnUnauthorized = true } = {}) {
     throw new Error(data?.error || 'Oturum suresi doldu. Lutfen tekrar giris yapin.');
   }
   if (!res.ok) {
-    throw new Error(data?.error || 'Bir hata oluştu');
+    const message = data?.error || 'Bir hata oluştu';
+    if (String(message).includes('ALLOWED_ORIGINS')) {
+      throw new Error('Sunucu ayarı güncellendi. Lütfen sayfayı yenileyip tekrar deneyin.');
+    }
+    throw new Error(message);
   }
   return data;
 }

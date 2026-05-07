@@ -5,7 +5,7 @@ import {
   HiOutlinePencilAlt, HiOutlineNewspaper, HiOutlineUsers,
   HiOutlineMail, HiOutlineCog, HiOutlineTrash,
   HiOutlinePlus, HiOutlineSave, HiOutlineEye,
-  HiOutlineX, HiOutlineMenuAlt3, HiOutlineDatabase,
+  HiOutlineEyeOff, HiOutlineX, HiOutlineMenuAlt3, HiOutlineDatabase,
   HiOutlineKey, HiOutlineCheck, HiOutlinePencil,
   HiOutlineCalendar, HiOutlineBell, HiOutlineMoon,
   HiOutlineSun, HiOutlineChartBar, HiOutlineViewBoards,
@@ -82,6 +82,7 @@ function Toast({ message, type, onClose }) {
 function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -126,15 +127,26 @@ function LoginScreen({ onLogin }) {
           </div>
           <div className="form-group">
             <label htmlFor="password">Şifre</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Şifrenizi girin..."
-              className={error ? 'error' : ''}
-              required
-            />
+            <div className="password-input-wrap">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Şifrenizi girin..."
+                className={error ? 'error' : ''}
+                required
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword((value) => !value)}
+                aria-label={showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}
+                title={showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}
+              >
+                {showPassword ? <HiOutlineEyeOff size={20} /> : <HiOutlineEye size={20} />}
+              </button>
+            </div>
             {error && <span className="error-text">{error}</span>}
           </div>
           <button type="submit" className="btn btn-primary login-btn" disabled={loading}>
