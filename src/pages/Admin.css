@@ -1335,12 +1335,22 @@
   padding: 2px 8px;
   border-radius: 10px;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .note-text {
   font-size: 0.85rem;
   color: var(--text-primary);
   line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.note-text.empty {
+  color: var(--text-tertiary);
+  font-style: italic;
 }
 
 .note-meta {

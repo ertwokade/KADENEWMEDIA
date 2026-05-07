@@ -2365,6 +2365,21 @@ function exportMessagesExcel(messages) {
   exportToExcel(headers, rows, `kade-mesajlar-${new Date().toISOString().slice(0, 10)}.xls`)
 }
 
+const NOTE_TYPES = {
+  note: { label: 'Not', Icon: HiOutlineAnnotation, color: 'var(--text-tertiary)', bg: 'rgba(156,163,175,0.15)' },
+  call: { label: 'Telefon', Icon: HiOutlinePhone, color: '#2ECC71', bg: 'rgba(46,204,113,0.15)' },
+  email: { label: 'E-posta', Icon: HiOutlineMail, color: '#6C63FF', bg: 'rgba(108,99,255,0.15)' },
+  meeting: { label: 'Toplantı', Icon: HiOutlineUserGroup, color: '#EAC321', bg: 'rgba(234,195,33,0.15)' },
+}
+
+function getNoteTypeMeta(type) {
+  return NOTE_TYPES[type] || NOTE_TYPES.note
+}
+
+function getNoteText(note) {
+  return String(note?.text || note?.note || note?.content || note?.message || note?.description || '').trim()
+}
+
 function MessagesSection({ showToast, onNewMessageCount }) {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
@@ -2584,13 +2599,13 @@ function MessagesSection({ showToast, onNewMessageCount }) {
 
               {/* Notes Timeline */}
               <div style={{ marginTop: 20, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 12 }}>📝 Notlar</h4>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><HiOutlineAnnotation size={18} /> Notlar</h4>
                 <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
                   <select value={noteType} onChange={e => setNoteType(e.target.value)} style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}>
-                    <option value="note">📝 Not</option>
-                    <option value="call">📞 Telefon</option>
-                    <option value="email">✉️ E-posta</option>
-                    <option value="meeting">🤝 Toplantı</option>
+                    <option value="note">Not</option>
+                    <option value="call">Telefon</option>
+                    <option value="email">E-posta</option>
+                    <option value="meeting">Toplantı</option>
                   </select>
                   <input type="text" value={noteText} onChange={e => setNoteText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleAddNote() }} placeholder="Not ekle..." style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: '0.85rem', fontFamily: 'var(--font)' }} />
                   <button className="btn btn-primary" style={{ padding: '8px 14px' }} onClick={handleAddNote}><HiOutlinePlus size={16} /></button>
@@ -2601,18 +2616,23 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                   <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.82rem', padding: 12 }}>Henüz not eklenmemiş</div>
                 ) : (
                   <div className="notes-timeline">
-                    {notes.map(n => (
-                      <div key={n._id} className="note-item">
-                        <div className="note-header">
-                          <span className="note-type-badge" style={{ background: n.type === 'call' ? 'rgba(46,204,113,0.15)' : n.type === 'email' ? 'rgba(108,99,255,0.15)' : n.type === 'meeting' ? 'rgba(234,195,33,0.15)' : 'rgba(156,163,175,0.15)', color: n.type === 'call' ? '#2ECC71' : n.type === 'email' ? '#6C63FF' : n.type === 'meeting' ? '#EAC321' : 'var(--text-tertiary)' }}>
-                            {n.type === 'call' ? '📞' : n.type === 'email' ? '✉️' : n.type === 'meeting' ? '🤝' : '📝'} {n.type === 'call' ? 'Telefon' : n.type === 'email' ? 'E-posta' : n.type === 'meeting' ? 'Toplantı' : 'Not'}
-                          </span>
-                          <button className="btn-icon danger" onClick={() => handleDeleteNote(n._id)} style={{ width: 24, height: 24, fontSize: '0.7rem' }}>✕</button>
+                    {notes.map(n => {
+                      const meta = getNoteTypeMeta(n.type)
+                      const noteText = getNoteText(n)
+                      const NoteIcon = meta.Icon
+                      return (
+                        <div key={n._id} className="note-item">
+                          <div className="note-header">
+                            <span className="note-type-badge" style={{ background: meta.bg, color: meta.color }}>
+                              <NoteIcon size={13} /> {meta.label}
+                            </span>
+                            <button className="btn-icon danger" onClick={() => handleDeleteNote(n._id)} style={{ width: 24, height: 24, fontSize: '0.7rem' }} aria-label="Notu sil"><HiOutlineX size={14} /></button>
+                          </div>
+                          <div className={`note-text ${noteText ? '' : 'empty'}`}>{noteText || 'Bu eski not kaydında içerik bulunmuyor.'}</div>
+                          <div className="note-meta">{n.createdBy || 'Sistem'} · {n.createdAt ? new Date(n.createdAt).toLocaleString('tr-TR') : ''}</div>
                         </div>
-                        <div className="note-text">{n.text}</div>
-                        <div className="note-meta">{n.createdBy} · {n.createdAt ? new Date(n.createdAt).toLocaleString('tr-TR') : ''}</div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </div>
