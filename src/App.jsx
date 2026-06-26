@@ -13,7 +13,6 @@ import ErrorTracker from './components/ErrorTracker'
 import GrainOverlay from './components/GrainOverlay'
 import AuroraBackground from './components/AuroraBackground'
 import ErrorBoundary from './components/ErrorBoundary'
-import ExitIntentPopup from './components/ExitIntentPopup'
 import NotificationPrompt from './components/NotificationPrompt'
 
 // Core pages — direct import for instant first render
@@ -218,7 +217,6 @@ function App() {
       {!isAdmin && <Footer />}
       {!isAdmin && <WhatsAppButton />}
       {!isAdmin && <CookieBanner />}
-      {!isAdmin && <ExitIntentPopup />}
       {!isAdmin && <NotificationPrompt />}
     </CustomerProvider>
   )
