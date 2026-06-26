@@ -161,12 +161,15 @@
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 .navbar-cta {
-  padding: 10px 24px;
-  font-size: 0.85rem;
+  padding: 9px 18px;
+  font-size: 0.82rem;
+  white-space: nowrap;
 }
 
 .navbar-login-btn {
@@ -311,6 +314,19 @@
   margin-top: 16px;
   text-align: center;
   justify-content: center;
+}
+
+@media (max-width: 1200px) {
+  .navbar-login-btn span {
+    display: none;
+  }
+  .navbar-login-btn {
+    padding: 8px 10px;
+  }
+  .navbar-cta {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 1100px) {
