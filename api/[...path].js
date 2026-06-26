@@ -1,5 +1,9 @@
 import auth from '../server/api/auth.js'
 import blog from '../server/api/blog.js'
+import customerAuth from '../server/api/customer-auth.js'
+import customerPortal from '../server/api/customer-portal.js'
+import customers from '../server/api/customers.js'
+import shopier from '../server/api/shopier.js'
 import calendarInvite from '../server/api/calendar-invite.js'
 import chat from '../server/api/chat.js'
 import client from '../server/api/client.js'
@@ -26,6 +30,10 @@ import { validateQuery } from '../server/api/_lib/validation.js'
 const handlers = {
   auth,
   blog,
+  'customer-auth': customerAuth,
+  'customer-portal': customerPortal,
+  customers,
+  shopier,
   'calendar-invite': calendarInvite,
   chat,
   client,
@@ -88,6 +96,10 @@ function isPublicPost(req) {
   // successful authentication, so requiring a pre-existing CSRF cookie here can
   // lock admins out when the bootstrap cookie was dropped or expired.
   if (route === 'auth' && (!action || action === 'login')) return true
+  // Customer register/login — unauthenticated by definition
+  if (route === 'customer-auth' && (!action || action === 'login' || action === 'register')) return true
+  // Shopier webhook — external POST with its own signature verification
+  if (route === 'shopier') return true
   // Public contact actions
   if (route === 'contact' && (!action || PUBLIC_ACTIONS.has(action))) return true
   // Public referral submission

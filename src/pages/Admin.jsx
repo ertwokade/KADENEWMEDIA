@@ -53,6 +53,7 @@ import {
   getReferralsApi, updateReferralApi, deleteReferralApi,
   getQuotesApi, updateQuoteApi, deleteQuoteApi,
   getCustomerProfilesApi, getInvoicesApi, createInvoiceApi, updateInvoiceApi, deleteInvoiceApi,
+  getPortalCustomersApi, getPackageDefinitionsApi, addCustomerPackageApi, updateCustomerPackageApi, removeCustomerPackageApi, updateCustomerStatusApi, deletePortalCustomerApi,
   getBackupSummaryApi, createBackupApi,
   getEmailTemplatesApi, createEmailTemplateApi, updateEmailTemplateApi, deleteEmailTemplateApi,
   getOnboardingFormsApi, createOnboardingFormApi, deleteOnboardingFormApi,
@@ -7251,6 +7252,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
   const crmNavItems = [
     { id: 'proposals', label: 'Teklifler', icon: HiOutlineCurrencyDollar },
     { id: 'quote-leads', label: 'Online Teklifler', icon: HiOutlineCalculator },
+    { id: 'portal-customers', label: 'Portal Müşterileri', icon: HiOutlineGlobe },
     { id: 'customer-profiles', label: 'Müşteri Profilleri', icon: HiOutlineUserGroup },
     { id: 'invoices', label: 'Fatura & Ödeme', icon: HiOutlineCurrencyDollar },
     { id: 'tasks', label: 'Görevler', icon: HiOutlineClipboardList },
@@ -7437,12 +7439,362 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
         {activeSection === 'onboarding' && <OnboardingSection showToast={showToast} />}
         {activeSection === 'report' && <ReportExportSection showToast={showToast} />}
         {activeSection === 'backup' && <BackupSection showToast={showToast} />}
+        {activeSection === 'portal-customers' && <PortalCustomersSection showToast={showToast} />}
       </main>
 
       {/* Toast */}
       <AnimatePresence>
         {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       </AnimatePresence>
+    </div>
+  )
+}
+
+// ========== PORTAL CUSTOMERS SECTION ==========
+const CONSULTING_LABELS = {
+  'social-media': 'Sosyal Medya',
+  'seo': 'SEO',
+  'content': 'İçerik Üretimi',
+  'ads': 'Reklam Yönetimi',
+  'branding': 'Marka Kimliği',
+  'web': 'Web Tasarım',
+  'email-marketing': 'E-posta Pazarlama',
+  'analytics': 'Analitik',
+  'consulting': 'Strateji Danışmanlığı',
+}
+
+function PortalCustomersSection({ showToast }) {
+  const [customers, setCustomers] = useState([])
+  const [packageDefs, setPackageDefs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [expandedId, setExpandedId] = useState(null)
+  const [showAddPkg, setShowAddPkg] = useState(null) // customerId
+  const [pkgForm, setPkgForm] = useState({ reference: '', customName: '', consultingArea: 'social-media', featuresText: '', expiresAt: '' })
+  const [submitting, setSubmitting] = useState(false)
+
+  const load = useCallback(() => {
+    setLoading(true)
+    Promise.all([getPortalCustomersApi(), getPackageDefinitionsApi()])
+      .then(([c, p]) => {
+        setCustomers(Array.isArray(c) ? c : [])
+        setPackageDefs(Array.isArray(p) ? p : [])
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const filtered = customers.filter(c =>
+    !search ||
+    c.name?.toLowerCase().includes(search.toLowerCase()) ||
+    c.email?.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const handleToggleStatus = async (c) => {
+    const newStatus = c.status === 'active' ? 'inactive' : 'active'
+    try {
+      await updateCustomerStatusApi(c._id, newStatus)
+      setCustomers(prev => prev.map(x => x._id === c._id ? { ...x, status: newStatus } : x))
+      showToast(`${c.name} durumu güncellendi`, 'success')
+    } catch { showToast('Güncelleme başarısız', 'error') }
+  }
+
+  const handleRemovePkg = async (customerId, packageId) => {
+    if (!window.confirm('Bu paketi kaldırmak istediğinizden emin misiniz?')) return
+    try {
+      await removeCustomerPackageApi(customerId, packageId)
+      setCustomers(prev => prev.map(c => c._id === customerId
+        ? { ...c, packages: c.packages.filter(p => p.id !== packageId) }
+        : c
+      ))
+      showToast('Paket kaldırıldı', 'success')
+    } catch { showToast('Kaldırma başarısız', 'error') }
+  }
+
+  const handleTogglePkgStatus = async (customerId, pkg) => {
+    const newStatus = pkg.status === 'active' ? 'expired' : 'active'
+    try {
+      await updateCustomerPackageApi(customerId, pkg.id, newStatus)
+      setCustomers(prev => prev.map(c => c._id === customerId
+        ? { ...c, packages: c.packages.map(p => p.id === pkg.id ? { ...p, status: newStatus } : p) }
+        : c
+      ))
+      showToast('Paket durumu güncellendi', 'success')
+    } catch { showToast('Güncelleme başarısız', 'error') }
+  }
+
+  const handleAddPackage = async (customerId) => {
+    setSubmitting(true)
+    try {
+      let payload
+      if (pkgForm.reference && pkgForm.reference !== 'custom') {
+        payload = { customerId, reference: pkgForm.reference }
+      } else {
+        payload = {
+          customerId,
+          reference: 'custom',
+          customPackage: {
+            name: pkgForm.customName || 'Özel Paket',
+            consultingArea: pkgForm.consultingArea,
+            features: pkgForm.featuresText.split('\n').map(f => f.trim()).filter(Boolean),
+            expiresAt: pkgForm.expiresAt || null,
+          },
+        }
+      }
+      const res = await addCustomerPackageApi(payload.customerId, payload.reference, payload.customPackage)
+      setCustomers(prev => prev.map(c => c._id === customerId
+        ? { ...c, packages: [...(c.packages || []), res.package] }
+        : c
+      ))
+      showToast('Paket eklendi', 'success')
+      setShowAddPkg(null)
+      setPkgForm({ reference: '', customName: '', consultingArea: 'social-media', featuresText: '', expiresAt: '' })
+    } catch (e) {
+      showToast(e.message || 'Paket eklenemedi', 'error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleDelete = async (c) => {
+    if (!window.confirm(`${c.name} adlı müşteriyi silmek istediğinizden emin misiniz?`)) return
+    try {
+      await deletePortalCustomerApi(c._id)
+      setCustomers(prev => prev.filter(x => x._id !== c._id))
+      showToast('Müşteri silindi', 'success')
+    } catch { showToast('Silme başarısız', 'error') }
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Portal <span>Müşterileri</span></h1>
+          <p>Kayıtlı müşterileri yönetin ve paket atayın</p>
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+            Shopier webhook: <code style={{ background: 'rgba(0,0,0,0.3)', padding: '2px 8px', borderRadius: 6 }}>/api/shopier</code>
+          </span>
+        </div>
+      </div>
+
+      <div className="admin-form" style={{ marginBottom: 20, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <HiOutlineUsers size={16} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
+        <input
+          className="admin-input"
+          placeholder="İsim veya e-posta ile ara..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ flex: 1, margin: 0 }}
+        />
+        <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+          {filtered.length} müşteri
+        </span>
+      </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>Yükleniyor...</div>
+      ) : filtered.length === 0 ? (
+        <div className="admin-form" style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>
+          {search ? 'Sonuç bulunamadı.' : 'Henüz kayıtlı müşteri yok. Müşteriler /giris üzerinden kayıt olabilir veya Shopier üzerinden otomatik oluşturulur.'}
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {filtered.map(c => {
+            const isExpanded = expandedId === c._id
+            const activeCount = (c.packages || []).filter(p => p.status === 'active').length
+            return (
+              <div key={c._id} className="admin-form" style={{ padding: 0, overflow: 'hidden' }}>
+                {/* Customer Row */}
+                <div
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setExpandedId(isExpanded ? null : c._id)}
+                >
+                  <div style={{
+                    width: 38, height: 38, borderRadius: '50%',
+                    background: c.status === 'active' ? 'rgba(234,195,33,0.15)' : 'rgba(255,255,255,0.05)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 800, fontSize: '0.9rem', color: '#eac321', flexShrink: 0,
+                  }}>
+                    {c.name?.charAt(0)?.toUpperCase() || '?'}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <strong style={{ fontSize: '0.95rem' }}>{c.name}</strong>
+                      <span style={{
+                        fontSize: '0.72rem', fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                        background: c.status === 'active' ? 'rgba(46,204,113,0.12)' : 'rgba(239,68,68,0.1)',
+                        color: c.status === 'active' ? '#2ECC71' : '#f87171',
+                        border: `1px solid ${c.status === 'active' ? 'rgba(46,204,113,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                      }}>
+                        {c.status === 'active' ? 'Aktif' : 'Pasif'}
+                      </span>
+                      {c.source === 'shopier' && (
+                        <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(108,99,255,0.12)', color: '#6C63FF', border: '1px solid rgba(108,99,255,0.2)', fontWeight: 600 }}>
+                          Shopier
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: 2 }}>{c.email}</div>
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#eac321' }}>{(c.packages || []).length} paket</div>
+                    <div style={{ fontSize: '0.76rem', color: 'var(--text-tertiary)' }}>{activeCount} aktif</div>
+                  </div>
+                  <HiOutlineChevronDown size={16} style={{ color: 'var(--text-tertiary)', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
+                </div>
+
+                {/* Expanded Detail */}
+                {isExpanded && (
+                  <div style={{ borderTop: '1px solid var(--border)', padding: '16px 20px' }}>
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
+                      <button
+                        className="btn btn-outline"
+                        style={{ fontSize: '0.8rem', padding: '6px 14px' }}
+                        onClick={() => {
+                          setShowAddPkg(c._id)
+                          setPkgForm({ reference: '', customName: '', consultingArea: 'social-media', featuresText: '', expiresAt: '' })
+                        }}
+                      >
+                        <HiOutlinePlus size={14} /> Paket Ekle
+                      </button>
+                      <button
+                        className="btn btn-outline"
+                        style={{ fontSize: '0.8rem', padding: '6px 14px' }}
+                        onClick={() => handleToggleStatus(c)}
+                      >
+                        {c.status === 'active' ? '⏸ Pasife Al' : '▶ Aktif Et'}
+                      </button>
+                      <button
+                        className="btn btn-outline"
+                        style={{ fontSize: '0.8rem', padding: '6px 14px', color: '#f87171', borderColor: 'rgba(239,68,68,0.3)' }}
+                        onClick={() => handleDelete(c)}
+                      >
+                        <HiOutlineTrash size={14} /> Sil
+                      </button>
+                    </div>
+
+                    {/* Add Package Form */}
+                    {showAddPkg === c._id && (
+                      <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                        <h4 style={{ marginBottom: 12, fontSize: '0.9rem' }}>Paket Ekle</h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                          <div>
+                            <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>Paket Tipi</label>
+                            <select
+                              className="admin-input"
+                              value={pkgForm.reference}
+                              onChange={e => setPkgForm(p => ({ ...p, reference: e.target.value }))}
+                              style={{ width: '100%' }}
+                            >
+                              <option value="">Seçin...</option>
+                              {packageDefs.map(d => (
+                                <option key={d.reference} value={d.reference}>{d.name}</option>
+                              ))}
+                              <option value="custom">✏️ Özel Paket</option>
+                            </select>
+                          </div>
+                          {pkgForm.reference === 'custom' && (
+                            <>
+                              <div>
+                                <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>Paket Adı</label>
+                                <input className="admin-input" value={pkgForm.customName} onChange={e => setPkgForm(p => ({ ...p, customName: e.target.value }))} placeholder="Özel Paket Adı" style={{ width: '100%' }} />
+                              </div>
+                              <div>
+                                <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>Danışmanlık Alanı</label>
+                                <select className="admin-input" value={pkgForm.consultingArea} onChange={e => setPkgForm(p => ({ ...p, consultingArea: e.target.value }))} style={{ width: '100%' }}>
+                                  {Object.entries(CONSULTING_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                </select>
+                              </div>
+                              <div>
+                                <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>Bitiş Tarihi</label>
+                                <input type="date" className="admin-input" value={pkgForm.expiresAt} onChange={e => setPkgForm(p => ({ ...p, expiresAt: e.target.value }))} style={{ width: '100%' }} />
+                              </div>
+                              <div style={{ gridColumn: '1/-1' }}>
+                                <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>Özellikler (her satıra bir özellik)</label>
+                                <textarea className="admin-input" value={pkgForm.featuresText} onChange={e => setPkgForm(p => ({ ...p, featuresText: e.target.value }))} rows={3} placeholder="Instagram yönetimi&#10;Facebook yönetimi&#10;Aylık 30 gönderi" style={{ width: '100%', resize: 'vertical' }} />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                          <button className="btn btn-primary" style={{ fontSize: '0.82rem', padding: '7px 16px' }} disabled={submitting || !pkgForm.reference} onClick={() => handleAddPackage(c._id)}>
+                            {submitting ? 'Ekleniyor...' : 'Ekle'}
+                          </button>
+                          <button className="btn btn-outline" style={{ fontSize: '0.82rem', padding: '7px 16px' }} onClick={() => setShowAddPkg(null)}>İptal</button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Packages List */}
+                    {(c.packages || []).length === 0 ? (
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>Bu müşterinin henüz paketi yok.</p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {(c.packages || []).map(pkg => (
+                          <div key={pkg.id} style={{
+                            display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 16px',
+                            background: 'rgba(0,0,0,0.15)', borderRadius: 10,
+                            border: `1px solid ${pkg.status === 'active' ? 'rgba(234,195,33,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                          }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+                                <strong style={{ fontSize: '0.88rem' }}>{pkg.name}</strong>
+                                <span style={{
+                                  fontSize: '0.7rem', fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                                  background: pkg.status === 'active' ? 'rgba(46,204,113,0.12)' : 'rgba(239,68,68,0.1)',
+                                  color: pkg.status === 'active' ? '#2ECC71' : '#f87171',
+                                }}>
+                                  {pkg.status === 'active' ? 'Aktif' : 'Pasif'}
+                                </span>
+                                {pkg.source === 'shopier' && <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(108,99,255,0.12)', color: '#6C63FF', fontWeight: 600 }}>Shopier</span>}
+                              </div>
+                              <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
+                                {CONSULTING_LABELS[pkg.consultingArea] || pkg.consultingArea}
+                                {pkg.purchasedAt && ` · ${new Date(pkg.purchasedAt).toLocaleDateString('tr-TR')}`}
+                                {pkg.expiresAt && ` → ${new Date(pkg.expiresAt).toLocaleDateString('tr-TR')}`}
+                              </div>
+                              {(pkg.features || []).length > 0 && (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
+                                  {pkg.features.map((f, i) => (
+                                    <span key={i} style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(234,195,33,0.08)', color: '#eac321', border: '1px solid rgba(234,195,33,0.15)' }}>{f}</span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                              <button
+                                className="btn btn-outline"
+                                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                                onClick={() => handleTogglePkgStatus(c._id, pkg)}
+                              >
+                                {pkg.status === 'active' ? '⏸' : '▶'}
+                              </button>
+                              <button
+                                className="btn btn-outline"
+                                style={{ fontSize: '0.75rem', padding: '4px 10px', color: '#f87171', borderColor: 'rgba(239,68,68,0.3)' }}
+                                onClick={() => handleRemovePkg(c._id, pkg.id)}
+                              >
+                                <HiOutlineTrash size={13} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

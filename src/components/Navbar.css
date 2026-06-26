@@ -169,6 +169,36 @@
   font-size: 0.85rem;
 }
 
+.navbar-login-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--gray-lighter);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.navbar-login-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.mobile-login-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--gray-lighter);
+}
+
 /* Language Toggle */
 .lang-toggle {
   display: flex;

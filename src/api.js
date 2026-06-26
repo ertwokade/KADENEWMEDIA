@@ -149,6 +149,102 @@ export async function changePasswordApi(currentPassword, newPassword) {
   return handleResponse(res);
 }
 
+// Customer Auth
+export async function customerLoginApi(email, password) {
+  await ensureCsrfToken({ force: true });
+  const res = await fetch(`${API_BASE}/customer-auth`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+export async function customerRegisterApi(name, email, password, phone) {
+  await ensureCsrfToken({ force: true });
+  const res = await fetch(`${API_BASE}/customer-auth?action=register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password, phone }),
+  });
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+export async function customerSessionApi() {
+  const res = await fetch(`${API_BASE}/customer-auth?action=session`);
+  if (res.status === 401) return { authenticated: false };
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+export async function customerLogoutApi() {
+  const res = await fetch(`${API_BASE}/customer-auth?action=logout`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+export async function customerPortalApi() {
+  const res = await fetch(`${API_BASE}/customer-portal`);
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+// Admin — Müşteri Yönetimi
+export async function getPortalCustomersApi() {
+  const res = await fetch(`${API_BASE}/customers`);
+  return handleResponse(res);
+}
+
+export async function getPackageDefinitionsApi() {
+  const res = await fetch(`${API_BASE}/customers?action=packages`);
+  return handleResponse(res);
+}
+
+export async function addCustomerPackageApi(customerId, reference, customPackage) {
+  const res = await fetch(`${API_BASE}/customers?action=add-package`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ customerId, reference, customPackage }),
+  });
+  return handleResponse(res);
+}
+
+export async function updateCustomerPackageApi(customerId, packageId, status) {
+  const res = await fetch(`${API_BASE}/customers?action=update-package`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ customerId, packageId, status }),
+  });
+  return handleResponse(res);
+}
+
+export async function removeCustomerPackageApi(customerId, packageId) {
+  const res = await fetch(`${API_BASE}/customers?action=remove-package`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ customerId, packageId }),
+  });
+  return handleResponse(res);
+}
+
+export async function updateCustomerStatusApi(customerId, status) {
+  const res = await fetch(`${API_BASE}/customers?action=update-status`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ customerId, status }),
+  });
+  return handleResponse(res);
+}
+
+export async function deletePortalCustomerApi(customerId) {
+  const res = await fetch(`${API_BASE}/customers`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ customerId }),
+  });
+  return handleResponse(res);
+}
+
 // Blog
 export async function getBlogsApi() {
   const res = await fetch(`${API_BASE}/blog`);

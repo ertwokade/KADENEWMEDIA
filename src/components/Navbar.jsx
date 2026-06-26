@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HiChevronDown, HiMenuAlt3, HiX } from 'react-icons/hi'
+import { HiChevronDown, HiMenuAlt3, HiX, HiOutlineUser } from 'react-icons/hi'
 import { HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useTheme } from '../i18n/ThemeContext'
+import { useCustomer } from '../contexts/CustomerContext'
 import SiteSearch from './SiteSearch'
 import './Navbar.css'
 
@@ -16,6 +17,7 @@ export default function Navbar() {
   const location = useLocation()
   const { lang, toggleLang, t } = useLanguage()
   const { theme, toggleTheme } = useTheme()
+  const { customer } = useCustomer()
 
   const navLinks = [
     { name: t('nav.home'), path: '/' },
@@ -145,6 +147,18 @@ export default function Navbar() {
             <span className={lang === 'en' ? 'lang-active' : ''}>EN</span>
           </motion.button>
 
+          {customer ? (
+            <Link to="/musteri-panel" className="navbar-login-btn">
+              <HiOutlineUser size={16} />
+              <span>{customer.name?.split(' ')[0]}</span>
+            </Link>
+          ) : (
+            <Link to="/giris" className="navbar-login-btn">
+              <HiOutlineUser size={16} />
+              <span>Giriş Yap</span>
+            </Link>
+          )}
+
           <Link to="/teklif-al" className="navbar-cta btn btn-primary">
             {t('nav.cta')}
           </Link>
@@ -218,6 +232,15 @@ export default function Navbar() {
                 </Link>
               </motion.div>
             ))}
+            {customer ? (
+              <Link to="/musteri-panel" className="btn mobile-cta mobile-login-cta">
+                <HiOutlineUser size={16} /> {customer.name?.split(' ')[0]} · Panelim
+              </Link>
+            ) : (
+              <Link to="/giris" className="btn mobile-cta mobile-login-cta">
+                <HiOutlineUser size={16} /> Giriş Yap
+              </Link>
+            )}
             <Link to="/teklif-al" className="btn btn-primary mobile-cta">
               {t('nav.cta')}
             </Link>

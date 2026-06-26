@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { CustomerProvider } from './contexts/CustomerContext'
 import { OrganizationSchema } from './components/StructuredData'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { trackPageviewApi, heartbeatApi, getSessionApi } from './api'
@@ -48,6 +49,7 @@ const ReferralProgram = lazy(() => import('./pages/ReferralProgram'))
 const QuoteRequest = lazy(() => import('./pages/QuoteRequest'))
 const PriceCalculator = lazy(() => import('./pages/PriceCalculator'))
 const CustomerPortal = lazy(() => import('./pages/CustomerPortal'))
+const Login = lazy(() => import('./pages/Login'))
 const ProjectTracking = lazy(() => import('./pages/ProjectTracking'))
 const PodcastWebinar = lazy(() => import('./pages/PodcastWebinar'))
 const NewsletterArchive = lazy(() => import('./pages/NewsletterArchive'))
@@ -108,6 +110,7 @@ const ROUTE_THEMES = {
   '/referans-programi': 'partners',
   '/teklif-al': 'contact',
   '/fiyat-hesaplama': 'packages',
+  '/giris': 'about',
   '/musteri-panel': 'about',
   '/proje-takip': 'services',
   '/podcast-webinar': 'blog',
@@ -166,7 +169,7 @@ function App() {
   }, [location.pathname, isAdmin])
 
   return (
-    <>
+    <CustomerProvider>
       <ErrorTracker />
       <OrganizationSchema />
       <a href="#main-content" className="skip-to-content">İçeriğe geç</a>
@@ -204,6 +207,7 @@ function App() {
         <Route path="/referans-programi" element={<LazyRoute><ReferralProgram /></LazyRoute>} />
         <Route path="/teklif-al" element={<LazyRoute><QuoteRequest /></LazyRoute>} />
         <Route path="/fiyat-hesaplama" element={<LazyRoute><PriceCalculator /></LazyRoute>} />
+        <Route path="/giris" element={<LazyRoute><Login /></LazyRoute>} />
         <Route path="/musteri-panel" element={<LazyRoute><CustomerPortal /></LazyRoute>} />
         <Route path="/proje-takip" element={<LazyRoute><ProjectTracking /></LazyRoute>} />
         <Route path="/podcast-webinar" element={<LazyRoute><PodcastWebinar /></LazyRoute>} />
@@ -216,7 +220,7 @@ function App() {
       {!isAdmin && <CookieBanner />}
       {!isAdmin && <ExitIntentPopup />}
       {!isAdmin && <NotificationPrompt />}
-    </>
+    </CustomerProvider>
   )
 }
 
