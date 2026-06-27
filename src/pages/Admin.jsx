@@ -103,7 +103,7 @@ function LoginScreen({ onLogin }) {
   }
 
   return (
-    <div className={`admin-login-container ${localStorage.getItem('kade_admin_dark') === 'true' ? 'dark' : ''}`}>
+    <div className={`admin-login-container ${localStorage.getItem('kade_admin_dark') !== 'false' ? 'dark' : ''}`}>
       <div className="login-bg-pattern" />
       <div className="login-grid-overlay" />
       <motion.div
@@ -7113,7 +7113,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
       return next
     })
   }
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('kade_admin_dark') === 'true')
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('kade_admin_dark') !== 'false')
   const [localMode, setLocalMode] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifCount, setNotifCount] = useState(0)

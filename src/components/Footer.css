@@ -295,3 +295,66 @@
 [data-theme="light"] .footer-newsletter-error {
   color: #fca5a5;
 }
+
+/* Kade Media1 footer treatment */
+.footer {
+  background:
+    radial-gradient(60% 60% at 50% 0%, rgba(255, 212, 0, 0.07), transparent 70%),
+    #060606 !important;
+  padding: clamp(70px, 10vh, 126px) 0 34px;
+}
+
+.footer-glow {
+  display: none;
+}
+
+.footer-newsletter {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.026);
+  border-color: rgba(255, 255, 255, 0.075);
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  margin-bottom: 18px;
+}
+
+.footer-logo-mark {
+  display: inline-flex;
+  color: #FFD400;
+  filter: drop-shadow(0 0 10px rgba(255, 212, 0, 0.62));
+}
+
+.footer-logo-word {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.footer-logo-word span {
+  color: #FFD400;
+}
+
+.footer-top {
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: clamp(24px, 4vw, 48px);
+}
+
+.footer-links-group h4 {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42) !important;
+}
+
+.footer-bottom {
+  border-top-color: rgba(255, 255, 255, 0.07);
+}
+
+.scroll-top-btn {
+  border-radius: 999px;
+  background: rgba(255, 212, 0, 0.08);
+}

@@ -159,3 +159,54 @@
     justify-content: center;
   }
 }
+
+/* Kade Media1 cookie treatment */
+.cookie-banner {
+  left: 24px;
+  right: 24px;
+  bottom: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 18px;
+  background: rgba(6, 6, 6, 0.82);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.38);
+  padding: 14px 18px;
+}
+
+.cookie-content p {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.cookie-btn {
+  border-radius: 999px;
+  min-height: 38px;
+}
+
+.cookie-accept {
+  background: #FFD400;
+  color: #060606;
+  box-shadow: 0 0 22px rgba(255, 212, 0, 0.28);
+}
+
+.cookie-decline {
+  background: rgba(255, 255, 255, 0.035);
+  color: rgba(255, 255, 255, 0.62);
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+.cookie-details {
+  color: #FFD400;
+}
+
+.kvkk-modal {
+  border-radius: 18px !important;
+  background: rgba(8, 8, 8, 0.94) !important;
+}
+
+@media (max-width: 768px) {
+  .cookie-banner {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    align-items: stretch;
+  }
+}

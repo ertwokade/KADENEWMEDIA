@@ -78,3 +78,25 @@
 @media (max-width: 768px) {
   .aurora__blob { filter: blur(70px); }
 }
+
+/* Kade Media1 keeps the scene black and lets particle canvas carry motion. */
+.aurora {
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(6, 6, 6, 0.95), rgba(6, 6, 6, 0.82) 48%, #060606),
+    #060606;
+}
+
+.aurora__blob {
+  display: none;
+}
+
+.aurora__grid {
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(255, 212, 0, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 212, 0, 0.022) 1px, transparent 1px);
+  background-size: 86px 86px;
+  mask-image: radial-gradient(ellipse at 50% 45%, black 18%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 45%, black 18%, transparent 72%);
+}

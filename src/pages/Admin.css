@@ -1735,3 +1735,184 @@
   .admin-page-header h1 { font-size: 1.3rem; }
   .dashboard-quick-actions { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Kade Media1 admin skin */
+.admin-dashboard,
+.admin-login-container,
+.admin-dashboard.dark,
+.admin-login-container.dark {
+  --bg-primary: #060606;
+  --bg-secondary: rgba(255, 255, 255, 0.035);
+  --bg-tertiary: rgba(255, 255, 255, 0.06);
+  --card-bg: rgba(8, 8, 8, 0.9);
+  --card-bg-glass: rgba(8, 8, 8, 0.78);
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.62);
+  --text-tertiary: rgba(255, 255, 255, 0.38);
+  --accent: #FFD400;
+  --accent-light: #FFE75A;
+  --accent-alpha: rgba(255, 212, 0, 0.08);
+  --accent-glow: rgba(255, 212, 0, 0.32);
+  --border: rgba(255, 255, 255, 0.075);
+  --border-strong: rgba(255, 255, 255, 0.13);
+  --shadow-sm: none;
+  --shadow-md: 0 16px 40px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.44);
+  --shadow-glow: 0 0 34px rgba(255, 212, 0, 0.18);
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 16px;
+  --radius-xl: 18px;
+  --font: 'Inter', system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+.admin-dashboard,
+.admin-login-container {
+  background:
+    radial-gradient(70% 58% at 74% 10%, rgba(255, 212, 0, 0.08), transparent 62%),
+    radial-gradient(55% 48% at 10% 82%, rgba(255, 212, 0, 0.055), transparent 68%),
+    #060606 !important;
+}
+
+.login-bg-pattern {
+  background:
+    radial-gradient(60% 55% at 60% 48%, rgba(255, 212, 0, 0.09), transparent 70%) !important;
+}
+
+.login-grid-overlay,
+.admin-grid-bg,
+.dark .login-grid-overlay,
+.dark .admin-grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 212, 0, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 212, 0, 0.022) 1px, transparent 1px) !important;
+  background-size: 86px 86px !important;
+  opacity: 0.36;
+}
+
+.admin-login-card,
+.admin-sidebar,
+.admin-stat-card,
+.admin-table-wrapper,
+.admin-form,
+.dashboard-quick-action,
+.dashboard-recent,
+.kanban-column,
+.kanban-card,
+.note-item,
+.notification-dropdown,
+.admin-modal,
+.seed-section {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.016) 58%, rgba(255, 212, 0, 0.035)), rgba(8, 8, 8, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.075) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.admin-login-card {
+  border-radius: 18px;
+}
+
+.admin-logo span,
+.admin-page-header h1 span,
+.sidebar-nav-item.active,
+.sidebar-site-link:hover,
+.dark-mode-toggle:hover,
+.admin-stat-card .stat-number,
+.kanban-card-service,
+.table-action-btn.primary,
+.admin-tab:hover:not(.active) {
+  color: #FFD400 !important;
+}
+
+.admin-dashboard .btn-primary,
+.admin-login-container .btn-primary,
+.admin-tab.active,
+.view-toggle button.active,
+.nav-badge {
+  background: #FFD400 !important;
+  border-color: #FFD400 !important;
+  color: #060606 !important;
+  box-shadow: 0 0 28px rgba(255, 212, 0, 0.26) !important;
+}
+
+.sidebar-avatar,
+.admin-stat-card .stat-icon {
+  background: rgba(255, 212, 0, 0.09) !important;
+  color: #FFD400 !important;
+  border: 1px solid rgba(255, 212, 0, 0.24);
+}
+
+.admin-sidebar {
+  border-right-color: rgba(255, 255, 255, 0.075) !important;
+}
+
+.sidebar-header,
+.sidebar-profile,
+.sidebar-footer,
+.admin-table-header,
+.dashboard-recent-header,
+.admin-form h3 {
+  border-color: rgba(255, 255, 255, 0.075) !important;
+}
+
+.sidebar-nav-item,
+.dashboard-quick-action,
+.table-action-btn,
+.btn-icon,
+.dark-mode-toggle,
+.sidebar-site-link,
+.sidebar-logout {
+  border-radius: 999px !important;
+}
+
+.sidebar-nav-item:hover,
+.sidebar-nav-item.active,
+.dashboard-quick-action:hover,
+.kanban-card:hover,
+.table-action-btn:hover,
+.btn-icon:hover {
+  background: rgba(255, 212, 0, 0.07) !important;
+  border-color: rgba(255, 212, 0, 0.42) !important;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select,
+.dark .admin-form input,
+.dark .admin-form textarea,
+.dark .admin-form select,
+.admin-login-card input,
+.seed-section input,
+.search-input {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border-radius: 14px !important;
+}
+
+.admin-form input:focus,
+.admin-form textarea:focus,
+.admin-form select:focus,
+.admin-login-card input:focus,
+.seed-section input:focus,
+.search-input:focus {
+  border-color: rgba(255, 212, 0, 0.72) !important;
+  box-shadow: 0 0 0 4px rgba(255, 212, 0, 0.12) !important;
+}
+
+.admin-table th {
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: rgba(255, 255, 255, 0.42) !important;
+}
+
+.admin-table td,
+.admin-table th {
+  border-color: rgba(255, 255, 255, 0.065) !important;
+}
+
+.admin-table tr:hover td {
+  background: rgba(255, 212, 0, 0.045) !important;
+}

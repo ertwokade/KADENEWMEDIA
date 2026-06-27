@@ -124,7 +124,12 @@ export default function Footer() {
         <div className="footer-top">
           <div className="footer-brand">
             <Link to="/" className="footer-logo">
-              <img src="/logo.png" alt="Kade Media" className="footer-logo-icon" />
+              <span className="footer-logo-mark" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24">
+                  <path d="M13 1.5 3.5 14h7.1l-2.1 8.5L20.5 8.5H13Z" fill="currentColor" />
+                </svg>
+              </span>
+              <span className="footer-logo-word">kade <span>media</span></span>
             </Link>
             <p className="footer-desc">{t('footer.desc')}</p>
             <div className="footer-socials">

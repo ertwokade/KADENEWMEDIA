@@ -69,13 +69,17 @@ export default function Navbar() {
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="container navbar-container">
         <Link to="/" className="navbar-logo">
-          <motion.img
-            src="/logo.png"
-            alt="Kade Media"
-            className="logo-icon"
+          <motion.span
+            className="logo-mark"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-          />
+            aria-hidden="true"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24">
+              <path d="M13 1.5 3.5 14h7.1l-2.1 8.5L20.5 8.5H13Z" fill="currentColor" />
+            </svg>
+          </motion.span>
+          <span className="logo-word">kade <span>media</span></span>
         </Link>
 
         <div className="navbar-links">
