@@ -82,6 +82,19 @@
   gap: 24px;
 }
 
+.cp-container-with-menu {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  align-items: start;
+}
+
+.cp-main-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 /* Empty state */
 .cp-empty-state {
   text-align: center;
@@ -382,6 +395,10 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .cp-container-with-menu {
+    grid-template-columns: 1fr;
+  }
+
   .cp-grid {
     grid-template-columns: 1fr;
   }

@@ -8,6 +8,7 @@ import {
 import { useSEO } from '../hooks/useSEO'
 import { useCustomer } from '../contexts/CustomerContext'
 import { customerPortalApi } from '../api'
+import OrganizationKitNav from '../components/OrganizationKitNav'
 import PageTransition from '../components/PageTransition'
 import './CustomerPortal.css'
 
@@ -39,7 +40,7 @@ function StatusBadge({ status }) {
 }
 
 export default function CustomerPortal() {
-  const { customer, checked, logout } = useCustomer()
+  const { customer, checked, logout, entitlements } = useCustomer()
   const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -98,6 +99,7 @@ export default function CustomerPortal() {
   const { consultingAreas = [], features = [], packages = [] } = data || {}
   const hasPackages = packages.length > 0
   const activePackages = packages.filter(p => p.status === 'active')
+  const showOrganizationKitMenu = Boolean(entitlements?.hasOrganizationKitAccess)
 
   return (
     <PageTransition>
@@ -121,23 +123,26 @@ export default function CustomerPortal() {
           </div>
         </div>
 
-        <div className="container cp-container">
-          {!hasPackages && (
-            <motion.div
-              className="cp-empty-state"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <div className="cp-empty-icon">
-                <HiOutlineShoppingBag size={32} color="var(--primary)" />
-              </div>
-              <h2>Henüz paket satın almadınız</h2>
-              <p>Hizmetlerimize erişmek için bir paket satın alın.</p>
-              <Link to="/paketler" className="btn btn-primary">Paketleri İncele</Link>
-            </motion.div>
-          )}
+        <div className={`container cp-container ${showOrganizationKitMenu ? 'cp-container-with-menu' : ''}`}>
+          {showOrganizationKitMenu && <OrganizationKitNav />}
 
-          <div className="cp-grid">
+          <div className="cp-main-column">
+            {!hasPackages && (
+              <motion.div
+                className="cp-empty-state"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <div className="cp-empty-icon">
+                  <HiOutlineShoppingBag size={32} color="var(--primary)" />
+                </div>
+                <h2>Henüz paket satın almadınız</h2>
+                <p>Hizmetlerimize erişmek için bir paket satın alın.</p>
+                <Link to="/paketler" className="btn btn-primary">Paketleri İncele</Link>
+              </motion.div>
+            )}
+
+            <div className="cp-grid">
             {/* Bölüm 1: Danışmanlık Alanları */}
             <motion.div
               className="cp-card"
@@ -263,36 +268,37 @@ export default function CustomerPortal() {
                 </div>
               )}
             </motion.div>
-          </div>
+            </div>
 
-          {/* Footer stats */}
-          <motion.div
-            className="cp-stats-row"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            <div className="cp-stat">
-              <span className="cp-stat-num">{packages.length}</span>
-              <span className="cp-stat-label">Toplam Paket</span>
-            </div>
-            <div className="cp-stat">
-              <span className="cp-stat-num">{activePackages.length}</span>
-              <span className="cp-stat-label">Aktif Paket</span>
-            </div>
-            <div className="cp-stat">
-              <span className="cp-stat-num">{consultingAreas.length}</span>
-              <span className="cp-stat-label">Danışmanlık Alanı</span>
-            </div>
-            <div className="cp-stat">
-              <span className="cp-stat-num">{features.length}</span>
-              <span className="cp-stat-label">Aktif Özellik</span>
-            </div>
-          </motion.div>
+            {/* Footer stats */}
+            <motion.div
+              className="cp-stats-row"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="cp-stat">
+                <span className="cp-stat-num">{packages.length}</span>
+                <span className="cp-stat-label">Toplam Paket</span>
+              </div>
+              <div className="cp-stat">
+                <span className="cp-stat-num">{activePackages.length}</span>
+                <span className="cp-stat-label">Aktif Paket</span>
+              </div>
+              <div className="cp-stat">
+                <span className="cp-stat-num">{consultingAreas.length}</span>
+                <span className="cp-stat-label">Danışmanlık Alanı</span>
+              </div>
+              <div className="cp-stat">
+                <span className="cp-stat-num">{features.length}</span>
+                <span className="cp-stat-label">Aktif Özellik</span>
+              </div>
+            </motion.div>
 
-          <div className="cp-support-banner">
-            <HiOutlineUser size={18} />
-            <span>Bir sorun mu var? <Link to="/iletisim" className="cp-link">Destek ekibimizle iletişime geçin</Link></span>
+            <div className="cp-support-banner">
+              <HiOutlineUser size={18} />
+              <span>Bir sorun mu var? <Link to="/iletisim" className="cp-link">Destek ekibimizle iletişime geçin</Link></span>
+            </div>
           </div>
         </div>
       </div>

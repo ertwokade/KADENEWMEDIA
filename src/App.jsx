@@ -14,6 +14,8 @@ import GrainOverlay from './components/GrainOverlay'
 import AuroraBackground from './components/AuroraBackground'
 import ErrorBoundary from './components/ErrorBoundary'
 import NotificationPrompt from './components/NotificationPrompt'
+import OrganizationKitGuard from './components/OrganizationKitGuard'
+import KadeKitBusinessGuard from './components/KadeKitBusinessGuard'
 
 // Core pages — direct import for instant first render
 import Home from './pages/Home'
@@ -52,6 +54,10 @@ const Login = lazy(() => import('./pages/Login'))
 const ProjectTracking = lazy(() => import('./pages/ProjectTracking'))
 const PodcastWebinar = lazy(() => import('./pages/PodcastWebinar'))
 const NewsletterArchive = lazy(() => import('./pages/NewsletterArchive'))
+const OrganizationKitDashboard = lazy(() => import('./pages/OrganizationKitDashboard'))
+const OrganizationKitPlan = lazy(() => import('./pages/OrganizationKitPlan'))
+const OrganizationKitSection = lazy(() => import('./pages/OrganizationKitSection'))
+const KadeKitBusinessStudio = lazy(() => import('./pages/KadeKitBusinessStudio'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -111,6 +117,8 @@ const ROUTE_THEMES = {
   '/fiyat-hesaplama': 'packages',
   '/giris': 'about',
   '/musteri-panel': 'about',
+  '/organizasyon-kiti': 'about',
+  '/kade-kit-business': 'services',
   '/proje-takip': 'services',
   '/podcast-webinar': 'blog',
   '/bulten-arsivi': 'blog',
@@ -121,6 +129,8 @@ function getCanvasTheme(pathname) {
   if (pathname.startsWith('/hizmetler/')) return 'services'
   if (pathname.startsWith('/partnerler/')) return 'partners'
   if (pathname.startsWith('/blog/')) return 'blog'
+  if (pathname.startsWith('/organizasyon-kiti')) return 'about'
+  if (pathname.startsWith('/kade-kit-business')) return 'services'
   return 'home'
 }
 
@@ -208,6 +218,10 @@ function App() {
         <Route path="/fiyat-hesaplama" element={<LazyRoute><PriceCalculator /></LazyRoute>} />
         <Route path="/giris" element={<LazyRoute><Login /></LazyRoute>} />
         <Route path="/musteri-panel" element={<LazyRoute><CustomerPortal /></LazyRoute>} />
+        <Route path="/organizasyon-kiti" element={<LazyRoute><OrganizationKitGuard><OrganizationKitDashboard /></OrganizationKitGuard></LazyRoute>} />
+        <Route path="/organizasyon-kiti/plan/fractional-new-media-director" element={<LazyRoute><OrganizationKitGuard><OrganizationKitPlan /></OrganizationKitGuard></LazyRoute>} />
+        <Route path="/organizasyon-kiti/:section" element={<LazyRoute><OrganizationKitGuard><OrganizationKitSection /></OrganizationKitGuard></LazyRoute>} />
+        <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
         <Route path="/proje-takip" element={<LazyRoute><ProjectTracking /></LazyRoute>} />
         <Route path="/podcast-webinar" element={<LazyRoute><PodcastWebinar /></LazyRoute>} />
         <Route path="/bulten-arsivi" element={<LazyRoute><NewsletterArchive /></LazyRoute>} />

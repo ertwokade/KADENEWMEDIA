@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { customerSessionApi, customerLogoutApi } from '../api'
+import { getUserEntitlements } from '../config/entitlements'
 
 const CustomerContext = createContext(null)
 
@@ -27,8 +28,10 @@ export function CustomerProvider({ children }) {
     setCustomer(null)
   }, [])
 
+  const entitlements = useMemo(() => getUserEntitlements(customer?.email), [customer?.email])
+
   return (
-    <CustomerContext.Provider value={{ customer, setCustomer, checked, logout }}>
+    <CustomerContext.Provider value={{ customer, setCustomer, checked, logout, entitlements }}>
       {children}
     </CustomerContext.Provider>
   )
