@@ -4,11 +4,11 @@ import { motion } from 'framer-motion'
 import {
   HiOutlineUser, HiOutlineBriefcase, HiOutlineStar, HiOutlineShoppingBag,
   HiOutlineCheckCircle, HiOutlineClock, HiOutlineLogout, HiOutlineExclamationCircle,
+  HiOutlineChartBar, HiOutlineSparkles, HiOutlineArrowRight,
 } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
 import { useCustomer } from '../contexts/CustomerContext'
 import { customerPortalApi } from '../api'
-import OrganizationKitNav from '../components/OrganizationKitNav'
 import PageTransition from '../components/PageTransition'
 import './CustomerPortal.css'
 
@@ -99,7 +99,28 @@ export default function CustomerPortal() {
   const { consultingAreas = [], features = [], packages = [] } = data || {}
   const hasPackages = packages.length > 0
   const activePackages = packages.filter(p => p.status === 'active')
-  const showOrganizationKitMenu = Boolean(entitlements?.hasOrganizationKitAccess)
+  const accessCards = [
+    entitlements?.hasOrganizationKitAccess && {
+      key: 'organization-kit',
+      eyebrow: 'Danışmanlık',
+      title: 'Kade Organizasyon Kiti',
+      description: 'Yol haritası, yönetim toplantıları, ekip süreçleri ve danışmanlık notlarına girin.',
+      to: '/organizasyon-kiti',
+      icon: HiOutlineChartBar,
+      tone: 'consulting',
+      cta: 'Danışmanlık paneline git',
+    },
+    entitlements?.hasKadeKitBusinessAccess && {
+      key: 'kade-kit-business',
+      eyebrow: 'Üretim Merkezi',
+      title: 'Kade Kit Business',
+      description: 'Yorum analizi, prodüksiyon CRM, AI araçları ve içerik üretim alanını açın.',
+      to: '/kade-kit-business',
+      icon: HiOutlineSparkles,
+      tone: 'business',
+      cta: 'Kit paneline git',
+    },
+  ].filter(Boolean)
 
   return (
     <PageTransition>
@@ -123,10 +144,49 @@ export default function CustomerPortal() {
           </div>
         </div>
 
-        <div className={`container cp-container ${showOrganizationKitMenu ? 'cp-container-with-menu' : ''}`}>
-          {showOrganizationKitMenu && <OrganizationKitNav />}
-
+        <div className="container cp-container">
           <div className="cp-main-column">
+            {accessCards.length > 0 && (
+              <motion.section
+                className="cp-access-section"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <div className="cp-access-heading">
+                  <span>Çalışma Alanlarım</span>
+                  <h2>Hangi panele geçmek istiyorsunuz?</h2>
+                </div>
+                <div className={`cp-access-grid ${accessCards.length === 1 ? 'single' : ''}`}>
+                  {accessCards.map((card, i) => {
+                    const Icon = card.icon
+                    return (
+                      <motion.div
+                        key={card.key}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.06 + i * 0.06 }}
+                      >
+                        <Link to={card.to} className={`cp-access-card ${card.tone}`}>
+                          <div className="cp-access-icon">
+                            <Icon size={24} />
+                          </div>
+                          <div className="cp-access-content">
+                            <span>{card.eyebrow}</span>
+                            <h3>{card.title}</h3>
+                            <p>{card.description}</p>
+                          </div>
+                          <div className="cp-access-cta">
+                            {card.cta}
+                            <HiOutlineArrowRight size={17} />
+                          </div>
+                        </Link>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              </motion.section>
+            )}
+
             {!hasPackages && (
               <motion.div
                 className="cp-empty-state"
