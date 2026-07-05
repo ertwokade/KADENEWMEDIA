@@ -15,6 +15,27 @@ export const CONSULTING_PLANS = {
   },
 }
 
+export const PACKAGE_ACCESS = {
+  'kade-organizasyon-kiti-test': {
+    consultingPlan: 'fractional_new_media_director',
+    consultingStatus: 'active',
+    hasOrganizationKitAccess: true,
+  },
+  'dijital-danismanlik': {
+    consultingPlan: 'fractional_new_media_director',
+    consultingStatus: 'active',
+    hasOrganizationKitAccess: true,
+  },
+  'tam-dijital': {
+    consultingPlan: 'fractional_new_media_director',
+    consultingStatus: 'active',
+    hasOrganizationKitAccess: true,
+    hasKadeKitBusinessAccess: true,
+    hasKadeRadarAccess: true,
+    hasAIKnowledgeCenterAccess: true,
+  },
+}
+
 export const userEntitlements = {
   'demirk314@gmail.com': {
     role: 'client_admin',
@@ -31,11 +52,38 @@ export function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase()
 }
 
-export function getUserEntitlements(email) {
+export function isPackageActive(pkg, now = new Date()) {
+  if (!pkg || pkg.status !== 'active') return false
+  if (!pkg.expiresAt) return true
+  const expiresAt = new Date(pkg.expiresAt)
+  return Number.isNaN(expiresAt.getTime()) || expiresAt >= now
+}
+
+export function getPackageEntitlements(packages = []) {
+  const entitlements = { ...DEFAULT_ENTITLEMENTS }
+  const activePackages = Array.isArray(packages) ? packages.filter(isPackageActive) : []
+
+  activePackages.forEach((pkg) => {
+    const access = pkg.access || PACKAGE_ACCESS[pkg.reference] || {}
+    Object.entries(access).forEach(([key, value]) => {
+      if (typeof value === 'boolean') {
+        entitlements[key] = Boolean(entitlements[key] || value)
+      } else if (value != null) {
+        entitlements[key] = value
+      }
+    })
+  })
+
+  return entitlements
+}
+
+export function getUserEntitlements(email, packages = [], extraEntitlements = {}) {
   const entitlement = userEntitlements[normalizeEmail(email)]
   return {
     ...DEFAULT_ENTITLEMENTS,
+    ...getPackageEntitlements(packages),
     ...(entitlement || {}),
+    ...(extraEntitlements || {}),
   }
 }
 

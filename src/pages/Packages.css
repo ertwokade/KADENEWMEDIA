@@ -159,6 +159,35 @@
   line-height: 1.5;
 }
 
+.package-free-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: -4px 0 18px;
+}
+
+.package-free-price strong {
+  color: var(--primary);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.package-free-price span {
+  color: var(--gray);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.package-claim-message {
+  max-width: 640px;
+  margin: 18px auto 0;
+  text-align: center;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .package-price {
   display: flex;
   align-items: baseline;

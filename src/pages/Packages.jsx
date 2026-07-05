@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   HiOutlineCheck,
@@ -7,7 +7,8 @@ import {
   HiOutlineArrowRight,
   HiOutlineSparkles,
 } from 'react-icons/hi'
-import { getContentApi } from '../api'
+import { claimFreePackageApi, getContentApi } from '../api'
+import { useCustomer } from '../contexts/CustomerContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import { analytics } from '../utils/analytics'
 import { useSEO } from '../hooks/useSEO'
@@ -55,6 +56,8 @@ function CompCell({ val }) {
 
 export default function Packages() {
   const { lang, t } = useLanguage()
+  const navigate = useNavigate()
+  const { customer, setCustomer } = useCustomer()
   useSEO({
     title: 'Paketler & Fiyatlar | Sosyal Medya Hizmet Paketleri',
     description: 'Kade Media sosyal medya yönetim paketleri. Başlangıç, Profesyonel, Kurumsal ve Özel olmak üzere 4 farklı paketle uygun fiyata profesyonel dijital pazarlama hizmeti alın.',
@@ -65,6 +68,8 @@ export default function Packages() {
 
   const [dynamicItems, setDynamicItems] = useState(null)
   const [exchangeRate, setExchangeRate] = useState(FALLBACK_RATE)
+  const [claimingReference, setClaimingReference] = useState('')
+  const [claimMessage, setClaimMessage] = useState('')
 
   useEffect(() => {
     getContentApi('packages')
@@ -112,7 +117,51 @@ export default function Packages() {
       }))
     : null
 
+  const handleClaimFreePackage = async (reference) => {
+    if (!customer) {
+      navigate('/giris')
+      return
+    }
+
+    setClaimingReference(reference)
+    setClaimMessage('')
+    try {
+      const res = await claimFreePackageApi(reference)
+      setCustomer(prev => prev ? ({
+        ...prev,
+        packages: res.packages || prev.packages || [],
+        entitlements: res.entitlements || prev.entitlements,
+      }) : prev)
+      setClaimMessage(res.alreadyOwned ? 'Bu test paketi hesabınızda zaten aktif.' : 'Kade Organizasyon Kiti hesabınıza eklendi.')
+      navigate('/musteri-panel')
+    } catch (err) {
+      setClaimMessage(err.message || 'Paket eklenemedi. Lütfen tekrar deneyin.')
+    } finally {
+      setClaimingReference('')
+    }
+  }
+
   const packages = [
+    {
+      tier: 'kade-organizasyon-kiti-test',
+      tag: isEN ? 'Free Test' : '0 TL Test',
+      name: 'Kade Organizasyon Kiti',
+      tagline: isEN ? 'Test access for the consulting workspace.' : 'Danışmanlık çalışma alanı test erişimi.',
+      desc: isEN
+        ? 'Claim the free test package and open the Kade Organization Kit inside your customer panel.'
+        : 'Ücretsiz test paketini al, müşteri panelinde Kade Organizasyon Kiti erişimini aç.',
+      features: [
+        isEN ? 'Organization Kit dashboard' : 'Organizasyon Kiti paneli',
+        isEN ? 'Media roadmap' : 'Medya yol haritası',
+        isEN ? 'Management meetings' : 'Yönetim toplantıları',
+        isEN ? 'Consulting notes' : 'Danışmanlık notları',
+      ],
+      popular: false,
+      color: 'rgba(0,212,170,0.06)',
+      priceLabel: '0 TL',
+      reference: 'kade-organizasyon-kiti-test',
+      freeClaim: true,
+    },
     {
       tier: 'start',
       tag: isEN ? 'Giriş' : 'Giriş',
@@ -238,7 +287,7 @@ export default function Packages() {
               </p>
             </FadeIn>
           </div>
-          <StaggerContainer className="packages-grid packages-grid-3" staggerDelay={0.12}>
+          <StaggerContainer className="packages-grid" staggerDelay={0.12}>
             {packages.map((pkg) => (
               <StaggerItem key={pkg.tier}>
                 <motion.div
@@ -257,6 +306,13 @@ export default function Packages() {
                   <p className="pkg-tagline">{pkg.tagline}</p>
                   <p className="package-desc">{pkg.desc}</p>
 
+                  {pkg.priceLabel && (
+                    <div className="package-free-price">
+                      <strong>{pkg.priceLabel}</strong>
+                      <span>{isEN ? 'test package' : 'test paketi'}</span>
+                    </div>
+                  )}
+
                   <div className="package-features">
                     {pkg.features.map((feature) => (
                       <div key={feature} className="feature-item included">
@@ -266,20 +322,42 @@ export default function Packages() {
                     ))}
                   </div>
 
-                  <a
-                    href={`https://wa.me/905067293423?text=${encodeURIComponent(isEN ? `Hi Kadir, I'm interested in the ${pkg.name} package. Can we talk?` : `Merhaba Kadir, ${pkg.name} paketi hakkında konuşmak istiyorum.`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`btn ${pkg.popular ? 'btn-primary' : 'btn-outline'} package-btn`}
-                    onClick={() => analytics.packageClick(pkg.name)}
-                  >
-                    {isEN ? "Let's Find Your Package" : 'Senin Paketini Seçelim'}
-                    <HiOutlineArrowRight size={16} />
-                  </a>
+                  {pkg.freeClaim ? (
+                    <button
+                      type="button"
+                      className="btn btn-primary package-btn"
+                      disabled={claimingReference === pkg.reference}
+                      onClick={() => {
+                        analytics.packageClick(pkg.name)
+                        handleClaimFreePackage(pkg.reference)
+                      }}
+                    >
+                      {claimingReference === pkg.reference
+                        ? (isEN ? 'Adding...' : 'Ekleniyor...')
+                        : customer
+                          ? (isEN ? 'Claim Free' : 'Ücretsiz Satın Al')
+                          : (isEN ? 'Login to Claim' : 'Giriş Yap ve Al')}
+                      <HiOutlineArrowRight size={16} />
+                    </button>
+                  ) : (
+                    <a
+                      href={`https://wa.me/905067293423?text=${encodeURIComponent(isEN ? `Hi Kadir, I'm interested in the ${pkg.name} package. Can we talk?` : `Merhaba Kadir, ${pkg.name} paketi hakkında konuşmak istiyorum.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`btn ${pkg.popular ? 'btn-primary' : 'btn-outline'} package-btn`}
+                      onClick={() => analytics.packageClick(pkg.name)}
+                    >
+                      {isEN ? "Let's Find Your Package" : 'Senin Paketini Seçelim'}
+                      <HiOutlineArrowRight size={16} />
+                    </a>
+                  )}
                 </motion.div>
               </StaggerItem>
             ))}
           </StaggerContainer>
+          {claimMessage && (
+            <p className="package-claim-message">{claimMessage}</p>
+          )}
 
           <FadeIn delay={0.4}>
             <div className="packages-bottom-note">

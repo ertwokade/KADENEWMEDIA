@@ -2,7 +2,7 @@ import { getDb } from './_lib/mongodb.js'
 import { requireAuth } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
 import { ObjectId } from 'mongodb'
-import { buildPackageObject, PACKAGE_DEFINITIONS } from './_lib/packages.js'
+import { buildEntitlementsFromPackages, buildPackageObject, PACKAGE_DEFINITIONS } from './_lib/packages.js'
 
 export default async function handler(req, res) {
   if (cors(req, res)) return
@@ -36,7 +36,11 @@ async function handleList(req, res) {
       .find({}, { projection: { password: 0 } })
       .sort({ createdAt: -1 })
       .toArray()
-    return res.status(200).json(customers.map(c => ({ ...c, _id: c._id.toString() })))
+    return res.status(200).json(customers.map(c => ({
+      ...c,
+      _id: c._id.toString(),
+      entitlements: buildEntitlementsFromPackages(c.packages || []),
+    })))
   } catch (err) {
     console.error('Customers list error:', err.message)
     return res.status(500).json({ error: 'Müşteriler yüklenemedi' })
@@ -50,6 +54,9 @@ function handlePackageDefinitions(req, res) {
     consultingArea: def.consultingArea,
     features: def.features,
     durationDays: def.durationDays,
+    price: def.price ?? null,
+    publicFree: Boolean(def.publicFree),
+    access: def.access || {},
   }))
   return res.status(200).json(defs)
 }
@@ -71,6 +78,7 @@ async function handleAddPackage(req, res) {
       name: customPackage.name || 'Özel Paket',
       consultingArea: customPackage.consultingArea || 'consulting',
       features: Array.isArray(customPackage.features) ? customPackage.features : [],
+      access: customPackage.access && typeof customPackage.access === 'object' ? customPackage.access : {},
       purchasedAt: new Date(),
       expiresAt: customPackage.expiresAt ? new Date(customPackage.expiresAt) : null,
       status: 'active',

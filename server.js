@@ -20,7 +20,14 @@ app.use((req, res, next) => {
 })
 
 app.use('/api', (req, res) => {
-  apiHandler(req, res).catch((err) => {
+  const handlerReq = Object.create(req)
+  Object.defineProperties(handlerReq, {
+    query: { value: { ...(req.query || {}) }, writable: true, configurable: true },
+    originalUrl: { value: req.originalUrl, writable: true, configurable: true },
+    url: { value: req.url, writable: true, configurable: true },
+  })
+
+  apiHandler(handlerReq, res).catch((err) => {
     console.error('API Error:', err)
     res.status(500).json({ error: err.message || 'API error' })
   })

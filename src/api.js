@@ -189,6 +189,15 @@ export async function customerPortalApi() {
   return handleResponse(res, { reloadOnUnauthorized: false });
 }
 
+export async function claimFreePackageApi(reference) {
+  const res = await fetch(`${API_BASE}/customer-portal?action=claim-free-package`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ reference }),
+  });
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
 // Admin — Müşteri Yönetimi
 export async function getPortalCustomersApi() {
   const res = await fetch(`${API_BASE}/customers`);

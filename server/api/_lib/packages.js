@@ -3,6 +3,24 @@
 // Her paket için consultingArea ve features tanımlayın.
 
 export const PACKAGE_DEFINITIONS = {
+  'kade-organizasyon-kiti-test': {
+    name: 'Kade Organizasyon Kiti',
+    consultingArea: 'consulting',
+    features: [
+      'Kade Organizasyon Kiti erişimi',
+      'Medya yol haritası',
+      'Yönetim toplantıları',
+      'Danışmanlık notları',
+    ],
+    durationDays: 30,
+    price: 0,
+    publicFree: true,
+    access: {
+      consultingPlan: 'fractional_new_media_director',
+      consultingStatus: 'active',
+      hasOrganizationKitAccess: true,
+    },
+  },
   // Anahtar = Shopier product_reference değeri
   'sosyal-medya-starter': {
     name: 'Sosyal Medya Başlangıç Paketi',
@@ -61,6 +79,11 @@ export const PACKAGE_DEFINITIONS = {
       'KPI belirleme',
     ],
     durationDays: 30,
+    access: {
+      consultingPlan: 'fractional_new_media_director',
+      consultingStatus: 'active',
+      hasOrganizationKitAccess: true,
+    },
   },
   'reklam-yonetimi': {
     name: 'Reklam Yönetimi Paketi',
@@ -96,7 +119,25 @@ export const PACKAGE_DEFINITIONS = {
       'Haftalık raporlama',
     ],
     durationDays: 30,
+    access: {
+      consultingPlan: 'fractional_new_media_director',
+      consultingStatus: 'active',
+      hasOrganizationKitAccess: true,
+      hasKadeKitBusinessAccess: true,
+      hasKadeRadarAccess: true,
+      hasAIKnowledgeCenterAccess: true,
+    },
   },
+}
+
+const DEFAULT_PACKAGE_ENTITLEMENTS = {
+  role: 'customer',
+  consultingPlan: null,
+  consultingStatus: 'inactive',
+  hasOrganizationKitAccess: false,
+  hasKadeKitBusinessAccess: false,
+  hasKadeRadarAccess: false,
+  hasAIKnowledgeCenterAccess: false,
 }
 
 export function getPackageByReference(reference) {
@@ -118,11 +159,43 @@ export function buildPackageObject(reference, extra = {}) {
     name: def.name,
     consultingArea: def.consultingArea,
     features: [...def.features],
+    access: { ...(def.access || {}) },
     purchasedAt: now,
     expiresAt,
     status: 'active',
     source: extra.source || 'manual',
     shopierOrderId: extra.shopierOrderId || null,
-    price: extra.price || null,
+    price: extra.price ?? def.price ?? null,
   }
+}
+
+export function isPackageCurrentlyActive(pkg, now = new Date()) {
+  if (!pkg || pkg.status !== 'active') return false
+  if (!pkg.expiresAt) return true
+  const expiresAt = new Date(pkg.expiresAt)
+  return Number.isNaN(expiresAt.getTime()) || expiresAt >= now
+}
+
+export function buildEntitlementsFromPackages(packages = []) {
+  const entitlements = { ...DEFAULT_PACKAGE_ENTITLEMENTS }
+  const activePackages = Array.isArray(packages) ? packages.filter(isPackageCurrentlyActive) : []
+
+  activePackages.forEach((pkg) => {
+    const access = pkg.access || getPackageByReference(pkg.reference)?.access || {}
+    if (!access || typeof access !== 'object') return
+
+    Object.entries(access).forEach(([key, value]) => {
+      if (typeof value === 'boolean') {
+        entitlements[key] = Boolean(entitlements[key] || value)
+      } else if (value != null) {
+        entitlements[key] = value
+      }
+    })
+  })
+
+  if (entitlements.hasOrganizationKitAccess && !entitlements.consultingStatus) {
+    entitlements.consultingStatus = 'active'
+  }
+
+  return entitlements
 }

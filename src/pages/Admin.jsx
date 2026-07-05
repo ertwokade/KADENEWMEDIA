@@ -26,6 +26,7 @@ import PodcastWebinarEditor from './admin/editors/PodcastWebinarEditor'
 import CaseStudiesEditor from './admin/editors/CaseStudiesEditor'
 import NewsletterArchiveEditor from './admin/editors/NewsletterArchiveEditor'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
+import { getPackageEntitlements } from '../config/entitlements'
 import {
   apiFetch,
   loginApi, logoutApi, getSessionApi, changePasswordApi,
@@ -7463,6 +7464,15 @@ const CONSULTING_LABELS = {
   'consulting': 'Strateji Danışmanlığı',
 }
 
+function getEntitlementBadges(entitlements = {}) {
+  return [
+    entitlements.hasOrganizationKitAccess && { label: 'Organizasyon Kiti', color: '#eac321' },
+    entitlements.hasKadeKitBusinessAccess && { label: 'Kade Kit Business', color: '#5ff3d3' },
+    entitlements.hasKadeRadarAccess && { label: 'Kade Radar', color: '#8da2ff' },
+    entitlements.hasAIKnowledgeCenterAccess && { label: 'AI Bilgi Merkezi', color: '#c084fc' },
+  ].filter(Boolean)
+}
+
 function PortalCustomersSection({ showToast }) {
   const [customers, setCustomers] = useState([])
   const [packageDefs, setPackageDefs] = useState([])
@@ -7606,6 +7616,7 @@ function PortalCustomersSection({ showToast }) {
           {filtered.map(c => {
             const isExpanded = expandedId === c._id
             const activeCount = (c.packages || []).filter(p => p.status === 'active').length
+            const entitlementBadges = getEntitlementBadges(getPackageEntitlements(c.packages || []))
             return (
               <div key={c._id} className="admin-form" style={{ padding: 0, overflow: 'hidden' }}>
                 {/* Customer Row */}
@@ -7642,6 +7653,23 @@ function PortalCustomersSection({ showToast }) {
                       )}
                     </div>
                     <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: 2 }}>{c.email}</div>
+                    {entitlementBadges.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 7 }}>
+                        {entitlementBadges.map(badge => (
+                          <span key={badge.label} style={{
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            padding: '2px 7px',
+                            borderRadius: 20,
+                            color: badge.color,
+                            background: `${badge.color}1f`,
+                            border: `1px solid ${badge.color}40`,
+                          }}>
+                            {badge.label}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
                     <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#eac321' }}>{(c.packages || []).length} paket</div>
@@ -7695,7 +7723,9 @@ function PortalCustomersSection({ showToast }) {
                             >
                               <option value="">Seçin...</option>
                               {packageDefs.map(d => (
-                                <option key={d.reference} value={d.reference}>{d.name}</option>
+                                <option key={d.reference} value={d.reference}>
+                                  {d.name}{d.publicFree ? ' · 0 TL Test' : ''}
+                                </option>
                               ))}
                               <option value="custom">✏️ Özel Paket</option>
                             </select>
@@ -7760,6 +7790,15 @@ function PortalCustomersSection({ showToast }) {
                                 {pkg.purchasedAt && ` · ${new Date(pkg.purchasedAt).toLocaleDateString('tr-TR')}`}
                                 {pkg.expiresAt && ` → ${new Date(pkg.expiresAt).toLocaleDateString('tr-TR')}`}
                               </div>
+                              {getEntitlementBadges(pkg.access).length > 0 && (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
+                                  {getEntitlementBadges(pkg.access).map(badge => (
+                                    <span key={badge.label} style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: 20, background: `${badge.color}1f`, color: badge.color, border: `1px solid ${badge.color}40`, fontWeight: 700 }}>
+                                      Yetki: {badge.label}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                               {(pkg.features || []).length > 0 && (
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
                                   {pkg.features.map((f, i) => (
@@ -7798,4 +7837,3 @@ function PortalCustomersSection({ showToast }) {
     </div>
   )
 }
-
