@@ -2,6 +2,7 @@ const DEFAULT_ENTITLEMENTS = {
   role: 'customer',
   consultingPlan: null,
   consultingStatus: 'inactive',
+  hasConsultingPanelAccess: false,
   hasOrganizationKitAccess: false,
   hasKadeKitBusinessAccess: false,
   hasKadeRadarAccess: false,
@@ -16,6 +17,11 @@ export const CONSULTING_PLANS = {
 }
 
 export const PACKAGE_ACCESS = {
+  'danismanlik-test': {
+    consultingPlan: 'fractional_new_media_director',
+    consultingStatus: 'active',
+    hasConsultingPanelAccess: true,
+  },
   'kade-organizasyon-kiti-test': {
     consultingPlan: 'fractional_new_media_director',
     consultingStatus: 'active',
@@ -24,11 +30,12 @@ export const PACKAGE_ACCESS = {
   'dijital-danismanlik': {
     consultingPlan: 'fractional_new_media_director',
     consultingStatus: 'active',
-    hasOrganizationKitAccess: true,
+    hasConsultingPanelAccess: true,
   },
   'tam-dijital': {
     consultingPlan: 'fractional_new_media_director',
     consultingStatus: 'active',
+    hasConsultingPanelAccess: true,
     hasOrganizationKitAccess: true,
     hasKadeKitBusinessAccess: true,
     hasKadeRadarAccess: true,

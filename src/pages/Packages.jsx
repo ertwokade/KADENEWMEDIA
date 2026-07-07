@@ -132,7 +132,8 @@ export default function Packages() {
         packages: res.packages || prev.packages || [],
         entitlements: res.entitlements || prev.entitlements,
       }) : prev)
-      setClaimMessage(res.alreadyOwned ? 'Bu test paketi hesabınızda zaten aktif.' : 'Kade Organizasyon Kiti hesabınıza eklendi.')
+      const packageName = reference === 'danismanlik-test' ? 'Dijital Strateji Danışmanlığı' : 'Kade Organizasyon Kiti'
+      setClaimMessage(res.alreadyOwned ? `${packageName} hesabınızda zaten aktif.` : `${packageName} hesabınıza eklendi.`)
       navigate('/musteri-panel')
     } catch (err) {
       setClaimMessage(err.message || 'Paket eklenemedi. Lütfen tekrar deneyin.')
@@ -143,13 +144,33 @@ export default function Packages() {
 
   const packages = [
     {
+      tier: 'danismanlik-test',
+      tag: isEN ? 'Free Test' : '0 TL Test',
+      name: isEN ? 'Digital Strategy Consulting' : 'Dijital Strateji Danışmanlığı',
+      tagline: isEN ? 'Test access for your consulting workspace.' : 'Danışmanlık alanınızı test edin.',
+      desc: isEN
+        ? 'Claim the free consulting package and see your purchased consulting area inside the customer panel.'
+        : 'Ücretsiz danışmanlık paketini al, müşteri panelinde aldığın danışmanlığı sol kutuda ve detaylarda gör.',
+      features: [
+        isEN ? 'Consulting panel card' : 'Aldığım danışmanlık kartı',
+        isEN ? 'Active service area' : 'Aktif hizmet alanı',
+        isEN ? 'Package status' : 'Paket durumu',
+        isEN ? 'Consulting notes scope' : 'Danışmanlık kapsamı',
+      ],
+      popular: false,
+      color: 'rgba(234,195,33,0.06)',
+      priceLabel: '0 TL',
+      reference: 'danismanlik-test',
+      freeClaim: true,
+    },
+    {
       tier: 'kade-organizasyon-kiti-test',
       tag: isEN ? 'Free Test' : '0 TL Test',
       name: 'Kade Organizasyon Kiti',
-      tagline: isEN ? 'Test access for the consulting workspace.' : 'Danışmanlık çalışma alanı test erişimi.',
+      tagline: isEN ? 'Test access for the organization kit.' : 'Organizasyon kiti test erişimi.',
       desc: isEN
         ? 'Claim the free test package and open the Kade Organization Kit inside your customer panel.'
-        : 'Ücretsiz test paketini al, müşteri panelinde Kade Organizasyon Kiti erişimini aç.',
+        : 'Ücretsiz test paketini al, müşteri panelinde sağ kutudan Kade Organizasyon Kiti arayüzünü aç.',
       features: [
         isEN ? 'Organization Kit dashboard' : 'Organizasyon Kiti paneli',
         isEN ? 'Media roadmap' : 'Medya yol haritası',

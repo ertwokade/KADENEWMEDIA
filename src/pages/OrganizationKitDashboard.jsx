@@ -1,187 +1,156 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import {
-  HiOutlineCalendar, HiOutlineChartBar, HiOutlineCheckCircle, HiOutlineClipboardList,
-  HiOutlineLightBulb, HiOutlineSparkles, HiOutlineUsers,
-} from 'react-icons/hi'
+import { HiOutlineArrowLeft, HiOutlineSparkles } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
-import { useCustomer } from '../contexts/CustomerContext'
-import OrganizationKitNav from '../components/OrganizationKitNav'
 import PageTransition from '../components/PageTransition'
-import { getConsultingPlanLabel } from '../config/entitlements'
-import {
-  aiPrompts, managementMeetings, operationScores, organizationKitSummary,
-  roadmapFocus, strategicDecisions, teamHealth,
-} from '../data/organizationKit'
+import kitHtml from '../embedded/kadir-organizasyon-kiti/index.html?raw'
+import kitCss from '../embedded/kadir-organizasyon-kiti/styles.css?raw'
+import kitJs from '../embedded/kadir-organizasyon-kiti/app.js?raw'
 import './OrganizationKit.css'
 
-function ScoreBar({ label, score }) {
-  return (
-    <div className="ok-score-row">
-      <div>
-        <span>{label}</span>
-        <strong>{score}</strong>
-      </div>
-      <div className="ok-score-track">
-        <span style={{ width: `${score}%` }} />
-      </div>
-    </div>
-  )
-}
+const lucideFallback = `<script>
+  window.lucide = window.lucide || {
+    createIcons() {
+      document.querySelectorAll('[data-lucide]').forEach((icon) => {
+        if (icon.dataset.iconReady) return;
+        icon.dataset.iconReady = '1';
+        icon.innerHTML = '<svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>';
+      });
+    }
+  };
+</script>`
 
-function DashboardCard({ icon: Icon, title, meta, children, action }) {
-  return (
-    <motion.article
-      className="ok-card"
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
-    >
-      <div className="ok-card-head">
-        <div className="ok-card-icon">{Icon && <Icon size={21} />}</div>
-        <div>
-          <h2>{title}</h2>
-          {meta && <p>{meta}</p>}
-        </div>
-      </div>
-      {children}
-      {action}
-    </motion.article>
-  )
-}
+const kadeThemeOverride = `
+  <style>
+    :root {
+      --bg: #08090d;
+      --bg2: #0d0f14;
+      --surface: rgba(255,255,255,0.035);
+      --surface-hover: rgba(255,255,255,0.065);
+      --border: rgba(255,255,255,0.09);
+      --border-hover: rgba(234,195,33,0.26);
+      --ink: #ffffff;
+      --ink2: #b7b7b7;
+      --ink3: #747474;
+      --teal: #eac321;
+      --teal-dim: rgba(234,195,33,0.12);
+      --teal-glow: rgba(234,195,33,0.26);
+      --indigo: #f4d95d;
+      --indigo-dim: rgba(244,217,93,0.1);
+      --gold: #eac321;
+      --gold-dim: rgba(234,195,33,0.12);
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+    html, body { background: transparent !important; }
+    body {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(234,195,33,0.09), transparent 30%),
+        radial-gradient(circle at 78% 18%, rgba(234,195,33,0.06), transparent 26%),
+        #08090d !important;
+    }
+    .sidebar,
+    .topbar {
+      background: rgba(8,9,13,0.86) !important;
+      border-color: rgba(234,195,33,0.14) !important;
+    }
+    .brand-mark {
+      background: linear-gradient(135deg, #eac321, #f4d95d) !important;
+      color: #08090d !important;
+      box-shadow: 0 0 18px rgba(234,195,33,0.24) !important;
+    }
+    .nav-item.active,
+    .filter-chip.active,
+    .primary-btn {
+      background: #eac321 !important;
+      border-color: #eac321 !important;
+      color: #08090d !important;
+    }
+    .nav-item:hover,
+    .icon-btn:hover,
+    .ghost-btn:hover,
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(234,195,33,0.42) !important;
+      color: #eac321 !important;
+      box-shadow: 0 0 0 3px rgba(234,195,33,0.1) !important;
+    }
+    .panel,
+    .kpi,
+    .kanban-column,
+    .production-card {
+      border-color: rgba(255,255,255,0.09) !important;
+      background: rgba(255,255,255,0.035) !important;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.16) !important;
+    }
+    .panel:hover,
+    .kpi:hover,
+    .production-card:hover {
+      border-color: rgba(234,195,33,0.24) !important;
+    }
+    .icon-area {
+      background: rgba(234,195,33,0.1) !important;
+    }
+    .icon-area i,
+    .nav-item.active i,
+    .nav-item.active span,
+    .eyebrow,
+    .pill.teal,
+    .word.positive {
+      color: #eac321 !important;
+    }
+    .answer-box,
+    .transcript-summary {
+      border-left-color: #eac321 !important;
+      background: rgba(234,195,33,0.1) !important;
+    }
+  </style>
+`
+
+const kitDocument = kitHtml
+  .replace(/Kade Kit Business/g, 'Kade Organizasyon Kiti')
+  .replace(/AI Üretim Merkezi/g, 'Organizasyon Kiti')
+  .replace('<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>', lucideFallback)
+  .replace('<link rel="stylesheet" href="styles.css"/>', `<style>${kitCss}</style>${kadeThemeOverride}`)
+  .replace('<script src="app.js" defer></script>', `<script>${kitJs.replace(/<\/script/gi, '<\\/script')}</script>`)
 
 export default function OrganizationKitDashboard() {
-  const { entitlements } = useCustomer()
-  const planLabel = getConsultingPlanLabel(entitlements?.consultingPlan)
-
   useSEO({
     title: 'Kade Organizasyon Kiti | Kade Media',
-    description: 'Medya, içerik ve büyüme operasyonunuzu stratejik yönetim ritmiyle takip edin.',
+    description: 'Kade Organizasyon Kiti arayüzü: üretim, notlar, yorum analizi ve operasyon araçları.',
     path: '/organizasyon-kiti',
     noindex: true,
   })
 
   return (
     <PageTransition>
-      <div className="ok-page">
-        <div className="container ok-layout">
-          <OrganizationKitNav />
-
-          <div className="ok-main">
-            <section className="ok-hero">
+      <div className="ok-page ok-studio-page">
+        <div className="container ok-studio-container">
+          <section className="ok-studio-header">
+            <div>
               <span className="ok-eyebrow">Kade Organizasyon Kiti</span>
-              <h1>Kade Organizasyon Kiti</h1>
-              <p>
-                Medya, içerik ve büyüme operasyonunuzu daha net kararlar, doğru süreçler ve düzenli yönetim ritmiyle yönetin.
-              </p>
-            </section>
+              <h1>Organizasyon arayüzü</h1>
+              <p>Verdiğiniz kit arayüzü KadeMedia temasıyla yüklendi. Danışmanlık panelinden ayrı, sağdaki kit alanı buraya açılır.</p>
+            </div>
+            <Link to="/musteri-panel" className="ok-plan-link">
+              <HiOutlineArrowLeft size={16} />
+              Müşteri paneli
+            </Link>
+          </section>
 
-            <section className="ok-plan-panel">
-              <div>
-                <span className="ok-plan-label">Aktif Plan</span>
-                <h2>{planLabel}</h2>
-                <p>Danışmanlık Modeli: {organizationKitSummary.consultingModel || 'Aylık stratejik yönetim ortaklığı'}</p>
-              </div>
-              <div className="ok-plan-grid">
-                <div><span>Durum</span><strong>Aktif</strong></div>
-                <div><span>Sonraki Yönetim Toplantısı</span><strong>{organizationKitSummary.nextMeeting}</strong></div>
-                <div><span>Danışman</span><strong>{organizationKitSummary.consultant}</strong></div>
-              </div>
-              <Link to="/organizasyon-kiti/plan/fractional-new-media-director" className="ok-plan-link">
-                Plan detayını gör
-              </Link>
-            </section>
-
-            <section className="kk-entry-band">
-              <div>
-                <span className="ok-eyebrow">Kade Kit Business</span>
-                <h2>AI Üretim Merkezi bağlı</h2>
-                <p>SentScan, prodüksiyon CRM, Banana Studio, Vibe Coding ve AI Radar araçlarını ayrı üretim alanında açın.</p>
-              </div>
-              <Link to="/kade-kit-business" className="ok-plan-link">Üretim merkezine git</Link>
-            </section>
-
-            <section className="ok-dashboard-grid">
-              <DashboardCard
-                icon={HiOutlineClipboardList}
-                title="90 Günlük Medya Yol Haritası"
-                meta={`${organizationKitSummary.period} dönemi`}
-              >
-                <div className="ok-progress">
-                  <div>
-                    <span>Tamamlanma</span>
-                    <strong>{organizationKitSummary.roadmapCompletion}%</strong>
-                  </div>
-                  <div className="ok-progress-track">
-                    <span style={{ width: `${organizationKitSummary.roadmapCompletion}%` }} />
-                  </div>
-                </div>
-                <ul className="ok-list">
-                  {roadmapFocus.map((item) => <li key={item}>{item}</li>)}
-                </ul>
-              </DashboardCard>
-
-              <DashboardCard
-                icon={HiOutlineLightBulb}
-                title="Stratejik Kararlar"
-                meta="Bekleyen kararlar ve onaylar"
-                action={<button type="button" className="ok-secondary-btn">Karar Oluştur</button>}
-              >
-                <div className="ok-decision-list">
-                  {strategicDecisions.map((decision) => (
-                    <div className="ok-decision" key={decision.title}>
-                      <strong>{decision.title}</strong>
-                      <span>{decision.status} · {decision.owner}</span>
-                    </div>
-                  ))}
-                </div>
-              </DashboardCard>
-
-              <DashboardCard icon={HiOutlineUsers} title="Ekip ve Süreç Sağlığı" meta="Operasyon görünürlüğü">
-                <div className="ok-metric-strip">
-                  <div><strong>{teamHealth.activeMembers}</strong><span>Aktif ekip üyesi</span></div>
-                  <div><strong>{teamHealth.openTasks}</strong><span>Açık görev</span></div>
-                  <div><strong>{teamHealth.delayedApprovals}</strong><span>Geciken onay</span></div>
-                </div>
-                <ul className="ok-list compact">
-                  {teamHealth.bottlenecks.map((item) => <li key={item}>{item}</li>)}
-                </ul>
-              </DashboardCard>
-
-              <DashboardCard icon={HiOutlineCalendar} title="Yönetim Toplantıları" meta="Gündem, karar ve aksiyon sahipleri">
-                <div className="ok-meeting-list">
-                  {managementMeetings.map((meeting) => (
-                    <div className="ok-meeting" key={meeting.title}>
-                      <span>{meeting.date}</span>
-                      <strong>{meeting.title}</strong>
-                      <p>{meeting.agenda.join(' · ')}</p>
-                    </div>
-                  ))}
-                </div>
-              </DashboardCard>
-
-              <DashboardCard icon={HiOutlineChartBar} title="Medya Operasyon Skoru" meta="Toplam skor ve alt başlıklar">
-                <div className="ok-total-score">
-                  <strong>{organizationKitSummary.mediaOperationScore}</strong>
-                  <span>Toplam medya operasyon skoru</span>
-                </div>
-                <div className="ok-score-list">
-                  {operationScores.map((score) => <ScoreBar key={score.label} {...score} />)}
-                </div>
-              </DashboardCard>
-
-              <DashboardCard icon={HiOutlineSparkles} title="Kade AI Yönetim Asistanı" meta="Hızlı yönetim soruları">
-                <div className="ok-prompt-grid">
-                  {aiPrompts.map((prompt) => (
-                    <button type="button" key={prompt}>
-                      <HiOutlineCheckCircle size={15} />
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </DashboardCard>
-            </section>
-          </div>
+          <section className="ok-studio-frame-wrap" aria-label="Kade Organizasyon Kiti arayüzü">
+            <div className="ok-studio-frame-label">
+              <HiOutlineSparkles size={16} />
+              <span>KadeMedia teması aktif</span>
+            </div>
+            <iframe
+              title="Kade Organizasyon Kiti"
+              srcDoc={kitDocument}
+              className="ok-studio-frame"
+              loading="lazy"
+              sandbox="allow-scripts allow-forms allow-downloads allow-modals allow-same-origin"
+            />
+          </section>
         </div>
       </div>
     </PageTransition>

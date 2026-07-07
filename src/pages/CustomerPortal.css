@@ -160,10 +160,24 @@
     rgba(255, 255, 255, 0.035);
 }
 
+.cp-access-card.kit {
+  border-color: rgba(234, 195, 33, 0.24);
+  background:
+    linear-gradient(135deg, rgba(234, 195, 33, 0.14), rgba(255, 255, 255, 0.036) 44%),
+    rgba(255, 255, 255, 0.035);
+}
+
 .cp-access-card.business:hover {
   border-color: rgba(0, 212, 170, 0.34);
   background:
     linear-gradient(135deg, rgba(0, 212, 170, 0.15), rgba(108, 142, 245, 0.1) 44%),
+    rgba(255, 255, 255, 0.045);
+}
+
+.cp-access-card.kit:hover {
+  border-color: rgba(234, 195, 33, 0.4);
+  background:
+    linear-gradient(135deg, rgba(234, 195, 33, 0.18), rgba(255, 255, 255, 0.048) 44%),
     rgba(255, 255, 255, 0.045);
 }
 
@@ -183,6 +197,12 @@
   border-color: rgba(0, 212, 170, 0.24);
   background: rgba(0, 212, 170, 0.1);
   color: #5ff3d3;
+}
+
+.cp-access-card.kit .cp-access-icon {
+  border-color: rgba(234, 195, 33, 0.28);
+  background: rgba(234, 195, 33, 0.12);
+  color: var(--primary);
 }
 
 .cp-access-content span {
@@ -216,6 +236,10 @@
 
 .cp-access-card.business .cp-access-cta {
   color: #5ff3d3;
+}
+
+.cp-access-card.kit .cp-access-cta {
+  color: var(--primary);
 }
 
 /* Empty state */

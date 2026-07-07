@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import {
   HiOutlineUser, HiOutlineBriefcase, HiOutlineStar, HiOutlineShoppingBag,
   HiOutlineCheckCircle, HiOutlineClock, HiOutlineLogout, HiOutlineExclamationCircle,
-  HiOutlineChartBar, HiOutlineSparkles, HiOutlineArrowRight,
+  HiOutlineChartBar, HiOutlineClipboardList, HiOutlineArrowRight,
 } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
 import { useCustomer } from '../contexts/CustomerContext'
@@ -99,26 +99,30 @@ export default function CustomerPortal() {
   const { consultingAreas = [], features = [], packages = [] } = data || {}
   const hasPackages = packages.length > 0
   const activePackages = packages.filter(p => p.status === 'active')
+  const consultingPackages = activePackages.filter(p => p.consultingArea && p.reference !== 'kade-organizasyon-kiti-test')
+  const hasConsultingPanel = consultingPackages.length > 0 || entitlements?.hasConsultingPanelAccess
   const accessCards = [
-    entitlements?.hasOrganizationKitAccess && {
-      key: 'organization-kit',
+    hasConsultingPanel && {
+      key: 'consulting',
       eyebrow: 'Danışmanlık',
-      title: 'Kade Organizasyon Kiti',
-      description: 'Yol haritası, yönetim toplantıları, ekip süreçleri ve danışmanlık notlarına girin.',
-      to: '/organizasyon-kiti',
+      title: 'Aldığım Danışmanlık',
+      description: consultingPackages[0]?.name
+        ? `${consultingPackages[0].name} hizmetinizin kapsamını, aktif alanlarını ve paket durumunu görün.`
+        : 'Aktif danışmanlık hizmetinizin kapsamını, alanlarını ve paket durumunu görün.',
+      to: '/musteri-panel#danismanlik',
       icon: HiOutlineChartBar,
       tone: 'consulting',
-      cta: 'Danışmanlık paneline git',
+      cta: 'Danışmanlığıma git',
     },
-    entitlements?.hasKadeKitBusinessAccess && {
-      key: 'kade-kit-business',
-      eyebrow: 'Üretim Merkezi',
-      title: 'Kade Kit Business',
-      description: 'Yorum analizi, prodüksiyon CRM, AI araçları ve içerik üretim alanını açın.',
-      to: '/kade-kit-business',
-      icon: HiOutlineSparkles,
-      tone: 'business',
-      cta: 'Kit paneline git',
+    entitlements?.hasOrganizationKitAccess && {
+      key: 'organization-kit',
+      eyebrow: 'Organizasyon Kiti',
+      title: 'Kade Organizasyon Kiti',
+      description: 'Verdiğiniz organizasyon arayüzünü KadeMedia temasıyla açın; üretim, notlar ve operasyon araçlarını kullanın.',
+      to: '/organizasyon-kiti',
+      icon: HiOutlineClipboardList,
+      tone: 'kit',
+      cta: 'Organizasyon kitine git',
     },
   ].filter(Boolean)
 
@@ -205,6 +209,7 @@ export default function CustomerPortal() {
             <div className="cp-grid">
             {/* Bölüm 1: Danışmanlık Alanları */}
             <motion.div
+              id="danismanlik"
               className="cp-card"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

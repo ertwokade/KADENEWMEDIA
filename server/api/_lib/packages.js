@@ -3,9 +3,27 @@
 // Her paket için consultingArea ve features tanımlayın.
 
 export const PACKAGE_DEFINITIONS = {
+  'danismanlik-test': {
+    name: 'Dijital Strateji Danışmanlığı',
+    consultingArea: 'consulting',
+    features: [
+      'Dijital strateji danışmanlığı',
+      'Aylık yol haritası',
+      'KPI ve aksiyon planı',
+      'Danışmanlık notları',
+    ],
+    durationDays: 30,
+    price: 0,
+    publicFree: true,
+    access: {
+      consultingPlan: 'fractional_new_media_director',
+      consultingStatus: 'active',
+      hasConsultingPanelAccess: true,
+    },
+  },
   'kade-organizasyon-kiti-test': {
     name: 'Kade Organizasyon Kiti',
-    consultingArea: 'consulting',
+    consultingArea: null,
     features: [
       'Kade Organizasyon Kiti erişimi',
       'Medya yol haritası',
@@ -82,7 +100,7 @@ export const PACKAGE_DEFINITIONS = {
     access: {
       consultingPlan: 'fractional_new_media_director',
       consultingStatus: 'active',
-      hasOrganizationKitAccess: true,
+      hasConsultingPanelAccess: true,
     },
   },
   'reklam-yonetimi': {
@@ -122,6 +140,7 @@ export const PACKAGE_DEFINITIONS = {
     access: {
       consultingPlan: 'fractional_new_media_director',
       consultingStatus: 'active',
+      hasConsultingPanelAccess: true,
       hasOrganizationKitAccess: true,
       hasKadeKitBusinessAccess: true,
       hasKadeRadarAccess: true,
@@ -134,6 +153,7 @@ const DEFAULT_PACKAGE_ENTITLEMENTS = {
   role: 'customer',
   consultingPlan: null,
   consultingStatus: 'inactive',
+  hasConsultingPanelAccess: false,
   hasOrganizationKitAccess: false,
   hasKadeKitBusinessAccess: false,
   hasKadeRadarAccess: false,

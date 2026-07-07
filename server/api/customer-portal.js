@@ -42,7 +42,10 @@ async function handleGetProfile(req, res, session) {
 
     // Danışmanlık alanlarını paketlerden çıkar (benzersiz)
     const consultingAreas = [...new Set(
-      activePackages.map(p => p.consultingArea).filter(Boolean)
+      activePackages
+        .filter(p => p.reference !== 'kade-organizasyon-kiti-test')
+        .map(p => p.consultingArea)
+        .filter(Boolean)
     )]
 
     // Özellikleri tüm aktif paketlerden topla (benzersiz)

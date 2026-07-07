@@ -7466,6 +7466,7 @@ const CONSULTING_LABELS = {
 
 function getEntitlementBadges(entitlements = {}) {
   return [
+    entitlements.hasConsultingPanelAccess && { label: 'Danışmanlık', color: '#eac321' },
     entitlements.hasOrganizationKitAccess && { label: 'Organizasyon Kiti', color: '#eac321' },
     entitlements.hasKadeKitBusinessAccess && { label: 'Kade Kit Business', color: '#5ff3d3' },
     entitlements.hasKadeRadarAccess && { label: 'Kade Radar', color: '#8da2ff' },
