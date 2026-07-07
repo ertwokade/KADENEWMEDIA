@@ -54,14 +54,14 @@ function GlassCard({ title, desc, offset, delay }) {
         transition: 'border-color 0.3s, background 0.3s',
       }}
       whileHover={{
-        borderColor: 'rgba(0,229,255,0.35)',
-        background: 'rgba(0,229,255,0.04)',
+        borderColor: 'rgba(217,164,65,0.35)',
+        background: 'rgba(217,164,65,0.04)',
       }}
     >
       <div style={{
         width: '32px',
         height: '2px',
-        background: 'linear-gradient(90deg, #00e5ff, transparent)',
+        background: 'linear-gradient(90deg, #d9a441, transparent)',
         borderRadius: '1px',
       }} />
       <h3 style={{
@@ -108,7 +108,7 @@ export default function Services() {
           fontWeight: '400',
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
-          color: 'rgba(0,229,255,0.7)',
+          color: 'rgba(217,164,65,0.7)',
           marginBottom: '48px',
         }}
       >

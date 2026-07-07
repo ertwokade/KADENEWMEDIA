@@ -30,3 +30,6 @@ dist-ssr
 .vercel
 
 ai-website-cloner-template/
+
+# Scratch video/frame references used during design work, not part of the site
+docs/design-references/

@@ -45,43 +45,43 @@ void main(){
   );
   float f = fbm(uv * 1.6 + 4.5 * r + t * 0.08);
 
-  /* ── Base: deep space black ── */
-  vec3 col = vec3(0.0, 0.008, 0.03);
+  /* ── Base: deep warm-black ── */
+  vec3 col = vec3(0.025, 0.008, 0.0);
 
-  /* ── LEFT side: dedicated GREEN aurora (independent FBM pass) ── */
+  /* ── LEFT side: dedicated GOLD aurora (independent FBM pass) ── */
   float leftWeight = clamp(1.8 - uv.x * 2.8, 0.0, 1.0);
-  /* Separate warp for green channel */
+  /* Separate warp for gold channel */
   vec2 gq = vec2(fbm(uv*2.0 + vec2(3.0, t*0.25)), fbm(uv*2.0 + vec2(8.0, t*0.2+1.3)));
   float gf = fbm(uv*1.6 + 3.5*gq + vec2(6.2, 0.0) + t*0.07);
-  /* Pure green colors — very low blue to avoid mixing into cyan */
-  col += vec3(0.0,  0.92, 0.04) * smoothstep(0.25, 0.58, gf) * leftWeight * 2.2;
-  col += vec3(0.04, 0.70, 0.06) * smoothstep(0.18, 0.48, gf) * leftWeight * 1.8;
-  col += vec3(0.18, 1.0,  0.08) * smoothstep(0.60, 0.85, gf) * leftWeight * 2.0; /* lime peaks */
+  /* Warm amber/gold tones — muted so wisps stay wisps, not a solid fill */
+  col += vec3(0.62, 0.40, 0.03) * smoothstep(0.32, 0.62, gf) * leftWeight * 1.3;
+  col += vec3(0.40, 0.24, 0.02) * smoothstep(0.24, 0.52, gf) * leftWeight * 1.0;
+  col += vec3(0.78, 0.62, 0.20) * smoothstep(0.68, 0.90, gf) * leftWeight * 1.15; /* bright gold peaks */
 
-  /* ── RIGHT side: electric cyan aurora — strict rightWeight, no base bleed ── */
+  /* ── RIGHT side: deep copper/red-bronze aurora — hue-separated from the gold left ── */
   float rightWeight = clamp(uv.x * 2.8 - 0.55, 0.0, 1.0);
-  float cyanLayer = smoothstep(0.36, 0.70, f);
-  col += vec3(0.0, 0.72, 1.0)  * cyanLayer * rightWeight * 2.8;
-  col += vec3(0.0, 0.92, 1.0)  * smoothstep(0.58, 0.84, f) * rightWeight * 2.8;
-  /* Vertical bright cyan streaks on far right */
+  float cyanLayer = smoothstep(0.40, 0.72, f);
+  col += vec3(0.45, 0.10, 0.03)  * cyanLayer * rightWeight * 1.6;
+  col += vec3(0.62, 0.18, 0.04)  * smoothstep(0.62, 0.86, f) * rightWeight * 1.6;
+  /* Vertical bronze streaks on far right */
   float vStreak = exp(-pow((uv.x - 0.88)*6.0, 2.0));
-  col += vec3(0.3, 0.95, 1.0) * vStreak * smoothstep(0.45, 0.72, f) * 1.6;
+  col += vec3(0.7, 0.32, 0.08) * vStreak * smoothstep(0.50, 0.75, f) * 0.9;
 
-  /* ── CENTER blend: green→cyan meetpoint shifted right ── */
+  /* ── CENTER blend: gold→copper meetpoint shifted right ── */
   float centerX = clamp(1.0 - abs(uv.x - 0.58) * 3.5, 0.0, 1.0);
-  col += vec3(0.0, 0.65, 0.55) * smoothstep(0.46, 0.78, f) * centerX * 1.1;
+  col += vec3(0.45, 0.26, 0.08) * smoothstep(0.50, 0.80, f) * centerX * 0.6;
 
   /* ── Peak highlights ── */
-  col += vec3(0.3, 1.0, 0.7) * smoothstep(0.82, 0.97, gf) * leftWeight * 2.5;
-  col += vec3(0.2, 1.0, 1.0) * smoothstep(0.82, 0.97, f)  * rightWeight * 2.5;
+  col += vec3(0.85, 0.66, 0.24) * smoothstep(0.86, 0.98, gf) * leftWeight * 1.4;
+  col += vec3(0.72, 0.24, 0.06) * smoothstep(0.86, 0.98, f)  * rightWeight * 1.4;
 
   /* ── Depth fbm layer — separated by side ── */
   float f2 = fbm(uv * 3.5 + r + t * 0.06);
-  col += vec3(0.0, 0.55, 0.20) * smoothstep(0.50, 0.70, f2) * leftWeight * 0.8;
-  col += vec3(0.0, 0.28, 0.52) * smoothstep(0.55, 0.78, f2) * rightWeight * 0.5;
+  col += vec3(0.28, 0.18, 0.02) * smoothstep(0.55, 0.74, f2) * leftWeight * 0.5;
+  col += vec3(0.22, 0.08, 0.01) * smoothstep(0.58, 0.80, f2) * rightWeight * 0.35;
 
   /* ── Contrast boost: make darks darker, brights brighter ── */
-  col = pow(max(col, 0.0), vec3(0.68));
+  col = pow(max(col, 0.0), vec3(0.85));
 
   /* ── Soft vignette ── */
   vec2 vig = uv - 0.5;

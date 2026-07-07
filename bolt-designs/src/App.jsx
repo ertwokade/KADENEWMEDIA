@@ -9,13 +9,14 @@ import Hero from './components/Hero'
 import Services from './components/Services'
 import Manifesto from './components/Manifesto'
 import Projects from './components/Projects'
+import Contact from './components/Contact'
 
 function Scene({ scrollY }) {
   return (
     <>
-      <ambientLight intensity={0.08} color="#001833" />
-      <directionalLight position={[3, 5, 5]} intensity={0.6} color="#44aaff" />
-      <Environment preset="night" />
+      <ambientLight intensity={0.12} color="#332008" />
+      <directionalLight position={[3, 5, 5]} intensity={0.7} color="#ffd9a0" />
+      <Environment preset="sunset" />
       <Background />
       <Suspense fallback={null}>
         <BoltEmblem scrollY={scrollY} />
@@ -28,7 +29,15 @@ export default function App() {
   const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
-    const fn = () => setScrollY(window.scrollY)
+    let ticking = false
+    const fn = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        setScrollY(window.scrollY)
+        ticking = false
+      })
+    }
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
@@ -36,10 +45,14 @@ export default function App() {
   return (
     <div style={{ position: 'relative', background: '#000510', minHeight: '100vh' }}>
 
-      {/* Fixed full-screen Three.js canvas — CSS filter for bloom glow */}
+      {/* Fixed full-screen Three.js canvas.
+          Intentionally no CSS `filter` here: a `position: fixed` element with
+          a CSS filter forces a separate compositor layer that some GPU/driver
+          combos redraw incorrectly while scrolling (visible as duplicated/
+          "ghosted" sections). The contrast/brightness boost is done via
+          renderer tone mapping instead, which stays inside the WebGL context. */}
       <div style={{
         position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none',
-        filter: 'contrast(1.15) brightness(1.22) saturate(1.4)',
       }}>
         <Canvas
           camera={{ position: [0, 0, 5], fov: 42 }}
@@ -47,7 +60,7 @@ export default function App() {
             antialias: true,
             alpha: false,
             toneMapping: 4,
-            toneMappingExposure: 1.8,
+            toneMappingExposure: 2.15,
           }}
           dpr={[1, 2]}
         >
@@ -65,6 +78,7 @@ export default function App() {
         <Services />
         <Manifesto />
         <Projects />
+        <Contact />
       </div>
     </div>
   )

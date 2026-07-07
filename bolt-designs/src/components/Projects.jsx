@@ -1,161 +1,29 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 
-function CoinpliancePreview() {
+function ImagePreview({ src, alt }) {
   return (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      background: 'linear-gradient(135deg, #080f1e 0%, #0d1f3a 100%)',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '32px',
-      gap: '24px',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      {/* Background grid lines */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: 'linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px)',
-        backgroundSize: '40px 40px',
-      }} />
-      <div style={{
-        fontSize: 'clamp(28px, 4vw, 52px)',
-        fontWeight: '200',
-        letterSpacing: '-0.04em',
-        color: 'rgba(255,255,255,0.9)',
-        textAlign: 'center',
-        zIndex: 1,
-        fontFamily: "'Inter', sans-serif",
-      }}>
-        POTENTIAL.
-      </div>
-      <div style={{
-        display: 'flex',
-        gap: '16px',
-        zIndex: 1,
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-      }}>
-        {['●', '◆', '■', '▲', '●'].map((sym, i) => (
-          <div key={i} style={{
-            width: '60px',
-            height: '24px',
-            background: 'rgba(0,229,255,0.08)',
-            border: '1px solid rgba(0,229,255,0.15)',
-            borderRadius: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '8px',
-            color: 'rgba(0,229,255,0.5)',
-          }}>{sym}</div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function BlackMangoPreview() {
-  return (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      background: '#060606',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      {/* X mark */}
-      <svg width="40%" height="40%" viewBox="0 0 100 100" style={{ opacity: 0.85 }}>
-        <line x1="10" y1="10" x2="90" y2="90" stroke="white" strokeWidth="6" strokeLinecap="round"/>
-        <line x1="90" y1="10" x2="10" y2="90" stroke="white" strokeWidth="6" strokeLinecap="round"/>
-      </svg>
-      <div style={{
-        position: 'absolute',
-        bottom: '24px',
-        left: '24px',
-        fontFamily: "'Inter', sans-serif",
-        fontSize: '10px',
-        fontWeight: '300',
-        color: 'rgba(255,255,255,0.3)',
-        letterSpacing: '0.15em',
-        textTransform: 'uppercase',
-      }}>
-        Black Mango Production
-      </div>
-    </div>
-  )
-}
-
-function ChainLabsPreview() {
-  return (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      background: 'linear-gradient(160deg, #060e1c 0%, #0a1830 100%)',
-      padding: '28px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '16px',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      <div style={{
-        fontFamily: "'Inter', sans-serif",
-        fontSize: '10px',
-        fontWeight: '400',
-        letterSpacing: '0.2em',
-        color: 'rgba(0,229,255,0.6)',
-        textTransform: 'uppercase',
-      }}>
-        Recent Projects
-      </div>
-      {['Protocol 01', 'Layer 02', 'Mesh 03'].map((p, i) => (
-        <div key={i} style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          padding: '10px 14px',
-          background: 'rgba(0,229,255,0.04)',
-          border: '1px solid rgba(0,229,255,0.1)',
-          borderRadius: '6px',
-        }}>
-          <div style={{
-            width: '6px', height: '6px',
-            borderRadius: '50%',
-            background: '#00e5ff',
-            boxShadow: '0 0 6px #00e5ff',
-            flexShrink: 0,
-          }} />
-          <span style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: '12px',
-            color: 'rgba(255,255,255,0.7)',
-          }}>{p}</span>
-          <span style={{
-            marginLeft: 'auto',
-            fontSize: '10px',
-            color: 'rgba(0,229,255,0.5)',
-          }}>→</span>
-        </div>
-      ))}
-    </div>
+    <img
+      src={src}
+      alt={alt}
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        display: 'block',
+      }}
+    />
   )
 }
 
 const projects = [
-  { title: 'Coinpliance', Preview: CoinpliancePreview },
-  { title: 'Black Mango Production', Preview: BlackMangoPreview },
-  { title: 'Chain — Labs', Preview: ChainLabsPreview },
+  { title: 'Coinpliance', src: '/projects/coinpliance.png' },
+  { title: 'Chain — Labs', src: '/projects/chain-labs.png' },
+  { title: 'Maisonsiete', src: '/projects/maisonsiete.png' },
+  { title: 'Black Mango Production', src: '/projects/black-mango.png' },
 ]
 
-function ProjectCard({ title, Preview, index }) {
+function ProjectCard({ title, src, index }) {
   const ref = useRef()
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
@@ -183,7 +51,7 @@ function ProjectCard({ title, Preview, index }) {
         overflow: 'hidden',
         position: 'relative',
       }}>
-        <Preview />
+        <ImagePreview src={src} alt={title} />
       </div>
 
       {/* Card footer */}
@@ -218,8 +86,8 @@ function ProjectCard({ title, Preview, index }) {
           transition: 'border-color 0.25s, background 0.25s',
         }}
         onMouseEnter={e => {
-          e.currentTarget.style.borderColor = 'rgba(0,229,255,0.5)'
-          e.currentTarget.style.background = 'rgba(0,229,255,0.08)'
+          e.currentTarget.style.borderColor = 'rgba(217,164,65,0.5)'
+          e.currentTarget.style.background = 'rgba(217,164,65,0.08)'
         }}
         onMouseLeave={e => {
           e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'
@@ -257,7 +125,7 @@ export default function Projects() {
           fontWeight: '400',
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
-          color: 'rgba(0,229,255,0.7)',
+          color: 'rgba(217,164,65,0.7)',
           marginBottom: '56px',
         }}
       >

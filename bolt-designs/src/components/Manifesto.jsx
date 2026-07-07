@@ -29,6 +29,21 @@ function ManifestoText({ children, delay = 0 }) {
 export default function Manifesto() {
   return (
     <>
+      {/* Tagline */}
+      <section style={{
+        position: 'relative',
+        minHeight: '60vh',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '80px 6vw',
+        zIndex: 10,
+      }}>
+        <ManifestoText delay={0}>
+          Built for Speed.<br />
+          Designed with heart.
+        </ManifestoText>
+      </section>
+
       {/* Block 1 */}
       <section style={{
         position: 'relative',
@@ -40,6 +55,11 @@ export default function Manifesto() {
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <ManifestoText delay={0}>
+            Bolt Designs started<br />
+            as a wild idea between<br />
+            two brothers —
+          </ManifestoText>
+          <ManifestoText delay={0.15}>
             One with a passion<br />
             for visuals, the<br />
             other with an eye<br />

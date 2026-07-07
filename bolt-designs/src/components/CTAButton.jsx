@@ -27,8 +27,8 @@ export default function CTAButton() {
         transition: 'background 0.3s, border-color 0.3s',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background = 'rgba(0,229,255,0.1)'
-        e.currentTarget.style.borderColor = 'rgba(0,229,255,0.5)'
+        e.currentTarget.style.background = 'rgba(217,164,65,0.1)'
+        e.currentTarget.style.borderColor = 'rgba(217,164,65,0.5)'
       }}
       onMouseLeave={e => {
         e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
