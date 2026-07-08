@@ -1,734 +1,182 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getContentApi } from '../api'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  HiOutlineArrowRight,
-  HiOutlineLightningBolt,
-  HiOutlineChartBar,
-  HiOutlineGlobe,
-  HiOutlineUsers,
-  HiOutlinePlay,
-  HiOutlineChevronDown,
-  HiOutlineChevronUp,
-  HiOutlineOfficeBuilding,
-  HiOutlineChatAlt2,
-  HiOutlineShieldCheck,
-} from 'react-icons/hi'
-import {
-  FaInstagram,
-  FaYoutube,
-  FaTiktok,
-  FaLinkedinIn,
-  FaQuoteLeft,
-  FaWhatsapp as FaWhatsApp,
-} from 'react-icons/fa'
-import { useLanguage } from '../i18n/LanguageContext'
-import { useSEO } from '../hooks/useSEO'
-import { partnersData as staticPartnersData } from '../data/content'
-import { getPartnersApi } from '../api'
-import PageTransition from '../components/PageTransition'
-import HeroBackground from '../components/HeroBackground'
-import MagneticButton from '../components/MagneticButton'
-import { FadeIn, StaggerContainer, StaggerItem, ScaleIn, TiltCard } from '../components/Animations'
-import AuditScore from '../components/AuditScore'
-import AnalysisForm from '../components/AnalysisForm'
-import PageBgAnimation from '../components/PageBgAnimation'
-import { CONTACT, SITE } from '../utils/constants'
-import CountUp from '../components/CountUp'
-import './Home.css'
+import Lenis from 'lenis'
+import KadeScene from '../components/kade/KadeScene'
+import KadeCursor from '../components/kade/KadeCursor'
+import '../styles/kade-design.css'
+import '../styles/kade-home.css'
 
-const platforms = [
-  { icon: FaInstagram, name: 'Instagram', url: 'https://instagram.com/kademediacom' },
-  { icon: FaYoutube, name: 'YouTube', url: 'https://www.youtube.com/@kademediacom' },
-  { icon: FaTiktok, name: 'TikTok', url: 'https://tiktok.com/@kademediacom' },
-  { icon: FaLinkedinIn, name: 'LinkedIn', url: 'https://www.linkedin.com/company/kademediaagency' },
+const PARTNERS = [
+  { slug: 'flavora', name: 'Flavora', emoji: '🍕', cat: 'YİYECEK & İÇECEK', year: '2024', c1: '#ff6a3d', c2: '#ffb03a', featured: true },
+  { slug: 'techvibe', name: 'TechVibe', emoji: '💻', cat: 'TEKNOLOJİ', year: '2024', c1: '#5b6cff', c2: '#9b5bff' },
+  { slug: 'greenlife', name: 'GreenLife', emoji: '🌿', cat: 'SAĞLIK', year: '2023', c1: '#2fbf71', c2: '#8fd94a' },
+  { slug: 'urbanstyle', name: 'UrbanStyle', emoji: '👗', cat: 'MODA', year: '2023', c1: '#ff4d8d', c2: '#ff8ac4' },
+  { slug: 'petpal', name: 'PetPal', emoji: '🐾', cat: 'EVCİL HAYVAN', year: '2023', c1: '#17b3b0', c2: '#4fe0c9' },
+  { slug: 'fitzone', name: 'FitZone', emoji: '💪', cat: 'SPOR', year: '2024', c1: '#ff7a1a', c2: '#ffc24b' },
 ]
-
-const testimonials = [
-  {
-    nameTr: 'Ahmet Yıldırım',
-    nameEn: 'Ahmet Yıldırım',
-    roleTr: 'CEO, Flavora',
-    roleEn: 'CEO, Flavora',
-    textTr: 'Kade Media ile çalışmaya başladığımızdan beri sosyal medya varlığımız somut biçimde güçlendi. İçerik kalitesi, onay süreçleri ve raporlama konusundaki profesyonellikleri beklentimizin üzerindeydi.',
-    textEn: 'Since we started working with Kade Media, our social media presence has grown noticeably. Their professionalism in content quality, approval processes, and reporting exceeded our expectations.',
-    avatar: 'AY',
-    color: '#eac321',
-  },
-  {
-    nameTr: 'Elif Özkan',
-    nameEn: 'Elif Özkan',
-    roleTr: 'Marketing Director, TechVibe',
-    roleEn: 'Marketing Director, TechVibe',
-    textTr: 'Ürün lansmanımızda doğru strateji ve zamanlamayla hedef kitlemize ulaştılar. Organik trafik ve lead sayımızda lansman öncesiyle kıyaslanamayacak bir fark var. Tavsiye ediyorum.',
-    textEn: 'They reached our target audience with the right strategy and timing during our product launch. There is an incomparable difference in organic traffic and lead count compared to pre-launch. Highly recommended.',
-    avatar: 'EÖ',
-    color: '#6C63FF',
-  },
-  {
-    nameTr: 'Mehmet Kara',
-    nameEn: 'Mehmet Kara',
-    roleTr: 'Founder, GreenLife',
-    roleEn: 'Founder, GreenLife',
-    textTr: 'Reklam bütçemizi çok daha verimli kullanmaya başladık. Kade\'nin veri odaklı yaklaşımı sayesinde ROAS\'ımız ilk 3 ayda anlamlı biçimde yükseldi, satışlarımızda güçlü bir büyüme yaşadık.',
-    textEn: 'We started using our ad budget much more efficiently. Thanks to Kade\'s data-driven approach, our ROAS improved significantly in the first 3 months, and we saw strong growth in sales.',
-    avatar: 'MK',
-    color: '#2ECC71',
-  },
+const SERVICES = [
+  { t: 'Sosyal Medya Yönetimi', d: 'Instagram, TikTok, YouTube ve LinkedIn hesaplarını profesyonelce yönetiyoruz.' },
+  { t: 'İçerik Üretimi', d: 'Markaya özel görsel, video ve metin içerikleri üretiyoruz.' },
+  { t: 'Reklam Yönetimi', d: 'Meta, Google ve TikTok Ads kampanyalarını verimli yönetiyoruz.' },
+  { t: 'Video Prodüksiyon', d: 'Reels, TikTok, YouTube ve reklam filmleri için prodüksiyon.' },
 ]
+const STEPS = [
+  { n: '01', t: 'Keşif', d: 'Markanı, sektörünü ve hedeflerini analiz ederiz.' },
+  { n: '02', t: 'Strateji', d: 'Veriye dayalı içerik ve reklam stratejisi kurarız.' },
+  { n: '03', t: 'Üretim', d: 'Görsel, video ve metin içeriklerini üretiriz.' },
+  { n: '04', t: 'Büyüme', d: 'Ölçer, optimize eder, şeffafça raporlarız.' },
+]
+const WA = 'https://wa.me/905067293423?text=Merhaba%20Kadir%2C%20siteyi%20g%C3%B6rd%C3%BCm.'
 
-const faqData = {
-  tr: [
-    { q: 'Kade Media ne tür hizmetler sunuyor?', a: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi (Meta, Google, TikTok), video prodüksiyon ve dijital strateji danışmanlığı hizmetleri sunuyoruz.' },
-    { q: 'Minimum sözleşme süresi ne kadar?', a: 'Minimum 3 aylık sözleşme yapıyoruz. Dijital pazarlamada sonuçlar zaman alır, bu süre stratejimizin etkisini görmeniz için idealdir.' },
-    { q: 'Reklam bütçesi paket fiyatına dahil mi?', a: 'Hayır, reklam bütçesi paket fiyatlarına dahil değildir. Reklam yönetim hizmeti dahildir ancak reklam harcaması ayrıca faturalandırılır.' },
-    { q: 'Sonuçları ne zaman görmeye başlarım?', a: 'Organik büyüme stratejilerinde 1-3 ay içinde belirgin sonuçlar görülebilir. Reklam kampanyalarında ise ilk hafta içinde sonuçlar alınmaya başlanır.' },
-    { q: 'Hangi sektörlere hizmet veriyorsunuz?', a: 'Yiyecek & içecek, teknoloji, moda, sağlık, fitness, e-ticaret ve daha birçok sektörde deneyimimiz var. Her sektöre özel stratejiler geliştiriyoruz.' },
-  ],
-  en: [
-    { q: 'What kind of services does Kade Media offer?', a: 'We offer social media management, content production, ad management (Meta, Google, TikTok), video production, and digital strategy consulting services.' },
-    { q: 'What is the minimum contract period?', a: 'We require a minimum 3-month contract. Results in digital marketing take time, and this period is ideal for seeing the impact of our strategy.' },
-    { q: 'Is the ad budget included in the package price?', a: 'No, the ad budget is not included in package prices. Ad management service is included, but ad spend is billed separately.' },
-    { q: 'When will I start seeing results?', a: 'Organic growth strategies can show significant results within 1-3 months. For ad campaigns, results can be seen within the first week.' },
-    { q: 'Which industries do you serve?', a: 'We have experience in food & beverage, technology, fashion, health, fitness, e-commerce, and many more sectors. We develop custom strategies for each industry.' },
-  ],
-}
-
-function FAQItem({ faq }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <motion.div className={`faq-item glass-card ${open ? 'open' : ''}`} layout>
-      <button className="faq-question" onClick={() => setOpen(!open)}>
-        <span>{faq.q}</span>
-        {open ? <HiOutlineChevronUp size={18} /> : <HiOutlineChevronDown size={18} />}
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="faq-answer"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <p>{faq.a}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  )
+function useClock() {
+  const [t, setT] = useState('--:--')
+  useEffect(() => {
+    const tick = () => { const n = new Date(); setT(`${String(n.getHours()).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`) }
+    tick(); const id = setInterval(tick, 1000); return () => clearInterval(id)
+  }, [])
+  return t
 }
 
 export default function Home() {
-  const { lang, t } = useLanguage()
-  useSEO({
-    title: 'Sosyal Medya Ajansı İstanbul | Dijital Pazarlama Ajansı | Kade Media',
-    description: 'Kade Media — İstanbul\'un öne çıkan sosyal medya ajansı. Instagram, TikTok, YouTube ve LinkedIn yönetimi, içerik üretimi, reklam yönetimi ve marka stratejisi. Profesyonel dijital pazarlama ajansı.',
-    keywords: 'sosyal medya ajansı istanbul, dijital pazarlama ajansı, social media agency istanbul, sosyal medya yönetimi, instagram ajansı, tiktok ajansı, içerik üretimi ajansı, reklam ajansı istanbul, marka stratejisi ajansı, agency istanbul, sosyal medya danışmanlığı, influencer marketing ajansı, youtube yönetimi, linkedin ajansı, kade media',
-    path: '/',
-  })
+  const [dark, setDark] = useState(false)
+  const [coords, setCoords] = useState({ x: 720, y: 450 })
+  const clock = useClock()
 
-  // Hero text from translations — API can override
-  const heroDefaults = {
-    title1: t('hero.title1'),
-    title2: t('hero.title2'),
-    subtitle: t('hero.subtitle'),
-  }
-  const [heroOverride, setHeroOverride] = useState(null)
-  const [dynamicStats, setDynamicStats] = useState(null)
-  const [dynamicFaq, setDynamicFaq] = useState(null)
-  const [dynamicTestimonials, setDynamicTestimonials] = useState(null)
-  const [partnersData, setPartnersData] = useState(staticPartnersData)
-
-  // FAQ Schema Markup (Google Rich Snippets)
   useEffect(() => {
-    const faqItems = dynamicFaq?.[lang]?.length > 0 ? dynamicFaq[lang] : faqData[lang]
-    const faqSchema = {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: faqItems.map(item => ({
-        '@type': 'Question',
-        name: item.q,
-        acceptedAnswer: { '@type': 'Answer', text: item.a },
-      })),
-    }
-    const el = document.getElementById('jsonld-faq')
-    if (el) { el.textContent = JSON.stringify(faqSchema) } else {
-      const s = document.createElement('script')
-      s.id = 'jsonld-faq'
-      s.type = 'application/ld+json'
-      s.textContent = JSON.stringify(faqSchema)
-      document.head.appendChild(s)
-    }
-    return () => { document.getElementById('jsonld-faq')?.remove() }
-  }, [lang, dynamicFaq])
-
-  // LocalBusiness Schema
-  useEffect(() => {
-    const bizSchema = {
-      '@context': 'https://schema.org',
-      '@type': ['ProfessionalService', 'MarketingAgency'],
-      name: 'Kade Media',
-      alternateName: 'Kade Media Sosyal Medya Ajansı',
-      description: 'İstanbul merkezli profesyonel sosyal medya yönetimi, dijital pazarlama ve içerik üretimi ajansı. Instagram, TikTok, YouTube, LinkedIn yönetimi ve reklam danışmanlığı.',
-      url: 'https://kademedia.com.tr',
-      logo: 'https://kademedia.com.tr/logo.png',
-      image: 'https://kademedia.com.tr/logo.png',
-      telephone: CONTACT.phone,
-      email: CONTACT.email,
-      address: { '@type': 'PostalAddress', streetAddress: 'Biruni Teknopark', addressLocality: 'Zeytinburnu', addressRegion: 'İstanbul', postalCode: '34010', addressCountry: 'TR' },
-      geo: { '@type': 'GeoCoordinates', latitude: 41.0082, longitude: 28.9784 },
-      areaServed: [
-        { '@type': 'Country', name: 'Turkey' },
-        { '@type': 'City', name: 'İstanbul' },
-      ],
-      serviceType: ['Sosyal Medya Yönetimi', 'Dijital Pazarlama', 'İçerik Üretimi', 'Reklam Yönetimi', 'Influencer Marketing', 'Marka Stratejisi'],
-      priceRange: '₺₺',
-      openingHours: 'Mo-Fr 09:00-18:00',
-      hasOfferCatalog: {
-        '@type': 'OfferCatalog',
-        name: 'Sosyal Medya ve Dijital Pazarlama Hizmetleri',
-        itemListElement: [
-          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Sosyal Medya Yönetimi' } },
-          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'İçerik Üretimi ve Tasarım' } },
-          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Reklam Yönetimi (Meta & Google Ads)' } },
-          { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Influencer Marketing' } },
-        ],
-      },
-      sameAs: [
-        'https://instagram.com/kademediacom',
-        'https://www.youtube.com/@kademediacom',
-        'https://tiktok.com/@kademediacom',
-        'https://www.linkedin.com/company/kademediaagency',
-      ],
-    }
-    const el = document.getElementById('jsonld-business')
-    if (el) { el.textContent = JSON.stringify(bizSchema) } else {
-      const s = document.createElement('script')
-      s.id = 'jsonld-business'
-      s.type = 'application/ld+json'
-      s.textContent = JSON.stringify(bizSchema)
-      document.head.appendChild(s)
-    }
-    return () => { document.getElementById('jsonld-business')?.remove() }
+    const lenis = new Lenis({ duration: 1.1, smoothWheel: true })
+    let raf
+    const loop = (t) => { lenis.raf(t); raf = requestAnimationFrame(loop) }
+    raf = requestAnimationFrame(loop)
+    lenis.on('scroll', ({ scroll }) => { window.__kscroll = Math.min(1, scroll / innerHeight) })
+    return () => { cancelAnimationFrame(raf); lenis.destroy(); window.__kscroll = 0 }
   }, [])
 
-  // Load overrides from API once
   useEffect(() => {
-    let cancelled = false
-    const loadFromApi = async () => {
-      try {
-        const heroData = await getContentApi('hero')
-        if (!cancelled && heroData?.data) setHeroOverride(heroData.data)
-      } catch { /* use defaults */ }
-
-      try {
-        const statsData = await getContentApi('stats')
-        if (!cancelled && statsData?.data) setDynamicStats(statsData.data)
-      } catch { /* use defaults */ }
-
-      try {
-        const faqRes = await getContentApi('faq')
-        if (!cancelled && faqRes?.data?.tr?.length) setDynamicFaq(faqRes.data)
-      } catch { /* use defaults */ }
-
-      try {
-        const testimonialsData = await getContentApi('testimonials')
-        if (!cancelled && testimonialsData?.data?.items?.length) setDynamicTestimonials(testimonialsData.data.items)
-      } catch { /* use defaults */ }
-
-      try {
-        const apiPartners = await getPartnersApi()
-        if (!cancelled && Array.isArray(apiPartners) && apiPartners.length > 0) {
-          // Merge: API partners override static by id, new ones appended
-          const idMap = new Map(apiPartners.map(p => [p.id || p.slug, p]))
-          const merged = staticPartnersData.map(p => idMap.get(p.id) || p)
-          const existingIds = new Set(staticPartnersData.map(p => p.id))
-          const newPartners = apiPartners.filter(p => !existingIds.has(p.id))
-          setPartnersData([...merged, ...newPartners])
-        }
-      } catch { /* use static */ }
+    let raf
+    let pending = [...document.querySelectorAll('.kade-home [data-kr]')]
+    const check = () => {
+      const trig = innerHeight * 0.9
+      pending = pending.filter((el) => { if (el.getBoundingClientRect().top < trig) { el.classList.add('in'); return false } return true })
+      if (pending.length) raf = requestAnimationFrame(check)
     }
-
-    loadFromApi()
-    return () => { cancelled = true }
+    raf = requestAnimationFrame(check)
+    return () => cancelAnimationFrame(raf)
   }, [])
 
-  // Derive hero texts: always use current translation, override only if API has data for current lang
-  const heroTexts = {
-    title1: heroOverride?.[lang]?.title1 || heroDefaults.title1,
-    title2: heroOverride?.[lang]?.title2 || heroDefaults.title2,
-    subtitle: heroOverride?.[lang]?.subtitle || heroDefaults.subtitle,
-  }
-
-  const services = [
-    { icon: HiOutlineGlobe, title: t('servicesSection.smm'), desc: t('servicesSection.smmDesc') },
-    { icon: HiOutlineLightningBolt, title: t('servicesSection.content'), desc: t('servicesSection.contentDesc') },
-    { icon: HiOutlineChartBar, title: t('servicesSection.ads'), desc: t('servicesSection.adsDesc') },
-    { icon: HiOutlinePlay, title: t('contact.videoProduction'), desc: t('services.videoDesc') },
-  ]
-
-  const stats = [
-    { number: dynamicStats?.clients ?? '20+', label: t('stats.clients') },
-    { number: dynamicStats?.followers ?? '500K+', label: t('stats.followers') },
-    { number: dynamicStats?.campaigns ?? '60+', label: t('stats.campaigns') },
-    { number: dynamicStats?.satisfaction ?? '4.8/5', label: t('stats.satisfaction') },
-  ]
+  useEffect(() => {
+    const onMove = (e) => setCoords({ x: e.clientX, y: e.clientY })
+    window.addEventListener('pointermove', onMove)
+    return () => window.removeEventListener('pointermove', onMove)
+  }, [])
 
   return (
-    <PageTransition>
-      {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-3d">
-          <HeroBackground />
-        </div>
-        <div className="grid-bg" />
-        <div className="hero-glow hero-glow-1" />
-        <div className="hero-glow hero-glow-2" />
+    <div className={`kade-home${dark ? ' kdark' : ''}`}>
+      <KadeScene dark={dark} />
+      <KadeCursor />
+      <div className="kade-grid" aria-hidden />
 
-        <div className="container hero-content">
-          <FadeIn delay={0.1}>
-            <h1 className="hero-title hero-gradient-text">
-              {heroTexts.title1}
-              <br />
-              <span className="hero-highlight">{heroTexts.title2}</span>
-            </h1>
-          </FadeIn>
+      <header className="kade-nav">
+        <Link className="kade-brand ktech" to="/">KADE MEDIA</Link>
+        <nav className="kade-navlinks ktech">
+          <Link to="/portfolio">İŞLER</Link>
+          <Link to="/hizmetler">HİZMETLER</Link>
+          <Link to="/paketler">PAKETLER</Link>
+          <Link to="/iletisim">İLETİŞİM</Link>
+          <button onClick={() => setDark((d) => !d)}>TEMA[A]</button>
+        </nav>
+      </header>
 
-          <FadeIn delay={0.15}>
-            <p className="hero-subtitle">{heroTexts.subtitle}</p>
-          </FadeIn>
+      <footer className="kade-status ktech">
+        <span>GMT+3 İST {clock} 24°C</span>
+        <span className="kcoords">{String(coords.x).padStart(4, '0')} X {String(coords.y).padStart(4, '0')} Y</span>
+        <span>◍</span>
+      </footer>
 
-          <FadeIn delay={0.2}>
-            <div className="hero-actions">
-              <MagneticButton as={Link} to="/iletisim" className="btn btn-primary" strength={0.22}>
-                {t('hero.cta1')}
-                <HiOutlineArrowRight size={18} />
-              </MagneticButton>
-              <MagneticButton as={Link} to="/hizmetler" className="btn btn-outline" strength={0.22}>
-                <HiOutlinePlay size={18} />
-                {t('hero.cta2')}
-              </MagneticButton>
-            </div>
-          </FadeIn>
+      <main className="kade-content">
+        <section className="kade-screen">
+          <div className="kade-intro">
+            <div className="kl kdisplay">Sosyal Medya &amp;<br />Dijital Pazarlama</div>
+            <div className="km ktech">Markaları dijitalde<br />büyütüyoruz.</div>
+            <div className="kr ktech">Kade Media — İstanbul merkezli dijital pazarlama ajansı. Sosyal medya, içerik, reklam ve prodüksiyonla markanı dijitalde konumlandırıyoruz.</div>
+          </div>
+          <h1 className="kade-bring kdisplay">BİZ MARKANI<br />BÜYÜTÜYORUZ</h1>
+        </section>
 
+        <div className="kade-sheet">
+          <section className="kade-about kade-screen">
+            <p className="kade-lead kdisplay" data-kr>Güçlü iş birlikleriyle markaları dijital dünyada büyütüyoruz.</p>
+            <p className="kade-sub ktech" data-kr>Strateji, içerik, reklam ve prodüksiyon — hepsi tek çatı altında. Veri odaklı, şeffaf raporlamayla.</p>
+          </section>
 
-          <FadeIn delay={0.3}>
-            <div className="hero-platforms">
-              <span className="platforms-label">{t('hero.platforms')}</span>
-              <div className="platform-icons">
-                {platforms.map((p, i) => (
-                  <motion.a
-                    key={p.name}
-                    href={p.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="platform-icon"
-                    whileHover={{ scale: 1.2, y: -5 }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 + i * 0.1 }}
-                    title={p.name}
-                  >
-                    <p.icon size={20} />
-                  </motion.a>
-                ))}
-              </div>
-            </div>
-          </FadeIn>
-        </div>
-
-        <div className="hero-scroll-indicator">
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="scroll-dot"
-          />
-        </div>
-      </section>
-
-      {/* Founder Section */}
-      <section className="founder-section">
-        <div className="container">
-          <FadeIn>
-            <div className="founder-card glass-card">
-              <div className="founder-photo-wrap">
-                <img
-                  src="/kadir.jpg"
-                  alt="Kadir Demir — Kade Media Kurucu"
-                  className="founder-photo"
-                  onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }}
-                />
-                <div className="founder-photo-fallback" style={{ display: 'none' }}>KD</div>
-              </div>
-              <div className="founder-body">
-                <div className="founder-label">
-                  {lang === 'tr' ? 'Kurucudan' : 'From the Founder'}
-                </div>
-                <blockquote className="founder-quote">
-                  {lang === 'tr'
-                    ? '"Her marka farklı bir hikâye anlatır. Benim işim o hikâyeyi doğru platformda, doğru insanlara ulaştırmak. Benimle çalışmak istiyorsanız doğrudan yazın — formlar değil, gerçek konuşmalar işe yarar."'
-                    : '"Every brand tells a different story. My job is to get that story to the right people on the right platform. If you want to work with me, reach out directly — real conversations, not forms."'}
-                </blockquote>
-                <div className="founder-meta">
-                  <strong>Kadir Demir</strong>
-                  <span>{lang === 'tr' ? 'Kurucu & Strateji Direktörü, Kade Media' : 'Founder & Strategy Director, Kade Media'}</span>
-                </div>
-                <a
-                  href={`https://wa.me/905067293423?text=${encodeURIComponent(lang === 'tr' ? 'Merhaba Kadir, siteyi gördüm. Kade Media hakkında bilgi almak istiyorum.' : 'Hi Kadir, I saw your site. I\'d like to learn more about Kade Media.')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary founder-cta"
-                >
-                  <FaWhatsApp size={18} />
-                  {lang === 'tr' ? 'Kadir ile Doğrudan Konuşun' : 'Talk Directly with Kadir'}
-                </a>
-              </div>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* Trust Bar */}
-      <div className="trust-bar">
-        <div className="container">
-          <div className="trust-bar-inner">
-            <div className="trust-item">
-              <HiOutlineUsers size={16} className="trust-icon" />
-              <span className="trust-value">20+</span>
-              <span className="trust-label">{lang === 'tr' ? 'Aktif Müşteri' : 'Active Clients'}</span>
-            </div>
-            <div className="trust-divider" />
-            <div className="trust-item">
-              <HiOutlineChartBar size={16} className="trust-icon" />
-              <span className="trust-value">500K+</span>
-              <span className="trust-label">{lang === 'tr' ? 'Yönetilen Takipçi' : 'Followers Managed'}</span>
-            </div>
-            <div className="trust-divider" />
-            <div className="trust-item">
-              <HiOutlineLightningBolt size={16} className="trust-icon" />
-              <span className="trust-value">{lang === 'tr' ? 'İstanbul merkezli' : 'Istanbul-based'}</span>
-              <span className="trust-label">{lang === 'tr' ? 'Biruni Teknopark' : 'Biruni Technopark'}</span>
-            </div>
-            <div className="trust-divider" />
-            <div className="trust-item">
-              <HiOutlineShieldCheck size={16} className="trust-icon" />
-              <span className="trust-value trust-guarantee">
-                {lang === 'tr' ? 'Ücretsiz Keşif Görüşmesi' : 'Free Discovery Call'}
-              </span>
+          <div className="kade-marquee" aria-hidden>
+            <div className="kade-mtrack kdisplay">
+              {['SOSYAL MEDYA', 'İÇERİK ÜRETİMİ', 'REKLAM YÖNETİMİ', 'VİDEO PRODÜKSİYON', 'MARKA STRATEJİSİ', 'SOSYAL MEDYA', 'İÇERİK ÜRETİMİ', 'REKLAM YÖNETİMİ', 'VİDEO PRODÜKSİYON', 'MARKA STRATEJİSİ'].map((t, i) => (
+                <span key={i} className="kade-mitem">{t}<span className="kade-mdot">✦</span></span>
+              ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Stats Section */}
-      <section className="stats-section">
-        <div className="container">
-          <StaggerContainer className="stats-grid" staggerDelay={0.1}>
-            {stats.map((stat) => {
-              const raw = String(stat.number)
-              const match = raw.match(/^([\d.,]+)(.*)$/)
-              const num = match ? parseFloat(match[1].replace(',', '.')) : null
-              const suffix = match ? match[2] : ''
-              return (
-                <StaggerItem key={stat.label}>
-                  <div className="stat-card glass-card">
-                    <div className="stat-number">
-                      {num != null && !Number.isNaN(num) ? (
-                        <CountUp to={num} suffix={suffix} duration={1600} decimals={Number.isInteger(num) ? 0 : 1} />
-                      ) : (
-                        raw
-                      )}
-                    </div>
-                    <div className="stat-label">{stat.label}</div>
+          <section className="kade-stats">
+            <div className="kade-statgrid">
+              {[['6+', 'Aktif Marka'], ['180%', 'Ort. Etkileşim Artışı'], ['4', 'Hizmet Alanı'], ['100%', 'Şeffaf Raporlama']].map(([n, l]) => (
+                <div className="kade-stat" key={l} data-kr><span className="kade-statnum kdisplay">{n}</span><span className="kade-statlabel ktech">{l}</span></div>
+              ))}
+            </div>
+          </section>
+
+          <section id="isler" className="kade-work">
+            <div className="kade-head ktech" data-kr><span>İŞLER / PARTNERLER</span><span>{PARTNERS.length} MARKA</span></div>
+            <div className="kade-workgrid">
+              {PARTNERS.map((p, i) => (
+                <Link key={p.slug} className={`kade-block${p.featured ? ' featured' : ''}`} to="/portfolio" data-kr>
+                  <div className="kade-visual" style={{ background: `linear-gradient(135deg, ${p.c1}, ${p.c2})` }}>
+                    <span className="kade-num ktech">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="kade-emoji">{p.emoji}</span>
+                    <span className="kade-tag ktech">PARTNER</span>
                   </div>
-                </StaggerItem>
-              )
-            })}
-          </StaggerContainer>
-        </div>
-      </section>
-
-      {/* Services Preview */}
-      <section className="section services-preview">
-        <div className="glow-effect" style={{ top: '-100px', right: '-100px' }} />
-        <div className="container">
-          <div className="section-header">
-            <FadeIn>
-              <div className="section-badge">
-                <HiOutlineLightningBolt size={14} />
-                {t('servicesSection.badge')}
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h2 className="section-title">
-                {t('servicesSection.title')} <span>{t('servicesSection.titleHighlight')}</span> {t('servicesSection.titleEnd')}
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="section-subtitle">{t('servicesSection.subtitle')}</p>
-            </FadeIn>
-          </div>
-
-          <StaggerContainer className="services-grid" staggerDelay={0.1}>
-            {services.map((service, index) => (
-              <StaggerItem key={index}>
-                <TiltCard className="service-card glass-card" strength={6}>
-                  <div className="service-icon-wrapper">
-                    <service.icon size={28} />
-                  </div>
-                  <h3>{service.title}</h3>
-                  <p>{service.desc}</p>
-                  <div className="service-number">0{index + 1}</div>
-                </TiltCard>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-
-          <FadeIn delay={0.3}>
-            <div className="services-cta">
-              <Link to="/hizmetler" className="btn btn-outline">
-                {t('servicesSection.viewAll')}
-                <HiOutlineArrowRight size={18} />
-              </Link>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* Partners Preview */}
-      <section className="section partners-preview-section">
-        <div className="container">
-          <div className="section-header">
-            <FadeIn>
-              <div className="section-badge">
-                <HiOutlineOfficeBuilding size={14} />
-                {t('partnersSection.badge')}
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h2 className="section-title">
-                <span>{t('partnersSection.title')}</span>
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="section-subtitle">{t('partnersSection.subtitle')}</p>
-            </FadeIn>
-          </div>
-
-          <StaggerContainer className="partners-preview-grid" staggerDelay={0.08}>
-            {partnersData.slice(0, 6).map((partner, idx) => (
-              <StaggerItem key={partner.id || partner.slug || String(partner._id) || idx}>
-                <Link to={`/partnerler/${partner.id || partner.slug || String(partner._id)}`}>
-                  <TiltCard className="partner-preview-card glass-card" strength={7}>
-                    <div className="partner-preview-logo" style={{ background: `${partner.color}12` }}>
-                      {partner.logo && (partner.logo.startsWith('data:') || partner.logo.startsWith('http'))
-                        ? <img src={partner.logo} alt={partner.name} style={{ width: '32px', height: '32px', objectFit: 'contain', borderRadius: 4 }} />
-                        : <span>{partner.logo}</span>
-                      }
-                    </div>
-                    <h4>{partner.name}</h4>
-                    <span className="partner-preview-category" style={{ color: partner.color }}>
-                      {lang === 'tr' ? partner.category : partner.categoryEn}
-                    </span>
-                  </TiltCard>
+                  <div className="kade-meta ktech"><span>{p.name} · {p.cat}</span><span>{p.year} ↗</span></div>
                 </Link>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-
-          <FadeIn delay={0.3}>
-            <div className="services-cta">
-              <Link to="/partnerler" className="btn btn-outline">
-                {t('partnersSection.viewAll')}
-                <HiOutlineArrowRight size={18} />
-              </Link>
+              ))}
             </div>
-          </FadeIn>
-        </div>
-      </section>
+          </section>
 
-      {/* Testimonials */}
-      <section className="section testimonials-section">
-        <div className="glow-effect" style={{ top: '50%', left: '-200px', transform: 'translateY(-50%)' }} />
-        <div className="container">
-          <div className="section-header">
-            <FadeIn>
-              <div className="section-badge">
-                <HiOutlineChatAlt2 size={14} />
-                {t('testimonials.badge')}
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h2 className="section-title">
-                <span>{t('testimonials.title')}</span>
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="section-subtitle">{t('testimonials.subtitle')}</p>
-            </FadeIn>
-          </div>
-
-          <StaggerContainer className="testimonials-grid" staggerDelay={0.15}>
-            {(dynamicTestimonials?.length > 0 ? dynamicTestimonials : testimonials).map((item, i) => (
-              <StaggerItem key={i}>
-                <motion.div className="testimonial-card glass-card" whileHover={{ y: -4 }}>
-                  <FaQuoteLeft className="testimonial-quote" size={24} />
-                  <p className="testimonial-text">
-                    {lang === 'tr' ? item.textTr : item.textEn}
-                  </p>
-                  <div className="testimonial-author">
-                    <div className="testimonial-avatar" style={{ background: `${item.color}25`, color: item.color }}>
-                      {item.avatar}
-                    </div>
-                    <div>
-                      <span className="testimonial-name">{lang === 'tr' ? item.nameTr : item.nameEn}</span>
-                      <span className="testimonial-role">{lang === 'tr' ? item.roleTr : item.roleEn}</span>
-                    </div>
-                  </div>
-                </motion.div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="section faq-home-section">
-        <div className="container">
-          <div className="section-header">
-            <FadeIn>
-              <div className="section-badge">
-                <HiOutlineChatAlt2 size={14} />
-                {t('faq.badge')}
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h2 className="section-title">
-                <span>{t('faq.title')}</span>
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="section-subtitle">{t('faq.subtitle')}</p>
-            </FadeIn>
-          </div>
-
-          <div className="faq-list">
-            {(dynamicFaq?.[lang]?.length > 0 ? dynamicFaq[lang] : faqData[lang]).map((faq, i) => (
-              <FadeIn key={i} delay={i * 0.05}>
-                <FAQItem faq={faq} />
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Ücretsiz Analiz Formu */}
-      <section className="section analysis-form-section">
-        <div className="container">
-          <div className="section-header">
-            <FadeIn>
-              <div className="section-badge">
-                <HiOutlineChartBar size={14} />
-                {lang === 'tr' ? 'Ücretsiz Dijital Analiz' : 'Free Digital Analysis'}
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h2 className="section-title">
-                {lang === 'tr'
-                  ? <>Sadece <span>2 Dakikada</span> Sosyal Medya Karneni Çıkar</>
-                  : <>Get Your Social Media <span>Report Card</span> in 2 Minutes</>}
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="section-subtitle">
-                {lang === 'tr'
-                  ? 'Hedefini ve sektörünü paylaş — Kadir sana özel bir analiz ve büyüme planıyla geri dönsün.'
-                  : 'Share your goal and industry — Kadir will come back with a custom analysis and growth plan.'}
-              </p>
-            </FadeIn>
-          </div>
-          <FadeIn delay={0.3}>
-            <div className="analysis-form-card glass-card">
-              <AnalysisForm />
+          <section id="hizmetler" className="kade-services">
+            <div className="kade-head ktech" data-kr><span>HİZMETLER</span><span>{SERVICES.length} ALAN</span></div>
+            <div className="kade-servgrid">
+              {SERVICES.map((s, i) => (
+                <div className="kade-servcard" key={s.t} data-kr><span className="ktech">0{i + 1}</span><h3 className="kdisplay">{s.t}</h3><p className="ktech">{s.d}</p></div>
+              ))}
             </div>
-          </FadeIn>
+          </section>
+
+          <section className="kade-process">
+            <div className="kade-head ktech" data-kr><span>SÜREÇ</span><span>NASIL ÇALIŞIYORUZ?</span></div>
+            <div className="kade-plist">
+              {STEPS.map((s) => (
+                <div className="kade-prow" key={s.n} data-kr><span className="ktech kade-pn">{s.n}</span><h3 className="kdisplay">{s.t}</h3><p className="ktech">{s.d}</p></div>
+              ))}
+            </div>
+          </section>
+
+          <section className="kade-statement kade-screen">
+            <h2 className="kdisplay" data-kr>BİRLİKTE<br />BÜYÜYORUZ</h2>
+          </section>
         </div>
-      </section>
 
-      {/* Audit Score */}
-      <AuditScore />
-
-      {/* Location */}
-      <section className="section location-section">
-        <div className="container">
-          <div className="section-header">
-            <FadeIn>
-              <div className="section-badge">
-                <HiOutlineOfficeBuilding size={14} />
-                {t('contact.locationTitle')}
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h2 className="section-title">
-                Biruni <span>Teknopark</span>
-              </h2>
-            </FadeIn>
+        <section id="iletisim" className="kade-contact kade-screen">
+          <h2 className="kade-cta kdisplay" data-kr>BİRLİKTE<br />BÜYÜYELİM</h2>
+          <a className="kade-wa ktech" href={WA} target="_blank" rel="noreferrer" data-magnetic>WHATSAPP&apos;TAN YAZ →</a>
+          <div className="kade-footer ktech">
+            <a href="mailto:thekademedia@gmail.com">THEKADEMEDIA@GMAIL.COM</a>
+            <div className="kade-social">
+              <a href="https://instagram.com/kademediacom" target="_blank" rel="noreferrer">INSTAGRAM</a>
+              <a href="https://tiktok.com/@kademediacom" target="_blank" rel="noreferrer">TIKTOK</a>
+              <a href="https://www.youtube.com/@kademediacom" target="_blank" rel="noreferrer">YOUTUBE</a>
+            </div>
           </div>
-          <FadeIn delay={0.2}>
-            <div className="location-card glass-card">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6!2d28.906!3d41.004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5307e731e3f%3A0x6b0e61f4c5c9a6e8!2sBiruni+Teknopark!5e0!3m2!1str!2str!4v1700000000000"
-                width="100%"
-                height="350"
-                style={{ border: 0, borderRadius: '16px', display: 'block' }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Biruni Teknopark"
-              />
-              <div className="location-footer">
-                <span className="location-address">📍 Biruni Teknopark, Kazlıçeşme, Zeytinburnu/İstanbul</span>
-                <a
-                  href="https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary"
-                >
-                  {t('contact.getDirections')}
-                  <HiOutlineArrowRight size={16} />
-                </a>
-              </div>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="cta-section">
-        <div className="cta-glow" />
-        <div className="grid-bg" />
-        <div className="container">
-          <ScaleIn>
-            <div className="cta-content glass-card">
-              <h2>
-                {t('cta.title1')} <span>{t('cta.titleHighlight')}</span> {t('cta.title2')}
-              </h2>
-              <p>{t('cta.subtitle')}</p>
-              <div className="cta-actions">
-                <MagneticButton as={Link} to="/iletisim" className="btn btn-primary" strength={0.22}>
-                  {t('cta.btn1')}
-                  <HiOutlineArrowRight size={18} />
-                </MagneticButton>
-                <MagneticButton as={Link} to="/paketler" className="btn btn-outline" strength={0.22}>
-                  {t('cta.btn2')}
-                </MagneticButton>
-              </div>
-            </div>
-          </ScaleIn>
-        </div>
-      </section>
-    </PageTransition>
+          <div className="kade-copy ktech">KADE MEDIA © 2026 · İSTANBUL</div>
+        </section>
+      </main>
+    </div>
   )
 }

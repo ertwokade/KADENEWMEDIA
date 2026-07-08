@@ -1,9 +1,0 @@
-<svg width="300" height="120" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="kadeGrad" x1="150" y1="-30" x2="150" y2="130" gradientUnits="userSpaceOnUse">
-<stop stop-color="#868585"/>
-<stop offset="0.808597" stop-color="white"/>
-</linearGradient>
-</defs>
-<text x="10" y="90" font-family="Georgia, 'Times New Roman', serif" font-size="88" font-style="italic" font-weight="400" fill="url(#kadeGrad)" letter-spacing="-2">Kade.</text>
-</svg>

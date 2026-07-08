@@ -5,3 +5,14 @@ preview.err.log
 preview.out.log
 scripts/export-admin-api-data.mjs
 scripts/export-admin-data.mjs
+
+# Çalışma/yedek klasörleri (deploy'a girmesin)
+kade-site
+haoqi-copy
+kademedia-orijinal-yedek
+kade-site-snapshot-1
+kade-site-snapshot-2
+_next
+sticker_img
+bgm.mp3
+GLASS_SHADER_SPEC.md

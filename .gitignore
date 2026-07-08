@@ -30,3 +30,15 @@ dist-ssr
 .vercel
 
 ai-website-cloner-template/
+.env*
+
+# Çalışma kopyaları ve yedekler (repo'ya girmesin)
+kade-site/
+haoqi-copy/
+kademedia-orijinal-yedek/
+kade-site-snapshot-*/
+# haoqi statik overlay artıkları (root'ta)
+/_next/
+/sticker_img/
+/bgm.mp3
+/GLASS_SHADER_SPEC.md

@@ -137,6 +137,8 @@ function getCanvasTheme(pathname) {
 function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
+  const isHome = location.pathname === '/'
+  const hideShell = isAdmin || isHome
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 
@@ -183,10 +185,10 @@ function App() {
       <OrganizationSchema />
       <a href="#main-content" className="skip-to-content">İçeriğe geç</a>
       <ScrollToTop />
-      {!isAdmin && <AuroraBackground />}
-      {!isAdmin && <GrainOverlay />}
-      {!isAdmin && <PageHeroCanvas type={canvasTheme} />}
-      {!isAdmin && <Navbar />}
+      {!hideShell && <AuroraBackground />}
+      {!hideShell && <GrainOverlay />}
+      {!hideShell && <PageHeroCanvas type={canvasTheme} />}
+      {!hideShell && <Navbar />}
       <main id="main-content">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />
@@ -228,7 +230,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       </main>
-      {!isAdmin && <Footer />}
+      {!hideShell && <Footer />}
       {!isAdmin && <WhatsAppButton />}
       {!isAdmin && <CookieBanner />}
       {!isAdmin && <NotificationPrompt />}
