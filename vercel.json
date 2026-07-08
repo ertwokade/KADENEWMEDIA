@@ -7,7 +7,8 @@
   ],
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/", "destination": "/site.html" },
+    { "source": "/((?!api/).*)", "destination": "/app.html" }
   ],
   "headers": [
     {
