@@ -1,101 +1,55 @@
 ---
 name: frontend-design
-description: Design-quality pass for a Next.js + shadcn/ui + Tailwind v4 site — turns a functional-but-plain UI into something that looks intentionally designed. Use when the user wants the frontend to look better, more premium, more modern, or "less AI-generated". Triggers on phrases like "tasarımı güzelleştir", "daha modern yap", "daha premium görünsün", "arayüzü iyileştir", "make it look better", "polish the design", "more modern UI", "less generic", "improve the visual design", "make it look premium". Optional argument names a page/route or section to focus on.
-argument-hint: "[page-or-section]"
-user-invocable: true
+description: Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.
+license: Complete terms in LICENSE.txt
 ---
 
 # Frontend Design
 
-You are doing a **design-quality pass** on the current Next.js + shadcn/ui + Tailwind v4 project. The goal is to take a UI that works but looks generic and make it look deliberately, tastefully designed — the kind of thing a senior product designer would ship.
+Approach this as the design lead at a small studio known for giving every client a visual identity that could not be mistaken for anyone else's. This client has already rejected proposals that felt templated, and is paying for a distinctive point of view: make deliberate, opinionated choices about palette, typography, and layout that are specific to this brief, and take one real aesthetic risk you can justify.
 
-Focus target: **$ARGUMENTS** if provided (a page, route, or named section). If empty, assess the whole app and prioritize the highest-traffic surface (usually the landing page).
+## Ground it in the subject
 
-This is not a rewrite. You are refining what exists — tightening spacing, fixing hierarchy, unifying tokens, adding the small details that separate "clearly AI-generated" from "designed." Preserve behavior and content; change how it looks and feels.
+If the brief does not pin down what the product or subject is, pin it yourself before designing: name one concrete subject, its audience, and the page's single job, and state your choice. If there's any information in your memory about the human's preferences, context about what they're building, or designs you've made before – use that as a hint. The subject's own world, its materials, instruments, artifacts, and vernacular, is where distinctive choices come from. Build with the brief's real content and subject matter throughout.
 
-## Pre-Flight
+## Design principles
 
-1. Verify the project builds: `npm run build`. If it doesn't, fix the build first — you can't judge design on a broken app.
-2. Take before screenshots. Prefer the `screenshot` skill if available; otherwise run the dev server and capture the target at 1440px, 768px, and 390px. These are your baseline for the after-comparison.
-3. Read `src/app/globals.css` and `src/app/layout.tsx` to learn the existing design tokens (colors, fonts, radius, spacing scale) and font setup. Work **within** this token system — don't introduce one-off hex values or arbitrary pixel numbers when a token exists.
+For web designs, the hero is a thesis. Open with the most characteristic thing in the subject's world, in whatever form makes sense for it: a headline, an image, an animation, a live demo, an interactive moment. Be deliberate with your choice: a big number with a small label, supporting stats, and a gradient accent is the template answer, only use if that's truly the best option.
 
-## The Design Principles
+Typography carries the personality of the page. Pair the display and body faces deliberately, not the same families you would reach for on any other project, and set a clear type scale with intentional weights, widths, and spacing. Make the type treatment itself a memorable part of the design, not a neutral delivery vehicle for the content.
 
-Internalize these. Every change you make should be traceable to one of them.
+Structure is information. Structural devices, numbering, eyebrows, dividers, labels, should encode something true about the content, not decorate it. Many generic designs use numbered markers (01 / 02 / 03), but that's only appropriate if the content actually is a sequence - like a real process or a typed timeline where order carries information the reader needs. Question if choices like numbered markers actually make sense before incorporating them.
 
-### 1. Hierarchy Is Everything
+Leverage motion deliberately. Think about where and if animation can serve the subject: a page-load sequence, a scroll-triggered reveal, hover micro-interactions, ambient atmosphere. An orchestrated moment usually lands harder than scattered effects; choose what the direction calls for. However, sometimes less is more, and extra animation contributes to the feeling that the design is AI-generated.
 
-The single biggest tell of an amateur UI is flat hierarchy — everything competes for attention, so nothing wins. Establish a clear order:
+Match complexity to the vision. Maximalist directions need elaborate execution; minimal directions need precision in spacing, type, and detail. Elegance is executing the chosen vision well.
 
-- **One** primary action per view. It gets the strongest visual weight (solid fill, brand color). Everything else is secondary (outline, ghost) or tertiary (text link).
-- Type scale should have real contrast. A hero headline at `text-2xl` sitting next to body at `text-base` reads as timid. Big things should be genuinely big (`text-5xl`–`text-7xl` for hero headlines), small things genuinely small.
-- Use weight and color, not just size. Muted foreground for secondary text (`text-muted-foreground`), full foreground for primary. Bold for emphasis, not for everything.
+Consider written content carefully. Often a design brief may not contain real content, and it's up to you to come up with copy. Copy can make a design feel as templated as the design itself. See the below section on writing for more guidance.
 
-### 2. Space Is a Design Element
+## Process: brainstorm, explore, plan, critique, build, critique again
 
-Generous, consistent whitespace is what makes a design feel premium. Cramped is the default failure mode.
+For calibration: AI-generated design right now clusters around three looks: (1) a warm cream background (near #F4F1EA) with a high-contrast serif display and a terracotta accent; (2) a near-black background with a single bright acid-green or vermilion accent; (3) a broadsheet-style layout with hairline rules, zero border-radius, and dense newspaper-like columns. All three are legitimate for some briefs, but they are defaults rather than choices, and they appear regardless of subject. Where the brief pins down a visual direction, follow it exactly — the brief's own words always win, including when it asks for one of these looks. Where it leaves an axis free, don't spend that freedom on one of these defaults. Just like a human designer who's hired, there's often a careful balance between doing what you're good at and taking each project as a chance to experiment and learn.
 
-- Use a consistent spacing scale (Tailwind's 4/8-based scale). Don't mix `gap-3`, `gap-[13px]`, `mt-5`, `mb-7` randomly — pick rhythm values and stick to them.
-- Sections need room to breathe. Vertical section padding of `py-20`/`py-24`/`py-32` on desktop is normal for landing pages, not excessive.
-- Constrain line length. Body text should live in a `max-w-prose` / `max-w-2xl` container — full-width paragraphs are hard to read and look unconsidered.
+Work in two passes. First, brainstorm a short design plan based on the human's design brief: create a compact token system with color, type, layout, and signature. Color: describe the palette as 4–6 named hex values. Type: the typefaces for 2+ roles (a characterful display face that's used with restraint, a complementary body face, and a utility face for captions or data if needed). Layout: a layout concept, using one-sentence prose descriptions and ASCII wireframes to ideate and compare. Signature: the single unique element this page will be remembered by that embodies the brief in an appropriate way.
 
-### 3. Restraint With Color
+Then review that plan against the brief before building: if any part of it reads like the generic default you would produce for any similar page (work through a similar prompt to see if you arrive somewhere similar) rather than a choice made for this specific brief — revise that part, say what you changed and why. Only after you've confirmed the relative uniqueness of your design plan should you start to write the code, following the revised plan exactly and deriving every color and type decision from it.
 
-- Lean on the neutral palette (background, foreground, muted, border) for 90% of the UI. Use the brand/accent color sparingly — for the primary action and a few intentional highlights. Color everywhere means color nowhere.
-- Borders and dividers should be subtle (`border-border`, low-contrast). Harsh full-black borders look cheap.
-- Prefer soft, layered shadows over hard drop shadows. A believable shadow is large, soft, and low-opacity (`shadow-lg` tuned down, or a custom multi-layer shadow), not `0 2px 4px black`.
+When writing the code, be careful of structuring your CSS selector specificities. It's easy to generate CSS classes that cancel each other out (especially with a type-based selector like .section and a element-based selector like .cta). This can happen often with paddings/margins between sections.
 
-### 4. Typography Details Matter
+Try to do a lot of this planning and iteration in your thinking, and only show ideas to the user when you have higher confidence it'll delight them.
 
-- Set tracking on large headings (`tracking-tight` on display sizes reads more refined).
-- Comfortable line-height on body (`leading-relaxed` / `leading-7`).
-- Don't leave orphans and awkward wraps in headlines — use `text-balance` on headings and `text-pretty` on paragraphs.
-- If the project only uses one system font, consider a proper display/body pairing via `next/font` — but only if it fits the brand. Font choice is high-leverage.
+## Restraint and self-critique
 
-### 5. Depth, Motion, and Detail
+Spend your boldness in one place. Let the signature element be the one memorable thing, keep everything around it quiet and disciplined, and cut any decoration that does not serve the brief. Not taking a risk can be a risk itself! Build to a quality floor without announcing it: responsive down to mobile, visible keyboard focus, reduced motion respected. Critique your own work as you build, taking screenshots if your environment supports it – a picture is worth 1000 tokens. Consider Chanel's advice: before leaving the house, take a look in the mirror and remove one accessory. Human creators have memory and always try to do something new, so if you have a space to quickly jot down notes about what you've tried, it can help you in future passes.
 
-These are the finishing touches that signal "someone cared":
+## More on writing in design
 
-- **Micro-interactions:** hover/focus states on every interactive element — subtle scale, color, or shadow transitions (`transition-colors`, `transition-transform`, 150–250ms, ease-out). Never leave a button with no hover feedback.
-- **Focus-visible states** for keyboard users — a visible ring. This is both a polish and an accessibility win.
-- **Rounded corners consistently** — pick a radius from the token system and apply it uniformly. Mixed radii look accidental.
-- **Gradients and texture, used tastefully** — a subtle background gradient, a soft radial glow behind a hero, a faint grid/noise. Restraint is key; one tasteful accent beats five.
-- **Consistent iconography** — one icon set, consistent stroke width and size. Mismatched icons are an instant tell.
+Words appear in a design for one reason: to make it easier to understand, and therefore easier to use. They are design material, not decoration. Bring the same intentionality to copy that you would bring to spacing and color. Before writing anything, ask what the design needs to say, and how it can best be said to help the person navigate the experience.
 
-### 6. Responsive Is Not Optional
+Write from the end user's side of the screen. Name things by what people control and recognize, never by how the system is built. A person manages notifications, not webhook config. Describe what something does in plain terms rather than selling it. Being specific is always better than being clever.
 
-A design that only looks good at 1440px is half-finished. Check that hierarchy, spacing, and readability hold at 768px and 390px. Stack columns gracefully, scale type down, keep tap targets ≥44px.
+Use active voice as default. A control should say exactly what happens when it's used: "Save changes," not "Submit." An action keeps the same name through the whole flow, so the button that says "Publish" produces a toast that says "Published." The vocabulary of an interface is the signposting for someone navigating the product. Cohesion and consistency are how people learn their way around.
 
-## Method
+Treat failure and emptiness as moments for direction, not mood. Explain what went wrong and how to fix it, in the interface's voice rather than a person's. Errors don't apologize, and they are never vague about what happened. An empty screen is an invitation to act.
 
-Work in tight, observable loops — change, look, adjust. Don't do a giant blind refactor.
-
-1. **Audit against the principles.** Go through the target surface and list the specific problems: flat hierarchy here, cramped spacing there, no hover states, harsh borders, inconsistent radii, weak type scale. Be concrete — cite the component and the issue.
-
-2. **Fix tokens first, then components.** If the whole app suffers from the same issue (radius, shadow, muted color, section rhythm), fix it at the token level in `globals.css` so every component benefits. Then handle component-specific refinements.
-
-3. **Go section by section** for the target page. For each: hierarchy → spacing → color → type → detail/motion → responsive. Don't move on until the section reads clean at all three viewports.
-
-4. **Verify continuously.** Keep `npx tsc --noEmit` green as you go. Run `npm run build` before finishing.
-
-5. **After screenshots + diff.** Capture the same viewports as the baseline and compare before/after. Every change should be a visible improvement — if a change didn't clearly help, revert it.
-
-## What NOT to Do
-
-- **Don't change content or copy** unless the user asked — you're a designer here, not a copywriter. (Trimming an obviously placeholder "Lorem ipsum" is fine.)
-- **Don't introduce arbitrary values** (`p-[17px]`, `#3a3a3a`) when a token or scale step exists. One-off values are how a design system rots.
-- **Don't pile on effects.** Five gradients, three shadows, and a glow on everything is worse than a clean, restrained surface. When in doubt, remove.
-- **Don't break responsive** to make desktop prettier. Check mobile after every meaningful change.
-- **Don't ship without hover/focus states.** A button with no interactive feedback is the most common "unfinished" tell.
-- **Don't fight the brand.** If `customize-clone` set brand colors/fonts, design within them — don't swap the palette on a whim.
-- **Don't leave the build broken.** Every step must keep `npx tsc --noEmit` and `npm run build` passing.
-
-## Completion
-
-When done, report:
-- Which surface(s) you refined
-- Token-level changes made in `globals.css` (and why)
-- The main hierarchy/spacing/detail fixes per section
-- Before/after screenshot paths at each viewport
-- Build status (`npm run build`)
-- Anything you deliberately left alone and why
+Keep the register conversational and tuned: plain verbs, sentence case, no filler, with tone matched to the brand and the audience. Let each element do exactly one job. A label labels, an example demonstrates, and nothing quietly does double duty.
