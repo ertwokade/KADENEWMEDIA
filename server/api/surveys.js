@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import nodemailer from 'nodemailer';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requirePermission } from './_lib/auth.js';
+import { rateLimitCheck } from './_lib/rateLimit.js';
 import { cors } from './_lib/cors.js';
 
 function makeTransporter() {
@@ -36,6 +37,8 @@ export default async function handler(req, res) {
 
   // Public: Submit survey response (no auth required — token-based access)
   if (req.method === 'POST' && req.query.action === 'submit') {
+    const rl = await rateLimitCheck(req, { namespace: 'survey-submit', windowMs: 60 * 60 * 1000, maxRequests: 30 });
+    if (!rl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${rl.retryAfter} dakika sonra tekrar deneyin.` });
     const { token, score, comment } = req.body;
     if (!token || score === undefined) {
       return res.status(400).json({ error: 'Token ve puan zorunludur' });
