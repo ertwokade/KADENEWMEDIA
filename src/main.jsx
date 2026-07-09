@@ -10,10 +10,14 @@ import './index.css'
 
 reportWebVitals()
 
+// Service worker'ı tamamen kaldır — eski cache staleness sorununu kökten bitir.
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {})
-  })
+  navigator.serviceWorker.getRegistrations()
+    .then((regs) => regs.forEach((r) => r.unregister()))
+    .catch(() => {})
+  if (window.caches?.keys) {
+    caches.keys().then((keys) => keys.forEach((k) => caches.delete(k))).catch(() => {})
+  }
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
