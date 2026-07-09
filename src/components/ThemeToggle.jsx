@@ -15,7 +15,7 @@ export default function ThemeToggle({ className = '' }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-    try { localStorage.setItem(STORAGE_KEY, theme) } catch {}
+    try { localStorage.setItem(STORAGE_KEY, theme) } catch { /* ignore unavailable storage */ }
   }, [theme])
 
   const toggle = () => {

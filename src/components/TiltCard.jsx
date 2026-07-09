@@ -32,6 +32,7 @@ export default function TiltCard({
     el.style.setProperty('--tilt-ry', '0deg')
   }, [])
 
+  void Tag
   return (
     <Tag
       ref={ref}

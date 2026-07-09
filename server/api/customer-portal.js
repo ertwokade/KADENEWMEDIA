@@ -1,21 +1,24 @@
 import { getDb } from './_lib/mongodb.js'
 import { cors } from './_lib/cors.js'
-import { getCustomerSession } from './customer-auth.js'
-import { ObjectId } from 'mongodb'
+import { getActiveCustomerSession } from './customer-auth.js'
 import { buildEntitlementsFromPackages, buildPackageObject, getPackageByReference, isPackageCurrentlyActive } from './_lib/packages.js'
+
+function isProductionRuntime() {
+  return process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production'
+}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return
 
-  const session = getCustomerSession(req)
-  if (!session) return res.status(401).json({ error: 'Giriş yapmanız gerekiyor' })
+  const active = await getActiveCustomerSession(req)
+  if (!active) return res.status(401).json({ error: 'Giriş yapmanız gerekiyor' })
 
   if (req.method === 'GET') {
-    return handleGetProfile(req, res, session)
+    return handleGetProfile(req, res, active.customer)
   }
 
   if (req.method === 'POST' && req.query?.action === 'claim-free-package') {
-    return handleClaimFreePackage(req, res, session)
+    return handleClaimFreePackage(req, res, active.customer)
   }
 
   return res.status(405).json({ error: 'Method not allowed' })
@@ -27,16 +30,8 @@ function parseBody(req) {
   return body || {}
 }
 
-async function handleGetProfile(req, res, session) {
+async function handleGetProfile(req, res, customer) {
   try {
-    const db = await getDb()
-    const customer = await db.collection('customers').findOne(
-      { _id: new ObjectId(session.id) },
-      { projection: { password: 0 } }
-    )
-
-    if (!customer) return res.status(404).json({ error: 'Müşteri bulunamadı' })
-
     const packages = customer.packages || []
     const activePackages = packages.filter(p => p.status === 'active')
 
@@ -73,7 +68,11 @@ async function handleGetProfile(req, res, session) {
   }
 }
 
-async function handleClaimFreePackage(req, res, session) {
+async function handleClaimFreePackage(req, res, customer) {
+  if (isProductionRuntime()) {
+    return res.status(403).json({ error: 'Ücretsiz test paketleri production ortamında kapalı' })
+  }
+
   const { reference } = parseBody(req)
   const def = getPackageByReference(reference)
 
@@ -83,13 +82,6 @@ async function handleClaimFreePackage(req, res, session) {
 
   try {
     const db = await getDb()
-    const customer = await db.collection('customers').findOne(
-      { _id: new ObjectId(session.id) },
-      { projection: { password: 0 } }
-    )
-
-    if (!customer) return res.status(404).json({ error: 'Müşteri bulunamadı' })
-
     const packages = customer.packages || []
     const existing = packages.find(pkg => pkg.reference === reference && isPackageCurrentlyActive(pkg))
 
@@ -105,7 +97,7 @@ async function handleClaimFreePackage(req, res, session) {
 
     const pkg = buildPackageObject(reference, { source: 'free-test' })
     await db.collection('customers').updateOne(
-      { _id: new ObjectId(session.id) },
+      { _id: customer._id },
       { $push: { packages: pkg }, $set: { updatedAt: new Date() } }
     )
 

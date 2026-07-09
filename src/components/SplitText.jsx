@@ -36,6 +36,7 @@ export default function SplitText({
     ? text.split(/(\s+)/)
     : [...text]
 
+  void Tag
   return (
     <Tag ref={ref} className={`split-text ${className}`} aria-label={text}>
       {units.map((u, i) => {

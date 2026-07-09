@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { getDb, isValidObjectId } from './_lib/mongodb.js'
-import { requireAuth } from './_lib/auth.js'
+import { requirePermission } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
 import { rateLimitCheck } from './_lib/rateLimit.js'
 
@@ -14,13 +14,8 @@ function escapeRegex(value) {
   return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-function requireAdmin(req, res) {
-  const user = requireAuth(req)
-  if (!user) {
-    res.status(401).json({ error: 'Yetkisiz erişim' })
-    return null
-  }
-  return user
+async function requireAdmin(req, res, permission = 'crm', options = {}) {
+  return requirePermission(req, res, permission, options)
 }
 
 async function handleQuotes(req, res, db) {
@@ -77,7 +72,7 @@ async function handleQuotes(req, res, db) {
     return res.status(201).json({ success: true, quote })
   }
 
-  const user = requireAdmin(req, res)
+  const user = await requireAdmin(req, res, 'quoteLeads', { write: req.method !== 'GET' })
   if (!user) return
 
   if (req.method === 'GET') {
@@ -107,7 +102,7 @@ async function handleQuotes(req, res, db) {
 }
 
 async function handleInvoices(req, res, db) {
-  const user = requireAdmin(req, res)
+  const user = await requireAdmin(req, res, 'invoices', { write: req.method !== 'GET' })
   if (!user) return
 
   const col = db.collection('invoices')
@@ -171,7 +166,7 @@ async function handleInvoices(req, res, db) {
 }
 
 async function handleCustomerProfiles(req, res, db) {
-  const user = requireAdmin(req, res)
+  const user = await requireAdmin(req, res, 'customerProfiles')
   if (!user) return
 
   const [messages, quotes, proposals, subscriptions, invoices] = await Promise.all([
@@ -229,7 +224,7 @@ async function handleCustomerProfiles(req, res, db) {
 }
 
 async function handleBackup(req, res, db) {
-  const user = requireAdmin(req, res)
+  const user = await requireAdmin(req, res, 'backup', { write: req.method !== 'GET' })
   if (!user) return
 
   const collections = ['messages', 'quotes', 'proposals', 'tasks', 'subscriptions', 'surveys', 'invoices', 'referrals', 'blogs', 'partners', 'content']
@@ -271,14 +266,14 @@ async function handleClientErrors(req, res, db) {
     return res.status(204).end()
   }
 
-  const user = requireAdmin(req, res)
+  const user = await requireAdmin(req, res, 'settings')
   if (!user) return
   const errors = await db.collection('client_errors').find({}).sort({ createdAt: -1 }).limit(100).toArray()
   return res.status(200).json(errors)
 }
 
 async function handleEmailTemplates(req, res, db) {
-  const user = requireAdmin(req, res)
+  const user = await requireAdmin(req, res, 'emailTemplates', { write: req.method !== 'GET' })
   if (!user) return
   const col = db.collection('email_templates')
 
@@ -323,7 +318,7 @@ async function handleEmailTemplates(req, res, db) {
 }
 
 async function handleOnboarding(req, res, db) {
-  const user = requireAdmin(req, res)
+  const user = await requireAdmin(req, res, 'onboarding', { write: req.method !== 'GET' })
   if (!user) return
   const col = db.collection('onboarding_forms')
 
@@ -361,7 +356,7 @@ async function handleOnboarding(req, res, db) {
 
 async function handlePush(req, res, db) {
   if (req.method !== 'POST') {
-    const user = requireAdmin(req, res)
+    const user = await requireAdmin(req, res, 'settings')
     if (!user) return
     const items = await db.collection('push_subscriptions').find({}).sort({ createdAt: -1 }).limit(200).toArray()
     return res.status(200).json(items)

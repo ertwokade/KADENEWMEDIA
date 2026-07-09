@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
 
@@ -23,8 +23,8 @@ export default async function handler(req, res) {
 
   // POST - Create partner (requires auth)
   if (req.method === 'POST') {
-    const user = requireAuth(req);
-    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    const user = await requirePermission(req, res, 'partners', { write: true });
+    if (!user) return;
 
     try {
       const {
@@ -58,8 +58,8 @@ export default async function handler(req, res) {
 
   // PUT - Update partner (requires auth)
   if (req.method === 'PUT') {
-    const user = requireAuth(req);
-    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    const user = await requirePermission(req, res, 'partners', { write: true });
+    if (!user) return;
 
     try {
       const { _id, ...updateData } = req.body;
@@ -80,8 +80,8 @@ export default async function handler(req, res) {
 
   // DELETE - Delete partner (requires auth)
   if (req.method === 'DELETE') {
-    const user = requireAuth(req);
-    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    const user = await requirePermission(req, res, 'partners', { write: true });
+    if (!user) return;
 
     try {
       const queryId = req.body?.id || req.query.id;

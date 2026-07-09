@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import nodemailer from 'nodemailer';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
 // Route: /api/crm?resource=proposals|tasks
@@ -184,11 +184,11 @@ async function handleTasks(req, res, db, user) {
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const user = requireAuth(req);
-  if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
-
   const db = await getDb();
   const { resource } = req.query;
+  const permission = resource === 'tasks' ? 'tasks' : resource === 'proposals' ? 'proposals' : 'crm';
+  const user = await requirePermission(req, res, permission, { write: req.method !== 'GET' });
+  if (!user) return;
 
   if (resource === 'proposals') return handleProposals(req, res, db, user);
   if (resource === 'tasks') return handleTasks(req, res, db, user);

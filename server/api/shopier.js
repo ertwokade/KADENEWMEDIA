@@ -4,19 +4,24 @@ import { getDb } from './_lib/mongodb.js'
 import { cors } from './_lib/cors.js'
 import { buildPackageObject } from './_lib/packages.js'
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 // Shopier webhook doğrulama
 // İmza = base64(hmac-sha256(random_nr + status + buyer_email + product_price, API_SECRET))
 // API_SECRET = Shopier paneli → Mağaza Ayarları → API → "API Şifresi" (kısa değer)
-// Ayarlanmamışsa veya JWT formatındaysa imza atlanır
+// Production'da secret eksik/geçersizse webhook işlenmez.
 function isJwt(s) { return typeof s === 'string' && s.startsWith('eyJ') }
+
+function isProductionRuntime() {
+  return process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production'
+}
 
 function verifyShopierSignature(body, apiSecret) {
   if (!apiSecret || isJwt(apiSecret)) {
-    console.log('ℹ️  Shopier: SHOPIER_API_SECRET ayarlı değil veya JWT — imza doğrulama atlandı')
-    return true
+    return false
   }
   const { random_nr, status, buyer_email, product_price, signature } = body
-  if (!signature) return false
+  if (!random_nr || !status || !buyer_email || !product_price || !signature) return false
   const data = String(random_nr || '') + String(status || '') + String(buyer_email || '') + String(product_price || '')
   const expected = crypto.createHmac('sha256', apiSecret).update(data).digest('base64')
   try {
@@ -51,12 +56,15 @@ export default async function handler(req, res) {
   const body = parseBody(req)
   const apiSecret = process.env.SHOPIER_API_SECRET
 
-  // İmza kontrolü (sadece production'da zorunlu)
-  if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
-    if (!verifyShopierSignature(body, apiSecret)) {
-      console.warn('Shopier webhook: geçersiz imza', { body })
+  // İmza kontrolü production'da zorunlu; development'ta secret varsa yine doğrulanır.
+  const hasUsableSecret = Boolean(apiSecret && !isJwt(apiSecret))
+  if (isProductionRuntime() || hasUsableSecret) {
+    if (!hasUsableSecret || !verifyShopierSignature(body, apiSecret)) {
+      console.warn('Shopier webhook: geçersiz veya eksik imza')
       return res.status(403).json({ error: 'Geçersiz imza' })
     }
+  } else {
+    console.warn('Shopier webhook: development ortamında imza doğrulama atlandı')
   }
 
   const { buyer_email, buyer_name, product_reference, product_price, status: paymentStatus, platform_order_id } = body
@@ -72,14 +80,26 @@ export default async function handler(req, res) {
   }
 
   const email = buyer_email.toLowerCase().trim()
+  if (!EMAIL_RE.test(email)) {
+    return res.status(400).json({ error: 'buyer_email geçersiz' })
+  }
 
   try {
     const db = await getDb()
+    await db.collection('shopier_orders').createIndex({ shopierOrderId: 1 }, { unique: true, sparse: true }).catch(() => {})
+
+    const orderId = platform_order_id ? String(platform_order_id).trim().slice(0, 120) : null
+    if (orderId) {
+      const existingOrder = await db.collection('shopier_orders').findOne({ shopierOrderId: orderId })
+      if (existingOrder) {
+        return res.status(200).json({ success: true, duplicate: true })
+      }
+    }
 
     // Paket nesnesini oluştur
     const pkg = buildPackageObject(product_reference, {
       source: 'shopier',
-      shopierOrderId: platform_order_id || null,
+      shopierOrderId: orderId,
       price: product_price ? parseFloat(product_price) : null,
     })
 
@@ -88,12 +108,11 @@ export default async function handler(req, res) {
       console.warn(`Shopier webhook: bilinmeyen product_reference: ${product_reference}`)
       await db.collection('shopier_unknown_orders').insertOne({
         buyer_email: email,
-        buyer_name,
-        product_reference,
-        product_price,
-        platform_order_id,
+        buyer_name: String(buyer_name || '').slice(0, 200),
+        product_reference: String(product_reference || '').slice(0, 120),
+        product_price: String(product_price || '').slice(0, 40),
+        platform_order_id: orderId,
         receivedAt: new Date(),
-        rawBody: body,
       })
       return res.status(200).json({ success: true, note: 'unknown_reference' })
     }
@@ -136,12 +155,15 @@ export default async function handler(req, res) {
       packageName: pkg.name,
       productReference: product_reference,
       price: pkg.price,
-      shopierOrderId: platform_order_id,
+      shopierOrderId: orderId,
       receivedAt: new Date(),
     })
 
     return res.status(200).json({ success: true })
   } catch (err) {
+    if (err?.code === 11000) {
+      return res.status(200).json({ success: true, duplicate: true })
+    }
     console.error('Shopier webhook error:', err.message)
     return res.status(500).json({ error: 'Sunucu hatası' })
   }

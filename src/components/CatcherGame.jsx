@@ -19,7 +19,7 @@ export default function CatcherGame() {
   const [lives, setLives] = useState(3)
 
   useEffect(() => {
-    try { localStorage.setItem('kade_404_best', String(best)) } catch {}
+    try { localStorage.setItem('kade_404_best', String(best)) } catch { /* ignore unavailable storage */ }
   }, [best])
 
   const start = () => {

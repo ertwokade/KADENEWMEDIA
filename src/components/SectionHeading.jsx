@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { createElement, useEffect, useRef } from 'react'
 import './SectionHeading.css'
 
 export default function SectionHeading({
@@ -41,7 +41,7 @@ export default function SectionHeading({
           {eyebrow}
         </span>
       )}
-      <Tag className="section-heading__title">{children}</Tag>
+      {createElement(Tag, { className: 'section-heading__title' }, children)}
     </div>
   )
 }

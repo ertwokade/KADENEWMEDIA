@@ -426,7 +426,7 @@ export async function sendCalendarInviteApi(data) {
 export async function seedApi(secret) {
   const res = await fetch(`${API_BASE}/seed`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ secret }),
   });
   return handleResponse(res);

@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import nodemailer from 'nodemailer';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
 function makeTransporter() {
@@ -22,6 +22,10 @@ function makeTransporter() {
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function cleanHeader(str, max = 200) {
+  return String(str || '').replace(/[\r\n]+/g, ' ').trim().slice(0, max);
 }
 
 export default async function handler(req, res) {
@@ -69,7 +73,7 @@ export default async function handler(req, res) {
           await transporter.sendMail({
             from: `"Kade Media" <${process.env.SMTP_USER}>`,
             to: process.env.MAIL_TO,
-            subject: `⚠️ Düşük NPS Puanı: ${npsScore}/10 — ${escapeHtml(survey.clientName)}`,
+            subject: cleanHeader(`⚠️ Düşük NPS Puanı: ${npsScore}/10 — ${survey.clientName}`),
             html: `<p>Müşteri <strong>${escapeHtml(survey.clientName)}</strong> NPS anketi için <strong>${npsScore}/10</strong> verdi.</p><p>Kategori: ${category}</p>${comment ? `<p>Yorum: ${escapeHtml(comment)}</p>` : ''}`,
           });
         } catch (e) {
@@ -82,8 +86,8 @@ export default async function handler(req, res) {
   }
 
   // Auth required for all other actions
-  const user = requireAuth(req);
-  if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+  const user = await requirePermission(req, res, 'surveys', { write: req.method !== 'GET' });
+  if (!user) return;
 
   // GET — list surveys with results
   if (req.method === 'GET') {
@@ -167,7 +171,7 @@ export default async function handler(req, res) {
         await transporter.sendMail({
           from: `"Kade Media" <${process.env.SMTP_USER}>`,
           to: clientEmail,
-          subject: `Hizmet Değerlendirme — Kade Media`,
+          subject: cleanHeader('Hizmet Değerlendirme — Kade Media'),
           html,
         });
       } catch (e) {

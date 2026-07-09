@@ -30,6 +30,7 @@ export default function MagneticButton({
     if (inner) inner.style.transform = ''
   }, [])
 
+  void Tag
   return (
     <Tag
       ref={ref}

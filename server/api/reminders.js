@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requireAuth, requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity, createNotification } from './_lib/notify.js';
 
@@ -24,6 +24,18 @@ function makeTransporter() {
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function escapeICS(str) {
+  return String(str || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/\r?\n/g, '\\n')
+    .replace(/,/g, '\\,')
+    .replace(/;/g, '\\;');
+}
+
+function cleanHeader(str, max = 200) {
+  return String(str || '').replace(/[\r\n]+/g, ' ').trim().slice(0, max);
 }
 
 function getEmails(reminder) {
@@ -81,6 +93,7 @@ export default async function handler(req, res) {
       userAgent.startsWith('vercel-cron/');
     const isSignedVercelRequest = verifyVercelSignature(req);
     if (!user && !isCronSecret && !isSignedVercelRequest) return res.status(401).json({ error: 'Unauthorized' });
+    if (user && !isCronSecret && !isSignedVercelRequest && !(await requirePermission(req, res, 'reminders', { write: true }))) return;
 
     try {
       const now = new Date();
@@ -110,7 +123,7 @@ export default async function handler(req, res) {
             await transporter.sendMail({
               from: `"Kade Media Hatırlatıcı" <${process.env.SMTP_USER}>`,
               to: emails.join(', '),
-              subject: `⏰ Hatırlatıcı: ${reminder.title}`,
+              subject: cleanHeader(`⏰ Hatırlatıcı: ${reminder.title}`),
               html: `
                 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#fff;border-radius:12px;">
                   <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
@@ -196,8 +209,8 @@ export default async function handler(req, res) {
   }
 
   // Diğer endpointler için auth zorunlu
-  const user = requireAuth(req);
-  if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+  const user = await requirePermission(req, res, 'reminders', { write: req.method !== 'GET' });
+  if (!user) return;
 
   // ── GET — Tüm hatırlatıcıları getir ──
   if (req.method === 'GET') {
@@ -208,7 +221,7 @@ export default async function handler(req, res) {
   }
 
   // ── POST — Yeni hatırlatıcı oluştur ──
-  if (req.method === 'POST') {
+  if (req.method === 'POST' && action !== 'send-invite') {
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
 
@@ -293,7 +306,7 @@ export default async function handler(req, res) {
       const endM = String(endTotal % 60).padStart(2, '0');
       const startFmt = `${year}${month}${day}T${hours.padStart(2, '0')}${minutes.padStart(2, '0')}00`;
       const endFmt = `${year}${month}${day}T${endH}${endM}00`;
-      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Kade Media//Calendar//TR','CALSCALE:GREGORIAN','METHOD:REQUEST','BEGIN:VTIMEZONE','TZID:Europe/Istanbul','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:+0300','TZOFFSETTO:+0300','END:STANDARD','END:VTIMEZONE','BEGIN:VEVENT',`DTSTART;TZID=Europe/Istanbul:${startFmt}`,`DTEND;TZID=Europe/Istanbul:${endFmt}`,`SUMMARY:${title}`,`DESCRIPTION:${(description || '').replace(/\n/g, '\\n')}`,'ORGANIZER;CN=Kade Media:mailto:hello@kademedia.com',`UID:${Date.now()}@kademedia.com`,'STATUS:CONFIRMED','END:VEVENT','END:VCALENDAR'].join('\r\n');
+      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Kade Media//Calendar//TR','CALSCALE:GREGORIAN','METHOD:REQUEST','BEGIN:VTIMEZONE','TZID:Europe/Istanbul','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:+0300','TZOFFSETTO:+0300','END:STANDARD','END:VTIMEZONE','BEGIN:VEVENT',`DTSTART;TZID=Europe/Istanbul:${startFmt}`,`DTEND;TZID=Europe/Istanbul:${endFmt}`,`SUMMARY:${escapeICS(title)}`,`DESCRIPTION:${escapeICS(description)}`,'ORGANIZER;CN=Kade Media:mailto:hello@kademedia.com',`UID:${Date.now()}@kademedia.com`,'STATUS:CONFIRMED','END:VEVENT','END:VCALENDAR'].join('\r\n');
     }
 
     const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -317,7 +330,7 @@ export default async function handler(req, res) {
 
     let sent = 0; let failed = 0;
     for (const email of emails) {
-      try { await transporter2.sendMail({ from: `"Kade Media Takvim" <${smtpUser}>`, to: email, subject: `📅 ${event.title} — ${event.date}`, html: emailBody, icalEvent: { method: 'REQUEST', content: icsContent } }); sent++; }
+	      try { await transporter2.sendMail({ from: `"Kade Media Takvim" <${smtpUser}>`, to: email, subject: cleanHeader(`📅 ${event.title} — ${event.date}`), html: emailBody, icalEvent: { method: 'REQUEST', content: icsContent } }); sent++; }
       catch (err) { console.error(`Davet hatası ${email}:`, err.message); failed++; }
     }
     return res.status(200).json({ message: `${sent} kişiye davet gönderildi${failed > 0 ? `, ${failed} başarısız` : ''}`, sent, failed });

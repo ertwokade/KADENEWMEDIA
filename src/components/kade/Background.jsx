@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { useRef, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 
 // Warm yellow caustics / light-streak backdrop (the glass refracts this).
@@ -34,9 +34,11 @@ export default function Background({ dark = false }) {
     uStreak: { value: new THREE.Color('#fffaf0') },
   }), [])
   useFrame((s) => {
+    /* eslint-disable react-hooks/immutability */
     uniforms.uTime.value = s.clock.elapsedTime
     if (dark) { uniforms.uColorA.value.set('#241a06'); uniforms.uColorB.value.set('#12100a'); uniforms.uStreak.value.set('#8a6a1e') }
     else { uniforms.uColorA.value.set('#ffd766'); uniforms.uColorB.value.set('#fff2cc'); uniforms.uStreak.value.set('#fffaf0') }
+    /* eslint-enable react-hooks/immutability */
   })
   return (
     <mesh position={[0, 0, -6]} scale={[viewport.width * 2.2, viewport.height * 2.2, 1]}>

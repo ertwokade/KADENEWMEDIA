@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { getDb } from './_lib/mongodb.js';
+import { getDefaultPermissions, requireAdmin } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 
@@ -384,6 +385,8 @@ export default async function handler(req, res) {
 
   try {
     const db = await getDb();
+    const userCount = await db.collection('users').countDocuments();
+    if (userCount > 0 && !(await requireAdmin(req, res))) return;
 
     // Ensure unique index on username to prevent duplicates
     await db.collection('users').createIndex({ username: 1 }, { unique: true }).catch(() => {});
@@ -393,15 +396,16 @@ export default async function handler(req, res) {
     if (!existingAdmin) {
       const hashedPassword = await bcrypt.hash(adminPassword, 10);
       await db.collection('users').insertOne({
-        username: 'kade',
-        password: hashedPassword,
-        role: 'admin',
-        createdAt: new Date(),
-      });
+          username: 'kade',
+          password: hashedPassword,
+          role: 'admin',
+          permissions: getDefaultPermissions('admin'),
+          createdAt: new Date(),
+        });
     }
 
     // Count existing users (for reporting only - seed never deletes users)
-    const userCount = await db.collection('users').countDocuments();
+    const finalUserCount = await db.collection('users').countDocuments();
 
     // Seed partners
     const partnerCount = await db.collection('partners').countDocuments();
@@ -451,7 +455,7 @@ export default async function handler(req, res) {
       message: 'Veritabanı başarıyla oluşturuldu!',
       seeded: {
         admin: !existingAdmin ? 'Oluşturuldu' : 'Zaten mevcut',
-        users: `${userCount} kullanıcı korunuyor`,
+        users: `${finalUserCount} kullanıcı korunuyor`,
         partners: partnerCount === 0 ? `${defaultPartners.length} partner eklendi` : 'Zaten mevcut',
         blogs: blogCount === 0 ? `${defaultBlogs.length} blog eklendi` : 'Zaten mevcut',
         content: contentCount === 0 ? `${defaultContent.length} içerik eklendi` : 'Zaten mevcut',

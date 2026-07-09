@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import './BentoGrid.css'
 
 export function BentoGrid({ children, className = '' }) {
@@ -12,13 +13,13 @@ export function BentoCell({
   className = '',
   ...rest
 }) {
-  return (
-    <Tag
-      className={`bento-cell bento-cell--${span} ${accent ? 'bento-cell--accent' : ''} ${className}`}
-      {...rest}
-    >
-      {children}
-    </Tag>
+  return createElement(
+    Tag,
+    {
+      className: `bento-cell bento-cell--${span} ${accent ? 'bento-cell--accent' : ''} ${className}`,
+      ...rest,
+    },
+    children
   )
 }
 

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 export function useViewTransition() {
   const navigate = useNavigate()
 
-  return useCallback((to, name) => {
+  return useCallback((to) => {
     if (typeof document !== 'undefined' && document.startViewTransition) {
       document.startViewTransition(() => {
         navigate(to)

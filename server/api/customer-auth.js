@@ -1,11 +1,12 @@
 import bcrypt from 'bcryptjs'
-import { getDb } from './_lib/mongodb.js'
+import { ObjectId } from 'mongodb'
+import { getDb, isValidObjectId } from './_lib/mongodb.js'
 import { createToken, verifyToken, createCsrfToken, getCookie } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
 import { rateLimitCheck } from './_lib/rateLimit.js'
 
 const CUSTOMER_COOKIE = 'kade_customer_session'
-const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 gün
+const SESSION_MAX_AGE = 8 * 60 * 60
 
 function shouldUseSecureCookie(req) {
   const proto = String(req.headers?.['x-forwarded-proto'] || '').split(',')[0].trim()
@@ -48,6 +49,28 @@ export function getCustomerSession(req) {
   return payload
 }
 
+export async function getActiveCustomerSession(req) {
+  const session = getCustomerSession(req)
+  if (!session || !isValidObjectId(session.id)) return null
+
+  const db = await getDb()
+  const customer = await db.collection('customers').findOne(
+    { _id: new ObjectId(session.id), status: { $ne: 'inactive' } },
+    { projection: { password: 0 } }
+  )
+  if (!customer) return null
+
+  return {
+    session: {
+      ...session,
+      id: customer._id.toString(),
+      name: customer.name,
+      email: customer.email,
+    },
+    customer,
+  }
+}
+
 function parseBody(req) {
   let body = req.body
   if (typeof body === 'string') { try { body = JSON.parse(body) } catch { body = {} } }
@@ -60,9 +83,9 @@ export default async function handler(req, res) {
   const action = req.query?.action || 'login'
 
   if (req.method === 'GET' && action === 'session') {
-    const session = getCustomerSession(req)
-    if (!session) return res.status(401).json({ authenticated: false })
-    return res.status(200).json({ authenticated: true, customer: { id: session.id, name: session.name, email: session.email } })
+    const active = await getActiveCustomerSession(req)
+    if (!active) return res.status(401).json({ authenticated: false })
+    return res.status(200).json({ authenticated: true, customer: { id: active.session.id, name: active.session.name, email: active.session.email } })
   }
 
   if (req.method === 'POST' && action === 'logout') {
@@ -103,12 +126,13 @@ async function handleRegister(req, res) {
     return res.status(400).json({ error: 'Geçerli bir e-posta adresi girin' })
   }
 
-  if (typeof password !== 'string' || password.length < 8) {
-    return res.status(400).json({ error: 'Şifre en az 8 karakter olmalı' })
+  if (typeof password !== 'string' || password.length < 12) {
+    return res.status(400).json({ error: 'Şifre en az 12 karakter olmalı' })
   }
 
   try {
     const db = await getDb()
+    await db.collection('customers').createIndex({ email: 1 }, { unique: true }).catch(() => {})
     const existing = await db.collection('customers').findOne({ email: email.toLowerCase().trim() })
     if (existing) {
       return res.status(409).json({ error: 'Bu e-posta adresi zaten kayıtlı' })
@@ -142,6 +166,9 @@ async function handleRegister(req, res) {
       customer: { id: result.insertedId.toString(), name: name.trim(), email: email.toLowerCase().trim() },
     })
   } catch (err) {
+    if (err?.code === 11000) {
+      return res.status(409).json({ error: 'Bu e-posta adresi zaten kayıtlı' })
+    }
     console.error('Customer register error:', err.message)
     return res.status(500).json({ error: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.' })
   }

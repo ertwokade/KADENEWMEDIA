@@ -1,5 +1,5 @@
 import { getDb } from './_lib/mongodb.js'
-import { requireAuth } from './_lib/auth.js'
+import { requirePermission } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
 import { ObjectId } from 'mongodb'
 import { buildEntitlementsFromPackages, buildPackageObject, PACKAGE_DEFINITIONS } from './_lib/packages.js'
@@ -7,10 +7,9 @@ import { buildEntitlementsFromPackages, buildPackageObject, PACKAGE_DEFINITIONS 
 export default async function handler(req, res) {
   if (cors(req, res)) return
 
-  const admin = requireAuth(req)
-  if (!admin) return res.status(401).json({ error: 'Yetkisiz erişim' })
-
   const action = req.query?.action || ''
+  const writeAction = req.method !== 'GET'
+  if (!(await requirePermission(req, res, ['portalCustomers', 'crm'], { write: writeAction }))) return
 
   if (req.method === 'GET' && !action) return handleList(req, res)
   if (req.method === 'GET' && action === 'packages') return handlePackageDefinitions(req, res)

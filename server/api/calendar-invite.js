@@ -1,12 +1,24 @@
 import nodemailer from 'nodemailer';
 import { ObjectId } from 'mongodb';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function escapeICS(str) {
+  return String(str || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/\r?\n/g, '\\n')
+    .replace(/,/g, '\\,')
+    .replace(/;/g, '\\;');
+}
+
+function cleanHeader(str, max = 200) {
+  return String(str || '').replace(/[\r\n]+/g, ' ').trim().slice(0, max);
 }
 
 function generateICS({ title, description, date, time, duration = 60 }) {
@@ -39,8 +51,8 @@ function generateICS({ title, description, date, time, duration = 60 }) {
     'BEGIN:VEVENT',
     `DTSTART;TZID=Europe/Istanbul:${startFmt}`,
     `DTEND;TZID=Europe/Istanbul:${endFmt}`,
-    `SUMMARY:${title}`,
-    `DESCRIPTION:${(description || '').replace(/\n/g, '\\n')}`,
+    `SUMMARY:${escapeICS(title)}`,
+    `DESCRIPTION:${escapeICS(description)}`,
     'ORGANIZER;CN=Kade Media:mailto:hello@kademedia.com',
     `UID:${Date.now()}@kademedia.com.tr`,
     'STATUS:CONFIRMED',
@@ -56,10 +68,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const user = requireAuth(req);
-  if (!user) {
-    return res.status(401).json({ error: 'Yetkilendirme gerekli' });
-  }
+  const user = await requirePermission(req, res, 'calendar', { write: true });
+  if (!user) return;
 
   try {
     const { event, recipients, customEmails, message } = req.body;
@@ -162,7 +172,7 @@ export default async function handler(req, res) {
         await transporter.sendMail({
           from: `"Kade Media Takvim" <${smtpUser}>`,
           to: email,
-          subject: `📅 ${event.title} — ${event.date} ${event.time || ''}`,
+          subject: cleanHeader(`📅 ${event.title} — ${event.date} ${event.time || ''}`),
           html: emailBody,
           icalEvent: {
             method: 'REQUEST',

@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import nodemailer from 'nodemailer';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
 function makeTransporter() {
@@ -27,8 +27,8 @@ function escapeHtml(str) {
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const user = requireAuth(req);
-  if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+  const user = await requirePermission(req, res, 'proposals', { write: req.method !== 'GET' });
+  if (!user) return;
 
   const db = await getDb();
   const col = db.collection('proposals');

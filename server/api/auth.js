@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { getDb } from './_lib/mongodb.js';
-import { clearAuthCookies, createToken, requireAuth, setAuthCookies, setCsrfCookie } from './_lib/auth.js';
+import { clearAuthCookies, createToken, getAuthorizedUser, getDefaultPermissions, requireAuth, setAuthCookies, setCsrfCookie } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import { logActivity } from './notifications.js';
@@ -25,11 +25,11 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET' && action === 'session') {
-    const user = requireAuth(req);
+    const user = await getAuthorizedUser(req);
     if (!user) return res.status(401).json({ authenticated: false });
     return res.status(200).json({
       authenticated: true,
-      user: { username: user.username, role: user.role },
+      user: { username: user.username, role: user.role, permissions: user.permissions || getDefaultPermissions(user.role) },
     });
   }
 
@@ -89,6 +89,7 @@ async function handleLogin(req, res) {
         username: DEFAULT_ADMIN_USERNAME,
         password: hashedPassword,
         role: 'admin',
+        permissions: getDefaultPermissions('admin'),
         createdAt: new Date(),
       });
       console.log(`✅ Admin kullanıcısı oluşturuldu: ${DEFAULT_ADMIN_USERNAME}`);
@@ -141,6 +142,7 @@ async function handleLogin(req, res) {
       user: {
         username: user.username,
         role: user.role,
+        permissions: user.permissions || getDefaultPermissions(user.role),
       }
     });
   } catch (error) {

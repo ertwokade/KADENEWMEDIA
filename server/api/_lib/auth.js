@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { ObjectId } from 'mongodb';
+import { getDb, isValidObjectId } from './mongodb.js';
 
 export const AUTH_COOKIE_NAME = 'kade_admin_session';
 export const CSRF_COOKIE_NAME = 'kade_csrf';
@@ -129,4 +131,164 @@ export function requireAuth(req) {
     return null;
   }
   return verifyToken(token);
+}
+
+const DEFAULT_ROLE_PERMISSIONS = {
+  admin: {
+    dashboard: true,
+    analytics: true,
+    blog: true,
+    content: true,
+    partners: true,
+    portfolio: true,
+    messages: true,
+    calendar: true,
+    reminders: true,
+    users: true,
+    settings: true,
+    activity: true,
+    backup: true,
+    media: true,
+    crm: true,
+    proposals: true,
+    quoteLeads: true,
+    portalCustomers: true,
+    customerProfiles: true,
+    invoices: true,
+    tasks: true,
+    subscriptions: true,
+    surveys: true,
+    referrals: true,
+    onboarding: true,
+    report: true,
+    emailTemplates: true,
+    aiContent: true,
+  },
+  editor: {
+    dashboard: true,
+    analytics: true,
+    blog: true,
+    content: true,
+    partners: true,
+    portfolio: true,
+    messages: true,
+    calendar: true,
+    reminders: true,
+    users: false,
+    settings: false,
+    activity: true,
+    backup: false,
+    media: true,
+    crm: true,
+    proposals: true,
+    quoteLeads: true,
+    portalCustomers: true,
+    customerProfiles: true,
+    invoices: true,
+    tasks: true,
+    subscriptions: true,
+    surveys: true,
+    referrals: true,
+    onboarding: true,
+    report: true,
+    emailTemplates: true,
+    aiContent: true,
+  },
+  viewer: {
+    dashboard: true,
+    analytics: true,
+    blog: false,
+    content: false,
+    partners: false,
+    portfolio: false,
+    messages: true,
+    calendar: false,
+    reminders: false,
+    users: false,
+    settings: false,
+    activity: false,
+    backup: false,
+    media: false,
+    crm: false,
+    proposals: false,
+    quoteLeads: false,
+    portalCustomers: false,
+    customerProfiles: false,
+    invoices: false,
+    tasks: false,
+    subscriptions: false,
+    surveys: false,
+    referrals: false,
+    onboarding: false,
+    report: false,
+    emailTemplates: false,
+    aiContent: false,
+  },
+};
+
+export function getDefaultPermissions(role = 'viewer') {
+  return { ...(DEFAULT_ROLE_PERMISSIONS[role] || DEFAULT_ROLE_PERMISSIONS.viewer) };
+}
+
+function hasPermission(user, permission, { write = false } = {}) {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+  if (write && user.role === 'viewer') return false;
+
+  const permissions = Array.isArray(permission) ? permission : [permission];
+  const defaults = getDefaultPermissions(user.role);
+  return permissions.some((key) => {
+    if (!key) return false;
+    if (typeof user.permissions?.[key] === 'boolean') return user.permissions[key];
+    return defaults[key] === true;
+  });
+}
+
+export async function getAuthorizedUser(req) {
+  const sessionUser = requireAuth(req);
+  if (!sessionUser) return null;
+
+  const db = await getDb();
+  const identityFilters = [];
+  if (isValidObjectId(sessionUser.id)) identityFilters.push({ _id: new ObjectId(sessionUser.id) });
+  if (sessionUser.username) identityFilters.push({ username: sessionUser.username });
+  if (identityFilters.length === 0) return null;
+
+  const dbUser = await db.collection('users').findOne({ $or: identityFilters }, { projection: { password: 0 } });
+  if (!dbUser) return null;
+
+  return {
+    ...sessionUser,
+    ...dbUser,
+    id: dbUser._id.toString(),
+    username: dbUser.username || sessionUser.username,
+    role: dbUser.role || sessionUser.role || 'viewer',
+    permissions: dbUser.permissions || getDefaultPermissions(dbUser.role || sessionUser.role || 'viewer'),
+  };
+}
+
+export async function requirePermission(req, res, permission, options = {}) {
+  const user = await getAuthorizedUser(req);
+  if (!user) {
+    res.status(401).json({ error: 'Yetkisiz erişim' });
+    return null;
+  }
+  if (!hasPermission(user, permission, options)) {
+    res.status(403).json({ error: 'Bu işlem için yetkiniz yok' });
+    return null;
+  }
+  return user;
+}
+
+export async function requireAdmin(req, res) {
+  const user = await getAuthorizedUser(req);
+  if (!user) {
+    res.status(401).json({ error: 'Yetkisiz erişim' });
+    return null;
+  }
+  if (user.role !== 'admin') {
+    res.status(403).json({ error: 'Bu işlem için admin yetkisi gerekli' });
+    return null;
+  }
+  return user;
 }

@@ -7,7 +7,7 @@ import {
   HiOutlineArrowRight,
   HiOutlineSparkles,
 } from 'react-icons/hi'
-import { claimFreePackageApi, getContentApi } from '../api'
+import { claimFreePackageApi } from '../api'
 import { useCustomer } from '../contexts/CustomerContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import { analytics } from '../utils/analytics'
@@ -16,37 +16,6 @@ import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Packages.css'
-
-// Exchange rate cache
-const RATE_CACHE_KEY = 'kade_usd_try_rate'
-const RATE_CACHE_TTL = 60 * 60 * 1000 // 1 hour — fresh rates
-const FALLBACK_RATE = 38.5 // fallback TRY per USD
-
-async function fetchExchangeRate() {
-  try {
-    const cached = localStorage.getItem(RATE_CACHE_KEY)
-    if (cached) {
-      const { rate, ts } = JSON.parse(cached)
-      if (Date.now() - ts < RATE_CACHE_TTL && rate > 0) return rate
-    }
-    const res = await fetch('https://open.er-api.com/v6/latest/USD')
-    if (!res.ok) return FALLBACK_RATE
-    const data = await res.json()
-    const rate = data?.rates?.TRY
-    if (rate && rate > 0) {
-      localStorage.setItem(RATE_CACHE_KEY, JSON.stringify({ rate, ts: Date.now() }))
-      return rate
-    }
-  } catch { /* fallback */ }
-  return FALLBACK_RATE
-}
-
-function convertTRYtoUSD(tryAmount, rate) {
-  if (!rate || !tryAmount) return null
-  const num = parseFloat(String(tryAmount).replace(/\./g, '').replace(',', '.'))
-  if (isNaN(num)) return null
-  return Math.round(num / rate)
-}
 
 function CompCell({ val }) {
   if (val === true) return <span className="comp-yes">✓</span>
@@ -66,19 +35,8 @@ export default function Packages() {
   })
   const isEN = lang === 'en'
 
-  const [dynamicItems, setDynamicItems] = useState(null)
-  const [exchangeRate, setExchangeRate] = useState(FALLBACK_RATE)
   const [claimingReference, setClaimingReference] = useState('')
   const [claimMessage, setClaimMessage] = useState('')
-
-  useEffect(() => {
-    getContentApi('packages')
-      .then(res => {
-        if (res?.data?.items?.length) setDynamicItems(res.data.items)
-      })
-      .catch(() => {})
-    fetchExchangeRate().then(rate => { if (rate) setExchangeRate(rate) })
-  }, [])
 
   useEffect(() => {
     const schema = {
@@ -103,19 +61,6 @@ export default function Packages() {
     }
     return () => { document.getElementById('jsonld-packages')?.remove() }
   }, [])
-
-  const dynamicPackages = dynamicItems
-    ? dynamicItems.map(item => ({
-        name: isEN ? item.nameEn : item.nameTr,
-        tier: (item.nameTr || item.nameEn || '').toLowerCase().replace(/\s+/g, '-'),
-        priceTRY: item.priceTRY,
-        priceUSD: item.priceUSD,
-        desc: isEN ? item.descEn : item.descTr,
-        popular: !!item.popular,
-        features: ((isEN ? item.featuresEn : item.featuresTr) || '').split(',').map(f => f.trim()).filter(Boolean),
-        notIncluded: [],
-      }))
-    : null
 
   const handleClaimFreePackage = async (reference) => {
     if (!customer) {

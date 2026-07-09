@@ -1,21 +1,19 @@
 import { ObjectId } from 'mongodb';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
-
-  const user = requireAuth(req);
-  if (!user) {
-    return res.status(401).json({ error: 'Yetkisiz erişim' });
-  }
 
   const db = await getDb();
   const action = req.query?.action;
 
   // ── Activity Log (GET /api/notifications?action=activity) ──
   if (action === 'activity') {
+    const user = await requirePermission(req, res, 'activity', { write: req.method !== 'GET' });
+    if (!user) return;
+
     if (req.method === 'GET') {
       const filter = req.query?.type;
       const match = filter && filter !== 'all' ? { type: filter } : {};
@@ -47,6 +45,9 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const user = await requirePermission(req, res, 'dashboard');
+  if (!user) return;
 
   const collection = db.collection('notifications');
 
@@ -80,7 +81,7 @@ export default async function handler(req, res) {
     if (id) {
       if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
       await collection.updateOne(
-        { _id: new ObjectId(id) },
+        { _id: new ObjectId(id), userId: user.id },
         { $set: { read: true } }
       );
       return res.status(200).json({ success: true });
@@ -96,7 +97,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'id gerekli' });
     }
     if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-    await collection.deleteOne({ _id: new ObjectId(id) });
+    await collection.deleteOne({ _id: new ObjectId(id), userId: user.id });
     return res.status(200).json({ success: true });
   }
 

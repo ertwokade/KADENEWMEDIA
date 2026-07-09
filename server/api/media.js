@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
 const MAX_BASE64_SIZE = 2 * 1024 * 1024; // 2MB base64 limit
@@ -8,8 +8,8 @@ const MAX_BASE64_SIZE = 2 * 1024 * 1024; // 2MB base64 limit
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const user = requireAuth(req);
-  if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+  const user = await requirePermission(req, res, ['media', 'content'], { write: req.method !== 'GET' });
+  if (!user) return;
 
   const db = await getDb();
   const col = db.collection('media');
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     const filter = {};
     if (type) filter.type = type;
-    if (search) filter.name = { $regex: search, $options: 'i' };
+    if (search) filter.name = { $regex: escapeRegex(search).slice(0, 100), $options: 'i' };
 
     const items = await col.find(filter, { projection: { data: 0 } })
       .sort({ createdAt: -1 })
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Dosya adı, veri ve MIME türü zorunludur' });
     }
 
-    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'video/mp4', 'application/pdf'];
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'application/pdf'];
     if (!allowedMimes.includes(mimeType)) {
       return res.status(400).json({ error: 'Desteklenmeyen dosya türü' });
     }
@@ -116,4 +116,8 @@ export default async function handler(req, res) {
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
+}
+
+function escapeRegex(value) {
+  return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

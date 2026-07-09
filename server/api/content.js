@@ -1,6 +1,7 @@
 import { getDb } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+import { rateLimitCheck } from './_lib/rateLimit.js';
 import jwt from 'jsonwebtoken';
 
 // ── GA4 helpers (kept in this file to stay within Vercel 12-function limit) ──
@@ -45,6 +46,9 @@ export default async function handler(req, res) {
   // ── Heartbeat (POST /api/content?action=heartbeat) — no auth ──
   // Tracks active visitor sessions. Frontend sends every ~30s while tab is visible.
   if (action === 'heartbeat' && req.method === 'POST') {
+    const rl = await rateLimitCheck(req, { namespace: 'content-heartbeat', windowMs: 60 * 1000, maxRequests: 30 });
+    if (!rl.allowed) return res.status(204).end();
+
     try {
       const db = await getDb();
       let body = req.body;
@@ -68,6 +72,9 @@ export default async function handler(req, res) {
   // ── Active visitors count (GET /api/content?action=active-visitors) — public ──
   // Counts sessions seen in the last 2 minutes. No auth: safe public metric.
   if (action === 'active-visitors' && req.method === 'GET') {
+    const rl = await rateLimitCheck(req, { namespace: 'content-active-visitors', windowMs: 60 * 1000, maxRequests: 60 });
+    if (!rl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${rl.retryAfter} dakika sonra tekrar deneyin.` });
+
     try {
       const db = await getDb();
       const cutoff = new Date(Date.now() - 45 * 1000);
@@ -84,8 +91,7 @@ export default async function handler(req, res) {
 
   // ── AI usage stats (GET /api/content?action=ai-usage) — auth required ──
   if (action === 'ai-usage' && req.method === 'GET') {
-    const user = requireAuth(req);
-    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    if (!(await requirePermission(req, res, ['aiContent', 'content']))) return;
     try {
       const db = await getDb();
       const col = db.collection('ai_usage');
@@ -119,6 +125,9 @@ export default async function handler(req, res) {
 
   // ── Pageview tracking (POST /api/content?action=pageview) — no auth ──
   if (action === 'pageview' && req.method === 'POST') {
+    const rl = await rateLimitCheck(req, { namespace: 'content-pageview', windowMs: 60 * 1000, maxRequests: 60 });
+    if (!rl.allowed) return res.status(204).end();
+
     try {
       const db = await getDb();
       let body = req.body;
@@ -181,8 +190,7 @@ export default async function handler(req, res) {
 
   // ── Analytics summary (GET /api/content?action=analytics) — auth required ──
   if (action === 'analytics' && req.method === 'GET') {
-    const user = requireAuth(req);
-    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    if (!(await requirePermission(req, res, ['analytics', 'dashboard']))) return;
 
     try {
       const db = await getDb();
@@ -294,8 +302,7 @@ export default async function handler(req, res) {
 
   // ── GA4 Data API (GET /api/content?action=ga4) — auth required ──
   if (action === 'ga4' && req.method === 'GET') {
-    const user = requireAuth(req);
-    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' });
+    if (!(await requirePermission(req, res, ['analytics', 'dashboard']))) return;
 
     const propertyId = process.env.GA4_PROPERTY_ID;
     if (!propertyId || !process.env.GA4_CLIENT_EMAIL || !process.env.GA4_PRIVATE_KEY) {
@@ -413,10 +420,7 @@ export default async function handler(req, res) {
 
   // PUT - Update site content (requires auth)
   if (req.method === 'PUT') {
-    const user = requireAuth(req);
-    if (!user) {
-      return res.status(401).json({ error: 'Yetkisiz erişim' });
-    }
+    if (!(await requirePermission(req, res, 'content', { write: true }))) return;
 
     try {
       const { section, data } = req.body;

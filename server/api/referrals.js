@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { getDb, isValidObjectId } from './_lib/mongodb.js'
-import { requireAuth } from './_lib/auth.js'
+import { requirePermission } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
 import { rateLimitCheck } from './_lib/rateLimit.js'
 import { logActivity } from './notifications.js'
@@ -19,8 +19,7 @@ export default async function handler(req, res) {
   const collection = db.collection('referrals')
 
   if (req.method === 'GET') {
-    const user = requireAuth(req)
-    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' })
+    if (!(await requirePermission(req, res, 'referrals'))) return
 
     const { status } = req.query || {}
     const filter = status && status !== 'all' ? { status } : {}
@@ -102,8 +101,8 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PUT') {
-    const user = requireAuth(req)
-    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' })
+    const user = await requirePermission(req, res, 'referrals', { write: true })
+    if (!user) return
 
     const { id, status, reward, notes } = req.body || {}
     if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' })
@@ -129,8 +128,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'DELETE') {
-    const user = requireAuth(req)
-    if (!user) return res.status(401).json({ error: 'Yetkisiz erişim' })
+    if (!(await requirePermission(req, res, 'referrals', { write: true }))) return
 
     const { id } = req.query || {}
     if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' })

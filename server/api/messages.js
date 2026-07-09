@@ -1,5 +1,5 @@
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
-import { requireAuth } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { ObjectId } from 'mongodb';
 import { logActivity } from './notifications.js';
@@ -12,13 +12,15 @@ function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function cleanHeader(str, max = 200) {
+  return String(str || '').replace(/[\r\n]+/g, ' ').trim().slice(0, max);
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const user = requireAuth(req);
-  if (!user) {
-    return res.status(401).json({ error: 'Yetkisiz erişim' });
-  }
+  const user = await requirePermission(req, res, 'messages', { write: req.method !== 'GET' });
+  if (!user) return;
 
   const db = await getDb();
   const collection = db.collection('messages');
@@ -52,7 +54,7 @@ export default async function handler(req, res) {
         connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000,
       });
 
-      const mailSubject = subject || `Re: Kade Media — ${message.service && message.service !== '-' ? message.service : 'İletişim'}`;
+      const mailSubject = cleanHeader(subject || `Re: Kade Media — ${message.service && message.service !== '-' ? message.service : 'İletişim'}`);
 
       await transporter.sendMail({
         from: `"Kade Media" <${smtpUser}>`,
