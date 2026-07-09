@@ -1,35 +1,15 @@
-const CACHE = 'kade-v2'
-const OFFLINE_URL = '/offline.html'
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll([OFFLINE_URL, '/', '/manifest.json']))
-  )
+// KADE service worker — cache-clearing passthrough (v3)
+// Eski agresif cache'leri temizler; fetch'e karışmaz => tarayıcı her zaman taze içerik alır.
+self.addEventListener('install', () => {
   self.skipWaiting()
 })
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))
-    )
-  )
-  self.clients.claim()
+  e.waitUntil((async () => {
+    const keys = await caches.keys()
+    await Promise.all(keys.map((k) => caches.delete(k)))
+    await self.clients.claim()
+  })())
 })
 
-self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return
-  if (e.request.url.includes('/api/')) return
-
-  e.respondWith(
-    fetch(e.request)
-      .then((res) => {
-        const clone = res.clone()
-        caches.open(CACHE).then((c) => c.put(e.request, clone))
-        return res
-      })
-      .catch(() =>
-        caches.match(e.request).then((cached) => cached || caches.match(OFFLINE_URL))
-      )
-  )
-})
+// fetch handler yok => tüm istekler doğrudan ağ/tarayıcı cache'ine gider (must-revalidate ile taze).
