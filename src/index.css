@@ -1293,7 +1293,7 @@ textarea::placeholder {
 }
 
 select option {
-  background: #0b0b0b !important;
+  background: #fffdf7 !important;
   color: var(--white) !important;
 }
 
