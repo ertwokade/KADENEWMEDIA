@@ -3,7 +3,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(10, 10, 10, 0.95);
+  background: rgba(255, 253, 247, 0.95);
   backdrop-filter: blur(20px);
   border-top: 1px solid rgba(234, 195, 33, 0.15);
   padding: 16px 24px;
@@ -183,7 +183,7 @@
 
 .cookie-accept {
   background: #FFD400;
-  color: #060606;
+  color: #fffdf7;
   box-shadow: 0 0 22px rgba(255, 212, 0, 0.28);
 }
 

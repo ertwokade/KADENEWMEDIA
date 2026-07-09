@@ -10,7 +10,7 @@
   flex-direction: column;
   border-radius: 20px;
   overflow: hidden;
-  background: rgba(15, 15, 15, 0.97);
+  background: rgba(255, 253, 247, 0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(234, 195, 33, 0.2);
