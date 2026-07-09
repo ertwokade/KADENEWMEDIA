@@ -169,9 +169,9 @@ export default function Home() {
           <div className="kade-footer ktech">
             <a href="mailto:thekademedia@gmail.com">THEKADEMEDIA@GMAIL.COM</a>
             <div className="kade-social">
-              <a href="https://instagram.com/kademediacom" target="_blank" rel="noreferrer">INSTAGRAM</a>
-              <a href="https://tiktok.com/@kademediacom" target="_blank" rel="noreferrer">TIKTOK</a>
-              <a href="https://www.youtube.com/@kademediacom" target="_blank" rel="noreferrer">YOUTUBE</a>
+              <a href="https://instagram.com/kadenewmedia" target="_blank" rel="noreferrer">INSTAGRAM</a>
+              <a href="https://tiktok.com/@kadenewmedia" target="_blank" rel="noreferrer">TIKTOK</a>
+              <a href="https://www.youtube.com/@kadenewmedia" target="_blank" rel="noreferrer">YOUTUBE</a>
             </div>
           </div>
           <div className="kade-copy ktech">KADE MEDIA © 2026 · İSTANBUL</div>

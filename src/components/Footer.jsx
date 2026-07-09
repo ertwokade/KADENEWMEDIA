@@ -41,9 +41,9 @@ export default function Footer() {
   }
 
   const socialLinks = [
-    { icon: FaInstagram, href: footerData?.instagram || 'https://instagram.com/kademediacom', label: 'Instagram' },
-    { icon: FaYoutube, href: footerData?.youtube || 'https://www.youtube.com/@kademediacom', label: 'YouTube' },
-    { icon: FaTiktok, href: footerData?.tiktok || 'https://tiktok.com/@kademediacom', label: 'TikTok' },
+    { icon: FaInstagram, href: footerData?.instagram || 'https://instagram.com/kadenewmedia', label: 'Instagram' },
+    { icon: FaYoutube, href: footerData?.youtube || 'https://www.youtube.com/@kadenewmedia', label: 'YouTube' },
+    { icon: FaTiktok, href: footerData?.tiktok || 'https://tiktok.com/@kadenewmedia', label: 'TikTok' },
     { icon: FaLinkedinIn, href: footerData?.linkedin || 'https://www.linkedin.com/company/kademediaagency', label: 'LinkedIn' },
   ]
 

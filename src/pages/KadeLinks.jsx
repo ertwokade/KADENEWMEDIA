@@ -29,8 +29,8 @@ const INTERNAL = [
 
 // Sosyal kanallar
 const SOCIAL = [
-  { label: 'Instagram', handle: '@kademediacom', href: 'https://instagram.com/kademediacom', icon: FaInstagram, cls: 'ig' },
-  { label: 'YouTube', handle: '@kademediacom', href: 'https://youtube.com/@kademediacom', icon: FaYoutube, cls: 'yt' },
+  { label: 'Instagram', handle: '@kadenewmedia', href: 'https://instagram.com/kadenewmedia', icon: FaInstagram, cls: 'ig' },
+  { label: 'YouTube', handle: '@kadenewmedia', href: 'https://youtube.com/@kadenewmedia', icon: FaYoutube, cls: 'yt' },
   { label: 'LinkedIn', handle: 'Kade Media', href: 'https://www.linkedin.com/company/kademediaagency', icon: FaLinkedinIn, cls: 'in' },
 ]
 

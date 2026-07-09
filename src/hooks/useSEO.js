@@ -60,7 +60,7 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
     setMeta('twitter:title', fullTitle)
     setMeta('twitter:description', description)
     setMeta('twitter:image', ogImage)
-    setMeta('twitter:site', '@kademediacom')
+    setMeta('twitter:site', '@kadenewmedia')
 
     setCanonical(canonicalUrl)
   }, [title, description, keywords, path, image, type, noindex])

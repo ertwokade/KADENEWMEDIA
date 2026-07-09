@@ -8,9 +8,9 @@ export const CONTACT = {
 }
 
 export const SOCIAL = {
-  instagram: 'https://instagram.com/kademediacom',
-  youtube: 'https://www.youtube.com/@kademediacom',
-  tiktok: 'https://tiktok.com/@kademediacom',
+  instagram: 'https://instagram.com/kadenewmedia',
+  youtube: 'https://www.youtube.com/@kadenewmedia',
+  tiktok: 'https://tiktok.com/@kadenewmedia',
   linkedin: 'https://www.linkedin.com/company/kademediaagency',
 }
 

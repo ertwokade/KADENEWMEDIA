@@ -27,9 +27,9 @@ export function OrganizationSchema() {
       url: 'https://kademedia.com.tr',
       logo: 'https://kademedia.com.tr/logo.png',
       sameAs: [
-        'https://instagram.com/kademediacom',
-        'https://www.youtube.com/@kademediacom',
-        'https://tiktok.com/@kademediacom',
+        'https://instagram.com/kadenewmedia',
+        'https://www.youtube.com/@kadenewmedia',
+        'https://tiktok.com/@kadenewmedia',
         'https://www.linkedin.com/company/kademediaagency',
       ],
       contactPoint: {
