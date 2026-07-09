@@ -1737,48 +1737,48 @@
   .dashboard-quick-actions { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* Kade Media1 admin skin */
+/* Kade admin skin — açık kade tema */
 .admin-dashboard,
 .admin-login-container,
 .admin-dashboard.dark,
 .admin-login-container.dark {
-  --bg-primary: #060606;
+  --bg-primary: #fdf6e3;
   --bg-secondary: rgba(23, 19, 10, 0.035);
   --bg-tertiary: rgba(23, 19, 10, 0.06);
-  --card-bg: rgba(253, 246, 227, 0.9);
-  --card-bg-glass: rgba(253, 246, 227, 0.78);
-  --text-primary: #FFFFFF;
+  --card-bg: #fffdf7;
+  --card-bg-glass: rgba(255, 253, 247, 0.82);
+  --text-primary: #17130a;
   --text-secondary: rgba(23, 19, 10, 0.62);
-  --text-tertiary: rgba(23, 19, 10, 0.38);
-  --accent: #FFD400;
-  --accent-light: #FFE75A;
-  --accent-alpha: rgba(255, 212, 0, 0.08);
-  --accent-glow: rgba(255, 212, 0, 0.32);
-  --border: rgba(23, 19, 10, 0.075);
-  --border-strong: rgba(23, 19, 10, 0.13);
-  --shadow-sm: none;
-  --shadow-md: 0 16px 40px rgba(0, 0, 0, 0.28);
-  --shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.44);
-  --shadow-glow: 0 0 34px rgba(255, 212, 0, 0.18);
+  --text-tertiary: rgba(23, 19, 10, 0.42);
+  --accent: #e0a81f;
+  --accent-light: #f0c93f;
+  --accent-alpha: rgba(224, 168, 31, 0.09);
+  --accent-glow: rgba(224, 168, 31, 0.28);
+  --border: rgba(23, 19, 10, 0.10);
+  --border-strong: rgba(23, 19, 10, 0.16);
+  --shadow-sm: 0 1px 3px rgba(23, 19, 10, 0.05);
+  --shadow-md: 0 12px 34px rgba(23, 19, 10, 0.10);
+  --shadow-lg: 0 24px 60px rgba(23, 19, 10, 0.14);
+  --shadow-glow: 0 0 34px rgba(224, 168, 31, 0.18);
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 16px;
   --radius-xl: 18px;
-  --font: 'Inter', system-ui, sans-serif;
-  color-scheme: dark;
+  --font: 'TikTokSans', 'Inter', system-ui, sans-serif;
+  color-scheme: light;
 }
 
 .admin-dashboard,
 .admin-login-container {
   background:
-    radial-gradient(70% 58% at 74% 10%, rgba(255, 212, 0, 0.08), transparent 62%),
-    radial-gradient(55% 48% at 10% 82%, rgba(255, 212, 0, 0.055), transparent 68%),
-    #060606 !important;
+    radial-gradient(70% 58% at 74% 10%, rgba(224, 168, 31, 0.10), transparent 62%),
+    radial-gradient(55% 48% at 10% 82%, rgba(224, 168, 31, 0.07), transparent 68%),
+    #fdf6e3 !important;
 }
 
 .login-bg-pattern {
   background:
-    radial-gradient(60% 55% at 60% 48%, rgba(255, 212, 0, 0.09), transparent 70%) !important;
+    radial-gradient(60% 55% at 60% 48%, rgba(224, 168, 31, 0.10), transparent 70%) !important;
 }
 
 .login-grid-overlay,
