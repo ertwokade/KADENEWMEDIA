@@ -1,4 +1,4 @@
-const CACHE = 'kade-v1'
+const CACHE = 'kade-v2'
 const OFFLINE_URL = '/offline.html'
 
 self.addEventListener('install', (e) => {
