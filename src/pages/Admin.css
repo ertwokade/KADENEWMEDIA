@@ -1744,8 +1744,8 @@
   --bg-primary: #060606;
   --bg-secondary: rgba(23, 19, 10, 0.035);
   --bg-tertiary: rgba(23, 19, 10, 0.06);
-  --card-bg: rgba(8, 8, 8, 0.9);
-  --card-bg-glass: rgba(8, 8, 8, 0.78);
+  --card-bg: rgba(253, 246, 227, 0.9);
+  --card-bg-glass: rgba(253, 246, 227, 0.78);
   --text-primary: #FFFFFF;
   --text-secondary: rgba(23, 19, 10, 0.62);
   --text-tertiary: rgba(23, 19, 10, 0.38);
@@ -1804,7 +1804,7 @@
 .notification-dropdown,
 .admin-modal,
 .seed-section {
-  background: linear-gradient(145deg, rgba(23, 19, 10, 0.045), rgba(23, 19, 10, 0.016) 58%, rgba(255, 212, 0, 0.035)), rgba(8, 8, 8, 0.9) !important;
+  background: linear-gradient(145deg, rgba(23, 19, 10, 0.045), rgba(23, 19, 10, 0.016) 58%, rgba(255, 212, 0, 0.035)), rgba(253, 246, 227, 0.9) !important;
   border-color: rgba(23, 19, 10, 0.075) !important;
   box-shadow: none !important;
   backdrop-filter: blur(14px);

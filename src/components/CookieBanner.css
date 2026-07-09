@@ -167,7 +167,7 @@
   bottom: 18px;
   border: 1px solid rgba(23, 19, 10, 0.075);
   border-radius: 18px;
-  background: rgba(6, 6, 6, 0.82);
+  background: rgba(253, 246, 227, 0.82);
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.38);
   padding: 14px 18px;
 }
@@ -199,7 +199,7 @@
 
 .kvkk-modal {
   border-radius: 18px !important;
-  background: rgba(8, 8, 8, 0.94) !important;
+  background: rgba(253, 246, 227, 0.94) !important;
 }
 
 @media (max-width: 768px) {

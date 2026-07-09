@@ -864,47 +864,47 @@ input, textarea {
 
 :root,
 [data-theme="light"] {
-  --primary: #FFD400;
-  --primary-dark: #C9A500;
-  --primary-light: #FFE76A;
-  --black: #060606;
-  --black-light: #080808;
-  --black-lighter: #101010;
-  --dark-gray: #151515;
-  --gray: #353535;
-  --gray-light: rgba(23, 19, 10, 0.48);
+  --primary: #e0a81f;
+  --primary-dark: #c8901a;
+  --primary-light: #fff2cc;
+  --black: #fdf6e3;
+  --black-light: #f7edd6;
+  --black-lighter: #f2e6c9;
+  --dark-gray: #ece0c4;
+  --gray: #e6d9ba;
+  --gray-light: rgba(23, 19, 10, 0.55);
   --gray-lighter: rgba(23, 19, 10, 0.72);
-  --white: #FFFFFF;
+  --white: #17130a;
   --white-dim: rgba(23, 19, 10, 0.86);
-  --text-primary: #FFFFFF;
+  --text-primary: #17130a;
   --text-secondary: rgba(23, 19, 10, 0.58);
   --text-tertiary: rgba(23, 19, 10, 0.38);
-  --bg-primary: #060606;
+  --bg-primary: #fdf6e3;
   --bg-secondary: rgba(23, 19, 10, 0.035);
   --card-bg: rgba(23, 19, 10, 0.026);
-  --border-color: rgba(23, 19, 10, 0.075);
-  --border-color-hover: rgba(255, 212, 0, 0.45);
-  --border: rgba(23, 19, 10, 0.075);
-  --gradient-primary: linear-gradient(135deg, #FFE75A 0%, #FFD400 42%, #FFB800 100%);
-  --gradient-dark: linear-gradient(180deg, #060606 0%, #0B0B0B 100%);
-  --gradient-card: linear-gradient(145deg, rgba(23, 19, 10, 0.045), rgba(23, 19, 10, 0.016) 58%, rgba(255, 212, 0, 0.035));
-  --gradient-glow: radial-gradient(circle at center, rgba(255, 212, 0, 0.14), transparent 70%);
-  --shadow-glow: 0 0 28px rgba(255, 212, 0, 0.18);
-  --shadow-glow-strong: 0 0 54px rgba(255, 212, 0, 0.32);
-  --font-display: 'Inter', 'Outfit', system-ui, sans-serif;
-  --font-primary: 'Inter', 'Outfit', system-ui, sans-serif;
-  --font-secondary: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --border-color: rgba(23, 19, 10, 0.10);
+  --border-color-hover: rgba(224, 168, 31, 0.55);
+  --border: rgba(23, 19, 10, 0.10);
+  --gradient-primary: linear-gradient(135deg, #e8b93a 0%, #e0a81f 42%, #cf9414 100%);
+  --gradient-dark: linear-gradient(180deg, #fdf6e3 0%, #f5ead0 100%);
+  --gradient-card: linear-gradient(145deg, rgba(23, 19, 10, 0.045), rgba(23, 19, 10, 0.016) 58%, rgba(224, 168, 31, 0.05));
+  --gradient-glow: radial-gradient(circle at center, rgba(224, 168, 31, 0.14), transparent 70%);
+  --shadow-glow: 0 10px 40px rgba(23, 19, 10, 0.08);
+  --shadow-glow-strong: 0 20px 60px rgba(23, 19, 10, 0.12);
+  --font-display: 'TikTokSans', 'Outfit', system-ui, sans-serif;
+  --font-primary: 'TikTokSans', 'Outfit', system-ui, sans-serif;
+  --font-secondary: 'TikTokSans', 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-serif: 'Newsreader', Georgia, serif;
   --section-padding: clamp(82px, 12vh, 150px) 0;
   --container-width: 1280px;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
 body,
 #root {
   min-height: 100%;
-  background: #060606 !important;
+  background: #fdf6e3 !important;
   color: var(--white) !important;
 }
 
@@ -920,9 +920,9 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(90% 70% at 62% 12%, rgba(255, 212, 0, 0.055), transparent 62%),
-    radial-gradient(70% 60% at 18% 78%, rgba(255, 212, 0, 0.045), transparent 70%),
-    linear-gradient(180deg, rgba(6, 6, 6, 0.35), #060606 78%);
+    radial-gradient(90% 70% at 62% 12%, rgba(224, 168, 31, 0.06), transparent 62%),
+    radial-gradient(70% 60% at 18% 78%, rgba(224, 168, 31, 0.05), transparent 70%),
+    linear-gradient(180deg, rgba(253, 246, 227, 0.4), #fdf6e3 78%);
 }
 
 body::after {
@@ -1175,7 +1175,7 @@ a.btn {
 .referral-form,
 .referral-step,
 .referral-reward {
-  background: var(--gradient-card), rgba(8, 8, 8, 0.88) !important;
+  background: var(--gradient-card), rgba(253, 246, 227, 0.88) !important;
   border: 1px solid rgba(23, 19, 10, 0.075) !important;
   border-radius: 16px !important;
   box-shadow: none !important;
@@ -1199,7 +1199,7 @@ a.btn {
 .perk-card:hover,
 .value-card:hover {
   border-color: rgba(255, 212, 0, 0.42) !important;
-  background: linear-gradient(145deg, rgba(255, 212, 0, 0.06), rgba(23, 19, 10, 0.024) 52%, rgba(23, 19, 10, 0.045)), rgba(8, 8, 8, 0.92) !important;
+  background: linear-gradient(145deg, rgba(255, 212, 0, 0.06), rgba(23, 19, 10, 0.024) 52%, rgba(23, 19, 10, 0.045)), rgba(253, 246, 227, 0.92) !important;
   box-shadow: 0 0 34px rgba(255, 212, 0, 0.09) !important;
 }
 
@@ -1312,7 +1312,7 @@ select option {
   justify-content: flex-start !important;
   align-items: flex-end !important;
   padding: 0 !important;
-  background: #060606 !important;
+  background: transparent !important;
   isolation: isolate;
 }
 
@@ -1325,7 +1325,7 @@ select option {
   pointer-events: none;
   background:
     radial-gradient(62% 58% at 60% 48%, rgba(255, 200, 0, 0.1), rgba(255, 200, 0, 0) 70%),
-    linear-gradient(180deg, rgba(6, 6, 6, 0.18) 0%, rgba(6, 6, 6, 0) 48%, rgba(6, 6, 6, 0.88) 100%);
+    linear-gradient(180deg, rgba(253, 246, 227, 0.18) 0%, rgba(253, 246, 227, 0) 48%, rgba(253, 246, 227, 0.88) 100%);
 }
 
 .hero::after,
@@ -1335,7 +1335,7 @@ select option {
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: radial-gradient(120% 100% at 50% 0%, rgba(6, 6, 6, 0) 55%, rgba(6, 6, 6, 0.88) 100%);
+  background: radial-gradient(120% 100% at 50% 0%, rgba(253, 246, 227, 0) 55%, rgba(253, 246, 227, 0.88) 100%);
 }
 
 .hero-3d {

@@ -299,8 +299,8 @@
 /* Kade Media1 footer treatment */
 .footer {
   background:
-    radial-gradient(60% 60% at 50% 0%, rgba(255, 212, 0, 0.07), transparent 70%),
-    #060606 !important;
+    radial-gradient(60% 60% at 50% 0%, rgba(224, 168, 31, 0.10), transparent 70%),
+    #f4e9cf !important;
   padding: clamp(70px, 10vh, 126px) 0 34px;
 }
 

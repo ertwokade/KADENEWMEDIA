@@ -365,12 +365,12 @@
 /* Kade Media1 navbar treatment */
 .navbar {
   padding: 22px 0;
-  background: linear-gradient(180deg, rgba(6, 6, 6, 0.72), rgba(6, 6, 6, 0));
+  background: linear-gradient(180deg, rgba(253, 246, 227, 0.72), rgba(253, 246, 227, 0));
 }
 
 .navbar.scrolled {
   padding: 14px 0;
-  background: rgba(6, 6, 6, 0.72);
+  background: rgba(253, 246, 227, 0.72);
   border-bottom: 1px solid rgba(23, 19, 10, 0.07);
   box-shadow: 0 14px 44px rgba(0, 0, 0, 0.32);
 }
@@ -436,7 +436,7 @@
   min-width: 240px;
   padding: 10px;
   border-radius: 16px;
-  background: rgba(6, 6, 6, 0.9);
+  background: rgba(253, 246, 227, 0.9);
   border-color: rgba(23, 19, 10, 0.08);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -478,7 +478,7 @@
 }
 
 .mobile-menu {
-  background: rgba(6, 6, 6, 0.96);
+  background: rgba(253, 246, 227, 0.96);
   border-bottom: 1px solid rgba(23, 19, 10, 0.08);
 }
 
