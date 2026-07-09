@@ -4,17 +4,18 @@
 
 /* ===== THEME TOKENS ===== */
 .admin-dashboard,
+.admin-dashboard,
 .admin-login-container {
-  --bg-primary: #F5F3F0;
-  --bg-secondary: #ECEAE6;
-  --bg-tertiary: #E2E0DC;
-  --card-bg: #FFFFFF;
-  --card-bg-glass: rgba(23, 19, 10, 0.72);
-  --text-primary: #1A1715;
+  --bg-primary: #fdf6e3;
+  --bg-secondary: #f5ead0;
+  --bg-tertiary: #efe2c6;
+  --card-bg: #fffdf7;
+  --card-bg-glass: rgba(255, 253, 247, 0.82);
+  --text-primary: #17130a;
   --text-secondary: #5C5753;
   --text-tertiary: #9E9994;
-  --accent: #D4A017;
-  --accent-light: #EAC321;
+  --accent: #e0a81f;
+  --accent-light: #f0c93f;
   --accent-alpha: rgba(212, 160, 23, 0.08);
   --accent-glow: rgba(212, 160, 23, 0.25);
   --border: rgba(0, 0, 0, 0.07);

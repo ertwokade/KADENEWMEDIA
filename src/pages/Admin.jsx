@@ -104,7 +104,7 @@ function LoginScreen({ onLogin }) {
   }
 
   return (
-    <div className={`admin-login-container ${localStorage.getItem('kade_admin_dark') !== 'false' ? 'dark' : ''}`}>
+    <div className={`admin-login-container ${localStorage.getItem('kade_admin_dark') === 'true' ? 'dark' : ''}`}>
       <div className="login-bg-pattern" />
       <div className="login-grid-overlay" />
       <motion.div
@@ -2859,7 +2859,7 @@ function SettingsSection({ showToast }) {
   const handleChangePassword = async (e) => {
     e.preventDefault()
     if (newPassword !== confirmPassword) { showToast('Yeni şifreler eşleşmiyor!', 'error'); return }
-    if (newPassword.length < 4) { showToast('Şifre en az 4 karakter olmalı!', 'error'); return }
+    if (newPassword.length < 12) { showToast('Şifre en az 12 karakter olmalı!', 'error'); return }
     setLoading(true)
     try {
       await changePasswordApi(currentPassword, newPassword)
@@ -2873,7 +2873,7 @@ function SettingsSection({ showToast }) {
     if (!seedSecret) { showToast('Seed secret giriniz', 'error'); return }
     setSeedLoading(true)
     try {
-      const result = await seedApi(seedSecret)
+      await seedApi(seedSecret)
       showToast('Veritabanı başarıyla oluşturuldu!', 'success')
       setSeedSecret('')
     } catch (err) { showToast(err.message, 'error') }
@@ -7114,7 +7114,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
       return next
     })
   }
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('kade_admin_dark') !== 'false')
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('kade_admin_dark') === 'true')
   const [localMode, setLocalMode] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifCount, setNotifCount] = useState(0)
@@ -7231,16 +7231,57 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     setCurrentUser(null)
   }
 
-  const mainNavItems = [
+  const permissionForSection = useMemo(() => ({
+    dashboard: 'dashboard',
+    analytics: 'analytics',
+    messages: 'messages',
+    kanban: 'crm',
+    calendar: 'calendar',
+    reminders: 'reminders',
+    blog: 'blog',
+    content: 'content',
+    partners: 'partners',
+    portfolio: 'portfolio',
+    newsletter: 'messages',
+    media: 'media',
+    'ai-content': 'aiContent',
+    proposals: 'proposals',
+    'quote-leads': 'quoteLeads',
+    'portal-customers': 'portalCustomers',
+    'customer-profiles': 'customerProfiles',
+    invoices: 'invoices',
+    tasks: 'tasks',
+    subscriptions: 'subscriptions',
+    surveys: 'surveys',
+    referrals: 'referrals',
+    onboarding: 'onboarding',
+    report: 'report',
+    'email-templates': 'emailTemplates',
+    users: 'users',
+    activity: 'activity',
+    backup: 'backup',
+    settings: 'settings',
+  }), [])
+
+  const canAccessSection = useCallback((id) => {
+    if (currentUser?.role === 'admin') return true
+    const key = permissionForSection[id]
+    if (!key) return true
+    return currentUser?.permissions?.[key] === true
+  }, [currentUser, permissionForSection])
+
+  const filterNavItems = (items) => items.filter(item => canAccessSection(item.id))
+
+  const mainNavItems = filterNavItems([
     { id: 'dashboard', label: 'Gösterge Paneli', icon: HiOutlineHome },
     { id: 'analytics', label: 'Analitik', icon: HiOutlineChartBar },
     { id: 'messages', label: 'İletişim & CRM', icon: HiOutlineMail, badge: unreadCount },
     { id: 'kanban', label: 'Kanban CRM', icon: HiOutlineViewBoards },
     { id: 'calendar', label: 'İçerik Takvimi', icon: HiOutlineCalendar },
     { id: 'reminders', label: 'Hatırlatıcılar', icon: HiOutlineBell },
-  ]
+  ])
 
-  const contentNavItems = [
+  const contentNavItems = filterNavItems([
     { id: 'blog', label: 'Blog Yazıları', icon: HiOutlineNewspaper },
     { id: 'content', label: 'İçerik Yönetimi', icon: HiOutlinePencilAlt },
     { id: 'partners', label: 'Partnerler', icon: HiOutlineUsers },
@@ -7248,9 +7289,9 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     { id: 'newsletter', label: 'Newsletter', icon: HiOutlineMail },
     { id: 'media', label: 'Medya Kütüphanesi', icon: HiOutlinePhotograph },
     { id: 'ai-content', label: 'AI İçerik Üretici', icon: HiOutlineSparkles },
-  ]
+  ])
 
-  const crmNavItems = [
+  const crmNavItems = filterNavItems([
     { id: 'proposals', label: 'Teklifler', icon: HiOutlineCurrencyDollar },
     { id: 'quote-leads', label: 'Online Teklifler', icon: HiOutlineCalculator },
     { id: 'portal-customers', label: 'Portal Müşterileri', icon: HiOutlineGlobe },
@@ -7263,14 +7304,20 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     { id: 'onboarding', label: 'Onboarding', icon: HiOutlineClipboardCheck },
     { id: 'report', label: 'Rapor Oluştur', icon: HiOutlineDocumentReport },
     { id: 'email-templates', label: 'E-posta Şablonları', icon: HiOutlineTemplate },
-  ]
+  ])
 
-  const systemNavItems = [
+  const systemNavItems = filterNavItems([
     { id: 'users', label: 'Kullanıcılar', icon: HiOutlineUsers },
     { id: 'activity', label: 'Aktivite Logu', icon: HiOutlineAnnotation },
     { id: 'backup', label: 'Yedekleme', icon: HiOutlineDatabase },
     { id: 'settings', label: 'Ayarlar', icon: HiOutlineCog },
-  ]
+  ])
+
+  useEffect(() => {
+    if (currentUser && !canAccessSection(activeSection)) {
+      setActiveSection('dashboard')
+    }
+  }, [activeSection, canAccessSection, currentUser])
 
   // Auto-open the nav group containing the active section so the active item is always visible
   useEffect(() => {
