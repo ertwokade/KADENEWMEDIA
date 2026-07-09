@@ -80,7 +80,7 @@ export default function KadeKit() {
 
   return (
     <div className="kk-page">
-      <section className="kk-hero">
+      <section className="kk-top">
         <span className="kk-eyebrow">◆ KADE KIT</span>
         <h1 className="kk-title">Markanı büyüten<br /><span>AI içerik kiti</span></h1>
         <p className="kk-sub">
