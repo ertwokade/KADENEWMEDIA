@@ -58,6 +58,7 @@ const OrganizationKitDashboard = lazy(() => import('./pages/OrganizationKitDashb
 const OrganizationKitPlan = lazy(() => import('./pages/OrganizationKitPlan'))
 const OrganizationKitSection = lazy(() => import('./pages/OrganizationKitSection'))
 const KadeKitBusinessStudio = lazy(() => import('./pages/KadeKitBusinessStudio'))
+const KadeLinks = lazy(() => import('./pages/KadeLinks'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -138,7 +139,8 @@ function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
   const isHome = location.pathname === '/'
-  const hideShell = isAdmin || isHome
+  const isKadeLinks = location.pathname === '/kadelinks'
+  const hideShell = isAdmin || isHome || isKadeLinks
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 
@@ -227,6 +229,7 @@ function App() {
         <Route path="/proje-takip" element={<LazyRoute><ProjectTracking /></LazyRoute>} />
         <Route path="/podcast-webinar" element={<LazyRoute><PodcastWebinar /></LazyRoute>} />
         <Route path="/bulten-arsivi" element={<LazyRoute><NewsletterArchive /></LazyRoute>} />
+        <Route path="/kadelinks" element={<LazyRoute><KadeLinks /></LazyRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </main>
