@@ -4,8 +4,12 @@ import { motion } from 'framer-motion'
 import {
   HiOutlineUser, HiOutlineBriefcase, HiOutlineStar, HiOutlineShoppingBag,
   HiOutlineCheckCircle, HiOutlineClock, HiOutlineLogout, HiOutlineExclamationCircle,
-  HiOutlineChartBar, HiOutlineClipboardList, HiOutlineArrowRight,
+  HiOutlineChartBar, HiOutlineClipboardList, HiOutlineArrowRight, HiOutlineSparkles,
 } from 'react-icons/hi'
+
+// KADE KIT (ContentAI Studio) uygulama erişim URL'i — hosted/indirme linki hazır olunca doldur.
+// Boşsa müşteri /kade-kit bilgi sayfasına yönlenir.
+const KIT_APP_URL = ''
 import { useSEO } from '../hooks/useSEO'
 import { useCustomer } from '../contexts/CustomerContext'
 import { customerPortalApi } from '../api'
@@ -114,6 +118,19 @@ export default function CustomerPortal() {
       tone: 'consulting',
       cta: 'Danışmanlığıma git',
     },
+    entitlements?.hasBigKitAccess && {
+      key: 'kade-kit',
+      eyebrow: 'KADE KIT',
+      title: entitlements?.hasQwenVideoAccess ? 'ContentAI Studio + Qwen AI Video' : 'ContentAI Studio',
+      description: entitlements?.hasQwenVideoAccess
+        ? '8 AI içerik aracı, Kade Organizasyon Kiti ve Qwen AI Video — masaüstü ve web erişimin hazır.'
+        : '8 AI içerik aracı ve Kade Organizasyon Kiti — masaüstü ve web erişimin hazır.',
+      to: KIT_APP_URL || '/kade-kit',
+      external: Boolean(KIT_APP_URL),
+      icon: HiOutlineSparkles,
+      tone: 'kit',
+      cta: KIT_APP_URL ? 'Kiti aç' : 'Kitimi gör',
+    },
     entitlements?.hasOrganizationKitAccess && {
       key: 'organization-kit',
       eyebrow: 'Organizasyon Kiti',
@@ -163,6 +180,22 @@ export default function CustomerPortal() {
                 <div className={`cp-access-grid ${accessCards.length === 1 ? 'single' : ''}`}>
                   {accessCards.map((card, i) => {
                     const Icon = card.icon
+                    const inner = (
+                      <>
+                        <div className="cp-access-icon">
+                          <Icon size={24} />
+                        </div>
+                        <div className="cp-access-content">
+                          <span>{card.eyebrow}</span>
+                          <h3>{card.title}</h3>
+                          <p>{card.description}</p>
+                        </div>
+                        <div className="cp-access-cta">
+                          {card.cta}
+                          <HiOutlineArrowRight size={17} />
+                        </div>
+                      </>
+                    )
                     return (
                       <motion.div
                         key={card.key}
@@ -170,20 +203,15 @@ export default function CustomerPortal() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.06 + i * 0.06 }}
                       >
-                        <Link to={card.to} className={`cp-access-card ${card.tone}`}>
-                          <div className="cp-access-icon">
-                            <Icon size={24} />
-                          </div>
-                          <div className="cp-access-content">
-                            <span>{card.eyebrow}</span>
-                            <h3>{card.title}</h3>
-                            <p>{card.description}</p>
-                          </div>
-                          <div className="cp-access-cta">
-                            {card.cta}
-                            <HiOutlineArrowRight size={17} />
-                          </div>
-                        </Link>
+                        {card.external ? (
+                          <a href={card.to} target="_blank" rel="noopener noreferrer" className={`cp-access-card ${card.tone}`}>
+                            {inner}
+                          </a>
+                        ) : (
+                          <Link to={card.to} className={`cp-access-card ${card.tone}`}>
+                            {inner}
+                          </Link>
+                        )}
                       </motion.div>
                     )
                   })}

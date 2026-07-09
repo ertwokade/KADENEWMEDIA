@@ -60,6 +60,7 @@ const OrganizationKitSection = lazy(() => import('./pages/OrganizationKitSection
 const KadeKitBusinessStudio = lazy(() => import('./pages/KadeKitBusinessStudio'))
 const KadeLinks = lazy(() => import('./pages/KadeLinks'))
 const KadeKit = lazy(() => import('./pages/KadeKit'))
+const Demo = lazy(() => import('./pages/Demo'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -232,6 +233,7 @@ function App() {
         <Route path="/bulten-arsivi" element={<LazyRoute><NewsletterArchive /></LazyRoute>} />
         <Route path="/kadelinks" element={<LazyRoute><KadeLinks /></LazyRoute>} />
         <Route path="/kade-kit" element={<LazyRoute><KadeKit /></LazyRoute>} />
+        <Route path="/demo" element={<LazyRoute><Demo /></LazyRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </main>

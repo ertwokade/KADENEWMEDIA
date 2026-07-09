@@ -30,6 +30,8 @@ export default function Navbar() {
   ]
 
   const resourceLinks = [
+    { name: 'KADE KIT 🚀', path: '/kade-kit' },
+    { name: 'Demo', path: '/demo' },
     { name: lang === 'tr' ? 'Neden Biz?' : 'Why Us?', path: '/neden-biz' },
     { name: lang === 'tr' ? 'Kariyer' : 'Careers', path: '/kariyer' },
     { name: lang === 'tr' ? 'Referanslar' : 'References', path: '/referanslar' },
