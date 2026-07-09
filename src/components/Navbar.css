@@ -80,7 +80,16 @@
 .navbar-login-btn {
   position: relative; display: inline-flex; align-items: center; gap: 6px;
   font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: #17130a; text-decoration: none; padding: 4px 0;
+  color: #17130a; text-decoration: none; padding: 4px 0; white-space: nowrap;
+}
+/* nav utility chip'lerini sadeleştir (editorial minimal) */
+.navbar-right .theme-toggle,
+.navbar-right .lang-toggle,
+.navbar-right .search-toggle,
+.navbar .site-search .search-toggle {
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
 }
 .navbar-login-btn::after {
   content: ''; position: absolute; left: 0; bottom: -3px; width: 100%; height: 1.5px;
