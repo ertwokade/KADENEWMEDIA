@@ -1249,11 +1249,7 @@ a.btn {
 .service-icon-wrapper,
 .contact-card-icon,
 .platform-icon,
-.social-link,
-.theme-toggle,
-.lang-toggle,
-.navbar-login-btn,
-.search-toggle {
+.social-link {
   background: rgba(23, 19, 10, 0.035) !important;
   border: 1px solid rgba(23, 19, 10, 0.09) !important;
   border-radius: 999px !important;
