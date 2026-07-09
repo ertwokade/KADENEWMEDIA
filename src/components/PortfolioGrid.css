@@ -10,7 +10,7 @@
   border-radius: 18px;
   overflow: hidden;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(23, 19, 10, 0.04);
   border: 1px solid var(--border-color);
 }
 
@@ -85,7 +85,7 @@
 .pgrid-title {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--white);
   margin: 0;
   line-height: 1.3;
   font-family: var(--font-primary);

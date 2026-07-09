@@ -6,7 +6,7 @@
   height: 56px;
   border-radius: 50%;
   background: #25D366;
-  color: white;
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,7 +26,7 @@
   position: absolute;
   right: 66px;
   background: rgba(0, 0, 0, 0.85);
-  color: white;
+  color: var(--white);
   padding: 6px 14px;
   border-radius: 8px;
   font-size: 0.8rem;

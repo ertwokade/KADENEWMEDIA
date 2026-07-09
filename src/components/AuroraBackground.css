@@ -1,55 +1,47 @@
+/* kade açık backdrop — krem zemin + yumuşak sarı glow + ince grid */
 .aurora {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  background: radial-gradient(ellipse at top, #151108 0%, #0a0a0a 50%, #050505 100%);
+  background: radial-gradient(ellipse at 50% 0%, #fff6db 0%, #fdf6e3 46%, #f7ecd2 100%);
 }
 
 .aurora__blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.55;
-  mix-blend-mode: screen;
+  filter: blur(120px);
+  opacity: 0.5;
+  mix-blend-mode: multiply;
   will-change: transform;
 }
 
 .aurora__blob--1 {
-  width: 520px; height: 520px;
-  top: -10%; left: -5%;
-  background: radial-gradient(circle, rgba(234, 195, 33, 0.55) 0%, transparent 70%);
+  width: 540px; height: 540px;
+  top: -12%; left: -6%;
+  background: radial-gradient(circle, rgba(224, 168, 31, 0.26) 0%, transparent 70%);
   animation: aurora-drift-1 22s ease-in-out infinite;
 }
 .aurora__blob--2 {
-  width: 680px; height: 680px;
-  top: 20%; right: -15%;
-  background: radial-gradient(circle, rgba(255, 150, 40, 0.22) 0%, transparent 70%);
+  width: 700px; height: 700px;
+  top: 18%; right: -16%;
+  background: radial-gradient(circle, rgba(255, 206, 120, 0.20) 0%, transparent 70%);
   animation: aurora-drift-2 28s ease-in-out infinite;
 }
-.aurora__blob--3 {
-  width: 460px; height: 460px;
-  bottom: -8%; left: 15%;
-  background: radial-gradient(circle, rgba(234, 195, 33, 0.30) 0%, transparent 70%);
-  animation: aurora-drift-3 26s ease-in-out infinite;
-}
-.aurora__blob--4 {
-  width: 380px; height: 380px;
-  bottom: 10%; right: 10%;
-  background: radial-gradient(circle, rgba(120, 80, 20, 0.35) 0%, transparent 70%);
-  animation: aurora-drift-4 30s ease-in-out infinite;
-}
+.aurora__blob--3 { display: none; }
+.aurora__blob--4 { display: none; }
 
 .aurora__grid {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(234, 195, 33, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(234, 195, 33, 0.035) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    linear-gradient(rgba(23, 19, 10, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 19, 10, 0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: 0.6;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 78%);
 }
 
 @keyframes aurora-drift-1 {
@@ -61,42 +53,10 @@
   0%, 100% { transform: translate(0, 0) scale(1); }
   50%      { transform: translate(-90px, 70px) scale(1.1); }
 }
-@keyframes aurora-drift-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  40%      { transform: translate(60px, -50px) scale(1.2); }
-  80%      { transform: translate(-30px, 30px) scale(0.95); }
-}
-@keyframes aurora-drift-4 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50%      { transform: translate(-70px, -40px) scale(1.15); }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .aurora__blob { animation: none; }
 }
-
 @media (max-width: 768px) {
-  .aurora__blob { filter: blur(70px); }
-}
-
-/* Kade Media1 keeps the scene black and lets particle canvas carry motion. */
-.aurora {
-  z-index: 0;
-  background:
-    linear-gradient(180deg, rgba(6, 6, 6, 0.95), rgba(6, 6, 6, 0.82) 48%, #060606),
-    #060606;
-}
-
-.aurora__blob {
-  display: none;
-}
-
-.aurora__grid {
-  opacity: 0.18;
-  background-image:
-    linear-gradient(rgba(255, 212, 0, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 212, 0, 0.022) 1px, transparent 1px);
-  background-size: 86px 86px;
-  mask-image: radial-gradient(ellipse at 50% 45%, black 18%, transparent 72%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 45%, black 18%, transparent 72%);
+  .aurora__blob { filter: blur(80px); }
 }

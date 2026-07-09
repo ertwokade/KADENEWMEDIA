@@ -130,7 +130,7 @@
   gap: 6px;
   padding: 6px 18px;
   background: var(--gradient-primary);
-  color: #FFFFFF;
+  color: var(--white);
   font-size: 0.75rem;
   font-weight: 700;
   border-radius: 100px;
@@ -393,7 +393,7 @@
 }
 
 .comparison-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(23, 19, 10, 0.02);
 }
 
 .comparison-table tr:hover td.col-kade {

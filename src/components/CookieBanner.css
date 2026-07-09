@@ -51,7 +51,7 @@
 
 .cookie-accept {
   background: var(--primary);
-  color: #FFFFFF;
+  color: var(--white);
 }
 
 .cookie-accept:hover {
@@ -165,7 +165,7 @@
   left: 24px;
   right: 24px;
   bottom: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  border: 1px solid rgba(23, 19, 10, 0.075);
   border-radius: 18px;
   background: rgba(6, 6, 6, 0.82);
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.38);
@@ -173,7 +173,7 @@
 }
 
 .cookie-content p {
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(23, 19, 10, 0.68);
 }
 
 .cookie-btn {
@@ -188,9 +188,9 @@
 }
 
 .cookie-decline {
-  background: rgba(255, 255, 255, 0.035);
-  color: rgba(255, 255, 255, 0.62);
-  border-color: rgba(255, 255, 255, 0.09);
+  background: rgba(23, 19, 10, 0.035);
+  color: rgba(23, 19, 10, 0.62);
+  border-color: rgba(23, 19, 10, 0.09);
 }
 
 .cookie-details {

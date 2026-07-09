@@ -48,7 +48,7 @@
   border-radius: 999px;
   pointer-events: none;
 }
-.ba__tag--before { left: 16px; color: #fff; }
+.ba__tag--before { left: 16px; color: var(--white); }
 .ba__tag--after  { right: 16px; color: var(--primary); border-color: rgba(234,195,33,0.45); }
 
 .ba__handle {

@@ -19,7 +19,7 @@
   top: 96px;
   border: 1px solid rgba(234, 195, 33, 0.18);
   background:
-    linear-gradient(145deg, rgba(234, 195, 33, 0.1), rgba(255, 255, 255, 0.025) 42%),
+    linear-gradient(145deg, rgba(234, 195, 33, 0.1), rgba(23, 19, 10, 0.025) 42%),
     rgba(9, 10, 14, 0.72);
   border-radius: 16px;
   padding: 16px;
@@ -28,7 +28,7 @@
 }
 
 .ok-sidebar-head {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(23, 19, 10, 0.08);
   padding-bottom: 14px;
   margin-bottom: 12px;
 }
@@ -79,7 +79,7 @@
 }
 
 .ok-sidebar-business {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(23, 19, 10, 0.08);
   margin-top: 14px;
   padding-top: 14px;
 }
@@ -101,7 +101,7 @@
 .ok-sidebar-link:hover,
 .ok-sidebar-link.active {
   color: var(--white);
-  background: rgba(255, 255, 255, 0.055);
+  background: rgba(23, 19, 10, 0.055);
   border-color: rgba(234, 195, 33, 0.2);
 }
 
@@ -113,9 +113,9 @@
 .ok-hero,
 .ok-section-hero,
 .ok-plan-detail {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(23, 19, 10, 0.08);
   background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.12), rgba(255, 255, 255, 0.03) 34%, rgba(255, 255, 255, 0.015)),
+    linear-gradient(135deg, rgba(234, 195, 33, 0.12), rgba(23, 19, 10, 0.03) 34%, rgba(23, 19, 10, 0.015)),
     rgba(7, 8, 12, 0.62);
   border-radius: 18px;
   padding: clamp(28px, 5vw, 48px);
@@ -147,7 +147,7 @@
 .ok-section-card,
 .ok-card {
   border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(23, 19, 10, 0.035);
   border-radius: 16px;
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
 }
@@ -160,8 +160,8 @@
   padding: 24px;
   border-color: rgba(234, 195, 33, 0.24);
   background:
-    linear-gradient(120deg, rgba(234, 195, 33, 0.12), rgba(255, 255, 255, 0.028) 44%),
-    rgba(255, 255, 255, 0.035);
+    linear-gradient(120deg, rgba(234, 195, 33, 0.12), rgba(23, 19, 10, 0.028) 44%),
+    rgba(23, 19, 10, 0.035);
   margin-bottom: 20px;
 }
 
@@ -174,8 +174,8 @@
   margin-bottom: 20px;
   border-color: rgba(0, 212, 170, 0.2);
   background:
-    linear-gradient(120deg, rgba(0, 212, 170, 0.1), rgba(108, 142, 245, 0.08) 40%, rgba(255, 255, 255, 0.025)),
-    rgba(255, 255, 255, 0.035);
+    linear-gradient(120deg, rgba(0, 212, 170, 0.1), rgba(108, 142, 245, 0.08) 40%, rgba(23, 19, 10, 0.025)),
+    rgba(23, 19, 10, 0.035);
 }
 
 .kk-entry-band h2 {
@@ -210,7 +210,7 @@
 .ok-plan-grid div,
 .ok-section-stats div,
 .ok-metric-strip div {
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(23, 19, 10, 0.07);
   background: rgba(0, 0, 0, 0.16);
   border-radius: 12px;
   padding: 13px;
@@ -321,7 +321,7 @@
 .ok-score-track {
   height: 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(23, 19, 10, 0.08);
   overflow: hidden;
 }
 
@@ -347,8 +347,8 @@
 .ok-decision,
 .ok-meeting,
 .ok-prompt-grid button {
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(255, 255, 255, 0.028);
+  border: 1px solid rgba(23, 19, 10, 0.07);
+  background: rgba(23, 19, 10, 0.028);
   border-radius: 12px;
 }
 
@@ -531,7 +531,7 @@
   width: min(720px, 100%);
   border: 1px solid rgba(234, 195, 33, 0.22);
   background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.13), rgba(255, 255, 255, 0.035) 40%),
+    linear-gradient(135deg, rgba(234, 195, 33, 0.13), rgba(23, 19, 10, 0.035) 40%),
     rgba(8, 9, 13, 0.84);
   border-radius: 18px;
   padding: clamp(28px, 6vw, 54px);
@@ -588,7 +588,7 @@
   gap: 18px;
   border: 1px solid rgba(234, 195, 33, 0.18);
   background:
-    linear-gradient(120deg, rgba(234, 195, 33, 0.12), rgba(255, 255, 255, 0.032) 46%),
+    linear-gradient(120deg, rgba(234, 195, 33, 0.12), rgba(23, 19, 10, 0.032) 46%),
     rgba(8, 9, 13, 0.74);
   border-radius: 16px;
   padding: 22px 24px;
@@ -664,7 +664,7 @@
   border: 1px solid rgba(0, 212, 170, 0.18);
   background:
     linear-gradient(120deg, rgba(0, 212, 170, 0.1), rgba(108, 142, 245, 0.07) 44%),
-    rgba(255, 255, 255, 0.03);
+    rgba(23, 19, 10, 0.03);
   border-radius: 16px;
   padding: 22px 24px;
 }
@@ -707,7 +707,7 @@
 
 .kk-metric-row div {
   border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(23, 19, 10, 0.03);
   border-radius: 14px;
   padding: 18px;
 }
@@ -730,8 +730,8 @@
 .kk-notes-panel {
   border: 1px solid var(--border-color);
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.018)),
-    rgba(255, 255, 255, 0.025);
+    linear-gradient(135deg, rgba(23, 19, 10, 0.04), rgba(23, 19, 10, 0.018)),
+    rgba(23, 19, 10, 0.025);
   border-radius: 16px;
   padding: 24px;
 }
@@ -766,7 +766,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(23, 19, 10, 0.07);
   background: rgba(0, 0, 0, 0.16);
   border-radius: 12px;
   padding: 12px;
@@ -803,10 +803,10 @@
   min-height: 270px;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(23, 19, 10, 0.08);
   background:
-    linear-gradient(145deg, rgba(0, 212, 170, 0.055), rgba(234, 195, 33, 0.035) 48%, rgba(255, 255, 255, 0.02)),
-    rgba(255, 255, 255, 0.03);
+    linear-gradient(145deg, rgba(0, 212, 170, 0.055), rgba(234, 195, 33, 0.035) 48%, rgba(23, 19, 10, 0.02)),
+    rgba(23, 19, 10, 0.03);
   border-radius: 16px;
   padding: 22px;
 }

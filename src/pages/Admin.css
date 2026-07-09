@@ -9,7 +9,7 @@
   --bg-secondary: #ECEAE6;
   --bg-tertiary: #E2E0DC;
   --card-bg: #FFFFFF;
-  --card-bg-glass: rgba(255, 255, 255, 0.72);
+  --card-bg-glass: rgba(23, 19, 10, 0.72);
   --text-primary: #1A1715;
   --text-secondary: #5C5753;
   --text-tertiary: #9E9994;
@@ -49,8 +49,8 @@
   --accent-light: #F5D84A;
   --accent-alpha: rgba(234, 195, 33, 0.10);
   --accent-glow: rgba(234, 195, 33, 0.20);
-  --border: rgba(255, 255, 255, 0.06);
-  --border-strong: rgba(255, 255, 255, 0.10);
+  --border: rgba(23, 19, 10, 0.06);
+  --border-strong: rgba(23, 19, 10, 0.10);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
@@ -104,8 +104,8 @@
 
 .dark .login-grid-overlay {
   background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    linear-gradient(rgba(23, 19, 10,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 19, 10,0.02) 1px, transparent 1px);
 }
 
 .admin-login-card {
@@ -258,7 +258,7 @@
 .admin-dashboard .btn-primary,
 .admin-login-container .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--white);
   border-color: var(--accent);
 }
 
@@ -338,8 +338,8 @@
 
 .dark .admin-grid-bg {
   background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    linear-gradient(rgba(23, 19, 10,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 19, 10,0.02) 1px, transparent 1px);
 }
 
 /* ===== SIDEBAR ===== */
@@ -434,7 +434,7 @@
   justify-content: center;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--white);
   flex-shrink: 0;
   text-transform: uppercase;
 }
@@ -557,7 +557,7 @@
 .nav-badge {
   margin-left: auto;
   background: var(--accent);
-  color: #fff;
+  color: var(--white);
   font-size: 0.68rem;
   font-weight: 700;
   padding: 2px 7px;
@@ -1033,7 +1033,7 @@
 
 .admin-tab.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--white);
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(212,160,23,0.2);
 }
@@ -1472,12 +1472,12 @@
 
 .admin-toast.success {
   background: #059669;
-  color: #fff;
+  color: var(--white);
 }
 
 .admin-toast.error {
   background: #DC2626;
-  color: #fff;
+  color: var(--white);
 }
 
 .admin-toast .toast-progress {
@@ -1486,7 +1486,7 @@
   left: 0;
   height: 3px;
   border-radius: 0 0 var(--radius-md) var(--radius-md);
-  background: rgba(255,255,255,0.3);
+  background: rgba(23, 19, 10,0.3);
   animation: toastProgress 3s linear;
 }
 
@@ -1635,7 +1635,7 @@
 
 .view-toggle button.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--white);
 }
 
 /* Search Input */
@@ -1742,19 +1742,19 @@
 .admin-dashboard.dark,
 .admin-login-container.dark {
   --bg-primary: #060606;
-  --bg-secondary: rgba(255, 255, 255, 0.035);
-  --bg-tertiary: rgba(255, 255, 255, 0.06);
+  --bg-secondary: rgba(23, 19, 10, 0.035);
+  --bg-tertiary: rgba(23, 19, 10, 0.06);
   --card-bg: rgba(8, 8, 8, 0.9);
   --card-bg-glass: rgba(8, 8, 8, 0.78);
   --text-primary: #FFFFFF;
-  --text-secondary: rgba(255, 255, 255, 0.62);
-  --text-tertiary: rgba(255, 255, 255, 0.38);
+  --text-secondary: rgba(23, 19, 10, 0.62);
+  --text-tertiary: rgba(23, 19, 10, 0.38);
   --accent: #FFD400;
   --accent-light: #FFE75A;
   --accent-alpha: rgba(255, 212, 0, 0.08);
   --accent-glow: rgba(255, 212, 0, 0.32);
-  --border: rgba(255, 255, 255, 0.075);
-  --border-strong: rgba(255, 255, 255, 0.13);
+  --border: rgba(23, 19, 10, 0.075);
+  --border-strong: rgba(23, 19, 10, 0.13);
   --shadow-sm: none;
   --shadow-md: 0 16px 40px rgba(0, 0, 0, 0.28);
   --shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.44);
@@ -1804,8 +1804,8 @@
 .notification-dropdown,
 .admin-modal,
 .seed-section {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.016) 58%, rgba(255, 212, 0, 0.035)), rgba(8, 8, 8, 0.9) !important;
-  border-color: rgba(255, 255, 255, 0.075) !important;
+  background: linear-gradient(145deg, rgba(23, 19, 10, 0.045), rgba(23, 19, 10, 0.016) 58%, rgba(255, 212, 0, 0.035)), rgba(8, 8, 8, 0.9) !important;
+  border-color: rgba(23, 19, 10, 0.075) !important;
   box-shadow: none !important;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -1846,7 +1846,7 @@
 }
 
 .admin-sidebar {
-  border-right-color: rgba(255, 255, 255, 0.075) !important;
+  border-right-color: rgba(23, 19, 10, 0.075) !important;
 }
 
 .sidebar-header,
@@ -1855,7 +1855,7 @@
 .admin-table-header,
 .dashboard-recent-header,
 .admin-form h3 {
-  border-color: rgba(255, 255, 255, 0.075) !important;
+  border-color: rgba(23, 19, 10, 0.075) !important;
 }
 
 .sidebar-nav-item,
@@ -1887,9 +1887,9 @@
 .admin-login-card input,
 .seed-section input,
 .search-input {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: #fff !important;
+  background: rgba(23, 19, 10, 0.04) !important;
+  border-color: rgba(23, 19, 10, 0.1) !important;
+  color: var(--white) !important;
   border-radius: 14px !important;
 }
 
@@ -1904,13 +1904,13 @@
 }
 
 .admin-table th {
-  background: rgba(255, 255, 255, 0.035) !important;
-  color: rgba(255, 255, 255, 0.42) !important;
+  background: rgba(23, 19, 10, 0.035) !important;
+  color: rgba(23, 19, 10, 0.42) !important;
 }
 
 .admin-table td,
 .admin-table th {
-  border-color: rgba(255, 255, 255, 0.065) !important;
+  border-color: rgba(23, 19, 10, 0.065) !important;
 }
 
 .admin-table tr:hover td {

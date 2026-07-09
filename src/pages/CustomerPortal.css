@@ -6,7 +6,7 @@
 /* Header */
 .cp-header {
   border-bottom: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(23, 19, 10, 0.02);
   padding: 100px 0 24px;
   margin-bottom: 40px;
 }
@@ -59,7 +59,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 18px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(23, 19, 10, 0.04);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   color: var(--gray-light);
@@ -137,8 +137,8 @@
   gap: 22px;
   border: 1px solid rgba(234, 195, 33, 0.18);
   background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.11), rgba(255, 255, 255, 0.032) 44%),
-    rgba(255, 255, 255, 0.035);
+    linear-gradient(135deg, rgba(234, 195, 33, 0.11), rgba(23, 19, 10, 0.032) 44%),
+    rgba(23, 19, 10, 0.035);
   border-radius: 16px;
   padding: 24px;
   color: var(--white);
@@ -149,36 +149,36 @@
   transform: translateY(-2px);
   border-color: rgba(234, 195, 33, 0.36);
   background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.15), rgba(255, 255, 255, 0.045) 44%),
-    rgba(255, 255, 255, 0.045);
+    linear-gradient(135deg, rgba(234, 195, 33, 0.15), rgba(23, 19, 10, 0.045) 44%),
+    rgba(23, 19, 10, 0.045);
 }
 
 .cp-access-card.business {
   border-color: rgba(0, 212, 170, 0.18);
   background:
     linear-gradient(135deg, rgba(0, 212, 170, 0.11), rgba(108, 142, 245, 0.075) 44%),
-    rgba(255, 255, 255, 0.035);
+    rgba(23, 19, 10, 0.035);
 }
 
 .cp-access-card.kit {
   border-color: rgba(234, 195, 33, 0.24);
   background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.14), rgba(255, 255, 255, 0.036) 44%),
-    rgba(255, 255, 255, 0.035);
+    linear-gradient(135deg, rgba(234, 195, 33, 0.14), rgba(23, 19, 10, 0.036) 44%),
+    rgba(23, 19, 10, 0.035);
 }
 
 .cp-access-card.business:hover {
   border-color: rgba(0, 212, 170, 0.34);
   background:
     linear-gradient(135deg, rgba(0, 212, 170, 0.15), rgba(108, 142, 245, 0.1) 44%),
-    rgba(255, 255, 255, 0.045);
+    rgba(23, 19, 10, 0.045);
 }
 
 .cp-access-card.kit:hover {
   border-color: rgba(234, 195, 33, 0.4);
   background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.18), rgba(255, 255, 255, 0.048) 44%),
-    rgba(255, 255, 255, 0.045);
+    linear-gradient(135deg, rgba(234, 195, 33, 0.18), rgba(23, 19, 10, 0.048) 44%),
+    rgba(23, 19, 10, 0.045);
 }
 
 .cp-access-icon {
@@ -246,7 +246,7 @@
 .cp-empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(23, 19, 10, 0.02);
   border: 1px solid var(--border-color);
   border-radius: 16px;
 }
@@ -282,7 +282,7 @@
 }
 
 .cp-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(23, 19, 10, 0.03);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px;
@@ -389,7 +389,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 16px 18px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(23, 19, 10, 0.03);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   transition: border-color 0.2s ease;
@@ -454,7 +454,7 @@
 .cp-stat {
   text-align: center;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(23, 19, 10, 0.02);
   border: 1px solid var(--border-color);
   border-radius: 12px;
 }
@@ -479,7 +479,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px 20px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(23, 19, 10, 0.02);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   font-size: 0.85rem;

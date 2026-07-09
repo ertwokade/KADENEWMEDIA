@@ -4,7 +4,13 @@ const ThemeContext = createContext()
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'dark'
+    // Yeni kade arayüzü açık tema — eski 'dark' tercihini bir kez sıfırla
+    const saved = localStorage.getItem('theme')
+    if (localStorage.getItem('kade_theme_v2') !== '1') {
+      localStorage.setItem('kade_theme_v2', '1')
+      return 'light'
+    }
+    return saved || 'light'
   })
 
   useEffect(() => {
