@@ -200,7 +200,7 @@ function add(){
  var isler=all.find(function(e){return /^İŞLER$|^İşler$/i.test((e.textContent||'').trim());});
  if(!isler||!isler.parentElement)return false;
  var box=isler.parentElement;box.classList.add('kade-navrow');
- if(!document.getElementById('kade-navrow-style')){var st=document.createElement('style');st.id='kade-navrow-style';st.textContent='.kade-navrow{flex-wrap:nowrap!important;gap:0 22px!important;justify-content:flex-end!important}.kade-navrow>a,.kade-navrow>button{font-size:13px!important;letter-spacing:.02em!important;white-space:nowrap;margin:0!important}';document.head.appendChild(st);}
+ if(!document.getElementById('kade-navrow-style')){var st=document.createElement('style');st.id='kade-navrow-style';st.textContent='.kade-navrow{flex-wrap:nowrap!important;gap:0 22px!important;justify-content:flex-end!important}.kade-navrow>a,.kade-navrow>button{font-size:13px!important;letter-spacing:.02em!important;white-space:nowrap;margin:0!important}.kade-tema::before{display:none!important}';document.head.appendChild(st);}
  var items=[['HAKKIMIZDA','/hakkimizda'],['BLOG','/blog'],['PARTNERLER','/partnerler'],['PAKETLER','/paketler'],['HİZMETLER','/hizmetler']];
  items.forEach(function(it){
   var a=document.createElement('a');a.href=it[1];a.textContent=it[0];a.className='kade-navadd';
@@ -209,6 +209,14 @@ function add(){
   box.insertBefore(a,box.firstChild);
  });
  isler.style.display='none';
+ var tema=all.find(function(e){return /TEMA/i.test((e.textContent||'').trim())&&(e.textContent||'').trim().length<12;});
+ if(tema){
+  tema.classList.add('kade-tema');tema.title='';
+  var t=tema.closest('button')||tema; t.title='';
+  function clean(){var leaf=tema;while(leaf.firstElementChild)leaf=leaf.firstElementChild;if(/\[/.test(leaf.textContent||''))leaf.textContent='TEMA';}
+  clean();try{new MutationObserver(clean).observe(tema,{childList:true,subtree:true,characterData:true});}catch(e){}
+  t.addEventListener('click',function(){setTimeout(function(){var leaf=tema;while(leaf.firstElementChild)leaf=leaf.firstElementChild;var dark=document.documentElement.classList.contains('dark')||document.documentElement.getAttribute('data-theme')==='dark';leaf.style.color=dark?'#c8901a':'';},60);});
+ }
  var f=document.createElement('span');f.id='kade-nav-added';f.style.display='none';box.appendChild(f);
  if(!document.getElementById('kade-login-btn')){var g=document.createElement('a');g.id='kade-login-btn';g.href='/giris';g.textContent='GİRİŞ →';g.style.cssText='position:fixed;right:24px;bottom:24px;z-index:99999;display:inline-flex;align-items:center;padding:14px 24px;border-radius:40px;background:linear-gradient(135deg,#f5d84a,#e0a81f);color:#17130a;font-family:GeistMono,monospace;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;box-shadow:0 10px 30px rgba(224,168,31,.45)';document.body.appendChild(g);}
  return true;
