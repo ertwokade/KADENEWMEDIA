@@ -15,6 +15,7 @@ function ensure(){
  var all=[].slice.call(document.querySelectorAll('button,a,span'));
  var tema=all.find(function(e){return /TEMA/i.test((e.textContent||'').trim())&&(e.textContent||'').trim().length<12;});
  if(tema){tema.classList.add('kade-tema');cleanTema(tema);}
+ var logo=all.find(function(e){return /kade\s*media/i.test((e.textContent||'').trim())&&(e.textContent||'').trim().length<16;});if(logo){logo.style.fontFamily="'tronica-mono',ui-monospace,monospace";logo.style.fontWeight='600';}
  if(document.querySelector('.kade-navadd')){return;}
  var isler=all.find(function(e){return /^İŞLER$|^İşler$/i.test((e.textContent||'').trim());});
  if(!isler||!isler.parentElement)return;
@@ -22,7 +23,7 @@ function ensure(){
  var items=[['HAKKIMIZDA','/hakkimizda'],['BLOG','/blog'],['PARTNERLER','/partnerler'],['PAKETLER','/paketler'],['HİZMETLER','/hizmetler']];
  items.forEach(function(it){var a=document.createElement('a');a.href=it[1];a.textContent=it[0];a.className='kade-navadd';a.style.cssText='font-family:inherit;color:inherit;text-decoration:none;text-transform:uppercase;padding:2px 0;transition:opacity .2s;white-space:nowrap';a.onmouseenter=function(){a.style.opacity='.5';};a.onmouseleave=function(){a.style.opacity='1';};box.insertBefore(a,box.firstChild);});
  isler.style.display='none';
- if(!document.getElementById('kade-login-btn')){var g=document.createElement('a');g.id='kade-login-btn';g.href='/giris';g.textContent='GİRİŞ →';g.style.cssText='position:fixed;right:24px;bottom:24px;z-index:99999;display:inline-flex;align-items:center;padding:14px 24px;border-radius:40px;background:linear-gradient(135deg,#f5d84a,#e0a81f);color:#17130a;font-family:GeistMono,monospace;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;box-shadow:0 10px 30px rgba(224,168,31,.45)';document.body.appendChild(g);}
+ if(!document.getElementById('kade-login-btn')){var g=document.createElement('a');g.id='kade-login-btn';g.href='/giris';g.textContent='GİRİŞ →';g.style.cssText='position:fixed;right:24px;bottom:24px;z-index:99999;display:inline-flex;align-items:center;padding:14px 24px;border-radius:40px;background:linear-gradient(135deg,#f5d84a,#e0a81f);color:#17130a;font-family:'tronica-mono',ui-monospace,monospace;font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;box-shadow:0 10px 30px rgba(224,168,31,.45)';document.body.appendChild(g);}
 }
 var n=0,iv=setInterval(function(){ensure();if(++n>150)clearInterval(iv);},100);
 ensure();
