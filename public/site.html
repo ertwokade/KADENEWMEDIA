@@ -200,7 +200,7 @@ function add(){
  var isler=all.find(function(e){return /^İŞLER$|^İşler$/i.test((e.textContent||'').trim());});
  if(!isler||!isler.parentElement)return false;
  var box=isler.parentElement;box.classList.add('kade-navrow');
- if(!document.getElementById('kade-navrow-style')){var st=document.createElement('style');st.id='kade-navrow-style';st.textContent='.kade-navrow{flex-wrap:nowrap!important;gap:0 20px!important}.kade-navrow>a,.kade-navrow>button{font-size:13px!important;letter-spacing:.02em!important;white-space:nowrap}';document.head.appendChild(st);}
+ if(!document.getElementById('kade-navrow-style')){var st=document.createElement('style');st.id='kade-navrow-style';st.textContent='.kade-navrow{flex-wrap:nowrap!important;gap:0 22px!important;justify-content:flex-end!important}.kade-navrow>a,.kade-navrow>button{font-size:13px!important;letter-spacing:.02em!important;white-space:nowrap;margin:0!important}';document.head.appendChild(st);}
  var items=[['HAKKIMIZDA','/hakkimizda'],['BLOG','/blog'],['PARTNERLER','/partnerler'],['PAKETLER','/paketler'],['HİZMETLER','/hizmetler']];
  items.forEach(function(it){
   var a=document.createElement('a');a.href=it[1];a.textContent=it[0];a.className='kade-navadd';
@@ -208,6 +208,7 @@ function add(){
   a.onmouseenter=function(){a.style.opacity='.5';};a.onmouseleave=function(){a.style.opacity='1';};
   box.insertBefore(a,box.firstChild);
  });
+ isler.style.display='none';
  var f=document.createElement('span');f.id='kade-nav-added';f.style.display='none';box.appendChild(f);
  if(!document.getElementById('kade-login-btn')){var g=document.createElement('a');g.id='kade-login-btn';g.href='/giris';g.textContent='GİRİŞ →';g.style.cssText='position:fixed;right:24px;bottom:24px;z-index:99999;display:inline-flex;align-items:center;padding:14px 24px;border-radius:40px;background:linear-gradient(135deg,#f5d84a,#e0a81f);color:#17130a;font-family:GeistMono,monospace;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;box-shadow:0 10px 30px rgba(224,168,31,.45)';document.body.appendChild(g);}
  return true;
