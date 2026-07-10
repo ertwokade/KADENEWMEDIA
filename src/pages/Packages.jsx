@@ -7,7 +7,7 @@ import {
   HiOutlineArrowRight,
   HiOutlineSparkles,
 } from 'react-icons/hi'
-import { claimFreePackageApi } from '../api'
+import { claimFreePackageApi, getContentApi } from '../api'
 import { useCustomer } from '../contexts/CustomerContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import { analytics } from '../utils/analytics'
@@ -21,6 +21,14 @@ function CompCell({ val }) {
   if (val === true) return <span className="comp-yes">✓</span>
   if (val === false) return <span className="comp-no">✗</span>
   return <span className="comp-maybe">~</span>
+}
+
+const splitFeatures = (value) => {
+  if (Array.isArray(value)) return value.filter(Boolean)
+  return String(value || '')
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean)
 }
 
 export default function Packages() {
@@ -37,6 +45,8 @@ export default function Packages() {
 
   const [claimingReference, setClaimingReference] = useState('')
   const [claimMessage, setClaimMessage] = useState('')
+  const [adminPackages, setAdminPackages] = useState([])
+  const [adminFaqs, setAdminFaqs] = useState([])
 
   useEffect(() => {
     const schema = {
@@ -87,7 +97,35 @@ export default function Packages() {
     }
   }
 
-  const packages = [
+  useEffect(() => {
+    let alive = true
+    Promise.allSettled([
+      getContentApi('packages'),
+      getContentApi('faq'),
+    ]).then(([packagesRes, faqRes]) => {
+      if (!alive) return
+
+      const packagesData = packagesRes.status === 'fulfilled'
+        ? (packagesRes.value?.data || packagesRes.value)
+        : null
+      const packageItems = Array.isArray(packagesData?.items) ? packagesData.items : []
+      if (packageItems.length) setAdminPackages(packageItems)
+
+      const faqData = faqRes.status === 'fulfilled'
+        ? (faqRes.value?.data || faqRes.value)
+        : null
+      const faqItems = Array.isArray(faqData?.[lang]) ? faqData[lang] : []
+      if (faqItems.length) {
+        setAdminFaqs(faqItems
+          .filter(item => item?.q || item?.a)
+          .slice(0, 4)
+          .map(item => ({ q: item.q || '', a: item.a || '' })))
+      }
+    }).catch(() => {})
+    return () => { alive = false }
+  }, [lang])
+
+  const defaultPackages = [
     {
       tier: 'danismanlik-test',
       tag: isEN ? 'Free Test' : '0 TL Test',
@@ -188,12 +226,32 @@ export default function Packages() {
     },
   ]
 
-  const faqs = [
+  const packages = adminPackages.length
+    ? adminPackages.map((pkg, index) => {
+      const name = isEN ? (pkg.nameEn || pkg.nameTr) : (pkg.nameTr || pkg.nameEn)
+      const desc = isEN ? (pkg.descEn || pkg.descTr) : (pkg.descTr || pkg.descEn)
+      const features = splitFeatures(isEN ? (pkg.featuresEn || pkg.featuresTr) : (pkg.featuresTr || pkg.featuresEn))
+      return {
+        tier: pkg.tier || `admin-${index}`,
+        tag: pkg.tier || (pkg.popular ? (isEN ? 'Popular' : 'Popüler') : (isEN ? 'Package' : 'Paket')),
+        name: name || (isEN ? 'Custom Package' : 'Özel Paket'),
+        tagline: desc || (isEN ? 'Tailored for your brand.' : 'Markanıza özel planlanır.'),
+        desc: desc || (isEN ? 'Contact us for a custom scope.' : 'Size özel kapsam için iletişime geçin.'),
+        features: features.length ? features : [isEN ? 'Custom scope' : 'Özel kapsam'],
+        popular: Boolean(pkg.popular),
+        color: pkg.popular ? 'rgba(234,195,33,0.06)' : 'rgba(255,255,255,0.06)',
+        priceLabel: pkg.priceTRY ? `${pkg.priceTRY} TL` : (isEN ? 'Custom quote' : 'Teklif al'),
+      }
+    })
+    : defaultPackages
+
+  const defaultFaqs = [
     { q: t('packages.faq1q'), a: t('packages.faq1a') },
     { q: t('packages.faq2q'), a: t('packages.faq2a') },
     { q: t('packages.faq3q'), a: t('packages.faq3a') },
     { q: t('packages.faq4q'), a: t('packages.faq4a') },
   ]
+  const faqs = adminFaqs.length ? adminFaqs : defaultFaqs
 
   return (
     <PageTransition>

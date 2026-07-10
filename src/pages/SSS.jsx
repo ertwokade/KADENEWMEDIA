@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   HiOutlineQuestionMarkCircle,
@@ -8,6 +8,7 @@ import {
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import { FAQSchema } from '../components/StructuredData'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
@@ -156,6 +157,7 @@ export default function SSS() {
   const [aktifKategori, setAktifKategori] = useState('genel')
   const [acikId, setAcikId] = useState(null)
   const [arama, setArama] = useState('')
+  const [sssItems, setSssItems] = useState(sssVerisi)
 
   useSEO({
     title: lang === 'tr' ? 'Sık Sorulan Sorular | Kade Media' : 'FAQ | Kade Media',
@@ -169,7 +171,40 @@ export default function SSS() {
   const soruKey = lang === 'tr' ? 'soru' : 'soruEn'
   const cevapKey = lang === 'tr' ? 'cevap' : 'cevapEn'
 
-  const filtreliSSSler = sssVerisi.filter(item => {
+  useEffect(() => {
+    let alive = true
+    getContentApi('faq')
+      .then(res => {
+        if (!alive) return
+        const data = res?.data || res
+        const tr = Array.isArray(data?.tr) ? data.tr : []
+        const en = Array.isArray(data?.en) ? data.en : []
+        const max = Math.max(tr.length, en.length)
+        if (!max) return
+
+        const normalized = Array.from({ length: max }, (_, i) => {
+          const trItem = tr[i] || {}
+          const enItem = en[i] || {}
+          return {
+            id: `admin-${i}`,
+            kategori: trItem.kategori || enItem.kategori || 'genel',
+            soru: trItem.q || enItem.q || '',
+            cevap: trItem.a || enItem.a || '',
+            soruEn: enItem.q || trItem.q || '',
+            cevapEn: enItem.a || trItem.a || '',
+          }
+        }).filter(item => item.soru || item.soruEn)
+
+        if (normalized.length) {
+          setSssItems(normalized)
+          setAktifKategori('hepsi')
+        }
+      })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [])
+
+  const filtreliSSSler = sssItems.filter(item => {
     const kategoriUygun = aktifKategori === 'hepsi' || item.kategori === aktifKategori
     const aramaUygun = arama === '' ||
       item[soruKey].toLowerCase().includes(arama.toLowerCase()) ||
@@ -181,7 +216,7 @@ export default function SSS() {
 
   return (
     <PageTransition>
-      <FAQSchema items={sssVerisi} />
+      <FAQSchema items={sssItems} />
       <section className="sss-hero">
         <PageBgAnimation type="contact" />
         <div className="grid-bg" />

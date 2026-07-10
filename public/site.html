@@ -84,4 +84,112 @@
   setTimeout(fix, 1000);
   setTimeout(fix, 2500);
 })();
+</script><script id="kade-home-content-sync">
+(function(){
+  function fetchSection(section){
+    return fetch('/api/content?section=' + encodeURIComponent(section), { credentials: 'same-origin' })
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(payload){ return payload && (payload.data || payload); })
+      .catch(function(){ return null; });
+  }
+  function setTextByExact(current, next){
+    if (!next) return;
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(node){
+        var parent = node.parentElement;
+        if (!parent || /script|style|noscript/i.test(parent.tagName)) return NodeFilter.FILTER_REJECT;
+        return node.nodeValue.trim() === current ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    var node = walker.nextNode();
+    if (node) node.nodeValue = next;
+  }
+  function setSocial(label, href){
+    if (!href) return;
+    Array.from(document.querySelectorAll('a')).forEach(function(a){
+      if ((a.textContent || '').trim().toLowerCase() === label.toLowerCase()) {
+        a.href = href;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+      }
+    });
+  }
+  function setMeta(selector, value){
+    var node = document.querySelector(selector);
+    if (node && value) node.setAttribute('content', value);
+  }
+  function applyHero(data){
+    var tr = data && (data.tr || data);
+    if (!tr) return;
+    setTextByExact('Sosyal Medya &', tr.title1);
+    setTextByExact('Pazarlama', tr.title2);
+    setTextByExact('Markaları dijitalde büyütüyoruz.', tr.title2);
+    setTextByExact('Strateji, içerik ve reklamı bir araya getirerek markaların dijitalde düzenli büyümesini sağlıyoruz.', tr.subtitle);
+    setMeta('meta[name="description"]', tr.subtitle);
+    setMeta('meta[property="og:description"]', tr.subtitle);
+    setMeta('meta[name="twitter:description"]', tr.subtitle);
+  }
+  function applyFooter(data){
+    if (!data) return;
+    if (data.email) {
+      var email = document.querySelector('footer a[href^="mailto:"]');
+      if (email) {
+        email.href = 'mailto:' + data.email;
+        email.textContent = data.email;
+      }
+    }
+    setSocial('Instagram', data.instagram);
+    setSocial('X', data.twitter || data.x);
+    setSocial('YouTube', data.youtube);
+    setSocial('TikTok', data.tiktok);
+    setSocial('LinkedIn', data.linkedin);
+    if (data.whatsapp) {
+      var group = document.querySelector('footer a[target="_blank"]')?.parentElement;
+      var exists = Array.from(document.querySelectorAll('footer a')).some(function(a){ return (a.textContent || '').trim().toLowerCase() === 'whatsapp'; });
+      if (group && !exists) {
+        var template = group.querySelector('a');
+        var link = template ? template.cloneNode(true) : document.createElement('a');
+        link.href = data.whatsapp;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.innerHTML = '<span style="opacity:1"><span>WhatsApp</span></span>';
+        group.appendChild(link);
+      }
+    }
+  }
+  function applyPortfolio(data){
+    var items = Array.isArray(data && data.items) ? data.items : [];
+    if (!items.length) return;
+    var cards = Array.from(document.querySelectorAll('#selected-work article a'));
+    cards.forEach(function(card, index){
+      var item = items[index];
+      if (!item) return;
+      var title = item.titleTr || item.titleEn || item.title;
+      var meta = item.category || item.partner || item.metricKey || 'Portfolio';
+      var metric = item.metricVal || item.year || '';
+      var titleNode = card.querySelector('.flex-1');
+      var badge = card.querySelector('.bg-selection');
+      var spans = card.querySelectorAll('.tabular-nums span');
+      if (titleNode && title) titleNode.textContent = title;
+      if (badge && meta) badge.textContent = meta;
+      if (spans.length && metric) spans[0].textContent = metric;
+      if (title) card.setAttribute('aria-label', title + (metric ? ' - ' + metric : ''));
+    });
+  }
+  function sync(){
+    Promise.all([fetchSection('hero'), fetchSection('footer'), fetchSection('portfolio')])
+      .then(function(results){
+        applyHero(results[0]);
+        applyFooter(results[1]);
+        applyPortfolio(results[2]);
+      });
+  }
+  function scheduleSync(){
+    setTimeout(sync, 1800);
+    setTimeout(sync, 3500);
+    setTimeout(sync, 5500);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scheduleSync); else scheduleSync();
+  window.addEventListener('load', scheduleSync);
+})();
 </script></body></html>

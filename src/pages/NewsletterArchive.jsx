@@ -24,7 +24,8 @@ export default function NewsletterArchive() {
 
   useEffect(() => {
     getContentApi('newsletterArchive')
-      .then(data => {
+      .then(res => {
+        const data = res?.data || res
         if (Array.isArray(data?.items) && data.items.length) setItems(data.items)
       })
       .catch(() => {})

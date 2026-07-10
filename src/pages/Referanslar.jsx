@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   HiOutlineStar,
@@ -10,6 +10,7 @@ import { FaInstagram, FaLinkedinIn, FaGoogle } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -146,6 +147,7 @@ export default function Referanslar() {
   const { lang } = useLanguage()
   const [aktifSayfa, setAktifSayfa] = useState(0)
   const [aktifSektor, setAktifSektor] = useState('hepsi')
+  const [yorumItems, setYorumItems] = useState(yorumlar)
   const yorumBasina = 6
 
   useSEO({
@@ -157,12 +159,51 @@ export default function Referanslar() {
     path: '/referanslar',
   })
 
+  useEffect(() => {
+    let alive = true
+    getContentApi('testimonials')
+      .then(res => {
+        if (!alive) return
+        const data = res?.data || res
+        const items = Array.isArray(data?.items) ? data.items : []
+        if (!items.length) return
+
+        const normalized = items.map((item, i) => {
+          const name = lang === 'tr' ? (item.nameTr || item.nameEn) : (item.nameEn || item.nameTr)
+          const role = lang === 'tr' ? (item.roleTr || item.roleEn) : (item.roleEn || item.roleTr)
+          const text = lang === 'tr' ? (item.textTr || item.textEn) : (item.textEn || item.textTr)
+          return {
+            id: `admin-${i}`,
+            isim: name || (lang === 'tr' ? 'Kade Media Müşterisi' : 'Kade Media Client'),
+            unvan: role || (lang === 'tr' ? 'Müşteri' : 'Client'),
+            sirket: '',
+            sektor: item.sectorTr || 'Genel',
+            sektorEn: item.sectorEn || 'General',
+            platform: item.platform || 'google',
+            puan: Number(item.rating) || 5,
+            yorum: text || '',
+            tarih: item.date || (lang === 'tr' ? 'Güncel' : 'Current'),
+            avatarRenk: item.color || '#eac321',
+            avatar: item.avatar || '',
+          }
+        }).filter(item => item.yorum)
+
+        if (normalized.length) {
+          setYorumItems(normalized)
+          setAktifSektor('hepsi')
+          setAktifSayfa(0)
+        }
+      })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [lang])
+
   const sektorKey = lang === 'tr' ? 'sektor' : 'sektorEn'
-  const sektorler = ['hepsi', ...new Set(yorumlar.map(y => y[sektorKey]))]
+  const sektorler = ['hepsi', ...new Set(yorumItems.map(y => y[sektorKey]).filter(Boolean))]
 
   const filtreliYorumlar = aktifSektor === 'hepsi'
-    ? yorumlar
-    : yorumlar.filter(y => y[sektorKey] === aktifSektor)
+    ? yorumItems
+    : yorumItems.filter(y => y[sektorKey] === aktifSektor)
 
   const sayfaSayisi = Math.ceil(filtreliYorumlar.length / yorumBasina)
   const gosterilen = filtreliYorumlar.slice(aktifSayfa * yorumBasina, (aktifSayfa + 1) * yorumBasina)
@@ -244,11 +285,11 @@ export default function Referanslar() {
                       className="referans-avatar"
                       style={{ background: `${yorum.avatarRenk}20`, color: yorum.avatarRenk }}
                     >
-                      {yorum.isim.charAt(0)}
+                      {yorum.avatar || yorum.isim.charAt(0)}
                     </div>
                     <div>
                       <div className="referans-isim">{yorum.isim}</div>
-                      <div className="referans-unvan">{yorum.unvan}, {yorum.sirket}</div>
+                      <div className="referans-unvan">{yorum.unvan}{yorum.sirket ? `, ${yorum.sirket}` : ''}</div>
                       <div className="referans-sektor">{lang === 'tr' ? yorum.sektor : yorum.sektorEn} · {yorum.tarih}</div>
                     </div>
                   </div>
