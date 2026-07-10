@@ -19,7 +19,7 @@ function ensure(){
  isler.style.display='none';
  if(!document.getElementById('kade-login-btn')){var g=document.createElement('a');g.id='kade-login-btn';g.href='/giris';g.textContent='GİRİŞ →';g.style.cssText='position:fixed;right:24px;bottom:24px;z-index:99999;display:inline-flex;align-items:center;padding:14px 24px;border-radius:40px;background:linear-gradient(135deg,#f5d84a,#e0a81f);color:#17130a;font-family:GeistMono,monospace;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;box-shadow:0 10px 30px rgba(224,168,31,.45)';document.body.appendChild(g);}
 }
-var n=0,iv=setInterval(function(){ensure();if(document.querySelector('.kade-navadd')||++n>80){clearInterval(iv);}},120);
+var n=0,iv=setInterval(function(){ensure();if(++n>150)clearInterval(iv);},100);
 ensure();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensure);
 // GÜVENLİK: 3sn sonra ne olursa olsun nav'ı göster (bulunamadıysa gizli kalmasın)
