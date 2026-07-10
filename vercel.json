@@ -5,6 +5,18 @@
       "schedule": "0 6 * * *"
     }
   ],
+  "redirects": [
+    {
+      "source": "/kadelinks",
+      "destination": "https://kadirardademir.com/links",
+      "permanent": true
+    },
+    {
+      "source": "/kadelinks/:path*",
+      "destination": "https://kadirardademir.com/links",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/", "destination": "/site.html" },

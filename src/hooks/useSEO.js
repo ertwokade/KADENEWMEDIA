@@ -24,7 +24,7 @@ function setCanonical(url) {
   el.setAttribute('href', url)
 }
 
-export function useSEO({ title, description, keywords, path = '/', image, type = 'website', noindex = false }) {
+export function useSEO({ title, description, keywords, path = '/', image, type = 'website', noindex = false, baseUrl = BASE_URL }) {
   useEffect(() => {
     // Avoid double-appending "Kade Media"
     let fullTitle
@@ -36,8 +36,8 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
       fullTitle = `${title} | Kade Media`
     }
 
-    const canonicalUrl = `${BASE_URL}${path}`
-    const ogImage = image || `${BASE_URL}/logo.png`
+    const canonicalUrl = `${baseUrl}${path}`
+    const ogImage = image || `${baseUrl}/logo.png`
 
     document.title = fullTitle
 
@@ -63,5 +63,5 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
     setMeta('twitter:site', '@kadenewmedia')
 
     setCanonical(canonicalUrl)
-  }, [title, description, keywords, path, image, type, noindex])
+  }, [title, description, keywords, path, image, type, noindex, baseUrl])
 }

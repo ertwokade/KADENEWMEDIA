@@ -11,7 +11,7 @@ export const SOCIAL = {
   instagram: 'https://instagram.com/kadenewmedia',
   youtube: 'https://www.youtube.com/@kadenewmedia',
   tiktok: 'https://tiktok.com/@kadenewmedia',
-  linkedin: 'https://www.linkedin.com/company/kademediaagency',
+  linkedin: 'https://www.linkedin.com/company/kadenewmedia',
 }
 
 export const SITE = {

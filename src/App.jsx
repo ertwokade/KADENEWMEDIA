@@ -99,6 +99,14 @@ function ProtectedAdminRoute() {
   )
 }
 
+function ExternalRedirect({ to }) {
+  useEffect(() => {
+    window.location.replace(to)
+  }, [to])
+
+  return <PageLoader />
+}
+
 const ROUTE_THEMES = {
   '/': 'home',
   '/hakkimizda': 'about',
@@ -141,7 +149,7 @@ function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
   const isHome = location.pathname === '/'
-  const isKadeLinks = location.pathname === '/kadelinks'
+  const isKadeLinks = location.pathname === '/links'
   const hideShell = isAdmin || isHome || isKadeLinks
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
@@ -231,7 +239,8 @@ function App() {
         <Route path="/proje-takip" element={<LazyRoute><ProjectTracking /></LazyRoute>} />
         <Route path="/podcast-webinar" element={<LazyRoute><PodcastWebinar /></LazyRoute>} />
         <Route path="/bulten-arsivi" element={<LazyRoute><NewsletterArchive /></LazyRoute>} />
-        <Route path="/kadelinks" element={<LazyRoute><KadeLinks /></LazyRoute>} />
+        <Route path="/links" element={<LazyRoute><KadeLinks /></LazyRoute>} />
+        <Route path="/kadelinks" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
         <Route path="/kade-kit" element={<LazyRoute><KadeKit /></LazyRoute>} />
         <Route path="/demo" element={<LazyRoute><Demo /></LazyRoute>} />
         <Route path="*" element={<NotFound />} />

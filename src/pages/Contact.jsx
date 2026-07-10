@@ -25,7 +25,7 @@ const socials = [
   { icon: FaInstagram, href: 'https://instagram.com/kadenewmedia', label: 'Instagram' },
   { icon: FaYoutube, href: 'https://www.youtube.com/@kadenewmedia', label: 'YouTube' },
   { icon: FaTiktok, href: 'https://tiktok.com/@kadenewmedia', label: 'TikTok' },
-  { icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/kademediaagency', label: 'LinkedIn' },
+  { icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/kadenewmedia', label: 'LinkedIn' },
   { icon: FaWhatsapp, href: CONTACT.whatsapp, label: 'WhatsApp' },
 ]
 

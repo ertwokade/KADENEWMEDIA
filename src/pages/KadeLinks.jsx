@@ -31,14 +31,15 @@ const INTERNAL = [
 const SOCIAL = [
   { label: 'Instagram', handle: '@kadenewmedia', href: 'https://instagram.com/kadenewmedia', icon: FaInstagram, cls: 'ig' },
   { label: 'YouTube', handle: '@kadenewmedia', href: 'https://youtube.com/@kadenewmedia', icon: FaYoutube, cls: 'yt' },
-  { label: 'LinkedIn', handle: 'Kade Media', href: 'https://www.linkedin.com/company/kademediaagency', icon: FaLinkedinIn, cls: 'in' },
+  { label: 'LinkedIn', handle: '@kadenewmedia', href: 'https://www.linkedin.com/company/kadenewmedia', icon: FaLinkedinIn, cls: 'in' },
 ]
 
 export default function KadeLinks() {
   useSEO({
-    title: 'Kade Media — Tüm Bağlantılar | kadelinks',
+    title: 'Kade Media — Tüm Bağlantılar | links',
     description: 'Kade Media resmi bağlantılar sayfası. WhatsApp, teklif, hizmetler, paketler ve sosyal medya kanallarımıza tek yerden ulaşın.',
-    path: '/kadelinks',
+    path: '/links',
+    baseUrl: 'https://kadirardademir.com',
   })
 
   return (
@@ -80,7 +81,7 @@ export default function KadeLinks() {
         </div>
 
         <a className="kl-mail" href={EMAIL}>hello@kademedia.com</a>
-        <footer className="kl-foot">© {new Date().getFullYear()} Kade Media · kademedia.com.tr</footer>
+        <footer className="kl-foot">© {new Date().getFullYear()} Kade Media · kadirardademir.com/links</footer>
       </main>
     </div>
   )

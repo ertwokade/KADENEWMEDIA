@@ -30,7 +30,7 @@ export function OrganizationSchema() {
         'https://instagram.com/kadenewmedia',
         'https://www.youtube.com/@kadenewmedia',
         'https://tiktok.com/@kadenewmedia',
-        'https://www.linkedin.com/company/kademediaagency',
+        'https://www.linkedin.com/company/kadenewmedia',
       ],
       contactPoint: {
         '@type': 'ContactPoint',
