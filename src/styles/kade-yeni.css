@@ -1,0 +1,314 @@
+/* =====================================================================
+   KADE YENİ — anasayfanın (site.html / "hello") GERÇEK dilini React
+   app'in tamamına taşır: /admin, /giris, /paketler, kit panelleri…
+   Onaylı v2 statik şablonla aynı token'lar:
+     bg #fbfaf4 · elevated #efede7 · ink #17130a · gold #e0a81f
+     display: TikTokSans wdth 120 UPPERCASE · mono: GeistMono
+     etiket: "— LABEL" mono, .2em tracking · kart: düz border, r6-8
+   En son import edilir (main.jsx) — paylaşılan sınıfları override eder.
+   ===================================================================== */
+
+@font-face { font-family:'TikTokSans'; src:url('/fonts/TikTokSans.ttf') format('truetype'); font-weight:100 900; font-display:swap; }
+@font-face { font-family:'GeistMono'; src:url('/fonts/GeistMono[wght].ttf') format('truetype'); font-weight:100 900; font-display:swap; }
+@font-face { font-family:'DepartureMono'; src:url('/fonts/DepartureMono-Regular.otf') format('opentype'); font-weight:400; font-display:swap; }
+
+:root, [data-theme="light"] {
+  --bg-primary: #fbfaf4;
+  --black: #fbfaf4;
+  --black-light: #f4f2e9;
+  --dark-gray: #efede7;
+  --gray: #e9e6da;
+  --card-bg: #fffdf6;
+  --border-color: rgba(23, 19, 10, 0.11);
+  --ky-ink: #17130a;
+  --ky-gold: #e0a81f;
+  --ky-gold-deep: #c8901a;
+  --ky-line: rgba(23, 19, 10, 0.11);
+  --ky-mono: 'GeistMono', ui-monospace, monospace;
+  --ky-tech: 'DepartureMono', ui-monospace, monospace;
+}
+html, body, #root { background: #fbfaf4 !important; }
+
+/* ---------- 1) BAŞLIKLAR: anasayfa display dili ---------- */
+.section-title,
+[class*="-hero"] h1.section-title {
+  font-family: 'TikTokSans', sans-serif !important;
+  font-variation-settings: "wdth" 120 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: -0.01em !important;
+  line-height: 0.94 !important;
+}
+/* serif-italik gold vurgu KALKAR — anasayfada yok */
+.section-title span,
+.hero-highlight,
+.cta-content h2 span {
+  color: var(--ky-ink) !important;
+  -webkit-text-fill-color: var(--ky-ink) !important;
+  font-family: inherit !important;
+  font-style: normal !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+  background: none !important;
+}
+
+/* ---------- 2) EYEBROW: "— LABEL" mono ---------- */
+.section-badge, .hero-badge {
+  font-family: var(--ky-mono) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.2em !important;
+  color: rgba(23, 19, 10, 0.55) !important;
+  text-transform: uppercase !important;
+  gap: 10px !important;
+}
+.section-badge::before, .hero-badge::before {
+  content: '—' !important;
+  width: auto !important; height: auto !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+.section-badge svg, .hero-badge svg { display: none !important; }
+
+/* ---------- 3) KARTLAR: düz bordered (glass/glow yok) ---------- */
+.glass-card, .value-card, .team-card, .feature-card, .pricing-card,
+.service-card, .tilt-card, .bento-item {
+  background: #fffdf6 !important;
+  border: 1px solid var(--ky-line) !important;
+  border-radius: 8px !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+.glass-card:hover, .value-card:hover, .team-card:hover, .feature-card:hover,
+.pricing-card:hover, .service-card:hover, .tilt-card:hover, .bento-item:hover {
+  border-color: rgba(224, 168, 31, 0.55) !important;
+  box-shadow: none !important;
+}
+
+/* ---------- 4) ZEMİN: thirds dikey çizgiler (anasayfa .kade-grid) ---------- */
+.grid-bg, [data-theme="light"] .grid-bg {
+  background-image: linear-gradient(90deg, var(--ky-line) 1px, transparent 1px) !important;
+  background-size: 33.333% 100% !important;
+  opacity: 0.5 !important;
+}
+.glow-effect, [data-theme="light"] .glow-effect {
+  background: radial-gradient(600px 380px at 70% 20%, rgba(235, 198, 105, 0.25), transparent 62%) !important;
+  filter: none !important;
+}
+
+/* ---------- 5) BUTONLAR: GİRİŞ hapı dili ---------- */
+.btn, button.btn, a.btn {
+  font-family: var(--ky-tech) !important;
+  font-size: 12px !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  font-weight: 500 !important;
+  border-radius: 999px !important;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #f5d84a, #e0a81f) !important;
+  color: #17130a !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.btn-outline {
+  border: 1px solid rgba(23, 19, 10, 0.35) !important;
+  color: var(--ky-ink) !important;
+}
+.btn-outline:hover { background: var(--ky-ink) !important; color: #fbfaf4 !important; }
+
+/* ---------- 6) NAVBAR: statik şablonla birebir ---------- */
+.navbar { font-family: var(--ky-mono); }
+.navbar .logo-word {
+  font-family: 'TikTokSans', sans-serif !important;
+  font-variation-settings: "wght" 700, "wdth" 120 !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+  color: var(--ky-ink) !important;
+}
+.navbar .logo-word span { color: var(--ky-ink) !important; }
+.navbar .logo-mark { display: none !important; }
+.navbar-link, .navbar-login-btn {
+  font-size: 13px !important;
+  letter-spacing: 0.02em !important;
+}
+.navbar-cta, .navbar-cta.btn-primary {
+  font-family: var(--ky-tech) !important;
+  font-size: 12px !important;
+  background: linear-gradient(135deg, #f5d84a, #e0a81f) !important;
+  color: #17130a !important;
+}
+.navbar.scrolled { background: rgba(251, 250, 244, 0.88); }
+
+/* ---------- 7) FOOTER: cream + mono uppercase ---------- */
+.footer, footer.footer {
+  background: #fbfaf4 !important;
+  border-top: 1px solid var(--ky-line) !important;
+}
+.footer h4, .footer h3, .footer-title {
+  font-family: var(--ky-mono) !important;
+  font-size: 12px !important;
+  letter-spacing: 0.2em !important;
+  text-transform: uppercase !important;
+  color: rgba(23, 19, 10, 0.55) !important;
+}
+.footer a { font-family: var(--ky-mono); font-size: 13px; }
+
+/* ---------- 8) İSTATİSTİK: mono ink sayılar ---------- */
+.stat-number, .story-stat-number, .count-up {
+  font-family: var(--ky-mono) !important;
+  font-weight: 600 !important;
+  color: var(--ky-ink) !important;
+  -webkit-text-fill-color: var(--ky-ink) !important;
+  background: none !important;
+  font-feature-settings: 'tnum';
+}
+.stat-label, .story-stat-label {
+  font-family: var(--ky-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+/* =====================================================================
+   ADMIN — kadeadmin'i anasayfa diline çek
+   ===================================================================== */
+.admin-dashboard, .admin-login-container,
+.admin-dashboard.dark, .admin-login-container.dark {
+  --bg-primary: #fbfaf4;
+  --card-bg: #fffdf6;
+  --card-bg-glass: #fffdf6;
+  --text-primary: #17130a;
+  --text-secondary: rgba(23, 19, 10, 0.60);
+  --text-tertiary: rgba(23, 19, 10, 0.42);
+  --accent: #e0a81f;
+  --accent-light: #ebc669;
+  --accent-alpha: rgba(224, 168, 31, 0.10);
+  --accent-glow: transparent;
+  --border: rgba(23, 19, 10, 0.11);
+  --border-strong: rgba(23, 19, 10, 0.18);
+  --shadow-sm: none; --shadow-md: none; --shadow-lg: none; --shadow-glow: none;
+  --radius-sm: 4px; --radius-md: 6px; --radius-lg: 8px; --radius-xl: 10px;
+  --font: 'TikTokSans', system-ui, sans-serif;
+}
+.admin-dashboard, .admin-login-container {
+  background: #fbfaf4 !important;
+}
+.login-grid-overlay, .admin-grid-bg,
+.dark .login-grid-overlay, .dark .admin-grid-bg {
+  background-image: linear-gradient(90deg, rgba(23,19,10,0.06) 1px, transparent 1px) !important;
+  background-size: 33.333% 100% !important;
+  opacity: 0.5;
+}
+.admin-login-card, .admin-sidebar, .admin-stat-card, .admin-table-wrapper,
+.admin-form, .dashboard-quick-action, .dashboard-recent, .kanban-column,
+.kanban-card, .note-item, .notification-dropdown, .admin-modal, .seed-section {
+  background: #fffdf6 !important;
+  border: 1px solid rgba(23, 19, 10, 0.11) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.admin-login-card { border-radius: 10px !important; }
+.admin-stat-card, .dashboard-quick-action, .dashboard-recent, .kanban-column,
+.admin-form, .admin-table-wrapper, .admin-modal { border-radius: 6px !important; }
+
+/* kadeadmin wordmark: display dili */
+.admin-logo {
+  font-family: 'TikTokSans', sans-serif !important;
+  font-variation-settings: "wdth" 120 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+}
+.admin-logo span { color: #e0a81f !important; }
+.admin-page-header h1 {
+  font-family: 'TikTokSans', sans-serif !important;
+  font-variation-settings: "wdth" 120 !important;
+  text-transform: uppercase !important;
+  font-weight: 800 !important;
+}
+.admin-page-header h1 span { color: #e0a81f !important; }
+.admin-page-header p {
+  font-family: var(--ky-mono) !important;
+  font-size: 12px !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+
+/* neon #FFD400 -> gold */
+.sidebar-nav-item.active, .sidebar-site-link:hover, .dark-mode-toggle:hover,
+.kanban-card-service, .table-action-btn.primary, .admin-tab:hover:not(.active) {
+  color: #c8901a !important;
+}
+.admin-dashboard .btn-primary, .admin-login-container .btn-primary,
+.admin-tab.active, .view-toggle button.active, .nav-badge {
+  background: linear-gradient(135deg, #f5d84a, #e0a81f) !important;
+  border-color: transparent !important;
+  color: #17130a !important;
+  box-shadow: none !important;
+}
+.sidebar-avatar, .admin-stat-card .stat-icon {
+  background: rgba(224, 168, 31, 0.10) !important;
+  color: #c8901a !important;
+  border: 1px solid rgba(224, 168, 31, 0.30) !important;
+  border-radius: 6px !important;
+}
+.sidebar-nav-item, .dashboard-quick-action, .table-action-btn, .btn-icon,
+.dark-mode-toggle, .sidebar-site-link, .sidebar-logout {
+  border-radius: 6px !important;
+}
+.sidebar-nav-item:hover, .sidebar-nav-item.active, .dashboard-quick-action:hover,
+.kanban-card:hover, .table-action-btn:hover, .btn-icon:hover {
+  background: rgba(224, 168, 31, 0.08) !important;
+  border-color: rgba(224, 168, 31, 0.42) !important;
+}
+.sidebar-nav-label, .admin-stat-card .stat-label, .admin-table th {
+  font-family: var(--ky-mono) !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+.admin-stat-card .stat-number {
+  font-family: var(--ky-mono) !important;
+  font-weight: 600 !important;
+  color: #17130a !important;
+  font-feature-settings: 'tnum';
+}
+.admin-form input, .admin-form textarea, .admin-form select,
+.admin-login-card input, .seed-section input, .search-input {
+  background: rgba(23, 19, 10, 0.035) !important;
+  border: 1px solid rgba(23, 19, 10, 0.12) !important;
+  color: #17130a !important;
+  border-radius: 6px !important;
+}
+.admin-form input:focus, .admin-form textarea:focus, .admin-form select:focus,
+.admin-login-card input:focus, .seed-section input:focus, .search-input:focus {
+  border-color: rgba(224, 168, 31, 0.72) !important;
+  box-shadow: 0 0 0 3px rgba(224, 168, 31, 0.12) !important;
+}
+.admin-table th { background: rgba(23, 19, 10, 0.035) !important; color: rgba(23,19,10,0.5) !important; }
+.admin-table td, .admin-table th { border-color: rgba(23, 19, 10, 0.08) !important; }
+.admin-table tr:hover td { background: rgba(224, 168, 31, 0.05) !important; }
+
+/* =====================================================================
+   ORG KIT / PORTAL erişim ekranları — koyu kart kalıntıları
+   ===================================================================== */
+.ok-access-card {
+  background: #fffdf6 !important;
+  border: 1px solid rgba(23, 19, 10, 0.11) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  color: #17130a !important;
+}
+.ok-access-card h1, .ok-access-card p { color: inherit !important; }
+.ok-eyebrow {
+  font-family: var(--ky-mono) !important;
+  letter-spacing: 0.2em !important;
+  text-transform: uppercase !important;
+  color: #c8901a !important;
+}

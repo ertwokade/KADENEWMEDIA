@@ -7,6 +7,7 @@ import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { reportWebVitals } from './utils/webVitals.js'
 import './index.css'
+import './styles/kade-yeni.css'
 
 reportWebVitals()
 
