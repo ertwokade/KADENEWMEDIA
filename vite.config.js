@@ -2,8 +2,34 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
+// Dev-only: prod'da Vercel `/` -> `/site.html` rewrite'ı yapıyor (bkz. vercel.json).
+// Dev sunucusunda bu rewrite olmadığı için `/` React app'i yükler, Home.jsx de
+// `/`'e replace edince sonsuz döngü olup beyaz ekran kalıyordu. Burada aynı
+// rewrite'ı taklit ederek dev'i prod ile hizalıyoruz.
+function serveStaticLandingAtRoot() {
+  return {
+    name: 'serve-static-landing-at-root',
+    configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        const url = (req.url || '').split('?')[0]
+        // prod'daki vercel.json rewrite'larının dev karşılığı
+        const staticMap = {
+          '/': '/site.html',
+          '/hakkimizda': '/hakkimizda.html',
+          '/hizmetler': '/hizmetler.html',
+          '/iletisim': '/iletisim.html',
+        }
+        if (staticMap[url]) {
+          req.url = staticMap[url]
+        }
+        next()
+      })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), serveStaticLandingAtRoot()],
   server: {
     hmr: {
       overlay: false,

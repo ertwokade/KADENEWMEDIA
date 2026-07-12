@@ -20,6 +20,9 @@
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/", "destination": "/site.html" },
+    { "source": "/hakkimizda", "destination": "/hakkimizda.html" },
+    { "source": "/hizmetler", "destination": "/hizmetler.html" },
+    { "source": "/iletisim", "destination": "/iletisim.html" },
     { "source": "/((?!api/).*)", "destination": "/app.html" }
   ],
   "headers": [
