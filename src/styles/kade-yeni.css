@@ -508,6 +508,7 @@ html, body, #root {
 [class*="-hero"]:not(.hero) .section-title {
   font-size: clamp(2.1rem, 4.6vw, 4.8rem) !important;
   max-width: 100% !important;
+  display: block !important; /* flex başlığı parçalayıp savuruyordu */
   text-align: left !important;
   word-spacing: normal !important;
   color: #17130a !important;
