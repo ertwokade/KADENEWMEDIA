@@ -346,13 +346,11 @@ html, body, #root { background: #fbfaf4 !important; }
    ===================================================================== */
 html, body, #root {
   background:
-    radial-gradient(52vw 42vh at 78% 6%, rgba(235, 198, 105, 0.34), transparent 62%),
-    radial-gradient(40vw 34vh at 12% 88%, rgba(235, 198, 105, 0.14), transparent 66%),
-    linear-gradient(115deg, transparent 42%, rgba(245, 216, 74, 0.10) 50%, transparent 58%),
-    linear-gradient(115deg, transparent 60%, rgba(245, 216, 74, 0.07) 68%, transparent 76%),
+    radial-gradient(70vw 60vh at 74% -10%, rgba(235, 198, 105, 0.26), transparent 65%),
+    radial-gradient(50vw 40vh at 6% 104%, rgba(235, 198, 105, 0.10), transparent 70%),
     linear-gradient(90deg, rgba(23, 19, 10, 0.05) 1px, transparent 1px),
     #fbfaf4 !important;
-  background-size: auto, auto, auto, auto, 33.333% 100%, auto !important;
+  background-size: auto, auto, 33.333% 100%, auto !important;
   background-attachment: fixed !important;
 }
 /* admin kendi düz zeminini korusun (panel okunabilirliği) */
@@ -396,3 +394,15 @@ html, body, #root {
   letter-spacing: 0.04em !important;
 }
 .login-logo::after { content: 'KADE MEDIA'; }
+
+
+/* çerez bandı: tam genişlik -> sol alt köşe kartı (GİRİŞ hapını kapatmaz) */
+.cookie-banner {
+  left: 20px !important;
+  right: auto !important;
+  bottom: 20px !important;
+  max-width: 400px !important;
+  width: auto !important;
+  padding: 14px 16px !important;
+  z-index: 900 !important;
+}

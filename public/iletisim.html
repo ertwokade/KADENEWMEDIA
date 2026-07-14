@@ -11,10 +11,8 @@
 /* anasayfa arka planı: thirds grid + gold ışık huzmeleri */
 .kade-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
  background:
-  radial-gradient(52vw 42vh at 78% 6%, rgba(235,198,105,.34), transparent 62%),
-  radial-gradient(40vw 34vh at 12% 88%, rgba(235,198,105,.14), transparent 66%),
-  linear-gradient(115deg, transparent 42%, rgba(245,216,74,.10) 50%, transparent 58%),
-  linear-gradient(115deg, transparent 60%, rgba(245,216,74,.07) 68%, transparent 76%);}
+  radial-gradient(70vw 60vh at 74% -10%, rgba(235,198,105,.26), transparent 65%),
+  radial-gradient(50vw 40vh at 6% 104%, rgba(235,198,105,.10), transparent 70%);}
 .kade-bg::after{content:'';position:absolute;inset:0;
  background-image:linear-gradient(90deg, rgba(23,19,10,.10) 1px, transparent 1px);
  background-size:33.333% 100%;opacity:.5;}
@@ -38,19 +36,26 @@
 <span class="hidden lg:inline p-2 uppercase">ISTANBUL <span id="clock">--:--</span></span>
 <span class="relative before:content-[''] before:absolute before:inset-0 before:border-2 before:border-dotted before:border-transparent before:pointer-events-none before:transition-colors before:duration-200 lg:hover:before:border-l1 hidden lg:inline lg:bottom-7 lg:left-1/2 lg:fixed p-2 lg:-translate-x-1/2 pointer-events-auto"><span id="coords">0001 X 0001 Y</span></span>
 </div></header>
-<a class="kade-giris" href="/giris">GİRİŞ →</a><div class="fixed inset-0 w-full h-full"><div class="w-full h-full overflow-y-auto overscroll-contain no-scrollbar"><div class="grid grid-cols-12 grid-rows-[auto_1fr] px-4 lg:px-14 py-18 lg:py-24 w-full h-dvh lg:h-screen">
+<a class="kade-giris" href="/giris">GİRİŞ →</a><div class="fixed inset-0 w-full h-full"><div class="w-full h-full overflow-y-auto overscroll-contain no-scrollbar"><div class="grid grid-cols-12 px-4 lg:px-14 w-full" style="padding-top:150px;padding-bottom:56px;row-gap:64px">
 <div class="flex flex-col order-2 lg:order-1 lg:grid lg:grid-cols-12 col-span-12 font-mono text-base">
 <span class="hidden lg:block lg:col-span-3 xl:col-span-2 lg:col-start-1 xl:col-start-1 p-2 font-sans font-bold" style="font-variation-settings:&quot;wdth&quot; 120">İletişim</span>
 <span class="hidden lg:block lg:col-span-3 xl:col-span-2 lg:col-start-4 xl:col-start-5 p-2 text-balance">Projeniz hakkında konuşalım.</span>
 <span class="col-span-12 lg:col-span-6 xl:col-span-4 lg:col-start-7 xl:col-start-9 mt-auto lg:mt-0 p-2 select-text">Formu doldurmana gerek yok — tek e-posta yeter. En kısa sürede dönüş yapıyoruz. İstanbul · Biruni Teknopark.</span>
 </div>
-<div class="flex flex-col self-end order-1 lg:order-2 col-span-12 px-2 font-bold text-[7.2svw] lg:text-[6.8svw] uppercase leading-none" style="font-variation-settings:&quot;wdth&quot; 120">
+<div class="flex flex-col order-1 lg:order-2 col-span-12 px-2 font-bold text-[7.2svw] lg:text-[6.8svw] uppercase leading-none" style="font-variation-settings:&quot;wdth&quot; 120">
 <span class="font-mono-2 text-l2" style="font-size:12px;letter-spacing:.2em;font-weight:400;margin-bottom:14px">— İLETİŞİM</span>
 <span>BİZİMLE</span><span>İLETİŞİME GEÇ</span>
-</div></div><section class="px-4 lg:px-14 py-18 lg:py-24 w-full">
+</div></div><section class="px-4 lg:px-14 py-18 lg:py-24 w-full" style="border-top:1px solid var(--label-4)">
 <div class="grid grid-cols-12 w-full">
-<span class="col-span-12 p-2 font-mono-2 text-l2 uppercase" style="font-size:12px;letter-spacing:.2em">— KANALLAR</span>
-<div class="col-span-12 lg:col-span-8 lg:col-start-5 p-2 kade-hair" style="padding-top:18px;padding-bottom:18px">
+<div class="hidden lg:block lg:col-span-3" style="position:relative">
+  <div style="position:sticky;top:110px" class="p-2">
+    <span class="font-mono-2 text-l2 uppercase" style="font-size:12px;letter-spacing:.2em;display:block">— KANALLAR</span>
+    <span class="font-sans font-bold text-l1" style="font-variation-settings:&quot;wdth&quot; 120;font-size:15px;display:block;margin-top:10px;text-transform:uppercase">Kade Media</span>
+    <span class="font-mono-2 text-l2" style="font-size:11px;display:block;margin-top:4px">İstanbul · Biruni Teknopark</span>
+  </div>
+</div>
+<span class="lg:hidden col-span-12 p-2 font-mono-2 text-l2 uppercase" style="font-size:12px;letter-spacing:.2em">— KANALLAR</span>
+<div class="col-span-12 lg:col-span-9 lg:col-start-4 p-2 kade-hair" style="padding-top:18px;padding-bottom:18px">
 <div class="flex justify-between items-center gap-3 min-w-0 uppercase">
 <span class="font-mono-2 tabular-nums text-l2" style="font-size:12px">01</span>
 <span class="flex-1 min-w-0 truncate font-sans font-bold sm:text-2xl lg:text-3xl" style="font-variation-settings:&quot;wdth&quot; 120">E-posta</span>
@@ -58,7 +63,7 @@
 </div>
 <p class="text-l2 text-sm" style="max-width:52ch;margin-top:6px">thekademedia@gmail.com — projeler ve iş birlikleri.</p>
 </div>
-<div class="col-span-12 lg:col-span-8 lg:col-start-5 p-2 kade-hair" style="padding-top:18px;padding-bottom:18px">
+<div class="col-span-12 lg:col-span-9 lg:col-start-4 p-2 kade-hair" style="padding-top:18px;padding-bottom:18px">
 <div class="flex justify-between items-center gap-3 min-w-0 uppercase">
 <span class="font-mono-2 tabular-nums text-l2" style="font-size:12px">02</span>
 <span class="flex-1 min-w-0 truncate font-sans font-bold sm:text-2xl lg:text-3xl" style="font-variation-settings:&quot;wdth&quot; 120">Instagram</span>
@@ -66,7 +71,7 @@
 </div>
 <p class="text-l2 text-sm" style="max-width:52ch;margin-top:6px">@kadenewmedia — güncel işler ve kamera arkası.</p>
 </div>
-<div class="col-span-12 lg:col-span-8 lg:col-start-5 p-2 kade-hair" style="padding-top:18px;padding-bottom:18px">
+<div class="col-span-12 lg:col-span-9 lg:col-start-4 p-2 kade-hair" style="padding-top:18px;padding-bottom:18px">
 <div class="flex justify-between items-center gap-3 min-w-0 uppercase">
 <span class="font-mono-2 tabular-nums text-l2" style="font-size:12px">03</span>
 <span class="flex-1 min-w-0 truncate font-sans font-bold sm:text-2xl lg:text-3xl" style="font-variation-settings:&quot;wdth&quot; 120">TikTok</span>
@@ -74,7 +79,7 @@
 </div>
 <p class="text-l2 text-sm" style="max-width:52ch;margin-top:6px">@kadenewmedia — kısa video ve trendler.</p>
 </div>
-<div class="col-span-12 lg:col-span-8 lg:col-start-5 p-2 kade-hair" style="padding-top:18px;padding-bottom:18px">
+<div class="col-span-12 lg:col-span-9 lg:col-start-4 p-2 kade-hair" style="padding-top:18px;padding-bottom:18px">
 <div class="flex justify-between items-center gap-3 min-w-0 uppercase">
 <span class="font-mono-2 tabular-nums text-l2" style="font-size:12px">04</span>
 <span class="flex-1 min-w-0 truncate font-sans font-bold sm:text-2xl lg:text-3xl" style="font-variation-settings:&quot;wdth&quot; 120">Konum</span>
