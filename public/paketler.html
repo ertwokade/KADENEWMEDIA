@@ -8,6 +8,16 @@
 @font-face{font-family:tiktok;src:url('/fonts/TikTokSans.ttf') format('truetype');font-weight:100 900;font-display:block}
 @font-face{font-family:mono;src:url('/fonts/GeistMono[wght].ttf') format('truetype');font-weight:100 900;font-display:block}
 @font-face{font-family:tronica-mono;src:url('/fonts/DepartureMono-Regular.otf') format('opentype');font-weight:400;font-display:block}
+/* anasayfa arka planı: thirds grid + gold ışık huzmeleri */
+.kade-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+ background:
+  radial-gradient(52vw 42vh at 78% 6%, rgba(235,198,105,.34), transparent 62%),
+  radial-gradient(40vw 34vh at 12% 88%, rgba(235,198,105,.14), transparent 66%),
+  linear-gradient(115deg, transparent 42%, rgba(245,216,74,.10) 50%, transparent 58%),
+  linear-gradient(115deg, transparent 60%, rgba(245,216,74,.07) 68%, transparent 76%);}
+.kade-bg::after{content:'';position:absolute;inset:0;
+ background-image:linear-gradient(90deg, rgba(23,19,10,.10) 1px, transparent 1px);
+ background-size:33.333% 100%;opacity:.5;}
 /* iç sayfa: gövde scroll'u iç konteynerde (anasayfa mimarisi) */
 .kade-hair{border-top:1px solid var(--label-4)}
 .kade-giris{position:fixed;right:16px;bottom:16px;z-index:60;display:inline-flex;align-items:center;gap:8px;
@@ -16,7 +26,7 @@
  pointer-events:auto;text-decoration:none;transition:transform .2s ease}
 .kade-giris:hover{transform:translateY(-1px)}
 @media(min-width:1024px){.kade-giris{right:56px;bottom:24px}}
-</style></head><body><div class="select-none"><header class="z-50 fixed inset-0 flex flex-col justify-between font-mono-2 pointer-events-none transition-colors duration-300 ease-out motion-reduce:transition-none text-l1">
+</style></head><body><div class="kade-bg"></div><div class="select-none"><header class="z-50 fixed inset-0 flex flex-col justify-between font-mono-2 pointer-events-none transition-colors duration-300 ease-out motion-reduce:transition-none text-l1">
 <div class="flex justify-between items-center px-4 lg:px-14 py-4 lg:py-7 text-base" style="background:linear-gradient(var(--background-1) 55%,transparent)">
 <a class="relative before:content-[''] before:absolute before:inset-0 before:border-2 before:border-dotted before:border-transparent before:pointer-events-none before:transition-colors before:duration-200 lg:hover:before:border-l1 p-2 font-sans font-bold uppercase pointer-events-auto" style="font-variation-settings:&quot;wght&quot; 700, &quot;wdth&quot; 120" href="/"><span><span>kade</span></span><span><span> media</span></span></a>
 <div class="hidden lg:flex flex-wrap justify-between items-center gap-x-3 gap-y-2 pointer-events-auto" style="flex-wrap:nowrap;gap:0 22px;justify-content:flex-end">
