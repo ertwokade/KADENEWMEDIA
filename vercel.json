@@ -23,6 +23,8 @@
     { "source": "/hakkimizda", "destination": "/hakkimizda.html" },
     { "source": "/hizmetler", "destination": "/hizmetler.html" },
     { "source": "/iletisim", "destination": "/iletisim.html" },
+    { "source": "/paketler", "destination": "/paketler.html" },
+    { "source": "/sss", "destination": "/sss.html" },
     { "source": "/((?!api/).*)", "destination": "/app.html" }
   ],
   "headers": [

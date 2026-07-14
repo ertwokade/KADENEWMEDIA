@@ -12,7 +12,7 @@ import './Navbar.css'
 // yakalamasın diye tam yükleme (<a href>) ile gidilir.
 const NAV_LINKS = [
   { name: 'HİZMETLER', path: '/hizmetler', static: true },
-  { name: 'PAKETLER', path: '/paketler' },
+  { name: 'PAKETLER', path: '/paketler', static: true },
   { name: 'PARTNERLER', path: '/partnerler' },
   { name: 'BLOG', path: '/blog' },
   { name: 'HAKKIMIZDA', path: '/hakkimizda', static: true },

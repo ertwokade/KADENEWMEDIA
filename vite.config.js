@@ -18,6 +18,8 @@ function serveStaticLandingAtRoot() {
           '/hakkimizda': '/hakkimizda.html',
           '/hizmetler': '/hizmetler.html',
           '/iletisim': '/iletisim.html',
+          '/paketler': '/paketler.html',
+          '/sss': '/sss.html',
         }
         if (staticMap[url]) {
           req.url = staticMap[url]
