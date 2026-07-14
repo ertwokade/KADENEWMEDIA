@@ -16,6 +16,18 @@
 .kade-bg::after{content:'';position:absolute;inset:0;
  background-image:linear-gradient(90deg, rgba(23,19,10,.10) 1px, transparent 1px);
  background-size:33.333% 100%;opacity:.5;}
+/* anasayfanın 3D hello'sundan alınan gerçek ışık/obje kesiti */
+.kade-art{position:absolute;top:0;right:-4vw;width:58vw;max-width:900px;z-index:0;pointer-events:none;
+ mix-blend-mode:multiply;
+ -webkit-mask-image:radial-gradient(closest-side,#000 55%,transparent 98%);
+ mask-image:radial-gradient(closest-side,#000 55%,transparent 98%);}
+.kade-art img{width:100%;height:auto;display:block}
+/* altın imleç — anasayfanın 3D okunun statik karşılığı */
+@media (pointer:fine){
+ html,body,a,button{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='30' viewBox='0 0 26 30'%3E%3Cpath d='M2 1l8 26 4.5-10.5L25 12z' fill='%23e8b435' stroke='%23a9780e' stroke-width='1.6'/%3E%3C/svg%3E") 2 1, auto !important;}
+}
+.kade-globe{width:34px;height:34px;border:1px solid rgba(23,19,10,.5);border-radius:50%;display:inline-grid;place-items:center;margin-right:10px;vertical-align:middle}
+.kade-globe svg{width:20px;height:20px}
 /* iç sayfa: gövde scroll'u iç konteynerde (anasayfa mimarisi) */
 .kade-hair{border-top:1px solid var(--label-4)}
 .kade-giris{position:fixed;right:16px;bottom:16px;z-index:60;display:inline-flex;align-items:center;gap:8px;
@@ -33,16 +45,17 @@
 </div></div>
 <div class="flex justify-between px-4 lg:px-14 py-4 lg:py-7" style="background:linear-gradient(transparent,var(--background-1) 45%)">
 <span class="lg:hidden p-2 uppercase"><span id="clock-m">--:--</span></span>
-<span class="hidden lg:inline p-2 uppercase">ISTANBUL <span id="clock">--:--</span></span>
+<span class="hidden lg:inline p-2 uppercase"><span class="kade-globe"><svg viewBox="0 0 24 24" fill="none" stroke="#17130a" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg></span>ISTANBUL <span id="clock">--:--</span></span>
 <span class="relative before:content-[''] before:absolute before:inset-0 before:border-2 before:border-dotted before:border-transparent before:pointer-events-none before:transition-colors before:duration-200 lg:hover:before:border-l1 hidden lg:inline lg:bottom-7 lg:left-1/2 lg:fixed p-2 lg:-translate-x-1/2 pointer-events-auto"><span id="coords">0001 X 0001 Y</span></span>
 </div></header>
-<a class="kade-giris" href="/giris">GİRİŞ →</a><div class="fixed inset-0 w-full h-full"><div class="w-full h-full overflow-y-auto overscroll-contain no-scrollbar"><div class="grid grid-cols-12 px-4 lg:px-14 w-full" style="padding-top:150px;padding-bottom:56px;row-gap:64px">
-<div class="flex flex-col order-2 lg:order-1 lg:grid lg:grid-cols-12 col-span-12 font-mono text-base">
+<a class="kade-giris" href="/giris">GİRİŞ →</a><div class="fixed inset-0 w-full h-full"><div class="w-full h-full overflow-y-auto overscroll-contain no-scrollbar"><div class="grid grid-cols-12 px-4 lg:px-14 w-full" style="position:relative;padding-top:150px;padding-bottom:56px;row-gap:64px">
+<div class="kade-art"><img src="/img/kade-hello-art.jpg" alt=""></div>
+<div class="flex flex-col order-2 lg:order-1 lg:grid lg:grid-cols-12 col-span-12 font-mono text-base" style="position:relative;z-index:1">
 <span class="hidden lg:block lg:col-span-3 xl:col-span-2 lg:col-start-1 xl:col-start-1 p-2 font-sans font-bold" style="font-variation-settings:&quot;wdth&quot; 120">SSS</span>
 <span class="hidden lg:block lg:col-span-3 xl:col-span-2 lg:col-start-4 xl:col-start-5 p-2 text-balance">Aklındaki her sorunun cevabı.</span>
 <span class="col-span-12 lg:col-span-6 xl:col-span-4 lg:col-start-7 xl:col-start-9 mt-auto lg:mt-0 p-2 select-text">Süreç, fiyatlandırma, içerik onayı ve raporlama hakkında en çok sorulanlar. Cevabını bulamazsan tek e-posta yeter.</span>
 </div>
-<div class="flex flex-col order-1 lg:order-2 col-span-12 px-2 font-bold text-[7.2svw] lg:text-[6.8svw] uppercase leading-none" style="font-variation-settings:&quot;wdth&quot; 120">
+<div class="flex flex-col order-1 lg:order-2 col-span-12 px-2 font-bold text-[7.2svw] lg:text-[6.8svw] uppercase leading-none" style="position:relative;z-index:1;font-variation-settings:&quot;wdth&quot; 120">
 <span class="font-mono-2 text-l2" style="font-size:12px;letter-spacing:.2em;font-weight:400;margin-bottom:14px">— SSS</span>
 <span>AKLINDAKİ HER</span><span>SORUNUN CEVABI</span>
 </div></div><section class="px-4 lg:px-14 py-18 lg:py-24 w-full" style="border-top:1px solid var(--label-4)">
