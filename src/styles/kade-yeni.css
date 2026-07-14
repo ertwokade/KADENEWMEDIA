@@ -406,3 +406,70 @@ html, body, #root {
   padding: 14px 16px !important;
   z-index: 900 !important;
 }
+
+/* =====================================================================
+   ESKİ PROJE DETAYLARINI SÖK — yeni sitede bunlar YOK
+   (WhatsApp balonu, çerez bandı, bildirim/exit popup'ları, chat balonu,
+    aurora/grain efektleri, imleç süsleri, yan etiket)
+   ===================================================================== */
+.whatsapp-float,
+.cookie-banner,
+.notification-prompt,
+.exit-intent-overlay, .exit-intent-popup,
+.chat-toggle-button, .chat-toggle-tooltip,
+.aurora-background, .aurora,
+.grain-overlay,
+.cursor-dot, .cursor-glow, .cursor-ring,
+.side-label {
+  display: none !important;
+}
+
+/* =====================================================================
+   /giris KARTI — SaaS kalıntılarından arındır (tab/ikon/gradient yok)
+   ===================================================================== */
+.login-card { padding: 40px 36px 30px !important; }
+/* sekmeler: yuvarlak segment -> mono, altı gold çizgili düz sekme */
+.login-tabs, .auth-tabs {
+  background: none !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(23, 19, 10, 0.12) !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  gap: 18px !important;
+}
+.login-tabs button, .auth-tabs button {
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-size: 12px !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: rgba(23, 19, 10, 0.5) !important;
+  padding: 10px 2px !important;
+}
+.login-tabs button.active, .auth-tabs button.active,
+.login-tabs button[aria-selected="true"], .auth-tabs button[aria-selected="true"] {
+  color: #17130a !important;
+  border-bottom: 2px solid #e0a81f !important;
+}
+/* input: ikonlar gizli, köşeli, mono placeholder */
+.login-field-icon { display: none !important; }
+.login-input {
+  border-radius: 4px !important;
+  padding-left: 14px !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-size: 13px !important;
+}
+/* buton: dev gradient hap -> düz gold, mono */
+.login-submit, .login-card .btn-primary {
+  background: #e0a81f !important;
+  border-radius: 4px !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  box-shadow: none !important;
+}
+.login-card a { color: #c8901a !important; }
+.login-logo, .login-logo::after { color: #17130a !important; }
