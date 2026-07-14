@@ -25,6 +25,11 @@
     { "source": "/iletisim", "destination": "/iletisim.html" },
     { "source": "/paketler", "destination": "/paketler.html" },
     { "source": "/sss", "destination": "/sss.html" },
+    { "source": "/neden-biz", "destination": "/neden-biz.html" },
+    { "source": "/ekip", "destination": "/ekip.html" },
+    { "source": "/kariyer", "destination": "/kariyer.html" },
+    { "source": "/basin", "destination": "/basin.html" },
+    { "source": "/tesekkur", "destination": "/tesekkur.html" },
     { "source": "/((?!api/).*)", "destination": "/app.html" }
   ],
   "headers": [

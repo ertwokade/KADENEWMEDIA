@@ -20,6 +20,11 @@ function serveStaticLandingAtRoot() {
           '/iletisim': '/iletisim.html',
           '/paketler': '/paketler.html',
           '/sss': '/sss.html',
+          '/neden-biz': '/neden-biz.html',
+          '/ekip': '/ekip.html',
+          '/kariyer': '/kariyer.html',
+          '/basin': '/basin.html',
+          '/tesekkur': '/tesekkur.html',
         }
         if (staticMap[url]) {
           req.url = staticMap[url]
