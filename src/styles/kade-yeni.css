@@ -734,3 +734,92 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
   border-radius: 4px !important; box-shadow: none !important;
   font-family: 'GeistMono', ui-monospace, monospace !important; text-transform: uppercase !important;
 }
+
+/* =====================================================================
+   FİNAL SÜPÜRME — kalan hero/emoji/renkli-etiket kalıntıları
+   ===================================================================== */
+
+/* --- Hero başlıkları: her yerde okunur, sınırlı, SOLID (vurgu/animasyon
+       artefaktı yok) — referral, demo, service detail vb. --- */
+[class*="-hero"] .section-title, [class*="-hero"] h1,
+.demo-title, .kk-title, [class*="hero"] h1 {
+  font-size: clamp(2rem, 4.6vw, 4.6rem) !important;
+  line-height: 1.02 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+[class*="-hero"] .section-title span, [class*="-hero"] h1 span,
+[class*="hero"] h1 span, .demo-title span, .kk-title span, .hero-title span,
+.page-title span {
+  color: #17130a !important;
+  -webkit-text-fill-color: #17130a !important;
+  background: none !important;
+  font-style: normal !important;
+  font-family: inherit !important;
+  text-shadow: none !important;
+}
+/* hero içerikleri: yarım kalan giriş animasyonunda bile görünür */
+[class*="-hero"] .container, [class*="-hero"] .container * {
+  opacity: 1 !important;
+}
+
+/* --- PARTNER kartları: mavi/renkli kategori → gold mono; emoji logo gizle --- */
+.partner-category {
+  color: #c8901a !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+.partner-logo-large {
+  background: rgba(23,19,10,0.04) !important;
+  border: 1px solid rgba(23,19,10,0.11) !important;
+  border-radius: 6px !important;
+}
+.partner-logo-large span { display: none !important; }   /* emoji logo */
+.partner-logo-large img { display: block !important; }    /* gerçek logo kalır */
+
+/* --- Kalan emoji ikon kutuları (adım/ödül/step) → gizle --- */
+.referral-step-icon span, .referral-reward-kicker + * span[style*="font-size"],
+[class*="step-icon"] span[style*="font-size"],
+[class*="-emoji"], .demo-card-ic {
+  /* not: demo-card-ic bir react-icon (svg); onu gold yap, gizleme */
+}
+.referral-step-icon span[style*="font-size"] { display: none !important; }
+.demo-card-ic { color: #c8901a !important; }
+
+/* --- Service detail: ikon kutusu düz, bölüm başlığı sola --- */
+.service-detail-icon, [class*="service"] [class*="icon"]:not(svg) {
+  background: rgba(224,168,31,0.10) !important;
+  border: 1px solid rgba(224,168,31,0.30) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+/* --- kesin: hero başlığı tek renk ink (gradient-clip + transform offset yok) --- */
+[class*="-hero"] .section-title, [class*="-hero"] .section-title *,
+[class*="hero"] h1, [class*="hero"] h1 * {
+  color: #17130a !important;
+  -webkit-text-fill-color: #17130a !important;
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+}
+[class*="-hero"] .container * { transform: none !important; }
+
+/* hero: her türlü wipe/reveal reset (final durum = okunur) + reduced-motion */
+[class*="-hero"] .container * {
+  clip-path: none !important;
+  -webkit-mask: none !important; mask: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .kade-art { display: none !important; }
+}
