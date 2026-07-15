@@ -9,21 +9,8 @@ function serveStaticLandingAtRoot() {
     configureServer(server) {
       server.middlewares.use((req, _res, next) => {
         const url = (req.url || '').split('?')[0]
-        // prod'daki vercel.json rewrite'larının dev karşılığı — statik editoryal sayfalar
-        const staticMap = {
-          '/': '/site.html',
-          '/hakkimizda': '/hakkimizda.html',
-          '/hizmetler': '/hizmetler.html',
-          '/iletisim': '/iletisim.html',
-          '/paketler': '/paketler.html',
-          '/sss': '/sss.html',
-          '/neden-biz': '/neden-biz.html',
-          '/ekip': '/ekip.html',
-          '/kariyer': '/kariyer.html',
-          '/basin': '/basin.html',
-          '/tesekkur': '/tesekkur.html',
-        }
-        if (staticMap[url]) req.url = staticMap[url]
+        // Sadece anasayfa statik (site.html); diğer route'lar React (SSG mimarisi).
+        if (url === '/') req.url = '/site.html'
         next()
       })
     },

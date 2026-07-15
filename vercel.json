@@ -1,5 +1,4 @@
 {
-  "trailingSlash": false,
   "crons": [
     {
       "path": "/api/reminders?action=check",
@@ -7,61 +6,6 @@
     }
   ],
   "redirects": [
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.kadenewmedia.com"
-        }
-      ],
-      "destination": "https://kadenewmedia.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "kadenewmedia.com.tr"
-        }
-      ],
-      "destination": "https://kadenewmedia.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.kadenewmedia.com.tr"
-        }
-      ],
-      "destination": "https://kadenewmedia.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "kademedia.com.tr"
-        }
-      ],
-      "destination": "https://kadenewmedia.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.kademedia.com.tr"
-        }
-      ],
-      "destination": "https://kadenewmedia.com/:path*",
-      "permanent": true
-    },
     {
       "source": "/links",
       "destination": "https://kadirardademir.com/links",
@@ -76,46 +20,6 @@
       "source": "/kadelinks/:path*",
       "destination": "https://kadirardademir.com/links",
       "permanent": true
-    },
-    {
-      "source": "/hakkimizda.html",
-      "destination": "/hakkimizda",
-      "permanent": true
-    },
-    {
-      "source": "/hizmetler.html",
-      "destination": "/hizmetler",
-      "permanent": true
-    },
-    {
-      "source": "/iletisim.html",
-      "destination": "/iletisim",
-      "permanent": true
-    },
-    {
-      "source": "/paketler.html",
-      "destination": "/paketler",
-      "permanent": true
-    },
-    {
-      "source": "/sss.html",
-      "destination": "/sss",
-      "permanent": true
-    },
-    {
-      "source": "/ekip.html",
-      "destination": "/ekip",
-      "permanent": true
-    },
-    {
-      "source": "/kariyer.html",
-      "destination": "/kariyer",
-      "permanent": true
-    },
-    {
-      "source": "/tesekkur.html",
-      "destination": "/tesekkur",
-      "permanent": true
     }
   ],
   "rewrites": [
@@ -128,69 +32,11 @@
       "destination": "/site.html"
     },
     {
-      "source": "/hakkimizda",
-      "destination": "/hakkimizda.html"
-    },
-    {
-      "source": "/hizmetler",
-      "destination": "/hizmetler.html"
-    },
-    {
-      "source": "/iletisim",
-      "destination": "/iletisim.html"
-    },
-    {
-      "source": "/paketler",
-      "destination": "/paketler.html"
-    },
-    {
-      "source": "/sss",
-      "destination": "/sss.html"
-    },
-    {
-      "source": "/neden-biz",
-      "destination": "/neden-biz.html"
-    },
-    {
-      "source": "/ekip",
-      "destination": "/ekip.html"
-    },
-    {
-      "source": "/kariyer",
-      "destination": "/kariyer.html"
-    },
-    {
-      "source": "/basin",
-      "destination": "/basin.html"
-    },
-    {
-      "source": "/tesekkur",
-      "destination": "/tesekkur.html"
-    },
-    {
       "source": "/((?!api/).*)",
       "destination": "/app.html"
     }
   ],
   "headers": [
-    {
-      "source": "/(admin|giris|musteri-panel|proje-takip|tesekkur|kade-kit-business)",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
-      ]
-    },
-    {
-      "source": "/organizasyon-kiti/:path*",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
-      ]
-    },
     {
       "source": "/(.*)",
       "headers": [
