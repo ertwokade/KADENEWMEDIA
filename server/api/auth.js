@@ -1,14 +1,9 @@
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
 import { getDb } from './_lib/mongodb.js';
 import { clearAuthCookies, createToken, getAuthorizedUser, getDefaultPermissions, requireAuth, setAuthCookies, setCsrfCookie } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import { logActivity } from './notifications.js';
-
-// Varsayılan admin bilgileri — .env'den alınır
-const DEFAULT_ADMIN_USERNAME = 'kade';
-const DEFAULT_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD;
 
 // Brute-force koruması: IP başına login denemesi sınırı
 const LOGIN_WINDOW_MS = 15 * 60 * 1000; // 15 dakika
@@ -26,7 +21,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET' && action === 'session') {
     const user = await getAuthorizedUser(req);
-    if (!user) return res.status(401).json({ authenticated: false });
+    if (!user) return res.status(200).json({ authenticated: false });
     return res.status(200).json({
       authenticated: true,
       user: { username: user.username, role: user.role, permissions: user.permissions || getDefaultPermissions(user.role) },
@@ -80,19 +75,9 @@ async function handleLogin(req, res) {
 
     const db = await getDb();
 
-    // Veritabanında hiç kullanıcı yoksa otomatik admin oluştur
     const userCount = await db.collection('users').countDocuments();
     if (userCount === 0) {
-      console.log('📦 Veritabanında kullanıcı yok — varsayılan admin oluşturuluyor...');
-      const hashedPassword = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10);
-      await db.collection('users').insertOne({
-        username: DEFAULT_ADMIN_USERNAME,
-        password: hashedPassword,
-        role: 'admin',
-        permissions: getDefaultPermissions('admin'),
-        createdAt: new Date(),
-      });
-      console.log(`✅ Admin kullanıcısı oluşturuldu: ${DEFAULT_ADMIN_USERNAME}`);
+      return res.status(503).json({ error: 'Yönetici hesabı yapılandırılmamış. Güvenli seed işlemini çalıştırın.' });
     }
 
     const user = await db.collection('users').findOne({ username });
@@ -106,26 +91,6 @@ async function handleLogin(req, res) {
       valid = await bcrypt.compare(password, user.password);
     } catch (bcryptErr) {
       console.error('bcrypt compare hatası:', bcryptErr.message);
-    }
-
-    const defaultPwMatches = DEFAULT_ADMIN_PASSWORD
-      ? (() => {
-          try {
-            const a = Buffer.from(password || '');
-            const b = Buffer.from(DEFAULT_ADMIN_PASSWORD);
-            return a.length === b.length && crypto.timingSafeEqual(a, b);
-          } catch { return false; }
-        })()
-      : false;
-    if (!valid && username === DEFAULT_ADMIN_USERNAME && defaultPwMatches) {
-      console.log('🔄 Admin şifre hash\'i uyumsuz — yeniden oluşturuluyor...');
-      const newHash = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10);
-      await db.collection('users').updateOne(
-        { _id: user._id },
-        { $set: { password: newHash } }
-      );
-      valid = true;
-      console.log('✅ Admin şifre hash\'i güncellendi');
     }
 
     if (!valid) {

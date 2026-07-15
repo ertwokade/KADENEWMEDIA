@@ -126,7 +126,7 @@ export default async function handler(req, res) {
       for (const sub of subscribers) {
         try {
           const unsubToken = generateUnsubToken(sub.email);
-          const unsubLink = `https://kademedia.com.tr/api/contact?action=unsubscribe&email=${encodeURIComponent(sub.email)}${unsubToken ? `&token=${unsubToken}` : ''}`;
+          const unsubLink = `https://www.kademedia.com.tr/api/contact?action=unsubscribe&email=${encodeURIComponent(sub.email)}${unsubToken ? `&token=${unsubToken}` : ''}`;
           const safeHtml = sanitizedHtml + `<div style="margin-top:32px;padding-top:16px;border-top:1px solid #333;text-align:center;font-size:12px;color:#888;">
             <a href="${unsubLink}" style="color:#888;">Abonelikten çık</a>
           </div>`;
@@ -165,117 +165,8 @@ export default async function handler(req, res) {
     }
   }
 
-  // ── Kariyer Başvurusu (public, POST only) ──
-  if (action === 'apply') {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    const applyRl = await rateLimitCheck(req, { namespace: 'career-apply', maxRequests: 5 });
-    if (!applyRl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${applyRl.retryAfter} dakika sonra tekrar deneyin.` });
-    let body = req.body;
-    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
-    const { name, email, phone, position, coverLetter } = body || {};
-    if (!name?.trim() || !email?.trim() || !position?.trim()) {
-      return res.status(400).json({ error: 'Ad, e-posta ve pozisyon zorunludur.' });
-    }
-    if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
-    try {
-      const db = await getDb();
-      await db.collection('applications').insertOne({
-        name: name.trim(), email: email.trim().toLowerCase(),
-        phone: phone?.trim() || '-', position: position.trim(),
-        coverLetter: coverLetter?.trim() || '',
-        status: 'yeni', createdAt: new Date(),
-      });
-      logActivity(db, { action: 'Yeni kariyer başvurusu', detail: `${name.trim()} — ${position.trim()}`, type: 'message', icon: '💼', user: 'sistem' }).catch(() => {});
-      const transporter = makeTransporter();
-      if (transporter) {
-        const mailTo = process.env.MAIL_TO || 'thekademedia@gmail.com';
-        transporter.sendMail({
-          from: `"Kade Media Website" <${process.env.SMTP_USER}>`,
-          to: mailTo,
-          subject: cleanHeader(`💼 Kariyer Başvurusu: ${name} — ${position}`),
-          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#fff;border-radius:12px;"><h2 style="color:#eac321;">💼 Kariyer Başvurusu</h2><table style="width:100%;border-collapse:collapse;"><tr><td style="color:#888;padding:6px 0;width:120px;">Ad Soyad</td><td style="color:#fff;font-weight:600;">${escapeHtml(name)}</td></tr><tr><td style="color:#888;padding:6px 0;">E-posta</td><td style="color:#eac321;">${escapeHtml(email)}</td></tr><tr><td style="color:#888;padding:6px 0;">Telefon</td><td style="color:#fff;">${escapeHtml(phone || '-')}</td></tr><tr><td style="color:#888;padding:6px 0;">Pozisyon</td><td style="color:#fff;">${escapeHtml(position)}</td></tr></table>${coverLetter ? `<div style="margin-top:16px;padding:14px;background:#1a1a1a;border-radius:8px;border-left:3px solid #eac321;"><p style="color:#ccc;margin:0;line-height:1.6;white-space:pre-wrap;">${escapeHtml(coverLetter)}</p></div>` : ''}</div>`,
-        }).catch(() => {});
-        transporter.sendMail({
-          from: `"Kade Media" <${process.env.SMTP_USER}>`,
-          to: email,
-          subject: 'Başvurunuz Alındı — Kade Media',
-          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px;"><h2 style="color:#eac321;">Kade Media</h2><h3>Merhaba ${escapeHtml(name)},</h3><p style="color:#ccc;line-height:1.8;"><strong style="color:#eac321;">${escapeHtml(position)}</strong> pozisyonu için başvurunuz alındı. İnceleme sonrasında sizinle iletişime geçeceğiz.</p><p style="color:#888;font-size:12px;margin-top:24px;">Kade Media | hello@kademedia.com | +90 506 729 34 23</p></div>`,
-        }).catch(() => {});
-      }
-      return res.status(200).json({ message: 'Başvurunuz başarıyla alındı!' });
-    } catch (err) {
-      console.error('Apply error:', err);
-      return res.status(500).json({ error: 'Bir hata oluştu, lütfen tekrar deneyin.' });
-    }
-  }
-
-  // ── Sosyal Medya Analiz Aracı Lead (public, POST only) ──
-  if (action === 'analyzer-lead') {
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-    const analyzerRl = await rateLimitCheck(req, { namespace: 'analyzer-lead', maxRequests: 10 });
-    if (!analyzerRl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${analyzerRl.retryAfter} dakika sonra tekrar deneyin.` });
-    let body = req.body;
-    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
-    const { email, score, platforms, usernames, categories } = body || {};
-    if (!email || !EMAIL_RE.test(email)) {
-      return res.status(400).json({ error: 'Geçerli bir e-posta adresi gerekli.' });
-    }
-    const safeScore = typeof score === 'number' && score >= 0 && score <= 100 ? Math.round(score) : 0;
-    const safePlatforms = Array.isArray(platforms) ? platforms.slice(0, 10).map(p => String(p).slice(0, 50)) : [];
-    const safeUsernames = usernames && typeof usernames === 'object' && !Array.isArray(usernames)
-      ? Object.fromEntries(Object.entries(usernames).slice(0, 10).map(([k, v]) => [String(k).slice(0, 50), String(v).slice(0, 100)]))
-      : {};
-    const safeCategories = Array.isArray(categories) ? categories.slice(0, 10).map(c => ({
-      key: String(c?.key || '').slice(0, 50),
-      score: typeof c?.score === 'number' ? c.score : 0,
-      max: typeof c?.max === 'number' ? c.max : 100,
-    })) : [];
-    try {
-      const db = await getDb();
-      await db.collection('analyzer_leads').insertOne({
-        email: email.trim().toLowerCase(), score: safeScore, platforms: safePlatforms, usernames: safeUsernames, categories: safeCategories,
-        createdAt: new Date(), source: 'social-media-analyzer', status: 'new',
-      });
-      await db.collection('messages').insertOne({
-        name: email.split('@')[0], email: email.trim().toLowerCase(),
-        phone: '', company: '', service: 'Sosyal Medya Analiz',
-        message: `Sosyal Medya Analiz Aracı Lead - Skor: ${safeScore}/100\nPlatformlar: ${safePlatforms.join(', ')}\nKullanıcı adları: ${JSON.stringify(safeUsernames)}`,
-        source: 'analyzer', status: 'yeni', read: false, createdAt: new Date(),
-      });
-      logActivity(db, { action: 'Yeni analiz lead', detail: `${email} — Skor: ${safeScore}/100`, type: 'message', icon: '📊', user: 'sistem' }).catch(() => {});
-
-      // Send emails
-      const transporter = makeTransporter();
-      if (transporter) {
-        const catLabels = { profile: 'Profil Optimizasyonu', diversity: 'Platform Çeşitliliği', accessibility: 'Erişilebilirlik', consistency: 'Marka Tutarlılığı', presence: 'Dijital Varlık' };
-        const catRows = safeCategories.map(c => `<tr><td style="padding:6px 12px;color:#888;">${escapeHtml(catLabels[c.key] || c.key)}</td><td style="padding:6px 12px;color:#eac321;font-weight:700;">${c.score}/${c.max}</td></tr>`).join('');
-        const platformList = safePlatforms.join(', ');
-        const scoreColor = safeScore <= 40 ? '#FF4444' : safeScore <= 60 ? '#FF9800' : safeScore <= 80 ? '#eac321' : '#2ECC71';
-        const scoreLabel = safeScore <= 40 ? 'Acil İyileştirme Gerekli' : safeScore <= 60 ? 'Geliştirilmeli' : safeScore <= 80 ? 'İyi Durumda' : 'Mükemmel';
-
-        // Notify thekademedia@gmail.com
-        const mailTo = process.env.MAIL_TO || 'thekademedia@gmail.com';
-        transporter.sendMail({
-          from: `"Kade Media Website" <${process.env.SMTP_USER}>`,
-          to: mailTo,
-          subject: cleanHeader(`📊 Yeni Analiz Lead: ${email} — Skor: ${safeScore}/100`),
-          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#fff;border-radius:12px;"><h2 style="color:#eac321;">📊 Yeni Sosyal Medya Analiz Lead</h2><table style="width:100%;border-collapse:collapse;"><tr><td style="padding:8px 0;color:#888;width:140px;">E-posta</td><td style="padding:8px 0;color:#eac321;font-weight:600;">${escapeHtml(email)}</td></tr><tr><td style="padding:8px 0;color:#888;">Platformlar</td><td style="padding:8px 0;color:#fff;">${escapeHtml(platformList)}</td></tr><tr><td style="padding:8px 0;color:#888;">Skor</td><td style="padding:8px 0;color:${scoreColor};font-weight:700;font-size:1.2em;">${safeScore}/100 — ${scoreLabel}</td></tr></table><table style="width:100%;border-collapse:collapse;margin-top:16px;background:#1a1a1a;border-radius:8px;">${catRows}</table></div>`,
-        }).catch(() => {});
-
-        // Send report to user
-        transporter.sendMail({
-          from: `"Kade Media" <${process.env.SMTP_USER}>`,
-          to: email,
-          subject: cleanHeader(`Sosyal Medya Analiz Raporunuz — ${safeScore}/100 Puan`),
-          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px;"><div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;"><h1 style="color:#eac321;margin:0;">Kade Media</h1><p style="color:#888;margin:8px 0 0;">Sosyal Medya Analiz Raporu</p></div><div style="padding:30px 20px;"><div style="text-align:center;margin-bottom:24px;"><div style="display:inline-block;width:100px;height:100px;border-radius:50%;border:3px solid ${scoreColor};line-height:100px;font-size:2rem;font-weight:700;color:${scoreColor};">${safeScore}</div><div style="color:#888;font-size:0.85rem;margin-top:4px;">/100 — ${scoreLabel}</div></div><p style="color:#ccc;line-height:1.8;">Merhaba,</p><p style="color:#ccc;line-height:1.8;">Sosyal medya hesaplarınızın analizini tamamladık. İşte detaylı sonuçlarınız:</p><table style="width:100%;border-collapse:collapse;margin:16px 0;background:rgba(255,255,255,0.05);border-radius:8px;overflow:hidden;">${catRows}</table><p style="color:#ccc;line-height:1.8;">Hesaplarınızı daha da güçlendirmek için uzman ekibimizle ücretsiz bir görüşme yapabilirsiniz.</p><div style="text-align:center;margin:24px 0;"><a href="https://kademedia.com.tr/iletisim" style="display:inline-block;padding:14px 32px;background:#eac321;color:#000;text-decoration:none;border-radius:8px;font-weight:bold;">Ücretsiz Danışmanlık Al →</a></div><hr style="border:none;border-top:1px solid #333;margin:24px 0;"/><p style="color:#888;font-size:12px;">Kade Media | Biruni Teknopark, Zeytinburnu/İstanbul<br/>hello@kademedia.com | +90 506 729 34 23</p></div></div>`,
-        }).catch(() => {});
-      }
-
-      return res.status(200).json({ success: true });
-    } catch (err) {
-      console.error('Analyzer lead error:', err);
-      return res.status(500).json({ error: 'Sunucu hatası' });
-    }
+  if (action === 'apply' || action === 'analyzer-lead') {
+    return res.status(410).json({ error: 'Bu form artık kullanılmıyor.' });
   }
 
   // ── Abonelik iptali (GET, imzalı token gerekli) ──
@@ -327,28 +218,32 @@ export default async function handler(req, res) {
   }
 
   const {
-    name, email, phone, company, service, message, source = 'iletisim-formu',
+    name, email, phone, company, service, message, consent,
   } = body || {};
 
   if (!name?.trim() || !email?.trim() || !message?.trim()) {
     return res.status(400).json({ error: 'Ad, e-posta ve mesaj alanları zorunludur.' });
   }
+  if (consent !== true) return res.status(400).json({ error: 'Aydınlatma metni onayı gereklidir.' });
 
   if (name.trim().length > 100) return res.status(400).json({ error: 'Ad çok uzun (max 100 karakter).' });
   if (email.trim().length > 254) return res.status(400).json({ error: 'E-posta çok uzun.' });
   if (phone && phone.length > 30) return res.status(400).json({ error: 'Telefon çok uzun.' });
   if (company && company.length > 100) return res.status(400).json({ error: 'Şirket adı çok uzun.' });
+  if (service && (typeof service !== 'string' || service.length > 200)) return res.status(400).json({ error: 'Hizmet seçimi geçersiz.' });
   if (message.trim().length > 5000) return res.status(400).json({ error: 'Mesaj çok uzun (max 5000 karakter).' });
 
   if (!EMAIL_RE.test(email)) {
     return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
   }
 
-  if (message.trim().length < 10) {
-    return res.status(400).json({ error: 'Mesajınız en az 10 karakter olmalıdır.' });
+  if (message.trim().length < 20) {
+    return res.status(400).json({ error: 'Mesajınız en az 20 karakter olmalıdır.' });
   }
 
   try {
+    let persisted = false;
+    let notified = false;
     // Save to DB
     try {
       const db = await getDb();
@@ -359,11 +254,13 @@ export default async function handler(req, res) {
         company: company?.trim() || '-',
         service: service || '-',
         message: message.trim(),
-        source,
+        source: 'iletisim-formu',
+        consentAt: new Date(),
         status: 'yeni',
         read: false,
         createdAt: new Date(),
       });
+      persisted = true;
       logActivity(db, { action: 'Yeni mesaj alındı', detail: `${name.trim()} - ${service || 'Genel'}`, type: 'message', icon: '✉️', user: 'sistem' }).catch(() => {});
     } catch (dbErr) {
       console.error('MongoDB save failed (non-critical):', dbErr.message);
@@ -403,6 +300,7 @@ export default async function handler(req, res) {
             </div>
           `,
         });
+        notified = true;
       } catch (mailErr) {
         console.log('Team notification email failed (non-critical):', mailErr.message);
       }
@@ -420,13 +318,10 @@ export default async function handler(req, res) {
               </div>
               <div style="padding:30px 20px;">
                 <h2 style="color:#fff;">Merhaba ${escapeHtml(name)},</h2>
-                <p style="color:#ccc;line-height:1.8;">Mesajınız başarıyla alındı. Ekibimiz en kısa sürede sizinle iletişime geçecek — genellikle 1 iş günü içinde yanıt veriyoruz.</p>
-                <p style="color:#ccc;line-height:1.8;">Acil bir konunuz varsa WhatsApp üzerinden ulaşabilirsiniz:</p>
-                <div style="text-align:center;margin:24px 0;">
-                  <a href="https://wa.me/905067293423" style="display:inline-block;padding:14px 32px;background:#eac321;color:#000;text-decoration:none;border-radius:8px;font-weight:bold;">WhatsApp'tan Yaz</a>
-                </div>
+                <p style="color:#ccc;line-height:1.8;">Mesajınız başarıyla alındı. Talebiniz incelendikten sonra verdiğiniz iletişim bilgileri üzerinden yanıtlanacaktır.</p>
+                <p style="color:#ccc;line-height:1.8;">Ek bilgi paylaşmak için bu e-postayı yanıtlayabilirsiniz.</p>
                 <hr style="border:none;border-top:1px solid #333;margin:24px 0;" />
-                <p style="color:#888;font-size:13px;">Kade Media | Biruni Teknopark, Zeytinburnu/İstanbul<br/>hello@kademedia.com | +90 506 729 34 23</p>
+                <p style="color:#888;font-size:13px;">Kade Media | İstanbul<br/>thekademedia@gmail.com</p>
               </div>
             </div>
           `,
@@ -450,6 +345,9 @@ export default async function handler(req, res) {
       }
     }
 
+    if (!persisted && !notified) {
+      return res.status(503).json({ error: 'Mesaj şu anda kaydedilemedi. Lütfen e-posta ile iletişime geçin.' });
+    }
     return res.status(200).json({ message: 'Mesajınız başarıyla gönderildi!' });
   } catch (error) {
     console.error('Contact error:', error);

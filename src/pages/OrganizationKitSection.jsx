@@ -28,6 +28,9 @@ export default function OrganizationKitSection() {
           <OrganizationKitNav />
 
           <main className="ok-main">
+            <p role="status" className="glass-card" style={{ padding: 14, marginBottom: 18 }}>
+              Demo veri — bu ekrandaki tarih, skor ve görevler gerçek müşteri kaydı değildir.
+            </p>
             <section className="ok-section-hero">
               <span className="ok-eyebrow">{content.eyebrow}</span>
               <h1>{content.title}</h1>

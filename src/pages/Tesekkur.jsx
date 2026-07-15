@@ -1,33 +1,15 @@
 import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   HiOutlineCheckCircle,
-  HiOutlineClock,
   HiOutlineMail,
-  HiOutlineArrowRight,
 } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
 import { CONTACT } from '../utils/constants'
 import PageTransition from '../components/PageTransition'
-import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import { FadeIn } from '../components/Animations'
 import './Tesekkur.css'
-
-const DEFAULT_CONTENT = {
-  baslik: 'Mesajınız iletildi!',
-  altMetin: 'İletişim formunuzu aldık. Ekibimiz en kısa sürede sizinle iletişime geçecek.',
-  yanitSuresi: '1 iş günü',
-  yanitSuresiNot: 'Talebin kapsamına göre değişebilir',
-  adimlarBaslik: 'Bundan sonra ne olacak?',
-  acilBaslik: 'Ek bilgi paylaşmak ister misiniz?',
-  acilEmail: CONTACT.email,
-  adimlar: [
-    { ikon: '📬', baslik: 'Talep Kaydı', aciklama: 'Formunuz sunucu tarafından alındı ve değerlendirme sırasına eklendi.' },
-    { ikon: '👤', baslik: 'İhtiyaç İncelemesi', aciklama: 'Paylaştığınız kapsam ekip tarafından incelenecek.' },
-    { ikon: '📋', baslik: 'Kapsam Görüşmesi', aciklama: 'Gerekli görülürse ihtiyaçlarınızı değerlendirmek için bir görüşme planlanacak.' },
-    { ikon: '🚀', baslik: 'Özel Teklif', aciklama: 'Görüşmenin ardından size özel bir paket ve fiyat teklifi sunulacak.' },
-  ],
-}
 
 // Split title at the last word to wrap it in the highlight <span>
 function splitTitle(baslik) {
@@ -39,11 +21,13 @@ function splitTitle(baslik) {
 }
 
 export default function Tesekkur() {
-  const content = DEFAULT_CONTENT
+  const location = useLocation()
+  const submitted = location.state?.submitted === true
+  const title = submitted ? 'Talebiniz alındı' : 'Talep durumu doğrulanamadı'
 
   useSEO({
-    title: 'Teşekkürler | Kade Media',
-    description: 'Formunuz alındı. En kısa sürede size dönüş yapacağız.',
+    title: 'Talep Durumu | Kade Media',
+    description: 'Kade Media iletişim talebi durum bilgisi.',
     path: '/tesekkur',
     noindex: true,
   })
@@ -56,7 +40,7 @@ export default function Tesekkur() {
     }
   }, [])
 
-  const { before, highlight } = splitTitle(content.baslik)
+  const { before, highlight } = splitTitle(title)
 
   return (
     <PageTransition>
@@ -81,41 +65,16 @@ export default function Tesekkur() {
 
           <FadeIn delay={0.3}>
             <p className="tesekkur-alt">
-              {content.altMetin}
+              {submitted
+                ? 'İletişim talebiniz sunucu tarafından başarıyla kaydedildi.'
+                : 'Bu sayfa doğrudan veya yenilenerek açıldı. Daha önce gönderilmiş bir talebin durumunu bu ekrandan doğrulayamıyoruz.'}
             </p>
           </FadeIn>
 
           <FadeIn delay={0.35}>
             <div className="tesekkur-bekleme glass-card">
-              <HiOutlineClock size={18} />
-              <span>Ortalama yanıt süresi: <strong>{content.yanitSuresi}</strong> ({content.yanitSuresiNot})</span>
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={0.4}>
-            <h2 className="tesekkur-adimlar-baslik">{content.adimlarBaslik}</h2>
-          </FadeIn>
-
-          <StaggerContainer className="tesekkur-adimlar">
-            {content.adimlar.map((adim, i) => (
-              <StaggerItem key={i}>
-                <div className="tesekkur-adim glass-card">
-                  <div className="adim-numara">{i + 1}</div>
-                  <span className="adim-ikon">{adim.ikon}</span>
-                  <h3>{adim.baslik}</h3>
-                  <p>{adim.aciklama}</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-
-          <FadeIn delay={0.5}>
-            <div className="tesekkur-acil glass-card">
-              <HiOutlineMail size={20} />
-              <div>
-                <strong>{content.acilBaslik}</strong>
-                <p><a href={`mailto:${content.acilEmail || CONTACT.email}`}>{content.acilEmail || CONTACT.email}</a></p>
-              </div>
+              <HiOutlineMail size={18} />
+              <span>{submitted ? 'Ek bilgi paylaşmak için' : 'Talebinizi doğrulamak veya yeniden iletmek için'} <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></span>
             </div>
           </FadeIn>
 
@@ -124,9 +83,8 @@ export default function Tesekkur() {
               <Link to="/" className="btn btn-outline">
                 Anasayfaya Dön
               </Link>
-              <Link to="/blog" className="btn btn-primary">
-                Blog'u Keşfet
-                <HiOutlineArrowRight size={16} />
+              <Link to="/iletisim" className="btn btn-primary">
+                İletişim sayfasına git
               </Link>
             </div>
           </FadeIn>

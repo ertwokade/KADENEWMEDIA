@@ -4,20 +4,38 @@ import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import './CookieBanner.css'
 
+const GA_ID = import.meta.env.VITE_GA_ID || 'G-R893K1VE79'
+
+function loadAnalytics() {
+  if (!GA_ID || document.querySelector('script[data-kade-analytics]')) return
+  window.dataLayer = window.dataLayer || []
+  window.gtag = window.gtag || function gtag() { window.dataLayer.push(arguments) }
+  window.gtag('consent', 'default', { analytics_storage: 'granted' })
+  window.gtag('js', new Date())
+  window.gtag('config', GA_ID, { page_path: window.location.pathname })
+  const script = document.createElement('script')
+  script.async = true
+  script.dataset.kadeAnalytics = 'true'
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA_ID)}`
+  document.head.appendChild(script)
+}
+
 export default function CookieBanner() {
   const { t } = useLanguage()
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     const consent = localStorage.getItem('cookie_consent')
-    if (!consent) {
+    if (consent === 'accepted') {
+      loadAnalytics()
+    } else if (!consent) {
       const timer = setTimeout(() => setVisible(true), 2000)
       return () => clearTimeout(timer)
     }
   }, [])
 
   const enableAnalytics = () => {
-    // Enable GA4 if consent given
+    loadAnalytics()
     if (typeof window.gtag === 'function') {
       window.gtag('consent', 'update', {
         analytics_storage: 'granted',
@@ -39,6 +57,7 @@ export default function CookieBanner() {
         document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
       }
     })
+    document.querySelector('script[data-kade-analytics]')?.remove()
   }
 
   const handleAccept = () => {

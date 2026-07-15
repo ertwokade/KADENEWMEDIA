@@ -19,7 +19,7 @@ import PageBgAnimation from '../components/PageBgAnimation'
 import './Services.css'
 
 export default function Services() {
-  const { t, lang } = useLanguage()
+  const { t } = useLanguage()
   useSEO({
     title: 'Hizmetlerimiz | Sosyal Medya Ajansı Hizmetleri | Kade Media',
     description: 'Profesyonel sosyal medya yönetimi, içerik üretimi, Meta & Google reklam yönetimi, influencer marketing ve video prodüksiyon. İstanbul sosyal medya ajansı Kade Media ile markanızı büyütün.',

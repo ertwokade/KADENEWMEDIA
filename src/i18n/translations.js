@@ -181,7 +181,7 @@ export const translations = {
       errorMsg: 'Mesaj gönderilemedi. Lütfen tekrar deneyin.',
       whatsappAlso: 'WhatsApp ile de gönderin',
       videoProduction: 'Video Prodüksiyon',
-      locationTitle: 'Konumumuz - Biruni Teknopark',
+      locationTitle: 'Konumumuz - İstanbul',
       getDirections: 'Yol Tarifi Al',
     },
     packages: {
@@ -498,7 +498,7 @@ export const translations = {
       errorMsg: 'Failed to send message. Please try again.',
       whatsappAlso: 'Also send via WhatsApp',
       videoProduction: 'Video Production',
-      locationTitle: 'Our Location - Biruni Teknopark',
+      locationTitle: 'Our Location - Istanbul',
       getDirections: 'Get Directions',
     },
     packages: {

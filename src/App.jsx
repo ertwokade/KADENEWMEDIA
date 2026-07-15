@@ -212,7 +212,13 @@ function App() {
         <Route path="/musteri-panel" element={<LazyRoute><CustomerPortal /></LazyRoute>} />
         <Route path="/organizasyon-kiti" element={<LazyRoute><OrganizationKitGuard><OrganizationKitDashboard /></OrganizationKitGuard></LazyRoute>} />
         <Route path="/organizasyon-kiti/plan/fractional-new-media-director" element={<LazyRoute><OrganizationKitGuard><OrganizationKitPlan /></OrganizationKitGuard></LazyRoute>} />
-        <Route path="/organizasyon-kiti/:section" element={<LazyRoute><OrganizationKitGuard><OrganizationKitSection /></OrganizationKitGuard></LazyRoute>} />
+        {['medya-yol-haritasi', 'yonetim-toplantilari', 'ekip-surecler', 'stratejik-kararlar', 'notlar'].map(section => (
+          <Route
+            key={section}
+            path={`/organizasyon-kiti/${section}`}
+            element={<LazyRoute><OrganizationKitGuard><OrganizationKitSection /></OrganizationKitGuard></LazyRoute>}
+          />
+        ))}
         <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
         <Route path="/proje-takip" element={<LazyRoute><CustomerRouteGuard><ProjectTracking /></CustomerRouteGuard></LazyRoute>} />
         <Route path="/links" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />

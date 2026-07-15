@@ -38,15 +38,15 @@ export default function CerezPolitikasi() {
 
               <h3>2.2 Tercih Çerezleri</h3>
               <p>
-                Dil tercihi gibi ayarlarınızı hatırlamak için kullanılır. Örneğin, Türkçe/İngilizce
-                dil seçiminiz bu çerezlerle kaydedilir.
+                Dil ve tema gibi tercihlerinizi hatırlamak için tarayıcı depolama alanı
+                kullanılabilir.
               </p>
 
               <h3>2.3 Analitik Çerezler</h3>
               <p>
-                Google Analytics gibi araçlar aracılığıyla anonim ziyaret istatistikleri
-                toplanmaktadır. Bu veriler kişisel tanımlama içermez ve site performansını
-                değerlendirmek için kullanılır.
+                Yalnızca analitik izni verdiğinizde Google Analytics yüklenebilir. Sağlayıcının
+                işlediği teknik veriler, site kullanımını ve performansını değerlendirmek için
+                kullanılabilir.
               </p>
 
               <h2>3. Çerez Yönetimi</h2>

@@ -1,6 +1,6 @@
 export const organizationKitSummary = {
   nextMeeting: '18 Temmuz 2026, 10:30',
-  consultant: 'Kade New Media',
+  consultant: 'Kade Media',
   consultingModel: 'Aylık stratejik yönetim ortaklığı',
   period: 'Temmuz - Eylül 2026',
   roadmapCompletion: 64,
@@ -16,7 +16,7 @@ export const roadmapFocus = [
 
 export const strategicDecisions = [
   { title: 'Temmuz kampanya ana mesaji', status: 'Onay bekliyor', owner: 'Yonetim' },
-  { title: 'Creator shortlist secimi', status: 'Karar gerekli', owner: 'Kade New Media' },
+  { title: 'Creator shortlist secimi', status: 'Karar gerekli', owner: 'Kade Media' },
   { title: 'Q3 medya butce dagilimi', status: 'Taslak hazir', owner: 'Finans + Pazarlama' },
 ]
 
@@ -103,7 +103,7 @@ export const organizationKitSections = {
   },
   notlar: {
     title: 'Danışmanlık Notları',
-    eyebrow: 'Kade New Media',
+    eyebrow: 'Kade Media',
     description: 'Toplantı çıktıları, gözlemler, riskler ve önerilen yönetim aksiyonları için merkezi not alanı.',
     stats: [
       ['Son not', '27 Haziran 2026'],
@@ -120,7 +120,7 @@ export const organizationKitSections = {
 
 export const fractionalDirectorPlan = {
   title: 'Fractional New Media Director',
-  description: 'Kade New Media ekibinin markanızın içerik, medya ve büyüme kararlarında stratejik yönetim partneri olarak çalıştığı danışmanlık modeli.',
+  description: 'Kade Media ekibinin markanızın içerik, medya ve büyüme kararlarında stratejik yönetim partneri olarak çalıştığı danışmanlık modeli.',
   badges: ['Özel Danışmanlık Planı', 'Aktif', 'Premium Erişim'],
   services: [
     'Aylık yönetim toplantıları',

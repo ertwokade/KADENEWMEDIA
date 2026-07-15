@@ -14,6 +14,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' })
+  const [consent, setConsent] = useState(false)
   const { customer, setCustomer, checked } = useCustomer()
   const navigate = useNavigate()
 
@@ -44,7 +45,8 @@ export default function Login() {
         data = await customerLoginApi(form.email, form.password)
       } else {
         if (!form.name.trim()) { setError('Ad Soyad gerekli'); setLoading(false); return }
-        data = await customerRegisterApi(form.name, form.email, form.password, form.phone)
+        if (!consent) { setError('Hesap oluşturmak için aydınlatma metnini onaylayın.'); setLoading(false); return }
+        data = await customerRegisterApi(form.name, form.email, form.password, form.phone, consent)
       }
       setCustomer(data.customer)
       navigate('/musteri-panel', { replace: true })
@@ -60,6 +62,7 @@ export default function Login() {
     setError('')
     setForm({ name: '', email: '', phone: '', password: '' })
     setShowPassword(false)
+    setConsent(false)
   }
 
   if (!checked) return null
@@ -75,6 +78,7 @@ export default function Login() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
+          <h1 className="visually-hidden">Kade Media müşteri girişi</h1>
           <Link to="/" className="login-logo">
             <img src="/logo.png" alt="Kade Media" />
           </Link>
@@ -109,7 +113,9 @@ export default function Login() {
               {tab === 'register' && (
                 <div className="login-field">
                   <HiOutlineUser className="login-field-icon" size={17} />
+                  <label className="visually-hidden" htmlFor="customer-name">Ad Soyad</label>
                   <input
+                    id="customer-name"
                     type="text"
                     name="name"
                     placeholder="Ad Soyad"
@@ -124,7 +130,9 @@ export default function Login() {
 
               <div className="login-field">
                 <HiOutlineMail className="login-field-icon" size={17} />
+                <label className="visually-hidden" htmlFor="customer-email">E-posta adresi</label>
                 <input
+                  id="customer-email"
                   type="email"
                   name="email"
                   placeholder="E-posta adresi"
@@ -139,7 +147,9 @@ export default function Login() {
               {tab === 'register' && (
                 <div className="login-field">
                   <HiOutlinePhone className="login-field-icon" size={17} />
+                  <label className="visually-hidden" htmlFor="customer-phone">Telefon</label>
                   <input
+                    id="customer-phone"
                     type="tel"
                     name="phone"
                     placeholder="Telefon (isteğe bağlı)"
@@ -153,10 +163,12 @@ export default function Login() {
 
               <div className="login-field">
                 <HiOutlineLockClosed className="login-field-icon" size={17} />
+                <label className="visually-hidden" htmlFor="customer-password">Şifre</label>
                 <input
+                  id="customer-password"
                   type={showPassword ? 'text' : 'password'}
                   name="password"
-                  placeholder={tab === 'login' ? 'Şifre' : 'Şifre (en az 8 karakter)'}
+                  placeholder={tab === 'login' ? 'Şifre' : 'Şifre (en az 12 karakter)'}
                   value={form.password}
                   onChange={handleChange}
                   className="login-input"
@@ -167,16 +179,24 @@ export default function Login() {
                   type="button"
                   className="login-field-eye"
                   onClick={() => setShowPassword(p => !p)}
-                  tabIndex={-1}
+                  aria-label={showPassword ? 'Şifreyi gizle' : 'Şifreyi göster'}
                 >
                   {showPassword ? <HiEyeOff size={17} /> : <HiEye size={17} />}
                 </button>
               </div>
 
+              {tab === 'register' && (
+                <label className="login-switch" style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                  <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} required />
+                  <span><Link to="/kvkk">KVKK Aydınlatma Metni</Link> ve <Link to="/gizlilik">Gizlilik Politikası</Link>'nı okudum ve hesap verilerimin işlenmesini onaylıyorum.</span>
+                </label>
+              )}
+
               <AnimatePresence>
                 {error && (
                   <motion.div
                     className="login-error"
+                    role="alert"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
@@ -217,12 +237,7 @@ export default function Login() {
             </motion.form>
           </AnimatePresence>
 
-          <p className="login-legal">
-            Devam ederek{' '}
-            <Link to="/kvkk">Gizlilik Politikası</Link>
-            {' '}ve{' '}
-            <Link to="/cerez-politikasi">Kullanım Koşulları</Link>'nı kabul etmiş olursunuz.
-          </p>
+          <p className="login-legal">Veri işleme ayrıntıları için <Link to="/gizlilik">Gizlilik Politikası</Link>'nı inceleyin.</p>
         </motion.div>
       </div>
     </PageTransition>

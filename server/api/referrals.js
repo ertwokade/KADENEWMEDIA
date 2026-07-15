@@ -2,7 +2,6 @@ import { ObjectId } from 'mongodb'
 import { getDb, isValidObjectId } from './_lib/mongodb.js'
 import { requirePermission } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
-import { rateLimitCheck } from './_lib/rateLimit.js'
 import { logActivity } from './notifications.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -28,10 +27,8 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const rl = await rateLimitCheck(req, { namespace: 'referrals', maxRequests: 5 })
-    if (!rl.allowed) {
-      return res.status(429).json({ error: `Çok fazla istek. ${rl.retryAfter} dakika sonra tekrar deneyin.` })
-    }
+    const user = await requirePermission(req, res, 'referrals', { write: true })
+    if (!user) return
 
     let body = req.body
     if (typeof body === 'string') {
@@ -94,7 +91,7 @@ export default async function handler(req, res) {
       detail: `${referral.referrerName} -> ${referral.leadName}`,
       type: 'message',
       icon: '↗',
-      user: 'sistem',
+      user: user.username,
     }).catch(() => {})
 
     return res.status(201).json({ success: true, referral })

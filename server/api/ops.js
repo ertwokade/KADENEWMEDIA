@@ -22,9 +22,7 @@ async function requireAdmin(req, res, permission = 'crm', options = {}) {
   return requirePermission(req, res, permission, options)
 }
 
-async function handleQuotes(req, res, db) {
-  const col = db.collection('quotes')
-
+async function handleQuotes(req, res) {
   if (req.method === 'POST') {
     const rl = await rateLimitCheck(req, { namespace: 'quotes', maxRequests: 10 })
     if (!rl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${rl.retryAfter} dakika sonra tekrar deneyin.` })
@@ -57,6 +55,8 @@ async function handleQuotes(req, res, db) {
       return res.status(400).json({ error: 'Geçersiz kapsam veya bütçe değeri.' })
     }
 
+    const db = await getDb()
+    const col = db.collection('quotes')
     const quote = {
       name: clean(name, 120),
       email: clean(email, 254).toLowerCase(),
@@ -72,6 +72,7 @@ async function handleQuotes(req, res, db) {
       package: clean(packageId, 40),
       source: clean(source, 80) || 'online-quote',
       notes: clean(notes, 1200),
+      consentAt: new Date(),
       status: 'yeni',
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -98,6 +99,8 @@ async function handleQuotes(req, res, db) {
 
   const user = await requireAdmin(req, res, 'quoteLeads', { write: req.method !== 'GET' })
   if (!user) return
+  const db = await getDb()
+  const col = db.collection('quotes')
 
   if (req.method === 'GET') {
     const quotes = await col.find({}).sort({ createdAt: -1 }).limit(250).toArray()
@@ -406,11 +409,11 @@ async function handlePush(req, res, db) {
 export default async function handler(req, res) {
   if (cors(req, res)) return
 
-  const db = await getDb()
   const { resource } = req.query || {}
 
   try {
-    if (resource === 'quotes') return handleQuotes(req, res, db)
+    if (resource === 'quotes') return handleQuotes(req, res)
+    const db = await getDb()
     if (resource === 'invoices') return handleInvoices(req, res, db)
     if (resource === 'customer-profiles') return handleCustomerProfiles(req, res, db)
     if (resource === 'backup') return handleBackup(req, res, db)

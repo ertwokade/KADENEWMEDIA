@@ -21,6 +21,9 @@ export default function OrganizationKitPlan() {
           <OrganizationKitNav />
 
           <main className="ok-main">
+            <p role="status" className="glass-card" style={{ padding: 14, marginBottom: 18 }}>
+              Demo kapsam — gerçek hizmetler yalnızca hesabınıza atanmış yazılı paket kaydından belirlenir.
+            </p>
             <section className="ok-plan-detail">
               <span className="ok-eyebrow">Aktif Danışmanlık Paketi</span>
               <h1>{fractionalDirectorPlan.title}</h1>

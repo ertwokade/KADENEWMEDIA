@@ -38,6 +38,7 @@ export default function Navbar() {
       if (event.key === 'Escape') {
         event.preventDefault()
         setIsOpen(false)
+        menuButtonRef.current?.focus()
         requestAnimationFrame(() => menuButtonRef.current?.focus())
         return
       }

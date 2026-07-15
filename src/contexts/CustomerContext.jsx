@@ -53,6 +53,8 @@ export function CustomerProvider({ children }) {
   )
 }
 
+// Hook and provider intentionally share this module to keep the session context singleton.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCustomer() {
   return useContext(CustomerContext)
 }

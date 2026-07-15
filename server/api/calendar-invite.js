@@ -53,7 +53,7 @@ function generateICS({ title, description, date, time, duration = 60 }) {
     `DTEND;TZID=Europe/Istanbul:${endFmt}`,
     `SUMMARY:${escapeICS(title)}`,
     `DESCRIPTION:${escapeICS(description)}`,
-    'ORGANIZER;CN=Kade Media:mailto:hello@kademedia.com',
+    'ORGANIZER;CN=Kade Media:mailto:thekademedia@gmail.com',
     `UID:${Date.now()}@kademedia.com.tr`,
     'STATUS:CONFIRMED',
     'END:VEVENT',

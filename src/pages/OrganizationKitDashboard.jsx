@@ -138,6 +138,10 @@ export default function OrganizationKitDashboard() {
             </Link>
           </section>
 
+          <p role="status" className="glass-card" style={{ padding: 14, marginBottom: 18 }}>
+            Demo çalışma alanı — iframe içindeki örnek görev ve analiz kayıtları gerçek müşteri verisi değildir.
+          </p>
+
           <section className="ok-studio-frame-wrap" aria-label="Kade Organizasyon Kiti arayüzü">
             <div className="ok-studio-frame-label">
               <HiOutlineSparkles size={16} />

@@ -13,7 +13,7 @@ const allowedActions = new Set([
   'send-invite', 'send-newsletter', 'sitemap', 'smtp-test', 'submit',
   'subscribers', 'session', 'unsubscribe',
   // Customer portal & Shopier
-  'register', 'packages', 'add-package', 'claim-free-package', 'remove-package', 'update-package', 'update-status',
+  'register', 'packages', 'add-package', 'remove-package', 'update-package', 'update-status',
 ]);
 
 const allowedResources = new Set([

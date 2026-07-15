@@ -14,7 +14,7 @@ export const PACKAGE_DEFINITIONS = {
     ],
     durationDays: 30,
     price: 0,
-    publicFree: true,
+    publicFree: false,
     access: {
       consultingPlan: 'fractional_new_media_director',
       consultingStatus: 'active',
@@ -32,7 +32,7 @@ export const PACKAGE_DEFINITIONS = {
     ],
     durationDays: 30,
     price: 0,
-    publicFree: true,
+    publicFree: false,
     access: {
       consultingPlan: 'fractional_new_media_director',
       consultingStatus: 'active',

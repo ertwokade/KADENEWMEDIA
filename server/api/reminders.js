@@ -139,7 +139,7 @@ export default async function handler(req, res) {
                       ${reminder.category ? `<tr><td style="padding:8px 0;color:#888;">Kategori</td><td style="padding:8px 0;color:#fff;">${escapeHtml(reminder.category)}</td></tr>` : ''}
                     </table>
                     <div style="text-align:center;margin:24px 0;">
-                      <a href="https://kademedia.com.tr/admin" style="display:inline-block;padding:14px 32px;background:#eac321;color:#000;text-decoration:none;border-radius:8px;font-weight:bold;">Admin Paneline Git</a>
+                      <a href="https://www.kademedia.com.tr/admin" style="display:inline-block;padding:14px 32px;background:#eac321;color:#000;text-decoration:none;border-radius:8px;font-weight:bold;">Admin Paneline Git</a>
                     </div>
                   </div>
                   <div style="text-align:center;padding:16px;border-top:1px solid #333;">
@@ -306,7 +306,7 @@ export default async function handler(req, res) {
       const endM = String(endTotal % 60).padStart(2, '0');
       const startFmt = `${year}${month}${day}T${hours.padStart(2, '0')}${minutes.padStart(2, '0')}00`;
       const endFmt = `${year}${month}${day}T${endH}${endM}00`;
-      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Kade Media//Calendar//TR','CALSCALE:GREGORIAN','METHOD:REQUEST','BEGIN:VTIMEZONE','TZID:Europe/Istanbul','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:+0300','TZOFFSETTO:+0300','END:STANDARD','END:VTIMEZONE','BEGIN:VEVENT',`DTSTART;TZID=Europe/Istanbul:${startFmt}`,`DTEND;TZID=Europe/Istanbul:${endFmt}`,`SUMMARY:${escapeICS(title)}`,`DESCRIPTION:${escapeICS(description)}`,'ORGANIZER;CN=Kade Media:mailto:hello@kademedia.com',`UID:${Date.now()}@kademedia.com`,'STATUS:CONFIRMED','END:VEVENT','END:VCALENDAR'].join('\r\n');
+      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Kade Media//Calendar//TR','CALSCALE:GREGORIAN','METHOD:REQUEST','BEGIN:VTIMEZONE','TZID:Europe/Istanbul','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:+0300','TZOFFSETTO:+0300','END:STANDARD','END:VTIMEZONE','BEGIN:VEVENT',`DTSTART;TZID=Europe/Istanbul:${startFmt}`,`DTEND;TZID=Europe/Istanbul:${endFmt}`,`SUMMARY:${escapeICS(title)}`,`DESCRIPTION:${escapeICS(description)}`,'ORGANIZER;CN=Kade Media:mailto:thekademedia@gmail.com',`UID:${Date.now()}@kademedia.com`,'STATUS:CONFIRMED','END:VEVENT','END:VCALENDAR'].join('\r\n');
     }
 
     const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

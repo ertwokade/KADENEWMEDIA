@@ -114,11 +114,11 @@ export default async function handler(req, res) {
               ${proposal.validUntil ? `<p style="color:#888;font-size:0.85rem">Bu teklif <strong>${new Date(proposal.validUntil).toLocaleDateString('tr-TR')}</strong> tarihine kadar geçerlidir.</p>` : ''}
               ${proposal.notes ? `<div style="background:#f9f9f9;border-radius:8px;padding:16px;margin-top:16px"><strong>Notlar:</strong><p style="margin:8px 0 0;color:#555">${escapeHtml(proposal.notes)}</p></div>` : ''}
               <div style="margin-top:32px;text-align:center">
-                <a href="mailto:hello@kademedia.com" style="background:#eac321;color:#111;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold">Teklifi Onaylayın</a>
+                <a href="mailto:thekademedia@gmail.com" style="background:#eac321;color:#111;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold">Teklifi Onaylayın</a>
               </div>
             </div>
             <div style="padding:20px 32px;border-top:1px solid #eee;font-size:0.8rem;color:#999;text-align:center">
-              Kade Media Dijital Pazarlama | hello@kademedia.com | 0506 729 34 23
+              Kade Media Dijital Pazarlama | thekademedia@gmail.com
             </div>
           </div>
         `;

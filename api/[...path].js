@@ -102,8 +102,6 @@ function isPublicPost(req) {
   if (route === 'shopier') return true
   // Public contact actions
   if (route === 'contact' && (!action || PUBLIC_ACTIONS.has(action))) return true
-  // Public referral submission
-  if (route === 'referrals' && !action) return true
   // Public survey response
   if (route === 'surveys' && action === 'submit') return true
   return false

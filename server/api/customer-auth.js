@@ -84,7 +84,7 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET' && action === 'session') {
     const active = await getActiveCustomerSession(req)
-    if (!active) return res.status(401).json({ authenticated: false })
+    if (!active) return res.status(200).json({ authenticated: false })
     return res.status(200).json({ authenticated: true, customer: { id: active.session.id, name: active.session.name, email: active.session.email } })
   }
 
@@ -111,11 +111,12 @@ async function handleRegister(req, res) {
     return res.status(429).json({ error: `Çok fazla kayıt denemesi. Lütfen ${rl.retryAfter} dakika sonra tekrar deneyin.` })
   }
 
-  const { name, email, password, phone } = parseBody(req)
+  const { name, email, password, phone, consent } = parseBody(req)
 
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Ad, e-posta ve şifre gerekli' })
   }
+  if (consent !== true) return res.status(400).json({ error: 'Aydınlatma metni onayı gereklidir' })
 
   if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 100) {
     return res.status(400).json({ error: 'Ad en az 2, en fazla 100 karakter olmalı' })
@@ -151,6 +152,7 @@ async function handleRegister(req, res) {
       createdAt: now,
       updatedAt: now,
       lastLoginAt: null,
+      consentAt: now,
     })
 
     const token = createToken({

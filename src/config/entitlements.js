@@ -16,45 +16,6 @@ export const CONSULTING_PLANS = {
   },
 }
 
-export const PACKAGE_ACCESS = {
-  'danismanlik-test': {
-    consultingPlan: 'fractional_new_media_director',
-    consultingStatus: 'active',
-    hasConsultingPanelAccess: true,
-  },
-  'kade-organizasyon-kiti-test': {
-    consultingPlan: 'fractional_new_media_director',
-    consultingStatus: 'active',
-    hasOrganizationKitAccess: true,
-  },
-  'dijital-danismanlik': {
-    consultingPlan: 'fractional_new_media_director',
-    consultingStatus: 'active',
-    hasConsultingPanelAccess: true,
-  },
-  'tam-dijital': {
-    consultingPlan: 'fractional_new_media_director',
-    consultingStatus: 'active',
-    hasConsultingPanelAccess: true,
-    hasOrganizationKitAccess: true,
-    hasKadeKitBusinessAccess: true,
-    hasKadeRadarAccess: true,
-    hasAIKnowledgeCenterAccess: true,
-  },
-}
-
-export const userEntitlements = {
-  'demirk314@gmail.com': {
-    role: 'client_admin',
-    consultingPlan: 'fractional_new_media_director',
-    consultingStatus: 'active',
-    hasOrganizationKitAccess: true,
-    hasKadeKitBusinessAccess: true,
-    hasKadeRadarAccess: true,
-    hasAIKnowledgeCenterAccess: true,
-  },
-}
-
 export function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase()
 }
@@ -71,7 +32,7 @@ export function getPackageEntitlements(packages = []) {
   const activePackages = Array.isArray(packages) ? packages.filter(isPackageActive) : []
 
   activePackages.forEach((pkg) => {
-    const access = pkg.access || PACKAGE_ACCESS[pkg.reference] || {}
+    const access = pkg.access || {}
     Object.entries(access).forEach(([key, value]) => {
       if (typeof value === 'boolean') {
         entitlements[key] = Boolean(entitlements[key] || value)
@@ -85,11 +46,9 @@ export function getPackageEntitlements(packages = []) {
 }
 
 export function getUserEntitlements(email, packages = [], extraEntitlements = {}) {
-  const entitlement = userEntitlements[normalizeEmail(email)]
   return {
     ...DEFAULT_ENTITLEMENTS,
     ...getPackageEntitlements(packages),
-    ...(entitlement || {}),
     ...(extraEntitlements || {}),
   }
 }

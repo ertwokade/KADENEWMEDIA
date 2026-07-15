@@ -160,12 +160,12 @@ export async function customerLoginApi(email, password) {
   return handleResponse(res, { reloadOnUnauthorized: false });
 }
 
-export async function customerRegisterApi(name, email, password, phone) {
+export async function customerRegisterApi(name, email, password, phone, consent) {
   await ensureCsrfToken({ force: true });
   const res = await fetch(`${API_BASE}/customer-auth?action=register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password, phone }),
+    body: JSON.stringify({ name, email, password, phone, consent }),
   });
   return handleResponse(res, { reloadOnUnauthorized: false });
 }
@@ -186,15 +186,6 @@ export async function customerLogoutApi() {
 
 export async function customerPortalApi() {
   const res = await fetch(`${API_BASE}/customer-portal`);
-  return handleResponse(res, { reloadOnUnauthorized: false });
-}
-
-export async function claimFreePackageApi(reference) {
-  const res = await fetch(`${API_BASE}/customer-portal?action=claim-free-package`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ reference }),
-  });
   return handleResponse(res, { reloadOnUnauthorized: false });
 }
 
@@ -619,16 +610,6 @@ export async function replyToMessageApi(id, replyText, subject) {
   return handleResponse(res);
 }
 
-// Kariyer başvurusu
-export async function applyJobApi(data) {
-  const res = await fetch(`${API_BASE}/contact?action=apply`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
-}
-
 // Portfolio (content section)
 export async function getPortfolioApi() {
   const res = await fetch(`${API_BASE}/content?section=portfolio`);
@@ -695,16 +676,6 @@ export async function checkRemindersApi() {
   const res = await fetch(`${API_BASE}/reminders?action=check`, {
     method: 'POST',
     headers: getAuthHeaders(),
-  });
-  return handleResponse(res);
-}
-
-// Social Media Analyzer Lead
-export async function submitAnalyzerLeadApi(data) {
-  const res = await fetch(`${API_BASE}/contact?action=analyzer-lead`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
   });
   return handleResponse(res);
 }

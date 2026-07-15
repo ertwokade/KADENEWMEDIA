@@ -34,7 +34,7 @@ export default function Gizlilik() {
                 <li><strong>Kimlik bilgileri:</strong> Ad, soyad</li>
                 <li><strong>İletişim bilgileri:</strong> E-posta, telefon numarası</li>
                 <li><strong>Şirket bilgileri:</strong> Şirket adı, sektör</li>
-                <li><strong>Teknik veriler:</strong> IP adresi, tarayıcı türü, ziyaret süresi (anonim)</li>
+                <li><strong>Teknik veriler:</strong> IP adresi, tarayıcı türü ve ziyaret bilgileri</li>
               </ul>
 
               <h2>3. Verilerin Kullanımı</h2>
@@ -62,9 +62,9 @@ export default function Gizlilik() {
 
               <h2>6. Veri Saklama Süresi</h2>
               <p>
-                Kişisel verileriniz, işleme amacının gerektirdiği süre boyunca ve yasal saklama
-                yükümlülükleri kapsamında saklanır. İletişim formundan gelen veriler en fazla
-                3 yıl süreyle saklanmaktadır.
+                Kişisel verileriniz, işleme amacının gerektirdiği süre boyunca ve yürürlükteki
+                yasal saklama yükümlülükleri kapsamında saklanır. Doğrulanmış ayrıntılı saklama
+                takvimi için iletişim adresimiz üzerinden bilgi talep edebilirsiniz.
               </p>
 
               <h2>7. Üçüncü Taraf Hizmetler</h2>

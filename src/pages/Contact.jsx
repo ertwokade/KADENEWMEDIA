@@ -76,12 +76,12 @@ export default function Contact() {
     setSending(true)
     setError('')
     try {
-      await sendContactApi({ ...formData, service: formData.services.join(', ') })
+      await sendContactApi({ ...formData, service: formData.services.join(', '), consent: kvkkAccepted })
       analytics.formSubmit(formData.services.join(', '))
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', company: '', services: [], message: '' })
       setKvkkAccepted(false)
-      setTimeout(() => navigate('/tesekkur'), 600)
+      setTimeout(() => navigate('/tesekkur', { state: { submitted: true } }), 600)
     } catch (err) {
       const errorMsg = err.message || ''
       if (errorMsg === 'API unavailable' || errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
@@ -187,6 +187,7 @@ export default function Contact() {
                   <input
                     type="text"
                     name="website"
+                    aria-label="Web sitesi"
                     tabIndex={-1}
                     autoComplete="off"
                     value={honeypot}
@@ -328,7 +329,7 @@ export default function Contact() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0 }}
                     >
-                      {t('contact.successNote') || 'Ekibimiz en kısa sürede size dönecek.'}
+                      Talebiniz sunucu tarafından alındı.
                     </motion.span>
                   )}
                 </div>
