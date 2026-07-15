@@ -831,3 +831,10 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   outline-offset: 2px !important;
   border-radius: 2px;
 }
+
+/* =====================================================================
+   Hakkımızda: eski "yıldırım glass-card" görseli editoryale uymuyor —
+   gizle, Hikayemiz'i tam genişlik editoryal metne çevir.
+   ===================================================================== */
+.about-story .story-visual { display: none !important; }
+.about-story .story-grid { grid-template-columns: 1fr !important; }
