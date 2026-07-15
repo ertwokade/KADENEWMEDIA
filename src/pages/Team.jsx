@@ -10,6 +10,9 @@ import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Team.css'
 
+// Yalnızca doğrulanmış gerçek kişi. Placeholder isimler kaldırıldı; ekip
+// büyüdükçe (veya admin panelinden) buraya gerçek üyeler eklenir. Gerçek veri
+// yoksa uydurma isim gösterilmez — bunun yerine açık pozisyonlar / roller sunulur.
 const defaultTeam = [
   {
     name: 'Kadir Demir',
@@ -20,36 +23,6 @@ const defaultTeam = [
     image: '/kadir.jpg',
     social: {},
     color: '#eac321',
-  },
-  {
-    name: 'Ayşe Yılmaz',
-    roleTr: 'Kreatif Direktör',
-    roleEn: 'Creative Director',
-    bioTr: 'Görsel hikaye anlatımı ve marka kimliği konularında uzman. Yaratıcı süreçlerin lideri.',
-    bioEn: 'Expert in visual storytelling and brand identity. Leads the creative process.',
-    image: null,
-    social: {},
-    color: '#E91E63',
-  },
-  {
-    name: 'Mehmet Kaya',
-    roleTr: 'Sosyal Medya Yöneticisi',
-    roleEn: 'Social Media Manager',
-    bioTr: 'Çok platformlu sosyal medya stratejileri ve topluluk yönetimi konusunda deneyimli.',
-    bioEn: 'Experienced in multi-platform social media strategies and community management.',
-    image: null,
-    social: {},
-    color: '#6C63FF',
-  },
-  {
-    name: 'Zeynep Demir',
-    roleTr: 'İçerik Stratejisti',
-    roleEn: 'Content Strategist',
-    bioTr: 'İçerik pazarlama stratejileriyle markaların dijital büyümesini ve organik erişimini artırıyor.',
-    bioEn: 'Grows brands\' digital presence and organic reach through content marketing strategies.',
-    image: null,
-    social: {},
-    color: '#2ECC71',
   },
 ]
 

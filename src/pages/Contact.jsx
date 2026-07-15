@@ -16,16 +16,18 @@ import { useSEO } from '../hooks/useSEO'
 import { sendContactApi } from '../api'
 import { analytics } from '../utils/analytics'
 import { CONTACT } from '../utils/constants'
+import { BRAND } from '../config/brand'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Contact.css'
 
+// Marka/sosyal bilgisi merkezi config'ten (src/config/brand.js)
 const socials = [
-  { icon: FaInstagram, href: 'https://instagram.com/kadenewmedia', label: 'Instagram' },
-  { icon: FaYoutube, href: 'https://www.youtube.com/@kadenewmedia', label: 'YouTube' },
-  { icon: FaTiktok, href: 'https://tiktok.com/@kadenewmedia', label: 'TikTok' },
-  { icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/kadenewmedia', label: 'LinkedIn' },
+  { icon: FaInstagram, href: BRAND.social.instagram, label: 'Instagram' },
+  { icon: FaYoutube, href: BRAND.social.youtube, label: 'YouTube' },
+  { icon: FaTiktok, href: BRAND.social.tiktok, label: 'TikTok' },
+  { icon: FaLinkedinIn, href: BRAND.social.linkedin, label: 'LinkedIn' },
   { icon: FaWhatsapp, href: CONTACT.whatsapp, label: 'WhatsApp' },
 ]
 

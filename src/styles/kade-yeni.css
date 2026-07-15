@@ -823,3 +823,11 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
   }
   .kade-art { display: none !important; }
 }
+
+/* item 12: klavye erişilebilirliği — görünür focus (marka gold ring) */
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible,
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid #e0a81f !important;
+  outline-offset: 2px !important;
+  border-radius: 2px;
+}

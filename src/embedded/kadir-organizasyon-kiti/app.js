@@ -1707,7 +1707,7 @@ function renderPageEditor(){
 
   // Cover
   const coverArea=document.getElementById("pageCoverArea");
-  if(coverArea)coverArea.innerHTML=pg.cover?`<img src="${esc(pg.cover)}" class="page-cover-img"/><button class="page-cover-remove" onclick="removeCover()">Kapağı kaldır</button>`:"";
+  if(coverArea)coverArea.innerHTML=pg.cover?`<img src="${esc(pg.cover)}" class="page-cover-img" alt="Sayfa kapak görseli"/><button class="page-cover-remove" onclick="removeCover()">Kapağı kaldır</button>`:"";
 
   // Breadcrumb
   const bc=document.getElementById("pageBreadcrumb");

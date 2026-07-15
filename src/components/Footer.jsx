@@ -1,16 +1,11 @@
 import { Link } from 'react-router-dom'
+import { BRAND, SOCIAL_LINKS } from '../config/brand'
 import './Footer.css'
 
 // Anasayfa (site.html) footer'ının birebir React versiyonu:
 // asimetrik dev display "BİRLİKTE HARİKA İŞLER BAŞARALIM",
 // altta e-posta + sosyal linkler, en altta ince yasal satır.
-const SOCIALS = [
-  ['Instagram', 'https://instagram.com/kadenewmedia'],
-  ['X', 'https://x.com/kadenewmedia'],
-  ['YouTube', 'https://www.youtube.com/@kadenewmedia'],
-  ['TikTok', 'https://tiktok.com/@kadenewmedia'],
-  ['LinkedIn', 'https://www.linkedin.com/company/kadenewmedia'],
-]
+// Marka/iletişim bilgisi merkezi config'ten (src/config/brand.js).
 
 export default function Footer() {
   return (
@@ -25,18 +20,18 @@ export default function Footer() {
       </div>
 
       <div className="kfoot-bar">
-        <a href="mailto:thekademedia@gmail.com" className="kfoot-link">thekademedia@gmail.com</a>
+        <a href={`mailto:${BRAND.email}`} className="kfoot-link">{BRAND.email}</a>
         <div className="kfoot-socials">
-          {SOCIALS.map(([name, url]) => (
-            <a key={name} href={url} target="_blank" rel="noopener noreferrer" className="kfoot-link">
-              {name}
+          {SOCIAL_LINKS.map(({ label, href }) => (
+            <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="kfoot-link">
+              {label}
             </a>
           ))}
         </div>
       </div>
 
       <div className="kfoot-legal">
-        <span>© {new Date().getFullYear()} KADE MEDIA · İSTANBUL</span>
+        <span>© {new Date().getFullYear()} {BRAND.name.toUpperCase()} · {BRAND.city.toUpperCase()}</span>
         <div className="kfoot-legal-links">
           <Link to="/kvkk">KVKK</Link>
           <Link to="/gizlilik">GİZLİLİK</Link>

@@ -222,4 +222,39 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scheduleSync); else scheduleSync();
   window.addEventListener('load', scheduleSync);
 })();
+</script><script id="kade-home-cleanup">
+(function(){
+  function run(){
+    try{
+      // ■ passcode-mask karakterleri temizle
+      var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n;
+      while(n=w.nextNode()){ if(n.nodeValue&&n.nodeValue.indexOf('■')>-1) n.nodeValue=n.nodeValue.replace(/■/g,''); }
+      // passcode "Protected" reveal gizle
+      document.querySelectorAll('[aria-label^="Protected"],[aria-label*="passcode"]').forEach(function(e){e.style.display='none';});
+      // İngilizce demo cümlesi → Türkçe
+      document.querySelectorAll('span').forEach(function(s){
+        if(!s.children.length){
+          var t=s.textContent||'';
+          if(/I['’]m Kade Media, leading social media/i.test(t)) s.textContent='Kade Media olarak ';
+          if(t==='BIZ') s.textContent='BİZ';
+          else if(t==='markani') s.textContent='MARKANI';
+          else if(t==='buyutuyoruz') s.textContent='BÜYÜTÜYORUZ';
+          else if(t==='Coding Project') s.textContent='Proje';
+          else if(t==='--:--') s.textContent='';
+          else if(t==='0001 X 0001 Y') s.textContent='';
+        }
+      });
+      // Figma/şablon demo linkleri → gerçek /portfolio (dış hedef kaldır)
+      document.querySelectorAll('a[href*="figma.com"]').forEach(function(a){a.setAttribute('href','/portfolio');a.removeAttribute('target');a.removeAttribute('rel');});
+      // iç absolute linkler → relative
+      document.querySelectorAll('a[href^="https://kademedia.com.tr/"],a[href^="https://www.kademedia.com.tr/"]').forEach(function(a){
+        try{var u=new URL(a.href);a.setAttribute('href',u.pathname+u.search+u.hash);a.removeAttribute('target');a.removeAttribute('rel');}catch(e){}
+      });
+    }catch(e){}
+  }
+  var mo; try{mo=new MutationObserver(run);mo.observe(document.documentElement,{childList:true,subtree:true,characterData:true});}catch(e){}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+  window.addEventListener('load',run); setTimeout(run,800); setTimeout(run,2000);
+  setTimeout(function(){run();if(mo)mo.disconnect();},5000);
+})();
 </script></body></html>
