@@ -7,5 +7,8 @@ Disallow: /api/
 Disallow: /tesekkur
 Disallow: /musteri-panel
 Disallow: /proje-takip
+Disallow: /giris
+Disallow: /kade-kit-business
+Disallow: /kade-kit-business/
 
 Sitemap: https://kademedia.com.tr/sitemap.xml
