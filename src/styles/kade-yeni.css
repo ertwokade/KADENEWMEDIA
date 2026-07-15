@@ -524,3 +524,213 @@ html, body, #root {
   transform: none !important;
   filter: none !important;
 }
+
+/* =====================================================================
+   GÖVDE DÖNÜŞÜMÜ — React sayfa içlerini anasayfa editoryal diline çek
+   (yuvarlak SaaS haplar/kartlar/emoji/mavi slider → düz mono/gold)
+   ===================================================================== */
+
+/* --- 1) FİLTRE HAPLARI → düz mono sekmeler (dotted-hover) --- */
+.blog-category-chips button, .portfolio-filters button,
+.category-chips button, .filter-bar button,
+[class*="filter"] button, [class*="-chips"] button {
+  background: none !important;
+  border: 1px solid transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-size: 12px !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: rgba(23,19,10,0.55) !important;
+  padding: 6px 8px !important;
+  transition: color .2s, border-color .2s !important;
+}
+.blog-category-chips button:hover, .portfolio-filters button:hover,
+.category-chips button:hover, .filter-bar button:hover,
+[class*="filter"] button:hover, [class*="-chips"] button:hover {
+  color: #17130a !important;
+  border-color: rgba(23,19,10,0.35) !important;
+  border-style: dotted !important;
+}
+.blog-category-chips button.active, .portfolio-filters button.active,
+.category-chips button.active, .filter-bar button.active,
+[class*="filter"] button.active, [class*="-chips"] button.active {
+  color: #17130a !important;
+  border: none !important;
+  border-bottom: 2px solid #e0a81f !important;
+  border-radius: 0 !important;
+}
+
+/* --- 2) ARAMA KUTUSU → düz köşeli mono --- */
+.blog-search-wrapper, .blog-search-input, .site-search input, .search-input {
+  background: rgba(23,19,10,0.035) !important;
+  border: 1px solid rgba(23,19,10,0.12) !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-size: 13px !important;
+}
+
+/* --- 3) RANGE SLIDER → gold (mavi kalkar) --- */
+input[type="range"] {
+  accent-color: #e0a81f !important;
+}
+input[type="range"]::-webkit-slider-thumb { background: #e0a81f !important; }
+input[type="range"]::-moz-range-thumb { background: #e0a81f !important; border: none !important; }
+input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0.10) !important; }
+
+/* --- 4) KART GRUBU → düz bordered (glow/blur/radius sıfır) --- */
+.portfolio-card, .blog-card, .partner-card, .stat-card, .kk-card,
+.tool-card, .case-card, .testimonial-card, .demo-card, .press-card,
+.newsletter-card, .referral-card, .podcast-card, .service-card {
+  background: #fffdf6 !important;
+  border: 1px solid rgba(23,19,10,0.11) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.portfolio-card:hover, .blog-card:hover, .partner-card:hover, .stat-card:hover,
+.kk-card:hover, .tool-card:hover, .case-card:hover, .testimonial-card:hover,
+.service-card:hover {
+  border-color: rgba(224,168,31,0.55) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* --- 5) EMOJİ / RENKLİ ETİKET → gold mono (anasayfada emoji yok) --- */
+.portfolio-card-emoji, .stat-card .stat-icon, .testimonial-avatar-emoji,
+.press-logo-emoji, .demo-emoji {
+  display: none !important;
+}
+.portfolio-card-category, [class*="-card-category"] {
+  color: #c8901a !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+.case-duration-tag, .case-platform-tag, .case-metric-label, .case-mini-label,
+.case-summary-label, .portfolio-metric-label {
+  color: rgba(23,19,10,0.55) !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  background: none !important;
+}
+
+/* --- 6) KADE KIT → editoryal --- */
+.kk-title span, [class*="-hero"] h1 span, .hero-title span, .page-title span {
+  color: #17130a !important;
+  -webkit-text-fill-color: #17130a !important;
+  font-family: inherit !important;
+  font-style: normal !important;
+  background: none !important;
+}
+.kk-eyebrow {
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  letter-spacing: 0.2em !important;
+  text-transform: uppercase !important;
+  color: #c8901a !important;
+}
+/* toggle segment → düz mono sekme */
+.kk-toggle {
+  background: none !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(23,19,10,0.12) !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  gap: 18px !important;
+}
+.kk-toggle button, .kk-toggle > * {
+  background: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+}
+.kk-toggle .active, .kk-toggle [aria-selected="true"] {
+  border-bottom: 2px solid #e0a81f !important;
+}
+/* "En Popüler" → tipografik işaret (hap değil) */
+.kk-badge {
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #c8901a !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  padding: 0 !important;
+}
+.kk-badge::before { content: '★ '; }
+.kk-price, .kk-amount {
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  color: #17130a !important;
+  -webkit-text-fill-color: #17130a !important;
+  background: none !important;
+  font-weight: 600 !important;
+}
+.kk-chk { color: #c8901a !important; }
+
+/* --- 7) hero'daki büyük başlık span'leri düz kalsın (tekrar teyit) --- */
+[class*="-hero"] .section-title span { color:#17130a !important; -webkit-text-fill-color:#17130a !important; background:none !important; font-style:normal !important; }
+
+/* --- portfolio metrik sayıları: inline renk -> ink mono --- */
+.portfolio-metric-value {
+  color: #17130a !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-weight: 600 !important;
+}
+.portfolio-card-header { border-bottom: 1px solid rgba(23,19,10,0.11) !important; }
+
+/* --- Referanslar üst istatistikleri: emoji gizle, düz mono kart --- */
+.referanslar-istatistikler .glass-card,
+.referanslar-istatistikler > * {
+  background: #fffdf6 !important;
+  border: 1px solid rgba(23,19,10,0.11) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+.ist-ikon { display: none !important; }
+.ist-rakam {
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  color: #17130a !important;
+  -webkit-text-fill-color: #17130a !important;
+  background: none !important;
+  font-weight: 600 !important;
+}
+/* NedenBiz benzeri rakam ikonları da (statik sayfalarda yok, güvenli) */
+[class*="rakam"] [class*="ikon"], [class*="stat"] .emoji { display: none !important; }
+
+/* --- Türkçe adlı filtreler (filtre/kategori) + sayfalama --- */
+.referanslar-filtre-btn, [class*="filtre"] button, [class*="filtre-btn"],
+[class*="kategori"] button {
+  background: none !important;
+  border: 1px solid transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-size: 12px !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: rgba(23,19,10,0.55) !important;
+  padding: 6px 8px !important;
+}
+.referanslar-filtre-btn:hover, [class*="filtre"] button:hover {
+  color: #17130a !important; border-color: rgba(23,19,10,0.35) !important; border-style: dotted !important;
+}
+.referanslar-filtre-btn.active, [class*="filtre"] button.active {
+  color: #17130a !important; border: none !important;
+  border-bottom: 2px solid #e0a81f !important; border-radius: 0 !important;
+}
+.sayfalama-btn {
+  background: none !important; border: 1px solid rgba(23,19,10,0.2) !important;
+  border-radius: 4px !important; box-shadow: none !important;
+  font-family: 'GeistMono', ui-monospace, monospace !important; text-transform: uppercase !important;
+}
