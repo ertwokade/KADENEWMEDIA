@@ -1,8 +1,9 @@
-const BASE = 'https://www.kademedia.com.tr';
+const BASE = 'https://kadenewmedia.com';
 
 const STATIC_PAGES = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },
   { loc: '/hizmetler', changefreq: 'monthly', priority: '0.9' },
+  { loc: '/new-media-ajansi', changefreq: 'monthly', priority: '0.9' },
   { loc: '/paketler', changefreq: 'monthly', priority: '0.9' },
   { loc: '/hakkimizda', changefreq: 'monthly', priority: '0.8' },
   { loc: '/iletisim', changefreq: 'yearly', priority: '0.8' },

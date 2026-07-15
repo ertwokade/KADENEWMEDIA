@@ -7,7 +7,7 @@ const outputDir = new URL('../docs/design-references/', import.meta.url)
 await mkdir(outputDir, { recursive: true })
 
 const routes = [
-  '/', '/hakkimizda', '/hizmetler', '/paketler', '/iletisim', '/sss', '/ekip', '/kariyer',
+  '/', '/hakkimizda', '/hizmetler', '/new-media-ajansi', '/paketler', '/iletisim', '/sss', '/ekip', '/kariyer',
   '/teklif-al', '/kvkk', '/gizlilik', '/cerez-politikasi', '/portfolio', '/partnerler', '/blog',
   '/referanslar', '/basari-hikayeleri', '/giris', '/musteri-panel', '/proje-takip',
   '/tesekkur', '/admin', '/organizasyon-kiti', '/organizasyon-kiti/plan/fractional-new-media-director',
@@ -93,7 +93,7 @@ try {
     if (!audit.title.trim()) addError(`${route}: empty title`)
     if (audit.h1 !== 1) addError(`${route}: expected one h1, found ${audit.h1}`)
     if (audit.canonical.length !== 1) addError(`${route}: expected one canonical, found ${audit.canonical.length}`)
-    if (!audit.canonical[0]?.startsWith('https://www.kademedia.com.tr')) addError(`${route}: canonical host mismatch`)
+    if (!audit.canonical[0]?.startsWith('https://kadenewmedia.com')) addError(`${route}: canonical host mismatch`)
     if (noindexRoutes.has(route) && !audit.robots.includes('noindex')) addError(`${route}: missing noindex`)
     if (!noindexRoutes.has(route) && audit.robots.includes('noindex')) addError(`${route}: unexpectedly noindex`)
     if (audit.overflow > 1) addError(`${route}: horizontal overflow ${audit.overflow}px`)
@@ -139,13 +139,13 @@ try {
   await page.locator('form.contact-form button[type="submit"]').click()
   const consentError = await page.locator('.form-error-msg').textContent({ timeout: 3000 }).catch(() => '')
   if (!consentError?.includes('KVKK')) addError('contact consent validation did not trigger')
-  await page.locator('.kvkk-consent input[type="checkbox"]').check()
+  await page.locator('.kvkk-consent .checkbox-mark').click()
   await page.locator('form.contact-form button[type="submit"]').click()
   await page.waitForURL(`${BASE}/tesekkur`, { timeout: 3000 }).catch(() => {})
   const confirmedCopy = await page.getByText('İletişim talebiniz sunucu tarafından başarıyla kaydedildi.').textContent({ timeout: 2000 }).catch(() => '')
   if (!confirmedCopy) addError('successful contact response did not produce a confirmed state')
 
-  await page.goto(`${BASE}/tesekkur`, { waitUntil: 'domcontentloaded' })
+  await page.goto(`${BASE}/tesekkur?direct=1`, { waitUntil: 'domcontentloaded' })
   const directThankYouCopy = await page.getByText(/Talep durumu doğrulanamadı/i).textContent({ timeout: 2000 }).catch(() => '')
   if (!directThankYouCopy) addError('direct thank-you route presented an unverified success state')
 

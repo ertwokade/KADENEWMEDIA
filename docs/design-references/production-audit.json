@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-07-15T16:42:17.082Z",
+  "generatedAt": "2026-07-15T18:33:52.299Z",
   "results": [
     {
       "route": "/",
       "status": 200,
-      "title": "Kade Media | İstanbul Sosyal Medya & Dijital Pazarlama Ajansı",
+      "title": "Kade Media | New Media, Medya ve Dijital Pazarlama Ajansı",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/"
+        "https://kadenewmedia.com/"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -38,10 +38,10 @@
     {
       "route": "/hakkimizda",
       "status": 200,
-      "title": "Hakkımızda | İstanbul Sosyal Medya Ajansı | Kade Media",
+      "title": "Kade Media Hakkında | New Media Ajansı İstanbul",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/hakkimizda"
+        "https://kadenewmedia.com/hakkimizda"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -68,10 +68,10 @@
     {
       "route": "/hizmetler",
       "status": 200,
-      "title": "Hizmetlerimiz | Sosyal Medya Ajansı Hizmetleri | Kade Media",
+      "title": "New Media ve Dijital Medya Hizmetleri | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/hizmetler"
+        "https://kadenewmedia.com/hizmetler"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -95,12 +95,50 @@
       ]
     },
     {
-      "route": "/paketler",
+      "route": "/new-media-ajansi",
       "status": 200,
-      "title": "Hizmet Paketleri | Kade Media",
+      "title": "New Media Ajansı İstanbul | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/paketler"
+        "https://kadenewmedia.com/new-media-ajansi"
+      ],
+      "robots": "index, follow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "/teklif-al",
+        "/hizmetler",
+        "/hizmetler/sosyal-medya-yonetimi",
+        "/hizmetler/icerik-uretimi",
+        "/hizmetler/reklam-yonetimi",
+        "/hizmetler/video-produksiyon",
+        "/hizmetler/strateji-danismanlik",
+        "/hizmetler/web-sitesi-tasarimi",
+        "/teklif-al",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
+      "route": "/paketler",
+      "status": 200,
+      "title": "Sosyal Medya Hizmet Kapsamları | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/paketler"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -129,10 +167,10 @@
     {
       "route": "/iletisim",
       "status": 200,
-      "title": "İletişim | Teklif Alın | Kade Media",
+      "title": "Kade Media İletişim | Projenizi Paylaşın",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/iletisim"
+        "https://kadenewmedia.com/iletisim"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -161,10 +199,10 @@
     {
       "route": "/sss",
       "status": 200,
-      "title": "Sık Sorulan Sorular | Kade Media",
+      "title": "Dijital Pazarlama Sık Sorulan Sorular | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/sss"
+        "https://kadenewmedia.com/sss"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -191,10 +229,10 @@
     {
       "route": "/ekip",
       "status": 200,
-      "title": "Ekibimiz | Kade Media",
+      "title": "Kade Media Ekibi | İstanbul Dijital Pazarlama Ajansı",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/ekip"
+        "https://kadenewmedia.com/ekip"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -220,10 +258,10 @@
     {
       "route": "/kariyer",
       "status": 200,
-      "title": "Kariyer | Kade Media",
+      "title": "Kade Media Kariyer | Genel Başvuru Bilgileri",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/kariyer"
+        "https://kadenewmedia.com/kariyer"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -250,10 +288,10 @@
     {
       "route": "/teklif-al",
       "status": 200,
-      "title": "Teklif Al | Hizmete Özel Başvuru | Kade Media",
+      "title": "Dijital Pazarlama Teklifi Al | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/teklif-al"
+        "https://kadenewmedia.com/teklif-al"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -282,7 +320,7 @@
       "title": "KVKK Aydınlatma Metni | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/kvkk"
+        "https://kadenewmedia.com/kvkk"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -311,7 +349,7 @@
       "title": "Gizlilik Politikası | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/gizlilik"
+        "https://kadenewmedia.com/gizlilik"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -342,7 +380,7 @@
       "title": "Çerez Politikası | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/cerez-politikasi"
+        "https://kadenewmedia.com/cerez-politikasi"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -372,7 +410,7 @@
       "title": "Portfolyo | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/portfolio"
+        "https://kadenewmedia.com/portfolio"
       ],
       "robots": "noindex, nofollow",
       "overflow": 0,
@@ -402,7 +440,7 @@
       "title": "İş Ortakları | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/partnerler"
+        "https://kadenewmedia.com/partnerler"
       ],
       "robots": "noindex, nofollow",
       "overflow": 0,
@@ -432,7 +470,7 @@
       "title": "İçgörüler | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/blog"
+        "https://kadenewmedia.com/blog"
       ],
       "robots": "noindex, nofollow",
       "overflow": 0,
@@ -462,7 +500,7 @@
       "title": "Müşteri Referansları | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/referanslar"
+        "https://kadenewmedia.com/referanslar"
       ],
       "robots": "noindex, nofollow",
       "overflow": 0,
@@ -492,7 +530,7 @@
       "title": "Vaka Çalışmaları | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/basari-hikayeleri"
+        "https://kadenewmedia.com/basari-hikayeleri"
       ],
       "robots": "noindex, nofollow",
       "overflow": 0,
@@ -522,7 +560,7 @@
       "title": "Giriş Yap | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/giris"
+        "https://kadenewmedia.com/giris"
       ],
       "robots": "noindex, nofollow",
       "overflow": 0,
@@ -553,7 +591,7 @@
       "title": "Giriş Yap | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/giris"
+        "https://kadenewmedia.com/giris"
       ],
       "robots": "noindex, nofollow",
       "overflow": 0,
@@ -584,7 +622,7 @@
       "title": "Proje Takip | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/proje-takip"
+        "https://kadenewmedia.com/proje-takip"
       ],
       "robots": "noindex, nofollow",
       "overflow": 0,
@@ -609,12 +647,302 @@
       ]
     },
     {
+      "route": "/tesekkur",
+      "status": 200,
+      "title": "Talep Durumu | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/tesekkur"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "mailto:thekademedia@gmail.com",
+        "/",
+        "/iletisim",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
+      "route": "/admin",
+      "status": 200,
+      "title": "Yönetim Paneli | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/admin"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content"
+      ]
+    },
+    {
+      "route": "/organizasyon-kiti",
+      "status": 200,
+      "title": "Kade Organizasyon Kiti",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/organizasyon-kiti"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "/paketler",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
+      "route": "/organizasyon-kiti/plan/fractional-new-media-director",
+      "status": 200,
+      "title": "Danışmanlık Planı | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/organizasyon-kiti/plan/fractional-new-media-director"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "/paketler",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
+      "route": "/organizasyon-kiti/medya-yol-haritasi",
+      "status": 200,
+      "title": "Medya Yol Haritası | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/organizasyon-kiti/medya-yol-haritasi"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "/paketler",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
+      "route": "/organizasyon-kiti/yonetim-toplantilari",
+      "status": 200,
+      "title": "Yönetim Toplantıları | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/organizasyon-kiti/yonetim-toplantilari"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "/paketler",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
+      "route": "/organizasyon-kiti/ekip-surecler",
+      "status": 200,
+      "title": "Ekip ve Süreçler | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/organizasyon-kiti/ekip-surecler"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "/paketler",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
+      "route": "/organizasyon-kiti/stratejik-kararlar",
+      "status": 200,
+      "title": "Stratejik Kararlar | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/organizasyon-kiti/stratejik-kararlar"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "/paketler",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
+      "route": "/organizasyon-kiti/notlar",
+      "status": 200,
+      "title": "Danışmanlık Notları | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/organizasyon-kiti/notlar"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "/paketler",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
+      "route": "/kade-kit-business",
+      "status": 200,
+      "title": "Kade Kit Business | Kade Media",
+      "h1": 1,
+      "canonical": [
+        "https://kadenewmedia.com/kade-kit-business"
+      ],
+      "robots": "noindex, nofollow",
+      "overflow": 0,
+      "unnamedButtons": 0,
+      "unnamedInputs": 0,
+      "brokenImages": [],
+      "lang": "tr",
+      "links": [
+        "#main-content",
+        "/",
+        "/hizmetler",
+        "/paketler",
+        "/hakkimizda",
+        "/iletisim",
+        "/giris",
+        "/paketler",
+        "mailto:thekademedia@gmail.com",
+        "/kvkk",
+        "/gizlilik",
+        "/cerez-politikasi",
+        "/sss"
+      ]
+    },
+    {
       "route": "/hizmetler/sosyal-medya-yonetimi",
       "status": 200,
       "title": "Sosyal Medya Yönetimi | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/hizmetler/sosyal-medya-yonetimi"
+        "https://kadenewmedia.com/hizmetler/sosyal-medya-yonetimi"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -647,7 +975,7 @@
       "title": "İçerik Üretimi | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/hizmetler/icerik-uretimi"
+        "https://kadenewmedia.com/hizmetler/icerik-uretimi"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -681,7 +1009,7 @@
       "title": "Reklam Yönetimi | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/hizmetler/reklam-yonetimi"
+        "https://kadenewmedia.com/hizmetler/reklam-yonetimi"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -715,7 +1043,7 @@
       "title": "Video Prodüksiyon | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/hizmetler/video-produksiyon"
+        "https://kadenewmedia.com/hizmetler/video-produksiyon"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -749,7 +1077,7 @@
       "title": "Strateji & Danışmanlık | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/hizmetler/strateji-danismanlik"
+        "https://kadenewmedia.com/hizmetler/strateji-danismanlik"
       ],
       "robots": "index, follow",
       "overflow": 0,
@@ -783,7 +1111,7 @@
       "title": "Web Sitesi Tasarımı | Kade Media",
       "h1": 1,
       "canonical": [
-        "https://www.kademedia.com.tr/hizmetler/web-sitesi-tasarimi"
+        "https://kadenewmedia.com/hizmetler/web-sitesi-tasarimi"
       ],
       "robots": "index, follow",
       "overflow": 0,

@@ -7,7 +7,7 @@ import { BRAND } from '../config/brand'
 export default function KVKK() {
   useSEO({
     title: 'KVKK Aydınlatma Metni | Kade Media',
-    description: 'Kade Media KVKK kapsamında kişisel verilerin işlenmesine ilişkin aydınlatma metni.',
+    description: 'Kade Media’nın kişisel verileri hangi amaçlarla ve hukuki sebeplerle işlediğini açıklayan KVKK aydınlatma metnini inceleyin.',
     path: '/kvkk',
   })
 

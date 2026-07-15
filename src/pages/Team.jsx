@@ -30,9 +30,9 @@ export default function Team() {
   const { lang } = useLanguage()
 
   useSEO({
-    title: lang === 'tr' ? 'Ekibimiz | Kade Media' : 'Our Team | Kade Media',
+    title: lang === 'tr' ? 'Kade Media Ekibi | İstanbul Dijital Pazarlama Ajansı' : 'Our Team | Kade Media',
     description: lang === 'tr'
-      ? 'Kade Media ekibi ile tanışın. Tutkulu ve deneyimli dijital pazarlama profesyonelleri.'
+      ? 'Kade Media’nın sosyal medya, içerik üretimi, reklam ve dijital projelerde birlikte çalışan İstanbul merkezli ekibiyle tanışın.'
       : 'Meet the Kade Media team. Passionate and experienced digital marketing professionals.',
     path: '/ekip',
   })

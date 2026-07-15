@@ -2,8 +2,8 @@
 
 Son bağımsız denetim: 15 Temmuz 2026
 
-Canonical alan adı: **https://www.kademedia.com.tr**  
-Doğrulanmış iletişim kanalı: **thekademedia@gmail.com**  
+Canonical alan adı: **https://kadenewmedia.com**
+Doğrulanmış iletişim kanalı: **thekademedia@gmail.com**
 Doğrulanmış genel konum: **İstanbul**
 
 Bu dosyadaki bir madde doğrulanmadan siteye gerçek veri gibi eklenmemelidir.
@@ -15,7 +15,7 @@ Bu dosyadaki bir madde doğrulanmadan siteye gerçek veri gibi eklenmemelidir.
 - Kaynağı ve editoryal onayı olmayan blog yazıları kaldırıldı; `/blog` noindex durumunda.
 - Sabit fiyat, ücretsiz hizmet, kontenjan ve aciliyet iddiaları kaldırıldı.
 - Doğrulanmamış telefon, WhatsApp, açık adres, çalışma saati ve sosyal hesaplar kaldırıldı.
-- Eski `Kade New Media` / `kadenewmedia` kamuya açık marka kullanımları kaldırıldı.
+- Ana marka adı `Kade Media`; `Kade New Media`, `Kademedia`, `Kadenewmedia` ve `Kade` kullanıcı aramalarında kullanılan alternatif marka adları olarak tanımlandı.
 - Geliştirme seed işlemi artık demo müşteri, partner, blog veya metrik üretmiyor.
 
 ## Yayına geri almak için gerekli kanıtlar
@@ -45,7 +45,10 @@ Bu dosyadaki bir madde doğrulanmadan siteye gerçek veri gibi eklenmemelidir.
 - Yazar/editör onayı
 - Güncel istatistiklerin birincil kaynakları ve erişim tarihleri
 - Telif hakkı uygun görsel/asset kaynağı
-- Search Console üzerinden sitemap ve canonical doğrulaması
+- Google Search Console'da `kadenewmedia.com` Domain Property sahiplik doğrulaması
+- `https://kadenewmedia.com/sitemap.xml` adresinin Search Console'a gönderilmesi
+- Eski domain mülkünden yeni domaine Adres Değişikliği bildirimi ve URL Denetimi ile örnek rota kontrolü
+- Dizin Oluşturma, tarama ve yönlendirme raporlarının domain geçişi tamamlanana kadar düzenli izlenmesi
 
 ### Fiyatlandırma ve ticari koşullar
 

@@ -114,7 +114,7 @@ function LoginScreen({ onLogin }) {
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <div className="admin-logo">kade<span>admin</span></div>
-        <h2>Yönetici Girişi</h2>
+        <h1>Yönetici Girişi</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Kullanıcı Adı</label>
@@ -7022,7 +7022,7 @@ h1{color:#111;border-bottom:3px solid #eac321;padding-bottom:12px}
   ${metrics.newLeads ? `<div class="metric"><div class="metric-val">${metrics.newLeads}</div><div class="metric-lbl">Yeni Lead</div></div>` : ''}
 </div>
 ${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong><p style="margin:8px 0 0">${metrics.notes}</p></div>` : ''}
-<div class="footer">Kade Media Dijital Pazarlama | hello@kademedia.com | 0506 729 34 23 | kademedia.com.tr</div>
+<div class="footer">Kade Media Dijital Pazarlama | hello@kademedia.com | 0506 729 34 23 | kadenewmedia.com</div>
 </body></html>`
 
     const blob = new Blob([html], { type: 'text/html' })

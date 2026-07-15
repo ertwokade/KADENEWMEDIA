@@ -45,4 +45,4 @@ if (failures.length) {
   console.error('❌ TASARIM REGRESYONU:\n' + failures.join('\n'))
   process.exit(1)
 }
-console.log(`✓ Tasarım regresyon kontrolü geçti (${(STATIC_ROUTES.length + REACT_ROUTES.length)} route × ${VIEWPORTS.length} viewport)`) // eslint-disable-line no-console
+console.log(`✓ Tasarım regresyon kontrolü geçti (${(STATIC_ROUTES.length + REACT_ROUTES.length)} route × ${VIEWPORTS.length} viewport)`)

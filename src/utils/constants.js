@@ -13,6 +13,6 @@ export const SOCIAL = BRAND.social
 
 export const SITE = {
   name: 'Kade Media',
-  url: 'https://kademedia.com.tr',
+  url: 'https://kadenewmedia.com',
   tagline: 'Sosyal Medya Ajansı',
 }

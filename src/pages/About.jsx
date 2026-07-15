@@ -30,9 +30,9 @@ export default function About() {
   const storyP1 = t('about.storyP1')
   const storyP2 = t('about.storyP2')
   useSEO({
-    title: 'Hakkımızda | İstanbul Sosyal Medya Ajansı',
-    description: 'Kade Media yaklaşımı, hizmet anlayışı ve değerleri hakkında bilgi edinin.',
-    keywords: 'kade media hakkında, sosyal medya ajansı istanbul, dijital ajans',
+    title: 'Kade Media Hakkında | New Media Ajansı İstanbul',
+    description: 'Kade Media; Kade New Media, Kademedia ve Kadenewmedia adlarıyla da aranan İstanbul merkezli new media ve dijital pazarlama ajansıdır.',
+    keywords: 'kade media, kade, kademedia, kade new media, kadenewmedia, new media ajansı, medya ajansı istanbul, dijital ajans',
     path: '/hakkimizda',
   })
 

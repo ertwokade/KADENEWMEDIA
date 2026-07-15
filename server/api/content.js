@@ -351,7 +351,7 @@ export default async function handler(req, res) {
         db2.collection('blogs').find({ published: { $ne: false } }, { projection: { slug: 1, updatedAt: 1, createdAt: 1 } }).toArray(),
         db2.collection('partners').find({}, { projection: { slug: 1, updatedAt: 1 } }).toArray(),
       ]);
-      const base = 'https://www.kademedia.com.tr';
+      const base = 'https://kadenewmedia.com';
       const today = new Date().toISOString().slice(0, 10);
       const staticUrls = [
         { loc: '/', priority: '1.0', freq: 'weekly' },

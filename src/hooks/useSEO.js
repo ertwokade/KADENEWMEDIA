@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 
-export const BASE_URL = 'https://www.kademedia.com.tr'
+export const BASE_URL = 'https://kadenewmedia.com'
+const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`
+const DEFAULT_OG_IMAGE_ALT = 'Kade Media — New Media ve Dijital Medya Ajansı'
 
 function setMeta(name, content, property = false) {
   if (!content) return
@@ -36,8 +38,9 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
       fullTitle = `${title} | Kade Media`
     }
 
-    const canonicalUrl = `${baseUrl}${path}`
-    const ogImage = image || `${baseUrl}/logo.png`
+    const normalizedPath = path === '/' ? '/' : `/${path.replace(/^\/+|\/+$/g, '')}`
+    const canonicalUrl = new URL(normalizedPath, `${baseUrl}/`).href
+    const ogImage = image || DEFAULT_OG_IMAGE
 
     document.title = fullTitle
 
@@ -51,6 +54,10 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
     setMeta('og:description', description, true)
     setMeta('og:url', canonicalUrl, true)
     setMeta('og:image', ogImage, true)
+    setMeta('og:image:type', 'image/png', true)
+    setMeta('og:image:width', '1200', true)
+    setMeta('og:image:height', '630', true)
+    setMeta('og:image:alt', DEFAULT_OG_IMAGE_ALT, true)
     setMeta('og:type', type, true)
     setMeta('og:site_name', 'Kade Media', true)
     setMeta('og:locale', 'tr_TR', true)
@@ -60,6 +67,7 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
     setMeta('twitter:title', fullTitle)
     setMeta('twitter:description', description)
     setMeta('twitter:image', ogImage)
+    setMeta('twitter:image:alt', DEFAULT_OG_IMAGE_ALT)
     const twitterSite = document.querySelector('meta[name="twitter:site"]')
     twitterSite?.remove()
 

@@ -54,10 +54,10 @@ export default function Packages() {
   const isEN = lang === 'en'
 
   useSEO({
-    title: isEN ? 'Service Packages | Kade Media' : 'Hizmet Paketleri | Kade Media',
+    title: isEN ? 'Service Packages | Kade Media' : 'Sosyal Medya Hizmet Kapsamları | Kade Media',
     description: isEN
       ? 'Review Kade Media service scopes and request a written quote tailored to your needs.'
-      : 'Kade Media hizmet kapsamlarını inceleyin ve ihtiyacınıza göre hazırlanmış yazılı teklif isteyin.',
+      : 'Düzenli içerik, reklam yönetimi ve proje bazlı prodüksiyon ihtiyaçlarına göre şekillenen Kade Media hizmet kapsamlarını inceleyin.',
     path: '/paketler',
   })
 

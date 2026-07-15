@@ -2,6 +2,7 @@
 // Aynı bilgi sayfalarda farklı/eski marka adıyla tekrarlanmasın diye buradan kullanılır.
 export const BRAND = {
   name: 'Kade Media',
+  alternateNames: ['Kade New Media', 'Kademedia', 'Kadenewmedia', 'Kade'],
   legalName: 'Kade Media',
   email: 'thekademedia@gmail.com',
   city: 'İstanbul',

@@ -54,7 +54,7 @@ function generateICS({ title, description, date, time, duration = 60 }) {
     `SUMMARY:${escapeICS(title)}`,
     `DESCRIPTION:${escapeICS(description)}`,
     'ORGANIZER;CN=Kade Media:mailto:thekademedia@gmail.com',
-    `UID:${Date.now()}@kademedia.com.tr`,
+    `UID:${Date.now()}@kadenewmedia.com`,
     'STATUS:CONFIRMED',
     'END:VEVENT',
     'END:VCALENDAR',

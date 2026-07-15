@@ -21,8 +21,8 @@ export default function Contact() {
   const { t } = useLanguage()
   const navigate = useNavigate()
   useSEO({
-    title: 'İletişim | Teklif Alın',
-    description: 'Kade Media ile iletişime geçin. Sosyal medya yönetimi, dijital pazarlama veya içerik üretimi için teklif alın.',
+    title: 'Kade Media İletişim | Projenizi Paylaşın',
+    description: 'Sosyal medya, dijital pazarlama, içerik üretimi veya web projeniz için Kade Media ile iletişime geçin ve ihtiyacınızı paylaşın.',
     keywords: 'sosyal medya ajansı iletişim, dijital pazarlama teklif, sosyal medya yönetim teklifi, kade media iletişim',
     path: '/iletisim',
   })

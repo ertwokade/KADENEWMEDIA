@@ -16,6 +16,7 @@ import {
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { ServiceSchema } from '../components/StructuredData'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Services.css'
@@ -26,7 +27,7 @@ const servicesMap = {
     icon: HiOutlineGlobe,
     titleTr: 'Sosyal Medya Yönetimi',
     titleEn: 'Social Media Management',
-    descTr: 'Instagram, Facebook, TikTok ve LinkedIn hesaplarınızı profesyonel bir şekilde yönetiyoruz. İçerik planlaması, paylaşım takvimi ve topluluk yönetimi ile markanızı dijital dünyada güçlendiriyoruz.',
+    descTr: 'Instagram, Facebook, TikTok ve LinkedIn için içerik planlama, yayın takvimi, topluluk yönetimi, raporlama ve marka iletişimi hizmetleri.',
     descEn: 'We professionally manage your Instagram, Facebook, TikTok, and LinkedIn accounts. We strengthen your brand in the digital world with content planning, posting schedules, and community management.',
     featuresTr: ['İçerik Takvimi Oluşturma', 'Topluluk Yönetimi', 'Kriz Yönetimi', 'Aylık Raporlama', 'Hashtag Stratejisi', 'Rakip Analizi'],
     featuresEn: ['Content Calendar Creation', 'Community Management', 'Crisis Management', 'Monthly Reporting', 'Hashtag Strategy', 'Competitor Analysis'],
@@ -37,7 +38,7 @@ const servicesMap = {
     icon: HiOutlinePencilAlt,
     titleTr: 'İçerik Üretimi',
     titleEn: 'Content Production',
-    descTr: 'Markanıza özel, yaratıcı ve etkileyici içerikler üretiyoruz. Görsel, video ve metin içeriklerinizi profesyonel ekibimizle hazırlıyoruz.',
+    descTr: 'Markanıza özel görsel, video ve metin içerikleri; içerik stratejisi, grafik tasarım, metin yazımı, fotoğraf çekimi ve sosyal medya tasarımları.',
     descEn: 'We produce unique, creative, and engaging content for your brand. We prepare your visual, video, and text content with our professional team.',
     featuresTr: ['Grafik Tasarım', 'Copywriting', 'Marka Kimliği', 'İçerik Stratejisi', 'Fotoğraf Çekimi', 'Story Tasarımları'],
     featuresEn: ['Graphic Design', 'Copywriting', 'Brand Identity', 'Content Strategy', 'Photography', 'Story Designs'],
@@ -48,7 +49,7 @@ const servicesMap = {
     icon: HiOutlineChartBar,
     titleTr: 'Reklam Yönetimi',
     titleEn: 'Ad Management',
-    descTr: 'Meta (Facebook & Instagram), Google Ads ve TikTok Ads platformlarında reklam kampanyalarınızı yönetiyoruz. Bütçenizi en verimli şekilde kullanıyoruz.',
+    descTr: 'Meta, Google Ads ve TikTok Ads kampanyaları için planlama, hedefleme, A/B testleri, yeniden pazarlama ve performans analizi hizmetleri.',
     descEn: 'We manage your ad campaigns on Meta (Facebook & Instagram), Google Ads, and TikTok Ads platforms. We use your budget most efficiently.',
     featuresTr: ['Meta Ads', 'Google Ads', 'TikTok Ads', 'A/B Test', 'Retargeting', 'Performans Analizi'],
     featuresEn: ['Meta Ads', 'Google Ads', 'TikTok Ads', 'A/B Testing', 'Retargeting', 'Performance Analysis'],
@@ -59,7 +60,7 @@ const servicesMap = {
     icon: HiOutlineFilm,
     titleTr: 'Video Prodüksiyon',
     titleEn: 'Video Production',
-    descTr: 'Reels, TikTok videoları, YouTube içerikleri ve reklam filmleri için profesyonel video prodüksiyon hizmeti sunuyoruz.',
+    descTr: 'Reels, TikTok, YouTube ve reklam projeleri için senaryo, çekim, kurgu, motion graphics ve proje kapsamına göre prodüksiyon hizmetleri.',
     descEn: 'We offer professional video production services for Reels, TikTok videos, YouTube content, and commercials.',
     featuresTr: ['Reels & TikTok', 'YouTube İçerikleri', 'Reklam Filmleri', 'Motion Graphics', 'Drone Çekimi', 'Senaryo Yazımı'],
     featuresEn: ['Reels & TikTok', 'YouTube Content', 'Commercials', 'Motion Graphics', 'Drone Footage', 'Scriptwriting'],
@@ -70,7 +71,7 @@ const servicesMap = {
     icon: HiOutlineChatAlt2,
     titleTr: 'Strateji & Danışmanlık',
     titleEn: 'Strategy & Consulting',
-    descTr: 'Dijital pazarlama stratejinizi oluşturuyor, hedeflerinize ulaşmanız için yol haritası çiziyoruz.',
+    descTr: 'Marka ve rakip analizi, hedef ve KPI belirleme, dijital pazarlama yol haritası, büyüme planı ve strateji danışmanlığı hizmetleri.',
     descEn: 'We create your digital marketing strategy and map out the path to reach your goals.',
     featuresTr: ['Marka Analizi', 'Rakip Analizi', 'Strateji Planı', 'KPI Belirleme', 'Büyüme Stratejisi', 'Pazar Araştırması'],
     featuresEn: ['Brand Analysis', 'Competitor Analysis', 'Strategy Plan', 'KPI Setting', 'Growth Strategy', 'Market Research'],
@@ -81,7 +82,7 @@ const servicesMap = {
     icon: HiOutlineCode,
     titleTr: 'Web Sitesi Tasarımı',
     titleEn: 'Web Design',
-    descTr: 'Markanıza özel, modern ve mobil uyumlu web siteleri tasarlıyor ve geliştiriyoruz. SEO uyumlu, hızlı ve etkileyici web çözümleri sunuyoruz.',
+    descTr: 'Markanıza özel mobil uyumlu web sitesi tasarımı, UI/UX, geliştirme, CMS ve e-ticaret entegrasyonu ile performans iyileştirme hizmetleri.',
     descEn: 'We design and develop modern, mobile-friendly websites tailored to your brand. We provide SEO-optimized, fast, and impactful web solutions.',
     featuresTr: ['Responsive Tasarım', 'SEO Optimizasyonu', 'UI/UX Tasarım', 'E-ticaret Çözümleri', 'CMS Entegrasyonu', 'Performans Optimizasyonu'],
     featuresEn: ['Responsive Design', 'SEO Optimization', 'UI/UX Design', 'E-commerce Solutions', 'CMS Integration', 'Performance Optimization'],
@@ -106,7 +107,7 @@ export default function ServiceDetail() {
     title: title ? `${title} | Kade Media` : 'Hizmet | Kade Media',
     description: desc,
     path: `/hizmetler/${slug}`,
-    image: 'https://www.kademedia.com.tr/og-services.png',
+    image: 'https://kadenewmedia.com/og-image.png',
   })
 
   useEffect(() => {
@@ -115,9 +116,9 @@ export default function ServiceDetail() {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://www.kademedia.com.tr' },
-        { '@type': 'ListItem', position: 2, name: 'Hizmetler', item: 'https://www.kademedia.com.tr/hizmetler' },
-        { '@type': 'ListItem', position: 3, name: title, item: `https://www.kademedia.com.tr/hizmetler/${slug}` },
+        { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://kadenewmedia.com' },
+        { '@type': 'ListItem', position: 2, name: 'Hizmetler', item: 'https://kadenewmedia.com/hizmetler' },
+        { '@type': 'ListItem', position: 3, name: title, item: `https://kadenewmedia.com/hizmetler/${slug}` },
       ],
     }
     let el = document.getElementById('jsonld-breadcrumb')
@@ -139,6 +140,7 @@ export default function ServiceDetail() {
 
   return (
     <PageTransition>
+      <ServiceSchema name={title} description={desc} url={`/hizmetler/${slug}`} />
       <section className="services-hero">
         <div className="grid-bg" />
         <div className="glow-effect" style={{ top: '-150px', right: '-150px' }} />

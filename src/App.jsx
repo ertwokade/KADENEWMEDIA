@@ -21,6 +21,7 @@ import CustomerRouteGuard from './components/CustomerRouteGuard'
 import Home from './pages/Home'
 import About from './pages/About'
 import Services from './pages/Services'
+import NewMediaAgency from './pages/NewMediaAgency'
 import ServiceDetail from './pages/ServiceDetail'
 import Contact from './pages/Contact'
 import Blog from './pages/Blog'
@@ -101,6 +102,7 @@ const ROUTE_THEMES = {
   '/': 'home',
   '/hakkimizda': 'about',
   '/hizmetler': 'services',
+  '/new-media-ajansi': 'services',
   '/paketler': 'packages',
   '/partnerler': 'partners',
   '/kariyer': 'careers',
@@ -189,6 +191,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/hakkimizda" element={<About />} />
         <Route path="/hizmetler" element={<Services />} />
+        <Route path="/new-media-ajansi" element={<NewMediaAgency />} />
         <Route path="/hizmetler/:slug" element={<ServiceDetail />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogDetail />} />

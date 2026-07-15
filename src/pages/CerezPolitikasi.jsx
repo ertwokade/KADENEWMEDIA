@@ -7,7 +7,7 @@ import { BRAND } from '../config/brand'
 export default function CerezPolitikasi() {
   useSEO({
     title: 'Çerez Politikası | Kade Media',
-    description: 'Kade Media çerez politikası. Web sitemizde kullanılan çerezler ve tercihlerinizi nasıl yönetebileceğiniz hakkında bilgi.',
+    description: 'Kade Media web sitesinde kullanılan çerez türlerini, kullanım amaçlarını ve çerez tercihlerinizi nasıl yönetebileceğinizi öğrenin.',
     path: '/cerez-politikasi',
   })
 

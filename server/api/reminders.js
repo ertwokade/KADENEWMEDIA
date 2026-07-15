@@ -139,7 +139,7 @@ export default async function handler(req, res) {
                       ${reminder.category ? `<tr><td style="padding:8px 0;color:#888;">Kategori</td><td style="padding:8px 0;color:#fff;">${escapeHtml(reminder.category)}</td></tr>` : ''}
                     </table>
                     <div style="text-align:center;margin:24px 0;">
-                      <a href="https://www.kademedia.com.tr/admin" style="display:inline-block;padding:14px 32px;background:#eac321;color:#000;text-decoration:none;border-radius:8px;font-weight:bold;">Admin Paneline Git</a>
+                      <a href="https://kadenewmedia.com/admin" style="display:inline-block;padding:14px 32px;background:#eac321;color:#000;text-decoration:none;border-radius:8px;font-weight:bold;">Admin Paneline Git</a>
                     </div>
                   </div>
                   <div style="text-align:center;padding:16px;border-top:1px solid #333;">

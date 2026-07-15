@@ -126,7 +126,7 @@ export default async function handler(req, res) {
       for (const sub of subscribers) {
         try {
           const unsubToken = generateUnsubToken(sub.email);
-          const unsubLink = `https://www.kademedia.com.tr/api/contact?action=unsubscribe&email=${encodeURIComponent(sub.email)}${unsubToken ? `&token=${unsubToken}` : ''}`;
+          const unsubLink = `https://kadenewmedia.com/api/contact?action=unsubscribe&email=${encodeURIComponent(sub.email)}${unsubToken ? `&token=${unsubToken}` : ''}`;
           const safeHtml = sanitizedHtml + `<div style="margin-top:32px;padding-top:16px;border-top:1px solid #333;text-align:center;font-size:12px;color:#888;">
             <a href="${unsubLink}" style="color:#888;">Abonelikten çık</a>
           </div>`;

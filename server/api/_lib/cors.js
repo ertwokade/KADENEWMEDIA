@@ -1,5 +1,10 @@
 const LOCAL_ORIGINS = ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:4173'];
-const PRODUCTION_ORIGINS = ['https://www.kademedia.com.tr', 'https://kademedia.com.tr'];
+const PRODUCTION_ORIGINS = [
+  'https://kadenewmedia.com',
+  'https://www.kadenewmedia.com',
+  'https://kadenewmedia.com.tr',
+  'https://www.kadenewmedia.com.tr',
+];
 
 function isProductionRuntime() {
   return process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';

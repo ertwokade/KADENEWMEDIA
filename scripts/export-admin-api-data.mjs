@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
-const baseUrl = process.env.KADE_ADMIN_BASE_URL || "https://www.kademedia.com.tr";
+const baseUrl = process.env.KADE_ADMIN_BASE_URL || "https://kadenewmedia.com";
 const username = process.env.KADE_ADMIN_USER;
 const password = process.env.KADE_ADMIN_PASS;
 

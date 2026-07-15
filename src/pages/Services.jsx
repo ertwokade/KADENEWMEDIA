@@ -21,9 +21,9 @@ import './Services.css'
 export default function Services() {
   const { t } = useLanguage()
   useSEO({
-    title: 'Hizmetlerimiz | Sosyal Medya Ajansı Hizmetleri | Kade Media',
-    description: 'Profesyonel sosyal medya yönetimi, içerik üretimi, Meta & Google reklam yönetimi, influencer marketing ve video prodüksiyon. İstanbul sosyal medya ajansı Kade Media ile markanızı büyütün.',
-    keywords: 'sosyal medya ajansı hizmetleri, sosyal medya yönetimi istanbul, instagram ajansı, tiktok ajansı, içerik üretimi, meta reklam ajansı, google ads ajansı, influencer marketing, video prodüksiyon, agency hizmetleri istanbul, dijital ajans',
+    title: 'New Media ve Dijital Medya Hizmetleri | Kade Media',
+    description: 'Kade Media’nın sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetleri.',
+    keywords: 'new media, yeni medya, medya ajansı, dijital medya ajansı, sosyal medya ajansı hizmetleri, sosyal medya yönetimi istanbul, instagram ajansı, tiktok ajansı, içerik üretimi, meta reklam ajansı, google ads ajansı, video prodüksiyon, dijital ajans',
     path: '/hizmetler',
   })
 

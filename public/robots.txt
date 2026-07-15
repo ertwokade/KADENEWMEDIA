@@ -10,5 +10,7 @@ Disallow: /proje-takip
 Disallow: /giris
 Disallow: /kade-kit-business
 Disallow: /kade-kit-business/
+Disallow: /organizasyon-kiti
+Disallow: /organizasyon-kiti/
 
-Sitemap: https://www.kademedia.com.tr/sitemap.xml
+Sitemap: https://kadenewmedia.com/sitemap.xml
