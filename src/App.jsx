@@ -7,7 +7,6 @@ import PageHeroCanvas from './components/PageHeroCanvas'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
-import WhatsAppButton from './components/WhatsAppButton'
 import CookieBanner from './components/CookieBanner'
 import ErrorTracker from './components/ErrorTracker'
 import GrainOverlay from './components/GrainOverlay'
@@ -38,7 +37,6 @@ const KVKK = lazy(() => import('./pages/KVKK'))
 const Gizlilik = lazy(() => import('./pages/Gizlilik'))
 const CerezPolitikasi = lazy(() => import('./pages/CerezPolitikasi'))
 const CaseStudies = lazy(() => import('./pages/CaseStudies'))
-const ROICalculator = lazy(() => import('./pages/ROICalculator'))
 const Admin = lazy(() => import('./pages/Admin'))
 // New pages
 const SSS = lazy(() => import('./pages/SSS'))
@@ -46,21 +44,15 @@ const Referanslar = lazy(() => import('./pages/Referanslar'))
 const Tesekkur = lazy(() => import('./pages/Tesekkur'))
 const Basin = lazy(() => import('./pages/Basin'))
 const NedenBiz = lazy(() => import('./pages/NedenBiz'))
-const ReferralProgram = lazy(() => import('./pages/ReferralProgram'))
 const QuoteRequest = lazy(() => import('./pages/QuoteRequest'))
-const PriceCalculator = lazy(() => import('./pages/PriceCalculator'))
 const CustomerPortal = lazy(() => import('./pages/CustomerPortal'))
 const Login = lazy(() => import('./pages/Login'))
 const ProjectTracking = lazy(() => import('./pages/ProjectTracking'))
-const PodcastWebinar = lazy(() => import('./pages/PodcastWebinar'))
-const NewsletterArchive = lazy(() => import('./pages/NewsletterArchive'))
 const OrganizationKitDashboard = lazy(() => import('./pages/OrganizationKitDashboard'))
 const OrganizationKitPlan = lazy(() => import('./pages/OrganizationKitPlan'))
 const OrganizationKitSection = lazy(() => import('./pages/OrganizationKitSection'))
 const KadeKitBusinessStudio = lazy(() => import('./pages/KadeKitBusinessStudio'))
 const KadeLinks = lazy(() => import('./pages/KadeLinks'))
-const KadeKit = lazy(() => import('./pages/KadeKit'))
-const Demo = lazy(() => import('./pages/Demo'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -217,7 +209,6 @@ function App() {
         <Route path="/portfolio" element={<LazyRoute><Portfolio /></LazyRoute>} />
         <Route path="/ekip" element={<LazyRoute><Team /></LazyRoute>} />
         <Route path="/basari-hikayeleri" element={<LazyRoute><CaseStudies /></LazyRoute>} />
-        <Route path="/roi-hesaplayici" element={<LazyRoute><ROICalculator /></LazyRoute>} />
         <Route path="/kvkk" element={<LazyRoute><KVKK /></LazyRoute>} />
         <Route path="/gizlilik" element={<LazyRoute><Gizlilik /></LazyRoute>} />
         <Route path="/cerez-politikasi" element={<LazyRoute><CerezPolitikasi /></LazyRoute>} />
@@ -227,9 +218,7 @@ function App() {
         <Route path="/tesekkur" element={<LazyRoute><Tesekkur /></LazyRoute>} />
         <Route path="/basin" element={<LazyRoute><Basin /></LazyRoute>} />
         <Route path="/neden-biz" element={<LazyRoute><NedenBiz /></LazyRoute>} />
-        <Route path="/referans-programi" element={<LazyRoute><ReferralProgram /></LazyRoute>} />
         <Route path="/teklif-al" element={<LazyRoute><QuoteRequest /></LazyRoute>} />
-        <Route path="/fiyat-hesaplama" element={<LazyRoute><PriceCalculator /></LazyRoute>} />
         <Route path="/giris" element={<LazyRoute><Login /></LazyRoute>} />
         <Route path="/musteri-panel" element={<LazyRoute><CustomerPortal /></LazyRoute>} />
         <Route path="/organizasyon-kiti" element={<LazyRoute><OrganizationKitGuard><OrganizationKitDashboard /></OrganizationKitGuard></LazyRoute>} />
@@ -237,17 +226,12 @@ function App() {
         <Route path="/organizasyon-kiti/:section" element={<LazyRoute><OrganizationKitGuard><OrganizationKitSection /></OrganizationKitGuard></LazyRoute>} />
         <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
         <Route path="/proje-takip" element={<LazyRoute><ProjectTracking /></LazyRoute>} />
-        <Route path="/podcast-webinar" element={<LazyRoute><PodcastWebinar /></LazyRoute>} />
-        <Route path="/bulten-arsivi" element={<LazyRoute><NewsletterArchive /></LazyRoute>} />
         <Route path="/links" element={<LazyRoute><KadeLinks /></LazyRoute>} />
         <Route path="/kadelinks" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
-        <Route path="/kade-kit" element={<LazyRoute><KadeKit /></LazyRoute>} />
-        <Route path="/demo" element={<LazyRoute><Demo /></LazyRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </main>
       {!hideShell && <Footer />}
-      {!isAdmin && <WhatsAppButton />}
       {!isAdmin && <CookieBanner />}
       {!isAdmin && <NotificationPrompt />}
     </CustomerProvider>

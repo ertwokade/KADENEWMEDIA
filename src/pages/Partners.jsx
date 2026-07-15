@@ -1,98 +1,34 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { HiOutlineArrowRight, HiOutlineOfficeBuilding } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
-import { partnersData as staticPartners } from '../data/content'
-import { getPartnersApi } from '../api'
 import PageTransition from '../components/PageTransition'
-import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import { FadeIn } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Partners.css'
 
 export default function Partners() {
-  const { lang, t } = useLanguage()
+  const { lang } = useLanguage()
+  const isEN = lang === 'en'
   useSEO({
-    title: 'Referanslarımız | Partner Markalar',
-    description: 'Kade Media\'nın çalıştığı markalar ve referanslar. Sosyal medya yönetimi ve dijital pazarlama alanında başarıyla hizmet verdiğimiz partnerlerimiz.',
-    keywords: 'kade media referanslar, sosyal medya ajansı müşterileri, dijital pazarlama partner markalar',
+    title: isEN ? 'Business Partners | Kade Media' : 'İş Ortakları | Kade Media',
+    description: isEN ? 'Verified Kade Media business partner information.' : 'Doğrulanmış Kade Media iş ortaklığı bilgileri.',
     path: '/partnerler',
+    noindex: true,
   })
-  const [partnersData, setPartnersData] = useState(staticPartners)
-
-  useEffect(() => {
-    getPartnersApi()
-      .then(data => {
-        if (data?.length > 0) {
-          const map = new Map(staticPartners.map(p => [p.id || p.slug, p]))
-          data.forEach(p => {
-            const key = p.id || p.slug || String(p._id)
-            map.set(key, { ...map.get(key), ...p })
-          })
-          setPartnersData(Array.from(map.values()))
-        }
-      })
-      .catch(() => {})
-  }, [])
 
   return (
     <PageTransition>
       <section className="partners-hero">
         <PageBgAnimation type="partners" />
         <div className="grid-bg" />
-        <div className="glow-effect" style={{ top: '-150px', left: '-100px' }} />
         <div className="container">
-          <FadeIn>
-            <div className="section-badge">
-              <HiOutlineOfficeBuilding size={14} />
-              {t('partnersSection.badge')}
-            </div>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              {t('partners.heroTitle')}
-            </h1>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="section-subtitle">{t('partners.heroSubtitle')}</p>
-          </FadeIn>
+          <FadeIn><div className="section-badge"><HiOutlineOfficeBuilding size={14} />{isEN ? 'Business partners' : 'İş ortakları'}</div></FadeIn>
+          <FadeIn delay={0.1}><h1 className="section-title">{isEN ? 'Verified ' : 'Doğrulanmış '}<span>{isEN ? 'partnerships' : 'iş ortaklıkları'}</span></h1></FadeIn>
+          <FadeIn delay={0.2}><p className="section-subtitle">{isEN ? 'Partner identities and logos are published only with permission. No verified partner list is currently public.' : 'Partner kimlikleri ve logoları yalnızca izinle yayınlanır. Şu anda public olarak doğrulanmış partner listesi bulunmuyor.'}</p></FadeIn>
         </div>
       </section>
-
-      <section className="section">
-        <div className="container">
-          <StaggerContainer className="partners-grid" staggerDelay={0.1}>
-            {partnersData.map((partner, idx) => (
-              <StaggerItem key={partner.id || partner.slug || String(partner._id) || idx}>
-                <Link to={`/partnerler/${partner.id || partner.slug || String(partner._id)}`}>
-                  <motion.div
-                    className="partner-card glass-card"
-                    whileHover={{ scale: 1.02, y: -5 }}
-                  >
-                    <div className="partner-logo-large" style={{ background: `${partner.color || '#eac321'}15`, borderColor: `${partner.color || '#eac321'}30` }}>
-                      {partner.logo && (partner.logo.startsWith('data:') || partner.logo.startsWith('http'))
-                        ? <img src={partner.logo} alt={partner.name} style={{ width: '60px', height: '60px', objectFit: 'contain', borderRadius: 8 }} />
-                        : <span style={{ fontSize: '2.5rem' }}>{partner.logo || '🏢'}</span>
-                      }
-                    </div>
-                    <div className="partner-card-info">
-                      <span className="partner-category" style={{ color: partner.color || '#eac321' }}>
-                        {lang === 'tr' ? partner.category : partner.categoryEn}
-                      </span>
-                      <h3>{partner.name}</h3>
-                      <p>{lang === 'tr' ? partner.descTr : partner.descEn}</p>
-                    </div>
-                    <div className="partner-card-arrow">
-                      <HiOutlineArrowRight size={18} />
-                    </div>
-                  </motion.div>
-                </Link>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
+      <section className="section"><div className="container"><div className="portfolio-cta glass-card"><h2>{isEN ? 'Partnership inquiries' : 'İş ortaklığı görüşmeleri'}</h2><Link to="/iletisim" className="btn btn-primary">{isEN ? 'Contact us' : 'İletişime geç'}<HiOutlineArrowRight size={16} /></Link></div></div></section>
     </PageTransition>
   )
 }

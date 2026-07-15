@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-const BASE_URL = 'https://kademedia.com.tr'
+export const BASE_URL = 'https://www.kademedia.com.tr'
 
 function setMeta(name, content, property = false) {
   if (!content) return
@@ -60,7 +60,8 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
     setMeta('twitter:title', fullTitle)
     setMeta('twitter:description', description)
     setMeta('twitter:image', ogImage)
-    setMeta('twitter:site', '@kadenewmedia')
+    const twitterSite = document.querySelector('meta[name="twitter:site"]')
+    twitterSite?.remove()
 
     setCanonical(canonicalUrl)
   }, [title, description, keywords, path, image, type, noindex, baseUrl])

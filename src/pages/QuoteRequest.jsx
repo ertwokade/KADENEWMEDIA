@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   HiOutlineCalculator, HiOutlinePaperAirplane, HiOutlineCheck, HiOutlineArrowRight, HiOutlineArrowLeft,
@@ -17,12 +17,12 @@ import { FadeIn } from '../components/Animations'
 import './QuoteRequest.css'
 
 const SERVICES = [
-  { id: 'social', icon: HiOutlineDeviceMobile, labelTr: 'Sosyal Medya Yönetimi', labelEn: 'Social Media Management', priceTr: '₺3.200/ay', descTr: 'Strateji + içerik + yayın', descEn: 'Strategy + content + publishing' },
-  { id: 'content', icon: HiOutlinePhotograph, labelTr: 'İçerik Üretimi', labelEn: 'Content Production', priceTr: '₺3.200/ay', descTr: 'Görsel, copy, tasarım', descEn: 'Visual, copy, design' },
-  { id: 'ads', icon: HiOutlineChartBar, labelTr: 'Reklam Yönetimi', labelEn: 'Ads Management', priceTr: '₺3.200/ay', descTr: 'Meta, Google, TikTok Ads', descEn: 'Meta, Google, TikTok Ads' },
-  { id: 'video', icon: HiOutlineVideoCamera, labelTr: 'Video Prodüksiyon', labelEn: 'Video Production', priceTr: '₺3.200/ay', descTr: 'Reels, kısa film, kurgu', descEn: 'Reels, short films, edit' },
-  { id: 'web', icon: HiOutlineGlobeAlt, labelTr: 'Web Sitesi', labelEn: 'Website', priceTr: '₺3.200/ay', descTr: 'Tasarım + geliştirme', descEn: 'Design + development' },
-  { id: 'consult', icon: HiOutlineLightBulb, labelTr: 'Danışmanlık', labelEn: 'Consulting', priceTr: '₺3.200/ay', descTr: 'Strateji + workshop', descEn: 'Strategy + workshop' },
+  { id: 'social', icon: HiOutlineDeviceMobile, labelTr: 'Sosyal Medya Yönetimi', labelEn: 'Social Media Management', descTr: 'Strateji + içerik + yayın', descEn: 'Strategy + content + publishing' },
+  { id: 'content', icon: HiOutlinePhotograph, labelTr: 'İçerik Üretimi', labelEn: 'Content Production', descTr: 'Görsel, metin ve tasarım', descEn: 'Visuals, copy, and design' },
+  { id: 'ads', icon: HiOutlineChartBar, labelTr: 'Reklam Yönetimi', labelEn: 'Ads Management', descTr: 'Meta, Google ve TikTok Ads', descEn: 'Meta, Google, and TikTok Ads' },
+  { id: 'video', icon: HiOutlineVideoCamera, labelTr: 'Video Prodüksiyon', labelEn: 'Video Production', descTr: 'Reels, kısa video ve kurgu', descEn: 'Reels, short video, and editing' },
+  { id: 'web', icon: HiOutlineGlobeAlt, labelTr: 'Web Sitesi', labelEn: 'Website', descTr: 'Tasarım ve geliştirme', descEn: 'Design and development' },
+  { id: 'consult', icon: HiOutlineLightBulb, labelTr: 'Danışmanlık', labelEn: 'Consulting', descTr: 'Strateji ve çalışma oturumu', descEn: 'Strategy and workshop' },
 ]
 
 const PLATFORMS = [
@@ -35,19 +35,14 @@ const PLATFORMS = [
 ]
 
 const TIMELINES = [
-  { id: 'normal', labelTr: 'Normal (2-3 hafta)', labelEn: 'Normal (2-3 weeks)', mult: 1, descTr: 'Standart başlangıç süresi', descEn: 'Standard onboarding time' },
-  { id: 'acil', labelTr: 'Acil (1 hafta)', labelEn: 'Rush (1 week)', mult: 1.18, descTr: 'Hızlı başlangıç (+%18)', descEn: 'Fast start (+18%)' },
+  { id: 'esnek', labelTr: 'Esnek', labelEn: 'Flexible', descTr: 'Takvim birlikte planlanır', descEn: 'Timeline is planned together' },
+  { id: 'oncelikli', labelTr: 'Öncelikli', labelEn: 'Priority', descTr: 'Uygunluk teklif aşamasında doğrulanır', descEn: 'Availability is confirmed during quoting' },
 ]
 
-function estimate(form) {
-  const base = 6500
-  const serviceTotal = form.services.length * 3200
-  const platformTotal = form.platforms.length * 1600
-  const contentTotal = Number(form.contentCount || 0) * 420
-  const videoTotal = Number(form.videoCount || 0) * 1800
-  const adTotal = form.adManagement ? 5500 : 0
-  const rush = form.timeline === 'acil' ? 1.18 : 1
-  return Math.round((base + serviceTotal + platformTotal + contentTotal + videoTotal + adTotal) * rush)
+const PACKAGE_SELECTIONS = {
+  baslangic: ['social'],
+  buyume: ['social', 'content', 'ads'],
+  ozel: [],
 }
 
 const STEPS = [
@@ -58,19 +53,22 @@ const STEPS = [
 
 export default function QuoteRequest() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { lang } = useLanguage()
+  const requestedPackage = searchParams.get('paket')
+  const safePackage = Object.hasOwn(PACKAGE_SELECTIONS, requestedPackage) ? requestedPackage : ''
   const [step, setStep] = useState(1)
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
   const [form, setForm] = useState({
     name: '', email: '', phone: '', company: '',
-    services: ['social'],
+    services: safePackage ? PACKAGE_SELECTIONS[safePackage] : ['social'],
     platforms: ['instagram'],
-    monthlyBudget: 25000,
-    contentCount: 20,
-    videoCount: 4,
-    adManagement: true,
-    timeline: 'normal',
+    monthlyBudget: '',
+    contentCount: '',
+    videoCount: '',
+    adManagement: false,
+    timeline: 'esnek',
     notes: '',
     consent: false,
   })
@@ -78,12 +76,10 @@ export default function QuoteRequest() {
   useSEO({
     title: lang === 'tr' ? 'Teklif Al | Hizmete Özel Başvuru' : 'Get Quote | Custom Service Request',
     description: lang === 'tr'
-      ? 'Kade Media hizmetleri için kapsam seçin, tahmini bütçeyi görün ve teklif talebi gönderin.'
-      : 'Choose scope for Kade Media services, see estimated budget and submit a quote request.',
+      ? 'Kade Media hizmetleri için kapsam seçin ve yazılı teklif talebi gönderin.'
+      : 'Choose the scope for Kade Media services and submit a written quote request.',
     path: '/teklif-al',
   })
-
-  const estimatedPrice = useMemo(() => estimate(form), [form])
 
   const toggle = (key, value) => {
     setForm(prev => ({
@@ -94,7 +90,7 @@ export default function QuoteRequest() {
 
   const canNext = () => {
     if (step === 1) return form.services.length > 0 && form.platforms.length > 0
-    if (step === 2) return Number(form.monthlyBudget) > 0
+    if (step === 2) return true
     if (step === 3) return form.name.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) && form.consent
     return true
   }
@@ -130,7 +126,7 @@ export default function QuoteRequest() {
         ...form,
         services: serviceLabels,
         platforms: platformLabels,
-        estimatedPrice,
+        package: safePackage || undefined,
         source: 'service-quote',
       })
       navigate('/tesekkur?source=quote')
@@ -153,13 +149,13 @@ export default function QuoteRequest() {
             <div className="section-badge"><HiOutlineCalculator size={14} /> {T('Online Teklif Sihirbazı', 'Online Quote Wizard')}</div>
             <h1 className="section-title quote-hero-title">
               {T('Hizmet kapsamını seçin, ', 'Choose your scope, ')}
-              <span>{T('anında tahmini fiyat', 'see estimated price')}</span>
-              {T(' alın', ' instantly')}
+              <span>{T('net bir teklif talebi', 'request a clear quote')}</span>
+              {T(' gönderin', '')}
             </h1>
             <p className="section-subtitle">
               {T(
-                '3 adımda kapsamınızı belirleyin. Tahmini bütçeyi anında görün, ekibimizden 24 saat içinde detaylı teklif alın.',
-                'Define your scope in 3 steps. See an estimated budget instantly and get a detailed quote within 24 hours.'
+                '3 adımda kapsamınızı belirleyin. Ücret, KDV, reklam bütçesi ve ek maliyetler yazılı teklifte netleşir.',
+                'Define your scope in three steps. Fees, taxes, media spend, and additional costs are confirmed in writing.'
               )}
             </p>
           </FadeIn>
@@ -213,6 +209,7 @@ export default function QuoteRequest() {
                             key={s.id}
                             className={`quote-pick-card ${active ? 'active' : ''}`}
                             onClick={() => toggle('services', s.id)}
+                            aria-pressed={active}
                           >
                             <div className="quote-pick-icon"><Icon size={22} /></div>
                             <div className="quote-pick-info">
@@ -235,6 +232,7 @@ export default function QuoteRequest() {
                             key={p.id}
                             className={`quote-chip ${active ? 'active' : ''}`}
                             onClick={() => toggle('platforms', p.id)}
+                            aria-pressed={active}
                           >
                             <span className="quote-chip-emoji">{p.emoji}</span>
                             {p.label}
@@ -254,8 +252,8 @@ export default function QuoteRequest() {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.25 }}
                   >
-                    <h2 className="quote-step-heading">{T('Aylık kapsam ve bütçe', 'Monthly scope & budget')}</h2>
-                    <p className="quote-step-sub">{T('Hesaplama anlık güncellenir', 'Calculation updates live')}</p>
+                    <h2 className="quote-step-heading">{T('Kapsam detayları', 'Scope details')}</h2>
+                    <p className="quote-step-sub">{T('Bildiğiniz alanları doldurmanız yeterli', 'Complete only what you know')}</p>
 
                     <div className="quote-fields">
                       <label className="quote-field">
@@ -271,7 +269,7 @@ export default function QuoteRequest() {
                       <label className="quote-field">
                         <span className="quote-field-label"><HiOutlineCurrencyDollar size={16} /> {T('Aylık bütçe (₺)', 'Monthly budget (₺)')}</span>
                         <input type="number" min="0" value={form.monthlyBudget} onChange={e => setForm({ ...form, monthlyBudget: e.target.value })} />
-                        <span className="quote-field-hint">{T('Hizmet + reklam dahil', 'Service + ad spend')}</span>
+                        <span className="quote-field-hint">{T('Varsa hedeflediğiniz toplam bütçe; bağlayıcı değildir', 'Optional target budget; not binding')}</span>
                       </label>
                     </div>
 
@@ -302,7 +300,7 @@ export default function QuoteRequest() {
                       <span className="quote-toggle-thumb" />
                       <div>
                         <strong>{T('Reklam yönetimi dahil', 'Include ad management')}</strong>
-                        <small>{T('+₺5.500/ay aylık reklam stratejisi ve optimizasyon', '+₺5,500/mo monthly ad strategy & optimization')}</small>
+                        <small>{T('Reklam bütçesi hizmet bedelinden ayrı teklif edilir', 'Media spend is quoted separately from service fees')}</small>
                       </div>
                     </label>
                   </motion.div>
@@ -317,7 +315,7 @@ export default function QuoteRequest() {
                     transition={{ duration: 0.25 }}
                   >
                     <h2 className="quote-step-heading">{T('Sizinle iletişime geçelim', "Let's get in touch")}</h2>
-                    <p className="quote-step-sub">{T('24 saat içinde detaylı teklif gönderiyoruz', 'Detailed quote within 24h')}</p>
+                    <p className="quote-step-sub">{T('Talebinizi inceleyip uygun iletişim kanalından döneceğiz', 'We will review the request and reply through the appropriate channel')}</p>
 
                     <div className="quote-fields two">
                       <label className="quote-field">
@@ -358,7 +356,7 @@ export default function QuoteRequest() {
                 )}
               </AnimatePresence>
 
-              {error && <p className="quote-error">{error}</p>}
+              {error && <p className="quote-error" role="alert" aria-live="assertive">{error}</p>}
 
               <div className="quote-actions">
                 {step > 1 && (
@@ -386,16 +384,8 @@ export default function QuoteRequest() {
               <div className="quote-summary-card glass-card">
                 <div className="quote-summary-head">
                   <HiOutlineSparkles size={18} />
-                  <span>{T('Tahmini aylık bütçe', 'Estimated monthly budget')}</span>
+                  <span>{T('Talep özeti', 'Request summary')}</span>
                 </div>
-                <motion.div
-                  key={estimatedPrice}
-                  initial={{ scale: 0.95, opacity: 0.8 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="quote-summary-price"
-                >
-                  ₺{estimatedPrice.toLocaleString('tr-TR')}
-                </motion.div>
                 <p className="quote-summary-note">
                   {T(
                     'Net teklif; brief, hedef ve üretim kapsamı görüşmesinden sonra hazırlanır.',
@@ -426,14 +416,14 @@ export default function QuoteRequest() {
                   </div>
                   <div className="quote-summary-row">
                     <span>{T('Teslim', 'Timeline')}</span>
-                    <strong>{form.timeline === 'acil' ? T('Acil', 'Rush') : T('Normal', 'Normal')}</strong>
+                    <strong>{form.timeline === 'oncelikli' ? T('Öncelikli', 'Priority') : T('Esnek', 'Flexible')}</strong>
                   </div>
                 </div>
 
                 <div className="quote-summary-perks">
-                  <div className="quote-perk"><HiOutlineCheck size={14} /> {T('Ücretsiz strateji görüşmesi', 'Free strategy call')}</div>
-                  <div className="quote-perk"><HiOutlineCheck size={14} /> {T('24 saat içinde geri dönüş', 'Reply within 24h')}</div>
-                  <div className="quote-perk"><HiOutlineCheck size={14} /> {T('Sözleşmesiz başlangıç', 'No-commitment start')}</div>
+                  <div className="quote-perk"><HiOutlineCheck size={14} /> {T('Yazılı kapsam', 'Written scope')}</div>
+                  <div className="quote-perk"><HiOutlineCheck size={14} /> {T('Ayrı maliyet kalemleri', 'Separate cost items')}</div>
+                  <div className="quote-perk"><HiOutlineCheck size={14} /> {T('Onaydan önce netleştirme', 'Clarification before approval')}</div>
                 </div>
               </div>
             </aside>

@@ -1,4 +1,4 @@
-import { Navigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlineArrowRight, HiOutlineClipboardCheck } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
@@ -6,6 +6,7 @@ import OrganizationKitNav from '../components/OrganizationKitNav'
 import PageTransition from '../components/PageTransition'
 import { organizationKitSections } from '../data/organizationKit'
 import './OrganizationKit.css'
+import NotFound from './NotFound'
 
 export default function OrganizationKitSection() {
   const { section } = useParams()
@@ -18,7 +19,7 @@ export default function OrganizationKitSection() {
     noindex: true,
   })
 
-  if (!content) return <Navigate to="/organizasyon-kiti" replace />
+  if (!content) return <NotFound />
 
   return (
     <PageTransition>

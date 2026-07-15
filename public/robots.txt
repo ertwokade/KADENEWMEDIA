@@ -11,4 +11,4 @@ Disallow: /giris
 Disallow: /kade-kit-business
 Disallow: /kade-kit-business/
 
-Sitemap: https://kademedia.com.tr/sitemap.xml
+Sitemap: https://www.kademedia.com.tr/sitemap.xml

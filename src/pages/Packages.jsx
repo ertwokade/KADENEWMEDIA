@@ -1,430 +1,132 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import {
-  HiOutlineCheck,
-  HiOutlineStar,
-  HiOutlineArrowRight,
-  HiOutlineSparkles,
-} from 'react-icons/hi'
-import { claimFreePackageApi, getContentApi } from '../api'
-import { useCustomer } from '../contexts/CustomerContext'
+import { HiOutlineArrowRight, HiOutlineCheck, HiOutlineSparkles } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
-import { analytics } from '../utils/analytics'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Packages.css'
 
-function CompCell({ val }) {
-  if (val === true) return <span className="comp-yes">✓</span>
-  if (val === false) return <span className="comp-no">✗</span>
-  return <span className="comp-maybe">~</span>
-}
+const PACKAGE_SCOPES = [
+  {
+    id: 'baslangic',
+    nameTr: 'Başlangıç',
+    nameEn: 'Starter',
+    descTr: 'Dijital iletişim temelini ve düzenli yayın akışını kurmak isteyen markalar için.',
+    descEn: 'For brands establishing their digital communication foundation and publishing rhythm.',
+    featuresTr: ['Marka ve kanal değerlendirmesi', 'İçerik planı', 'Yayın akışı', 'Dönemsel değerlendirme'],
+    featuresEn: ['Brand and channel review', 'Content plan', 'Publishing workflow', 'Periodic review'],
+  },
+  {
+    id: 'buyume',
+    nameTr: 'Büyüme',
+    nameEn: 'Growth',
+    descTr: 'İçerik üretimiyle reklam yönetimini aynı plan içinde yürütmek isteyen markalar için.',
+    descEn: 'For brands managing content production and advertising in one plan.',
+    featuresTr: ['İçerik üretim planı', 'Kanal yönetimi', 'Reklam operasyonu', 'Performans raporlaması'],
+    featuresEn: ['Content production plan', 'Channel management', 'Ad operations', 'Performance reporting'],
+  },
+  {
+    id: 'ozel',
+    nameTr: 'Özel Kapsam',
+    nameEn: 'Custom Scope',
+    descTr: 'Prodüksiyon, kampanya veya çok kanallı ihtiyaçları proje bazında planlanan markalar için.',
+    descEn: 'For project-based production, campaign, or multi-channel requirements.',
+    featuresTr: ['İhtiyaç analizi', 'Özel teslim planı', 'Kapsama göre ekip', 'Teklif öncesi netleştirme'],
+    featuresEn: ['Needs analysis', 'Custom delivery plan', 'Scope-based team', 'Pre-quote clarification'],
+  },
+]
 
-const splitFeatures = (value) => {
-  if (Array.isArray(value)) return value.filter(Boolean)
-  return String(value || '')
-    .split(',')
-    .map(item => item.trim())
-    .filter(Boolean)
-}
+const FAQS = [
+  {
+    tr: ['Fiyatlar neden listelenmiyor?', 'Hizmet bedeli kanal, üretim adedi, reklam operasyonu ve teslim kapsamına göre değişir. KDV ve ek maliyetler yazılı teklifte ayrıca belirtilir.'],
+    en: ['Why are prices not listed?', 'Fees vary by channel, production volume, advertising operations, and delivery scope. Taxes and additional costs are stated separately in the written quote.'],
+  },
+  {
+    tr: ['Reklam bütçesi pakete dahil mi?', 'Dahil olduğu varsayılmaz. Medya bütçesi ile hizmet bedeli, hazırlanacak teklifte ayrı kalemler olarak açıklanır.'],
+    en: ['Is media spend included?', 'It is not assumed to be included. Media spend and service fees are described as separate items in the quote.'],
+  },
+]
 
 export default function Packages() {
-  const { lang, t } = useLanguage()
-  const navigate = useNavigate()
-  const { customer, setCustomer } = useCustomer()
-  useSEO({
-    title: 'Paketler & Fiyatlar | Sosyal Medya Hizmet Paketleri',
-    description: 'Kade Media sosyal medya yönetim paketleri. Başlangıç, Profesyonel, Kurumsal ve Özel olmak üzere 4 farklı paketle uygun fiyata profesyonel dijital pazarlama hizmeti alın.',
-    keywords: 'sosyal medya paketleri, sosyal medya fiyatları, instagram yönetim paketi, dijital pazarlama fiyatları, sosyal medya yönetim ücreti',
-    path: '/paketler',
-  })
+  const { lang } = useLanguage()
   const isEN = lang === 'en'
 
-  const [claimingReference, setClaimingReference] = useState('')
-  const [claimMessage, setClaimMessage] = useState('')
-  const [adminPackages, setAdminPackages] = useState([])
-  const [adminFaqs, setAdminFaqs] = useState([])
-
-  useEffect(() => {
-    const schema = {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      name: 'Kade Media Sosyal Medya Paketleri',
-      url: 'https://kademedia.com.tr/paketler',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Başlangıç Paketi', url: 'https://kademedia.com.tr/paketler#starter' },
-        { '@type': 'ListItem', position: 2, name: 'Profesyonel Paket', url: 'https://kademedia.com.tr/paketler#professional' },
-        { '@type': 'ListItem', position: 3, name: 'Kurumsal Paket', url: 'https://kademedia.com.tr/paketler#enterprise' },
-        { '@type': 'ListItem', position: 4, name: 'Özel Paket', url: 'https://kademedia.com.tr/paketler#custom' },
-      ],
-    }
-    let el = document.getElementById('jsonld-packages')
-    if (el) { el.textContent = JSON.stringify(schema) } else {
-      const s = document.createElement('script')
-      s.id = 'jsonld-packages'
-      s.type = 'application/ld+json'
-      s.textContent = JSON.stringify(schema)
-      document.head.appendChild(s)
-    }
-    return () => { document.getElementById('jsonld-packages')?.remove() }
-  }, [])
-
-  const handleClaimFreePackage = async (reference) => {
-    if (!customer) {
-      navigate('/giris')
-      return
-    }
-
-    setClaimingReference(reference)
-    setClaimMessage('')
-    try {
-      const res = await claimFreePackageApi(reference)
-      setCustomer(prev => prev ? ({
-        ...prev,
-        packages: res.packages || prev.packages || [],
-        entitlements: res.entitlements || prev.entitlements,
-      }) : prev)
-      const packageName = reference === 'danismanlik-test' ? 'Dijital Strateji Danışmanlığı' : 'Kade Organizasyon Kiti'
-      setClaimMessage(res.alreadyOwned ? `${packageName} hesabınızda zaten aktif.` : `${packageName} hesabınıza eklendi.`)
-      navigate('/musteri-panel')
-    } catch (err) {
-      setClaimMessage(err.message || 'Paket eklenemedi. Lütfen tekrar deneyin.')
-    } finally {
-      setClaimingReference('')
-    }
-  }
-
-  useEffect(() => {
-    let alive = true
-    Promise.allSettled([
-      getContentApi('packages'),
-      getContentApi('faq'),
-    ]).then(([packagesRes, faqRes]) => {
-      if (!alive) return
-
-      const packagesData = packagesRes.status === 'fulfilled'
-        ? (packagesRes.value?.data || packagesRes.value)
-        : null
-      const packageItems = Array.isArray(packagesData?.items) ? packagesData.items : []
-      if (packageItems.length) setAdminPackages(packageItems)
-
-      const faqData = faqRes.status === 'fulfilled'
-        ? (faqRes.value?.data || faqRes.value)
-        : null
-      const faqItems = Array.isArray(faqData?.[lang]) ? faqData[lang] : []
-      if (faqItems.length) {
-        setAdminFaqs(faqItems
-          .filter(item => item?.q || item?.a)
-          .slice(0, 4)
-          .map(item => ({ q: item.q || '', a: item.a || '' })))
-      }
-    }).catch(() => {})
-    return () => { alive = false }
-  }, [lang])
-
-  const defaultPackages = [
-    {
-      tier: 'danismanlik-test',
-      tag: isEN ? 'Free Test' : '0 TL Test',
-      name: isEN ? 'Digital Strategy Consulting' : 'Dijital Strateji Danışmanlığı',
-      tagline: isEN ? 'Test access for your consulting workspace.' : 'Danışmanlık alanınızı test edin.',
-      desc: isEN
-        ? 'Claim the free consulting package and see your purchased consulting area inside the customer panel.'
-        : 'Ücretsiz danışmanlık paketini al, müşteri panelinde aldığın danışmanlığı sol kutuda ve detaylarda gör.',
-      features: [
-        isEN ? 'Consulting panel card' : 'Aldığım danışmanlık kartı',
-        isEN ? 'Active service area' : 'Aktif hizmet alanı',
-        isEN ? 'Package status' : 'Paket durumu',
-        isEN ? 'Consulting notes scope' : 'Danışmanlık kapsamı',
-      ],
-      popular: false,
-      color: 'rgba(234,195,33,0.06)',
-      priceLabel: '0 TL',
-      reference: 'danismanlik-test',
-      freeClaim: true,
-    },
-    {
-      tier: 'kade-organizasyon-kiti-test',
-      tag: isEN ? 'Free Test' : '0 TL Test',
-      name: 'Kade Organizasyon Kiti',
-      tagline: isEN ? 'Test access for the organization kit.' : 'Organizasyon kiti test erişimi.',
-      desc: isEN
-        ? 'Claim the free test package and open the Kade Organization Kit inside your customer panel.'
-        : 'Ücretsiz test paketini al, müşteri panelinde sağ kutudan Kade Organizasyon Kiti arayüzünü aç.',
-      features: [
-        isEN ? 'Organization Kit dashboard' : 'Organizasyon Kiti paneli',
-        isEN ? 'Media roadmap' : 'Medya yol haritası',
-        isEN ? 'Management meetings' : 'Yönetim toplantıları',
-        isEN ? 'Consulting notes' : 'Danışmanlık notları',
-      ],
-      popular: false,
-      color: 'rgba(0,212,170,0.06)',
-      priceLabel: '0 TL',
-      reference: 'kade-organizasyon-kiti-test',
-      freeClaim: true,
-    },
-    {
-      tier: 'start',
-      tag: isEN ? 'Giriş' : 'Giriş',
-      name: isEN ? 'Start-Up' : 'Start-Up',
-      tagline: isEN ? 'Strategy & vertical video first.' : 'Strateji ve dikey video önce.',
-      desc: isEN
-        ? 'For brands just starting to build a digital presence. We define your voice, produce vertical content, and set the foundation.'
-        : 'Dijital varlığını oluşturmaya yeni başlayan markalar için. Sesini belirliyor, dikey içerik üretiyor, temeli atıyoruz.',
-      features: [
-        isEN ? 'Brand strategy & positioning' : 'Marka stratejisi & konumlandırma',
-        isEN ? '2 platforms (Instagram + TikTok)' : '2 platform (Instagram + TikTok)',
-        isEN ? '8 vertical videos / month' : 'Ayda 8 dikey video',
-        isEN ? 'Caption & hashtag strategy' : 'Caption & hashtag stratejisi',
-        isEN ? 'Monthly growth report' : 'Aylık büyüme raporu',
-      ],
-      popular: false,
-      color: 'rgba(255,255,255,0.06)',
-    },
-    {
-      tier: 'growth',
-      tag: isEN ? 'Growth' : 'Büyüme',
-      name: isEN ? 'Growth' : 'Büyüme',
-      tagline: isEN ? 'Full management + ads + 12 Reels.' : 'Tam yönetim + reklam + 12 Reels.',
-      desc: isEN
-        ? 'For brands ready to scale. Social media management, Reels production, and ad campaigns that deliver real results.'
-        : 'Ölçeklenmeye hazır markalar için. Sosyal medya yönetimi, Reels prodüksiyonu ve gerçek sonuç getiren reklam kampanyaları.',
-      features: [
-        isEN ? 'Everything in Start-Up' : 'Start-Up\'taki her şey',
-        isEN ? '4 platforms' : '4 platform',
-        isEN ? '12 Reels / month' : 'Ayda 12 Reels',
-        isEN ? 'Meta & TikTok Ads management' : 'Meta & TikTok Ads yönetimi',
-        isEN ? 'Competitor analysis' : 'Rakip analizi',
-        isEN ? 'Bi-weekly performance review' : '2 haftada bir performans inceleme',
-        isEN ? 'Community management' : 'Topluluk yönetimi',
-      ],
-      popular: true,
-      color: 'rgba(234,195,33,0.06)',
-    },
-    {
-      tier: 'premium',
-      tag: isEN ? 'Premium' : 'Premium',
-      name: isEN ? 'Premium' : 'Premium',
-      tagline: isEN ? 'Full production + influencer marketing.' : 'Tam prodüksiyon + influencer marketing.',
-      desc: isEN
-        ? 'The complete package. Studio-level production, influencer campaigns, and a dedicated strategist — the LumiFem model.'
-        : 'Tam paket. Stüdyo kalitesinde prodüksiyon, influencer kampanyaları ve özel strateji danışmanı — LumiFem modeli.',
-      features: [
-        isEN ? 'Everything in Growth' : 'Büyüme\'deki her şey',
-        isEN ? 'Studio-level production shoots' : 'Stüdyo kalitesinde prodüksiyon çekimleri',
-        isEN ? 'Influencer marketing campaigns' : 'Influencer marketing kampanyaları',
-        isEN ? 'Dedicated strategy consultant' : 'Özel strateji danışmanı',
-        isEN ? 'Weekly reporting & calls' : 'Haftalık rapor & görüşme',
-        isEN ? 'Crisis management' : 'Kriz yönetimi',
-        isEN ? 'Priority response (4h)' : 'Öncelikli yanıt (4 saat)',
-      ],
-      popular: false,
-      color: 'rgba(108,99,255,0.06)',
-    },
-  ]
-
-  const packages = adminPackages.length
-    ? adminPackages.map((pkg, index) => {
-      const name = isEN ? (pkg.nameEn || pkg.nameTr) : (pkg.nameTr || pkg.nameEn)
-      const desc = isEN ? (pkg.descEn || pkg.descTr) : (pkg.descTr || pkg.descEn)
-      const features = splitFeatures(isEN ? (pkg.featuresEn || pkg.featuresTr) : (pkg.featuresTr || pkg.featuresEn))
-      return {
-        tier: pkg.tier || `admin-${index}`,
-        tag: pkg.tier || (pkg.popular ? (isEN ? 'Popular' : 'Popüler') : (isEN ? 'Package' : 'Paket')),
-        name: name || (isEN ? 'Custom Package' : 'Özel Paket'),
-        tagline: desc || (isEN ? 'Tailored for your brand.' : 'Markanıza özel planlanır.'),
-        desc: desc || (isEN ? 'Contact us for a custom scope.' : 'Size özel kapsam için iletişime geçin.'),
-        features: features.length ? features : [isEN ? 'Custom scope' : 'Özel kapsam'],
-        popular: Boolean(pkg.popular),
-        color: pkg.popular ? 'rgba(234,195,33,0.06)' : 'rgba(255,255,255,0.06)',
-        priceLabel: pkg.priceTRY ? `${pkg.priceTRY} TL` : (isEN ? 'Custom quote' : 'Teklif al'),
-      }
-    })
-    : defaultPackages
-
-  const defaultFaqs = [
-    { q: t('packages.faq1q'), a: t('packages.faq1a') },
-    { q: t('packages.faq2q'), a: t('packages.faq2a') },
-    { q: t('packages.faq3q'), a: t('packages.faq3a') },
-    { q: t('packages.faq4q'), a: t('packages.faq4a') },
-  ]
-  const faqs = adminFaqs.length ? adminFaqs : defaultFaqs
+  useSEO({
+    title: isEN ? 'Service Packages | Kade Media' : 'Hizmet Paketleri | Kade Media',
+    description: isEN
+      ? 'Review Kade Media service scopes and request a written quote tailored to your needs.'
+      : 'Kade Media hizmet kapsamlarını inceleyin ve ihtiyacınıza göre hazırlanmış yazılı teklif isteyin.',
+    path: '/paketler',
+  })
 
   return (
     <PageTransition>
-      {/* Hero */}
       <section className="packages-hero">
         <PageBgAnimation type="packages" />
         <div className="grid-bg" />
         <div className="glow-effect" style={{ top: '-150px', left: '-150px' }} />
         <div className="container">
           <FadeIn>
-            <div className="section-badge">
-              <HiOutlineSparkles size={14} />
-              {t('packages.badge')}
-            </div>
+            <div className="section-badge"><HiOutlineSparkles size={14} />{isEN ? 'Service scopes' : 'Hizmet kapsamları'}</div>
           </FadeIn>
           <FadeIn delay={0.1}>
             <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              {t('packages.title')} <span>{t('packages.titleHighlight')}</span> {t('packages.titleEnd')}
+              {isEN ? <>Choose the <span>right scope</span></> : <>İhtiyacınıza uygun <span>kapsamı seçin</span></>}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="section-subtitle">
-              {t('packages.subtitle')}
+              {isEN
+                ? 'Packages describe the working scope. Final fees, taxes, media spend, and additional costs are confirmed in the written quote.'
+                : 'Paketler çalışma kapsamını tanımlar. Nihai ücret, KDV, reklam bütçesi ve ek maliyetler yazılı teklifte netleştirilir.'}
             </p>
           </FadeIn>
         </div>
       </section>
 
-      {/* Urgency Banner */}
-      <div className="packages-urgency-bar">
-        <span className="urgency-dot" />
-        <span>
-          {isEN
-            ? 'Only 3 client spots remaining this month — '
-            : 'Bu ay yalnızca 3 müşteri yerimiz kaldı — '}
-        </span>
-        <a href="/iletisim" className="urgency-link">
-          {isEN ? 'Reserve your spot now' : 'Şimdi yerinizi ayırtın'}
-          <HiOutlineArrowRight size={13} style={{ display: 'inline', marginLeft: 4, verticalAlign: 'middle' }} />
-        </a>
-      </div>
-
-      {/* Pricing Cards */}
       <section className="section">
         <div className="container">
-          <div className="section-header" style={{ marginBottom: 16 }}>
-            <FadeIn delay={0.1}>
-              <h2 className="section-title">
-                {isEN ? <>Find the <span>Right Package</span> for You</> : <>Sana <span>Uygun Paketi</span> Seçelim</>}
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="section-subtitle" style={{ maxWidth: 540, margin: '0 auto' }}>
-                {isEN
-                  ? "Prices are personalized based on your brand's needs. Book a free call and we'll figure it out together."
-                  : 'Fiyatlar markanın ihtiyacına göre kişiselleştirilir. Ücretsiz görüşme rezerv et, birlikte belirleyelim.'}
-              </p>
-            </FadeIn>
-          </div>
           <StaggerContainer className="packages-grid" staggerDelay={0.12}>
-            {packages.map((pkg) => (
-              <StaggerItem key={pkg.tier}>
-                <motion.div
-                  className={`package-card glass-card pkg-v2 ${pkg.popular ? 'popular' : ''}`}
-                  style={{ background: pkg.color }}
-                  whileHover={{ scale: 1.02, y: -6 }}
-                >
-                  {pkg.popular && (
-                    <div className="popular-badge">
-                      <HiOutlineStar size={14} />
-                      {isEN ? 'Most Popular' : 'En Çok Tercih Edilen'}
+            {PACKAGE_SCOPES.map((pkg) => {
+              const name = isEN ? pkg.nameEn : pkg.nameTr
+              const features = isEN ? pkg.featuresEn : pkg.featuresTr
+              return (
+                <StaggerItem key={pkg.id}>
+                  <motion.article className="package-card glass-card pkg-v2" whileHover={{ y: -4 }}>
+                    <div className="pkg-tag">{isEN ? 'Scope' : 'Kapsam'}</div>
+                    <h2 className="pkg-name">{name}</h2>
+                    <p className="package-desc">{isEN ? pkg.descEn : pkg.descTr}</p>
+                    <div className="package-features">
+                      {features.map((feature) => (
+                        <div key={feature} className="feature-item included"><HiOutlineCheck size={15} /><span>{feature}</span></div>
+                      ))}
                     </div>
-                  )}
-                  <div className="pkg-tag">{pkg.tag}</div>
-                  <h3 className="pkg-name">{pkg.name}</h3>
-                  <p className="pkg-tagline">{pkg.tagline}</p>
-                  <p className="package-desc">{pkg.desc}</p>
-
-                  {pkg.priceLabel && (
-                    <div className="package-free-price">
-                      <strong>{pkg.priceLabel}</strong>
-                      <span>{isEN ? 'test package' : 'test paketi'}</span>
-                    </div>
-                  )}
-
-                  <div className="package-features">
-                    {pkg.features.map((feature) => (
-                      <div key={feature} className="feature-item included">
-                        <HiOutlineCheck size={15} />
-                        <span>{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {pkg.freeClaim ? (
-                    <button
-                      type="button"
-                      className="btn btn-primary package-btn"
-                      disabled={claimingReference === pkg.reference}
-                      onClick={() => {
-                        analytics.packageClick(pkg.name)
-                        handleClaimFreePackage(pkg.reference)
-                      }}
+                    <Link
+                      to={`/teklif-al?paket=${pkg.id}`}
+                      className="btn btn-outline package-btn"
+                      aria-label={`${name} ${isEN ? 'scope quote' : 'kapsamı için teklif al'}`}
                     >
-                      {claimingReference === pkg.reference
-                        ? (isEN ? 'Adding...' : 'Ekleniyor...')
-                        : customer
-                          ? (isEN ? 'Claim Free' : 'Ücretsiz Satın Al')
-                          : (isEN ? 'Login to Claim' : 'Giriş Yap ve Al')}
-                      <HiOutlineArrowRight size={16} />
-                    </button>
-                  ) : (
-                    <a
-                      href={`https://wa.me/905067293423?text=${encodeURIComponent(isEN ? `Hi Kadir, I'm interested in the ${pkg.name} package. Can we talk?` : `Merhaba Kadir, ${pkg.name} paketi hakkında konuşmak istiyorum.`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`btn ${pkg.popular ? 'btn-primary' : 'btn-outline'} package-btn`}
-                      onClick={() => analytics.packageClick(pkg.name)}
-                    >
-                      {isEN ? "Let's Find Your Package" : 'Senin Paketini Seçelim'}
-                      <HiOutlineArrowRight size={16} />
-                    </a>
-                  )}
-                </motion.div>
-              </StaggerItem>
-            ))}
+                      {isEN ? 'Request a quote' : 'Teklif al'} <HiOutlineArrowRight size={16} />
+                    </Link>
+                  </motion.article>
+                </StaggerItem>
+              )
+            })}
           </StaggerContainer>
-          {claimMessage && (
-            <p className="package-claim-message">{claimMessage}</p>
-          )}
-
-          <FadeIn delay={0.4}>
-            <div className="packages-bottom-note">
-              <p>
-                {isEN
-                  ? "Not sure which one? That's fine — we'll figure it out in a 15-minute call."
-                  : 'Hangisi uygun emin değil misin? Normal — 15 dakikalık görüşmede birlikte belirleriz.'}
-              </p>
-              <a
-                href={`https://wa.me/905067293423?text=${encodeURIComponent(isEN ? 'Hi Kadir, I need help choosing a package.' : 'Merhaba Kadir, hangi paketi seçeceğime karar veremiyorum, yardımcı olur musun?')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary"
-              >
-                {isEN ? '15-min Free Call' : '15 Dk Ücretsiz Görüşme'}
-                <HiOutlineArrowRight size={16} />
-              </a>
-            </div>
-          </FadeIn>
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="section faq-section">
         <div className="container">
-          <div className="section-header">
-            <FadeIn>
-              <h2 className="section-title">
-                {t('packages.faqTitle')} <span>{t('packages.faqHighlight')}</span>
-              </h2>
-            </FadeIn>
+          <div className="section-header"><h2 className="section-title">{isEN ? 'Clear ' : 'Net '}<span>{isEN ? 'terms' : 'koşullar'}</span></h2></div>
+          <div className="faq-grid">
+            {FAQS.map((faq) => {
+              const [question, answer] = isEN ? faq.en : faq.tr
+              return <article className="faq-card glass-card" key={question}><h3>{question}</h3><p>{answer}</p></article>
+            })}
           </div>
-
-          <StaggerContainer className="faq-grid" staggerDelay={0.1}>
-            {faqs.map((faq) => (
-              <StaggerItem key={faq.q}>
-                <div className="faq-card glass-card">
-                  <h4>{faq.q}</h4>
-                  <p>{faq.a}</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
         </div>
       </section>
     </PageTransition>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useParams, Link, Navigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   HiOutlineArrowLeft,
@@ -20,6 +20,7 @@ import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Services.css'
+import NotFound from './NotFound'
 
 const servicesMap = {
   'sosyal-medya-yonetimi': {
@@ -150,7 +151,7 @@ export default function ServiceDetail() {
     return () => { document.getElementById('jsonld-breadcrumb')?.remove() }
   }, [service, slug, title])
 
-  if (!staticService) return <Navigate to="/hizmetler" replace />
+  if (!staticService) return <NotFound />
 
   const currentIdx = slugList.indexOf(slug)
   const prevSlug = currentIdx > 0 ? slugList[currentIdx - 1] : null

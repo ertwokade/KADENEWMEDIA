@@ -5,6 +5,10 @@ import { cors } from './_lib/cors.js'
 import { rateLimitCheck } from './_lib/rateLimit.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const QUOTE_SERVICES = new Set(['Sosyal Medya Yönetimi', 'İçerik Üretimi', 'Reklam Yönetimi', 'Video Prodüksiyon', 'Web Sitesi', 'Danışmanlık', 'Social Media Management', 'Content Production', 'Ads Management', 'Video Production', 'Website', 'Consulting'])
+const QUOTE_PLATFORMS = new Set(['Instagram', 'TikTok', 'LinkedIn', 'YouTube', 'Facebook', 'Google Ads'])
+const QUOTE_PACKAGES = new Set(['', 'baslangic', 'buyume', 'ozel'])
+const QUOTE_TIMELINES = new Set(['esnek', 'oncelikli'])
 
 function clean(value, max = 300) {
   return String(value || '').trim().slice(0, max)
@@ -27,26 +31,46 @@ async function handleQuotes(req, res, db) {
 
     const {
       name, email, phone, company, services, platforms, monthlyBudget,
-      contentCount, videoCount, adManagement, timeline, source, estimatedPrice, notes,
+      contentCount, videoCount, adManagement, timeline, source, notes, consent, package: packageId,
     } = req.body || {}
 
     if (!clean(name, 120) || !clean(email, 254)) return res.status(400).json({ error: 'Ad ve e-posta zorunludur.' })
     if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' })
+    if (consent !== true) return res.status(400).json({ error: 'Teklif talebi için KVKK onayı zorunludur.' })
+    if (String(name).trim().length > 120 || String(email).trim().length > 254 || String(phone || '').length > 30 || String(company || '').length > 120) {
+      return res.status(400).json({ error: 'İletişim alanlarından biri izin verilen uzunluğu aşıyor.' })
+    }
+    if (String(notes || '').length > 1200) return res.status(400).json({ error: 'Not alanı çok uzun (en fazla 1200 karakter).' })
+    if (!Array.isArray(services) || services.length < 1 || services.length > 12 || services.some(item => !QUOTE_SERVICES.has(String(item)))) {
+      return res.status(400).json({ error: 'Geçersiz hizmet seçimi.' })
+    }
+    if (!Array.isArray(platforms) || platforms.length < 1 || platforms.length > 12 || platforms.some(item => !QUOTE_PLATFORMS.has(String(item)))) {
+      return res.status(400).json({ error: 'Geçersiz platform seçimi.' })
+    }
+    if (!QUOTE_PACKAGES.has(clean(packageId, 40))) return res.status(400).json({ error: 'Geçersiz paket seçimi.' })
+    if (!QUOTE_TIMELINES.has(clean(timeline, 80))) return res.status(400).json({ error: 'Geçersiz takvim seçimi.' })
+
+    const safeBudget = monthlyBudget === '' || monthlyBudget == null ? 0 : Number(monthlyBudget)
+    const safeContentCount = contentCount === '' || contentCount == null ? 0 : Number(contentCount)
+    const safeVideoCount = videoCount === '' || videoCount == null ? 0 : Number(videoCount)
+    if (![safeBudget, safeContentCount, safeVideoCount].every(Number.isFinite) || safeBudget < 0 || safeBudget > 100000000 || safeContentCount < 0 || safeContentCount > 1000 || safeVideoCount < 0 || safeVideoCount > 1000) {
+      return res.status(400).json({ error: 'Geçersiz kapsam veya bütçe değeri.' })
+    }
 
     const quote = {
       name: clean(name, 120),
       email: clean(email, 254).toLowerCase(),
       phone: clean(phone, 30),
       company: clean(company, 120),
-      services: Array.isArray(services) ? services.slice(0, 12).map(s => clean(s, 80)) : [],
-      platforms: Array.isArray(platforms) ? platforms.slice(0, 12).map(s => clean(s, 80)) : [],
-      monthlyBudget: Number(monthlyBudget) || 0,
-      contentCount: Number(contentCount) || 0,
-      videoCount: Number(videoCount) || 0,
+      services: services.map(s => clean(s, 80)),
+      platforms: platforms.map(s => clean(s, 80)),
+      monthlyBudget: safeBudget,
+      contentCount: safeContentCount,
+      videoCount: safeVideoCount,
       adManagement: !!adManagement,
       timeline: clean(timeline, 80),
+      package: clean(packageId, 40),
       source: clean(source, 80) || 'online-quote',
-      estimatedPrice: Number(estimatedPrice) || 0,
       notes: clean(notes, 1200),
       status: 'yeni',
       createdAt: new Date(),
@@ -62,7 +86,7 @@ async function handleQuotes(req, res, db) {
       phone: quote.phone || '-',
       company: quote.company || '-',
       service: quote.services.join(', ') || 'Online Teklif',
-      message: `Online teklif talebi\nTahmini fiyat: ₺${quote.estimatedPrice.toLocaleString('tr-TR')}\nPlatformlar: ${quote.platforms.join(', ') || '-'}\nNot: ${quote.notes || '-'}`,
+      message: `Online teklif talebi\nKapsam: ${quote.package || 'Belirtilmedi'}\nPlatformlar: ${quote.platforms.join(', ') || '-'}\nNot: ${quote.notes || '-'}`,
       source: quote.source,
       status: 'yeni',
       read: false,

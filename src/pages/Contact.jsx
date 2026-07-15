@@ -3,43 +3,26 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   HiOutlineMail,
-  HiOutlinePhone,
   HiOutlineLocationMarker,
-  HiOutlineClock,
   HiOutlinePaperAirplane,
-  HiOutlineExternalLink,
   HiOutlineCheck,
 } from 'react-icons/hi'
-import { FaInstagram, FaYoutube, FaTiktok, FaWhatsapp, FaLinkedinIn } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { sendContactApi } from '../api'
 import { analytics } from '../utils/analytics'
 import { CONTACT } from '../utils/constants'
-import { BRAND } from '../config/brand'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Contact.css'
-
-// Marka/sosyal bilgisi merkezi config'ten (src/config/brand.js)
-const socials = [
-  { icon: FaInstagram, href: BRAND.social.instagram, label: 'Instagram' },
-  { icon: FaYoutube, href: BRAND.social.youtube, label: 'YouTube' },
-  { icon: FaTiktok, href: BRAND.social.tiktok, label: 'TikTok' },
-  { icon: FaLinkedinIn, href: BRAND.social.linkedin, label: 'LinkedIn' },
-  { icon: FaWhatsapp, href: CONTACT.whatsapp, label: 'WhatsApp' },
-]
-
-const MAPS_LINK = 'https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7'
-const MAPS_EMBED_URL = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3011.6317487673837!2d28.904168684884153!3d41.003986979300244!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa5307e731e3f%3A0x6b0e61f4c5c9a6e8!2sBiruni%20Teknopark!5e0!3m2!1str!2str!4v1714000000000!5m2!1str!2str'
 
 export default function Contact() {
   const { t } = useLanguage()
   const navigate = useNavigate()
   useSEO({
     title: 'İletişim | Teklif Alın',
-    description: 'Kade Media ile iletişime geçin. Sosyal medya yönetimi, dijital pazarlama veya içerik üretimi için ücretsiz teklif alın. İstanbul - Biruni Teknopark.',
+    description: 'Kade Media ile iletişime geçin. Sosyal medya yönetimi, dijital pazarlama veya içerik üretimi için teklif alın.',
     keywords: 'sosyal medya ajansı iletişim, dijital pazarlama teklif, sosyal medya yönetim teklifi, kade media iletişim',
     path: '/iletisim',
   })
@@ -107,7 +90,7 @@ export default function Contact() {
         const body = encodeURIComponent(
           `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.services.join(', ') || '-'}\n\nMesaj:\n${formData.message}`
         )
-        window.open(`mailto:hello@kademedia.com?subject=${subject}&body=${body}`, '_self')
+        window.open(`mailto:${CONTACT.email}?subject=${subject}&body=${body}`, '_self')
         setError(t('contact.fallbackMsg') || 'Sunucu şu an erişilemez. E-posta uygulamanız açılacak.')
       } else {
         setError(errorMsg || t('contact.errorMsg') || 'Mesaj gönderilemedi. Lütfen tekrar deneyin.')
@@ -126,21 +109,9 @@ export default function Contact() {
       link: `mailto:${CONTACT.email}`,
     },
     {
-      icon: HiOutlinePhone,
-      title: t('contact.phone'),
-      value: CONTACT.phoneDisplay,
-      link: `tel:${CONTACT.phone}`,
-    },
-    {
       icon: HiOutlineLocationMarker,
       title: t('contact.address'),
       value: CONTACT.address,
-      link: MAPS_LINK,
-    },
-    {
-      icon: HiOutlineClock,
-      title: t('contact.hours'),
-      value: t('contact.hoursValue'),
       link: null,
     },
   ]
@@ -207,25 +178,6 @@ export default function Contact() {
                 ))}
               </StaggerContainer>
 
-              <div className="contact-socials">
-                <span className="contact-social-label">{t('contact.socialMedia')}</span>
-                <div className="contact-social-links">
-                  {socials.map((social) => (
-                    <motion.a
-                      key={social.label}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="contact-social-link"
-                      aria-label={social.label}
-                      whileHover={{ scale: 1.1, y: -2 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <social.icon size={18} />
-                    </motion.a>
-                  ))}
-                </div>
-              </div>
             </FadeIn>
 
             <FadeIn direction="right" className="contact-form-wrapper">
@@ -394,38 +346,8 @@ export default function Contact() {
             </FadeIn>
           </div>
 
-          <FadeIn delay={0.3}>
-            <div className="contact-map-section">
-              <div className="contact-map-header">
-                <h3>
-                  <HiOutlineLocationMarker size={22} />
-                  {t('contact.locationTitle')}
-                </h3>
-                <a
-                  href={MAPS_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline map-directions-btn"
-                  onClick={() => analytics.mapDirections()}
-                >
-                  {t('contact.getDirections')}
-                  <HiOutlineExternalLink size={16} />
-                </a>
-              </div>
-              <div className="contact-map glass-card">
-                <iframe
-                  src={MAPS_EMBED_URL}
-                  width="100%"
-                  height="400"
-                  style={{ border: 0, borderRadius: '16px' }}
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Biruni Teknopark - Kade Media"
-                />
-              </div>
-            </div>
-          </FadeIn>
+          {/* Harita/adres bölümü kaldırıldı: doğrulanmış açık adres/harita verisi
+              yok (bkz. CONTENT_REQUIRED.md). Doğrulanınca yeniden eklenir. */}
         </div>
       </section>
     </PageTransition>

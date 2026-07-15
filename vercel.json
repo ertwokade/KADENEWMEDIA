@@ -29,8 +29,7 @@
     { "source": "/ekip", "destination": "/ekip.html" },
     { "source": "/kariyer", "destination": "/kariyer.html" },
     { "source": "/basin", "destination": "/basin.html" },
-    { "source": "/tesekkur", "destination": "/tesekkur.html" },
-    { "source": "/((?!api/).*)", "destination": "/app.html" }
+    { "source": "/tesekkur", "destination": "/tesekkur.html" }
   ],
   "headers": [
     {

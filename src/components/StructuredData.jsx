@@ -1,4 +1,6 @@
 import { useEffect } from 'react'
+import { BRAND } from '../config/brand'
+import { BASE_URL } from '../hooks/useSEO'
 
 function injectSchema(id, schema) {
   let el = document.getElementById(id)
@@ -22,71 +24,21 @@ export function OrganizationSchema() {
     injectSchema('schema-organization', {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'Kade Media',
-      alternateName: 'Kade Media Dijital Pazarlama',
-      url: 'https://kademedia.com.tr',
-      logo: 'https://kademedia.com.tr/logo.png',
-      sameAs: [
-        'https://instagram.com/kadenewmedia',
-        'https://www.youtube.com/@kadenewmedia',
-        'https://tiktok.com/@kadenewmedia',
-        'https://www.linkedin.com/company/kadenewmedia',
-      ],
+      name: BRAND.name,
+      url: BASE_URL,
+      logo: `${BASE_URL}/logo.png`,
+      email: BRAND.email,
       contactPoint: {
         '@type': 'ContactPoint',
-        telephone: '+90-506-729-34-23',
-        contactType: 'customer service',
+        email: BRAND.email,
+        contactType: 'sales',
         areaServed: 'TR',
-        availableLanguage: ['Turkish', 'English'],
+        availableLanguage: ['Turkish'],
       },
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Biruni Teknopark',
-        addressLocality: 'İstanbul',
-        addressRegion: 'İstanbul',
-        postalCode: '34010',
-        addressCountry: 'TR',
-      },
-    })
-
-    injectSchema('schema-local-business', {
-      '@context': 'https://schema.org',
-      '@type': 'LocalBusiness',
-      '@id': 'https://kademedia.com.tr/#business',
-      name: 'Kade Media',
-      description: 'İstanbul merkezli sosyal medya yönetimi, dijital pazarlama ve içerik üretimi ajansı.',
-      url: 'https://kademedia.com.tr',
-      telephone: '+90-506-729-34-23',
-      email: 'hello@kademedia.com',
-      priceRange: '₺₺₺',
-      image: 'https://kademedia.com.tr/logo.png',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Biruni Teknopark, Kazlıçeşme',
-        addressLocality: 'Zeytinburnu',
-        addressRegion: 'İstanbul',
-        postalCode: '34010',
-        addressCountry: 'TR',
-      },
-      geo: {
-        '@type': 'GeoCoordinates',
-        latitude: 41.004,
-        longitude: 28.906,
-      },
-      openingHoursSpecification: [
-        {
-          '@type': 'OpeningHoursSpecification',
-          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          opens: '09:00',
-          closes: '18:00',
-        },
-      ],
-      hasMap: 'https://maps.app.goo.gl/Zy5j7cpcwP5y99Wx7',
     })
 
     return () => {
       removeSchema('schema-organization')
-      removeSchema('schema-local-business')
     }
   }, [])
 
@@ -126,7 +78,7 @@ export function BreadcrumbSchema({ items }) {
         '@type': 'ListItem',
         position: i + 1,
         name: item.name,
-        item: `https://kademedia.com.tr${item.path}`,
+        item: `${BASE_URL}${item.path}`,
       })),
     })
     return () => removeSchema('schema-breadcrumb')
@@ -143,7 +95,7 @@ export function ArticleSchema({ title, description, image, datePublished, dateMo
       '@type': 'Article',
       headline: title,
       description,
-      image: image || 'https://kademedia.com.tr/logo.png',
+      image: image || `${BASE_URL}/logo.png`,
       datePublished,
       dateModified: dateModified || datePublished,
       author: {
@@ -153,7 +105,7 @@ export function ArticleSchema({ title, description, image, datePublished, dateMo
       publisher: {
         '@type': 'Organization',
         name: 'Kade Media',
-        logo: { '@type': 'ImageObject', url: 'https://kademedia.com.tr/logo.png' },
+        logo: { '@type': 'ImageObject', url: `${BASE_URL}/logo.png` },
       },
     })
     return () => removeSchema('schema-article')
@@ -170,11 +122,11 @@ export function ServiceSchema({ name, description, url }) {
       '@type': 'Service',
       name,
       description,
-      url: `https://kademedia.com.tr${url}`,
+      url: `${BASE_URL}${url}`,
       provider: {
         '@type': 'Organization',
         name: 'Kade Media',
-        url: 'https://kademedia.com.tr',
+        url: BASE_URL,
       },
       areaServed: {
         '@type': 'Country',

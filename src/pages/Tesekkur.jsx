@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import {
   HiOutlineCheckCircle,
   HiOutlineClock,
-  HiOutlinePhone,
+  HiOutlineMail,
   HiOutlineArrowRight,
 } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
@@ -17,15 +17,14 @@ import './Tesekkur.css'
 const DEFAULT_CONTENT = {
   baslik: 'Mesajınız iletildi!',
   altMetin: 'İletişim formunuzu aldık. Ekibimiz en kısa sürede sizinle iletişime geçecek.',
-  yanitSuresi: '2-4 saat',
-  yanitSuresiNot: 'Hafta içi 09:00–18:00',
+  yanitSuresi: '1 iş günü',
+  yanitSuresiNot: 'Talebin kapsamına göre değişebilir',
   adimlarBaslik: 'Bundan sonra ne olacak?',
-  acilBaslik: 'Acil görüşme mi istiyorsunuz?',
-  acilTelefon: CONTACT.phoneDisplay,
-  acilTelefonTel: CONTACT.phone,
+  acilBaslik: 'Ek bilgi paylaşmak ister misiniz?',
+  acilEmail: CONTACT.email,
   adimlar: [
-    { ikon: '📬', baslik: 'Onay E-postası', aciklama: 'Formunuz alındı. Birkaç dakika içinde otomatik bir onay e-postası alacaksınız.' },
-    { ikon: '👤', baslik: 'Uzman Eşleştirme', aciklama: '1 iş günü içinde sektörünüze uygun bir uzmanımız sizinle iletişime geçecek.' },
+    { ikon: '📬', baslik: 'Talep Kaydı', aciklama: 'Formunuz sunucu tarafından alındı ve değerlendirme sırasına eklendi.' },
+    { ikon: '👤', baslik: 'İhtiyaç İncelemesi', aciklama: 'Paylaştığınız kapsam ekip tarafından incelenecek.' },
     { ikon: '📋', baslik: 'Strateji Görüşmesi', aciklama: '30 dakikalık ücretsiz keşif görüşmesinde ihtiyaçlarınızı birlikte değerlendireceğiz.' },
     { ikon: '🚀', baslik: 'Özel Teklif', aciklama: 'Görüşmenin ardından size özel bir paket ve fiyat teklifi sunulacak.' },
   ],
@@ -131,10 +130,10 @@ export default function Tesekkur() {
 
           <FadeIn delay={0.5}>
             <div className="tesekkur-acil glass-card">
-              <HiOutlinePhone size={20} />
+              <HiOutlineMail size={20} />
               <div>
                 <strong>{content.acilBaslik}</strong>
-                <p>Bizi hemen arayın: <a href={`tel:${content.acilTelefonTel}`}>{content.acilTelefon}</a></p>
+                <p><a href={`mailto:${content.acilEmail || CONTACT.email}`}>{content.acilEmail || CONTACT.email}</a></p>
               </div>
             </div>
           </FadeIn>

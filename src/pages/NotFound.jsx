@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlineHome, HiOutlineArrowRight, HiOutlineSearch } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -11,9 +11,6 @@ import './NotFound.css'
 const populerSayfalar = [
   { yol: '/hizmetler', etiket: '📋 Hizmetler' },
   { yol: '/paketler', etiket: '💰 Paketler' },
-  { yol: '/blog', etiket: '📝 Blog' },
-  { yol: '/partnerler', etiket: '🤝 Partnerler' },
-  { yol: '/referanslar', etiket: '⭐ Referanslar' },
   { yol: '/sss', etiket: '❓ SSS' },
   { yol: '/iletisim', etiket: '✉️ İletişim' },
   { yol: '/roi-hesaplayici', etiket: '📊 ROI Hesaplayıcı' },
@@ -22,12 +19,13 @@ const populerSayfalar = [
 export default function NotFound() {
   const { lang } = useLanguage()
   const navigate = useNavigate()
+  const location = useLocation()
   const [arama, setArama] = useState('')
 
   useSEO({
     title: lang === 'tr' ? 'Sayfa Bulunamadı | Kade Media' : 'Page Not Found | Kade Media',
     description: lang === 'tr' ? 'Aradığınız sayfa bulunamadı.' : 'The page you are looking for was not found.',
-    path: '/404',
+    path: location.pathname,
     noindex: true,
   })
 
@@ -90,8 +88,9 @@ export default function NotFound() {
               value={arama}
               onChange={(e) => setArama(e.target.value)}
               className="notfound-arama-input"
+              aria-label={lang === 'tr' ? 'Site içinde ara' : 'Search the site'}
             />
-            <button type="submit" className="notfound-arama-btn">
+            <button type="submit" className="notfound-arama-btn" aria-label={lang === 'tr' ? 'Ara' : 'Search'}>
               <HiOutlineSearch size={18} />
             </button>
           </motion.form>
