@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -11,52 +10,29 @@ import {
 } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
-import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
-import ProgressTimeline from '../components/ProgressTimeline'
 import './About.css'
 
+// Placeholder ekip isimleri kaldırıldı (bkz. CONTENT_REQUIRED.md). Yalnızca
+// doğrulanabilir kurucu; gerçek ekip admin/content'ten gelir.
 const defaultTeam = [
   { name: 'Kadir Demir', roleTr: 'Kurucu & CEO', roleEn: 'Founder & CEO', color: '#eac321', avatar: '/kadir.jpg' },
-  { name: 'Ayşe Yılmaz', roleTr: 'Kreatif Direktör', roleEn: 'Creative Director', color: '#eac321' },
-  { name: 'Mehmet Kaya', roleTr: 'Sosyal Medya Yöneticisi', roleEn: 'Social Media Manager', color: '#eac321' },
-  { name: 'Zeynep Demir', roleTr: 'İçerik Stratejisti', roleEn: 'Content Strategist', color: '#eac321' },
 ]
 
-const defaultStats = { experience: '3+', teamSize: '4+', clients: '20+' }
+const defaultStats = { experience: '—', teamSize: '—', clients: '—' }
 
 export default function About() {
   const { t, lang } = useLanguage()
-  const [aboutData, setAboutData] = useState(null)
-
-  useEffect(() => {
-    getContentApi('about')
-      .then((res) => {
-        if (res && res.data) setAboutData(res.data)
-      })
-      .catch(() => {})
-  }, [])
-
-  const team = aboutData?.team?.length
-    ? aboutData.team.map((m) => ({ ...m, color: '#eac321' }))
-    : defaultTeam
-  const stats = {
-    experience: aboutData?.experience || defaultStats.experience,
-    teamSize: aboutData?.teamSize || defaultStats.teamSize,
-    clients: aboutData?.clients || defaultStats.clients,
-  }
-  const storyP1 = aboutData
-    ? (lang === 'en' ? aboutData.storyEn : aboutData.storyTr) || t('about.storyP1')
-    : t('about.storyP1')
-  const storyP2 = aboutData
-    ? (lang === 'en' ? aboutData.missionEn : aboutData.missionTr) || t('about.storyP2')
-    : t('about.storyP2')
+  const team = defaultTeam
+  const stats = defaultStats
+  const storyP1 = t('about.storyP1')
+  const storyP2 = t('about.storyP2')
   useSEO({
     title: 'Hakkımızda | İstanbul Sosyal Medya Ajansı',
-    description: 'Kade Media, İstanbul Biruni Teknopark\'ta kurulu sosyal medya ve dijital pazarlama ajansı. Ekibimiz, vizyonumuz ve değerlerimiz hakkında bilgi edinin.',
-    keywords: 'kade media hakkında, sosyal medya ajansı istanbul, dijital ajans ekibi, biruni teknopark ajans, kademedia',
+    description: 'Kade Media yaklaşımı, hizmet anlayışı ve değerleri hakkında bilgi edinin.',
+    keywords: 'kade media hakkında, sosyal medya ajansı istanbul, dijital ajans',
     path: '/hakkimizda',
   })
 
@@ -256,27 +232,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Growth Timeline */}
-      <section className="section">
-        <div className="container">
-          <div className="section-header">
-            <FadeIn>
-              <div className="section-badge">
-                <HiOutlineLightBulb size={14} />
-                {lang === 'en' ? 'Our Journey' : 'Büyüme Hikayemiz'}
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h2 className="section-title">
-                {lang === 'en' ? <>From <span>Day One</span> to Today</> : <><span>Başlangıçtan</span> Bugüne</>}
-              </h2>
-            </FadeIn>
-          </div>
-          <FadeIn delay={0.2}>
-            <ProgressTimeline />
-          </FadeIn>
-        </div>
-      </section>
     </PageTransition>
   )
 }

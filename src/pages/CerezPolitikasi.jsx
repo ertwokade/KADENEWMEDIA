@@ -2,6 +2,7 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import './Legal.css'
+import { BRAND } from '../config/brand'
 
 export default function CerezPolitikasi() {
   useSEO({
@@ -18,7 +19,7 @@ export default function CerezPolitikasi() {
           <FadeIn>
             <div className="legal-content glass-card">
               <h1>Çerez Politikası</h1>
-              <p className="legal-date">Son güncelleme: Mart 2026</p>
+              <p className="legal-date">Son güncelleme: Temmuz 2026</p>
 
               <h2>1. Çerez Nedir?</h2>
               <p>
@@ -64,15 +65,15 @@ export default function CerezPolitikasi() {
 
               <h2>4. Üçüncü Taraf Çerezler</h2>
               <p>
-                Web sitemizde Google Maps (harita gösterimi) ve Google Analytics (trafik analizi)
-                hizmetleri kullanılmaktadır. Bu hizmetler kendi çerez politikalarına tabidir.
+                Analitik izni verdiğinizde Google Analytics kullanılabilir. Bu hizmetin
+                yerleştirdiği çerezler sağlayıcının kendi politikalarına tabidir.
               </p>
 
               <h2>5. İletişim</h2>
               <p>
                 Çerez politikamızla ilgili sorularınız için:{' '}
-                <a href="mailto:hello@kademedia.com" style={{ color: 'var(--primary)' }}>
-                  hello@kademedia.com
+                <a href={`mailto:${BRAND.email}`} style={{ color: 'var(--primary)' }}>
+                  {BRAND.email}
                 </a>
               </p>
             </div>

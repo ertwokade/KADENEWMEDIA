@@ -5,7 +5,6 @@ import { HiOutlineHome, HiOutlineArrowRight, HiOutlineSearch } from 'react-icons
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
-import CatcherGame from '../components/CatcherGame'
 import './NotFound.css'
 
 const populerSayfalar = [
@@ -13,7 +12,6 @@ const populerSayfalar = [
   { yol: '/paketler', etiket: '💰 Paketler' },
   { yol: '/sss', etiket: '❓ SSS' },
   { yol: '/iletisim', etiket: '✉️ İletişim' },
-  { yol: '/roi-hesaplayici', etiket: '📊 ROI Hesaplayıcı' },
 ]
 
 export default function NotFound() {
@@ -129,17 +127,6 @@ export default function NotFound() {
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            style={{ marginTop: 48 }}
-          >
-            <p className="notfound-populer-baslik" style={{ textAlign: 'center' }}>
-              {lang === 'tr' ? 'Canın sıkıldıysa mini oyun 🎮' : 'A little mini game while you wait 🎮'}
-            </p>
-            <CatcherGame />
-          </motion.div>
         </div>
       </section>
     </PageTransition>

@@ -6,6 +6,14 @@ const DIST = new URL('../dist/', import.meta.url)
 const template = await readFile(new URL('app.html', DIST), 'utf8')
 
 const routes = [
+  ['/hakkimizda', 'Hakkımızda | Kade Media', 'Kade Media yaklaşımı ve çalışma ilkeleri.', false],
+  ['/hizmetler', 'Hizmetler | Kade Media', 'Kade Media dijital pazarlama hizmet kapsamları.', false],
+  ['/iletisim', 'İletişim | Kade Media', 'Kade Media ile doğrulanmış e-posta kanalı üzerinden iletişime geçin.', false],
+  ['/paketler', 'Hizmet Kapsamları | Kade Media', 'İhtiyacınıza göre şekillenen hizmet kapsamlarını inceleyin.', false],
+  ['/sss', 'Sık Sorulan Sorular | Kade Media', 'Kade Media çalışma süreci hakkında sık sorulan sorular.', false],
+  ['/ekip', 'Ekip | Kade Media', 'Kade Media ekip sayfası.', false],
+  ['/kariyer', 'Kariyer | Kade Media', 'Kade Media kariyer ve başvuru bilgileri.', false],
+  ['/tesekkur', 'Talebiniz Alındı | Kade Media', 'Talebinizin kaydedildiğine ilişkin bilgilendirme.', true],
   ['/portfolio', 'Portfolyo | Kade Media', 'Onaylı proje detayları müşteri izniyle yayınlanır.', true],
   ['/partnerler', 'İş Ortakları | Kade Media', 'Doğrulanmış Kade Media iş ortaklığı bilgileri.', true],
   ['/blog', 'İçgörüler | Kade Media', 'Kaynağı kontrol edilmiş Kade Media yazıları.', true],
@@ -22,7 +30,6 @@ const routes = [
   ['/organizasyon-kiti/plan/fractional-new-media-director', 'Danışmanlık Planı | Kade Media', 'Korumalı müşteri çalışma alanı.', true],
   ['/kade-kit-business', 'Kade Kit Business | Kade Media', 'Korumalı müşteri çalışma alanı.', true],
   ['/proje-takip', 'Proje Takip | Kade Media', 'Korumalı müşteri çalışma alanı.', true],
-  ['/links', 'Kade Media Bağlantıları', 'Kade Media bağlantı sayfası.', true],
   ['/hizmetler/sosyal-medya-yonetimi', 'Sosyal Medya Yönetimi | Kade Media', 'Sosyal medya yönetimi hizmet kapsamı.', false],
   ['/hizmetler/icerik-uretimi', 'İçerik Üretimi | Kade Media', 'İçerik üretimi hizmet kapsamı.', false],
   ['/hizmetler/reklam-yonetimi', 'Reklam Yönetimi | Kade Media', 'Dijital reklam yönetimi hizmet kapsamı.', false],

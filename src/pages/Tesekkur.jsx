@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -8,7 +8,6 @@ import {
   HiOutlineArrowRight,
 } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
-import { getContentApi } from '../api'
 import { CONTACT } from '../utils/constants'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
@@ -25,7 +24,7 @@ const DEFAULT_CONTENT = {
   adimlar: [
     { ikon: '📬', baslik: 'Talep Kaydı', aciklama: 'Formunuz sunucu tarafından alındı ve değerlendirme sırasına eklendi.' },
     { ikon: '👤', baslik: 'İhtiyaç İncelemesi', aciklama: 'Paylaştığınız kapsam ekip tarafından incelenecek.' },
-    { ikon: '📋', baslik: 'Strateji Görüşmesi', aciklama: '30 dakikalık ücretsiz keşif görüşmesinde ihtiyaçlarınızı birlikte değerlendireceğiz.' },
+    { ikon: '📋', baslik: 'Kapsam Görüşmesi', aciklama: 'Gerekli görülürse ihtiyaçlarınızı değerlendirmek için bir görüşme planlanacak.' },
     { ikon: '🚀', baslik: 'Özel Teklif', aciklama: 'Görüşmenin ardından size özel bir paket ve fiyat teklifi sunulacak.' },
   ],
 }
@@ -40,7 +39,7 @@ function splitTitle(baslik) {
 }
 
 export default function Tesekkur() {
-  const [content, setContent] = useState(DEFAULT_CONTENT)
+  const content = DEFAULT_CONTENT
 
   useSEO({
     title: 'Teşekkürler | Kade Media',
@@ -55,24 +54,6 @@ export default function Tesekkur() {
         send_to: 'AW-CONVERSION_ID/CONVERSION_LABEL',
       })
     }
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    getContentApi('tesekkur')
-      .then(res => {
-        if (cancelled) return
-        const data = res?.data || res
-        if (data && typeof data === 'object') {
-          setContent(prev => ({
-            ...prev,
-            ...data,
-            adimlar: Array.isArray(data.adimlar) && data.adimlar.length ? data.adimlar : prev.adimlar,
-          }))
-        }
-      })
-      .catch(() => {})
-    return () => { cancelled = true }
   }, [])
 
   const { before, highlight } = splitTitle(content.baslik)

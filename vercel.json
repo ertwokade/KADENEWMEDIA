@@ -19,17 +19,7 @@
   ],
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/", "destination": "/site.html" },
-    { "source": "/hakkimizda", "destination": "/hakkimizda.html" },
-    { "source": "/hizmetler", "destination": "/hizmetler.html" },
-    { "source": "/iletisim", "destination": "/iletisim.html" },
-    { "source": "/paketler", "destination": "/paketler.html" },
-    { "source": "/sss", "destination": "/sss.html" },
-    { "source": "/neden-biz", "destination": "/neden-biz.html" },
-    { "source": "/ekip", "destination": "/ekip.html" },
-    { "source": "/kariyer", "destination": "/kariyer.html" },
-    { "source": "/basin", "destination": "/basin.html" },
-    { "source": "/tesekkur", "destination": "/tesekkur.html" }
+    { "source": "/", "destination": "/site.html" }
   ],
   "headers": [
     {

@@ -2,6 +2,7 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import './Legal.css'
+import { BRAND } from '../config/brand'
 
 export default function KVKK() {
   useSEO({
@@ -18,12 +19,12 @@ export default function KVKK() {
           <FadeIn>
             <div className="legal-content glass-card">
               <h1>KVKK Aydınlatma Metni</h1>
-              <p className="legal-date">Son güncelleme: Mart 2026</p>
+              <p className="legal-date">Son güncelleme: Temmuz 2026</p>
 
               <h2>1. Veri Sorumlusu</h2>
               <p>
                 Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca
-                <strong> Kade Media</strong> (Biruni Teknopark, Zeytinburnu/İstanbul) tarafından,
+                <strong> Kade Media</strong> tarafından,
                 veri sorumlusu sıfatıyla hazırlanmıştır.
               </p>
 
@@ -76,7 +77,7 @@ export default function KVKK() {
 
               <h2>7. İletişim</h2>
               <p>
-                Haklarınıza ilişkin taleplerinizi <strong>hello@kademedia.com</strong> adresine
+                Haklarınıza ilişkin taleplerinizi <strong>{BRAND.email}</strong> adresine
                 e-posta göndererek iletebilirsiniz.
               </p>
             </div>

@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { HiOutlineUserGroup } from 'react-icons/hi'
 import { FaLinkedinIn, FaInstagram } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
-import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -30,7 +28,6 @@ const socialIcons = { linkedin: FaLinkedinIn, instagram: FaInstagram }
 
 export default function Team() {
   const { lang } = useLanguage()
-  const [teamData, setTeamData] = useState(null)
 
   useSEO({
     title: lang === 'tr' ? 'Ekibimiz | Kade Media' : 'Our Team | Kade Media',
@@ -40,17 +37,7 @@ export default function Team() {
     path: '/ekip',
   })
 
-  useEffect(() => {
-    getContentApi('about')
-      .then(res => {
-        if (res?.data?.team?.length) setTeamData(res.data.team)
-      })
-      .catch(() => {})
-  }, [])
-
-  const team = teamData
-    ? teamData.map((m, i) => ({ ...defaultTeam[i], ...m, color: defaultTeam[i]?.color || '#eac321' }))
-    : defaultTeam
+  const team = defaultTeam
 
   return (
     <PageTransition>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -16,7 +16,6 @@ import {
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
-import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import './Services.css'
@@ -96,27 +95,8 @@ const slugList = Object.keys(servicesMap)
 export default function ServiceDetail() {
   const { slug } = useParams()
   const { lang } = useLanguage()
-  const [dynamicServices, setDynamicServices] = useState(null)
-
-  useEffect(() => {
-    getContentApi('services')
-      .then(res => { if (res?.data?.items?.length) setDynamicServices(res.data.items) })
-      .catch(() => {})
-  }, [])
-
   const staticService = servicesMap[slug]
-  const slugIdx = slugList.indexOf(slug)
-  const dynamic = dynamicServices?.[slugIdx]
-
-  const service = useMemo(() => staticService ? {
-    ...staticService,
-    titleTr: dynamic?.titleTr || staticService.titleTr,
-    titleEn: dynamic?.titleEn || staticService.titleEn,
-    descTr: dynamic?.descTr || staticService.descTr,
-    descEn: dynamic?.descEn || staticService.descEn,
-    featuresTr: dynamic?.featuresTr ? (typeof dynamic.featuresTr === 'string' ? dynamic.featuresTr.split(',').map(s => s.trim()).filter(Boolean) : dynamic.featuresTr) : staticService.featuresTr,
-    featuresEn: dynamic?.featuresEn ? (typeof dynamic.featuresEn === 'string' ? dynamic.featuresEn.split(',').map(s => s.trim()).filter(Boolean) : dynamic.featuresEn) : staticService.featuresEn,
-  } : null, [staticService, dynamic])
+  const service = useMemo(() => staticService || null, [staticService])
 
   const title = service ? (lang === 'tr' ? service.titleTr : service.titleEn) : ''
   const desc = service ? (lang === 'tr' ? service.descTr : service.descEn) : ''
@@ -126,7 +106,7 @@ export default function ServiceDetail() {
     title: title ? `${title} | Kade Media` : 'Hizmet | Kade Media',
     description: desc,
     path: `/hizmetler/${slug}`,
-    image: 'https://kademedia.com.tr/og-services.png',
+    image: 'https://www.kademedia.com.tr/og-services.png',
   })
 
   useEffect(() => {
@@ -135,9 +115,9 @@ export default function ServiceDetail() {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://kademedia.com.tr' },
-        { '@type': 'ListItem', position: 2, name: 'Hizmetler', item: 'https://kademedia.com.tr/hizmetler' },
-        { '@type': 'ListItem', position: 3, name: title, item: `https://kademedia.com.tr/hizmetler/${slug}` },
+        { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://www.kademedia.com.tr' },
+        { '@type': 'ListItem', position: 2, name: 'Hizmetler', item: 'https://www.kademedia.com.tr/hizmetler' },
+        { '@type': 'ListItem', position: 3, name: title, item: `https://www.kademedia.com.tr/hizmetler/${slug}` },
       ],
     }
     let el = document.getElementById('jsonld-breadcrumb')
@@ -237,12 +217,12 @@ export default function ServiceDetail() {
               </h3>
               <p style={{ color: 'var(--text-secondary)', maxWidth: 440, margin: '0 auto 24px', lineHeight: 1.6 }}>
                 {lang === 'tr'
-                  ? 'Ücretsiz keşif görüşmesiyle markanız için özel bir strateji oluşturalım.'
-                  : "Let's create a custom strategy for your brand with a free discovery call."}
+                  ? 'İhtiyacınızı paylaşın; kapsamı ve çalışma koşullarını yazılı teklifte netleştirelim.'
+                  : "Share your needs; we'll clarify scope and terms in a written proposal."}
               </p>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Link to="/iletisim" className="btn btn-primary">
-                  {lang === 'tr' ? 'Ücretsiz Görüşme Al' : 'Get Free Consultation'}
+                  {lang === 'tr' ? 'Teklif İste' : 'Request a Proposal'}
                   <HiOutlineArrowRight size={16} />
                 </Link>
                 <Link to="/paketler" className="btn btn-outline">

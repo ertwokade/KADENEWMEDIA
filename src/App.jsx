@@ -15,6 +15,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import NotificationPrompt from './components/NotificationPrompt'
 import OrganizationKitGuard from './components/OrganizationKitGuard'
 import KadeKitBusinessGuard from './components/KadeKitBusinessGuard'
+import CustomerRouteGuard from './components/CustomerRouteGuard'
 
 // Core pages — direct import for instant first render
 import Home from './pages/Home'
@@ -42,8 +43,6 @@ const Admin = lazy(() => import('./pages/Admin'))
 const SSS = lazy(() => import('./pages/SSS'))
 const Referanslar = lazy(() => import('./pages/Referanslar'))
 const Tesekkur = lazy(() => import('./pages/Tesekkur'))
-const Basin = lazy(() => import('./pages/Basin'))
-const NedenBiz = lazy(() => import('./pages/NedenBiz'))
 const QuoteRequest = lazy(() => import('./pages/QuoteRequest'))
 const CustomerPortal = lazy(() => import('./pages/CustomerPortal'))
 const Login = lazy(() => import('./pages/Login'))
@@ -52,7 +51,6 @@ const OrganizationKitDashboard = lazy(() => import('./pages/OrganizationKitDashb
 const OrganizationKitPlan = lazy(() => import('./pages/OrganizationKitPlan'))
 const OrganizationKitSection = lazy(() => import('./pages/OrganizationKitSection'))
 const KadeKitBusinessStudio = lazy(() => import('./pages/KadeKitBusinessStudio'))
-const KadeLinks = lazy(() => import('./pages/KadeLinks'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -112,19 +110,13 @@ const ROUTE_THEMES = {
   '/iletisim': 'contact',
   '/sss': 'contact',
   '/referanslar': 'about',
-  '/basin': 'blog',
-  '/neden-biz': 'services',
   '/tesekkur': 'contact',
-  '/referans-programi': 'partners',
   '/teklif-al': 'contact',
-  '/fiyat-hesaplama': 'packages',
   '/giris': 'about',
   '/musteri-panel': 'about',
   '/organizasyon-kiti': 'about',
   '/kade-kit-business': 'services',
   '/proje-takip': 'services',
-  '/podcast-webinar': 'blog',
-  '/bulten-arsivi': 'blog',
 }
 
 function getCanvasTheme(pathname) {
@@ -141,8 +133,7 @@ function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
   const isHome = location.pathname === '/'
-  const isKadeLinks = location.pathname === '/links'
-  const hideShell = isAdmin || isHome || isKadeLinks
+  const hideShell = isAdmin || isHome
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 
@@ -216,8 +207,6 @@ function App() {
         <Route path="/sss" element={<LazyRoute><SSS /></LazyRoute>} />
         <Route path="/referanslar" element={<LazyRoute><Referanslar /></LazyRoute>} />
         <Route path="/tesekkur" element={<LazyRoute><Tesekkur /></LazyRoute>} />
-        <Route path="/basin" element={<LazyRoute><Basin /></LazyRoute>} />
-        <Route path="/neden-biz" element={<LazyRoute><NedenBiz /></LazyRoute>} />
         <Route path="/teklif-al" element={<LazyRoute><QuoteRequest /></LazyRoute>} />
         <Route path="/giris" element={<LazyRoute><Login /></LazyRoute>} />
         <Route path="/musteri-panel" element={<LazyRoute><CustomerPortal /></LazyRoute>} />
@@ -225,8 +214,8 @@ function App() {
         <Route path="/organizasyon-kiti/plan/fractional-new-media-director" element={<LazyRoute><OrganizationKitGuard><OrganizationKitPlan /></OrganizationKitGuard></LazyRoute>} />
         <Route path="/organizasyon-kiti/:section" element={<LazyRoute><OrganizationKitGuard><OrganizationKitSection /></OrganizationKitGuard></LazyRoute>} />
         <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
-        <Route path="/proje-takip" element={<LazyRoute><ProjectTracking /></LazyRoute>} />
-        <Route path="/links" element={<LazyRoute><KadeLinks /></LazyRoute>} />
+        <Route path="/proje-takip" element={<LazyRoute><CustomerRouteGuard><ProjectTracking /></CustomerRouteGuard></LazyRoute>} />
+        <Route path="/links" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
         <Route path="/kadelinks" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

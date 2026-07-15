@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   HiOutlineGlobe,
@@ -14,31 +13,13 @@ import {
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
-import { getContentApi } from '../api'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Services.css'
 
-const iconMap = {
-  HiOutlineGlobe, HiOutlineLightningBolt, HiOutlineChartBar,
-  HiOutlineCamera, HiOutlineFilm, HiOutlineChatAlt2,
-  HiOutlinePencilAlt, HiOutlineSpeakerphone, HiOutlineCode,
-}
-
-const platformMap = { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } // eslint-disable-line no-unused-vars
-
 export default function Services() {
   const { t, lang } = useLanguage()
-  const [dynamicServices, setDynamicServices] = useState(null)
-
-  useEffect(() => {
-    getContentApi('services')
-      .then(res => {
-        if (res?.data?.items?.length) setDynamicServices(res.data.items)
-      })
-      .catch(() => {})
-  }, [])
   useSEO({
     title: 'Hizmetlerimiz | Sosyal Medya Ajansı Hizmetleri | Kade Media',
     description: 'Profesyonel sosyal medya yönetimi, içerik üretimi, Meta & Google reklam yönetimi, influencer marketing ve video prodüksiyon. İstanbul sosyal medya ajansı Kade Media ile markanızı büyütün.',
@@ -46,9 +27,7 @@ export default function Services() {
     path: '/hizmetler',
   })
 
-  const defaultIcons = [HiOutlineGlobe, HiOutlinePencilAlt, HiOutlineChartBar, HiOutlineFilm, HiOutlineChatAlt2, HiOutlineCode]
-
-  const defaultServices = [
+  const services = [
     {
       icon: HiOutlineGlobe,
       title: t('services.smm'),
@@ -92,17 +71,6 @@ export default function Services() {
       platforms: [FaInstagram, FaLinkedinIn],
     },
   ]
-
-  // Map dynamic services from admin API, falling back to default
-  const services = dynamicServices
-    ? dynamicServices.map((item, i) => ({
-        icon: iconMap[item.icon] || defaultIcons[i % defaultIcons.length],
-        title: lang === 'en' ? (item.titleEn || item.titleTr) : (item.titleTr || item.titleEn),
-        desc: lang === 'en' ? (item.descEn || item.descTr) : (item.descTr || item.descEn),
-        features: ((lang === 'en' ? item.featuresEn : item.featuresTr) || '').split(',').map(f => f.trim()).filter(Boolean),
-        platforms: [FaInstagram, FaTiktok, FaYoutube],
-      }))
-    : defaultServices
 
   const process = [
     { step: '01', title: t('services.processStep1'), desc: t('services.processStep1Desc') },

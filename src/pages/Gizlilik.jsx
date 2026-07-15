@@ -2,6 +2,7 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import './Legal.css'
+import { BRAND } from '../config/brand'
 
 export default function Gizlilik() {
   useSEO({
@@ -18,7 +19,7 @@ export default function Gizlilik() {
           <FadeIn>
             <div className="legal-content glass-card">
               <h1>Gizlilik Politikası</h1>
-              <p className="legal-date">Son güncelleme: Mart 2026</p>
+              <p className="legal-date">Son güncelleme: Temmuz 2026</p>
 
               <h2>1. Genel Bilgi</h2>
               <p>
@@ -68,16 +69,16 @@ export default function Gizlilik() {
 
               <h2>7. Üçüncü Taraf Hizmetler</h2>
               <p>
-                Web sitemiz Google Analytics (anonim trafik analizi) ve Google Maps
-                (harita gösterimi) hizmetlerini kullanabilir. Bu hizmetlerin gizlilik
+                Web sitemiz, yalnızca analitik izni verildiğinde Google Analytics
+                hizmetini kullanabilir. Bu hizmetin gizlilik
                 politikaları için ilgili sağlayıcıların sitelerini inceleyiniz.
               </p>
 
               <h2>8. İletişim</h2>
               <p>
                 Gizlilik politikamızla ilgili sorularınız için:{' '}
-                <a href="mailto:hello@kademedia.com" style={{ color: 'var(--primary)' }}>
-                  hello@kademedia.com
+                <a href={`mailto:${BRAND.email}`} style={{ color: 'var(--primary)' }}>
+                  {BRAND.email}
                 </a>
               </p>
             </div>
