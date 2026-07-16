@@ -33,6 +33,10 @@ const servicesMap = {
     featuresEn: ['Content Calendar Creation', 'Community Management', 'Crisis Management', 'Monthly Reporting', 'Hashtag Strategy', 'Competitor Analysis'],
     platforms: [FaInstagram, FaFacebookF, FaTiktok, FaLinkedinIn],
     color: '#eac321',
+    problemTr: 'Düzensiz paylaşım ve tutarsız marka sesi, sosyal medyada görünürlüğü ve güveni düşürür. Planlı, tutarlı bir yayın akışıyla bunu çözeriz.',
+    problemEn: 'Irregular posting and an inconsistent brand voice reduce visibility and trust. We fix this with a planned, consistent publishing flow.',
+    deliverablesTr: ['Aylık içerik takvimi', 'Yayın ve topluluk yönetimi', 'Aylık performans raporu'],
+    deliverablesEn: ['Monthly content calendar', 'Publishing and community management', 'Monthly performance report'],
   },
   'icerik-uretimi': {
     icon: HiOutlinePencilAlt,
@@ -44,6 +48,10 @@ const servicesMap = {
     featuresEn: ['Graphic Design', 'Copywriting', 'Brand Identity', 'Content Strategy', 'Photography', 'Story Designs'],
     platforms: [FaInstagram, FaTiktok, FaYoutube],
     color: '#E91E63',
+    problemTr: 'Çoğu marka “ne paylaşacağını” bulmakta zorlanır. Marka diline uygun, ölçekli bir içerik hattı kurarak bu boşluğu doldururuz.',
+    problemEn: 'Most brands struggle to decide what to post. We fill that gap by building an on-brand, scalable content pipeline.',
+    deliverablesTr: ['İçerik konsepti ve şablonlar', 'Görsel, video ve metin üretimi', 'Marka kimliği tutarlılığı'],
+    deliverablesEn: ['Content concept and templates', 'Visual, video and copy production', 'Brand identity consistency'],
   },
   'reklam-yonetimi': {
     icon: HiOutlineChartBar,
@@ -55,6 +63,10 @@ const servicesMap = {
     featuresEn: ['Meta Ads', 'Google Ads', 'TikTok Ads', 'A/B Testing', 'Retargeting', 'Performance Analysis'],
     platforms: [FaFacebookF, FaInstagram, FaTiktok],
     color: '#6C63FF',
+    problemTr: 'Yanlış hedefleme ve ölçümsüz kampanyalar bütçeyi tüketir. Veriyle hedefler, test eder ve bütçeyi verimli kullanırız.',
+    problemEn: 'Poor targeting and unmeasured campaigns burn budget. We target with data, test, and spend efficiently.',
+    deliverablesTr: ['Kampanya kurulumu ve hedefleme', 'A/B testleri ve optimizasyon', 'Şeffaf performans raporu'],
+    deliverablesEn: ['Campaign setup and targeting', 'A/B tests and optimization', 'Transparent performance report'],
   },
   'video-produksiyon': {
     icon: HiOutlineFilm,
@@ -66,6 +78,10 @@ const servicesMap = {
     featuresEn: ['Reels & TikTok', 'YouTube Content', 'Commercials', 'Motion Graphics', 'Drone Footage', 'Scriptwriting'],
     platforms: [FaInstagram, FaTiktok, FaYoutube],
     color: '#FF5722',
+    problemTr: 'Dikkat süresi kısa; sıradan video iş görmez. Platforma özel, performans için tasarlanmış video üretiriz.',
+    problemEn: 'Attention spans are short; generic video does not work. We produce platform-native video designed for performance.',
+    deliverablesTr: ['Senaryo ve çekim planı', 'Çekim, kurgu ve motion', 'Platforma özel formatlar'],
+    deliverablesEn: ['Script and shoot plan', 'Filming, editing and motion', 'Platform-specific formats'],
   },
   'strateji-danismanlik': {
     icon: HiOutlineChatAlt2,
@@ -77,6 +93,10 @@ const servicesMap = {
     featuresEn: ['Brand Analysis', 'Competitor Analysis', 'Strategy Plan', 'KPI Setting', 'Growth Strategy', 'Market Research'],
     platforms: [FaLinkedinIn, FaInstagram, FaFacebookF],
     color: '#00BCD4',
+    problemTr: 'Net hedef ve yol haritası olmadan kanallar dağınık çalışır. Ölçülebilir bir plan çıkararak yönü netleştiririz.',
+    problemEn: 'Without clear goals and a roadmap, channels work in silos. We create a measurable plan that sets the direction.',
+    deliverablesTr: ['Marka ve rakip analizi', 'Kanal planı ve KPI seti', 'Dijital yol haritası'],
+    deliverablesEn: ['Brand and competitor analysis', 'Channel plan and KPI set', 'Digital roadmap'],
   },
   'web-sitesi-tasarimi': {
     icon: HiOutlineCode,
@@ -88,10 +108,21 @@ const servicesMap = {
     featuresEn: ['Responsive Design', 'SEO Optimization', 'UI/UX Design', 'E-commerce Solutions', 'CMS Integration', 'Performance Optimization'],
     platforms: [FaInstagram, FaLinkedinIn],
     color: '#9C27B0',
+    problemTr: 'Yavaş, mobil-uyumsuz veya dönüşüm getirmeyen siteler müşteri kaybettirir. Hızlı, mobil-öncelikli ve dönüşüm odaklı tasarlarız.',
+    problemEn: 'Slow, non-mobile or low-converting sites lose customers. We design fast, mobile-first and conversion-focused.',
+    deliverablesTr: ['UI/UX tasarım', 'Mobil-öncelikli geliştirme', 'SEO ve hız optimizasyonu'],
+    deliverablesEn: ['UI/UX design', 'Mobile-first development', 'SEO and speed optimization'],
   },
 }
 
 const slugList = Object.keys(servicesMap)
+
+const PROCESS = [
+  { n: '01', tTr: 'Keşif & Brief', tEn: 'Discovery & Brief', dTr: 'Hedef, kitle ve ton netleşir.', dEn: 'Goals, audience and tone are set.' },
+  { n: '02', tTr: 'Strateji & Plan', tEn: 'Strategy & Plan', dTr: 'Kapsam, takvim ve KPI yazılı hale gelir.', dEn: 'Scope, schedule and KPIs are written down.' },
+  { n: '03', tTr: 'Üretim & Uygulama', tEn: 'Production & Delivery', dTr: 'İş, marka diline sadık ve ölçekli üretilir.', dEn: 'Work is produced on-brand and at scale.' },
+  { n: '04', tTr: 'Raporlama', tEn: 'Reporting', dTr: 'Sonuç şeffaf ve karşılaştırılabilir raporlanır.', dEn: 'Results are reported transparently and comparably.' },
+]
 
 export default function ServiceDetail() {
   const { slug } = useParams()
@@ -102,6 +133,8 @@ export default function ServiceDetail() {
   const title = service ? (lang === 'tr' ? service.titleTr : service.titleEn) : ''
   const desc = service ? (lang === 'tr' ? service.descTr : service.descEn) : ''
   const features = service ? (lang === 'tr' ? service.featuresTr : service.featuresEn) : []
+  const problem = service ? (lang === 'tr' ? service.problemTr : service.problemEn) : ''
+  const deliverables = service ? (lang === 'tr' ? service.deliverablesTr : service.deliverablesEn) : []
 
   useSEO({
     title: title ? `${title} | Kade Media` : 'Hizmet | Kade Media',
@@ -169,6 +202,16 @@ export default function ServiceDetail() {
 
       <section className="section">
         <div className="container">
+          {problem && (
+            <FadeIn>
+              <div className="glass-card" style={{ padding: '28px 32px', maxWidth: 780, margin: '0 auto 44px' }}>
+                <h2 style={{ color: 'var(--white)', fontSize: '1.2rem', marginBottom: 10 }}>
+                  {lang === 'tr' ? 'Hangi soruna çözüm sunuyoruz?' : 'What problem does it solve?'}
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>{problem}</p>
+              </div>
+            </FadeIn>
+          )}
           <FadeIn>
             <h2 style={{ color: 'var(--white)', fontSize: '1.4rem', textAlign: 'center', marginBottom: 32 }}>
               {lang === 'tr' ? 'Neler Yapıyoruz?' : 'What We Do'}
@@ -185,6 +228,50 @@ export default function ServiceDetail() {
             ))}
           </StaggerContainer>
 
+          {/* Çalışma süreci */}
+          <FadeIn>
+            <h2 style={{ color: 'var(--white)', fontSize: '1.4rem', textAlign: 'center', margin: '56px 0 28px' }}>
+              {lang === 'tr' ? 'Çalışma Süreci' : 'How We Work'}
+            </h2>
+          </FadeIn>
+          <StaggerContainer className="process-grid" staggerDelay={0.1} style={{ maxWidth: 940, margin: '0 auto' }}>
+            {PROCESS.map((s) => (
+              <StaggerItem key={s.n}>
+                <div className="process-card glass-card">
+                  <div className="process-step">{s.n}</div>
+                  <h3>{lang === 'tr' ? s.tTr : s.tEn}</h3>
+                  <p>{lang === 'tr' ? s.dTr : s.dEn}</p>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+
+          {/* Teslimatlar */}
+          <FadeIn>
+            <div style={{ maxWidth: 780, margin: '52px auto 0' }}>
+              <h2 style={{ color: 'var(--white)', fontSize: '1.4rem', textAlign: 'center', marginBottom: 20 }}>
+                {lang === 'tr' ? 'Ne Teslim Ediyoruz?' : 'What You Get'}
+              </h2>
+              <div style={{ display: 'grid', gap: 12 }}>
+                {deliverables.map((d) => (
+                  <div key={d} className="glass-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <HiOutlineBadgeCheck size={18} style={{ color: service.color, flexShrink: 0 }} />
+                    <span style={{ color: 'var(--white)', fontSize: '0.95rem' }}>{d}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* Gerçekçi beklenti */}
+          <FadeIn>
+            <p style={{ maxWidth: 640, margin: '26px auto 0', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.7 }}>
+              {lang === 'tr'
+                ? 'Sonuçlar sektör, bütçe ve rekabete göre değişir; garanti vermeyiz, süreci ve metrikleri şeffaf paylaşırız.'
+                : 'Results vary by sector, budget and competition; we make no guarantees and share the process and metrics transparently.'}
+            </p>
+          </FadeIn>
+
           <FadeIn delay={0.2}>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 32 }}>
               {service.platforms.map((Platform, i) => (
@@ -195,8 +282,13 @@ export default function ServiceDetail() {
             </div>
           </FadeIn>
 
-          {/* Navigation between services */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 48, gap: 16, flexWrap: 'wrap' }}>
+          {/* İlgili hizmetler */}
+          <FadeIn>
+            <h2 style={{ color: 'var(--white)', fontSize: '1.2rem', textAlign: 'center', margin: '52px 0 20px' }}>
+              {lang === 'tr' ? 'İlgili Hizmetler' : 'Related Services'}
+            </h2>
+          </FadeIn>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, gap: 16, flexWrap: 'wrap' }}>
             {prevSlug ? (
               <Link to={`/hizmetler/${prevSlug}`} className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <HiOutlineArrowLeft size={16} />
