@@ -941,16 +941,6 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   mix-blend-mode: soft-light;
 }
 .kade-spot:hover .kade-spot-glare { opacity: 1; }
-
-/* sürekli 3D süzülme: kartlar hover'sız da hafifçe döner/yüzer (reveal bitince) */
-.kade-idle { animation: kade-float3d 7s ease-in-out infinite; }
-@keyframes kade-float3d {
-  0%   { transform: perspective(900px) rotateY(-2.2deg) rotateX(1.4deg) translateY(0); }
-  25%  { transform: perspective(900px) rotateY(0deg)    rotateX(-1.6deg) translateY(-5px); }
-  50%  { transform: perspective(900px) rotateY(2.2deg)  rotateX(1.2deg) translateY(-2px); }
-  75%  { transform: perspective(900px) rotateY(0.6deg)  rotateX(-0.8deg) translateY(-6px); }
-  100% { transform: perspective(900px) rotateY(-2.2deg) rotateX(1.4deg) translateY(0); }
-}
 /* imleç takipli yumuşak gold ışık (iki katman: geniş hâle + sıcak çekirdek) */
 .kade-spot-glow {
   position: absolute;

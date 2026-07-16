@@ -29,16 +29,8 @@
     ? new IntersectionObserver((entries) => {
         entries.forEach((e) => {
           if (!e.isIntersecting) return;
-          const t = e.target;
-          t.classList.add('in-view');
-          io.unobserve(t);
-          // kart ise: reveal bitince sürekli 3D süzülme animasyonunu başlat (faz kaydır)
-          if (t.classList.contains('kade-spot')) {
-            setTimeout(() => {
-              t.style.animationDelay = (-(Math.random() * 7)).toFixed(2) + 's';
-              t.classList.add('kade-idle');
-            }, 900);
-          }
+          e.target.classList.add('in-view');
+          io.unobserve(e.target);
         });
       }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 })
     : null;
