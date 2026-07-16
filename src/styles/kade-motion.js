@@ -88,7 +88,7 @@
       glow.className = 'pf-glow';
       glow.setAttribute('aria-hidden', 'true');
       el.appendChild(glow);
-      const T = 11; // derece
+      const T = 6; // derece — hafif, bozulmayan 3D
       el.addEventListener('pointermove', (ev) => {
         const r = el.getBoundingClientRect();
         if (!r.width || !r.height) return;
@@ -97,7 +97,7 @@
         el.style.setProperty('--mx', px * 100 + '%');
         el.style.setProperty('--my', py * 100 + '%');
         el.style.transform =
-          'perspective(640px) rotateY(' + ((px - 0.5) * 2 * T) + 'deg) rotateX(' +
+          'perspective(1100px) rotateY(' + ((px - 0.5) * 2 * T) + 'deg) rotateX(' +
           (-(py - 0.5) * 2 * T) + 'deg)';
       });
       el.addEventListener('pointerleave', () => { el.style.removeProperty('transform'); });

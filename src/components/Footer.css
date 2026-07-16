@@ -78,3 +78,9 @@
   .kfoot-w1, .kfoot-w3 { margin-left: 0; }
   .kfoot-w4 { margin-right: 0; }
 }
+
+/* mobil: dev başlık kelimeleri çakışmasın — dikey yığ, sola yasla */
+@media (max-width: 640px) {
+  .kfoot-row { flex-direction: column; justify-content: flex-start; align-items: flex-start; }
+  .kfoot-w1, .kfoot-w2, .kfoot-w3, .kfoot-w4 { margin-left: 0 !important; margin-right: 0 !important; }
+}
