@@ -80,6 +80,29 @@
       el.addEventListener('pointerleave', () => { el.style.removeProperty('transform'); });
     });
 
+    // portfolyo kare tile'ları: imleç-takipli 3D tilt + parallax + gold spotlight
+    document.querySelectorAll('.pf-sq').forEach((el) => {
+      if (el.dataset.kmt || excluded(el)) return;
+      el.dataset.kmt = '1';
+      const glow = document.createElement('span');
+      glow.className = 'pf-glow';
+      glow.setAttribute('aria-hidden', 'true');
+      el.appendChild(glow);
+      const T = 11; // derece
+      el.addEventListener('pointermove', (ev) => {
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const px = (ev.clientX - r.left) / r.width;
+        const py = (ev.clientY - r.top) / r.height;
+        el.style.setProperty('--mx', px * 100 + '%');
+        el.style.setProperty('--my', py * 100 + '%');
+        el.style.transform =
+          'perspective(640px) rotateY(' + ((px - 0.5) * 2 * T) + 'deg) rotateX(' +
+          (-(py - 0.5) * 2 * T) + 'deg)';
+      });
+      el.addEventListener('pointerleave', () => { el.style.removeProperty('transform'); });
+    });
+
     // manyetik butonlar: gold pill'ler imlece doğru hafifçe çekilir
     document.querySelectorAll('.btn-primary, .knav-giris').forEach((el) => {
       if (el.dataset.kmb) return;
