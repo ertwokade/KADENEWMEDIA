@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { HiMenuAlt3, HiX } from 'react-icons/hi'
+import { HiMenuAlt3, HiX, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
 import { useTheme } from '../i18n/ThemeContext'
 import { useCustomer } from '../contexts/CustomerContext'
 import './Navbar.css'
@@ -24,7 +24,10 @@ export default function Navbar() {
   const menuButtonRef = useRef(null)
   const mobileMenuRef = useRef(null)
   const location = useLocation()
-  const { toggleTheme } = useTheme()
+  const { theme, toggleTheme } = useTheme()
+  const isDark = theme === 'dark'
+  const ThemeIcon = isDark ? HiOutlineSun : HiOutlineMoon
+  const themeLabel = isDark ? 'Açık temaya geç' : 'Koyu temaya geç'
   const { customer } = useCustomer()
 
   useEffect(() => { setIsOpen(false) }, [location])
@@ -89,7 +92,8 @@ export default function Navbar() {
               </Link>
             )
           ))}
-          <button type="button" className="knav-link knav-tema" onClick={toggleTheme} aria-label="Temayı değiştir">
+          <button type="button" className="knav-link knav-tema" onClick={toggleTheme} aria-label={themeLabel} title={themeLabel}>
+            <ThemeIcon size={13} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />
             TEMA
           </button>
         </div>
@@ -121,7 +125,7 @@ export default function Navbar() {
                 </Link>
               )
             ))}
-            <button type="button" className="knav-mlink" onClick={toggleTheme} aria-label="Temayı değiştir">TEMA</button>
+            <button type="button" className="knav-mlink" onClick={toggleTheme} aria-label={themeLabel}><ThemeIcon size={15} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 7 }} />TEMA</button>
           </div>
         )}
       </nav>
