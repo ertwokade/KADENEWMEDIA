@@ -11,7 +11,7 @@ export default function Blog() {
   const { lang } = useLanguage()
   const isEN = lang === 'en'
   useSEO({
-    title: isEN ? 'Insights | Kade Media' : 'İçgörüler | Kade Media',
+    title: isEN ? 'Blog | Kade Media' : 'Blog | Kade Media',
     description: isEN ? 'Verified Kade Media articles and practical notes.' : 'Doğrulanmış Kade Media yazıları ve pratik notları.',
     path: '/blog',
     noindex: true,
@@ -23,7 +23,7 @@ export default function Blog() {
         <PageBgAnimation type="blog" />
         <div className="grid-bg" />
         <div className="container">
-          <FadeIn><div className="section-badge"><HiOutlineBookOpen size={14} />{isEN ? 'Insights' : 'İçgörüler'}</div></FadeIn>
+          <FadeIn><div className="section-badge"><HiOutlineBookOpen size={14} />{isEN ? 'Blog' : 'Blog'}</div></FadeIn>
           <FadeIn delay={0.1}><h1 className="section-title">{isEN ? 'Source-checked ' : 'Kaynağı kontrol edilmiş '}<span>{isEN ? 'articles' : 'yazılar'}</span></h1></FadeIn>
           <FadeIn delay={0.2}><p className="section-subtitle">{isEN ? 'Articles are published after their claims, dates, and sources are reviewed. No verified article is currently public.' : 'Yazılar; iddiaları, tarihleri ve kaynakları kontrol edildikten sonra yayınlanır. Şu anda public olarak doğrulanmış yazı bulunmuyor.'}</p></FadeIn>
         </div>

@@ -13,7 +13,9 @@ import './Navbar.css'
 const NAV_LINKS = [
   { name: 'HİZMETLER', path: '/hizmetler', static: true },
   { name: 'PAKETLER', path: '/paketler', static: true },
+  { name: 'PORTFOLYO', path: '/portfolio', static: true },
   { name: 'HAKKIMIZDA', path: '/hakkimizda', static: true },
+  { name: 'BLOG', path: '/blog', static: true },
   { name: 'İLETİŞİM', path: '/iletisim', static: true },
 ]
 

@@ -153,3 +153,24 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Hizmet kartı = tıklanabilir link (detay sayfası) */
+a.service-detail-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.service-detail-more {
+  margin-top: auto;
+  padding-top: 14px;
+  font-family: var(--ky-mono, ui-monospace, monospace);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ky-gold-deep, #c8901a);
+  transition: transform 0.25s ease;
+}
+a.service-detail-card:hover .service-detail-more { transform: translateX(4px); }

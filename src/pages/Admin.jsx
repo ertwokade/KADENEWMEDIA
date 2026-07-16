@@ -4010,7 +4010,7 @@ function AnalyticsSection() {
   const PAGE_NAMES = {
     '/': 'Ana Sayfa', '/hizmetler': 'Hizmetler', '/paketler': 'Paketler',
     '/blog': 'Blog', '/iletisim': 'Iletisim', '/hakkimizda': 'Hakkimizda',
-    '/ekip': 'Ekip', '/kariyer': 'Kariyer', '/partnerler': 'Partnerler', '/portfolio': 'Portfolio',
+    '/ekip': 'Ekip', '/kariyer': 'Kariyer', '/partnerler': 'Partnerler', '/portfolio': 'Portfolyo',
     '/basari-hikayeleri': 'Basari Hikayeleri', '/roi-hesaplayici': 'ROI Hesaplayici',
     '/kvkk': 'KVKK', '/gizlilik': 'Gizlilik', '/cerez-politikasi': 'Cerez Politikasi',
   }

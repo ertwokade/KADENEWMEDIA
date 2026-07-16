@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import {
   HiOutlineGlobe,
   HiOutlineLightningBolt,
@@ -30,6 +31,7 @@ export default function Services() {
   const services = [
     {
       icon: HiOutlineGlobe,
+      slug: 'sosyal-medya-yonetimi',
       title: t('services.smm'),
       desc: t('services.smmDesc'),
       features: [t('services.smmFeat1'), t('services.smmFeat2'), t('services.smmFeat3'), t('services.smmFeat4')],
@@ -37,6 +39,7 @@ export default function Services() {
     },
     {
       icon: HiOutlinePencilAlt,
+      slug: 'icerik-uretimi',
       title: t('services.contentTitle'),
       desc: t('services.contentDesc'),
       features: [t('services.contentFeat1'), t('services.contentFeat2'), t('services.contentFeat3'), t('services.contentFeat4')],
@@ -44,6 +47,7 @@ export default function Services() {
     },
     {
       icon: HiOutlineChartBar,
+      slug: 'reklam-yonetimi',
       title: t('services.adsTitle'),
       desc: t('services.adsDesc'),
       features: [t('services.adsFeat1'), t('services.adsFeat2'), t('services.adsFeat3'), t('services.adsFeat4')],
@@ -51,6 +55,7 @@ export default function Services() {
     },
     {
       icon: HiOutlineFilm,
+      slug: 'video-produksiyon',
       title: t('services.videoTitle'),
       desc: t('services.videoDesc'),
       features: [t('services.videoFeat1'), t('services.videoFeat2'), t('services.videoFeat3'), t('services.videoFeat4')],
@@ -58,6 +63,7 @@ export default function Services() {
     },
     {
       icon: HiOutlineChatAlt2,
+      slug: 'strateji-danismanlik',
       title: t('services.strategyTitle'),
       desc: t('services.strategyDesc'),
       features: [t('services.strategyFeat1'), t('services.strategyFeat2'), t('services.strategyFeat3'), t('services.strategyFeat4')],
@@ -65,6 +71,7 @@ export default function Services() {
     },
     {
       icon: HiOutlineCode,
+      slug: 'web-sitesi-tasarimi',
       title: t('services.webTitle'),
       desc: t('services.webDesc'),
       features: [t('services.webFeat1'), t('services.webFeat2'), t('services.webFeat3'), t('services.webFeat4')],
@@ -112,31 +119,35 @@ export default function Services() {
           <StaggerContainer className="services-detail-grid" staggerDelay={0.1}>
             {services.map((service) => (
               <StaggerItem key={service.title}>
-                <motion.div
-                  className="service-detail-card glass-card"
-                  whileHover={{ scale: 1.01 }}
-                >
-                  <div className="service-detail-header">
-                    <div className="service-detail-icon">
-                      <service.icon size={28} />
+                <motion.div whileHover={{ scale: 1.01 }} style={{ height: '100%' }}>
+                  <Link
+                    to={`/hizmetler/${service.slug}`}
+                    className="service-detail-card glass-card"
+                    aria-label={`${service.title} hizmet detayları`}
+                  >
+                    <div className="service-detail-header">
+                      <div className="service-detail-icon">
+                        <service.icon size={28} />
+                      </div>
+                      <h3>{service.title}</h3>
                     </div>
-                    <h3>{service.title}</h3>
-                  </div>
-                  <p className="service-detail-desc">{service.desc}</p>
-                  <div className="service-features">
-                    {service.features.map((feature) => (
-                      <span key={feature} className="feature-tag">
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="service-platforms">
-                    {service.platforms.map((Platform, i) => (
-                      <span key={i} className="platform-tag">
-                        <Platform size={14} />
-                      </span>
-                    ))}
-                  </div>
+                    <p className="service-detail-desc">{service.desc}</p>
+                    <div className="service-features">
+                      {service.features.map((feature) => (
+                        <span key={feature} className="feature-tag">
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="service-platforms">
+                      {service.platforms.map((Platform, i) => (
+                        <span key={i} className="platform-tag">
+                          <Platform size={14} />
+                        </span>
+                      ))}
+                    </div>
+                    <span className="service-detail-more" aria-hidden="true">Detayları gör →</span>
+                  </Link>
                 </motion.div>
               </StaggerItem>
             ))}

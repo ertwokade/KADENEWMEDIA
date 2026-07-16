@@ -121,7 +121,7 @@
     });
   }
 
-  const run = () => { try { enhance(); } catch (e) { /* sessiz */ } };
+  const run = () => { try { enhance(); } catch { /* sessiz */ } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
   else run();
 
