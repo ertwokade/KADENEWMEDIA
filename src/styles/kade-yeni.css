@@ -838,3 +838,162 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
    ===================================================================== */
 .about-story .story-visual { display: none !important; }
 .about-story .story-grid { grid-template-columns: 1fr !important; }
+
+/* =====================================================================
+   ANASAYFA HAVASI → ALT SAYFA HERO'LARI (2026-07-16)
+   Anasayfanın 3D "hello" objesinin kesitini her hero'ya taşır: gold
+   glossy obje + ışık, mix-blend-multiply + radial mask ile krem zemine
+   yumuşak oturur. Sadece hero KONTEYNERLERİ (başlık/alt-başlık hariç).
+   ===================================================================== */
+[class*="-hero"]:not(h1):not([class*="-title"]):not([class*="-subtitle"]):not([class*="-badge"]):not([class*="-desc"]) {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden;
+}
+[class*="-hero"]:not(h1):not([class*="-title"]):not([class*="-subtitle"]):not([class*="-badge"]):not([class*="-desc"])::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  right: -6%;
+  top: 46%;
+  transform: translateY(-50%);
+  width: min(52vw, 680px);
+  height: min(52vw, 680px);
+  background: url('/img/kade-hello-art.jpg') no-repeat center center;
+  background-size: contain;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+  -webkit-mask-image: radial-gradient(58% 58% at 52% 50%, #000 38%, transparent 72%);
+  mask-image: radial-gradient(58% 58% at 52% 50%, #000 38%, transparent 72%);
+}
+/* mobilde daha küçük + kenarda, metni ezmesin */
+@media (max-width: 768px) {
+  [class*="-hero"]:not(h1):not([class*="-title"]):not([class*="-subtitle"]):not([class*="-badge"]):not([class*="-desc"])::after {
+    width: 78vw; height: 78vw;
+    right: -22%; top: 12%; transform: none;
+    opacity: 0.32;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  [class*="-hero"]:not(h1):not([class*="-title"]):not([class*="-subtitle"]):not([class*="-badge"]):not([class*="-desc"])::after {
+    animation: kade-hero-float 14s ease-in-out infinite;
+  }
+}
+@keyframes kade-hero-float {
+  0%, 100% { transform: translateY(-50%); }
+  50% { transform: translateY(-54%); }
+}
+
+/* =====================================================================
+   HAREKET (kade-motion.js): scroll-reveal + kart spotlight/tilt/beam
+   Editoryal ama zengin. Reduced-motion'da JS hiç devreye girmez.
+   ===================================================================== */
+@property --kade-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+/* scroll-reveal: 3D dönerek + yukarı kayma + blur çözülmesi */
+.kade-motion .kade-reveal {
+  opacity: 0;
+  transform: perspective(1200px) rotateX(15deg) translateY(30px);
+  transform-origin: 50% 100%;
+  filter: blur(7px);
+  transition: opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+              filter 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.kade-motion .kade-reveal.in-view {
+  opacity: 1;
+  transform: perspective(1200px) rotateX(0deg) translateY(0);
+  filter: none;
+}
+
+/* kart (D — yumuşak parıltı): yuvarlak + gold gradient kenar + spotlight/tilt/beam */
+.kade-spot {
+  position: relative;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  border: 1px solid transparent !important;
+  border-radius: 16px !important;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, rgba(224, 168, 31, 0.50), rgba(23, 19, 10, 0.12)) border-box !important;
+  box-shadow: 0 10px 30px -22px rgba(23, 19, 10, 0.50) !important;
+  transition: transform 0.24s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.34s ease;
+}
+.kade-spot:hover {
+  box-shadow: 0 30px 60px -28px rgba(224, 168, 31, 0.60) !important;
+}
+/* 3D derinlik: içerik düzlemleri karta göre öne kalkar (tilt'te parallax) */
+.kade-spot > *:not(.kade-spot-glow):not(.kade-spot-ring):not(.kade-spot-glare):not(a):not(button) {
+  transform: translateZ(30px);
+}
+/* imleçle hareket eden beyaz ışık parıltısı (glare) — üstte, yumuşak */
+.kade-spot-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(circle 200px at var(--mx, 50%) var(--my, 50%),
+              rgba(255, 255, 255, 0.40), transparent 60%);
+  mix-blend-mode: soft-light;
+}
+.kade-spot:hover .kade-spot-glare { opacity: 1; }
+
+/* sürekli 3D süzülme: kartlar hover'sız da hafifçe döner/yüzer (reveal bitince) */
+.kade-idle { animation: kade-float3d 7s ease-in-out infinite; }
+@keyframes kade-float3d {
+  0%   { transform: perspective(900px) rotateY(-2.2deg) rotateX(1.4deg) translateY(0); }
+  25%  { transform: perspective(900px) rotateY(0deg)    rotateX(-1.6deg) translateY(-5px); }
+  50%  { transform: perspective(900px) rotateY(2.2deg)  rotateX(1.2deg) translateY(-2px); }
+  75%  { transform: perspective(900px) rotateY(0.6deg)  rotateX(-0.8deg) translateY(-6px); }
+  100% { transform: perspective(900px) rotateY(-2.2deg) rotateX(1.4deg) translateY(0); }
+}
+/* imleç takipli yumuşak gold ışık (iki katman: geniş hâle + sıcak çekirdek) */
+.kade-spot-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background:
+    radial-gradient(280px 280px at var(--mx, 50%) var(--my, 50%), rgba(224, 168, 31, 0.24), transparent 62%),
+    radial-gradient(90px 90px at var(--mx, 50%) var(--my, 50%), rgba(245, 216, 74, 0.30), transparent 60%);
+}
+.kade-spot:hover .kade-spot-glow { opacity: 1; }
+/* dönen gold beam: 1px kenarlık boyunca dolaşan ışık */
+.kade-spot-ring {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: conic-gradient(from var(--kade-angle),
+    transparent 0 58%, rgba(224, 168, 31, 0.85) 74%, rgba(245, 216, 74, 0.95) 80%, transparent 92%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+}
+.kade-spot:hover .kade-spot-ring {
+  opacity: 1;
+  animation: kade-spin 2.6s linear infinite;
+}
+@keyframes kade-spin { to { --kade-angle: 360deg; } }
+
+/* manyetik buton: imlece doğru hafif çekilme (kade-motion.js) */
+.kade-magnet { transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .kade-spot { transition: none !important; }
+  .kade-spot:hover { transform: none !important; }
+  .kade-spot-ring { display: none !important; }
+  .kade-magnet { transition: none !important; }
+}
