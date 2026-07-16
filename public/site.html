@@ -102,9 +102,10 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       });
     }catch(e){}
   }
-  var mo; try{mo=new MutationObserver(run);mo.observe(document.documentElement,{childList:true,subtree:true,characterData:true});}catch(e){}
+  // Statik HTML zaten temiz; sürekli MutationObserver YOK (React ile kavga edip
+  // ana thread'i kilitliyordu). Sadece hidrasyon sonrası birkaç sınırlı çalıştırma.
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
-  window.addEventListener('load',run); setTimeout(run,600); setTimeout(run,1500); setTimeout(run,3000);
-  setTimeout(function(){run();if(mo)mo.disconnect();},8000);
+  window.addEventListener('load',run);
+  [400,1000,2000,3500,5500].forEach(function(d){setTimeout(run,d);});
 })();
 </script></body></html>
