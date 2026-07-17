@@ -28,6 +28,14 @@
       "destination": "/api/sitemap"
     },
     {
+      "source": "/kadeai",
+      "destination": "https://kadeai.vercel.app/kadeai"
+    },
+    {
+      "source": "/kadeai/:path*",
+      "destination": "https://kadeai.vercel.app/kadeai/:path*"
+    },
+    {
       "source": "/",
       "destination": "/site.html"
     },

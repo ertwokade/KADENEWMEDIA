@@ -1,9 +1,10 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 
 const BASE = 'https://kadenewmedia.com'
-const DIST = new URL('../dist/', import.meta.url)
-const template = await readFile(new URL('app.html', DIST), 'utf8')
+const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
+const template = await readFile(join(DIST, 'app.html'), 'utf8')
 
 const routes = [
   ['/hakkimizda', 'Kade Media Hakkında | New Media Ajansı İstanbul', 'Kade Media; Kade New Media, Kademedia ve Kadenewmedia adlarıyla da aranan İstanbul merkezli new media ve dijital pazarlama ajansıdır.', false],
@@ -108,7 +109,7 @@ function render(route, title, description, noindex) {
 }
 
 for (const [route, title, description, noindex] of routes) {
-  const directory = join(DIST.pathname, route.slice(1))
+  const directory = join(DIST, route.slice(1))
   await mkdir(directory, { recursive: true })
   await writeFile(join(directory, 'index.html'), render(route, title, description, noindex))
 }
