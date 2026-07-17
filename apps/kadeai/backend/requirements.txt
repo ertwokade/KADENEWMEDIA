@@ -1,0 +1,35 @@
+# ─── Core ────────────────────────────────────────────────────────────────────
+fastapi==0.139.2
+starlette==1.3.1
+uvicorn[standard]==0.49.0
+click==8.3.3
+websockets==16.0
+pydantic==2.13.4
+pydantic-settings==2.14.2
+httpx==0.28.1
+python-multipart==0.0.32
+aiofiles==25.1.0
+
+# ─── Database ────────────────────────────────────────────────────────────────
+sqlalchemy==2.0.30
+asyncpg==0.30.0
+alembic==1.14.0
+
+# ─── AutoEdit AI — Video/Audio Processing ────────────────────────────────────
+openai-whisper==20250625
+librosa==0.11.0
+ffmpeg-python==0.2.0
+opencv-python==4.13.0.92
+scenedetect==0.7
+pyloudnorm==0.2.0
+soundfile==0.14.0
+numpy==2.4.6
+scipy==1.17.1
+
+# ─── Growth AI — AI & Auth ───────────────────────────────────────────────────
+anthropic>=0.40.0
+cryptography>=42.0.0
+
+# ─── Dev ─────────────────────────────────────────────────────────────────────
+pytest==9.0.3
+pytest-asyncio==1.4.0

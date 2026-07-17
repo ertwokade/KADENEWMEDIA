@@ -1,0 +1,166 @@
+:root {
+  --bg: #08090d !important;
+  --bg2: #0d0f14 !important;
+  --surface: rgba(255, 255, 255, 0.035) !important;
+  --surface-hover: rgba(255, 255, 255, 0.065) !important;
+  --border: rgba(255, 255, 255, 0.09) !important;
+  --border-hover: rgba(234, 195, 33, 0.26) !important;
+  --ink: #ffffff !important;
+  --ink2: #b7b7b7 !important;
+  --ink3: #747474 !important;
+  --teal: #eac321 !important;
+  --teal-dim: rgba(234, 195, 33, 0.12) !important;
+  --teal-glow: rgba(234, 195, 33, 0.26) !important;
+  --indigo: #f4d95d !important;
+  --indigo-dim: rgba(244, 217, 93, 0.1) !important;
+  --gold: #eac321 !important;
+  --gold-dim: rgba(234, 195, 33, 0.12) !important;
+  --radius: 10px !important;
+  --radius-lg: 14px !important;
+}
+
+html,
+body {
+  background: transparent !important;
+}
+
+body {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(234, 195, 33, 0.09), transparent 30%),
+    radial-gradient(circle at 78% 18%, rgba(234, 195, 33, 0.06), transparent 26%),
+    #08090d !important;
+}
+
+.app-shell,
+.workspace {
+  background: transparent !important;
+}
+
+.sidebar,
+.topbar {
+  background: rgba(8, 9, 13, 0.86) !important;
+  border-color: rgba(234, 195, 33, 0.14) !important;
+}
+
+.brand-mark {
+  background: linear-gradient(135deg, #eac321, #f4d95d) !important;
+  color: #08090d !important;
+  box-shadow: 0 0 18px rgba(234, 195, 33, 0.24) !important;
+}
+
+.nav-item.active,
+.filter-chip.active,
+.primary-btn {
+  background: #eac321 !important;
+  border-color: #eac321 !important;
+  color: #08090d !important;
+}
+
+.nav-item.active i,
+.nav-item.active span {
+  color: #08090d !important;
+}
+
+.nav-item:hover,
+.icon-btn:hover,
+.ghost-btn:hover,
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(234, 195, 33, 0.42) !important;
+  color: #eac321 !important;
+  box-shadow: 0 0 0 3px rgba(234, 195, 33, 0.1) !important;
+}
+
+.panel,
+.kpi,
+.kanban-column,
+.production-card,
+.metric-card,
+.page-card,
+.template-card,
+.doc-card {
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.16) !important;
+}
+
+.panel:hover,
+.kpi:hover,
+.production-card:hover,
+.page-card:hover,
+.template-card:hover {
+  border-color: rgba(234, 195, 33, 0.24) !important;
+}
+
+.icon-area {
+  background: rgba(234, 195, 33, 0.1) !important;
+}
+
+.icon-area i,
+.eyebrow,
+.pill.teal,
+.word.positive,
+.nav-label,
+.ptree-nav-label {
+  color: #eac321 !important;
+}
+
+.answer-box,
+.transcript-summary {
+  border-left-color: #eac321 !important;
+  background: rgba(234, 195, 33, 0.1) !important;
+}
+
+.search-box,
+.search-input,
+input,
+textarea,
+select {
+  background: rgba(0, 0, 0, 0.22) !important;
+  border-color: rgba(234, 195, 33, 0.14) !important;
+}
+
+html.embedded,
+html.embedded body {
+  min-height: 100%;
+  overflow: hidden !important;
+}
+
+html.embedded body {
+  background: #08090d !important;
+}
+
+html.embedded .mobile-overlay,
+html.embedded .sidebar,
+html.embedded .topbar {
+  display: none !important;
+}
+
+html.embedded .app-shell {
+  display: block !important;
+  min-height: 100vh !important;
+}
+
+html.embedded .workspace {
+  display: block !important;
+  min-height: 100vh !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+html.embedded .view {
+  min-height: 100vh !important;
+  padding: 28px 32px 48px !important;
+}
+
+html.embedded .view.active {
+  display: flex !important;
+}
+
+@media (max-width: 820px) {
+  html.embedded .view {
+    padding: 18px 16px 36px !important;
+  }
+}
