@@ -1,7 +1,10 @@
 import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '/kadeai'
+const projectRoot = dirname(fileURLToPath(import.meta.url))
 const isProduction = process.env.NODE_ENV === 'production'
 const supabaseOrigin = (() => {
   try {
@@ -38,6 +41,9 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   skipTrailingSlashRedirect: true,
   allowedDevOrigins: ['127.0.0.1'],
+  turbopack: {
+    root: projectRoot,
+  },
 
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,

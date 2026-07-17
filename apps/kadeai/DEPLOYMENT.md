@@ -1,5 +1,9 @@
 # KADE AI Production Deployment
 
+## Monorepo kaynağı
+
+KADE AI kaynak kodu ana siteyle birlikte `kadirdemirs/kademedia` GitHub deposunda `apps/kadeai` dizinindedir. Git tabanlı deployment ayarlanırken ana site Vercel projesinin Root Directory değeri `.`, KADE AI Vercel projesinin Root Directory değeri `apps/kadeai` olmalıdır. İki proje aynı repository’yi kullanır; `kadenewmedia.com` domaini yalnız ana site projesinde kalır.
+
 Hedefler `/kadeai/login`, `/kadeai/dashboard` ve `/kadeai/api/health` production’da çalışıyor. KADE AI upstream `kadeai.vercel.app`, ana domain rewrite `kadenewmedia.com/kadeai` üzerinden doğrulandı. Ana site `/` rotası deployment öncesi ve sonrası 200 ve aynı title ile çalıştı.
 
 ## Kök neden ve doğru routing

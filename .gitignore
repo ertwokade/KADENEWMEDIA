@@ -16,6 +16,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+!**/.env.example
 
 # Editor directories and files
 .vscode/*
@@ -31,7 +32,6 @@ dist-ssr
 .playwright-cli/
 
 ai-website-cloner-template/
-.env*
 
 # Çalışma kopyaları ve yedekler (repo'ya girmesin)
 kade-site/
