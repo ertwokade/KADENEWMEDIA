@@ -46,6 +46,7 @@ const Referanslar = lazy(() => import('./pages/Referanslar'))
 const Tesekkur = lazy(() => import('./pages/Tesekkur'))
 const QuoteRequest = lazy(() => import('./pages/QuoteRequest'))
 const CustomerPortal = lazy(() => import('./pages/CustomerPortal'))
+const LoginHub = lazy(() => import('./pages/LoginHub'))
 const Login = lazy(() => import('./pages/Login'))
 const ProjectTracking = lazy(() => import('./pages/ProjectTracking'))
 const OrganizationKitDashboard = lazy(() => import('./pages/OrganizationKitDashboard'))
@@ -126,6 +127,7 @@ function getCanvasTheme(pathname) {
   if (pathname.startsWith('/hizmetler/')) return 'services'
   if (pathname.startsWith('/partnerler/')) return 'partners'
   if (pathname.startsWith('/blog/')) return 'blog'
+  if (pathname.startsWith('/giris')) return 'about'
   if (pathname.startsWith('/organizasyon-kiti')) return 'about'
   if (pathname.startsWith('/kade-kit-business')) return 'services'
   return 'home'
@@ -135,7 +137,8 @@ function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
   const isHome = location.pathname === '/'
-  const hideShell = isAdmin || isHome
+  const isLoginArea = location.pathname.startsWith('/giris')
+  const hideShell = isAdmin || isHome || isLoginArea
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 
@@ -211,7 +214,8 @@ function App() {
         <Route path="/referanslar" element={<LazyRoute><Referanslar /></LazyRoute>} />
         <Route path="/tesekkur" element={<LazyRoute><Tesekkur /></LazyRoute>} />
         <Route path="/teklif-al" element={<LazyRoute><QuoteRequest /></LazyRoute>} />
-        <Route path="/giris" element={<LazyRoute><Login /></LazyRoute>} />
+        <Route path="/giris" element={<LazyRoute><LoginHub /></LazyRoute>} />
+        <Route path="/giris/danismanlik" element={<LazyRoute><Login /></LazyRoute>} />
         <Route path="/musteri-panel" element={<LazyRoute><CustomerPortal /></LazyRoute>} />
         <Route path="/organizasyon-kiti" element={<LazyRoute><OrganizationKitGuard><OrganizationKitDashboard /></OrganizationKitGuard></LazyRoute>} />
         <Route path="/organizasyon-kiti/plan/fractional-new-media-director" element={<LazyRoute><OrganizationKitGuard><OrganizationKitPlan /></OrganizationKitGuard></LazyRoute>} />

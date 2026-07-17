@@ -1,0 +1,205 @@
+.access-hub {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 132px 24px 80px;
+  position: relative;
+}
+
+.access-hub-panel {
+  width: min(100%, 920px);
+  position: relative;
+  z-index: 1;
+}
+
+.access-hub-brand {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #17130a;
+  text-decoration: none;
+  font-family: 'TikTokSans', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.access-hub-brand img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.access-hub-heading {
+  max-width: 680px;
+  margin: 46px 0 36px;
+}
+
+.access-hub-eyebrow {
+  display: block;
+  margin-bottom: 14px;
+  color: #a66e07;
+  font-family: 'GeistMono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.access-hub-heading h1 {
+  margin: 0;
+  color: #17130a;
+  font-family: 'TikTokSans', sans-serif;
+  font-size: clamp(2.25rem, 5vw, 4.75rem);
+  font-weight: 750;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.access-hub-heading p {
+  max-width: 590px;
+  margin: 22px 0 0;
+  color: rgba(23, 19, 10, 0.63);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.access-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.access-hub-grid > div {
+  min-width: 0;
+}
+
+.access-hub-card {
+  min-height: 320px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 28px;
+  color: #17130a;
+  background: rgba(255, 253, 246, 0.92);
+  border: 1px solid rgba(23, 19, 10, 0.13);
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 22px 60px rgba(80, 56, 5, 0.07);
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.access-hub-card:hover {
+  color: #17130a;
+  background: #fffdf6;
+  border-color: rgba(224, 168, 31, 0.72);
+  box-shadow: 0 26px 70px rgba(80, 56, 5, 0.12);
+}
+
+.access-hub-card:focus-visible {
+  outline: 3px solid rgba(224, 168, 31, 0.5);
+  outline-offset: 4px;
+}
+
+.access-hub-card-top,
+.access-hub-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.access-hub-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  color: #17130a;
+  background: #e0a81f;
+  border-radius: 5px;
+}
+
+.access-hub-number {
+  align-self: flex-start;
+  color: rgba(23, 19, 10, 0.34);
+  font-family: 'GeistMono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.access-hub-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: auto 0 32px;
+}
+
+.access-hub-card-copy strong {
+  font-family: 'TikTokSans', sans-serif;
+  font-size: clamp(1.65rem, 3vw, 2.3rem);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+
+.access-hub-card-copy > span {
+  max-width: 330px;
+  color: rgba(23, 19, 10, 0.58);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.access-hub-cta {
+  justify-content: flex-start;
+  gap: 10px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(23, 19, 10, 0.1);
+  font-family: 'GeistMono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.access-hub-card:hover .access-hub-cta svg {
+  transform: translateX(4px);
+}
+
+.access-hub-cta svg {
+  transition: transform 180ms ease;
+}
+
+.access-hub-note {
+  margin: 24px 0 0;
+  color: rgba(23, 19, 10, 0.48);
+  font-family: 'GeistMono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.035em;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .access-hub {
+    padding: 112px 18px 56px;
+    place-items: start center;
+  }
+
+  .access-hub-heading {
+    margin: 36px 0 28px;
+  }
+
+  .access-hub-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .access-hub-card {
+    min-height: 260px;
+    padding: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .access-hub-card,
+  .access-hub-cta svg {
+    transition: none;
+  }
+}

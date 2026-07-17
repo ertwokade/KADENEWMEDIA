@@ -28,6 +28,7 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+.playwright-cli/
 
 ai-website-cloner-template/
 .env*
