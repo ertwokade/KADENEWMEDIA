@@ -1,0 +1,79 @@
+appId: com.kademedia.contentai
+productName: ContentAI Studio
+copyright: Copyright © 2024 Kade Media
+
+# Entry point
+main: electron/main.js
+
+# Files to include in the package
+files:
+  - electron/**/*
+  - .next/standalone/**/*
+  - .next/static/**/*
+  - public/**/*
+  - node_modules/electron/**/*
+
+# Extra resources copied outside ASAR
+extraResources:
+  - from: .next/standalone
+    to: app/.next/standalone
+    filter:
+      - "**/*"
+  - from: .next/static
+    to: app/.next/standalone/.next/static
+    filter:
+      - "**/*"
+  - from: public
+    to: app/public
+    filter:
+      - "**/*"
+
+directories:
+  buildResources: electron/assets
+  output: dist-electron
+
+# macOS
+mac:
+  category: public.app-category.productivity
+  icon: public/icons/icon-512.png
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  dmg:
+    title: ContentAI Studio
+    window:
+      width: 540
+      height: 380
+
+# Windows
+win:
+  icon: public/icons/icon-512.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: ContentAI-Studio-Setup-${version}.exe
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: ContentAI Studio
+  installerHeader: public/icons/icon-192.png
+
+# Linux
+linux:
+  icon: public/icons/icon-512.png
+  target:
+    - AppImage
+    - deb
+  category: Utility
+
+# Publish (GitHub Releases otomatik güncelleme için)
+publish:
+  provider: github
+  owner: kadirdemirs
+  repo: KADE-SOCIAL-MEDIA-AI
