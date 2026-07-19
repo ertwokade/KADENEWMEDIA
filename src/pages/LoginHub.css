@@ -14,20 +14,14 @@
 
 .access-hub-brand {
   width: fit-content;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  color: #17130a;
+  display: inline-block;
   text-decoration: none;
-  font-family: 'TikTokSans', sans-serif;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
 }
 
 .access-hub-brand img {
-  width: 32px;
-  height: 32px;
+  display: block;
+  width: clamp(160px, 18vw, 190px);
+  height: auto;
   object-fit: contain;
 }
 

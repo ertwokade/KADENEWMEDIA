@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HiOutlineMail, HiOutlineLockClosed, HiOutlineUser, HiOutlinePhone, HiEye, HiEyeOff } from 'react-icons/hi'
+import { HiOutlineMail, HiOutlineLockClosed, HiOutlineUser, HiOutlinePhone, HiOutlineHome, HiEye, HiEyeOff } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
 import { useCustomer } from '../contexts/CustomerContext'
 import { customerLoginApi, customerRegisterApi } from '../api'
@@ -80,7 +80,7 @@ export default function Login() {
         >
           <h1 className="visually-hidden">Kade Media müşteri girişi</h1>
           <Link to="/" className="login-logo">
-            <img src="/logo.png" alt="Kade Media" />
+            <img src="/logo.png" alt="Kade Media" width="514" height="180" />
           </Link>
 
           <div className="login-tabs">
@@ -238,6 +238,10 @@ export default function Login() {
           </AnimatePresence>
 
           <p className="login-legal">Veri işleme ayrıntıları için <Link to="/gizlilik">Gizlilik Politikası</Link>'nı inceleyin.</p>
+          <a href="https://kadenewmedia.com" className="login-home-link">
+            <HiOutlineHome size={18} aria-hidden="true" />
+            Anasayfaya Dön
+          </a>
         </motion.div>
       </div>
     </PageTransition>

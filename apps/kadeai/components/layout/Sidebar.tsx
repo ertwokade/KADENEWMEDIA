@@ -12,7 +12,7 @@ import {
   MessageSquare, Mail, Radio, AlertCircle,
   Copy, BookMarked, Activity, Library,
   ChevronRight, Clapperboard, LayoutDashboard,
-  CircleDollarSign,
+  CircleDollarSign, LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSidebar } from '@/lib/context/SidebarContext'
@@ -321,7 +321,7 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="px-4 py-4 border-t border-zinc-100 flex-shrink-0">
+        <div className="space-y-2 border-t border-zinc-100 px-4 py-4 flex-shrink-0">
           <Link
             href="/dashboard/settings"
             onClick={() => close()}
@@ -329,6 +329,14 @@ export default function Sidebar() {
           >
             <Activity className="h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />
             <p className="text-[10px] font-medium text-[#8f8b80]">Sistem durumunu kontrol et</p>
+          </Link>
+          <Link
+            href="/logout"
+            onClick={() => close()}
+            className="flex items-center gap-2.5 rounded-xl border border-zinc-200 px-3 py-2.5 text-zinc-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+          >
+            <LogOut className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="text-[11px] font-semibold">Çıkış Yap</span>
           </Link>
         </div>
       </aside>

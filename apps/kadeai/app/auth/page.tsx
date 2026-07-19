@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
-import { User, Lock, Mail } from 'lucide-react'
+import { User, Lock, Mail, Home } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { apiPath, withBasePath } from '@/lib/appConfig'
 import KadeLogo from '@/components/brand/KadeLogo'
@@ -135,6 +135,13 @@ export default function AuthPage() {
           </form>
 
         </div>
+        <a
+          href="https://kadenewmedia.com"
+          className="mx-auto flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/70 px-5 text-sm font-semibold text-zinc-400 transition-colors hover:border-amber-400/40 hover:text-amber-300"
+        >
+          <Home className="h-4 w-4" aria-hidden="true" />
+          Anasayfaya Dön
+        </a>
       </div>
     </div>
   )

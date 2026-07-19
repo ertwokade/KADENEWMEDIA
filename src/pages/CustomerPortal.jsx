@@ -58,7 +58,7 @@ export default function CustomerPortal() {
   })
 
   useEffect(() => {
-    if (checked && !customer) navigate('/giris', { replace: true })
+    if (checked && !customer) navigate('/giris/danismanlik', { replace: true })
   }, [checked, customer, navigate])
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export default function CustomerPortal() {
 
   const handleLogout = async () => {
     await logout()
-    navigate('/giris', { replace: true })
+    navigate('/giris/danismanlik', { replace: true })
   }
 
   if (!checked || !customer) return null

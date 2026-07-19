@@ -42,8 +42,7 @@ export default function LoginHub() {
           transition={{ duration: 0.4 }}
         >
           <Link to="/" className="access-hub-brand" aria-label="Kade Media ana sayfa">
-            <img src="/logo-icon.svg" alt="" />
-            <span>KADE MEDIA</span>
+            <img src="/logo.png" alt="Kade Media" width="514" height="180" />
           </Link>
 
           <div className="access-hub-heading">
