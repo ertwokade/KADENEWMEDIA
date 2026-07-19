@@ -1,0 +1,11 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
+  "headers": [
+    {
+      "source": "/kadeai/manifest.json",
+      "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+    }
+  ]
+}

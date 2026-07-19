@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 181" role="img" aria-labelledby="title desc">
+  <title id="title">KADE</title>
+  <desc id="desc">Altın renkli şimşek simgesi ve KADE yazısı</desc>
+  <defs>
+    <linearGradient id="boltTop" x1="9" y1="103" x2="58" y2="22" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff6a6"/>
+      <stop offset="0.55" stop-color="#f5d72f"/>
+      <stop offset="1" stop-color="#8c7200"/>
+    </linearGradient>
+    <linearGradient id="boltBottom" x1="52" y1="81" x2="88" y2="143" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9a7b00"/>
+      <stop offset="0.46" stop-color="#d7af08"/>
+      <stop offset="1" stop-color="#fff36a"/>
+    </linearGradient>
+    <linearGradient id="wordmark" x1="143" y1="92" x2="465" y2="92" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f5d526"/>
+      <stop offset="0.34" stop-color="#ffe45a"/>
+      <stop offset="0.72" stop-color="#fff7d5"/>
+      <stop offset="1" stop-color="#fffdf1"/>
+    </linearGradient>
+  </defs>
+  <path d="M52 10 0 105h52V75Z" fill="url(#boltTop)"/>
+  <path d="M52 75h54l-54 95v-65Z" fill="url(#boltBottom)"/>
+  <path d="M52 75h28l-28 50Z" fill="#6e5900" opacity=".52"/>
+  <path fill="url(#wordmark)" d="M143 61h16v25l30-25h21l-36 29 39 33h-23l-31-28v28h-16V61Zm109-1h12l38 63h-18l-9-15h-34l-9 15h-18l38-63Zm-4 35h20l-10-18-10 18Zm58-34h31c28 0 46 11 46 31s-18 31-46 31h-31V61Zm16 14v34h14c19 0 30-6 30-17s-11-17-30-17h-14Zm79-14h63v14h-47v10h42v14h-42v10h48v14h-64V61Z" fill-rule="evenodd"/>
+</svg>

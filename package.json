@@ -6,8 +6,13 @@
   "scripts": {
     "dev": "vite",
     "dev:api": "node server.js",
-    "build": "vite build && mv dist/index.html dist/app.html && node scripts/generate-static-routes.mjs",
+    "dev:kadeai": "npm --prefix apps/kadeai run dev",
+    "build": "vite build && node -e \"require('fs').renameSync('dist/index.html','dist/app.html')\" && node scripts/generate-static-routes.mjs",
+    "build:kadeai": "npm --prefix apps/kadeai run build",
+    "build:all": "npm run build && npm run build:kadeai",
     "lint": "eslint .",
+    "verify:all": "npm run lint && npm run build && npm --prefix apps/kadeai run verify",
+    "test:backend:kadeai": "npm --prefix apps/kadeai run test:backend",
     "preview": "vite preview",
     "test:production": "node scripts/audit-production.mjs"
   },

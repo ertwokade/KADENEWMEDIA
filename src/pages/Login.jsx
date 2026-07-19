@@ -19,9 +19,9 @@ export default function Login() {
   const navigate = useNavigate()
 
   useSEO({
-    title: 'Giriş Yap | Kade Media',
-    description: 'Kade Media müşteri hesabınıza giriş yapın veya yeni hesap oluşturun.',
-    path: '/giris',
+    title: 'Danışmanlık Girişi | Kade Media',
+    description: 'Kade Media danışmanlık ve müşteri hesabınıza giriş yapın veya yeni hesap oluşturun.',
+    path: '/giris/danismanlik',
     noindex: true,
   })
 

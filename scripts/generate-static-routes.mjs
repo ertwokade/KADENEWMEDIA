@@ -1,9 +1,10 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 
 const BASE = 'https://kadenewmedia.com'
-const DIST = new URL('../dist/', import.meta.url)
-const template = await readFile(new URL('app.html', DIST), 'utf8')
+const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
+const template = await readFile(join(DIST, 'app.html'), 'utf8')
 
 const routes = [
   ['/hakkimizda', 'Kade Media Hakkında | New Media Ajansı İstanbul', 'Kade Media; Kade New Media, Kademedia ve Kadenewmedia adlarıyla da aranan İstanbul merkezli new media ve dijital pazarlama ajansıdır.', false],
@@ -24,7 +25,8 @@ const routes = [
   ['/kvkk', 'KVKK Aydınlatma Metni | Kade Media', 'Kade Media’nın kişisel verileri hangi amaçlarla ve hukuki sebeplerle işlediğini açıklayan KVKK aydınlatma metnini inceleyin.', false],
   ['/gizlilik', 'Gizlilik Politikası | Kade Media', 'Kade Media web sitesinde kişisel verilerin nasıl toplandığı, kullanıldığı, korunduğu ve hangi haklara sahip olduğunuz hakkında bilgi alın.', false],
   ['/cerez-politikasi', 'Çerez Politikası | Kade Media', 'Kade Media web sitesinde kullanılan çerez türlerini, kullanım amaçlarını ve çerez tercihlerinizi nasıl yönetebileceğinizi öğrenin.', false],
-  ['/giris', 'Giriş | Kade Media', 'Müşteri hesabı giriş sayfası.', true],
+  ['/giris', 'Çalışma Alanı Seçimi | Kade Media', 'Danışmanlık ve Content AI çalışma alanlarından kullanmak istediğinizi seçin.', true],
+  ['/giris/danismanlik', 'Danışmanlık Girişi | Kade Media', 'Kade Media danışmanlık ve müşteri hesabı giriş sayfası.', true],
   ['/musteri-panel', 'Müşteri Paneli | Kade Media', 'Korumalı müşteri alanı.', true],
   ['/admin', 'Yönetim Paneli | Kade Media', 'Korumalı yönetim alanı.', true],
   ['/organizasyon-kiti', 'Kade Organizasyon Kiti', 'Korumalı müşteri çalışma alanı.', true],
@@ -108,7 +110,7 @@ function render(route, title, description, noindex) {
 }
 
 for (const [route, title, description, noindex] of routes) {
-  const directory = join(DIST.pathname, route.slice(1))
+  const directory = join(DIST, route.slice(1))
   await mkdir(directory, { recursive: true })
   await writeFile(join(directory, 'index.html'), render(route, title, description, noindex))
 }

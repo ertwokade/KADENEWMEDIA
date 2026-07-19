@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="tr" data-theme="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <script>
+    if (new URLSearchParams(location.search).get('embed') === '1') {
+      document.documentElement.classList.add('embedded')
+    }
+  </script>
+  <title>Kade Organizasyon Kiti — AI Destekli Üretim Merkezi</title>
+  <meta name="description" content="SentScan yorum analizi, prodüksiyon CRM, Banana Studio görsel üretimi ve AI araç rehberi."/>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="kademedia-theme.css"/>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" integrity="sha384-uTYyvsSSUZeaPhb5RbKlQa0zY/WpX/QHfvg2mczXyBQOpkWPEDy9lczyp+w7SKXu" crossorigin="anonymous" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+<!-- ── MOBİL MENÜ ── -->
+<div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+<div class="app-shell">
+
+  <!-- ────────────────────────── SİDEBAR ────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">K</div>
+      <div class="brand-text">
+        <strong id="appTeamName">Kade Kit</strong>
+        <span>AI Üretim Merkezi</span>
+      </div>
+    </div>
+
+    <div class="nav-list-wrap">
+      <p class="nav-label">Genel</p>
+      <button class="nav-item active" data-view="dashboard"><i data-lucide="layout-dashboard"></i><span>Özet</span><span class="nav-badge" id="badge-tasks" style="display:none"></span></button>
+
+      <p class="nav-label">Araçlar</p>
+      <button class="nav-item" data-view="comments"><i data-lucide="message-square-text"></i><span>SentScan</span></button>
+      <button class="nav-item" data-view="crm"><i data-lucide="kanban-square"></i><span>Prodüksiyon CRM</span></button>
+      <button class="nav-item" data-view="banana"><i data-lucide="sparkles"></i><span>Banana Studio</span></button>
+
+      <p class="nav-label">Rehber</p>
+      <button class="nav-item" data-view="vibe"><i data-lucide="code-2"></i><span>Vibe Coding</span></button>
+      <button class="nav-item" data-view="radar"><i data-lucide="radio-tower"></i><span>AI Radar</span></button>
+
+      <p class="nav-label">Notlar</p>
+      <button class="nav-item" data-view="pages"><i data-lucide="notebook-text"></i><span>Sayfalar</span></button>
+
+      <p class="nav-label">Sistem</p>
+      <button class="nav-item" data-view="settings"><i data-lucide="settings"></i><span>Ayarlar</span></button>
+    </div>
+
+    <!-- Page Tree (Notion tarzı daima görünür) -->
+    <div class="ptree-nav" id="pagesNavTree">
+      <div class="ptree-nav-head">
+        <span class="ptree-nav-label">Favoriler</span>
+      </div>
+      <div id="pageTreeFavs"><div class="ptree-empty">Favori yok</div></div>
+      <div class="ptree-nav-head" style="margin-top:6px">
+        <span class="ptree-nav-label">Sayfalar</span>
+        <button id="newRootPage" class="icon-btn ptree-new-btn" title="Yeni sayfa"><i data-lucide="plus" style="width:12px;height:12px"></i></button>
+      </div>
+      <div id="pageTreeRoot"></div>
+      <button id="openTrashBtn" class="ptree-trash-btn"><i data-lucide="trash-2" style="width:12px;height:12px"></i>Çöp kutusu</button>
+    </div>
+
+    <div class="sidebar-footer">
+      <span class="dot"></span>
+      <span id="saveStatus">Yerel kayıt hazır</span>
+    </div>
+  </aside>
+
+  <!-- ────────────────────────── WORKSPACE ────────────────────────── -->
+  <main class="workspace">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menü">
+          <i data-lucide="menu"></i>
+        </button>
+        <div>
+          <p class="eyebrow" id="viewEyebrow">Kontrol Paneli</p>
+          <h1 id="viewTitle">Özet</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <label class="searchbox">
+          <i data-lucide="search"></i>
+          <input id="globalSearch" type="search" placeholder="Ara… veya Ctrl+K" aria-label="Ara"/>
+        </label>
+        <button class="icon-btn" id="themeToggle" title="Tema" aria-label="Tema değiştir">🌙</button>
+        <button class="icon-btn" id="backupBtn" title="JSON Yedek Al" aria-label="Yedek al"><i data-lucide="download-cloud"></i></button>
+        <button class="icon-btn" id="restoreBtn" title="Yedek Yükle" aria-label="Yedek yükle"><i data-lucide="upload-cloud"></i></button>
+        <input type="file" id="restoreFile" accept=".json" style="display:none"/>
+        <button class="icon-btn" id="undoBtn" title="Geri Al (Ctrl+Z)" aria-label="Geri al" disabled><i data-lucide="undo-2"></i></button>
+        <button class="icon-btn" id="printBtn" title="Yazdır / PDF" aria-label="Yazdır"><i data-lucide="printer"></i></button>
+        <button class="icon-btn" id="resetBtn" title="Çalışma alanını sıfırla" aria-label="Çalışma alanını sıfırla"><i data-lucide="rotate-ccw"></i></button>
+      </div>
+    </header>
+
+    <!-- ══════════════ DASHBOARD ══════════════ -->
+    <section class="view active" id="dashboard" data-title="Özet" data-eyebrow="Kontrol Paneli">
+      <div class="section-toolbar">
+        <div class="filter-chips" id="dashFilter">
+          <button class="filter-chip active" data-filter="all">Tüm zamanlar</button>
+          <button class="filter-chip" data-filter="thismonth">Bu ay</button>
+          <button class="filter-chip" data-filter="lastmonth">Geçen ay</button>
+        </div>
+      </div>
+      <div class="starter-notice" id="starterNotice">
+        <span><strong>Başlangıç verileri gösteriliyor.</strong> Tutarlar, görevler ve prodüksiyonlar örnektir; gerçek kayıt değildir.</span>
+        <button type="button" class="ghost-btn" id="clearStarterData">Boş çalışma alanına geç</button>
+      </div>
+      <div class="kpi-grid" id="dashKpis"></div>
+      <div class="layout-two">
+        <article class="panel panel-action" role="button" tabindex="0" data-dashboard-nav="crm" aria-label="Aylık bütçe ayrıntılarını Prodüksiyon CRM'de aç"><div class="panel-head"><div><p class="eyebrow">Bütçe</p><h2>Aylık kullanım</h2></div><div class="icon-area"><i data-lucide="wallet"></i></div></div><div id="budgetOverview"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">CRM Asistanı</p><h2>Hızlı soru</h2></div><div class="icon-area"><i data-lucide="bot"></i></div></div>
+          <form id="assistantForm" class="inline-form"><input id="assistantInput" type="text" placeholder="Bütçe, ekip veya görevler hakkında sor…" aria-label="Soru"/><button type="submit" class="primary-btn" aria-label="Soruyu gönder"><i data-lucide="send" aria-hidden="true"></i></button></form>
+          <div class="answer-box" id="assistantAnswer" aria-live="polite">Bir soru yaz ve göndermek için ok düğmesine bas.</div>
+        </article>
+      </div>
+      <div class="layout-two">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Açık işler</p><h2>Görev takvimi</h2></div><div class="icon-area"><i data-lucide="calendar-clock" aria-hidden="true"></i></div></div><div id="upcomingTasks"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Son üretimler</p><h2>Banana Studio</h2></div><div class="icon-area"><i data-lucide="image" aria-hidden="true"></i></div></div><div class="media-strip" id="recentMedia"></div></article>
+      </div>
+      <div class="layout-two">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Aktivite</p><h2>Son aksiyonlar</h2></div><div class="icon-area"><i data-lucide="activity" aria-hidden="true"></i></div></div><div id="activityFeed"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Ekip</p><h2>Görev yükü</h2></div><div class="icon-area"><i data-lucide="users" aria-hidden="true"></i></div></div><div id="teamWorkload" class="bar-chart"></div></article>
+      </div>
+    </section>
+
+    <!-- ══════════════ SENTSCAN ══════════════ -->
+    <section class="view" id="comments" data-title="SentScan" data-eyebrow="Yapay Zeka Yorum Analizi">
+      <article class="panel source-panel">
+        <div class="panel-head"><div><p class="eyebrow">Kaynak</p><h2>Video & Transkript</h2></div><div class="icon-area"><i data-lucide="file-video-2"></i></div></div>
+        <div class="source-grid">
+          <div class="source-video-box">
+            <label><span class="label-text">Video dosyası</span><input id="sourceVideoFile" type="file" accept="video/*"/></label>
+            <div class="source-video-preview">
+              <div id="sourceVideoEmpty" class="source-video-empty"><i data-lucide="film"></i></div>
+              <video id="sourceVideoPreview" controls playsinline style="display:none"></video>
+            </div>
+            <div id="sourceVideoMeta" class="source-meta"></div>
+          </div>
+          <div class="source-transcript-box">
+            <label><span class="label-text">Transkript dosyası</span><input id="transcriptFile" type="file" accept=".txt,.srt,.vtt,.json,text/plain"/></label>
+            <label><span class="label-text">Transkript</span><textarea id="transcriptInput" rows="8" placeholder="Transkripti buraya yapıştır veya .txt/.srt yükle"></textarea></label>
+            <div id="transcriptMeta" class="source-meta"></div>
+            <div class="form-actions">
+              <button type="button" class="ghost-btn" id="clearTranscriptBtn"><i data-lucide="eraser"></i>Temizle</button>
+              <button type="button" class="ghost-btn" id="sendTranscriptPage"><i data-lucide="notebook-tabs"></i>Notlara Aktar</button>
+              <button type="button" class="primary-btn" id="analyzeTranscriptBtn"><i data-lucide="scan-text"></i>Transkripti Analiz Et</button>
+            </div>
+          </div>
+        </div>
+        <div id="transcriptInsights" class="transcript-insights"></div>
+      </article>
+      <div class="layout-two wide-left">
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">YouTube</p><h2>Yorum seti</h2></div><div class="icon-area"><i data-lucide="youtube"></i></div></div>
+          <form id="commentForm" class="form-grid">
+            <label><span class="label-text">Video linki &nbsp;<small id="youtubeApiBadge" style="text-transform:none;font-weight:400;color:var(--ink3)">Bağlantı kontrol ediliyor</small></span><input id="videoUrl" type="url" placeholder="https://youtu.be/..."/></label>
+            <button type="button" class="ghost-btn" id="fetchCommentsBtn" style="display:none;justify-self:start"><i data-lucide="download-cloud"></i>YouTube'dan yorumları çek</button>
+            <label><span class="label-text">Yorumlar &nbsp;<small style="text-transform:none;font-weight:400">[beğeni] başa yaz</small></span><textarea id="commentsInput" rows="12" placeholder="[421] Bu format çok samimi olmuş…"></textarea></label>
+            <div class="form-actions">
+              <button type="button" class="export-btn" id="exportCsv"><i data-lucide="download"></i>CSV</button>
+              <button type="button" class="ghost-btn" id="saveAnalysis"><i data-lucide="save"></i>Kaydet</button>
+              <button type="button" class="ghost-btn" id="loadSampleComments"><i data-lucide="file-text"></i>Örnek yorumlar</button>
+              <button type="submit" class="primary-btn"><i data-lucide="bar-chart-3"></i>Analiz Et</button>
+            </div>
+          </form>
+        </article>
+        <div style="display:grid;gap:20px">
+          <article class="panel">
+            <div class="panel-head"><div><p class="eyebrow">Genel puan</p><h2>Video skoru</h2></div><div class="icon-area"><i data-lucide="star"></i></div></div>
+            <div id="videoScore"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><p class="eyebrow">Sonuç</p><h2>Tema analizi</h2></div><div class="icon-area"><i data-lucide="pie-chart"></i></div></div>
+            <div id="commentSummary"></div>
+          </article>
+        </div>
+      </div>
+      <div class="layout-two">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">İyileştirme</p><h2>Öneriler</h2></div><div class="icon-area"><i data-lucide="lightbulb"></i></div></div><div id="recommendations"></div></article>
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Duygu</p><h2>Kelime bulutu</h2></div><div class="icon-area"><i data-lucide="cloud"></i></div></div>
+          <div id="wordFilterBar" style="display:none" class="word-filter-bar"><span id="wordFilterLabel"></span><button class="word-filter-reset" onclick="clearWordFilter()">× Sıfırla</button></div>
+          <div class="word-cloud" id="wordCloud"></div>
+        </article>
+      </div>
+      <div class="layout-two">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Yorumlar</p><h2>En çok beğenilenler</h2></div><div class="icon-area"><i data-lucide="thumbs-up"></i></div></div><div id="topComments"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Anlık tepkiler</p><h2>Zaman damgaları</h2></div><div class="icon-area"><i data-lucide="clock-3"></i></div></div><div id="timestampComments"></div></article>
+      </div>
+      <article class="panel">
+        <div class="panel-head"><div><p class="eyebrow">Geçmiş</p><h2>Kayıtlı analizler</h2></div><div class="icon-area"><i data-lucide="history"></i></div></div>
+        <div id="analysisHistory"></div>
+      </article>
+    </section>
+
+    <!-- ══════════════ CRM ══════════════ -->
+    <section class="view" id="crm" data-title="Prodüksiyon CRM" data-eyebrow="Proje ve Bütçe Yönetimi">
+      <div class="toolbar">
+        <div class="tabs">
+          <button class="tab-btn active" data-crm-tab="productions">Kanban</button>
+          <button class="tab-btn" data-crm-tab="ideas">Fikirler</button>
+          <button class="tab-btn" data-crm-tab="tasks">Görevler</button>
+          <button class="tab-btn" data-crm-tab="gantt">Gantt</button>
+          <button class="tab-btn" data-crm-tab="inventory">Envanter</button>
+          <button class="tab-btn" data-crm-tab="library">Kütüphane</button>
+        </div>
+        <button class="primary-btn" id="quickAddProduction"><i data-lucide="plus"></i>Yeni Kart</button>
+      </div>
+
+      <!-- Kanban -->
+      <div class="crm-tab active" id="crm-productions">
+        <div class="kpi-grid compact" id="crmKpis"></div>
+        <!-- Tag filtre -->
+        <div class="tag-filter-bar" id="tagFilterBar"></div>
+        <div class="kanban" id="kanbanBoard"></div>
+      </div>
+
+      <!-- Fikirler -->
+      <div class="crm-tab" id="crm-ideas">
+        <div class="layout-two wide-left">
+          <article class="panel"><div class="panel-head"><div><p class="eyebrow">Fikir havuzu</p><h2>Video fikirleri</h2></div><div class="icon-area"><i data-lucide="notebook-pen"></i></div></div><div id="ideaList" class="idea-grid"></div></article>
+          <article class="panel">
+            <div class="panel-head"><div><p class="eyebrow">Yeni fikir</p><h2>Kart aç</h2></div><div class="icon-area"><i data-lucide="plus-circle"></i></div></div>
+            <form id="ideaForm" class="form-grid">
+              <label><span class="label-text">Başlık</span><input id="ideaTitle" required placeholder="Fikrin adı"/></label>
+              <label><span class="label-text">Kanal</span><select id="ideaChannel"><option value="Kade Media">Kade Media</option><option value="Kade V2">Kade V2</option></select></label>
+              <label><span class="label-text">Not</span><textarea id="ideaNotes" rows="4" placeholder="Açıklama…"></textarea></label>
+              <button class="primary-btn" type="submit"><i data-lucide="save"></i>Kaydet</button>
+            </form>
+          </article>
+        </div>
+      </div>
+
+      <!-- Görevler -->
+      <div class="crm-tab" id="crm-tasks">
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Görevler</p><h2>Ekip panosu</h2></div><div class="icon-area"><i data-lucide="list-checks"></i></div></div>
+          <div class="task-filter-bar">
+            <label>Kişi: <select id="taskAssigneeFilter" onchange="renderGeneralTasks()"><option value="">— Tümü —</option></select></label>
+            <label>Durum: <select id="taskStatusFilter" onchange="renderGeneralTasks()"><option value="">Tümü</option><option value="open">Açık</option><option value="done">Tamamlanan</option></select></label>
+            <label>Öncelik: <select id="taskPrioFilter" onchange="renderGeneralTasks()"><option value="">Tümü</option><option>Yüksek</option><option>Orta</option><option>Düşük</option></select></label>
+          </div>
+          <div id="bulkTaskToolbar" class="bulk-toolbar" style="display:none">
+            <span id="bulkCount">0 seçili</span>
+            <button type="button" class="ghost-btn" onclick="bulkCompleteTasks()"><i data-lucide="check-square"></i>Tamamla</button>
+            <button type="button" class="ghost-btn" onclick="clearBulkSelect()"><i data-lucide="x-square"></i>Seçimi kaldır</button>
+          </div>
+          <div id="generalTasks"></div>
+        </article>
+      </div>
+
+      <!-- Gantt -->
+      <div class="crm-tab" id="crm-gantt">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Zaman çizelgesi</p><h2>Prodüksiyon Gantt</h2></div><div class="icon-area"><i data-lucide="calendar-range"></i></div></div><div id="ganttChart" class="gantt-wrap"></div></article>
+      </div>
+
+      <!-- Envanter -->
+      <div class="crm-tab" id="crm-inventory">
+        <div class="layout-two wide-left">
+          <article class="panel"><div class="panel-head"><div><p class="eyebrow">Depo</p><h2>Envanter</h2></div><div class="icon-area"><i data-lucide="boxes"></i></div></div><div id="inventoryTable"></div></article>
+          <article class="panel">
+            <div class="panel-head"><div><p class="eyebrow">Yeni ürün</p><h2>Stok ekle</h2></div><div class="icon-area"><i data-lucide="package-plus"></i></div></div>
+            <form id="inventoryForm" class="form-grid">
+              <label><span class="label-text">Ürün adı</span><input id="inventoryName" required placeholder="LED panel…"/></label>
+              <label><span class="label-text">Adet</span><input id="inventoryQty" type="number" min="1" value="1"/></label>
+              <label><span class="label-text">Konum</span><input id="inventoryLocation" value="Depo A / Raf 1"/></label>
+              <button class="primary-btn" type="submit"><i data-lucide="save"></i>Kaydet</button>
+            </form>
+          </article>
+        </div>
+      </div>
+
+      <!-- Kütüphane -->
+      <div class="crm-tab" id="crm-library">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Şirket</p><h2>Doküman kütüphanesi</h2></div><div class="icon-area"><i data-lucide="folder-open"></i></div></div><div id="libraryList" class="doc-grid"></div></article>
+      </div>
+    </section>
+
+    <!-- ══════════════ BANANA STUDIO ══════════════ -->
+    <section class="view" id="banana" data-title="Banana Studio" data-eyebrow="Görsel & Video Üretim Stüdyosu">
+      <div class="toolbar">
+        <div class="tabs">
+          <button class="tab-btn active" data-banana-tab="image">🖼 Görsel</button>
+          <button class="tab-btn" data-banana-tab="video">🎬 Video</button>
+          <button class="tab-btn" data-banana-tab="admin">📊 Admin</button>
+        </div>
+        <span class="cost-chip" id="bananaCost">$0.00</span>
+      </div>
+
+      <!-- Görsel -->
+      <div class="banana-tab active" id="banana-image">
+        <div class="layout-two wide-left">
+          <article class="panel">
+            <div class="panel-head"><div><p class="eyebrow">Görsel üretimi</p><h2>Prompt paneli</h2></div><div class="icon-area"><i data-lucide="image-plus"></i></div></div>
+            <form id="imageForm" class="form-grid">
+              <div class="form-row">
+                <label><span class="label-text">Model</span><select id="imageModel"></select></label>
+                <label><span class="label-text">Oran</span><select id="imageRatio"></select></label>
+                <label><span class="label-text">Çözünürlük</span><select id="imageResolution"></select></label>
+                <label><span class="label-text">Adet</span><input id="imageCount" type="number" min="1" max="12" value="4"/></label>
+              </div>
+              <label><span class="label-text">Prompt</span><textarea id="imagePrompt" rows="5" placeholder="@ana-kisi ve @ikinci-kisi 1 yıldızlı restoranda kapak pozu veriyor…"></textarea></label>
+              <div class="form-actions">
+                <select id="brainstormCount" class="count-select" aria-label="Brainstorm adet">
+                  <option value="5">5 fikir</option>
+                  <option value="10">10 fikir</option>
+                  <option value="20">20 fikir</option>
+                </select>
+                <button type="button" class="ghost-btn" id="brainstormImage"><i data-lucide="brain"></i>Öneri oluştur</button>
+                <button type="button" class="ghost-btn" id="enhanceImagePrompt"><i data-lucide="wand-2"></i>İyileştir</button>
+                <button type="button" class="ghost-btn" id="saveTemplate"><i data-lucide="bookmark"></i>Şablon Kaydet</button>
+                <button type="submit" class="primary-btn"><i data-lucide="sparkles"></i>Oluştur</button>
+              </div>
+            </form>
+          </article>
+          <div style="display:grid;gap:16px">
+            <article class="panel">
+              <div class="panel-head"><div><p class="eyebrow">Kişi etiketleri</p><h2>Referanslar</h2></div><div class="icon-area"><i data-lucide="tags"></i></div></div>
+              <div class="reference-list" id="referenceList"></div>
+              <form id="referenceForm" class="mini-form" style="margin-top:12px"><input id="referenceTag" placeholder="@etiket" aria-label="Referans etiketi"/><button class="icon-btn" type="submit" aria-label="Referans ekle"><i data-lucide="plus" aria-hidden="true"></i></button></form>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><div><p class="eyebrow">Şablonlar</p><h2>Hızlı promptlar</h2></div><div class="icon-area"><i data-lucide="bookmark"></i></div></div>
+              <div id="promptTemplates"></div>
+            </article>
+          </div>
+        </div>
+        <div class="layout-two">
+          <article class="panel"><div class="panel-head"><div><p class="eyebrow">Yerel yardımcı</p><h2>Prompt önerileri</h2></div><div class="icon-area"><i data-lucide="list-plus"></i></div></div><div id="brainstormList" class="prompt-list"></div></article>
+          <article class="panel"><div class="panel-head"><div><p class="eyebrow">Son promptlar</p><h2>Prompt geçmişi</h2></div><div class="icon-area"><i data-lucide="clock"></i></div></div><div id="promptHistory"></div></article>
+        </div>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Galeri</p><h2>Üretimler</h2></div><div class="icon-area"><i data-lucide="images"></i></div></div><div id="imageGallery" class="image-grid"></div></article>
+      </div>
+
+      <!-- Video -->
+      <div class="banana-tab" id="banana-video">
+        <div class="layout-two wide-left">
+          <article class="panel">
+            <div class="panel-head"><div><p class="eyebrow">Video üretimi</p><h2>Seadance akışı</h2></div><div class="icon-area"><i data-lucide="film"></i></div></div>
+            <form id="videoForm" class="form-grid">
+              <div class="form-row" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+                <label><span class="label-text">Model</span><select id="videoModel"></select></label>
+                <label><span class="label-text">Süre</span><select id="videoDuration"></select></label>
+                <label><span class="label-text">Çözünürlük</span><select id="videoResolution"></select></label>
+              </div>
+              <label><span class="label-text">Video promptu</span><textarea id="videoPrompt" rows="6" placeholder="@ana-kisi makinenin içinde saklanıyor…"></textarea></label>
+              <div class="form-actions">
+                <button type="button" class="ghost-btn" id="continueVideo"><i data-lucide="step-forward"></i>Devam Ettir</button>
+                <button type="button" class="ghost-btn" id="enhanceVideoPrompt"><i data-lucide="wand-sparkles"></i>İyileştir</button>
+                <button type="submit" class="primary-btn" id="videoGenerateButton" disabled><i data-lucide="clock-3"></i>Yakında</button>
+              </div>
+            </form>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><p class="eyebrow">Referanslar</p><h2>YouTube konseptleri</h2></div><div class="icon-area"><i data-lucide="clapperboard"></i></div></div>
+            <div class="yt-ref-filter">
+              <button class="filter-chip active" data-yt-sort="popular" onclick="switchYtSort('popular',this)">En çok izlenen</button>
+              <button class="filter-chip" data-yt-sort="recent" onclick="switchYtSort('recent',this)">Son videolar</button>
+            </div>
+            <div id="youtubeReferences"></div>
+          </article>
+        </div>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Geçmiş</p><h2>Üretim kayıtları</h2></div><div class="icon-area"><i data-lucide="history"></i></div></div><div id="videoHistory" class="video-grid"></div></article>
+      </div>
+
+      <!-- Admin -->
+      <div class="banana-tab" id="banana-admin">
+        <div class="layout-two">
+          <article class="panel"><div class="panel-head"><div><p class="eyebrow">Kullanım</p><h2>Ekip harcaması</h2></div><div class="icon-area"><i data-lucide="receipt"></i></div></div><div id="adminSpend"></div></article>
+          <article class="panel"><div class="panel-head"><div><p class="eyebrow">Modeller</p><h2>Birim maliyet</h2></div><div class="icon-area"><i data-lucide="coins"></i></div></div><div id="modelCosts"></div></article>
+        </div>
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Grafik</p><h2>Kullanıcı bazlı maliyet</h2></div><div class="icon-area"><i data-lucide="bar-chart-2"></i></div></div><div id="spendingChart" class="bar-chart"></div></article>
+      </div>
+    </section>
+
+    <!-- ══════════════ VİBE CODİNG ══════════════ -->
+    <section class="view" id="vibe" data-title="Vibe Coding Rehberi" data-eyebrow="Yazılım Bilmeden Uygulama Geliştirme">
+      <div class="layout-two wide-left">
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Brief oluşturucu</p><h2>Uygulama taslağı</h2></div><div class="icon-area"><i data-lucide="file-code-2"></i></div></div>
+          <form id="briefForm" class="form-grid">
+            <label><span class="label-text">Uygulama fikri</span><input id="briefIdea" value="Prodüksiyon ekibi için bütçe ve görev takip sistemi"/></label>
+            <label><span class="label-text">Kullanıcılar</span><input id="briefUsers" value="Yönetici, prodüktör, kurgu ekibi"/></label>
+            <label><span class="label-text">Yapabilsin</span><textarea id="briefCan" rows="4">Prodüksiyon kartı açsın, görev atasın, harcama girsin.</textarea></label>
+            <label><span class="label-text">Yapamasın</span><textarea id="briefCannot" rows="3">Yetkisiz kullanıcı bütçe silemesin.</textarea></label>
+            <button class="primary-btn" type="submit"><i data-lucide="clipboard-check"></i>Brief Oluştur</button>
+          </form>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Çıktı</p><h2>Kopyalanabilir brief</h2></div><div class="icon-area"><i data-lucide="clipboard"></i></div></div>
+          <pre id="briefOutput" class="brief-output">Brief oluşturmak için formu doldurun…</pre>
+          <div style="margin-top:10px;display:flex;justify-content:flex-end"><button class="ghost-btn" id="copyBrief"><i data-lucide="copy"></i>Kopyala</button></div>
+        </article>
+      </div>
+      <article class="panel"><div class="panel-head"><div><p class="eyebrow">Rehber</p><h2>Vibe Coding yol haritası</h2></div><div class="icon-area"><i data-lucide="workflow"></i></div></div><div id="vibeSteps" style="display:grid;gap:10px"></div></article>
+    </section>
+
+    <!-- ══════════════ AI RADAR ══════════════ -->
+    <section class="view" id="radar" data-title="AI Radar" data-eyebrow="Günlük AI Kaynakları">
+      <div class="layout-three" id="radarCards"></div>
+      <div class="layout-two">
+        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Model seçimi</p><h2>Kullanım matrisi</h2></div><div class="icon-area"><i data-lucide="table-2"></i></div></div><div id="modelMatrix" class="model-matrix"></div></article>
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Notlar</p><h2>Keşif defteri</h2></div><div class="icon-area"><i data-lucide="book-marked"></i></div></div>
+          <form id="radarNoteForm" class="inline-form" style="margin-bottom:14px"><input id="radarNoteInput" placeholder="Yeni not…" aria-label="Yeni radar notu"/><button class="primary-btn" type="submit" aria-label="Radar notu ekle"><i data-lucide="plus" aria-hidden="true"></i></button></form>
+          <div id="radarNotes" class="note-list"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ══════════════ AYARLAR ══════════════ -->
+    <section class="view" id="settings" data-title="Ayarlar" data-eyebrow="Sistem Yapılandırması">
+      <div class="layout-two">
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Genel</p><h2>Uygulama ayarları</h2></div><div class="icon-area"><i data-lucide="sliders-horizontal"></i></div></div>
+          <form id="settingsForm" class="form-grid">
+            <label><span class="label-text">Ekip adı</span><input id="setTeamName" placeholder="Ork Digital"/></label>
+            <label><span class="label-text">Aylık bütçe (₺)</span><input id="setBudget" type="number" min="0" placeholder="650000"/></label>
+            <label><span class="label-text">Ekip üyeleri (virgülle ayır)</span><input id="setMembers" placeholder="Kadir, Emir, Emre, Çağrı, Berkin, Merve"/></label>
+            <button class="primary-btn" type="submit"><i data-lucide="save"></i>Kaydet</button>
+          </form>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Veri</p><h2>Yedek & Geri yükleme</h2></div><div class="icon-area"><i data-lucide="database"></i></div></div>
+          <div style="display:grid;gap:12px">
+            <button class="ghost-btn" id="settingsBackup" style="justify-content:flex-start"><i data-lucide="download-cloud"></i>JSON Yedek Al</button>
+            <button class="ghost-btn" id="settingsRestore" style="justify-content:flex-start"><i data-lucide="upload-cloud"></i>Yedek Yükle</button>
+            <button class="danger-btn" id="settingsReset" style="justify-content:flex-start"><i data-lucide="trash-2"></i>Tüm veriyi sıfırla</button>
+          </div>
+        </article>
+      </div>
+      <div class="layout-two">
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Klavye kısayolları</p><h2>Hızlı erişim</h2></div><div class="icon-area"><i data-lucide="keyboard"></i></div></div>
+          <table class="data-table" id="shortcutsTable"></table>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Aktivite logu</p><h2>Tüm aksiyonlar</h2></div><div class="icon-area"><i data-lucide="scroll-text"></i></div></div>
+          <div id="fullActivityLog"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ══════════════ PAGES ══════════════ -->
+    <section class="view" id="pages" data-title="Sayfalar" data-eyebrow="Notion Tarzı Notlar">
+
+      <!-- Empty state -->
+      <div id="pageEmpty" class="page-empty-state">
+        <div class="page-empty-icon">📝</div>
+        <h2>Sayfana başla</h2>
+        <p>Bir sayfa oluştur, notlarını yaz, listeler yap.</p>
+        <button id="newPageFromEmpty" class="primary-btn"><i data-lucide="plus"></i>Yeni sayfa</button>
+      </div>
+
+      <!-- Page editor -->
+      <div id="pageEditor" class="page-editor-shell" style="display:none">
+        <!-- Cover image area -->
+        <div id="pageCoverArea" class="page-cover-area"></div>
+
+        <!-- Breadcrumb + actions -->
+        <div class="page-topbar">
+          <div id="pageBreadcrumb" class="page-breadcrumb"></div>
+          <div class="page-actions">
+            <button id="pageFavBtn" class="ghost-btn" style="font-size:12px"><i data-lucide="star" style="width:13px;height:13px"></i>Favori ekle</button>
+            <button id="pageAddCoverBtn" class="ghost-btn" style="font-size:12px"><i data-lucide="image" style="width:13px;height:13px"></i>Kapak ekle</button>
+            <button id="pageAddSubBtn" class="ghost-btn" style="font-size:12px"><i data-lucide="file-plus-2" style="width:13px;height:13px"></i>Alt sayfa</button>
+            <button id="pageDupBtn" class="ghost-btn" style="font-size:12px"><i data-lucide="copy" style="width:13px;height:13px"></i>Çoğalt</button>
+            <button id="pageMoveBtn" class="ghost-btn" style="font-size:12px"><i data-lucide="move" style="width:13px;height:13px"></i>Taşı</button>
+            <button class="ghost-btn" style="font-size:12px" onclick="togglePageSearch()" title="Ctrl+F"><i data-lucide="search" style="width:13px;height:13px"></i>Ara</button>
+            <button id="pageExportMdBtn" class="ghost-btn" style="font-size:12px"><i data-lucide="download" style="width:13px;height:13px"></i>Markdown</button>
+            <button id="pageDeleteBtn" class="ghost-btn" style="font-size:12px;color:var(--danger)"><i data-lucide="trash-2" style="width:13px;height:13px"></i>Sil</button>
+          </div>
+        </div>
+
+        <!-- Page content area -->
+        <div class="page-content">
+          <!-- Page icon + title -->
+          <div class="page-title-row">
+            <button id="pageIconBtn" class="page-icon-btn" title="Emoji değiştir">📄</button>
+            <div id="pageTitleEl" class="page-title-el" contenteditable="true" data-ph="Başlıksız"></div>
+          </div>
+
+          <!-- Blocks -->
+          <div id="blocksInner" class="blocks-inner"></div>
+
+          <!-- Word count -->
+          <div id="pageWordCount" class="page-word-count"></div>
+
+          <!-- Add block hint -->
+          <button id="addBlockHintBtn" class="add-block-hint-btn">
+            <i data-lucide="plus" style="width:14px;height:14px"></i>Blok ekle ya da / yazarak komut gir
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- /workspace -->
+</div><!-- /app-shell -->
+
+<!-- ── Production Dialog ── -->
+<dialog id="productionDialog" class="detail-dialog" aria-modal="true" aria-labelledby="dialogTitle">
+  <form method="dialog" class="dialog-shell">
+    <div class="dialog-head">
+      <div class="dialog-head-left">
+        <p class="eyebrow" id="dialogStage"></p>
+        <h2 id="dialogTitle"></h2>
+      </div>
+      <div class="dialog-head-actions">
+        <button type="button" class="ghost-btn" style="font-size:12px" id="duplicateProductionBtn"><i data-lucide="copy"></i>Kopyala</button>
+        <button type="button" class="danger-btn" id="deleteProductionBtn"><i data-lucide="trash-2"></i>Sil</button>
+        <button class="icon-btn" value="close" aria-label="Kapat"><i data-lucide="x"></i></button>
+      </div>
+    </div>
+    <div id="dialogBody" class="dialog-body"></div>
+  </form>
+</dialog>
+
+<!-- ── Komut Paleti ── -->
+<div id="commandPalette" class="command-overlay" style="display:none" onclick="closeCommandPalette(event)">
+  <div class="command-box">
+    <div class="command-search-wrap">
+      <i data-lucide="search" class="command-icon"></i>
+      <input id="commandInput" type="text" placeholder="Komut veya sayfa ara…" autocomplete="off" aria-label="Komut ara"/>
+      <kbd class="kbd">ESC</kbd>
+    </div>
+    <div id="commandResults" class="command-results"></div>
+    <div class="command-footer">
+      <span><kbd class="kbd">↑↓</kbd> Gezin</span>
+      <span><kbd class="kbd">↵</kbd> Seç</span>
+      <span><kbd class="kbd">ESC</kbd> Kapat</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast container ── -->
+<div id="toastContainer"></div>
+
+<!-- ══ SLASH MENU ══ -->
+<div id="slashMenu" class="slash-menu" style="display:none">
+  <div class="slash-search-wrap">
+    <i data-lucide="search" style="width:13px;height:13px;opacity:.5"></i>
+    <input id="slashInput" type="text" class="slash-search" placeholder="Blok ara…" autocomplete="off"/>
+  </div>
+  <div id="slashList" class="slash-list"></div>
+  <div class="slash-footer"><kbd class="kbd">↑↓</kbd>Gezin &nbsp;<kbd class="kbd">↵</kbd>Seç &nbsp;<kbd class="kbd">ESC</kbd>Kapat</div>
+</div>
+
+<!-- ══ INLINE TOOLBAR ══ -->
+<div id="inlineToolbar" class="inline-toolbar" style="display:none">
+  <button class="itb-btn" data-cmd="bold" title="Kalın (Ctrl+B)"><b>B</b></button>
+  <button class="itb-btn" data-cmd="italic" title="İtalik (Ctrl+I)"><i>I</i></button>
+  <button class="itb-btn" data-cmd="underline" title="Altı çizili"><u>U</u></button>
+  <button class="itb-btn" data-cmd="strikeThrough" title="Üstü çizili"><s>S</s></button>
+  <button class="itb-btn" data-cmd="inlineCode" title="Kod">&#60;/&#62;</button>
+  <div class="itb-sep"></div>
+  <button class="itb-btn" data-cmd="createLink" title="Link"><i data-lucide="link" style="width:13px;height:13px"></i></button>
+  <div class="itb-sep"></div>
+  <div class="itb-color-wrap" title="Metin rengi">
+    <span class="itb-color-label">A</span>
+    <div class="itb-color-swatches" id="itbTextColors">
+      <button class="color-swatch" data-cmd="foreColor" data-val="#f0f4ff" style="background:#f0f4ff" title="Varsayılan"></button>
+      <button class="color-swatch" data-cmd="foreColor" data-val="#00d4aa" style="background:#00d4aa" title="Turkuaz"></button>
+      <button class="color-swatch" data-cmd="foreColor" data-val="#6c8ef5" style="background:#6c8ef5" title="İndigo"></button>
+      <button class="color-swatch" data-cmd="foreColor" data-val="#ff6b6b" style="background:#ff6b6b" title="Kırmızı"></button>
+      <button class="color-swatch" data-cmd="foreColor" data-val="#ffd166" style="background:#ffd166" title="Sarı"></button>
+      <button class="color-swatch" data-cmd="foreColor" data-val="#c77dff" style="background:#c77dff" title="Mor"></button>
+    </div>
+  </div>
+  <div class="itb-color-wrap" title="Arka plan rengi">
+    <span class="itb-color-label" style="background:rgba(255,255,255,0.12)">A</span>
+    <div class="itb-color-swatches" id="itbBgColors">
+      <button class="color-swatch" data-cmd="hiliteColor" data-val="transparent" style="background:transparent;border:1px solid rgba(255,255,255,0.3)" title="Yok"></button>
+      <button class="color-swatch" data-cmd="hiliteColor" data-val="rgba(0,212,170,0.2)" style="background:rgba(0,212,170,0.2)" title="Yeşil arka plan"></button>
+      <button class="color-swatch" data-cmd="hiliteColor" data-val="rgba(108,142,245,0.2)" style="background:rgba(108,142,245,0.2)" title="Mavi arka plan"></button>
+      <button class="color-swatch" data-cmd="hiliteColor" data-val="rgba(255,107,107,0.2)" style="background:rgba(255,107,107,0.2)" title="Kırmızı arka plan"></button>
+      <button class="color-swatch" data-cmd="hiliteColor" data-val="rgba(255,209,102,0.2)" style="background:rgba(255,209,102,0.2)" title="Sarı arka plan"></button>
+      <button class="color-swatch" data-cmd="hiliteColor" data-val="rgba(199,125,255,0.2)" style="background:rgba(199,125,255,0.2)" title="Mor arka plan"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EMOJI PICKER ══ -->
+<div id="emojiPicker" class="emoji-picker" style="display:none">
+  <div class="emoji-picker-head">Emoji seç</div>
+  <div id="emojiGrid" class="emoji-grid"></div>
+</div>
+
+<!-- ══ TRASH MODAL ══ -->
+<dialog id="trashModal" class="detail-dialog" aria-modal="true" aria-labelledby="trashTitle">
+  <form method="dialog" class="dialog-shell">
+    <div class="dialog-head">
+      <div class="dialog-head-left">
+        <p class="eyebrow">Geri dönüşüm kutusu</p>
+        <h2 id="trashTitle">Silinmiş sayfalar</h2>
+      </div>
+      <div class="dialog-head-actions">
+        <button class="icon-btn" value="close" aria-label="Kapat"><i data-lucide="x"></i></button>
+      </div>
+    </div>
+    <div class="dialog-body">
+      <div id="trashList"></div>
+    </div>
+  </form>
+</dialog>
+
+</body>
+</html>
