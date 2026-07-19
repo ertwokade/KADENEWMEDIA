@@ -2,11 +2,22 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
 import { canAccessOwnedResource } from '../../lib/security/ownership'
+import { isSettingsOwnerEmail, isSettingsOwnerOnlyRoute } from '../../lib/featureAccess'
 
 test('user A cannot access a resource owned by user B', () => {
   assert.equal(canAccessOwnedResource('user-a', 'user-a'), true)
   assert.equal(canAccessOwnedResource('user-a', 'user-b'), false)
   assert.equal(canAccessOwnedResource('', 'user-b'), false)
+})
+
+test('settings are restricted to the single account owner email', () => {
+  assert.equal(isSettingsOwnerEmail('demirk314@gmail.com'), true)
+  assert.equal(isSettingsOwnerEmail(' DEMIRK314@GMAIL.COM '), true)
+  assert.equal(isSettingsOwnerEmail('another-owner@gmail.com'), false)
+  assert.equal(isSettingsOwnerEmail(null), false)
+  assert.equal(isSettingsOwnerOnlyRoute('/dashboard/settings'), true)
+  assert.equal(isSettingsOwnerOnlyRoute('/api/env-status'), true)
+  assert.equal(isSettingsOwnerOnlyRoute('/dashboard/title'), false)
 })
 
 test('latest RLS migration uses explicit operations and isolates payment ownership', async () => {

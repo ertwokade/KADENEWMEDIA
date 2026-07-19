@@ -4,18 +4,17 @@
 
 /* ===== THEME TOKENS ===== */
 .admin-dashboard,
-.admin-dashboard,
 .admin-login-container {
-  --bg-primary: #fdf6e3;
-  --bg-secondary: #f5ead0;
-  --bg-tertiary: #efe2c6;
-  --card-bg: #fffdf7;
-  --card-bg-glass: rgba(255, 253, 247, 0.82);
-  --text-primary: #17130a;
+  --bg-primary: #F5F3F0;
+  --bg-secondary: #ECEAE6;
+  --bg-tertiary: #E2E0DC;
+  --card-bg: #FFFFFF;
+  --card-bg-glass: rgba(255, 255, 255, 0.72);
+  --text-primary: #1A1715;
   --text-secondary: #5C5753;
   --text-tertiary: #9E9994;
-  --accent: #e0a81f;
-  --accent-light: #f0c93f;
+  --accent: #D4A017;
+  --accent-light: #EAC321;
   --accent-alpha: rgba(212, 160, 23, 0.08);
   --accent-glow: rgba(212, 160, 23, 0.25);
   --border: rgba(0, 0, 0, 0.07);
@@ -50,8 +49,8 @@
   --accent-light: #F5D84A;
   --accent-alpha: rgba(234, 195, 33, 0.10);
   --accent-glow: rgba(234, 195, 33, 0.20);
-  --border: rgba(23, 19, 10, 0.06);
-  --border-strong: rgba(23, 19, 10, 0.10);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.10);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
@@ -105,8 +104,8 @@
 
 .dark .login-grid-overlay {
   background-image:
-    linear-gradient(rgba(23, 19, 10,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(23, 19, 10,0.02) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
 }
 
 .admin-login-card {
@@ -259,7 +258,7 @@
 .admin-dashboard .btn-primary,
 .admin-login-container .btn-primary {
   background: var(--accent);
-  color: var(--white);
+  color: #fff;
   border-color: var(--accent);
 }
 
@@ -339,8 +338,8 @@
 
 .dark .admin-grid-bg {
   background-image:
-    linear-gradient(rgba(23, 19, 10,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(23, 19, 10,0.02) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
 }
 
 /* ===== SIDEBAR ===== */
@@ -435,7 +434,7 @@
   justify-content: center;
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--white);
+  color: #fff;
   flex-shrink: 0;
   text-transform: uppercase;
 }
@@ -558,7 +557,7 @@
 .nav-badge {
   margin-left: auto;
   background: var(--accent);
-  color: var(--white);
+  color: #fff;
   font-size: 0.68rem;
   font-weight: 700;
   padding: 2px 7px;
@@ -1034,7 +1033,7 @@
 
 .admin-tab.active {
   background: var(--accent);
-  color: var(--white);
+  color: #fff;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(212,160,23,0.2);
 }
@@ -1473,12 +1472,12 @@
 
 .admin-toast.success {
   background: #059669;
-  color: var(--white);
+  color: #fff;
 }
 
 .admin-toast.error {
   background: #DC2626;
-  color: var(--white);
+  color: #fff;
 }
 
 .admin-toast .toast-progress {
@@ -1487,7 +1486,7 @@
   left: 0;
   height: 3px;
   border-radius: 0 0 var(--radius-md) var(--radius-md);
-  background: rgba(23, 19, 10,0.3);
+  background: rgba(255,255,255,0.3);
   animation: toastProgress 3s linear;
 }
 
@@ -1636,7 +1635,7 @@
 
 .view-toggle button.active {
   background: var(--accent);
-  color: var(--white);
+  color: #fff;
 }
 
 /* Search Input */
@@ -1737,48 +1736,48 @@
   .dashboard-quick-actions { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* Kade admin skin — açık kade tema */
+/* Kade Media1 admin skin */
 .admin-dashboard,
 .admin-login-container,
 .admin-dashboard.dark,
 .admin-login-container.dark {
-  --bg-primary: #fdf6e3;
-  --bg-secondary: rgba(23, 19, 10, 0.035);
-  --bg-tertiary: rgba(23, 19, 10, 0.06);
-  --card-bg: #fffdf7;
-  --card-bg-glass: rgba(255, 253, 247, 0.82);
-  --text-primary: #17130a;
-  --text-secondary: rgba(23, 19, 10, 0.62);
-  --text-tertiary: rgba(23, 19, 10, 0.42);
-  --accent: #e0a81f;
-  --accent-light: #f0c93f;
-  --accent-alpha: rgba(224, 168, 31, 0.09);
-  --accent-glow: rgba(224, 168, 31, 0.28);
-  --border: rgba(23, 19, 10, 0.10);
-  --border-strong: rgba(23, 19, 10, 0.16);
-  --shadow-sm: 0 1px 3px rgba(23, 19, 10, 0.05);
-  --shadow-md: 0 12px 34px rgba(23, 19, 10, 0.10);
-  --shadow-lg: 0 24px 60px rgba(23, 19, 10, 0.14);
-  --shadow-glow: 0 0 34px rgba(224, 168, 31, 0.18);
+  --bg-primary: #060606;
+  --bg-secondary: rgba(255, 255, 255, 0.035);
+  --bg-tertiary: rgba(255, 255, 255, 0.06);
+  --card-bg: rgba(8, 8, 8, 0.9);
+  --card-bg-glass: rgba(8, 8, 8, 0.78);
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.62);
+  --text-tertiary: rgba(255, 255, 255, 0.38);
+  --accent: #FFD400;
+  --accent-light: #FFE75A;
+  --accent-alpha: rgba(255, 212, 0, 0.08);
+  --accent-glow: rgba(255, 212, 0, 0.32);
+  --border: rgba(255, 255, 255, 0.075);
+  --border-strong: rgba(255, 255, 255, 0.13);
+  --shadow-sm: none;
+  --shadow-md: 0 16px 40px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.44);
+  --shadow-glow: 0 0 34px rgba(255, 212, 0, 0.18);
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 16px;
   --radius-xl: 18px;
-  --font: 'TikTokSans', 'Inter', system-ui, sans-serif;
-  color-scheme: light;
+  --font: 'Inter', system-ui, sans-serif;
+  color-scheme: dark;
 }
 
 .admin-dashboard,
 .admin-login-container {
   background:
-    radial-gradient(70% 58% at 74% 10%, rgba(224, 168, 31, 0.10), transparent 62%),
-    radial-gradient(55% 48% at 10% 82%, rgba(224, 168, 31, 0.07), transparent 68%),
-    #fdf6e3 !important;
+    radial-gradient(70% 58% at 74% 10%, rgba(255, 212, 0, 0.08), transparent 62%),
+    radial-gradient(55% 48% at 10% 82%, rgba(255, 212, 0, 0.055), transparent 68%),
+    #060606 !important;
 }
 
 .login-bg-pattern {
   background:
-    radial-gradient(60% 55% at 60% 48%, rgba(224, 168, 31, 0.10), transparent 70%) !important;
+    radial-gradient(60% 55% at 60% 48%, rgba(255, 212, 0, 0.09), transparent 70%) !important;
 }
 
 .login-grid-overlay,
@@ -1805,8 +1804,8 @@
 .notification-dropdown,
 .admin-modal,
 .seed-section {
-  background: linear-gradient(145deg, rgba(23, 19, 10, 0.045), rgba(23, 19, 10, 0.016) 58%, rgba(255, 212, 0, 0.035)), rgba(253, 246, 227, 0.9) !important;
-  border-color: rgba(23, 19, 10, 0.075) !important;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.016) 58%, rgba(255, 212, 0, 0.035)), rgba(8, 8, 8, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.075) !important;
   box-shadow: none !important;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -1847,7 +1846,7 @@
 }
 
 .admin-sidebar {
-  border-right-color: rgba(23, 19, 10, 0.075) !important;
+  border-right-color: rgba(255, 255, 255, 0.075) !important;
 }
 
 .sidebar-header,
@@ -1856,7 +1855,7 @@
 .admin-table-header,
 .dashboard-recent-header,
 .admin-form h3 {
-  border-color: rgba(23, 19, 10, 0.075) !important;
+  border-color: rgba(255, 255, 255, 0.075) !important;
 }
 
 .sidebar-nav-item,
@@ -1888,9 +1887,9 @@
 .admin-login-card input,
 .seed-section input,
 .search-input {
-  background: rgba(23, 19, 10, 0.04) !important;
-  border-color: rgba(23, 19, 10, 0.1) !important;
-  color: var(--white) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
   border-radius: 14px !important;
 }
 
@@ -1905,13 +1904,13 @@
 }
 
 .admin-table th {
-  background: rgba(23, 19, 10, 0.035) !important;
-  color: rgba(23, 19, 10, 0.42) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: rgba(255, 255, 255, 0.42) !important;
 }
 
 .admin-table td,
 .admin-table th {
-  border-color: rgba(23, 19, 10, 0.065) !important;
+  border-color: rgba(255, 255, 255, 0.065) !important;
 }
 
 .admin-table tr:hover td {

@@ -5,6 +5,8 @@ import {
   isAllowedOwnerEmail,
   isOwnerMode,
   isOwnerOnlyRoute,
+  isSettingsOwnerEmail,
+  isSettingsOwnerOnlyRoute,
 } from '@/lib/featureAccess'
 import { stripBasePath } from '@/lib/appConfig'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
@@ -44,9 +46,10 @@ export async function proxy(request: NextRequest) {
   const isDashboard = pathname.startsWith('/dashboard') || pathname === '/onboarding'
   const isOperationsKit = pathname.startsWith('/operations-kit')
   const isOwnerRoute = isOwnerOnlyRoute(pathname)
+  const isSettingsOwnerRoute = isSettingsOwnerOnlyRoute(pathname)
   const isPublicApi = pathname === '/api/health' || pathname === '/api/auth/password' || pathname === '/api/auth/recovery' || pathname === '/api/auth/recovery-session' || pathname === '/api/payments/webhook'
   const protectedApi = isApi && !isPublicApi
-  const requiresAuth = isDashboard || isOperationsKit || isOwnerRoute || protectedApi
+  const requiresAuth = isDashboard || isOperationsKit || isOwnerRoute || isSettingsOwnerRoute || protectedApi
   const isAiApi = pathname === '/api/assistant' || pathname === '/api/image' || pathname === '/api/transcribe' || pathname === '/api/youtube/comments' || pathname.startsWith('/api/generate/')
 
   if (isApi && !['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
@@ -150,6 +153,16 @@ export async function proxy(request: NextRequest) {
     }
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.search = ''
+    return NextResponse.redirect(url)
+  }
+
+  if (isSettingsOwnerRoute && !isSettingsOwnerEmail(user?.email)) {
+    if (isApi) {
+      return NextResponse.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
+    }
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
     url.search = ''
     return NextResponse.redirect(url)
   }

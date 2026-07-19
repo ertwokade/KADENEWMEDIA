@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAvailableModels } from '@/lib/ai/modelRouter'
-import { isAllowedOwnerEmail, isOwnerMode } from '@/lib/featureAccess'
+import { isAllowedOwnerEmail, isOwnerMode, isSettingsOwnerEmail } from '@/lib/featureAccess'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
 
 export const dynamic = 'force-dynamic'
@@ -13,12 +13,14 @@ export async function GET() {
   if (!(await hasAuthenticatedUser())) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
   let operationsSync = false
   let ownerAccess = false
+  let settingsAccess = false
   if (configured('NEXT_PUBLIC_SUPABASE_URL') && configured('NEXT_PUBLIC_SUPABASE_ANON_KEY')) {
     try {
       const supabase = await createClient()
       const { data: { user } } = await supabase.auth.getUser()
       operationsSync = Boolean(user)
       ownerAccess = isOwnerMode() && isAllowedOwnerEmail(user?.email)
+      settingsAccess = isSettingsOwnerEmail(user?.email)
     } catch {
       operationsSync = false
     }
@@ -46,6 +48,7 @@ export async function GET() {
     youtube: configured('YOUTUBE_API_KEY'),
     operationsSync,
     ownerAccess,
+    settingsAccess,
     autoRouting: true,
     availableModels: getAvailableModels(),
   }, {

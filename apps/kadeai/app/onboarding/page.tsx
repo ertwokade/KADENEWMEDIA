@@ -120,7 +120,7 @@ function OnboardingForm() {
           </div>}
 
           {step === 4 && <div className="space-y-5">
-            <div><h1 className="text-2xl font-bold">Hazır görünüyorsun</h1><p className="mt-1 text-sm text-zinc-500">Daha sonra Ayarlar’dan tüm bilgileri değiştirebilirsin.</p></div>
+            <div><h1 className="text-2xl font-bold">Hazır görünüyorsun</h1><p className="mt-1 text-sm text-zinc-500">Profil ve marka bilgilerin çalışma alanına kaydedilecek.</p></div>
             <div className="grid gap-3 sm:grid-cols-2">{[
               ['Profil', draft.profile.displayName || 'Eksik'], ['Marka', draft.brand.name || 'Eksik'],
               ['Niş', draft.brand.niche || 'Eksik'], ['Hedef kitle', draft.brand.audience || 'Eksik'],

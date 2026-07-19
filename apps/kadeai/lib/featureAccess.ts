@@ -60,12 +60,27 @@ const OWNER_ONLY_ROUTES = [
   '/api/shopier',
 ]
 
+const SETTINGS_OWNER_ONLY_ROUTES = [
+  '/dashboard/settings',
+  '/api/env-status',
+]
+
+const SETTINGS_OWNER_EMAIL = 'demirk314@gmail.com'
+
 function matchesRoute(pathname: string, route: string) {
   return pathname === route || pathname.startsWith(`${route}/`)
 }
 
 export function isOwnerOnlyRoute(pathname: string) {
   return OWNER_ONLY_ROUTES.some((route) => matchesRoute(pathname, route))
+}
+
+export function isSettingsOwnerOnlyRoute(pathname: string) {
+  return SETTINGS_OWNER_ONLY_ROUTES.some((route) => matchesRoute(pathname, route))
+}
+
+export function isSettingsOwnerEmail(email?: string | null) {
+  return email?.trim().toLowerCase() === SETTINGS_OWNER_EMAIL
 }
 
 export function isAllowedOwnerEmail(email?: string | null) {

@@ -1,4 +1,5 @@
-import { hasAuthenticatedUser } from '@/lib/auth/server'
+import { getAuthenticatedUser } from '@/lib/auth/server'
+import { isSettingsOwnerEmail } from '@/lib/featureAccess'
 
 const COMMON_ENV_KEYS = [
   'GROQ_API_KEY',
@@ -16,7 +17,11 @@ const COMMON_ENV_KEYS = [
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  if (!(await hasAuthenticatedUser())) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
+  const user = await getAuthenticatedUser()
+  if (!user) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
+  if (!isSettingsOwnerEmail(user.email)) {
+    return Response.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
+  }
 
   const status = Object.fromEntries(
     COMMON_ENV_KEYS.map((key) => [key, Boolean(process.env[key]?.trim())])

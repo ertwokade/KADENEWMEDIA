@@ -30,7 +30,7 @@ export interface ToolDefinition {
   status: ToolStatus
   requiredProfileFields: ProfileField[]
   requiredIntegrations: IntegrationId[]
-  permissions: Array<'user' | 'owner'>
+  permissions: Array<'user' | 'owner' | 'settings-owner'>
   historyEnabled: boolean
   enabled: boolean
   comingSoon: boolean
@@ -96,7 +96,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('history', 'Geçmiş', 'planning', '/dashboard/history', 'history', 'Araç çalıştırmalarını arar, filtreler ve yeniden açar.', [], false),
 
   { ...tool('shopier', 'Satış Merkezi', 'owner', '/dashboard/shopier', 'circle-dollar', 'Teklif ve satış takibi.', [], false), permissions: ['owner'] },
-  tool('settings', 'Ayarlar', 'settings', '/dashboard/settings', 'settings', 'Profil, marka, entegrasyon ve sistem ayarları.', [], false),
+  { ...tool('settings', 'Ayarlar', 'settings', '/dashboard/settings', 'settings', 'Profil, marka, entegrasyon ve sistem ayarları.', [], false), permissions: ['settings-owner'] },
 ]
 
 function tool(

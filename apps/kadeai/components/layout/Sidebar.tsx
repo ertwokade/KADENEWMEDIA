@@ -56,12 +56,13 @@ const iconMap = {
   'circle-dollar': CircleDollarSign,
 } as const
 
-function buildNavItems(ownerAccess: boolean) {
+function buildNavItems(ownerAccess: boolean, settingsAccess: boolean) {
   return TOOL_CATEGORIES.map((category) => ({
   category: category.label,
   items: TOOL_REGISTRY
     .filter((tool) => tool.category === category.id)
     .filter((tool) => ownerAccess || !tool.permissions.includes('owner'))
+    .filter((tool) => settingsAccess || !tool.permissions.includes('settings-owner'))
     .map((tool) => ({
       id: tool.id,
       label: tool.comingSoon ? `${tool.name} · Yakında` : tool.name,
@@ -105,6 +106,7 @@ export default function Sidebar() {
   const [search, setSearch] = useState('')
   const [operationsView, setOperationsView] = useState('dashboard')
   const [ownerAccess, setOwnerAccess] = useState(false)
+  const [settingsAccess, setSettingsAccess] = useState(false)
   const [openCats, setOpenCats] = useState<Set<string>>(
     new Set(['PLATFORM'])
   )
@@ -120,14 +122,22 @@ export default function Sidebar() {
 
   const isSearching = search.trim().length > 0
   const q = search.toLowerCase()
-  const navItems = useMemo(() => buildNavItems(ownerAccess), [ownerAccess])
+  const navItems = useMemo(() => buildNavItems(ownerAccess, settingsAccess), [ownerAccess, settingsAccess])
 
   useEffect(() => {
     let active = true
     fetch(apiPath('/api/config'), { cache: 'no-store' })
       .then((response) => response.ok ? response.json() : null)
-      .then((config) => { if (active) setOwnerAccess(config?.ownerAccess === true) })
-      .catch(() => { if (active) setOwnerAccess(false) })
+      .then((config) => {
+        if (!active) return
+        setOwnerAccess(config?.ownerAccess === true)
+        setSettingsAccess(config?.settingsAccess === true)
+      })
+      .catch(() => {
+        if (!active) return
+        setOwnerAccess(false)
+        setSettingsAccess(false)
+      })
     return () => { active = false }
   }, [])
 
@@ -322,14 +332,16 @@ export default function Sidebar() {
 
         {/* Footer */}
         <div className="space-y-2 border-t border-zinc-100 px-4 py-4 flex-shrink-0">
-          <Link
-            href="/dashboard/settings"
-            onClick={() => close()}
-            className="kade-sidebar-footer flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-colors hover:bg-zinc-50"
-          >
-            <Activity className="h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />
-            <p className="text-[10px] font-medium text-[#8f8b80]">Sistem durumunu kontrol et</p>
-          </Link>
+          {settingsAccess && (
+            <Link
+              href="/dashboard/settings"
+              onClick={() => close()}
+              className="kade-sidebar-footer flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-colors hover:bg-zinc-50"
+            >
+              <Activity className="h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />
+              <p className="text-[10px] font-medium text-[#8f8b80]">Sistem durumunu kontrol et</p>
+            </Link>
+          )}
           <Link
             href="/logout"
             onClick={() => close()}

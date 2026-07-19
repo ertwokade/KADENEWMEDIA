@@ -48,7 +48,6 @@ export default function LoginHub() {
           <div className="access-hub-heading">
             <span className="access-hub-eyebrow">ÇALIŞMA ALANLARI</span>
             <h1 id="access-hub-title">Nereye giriş yapmak istiyorsunuz?</h1>
-            <p>Kullandığınız hizmeti seçin. Her çalışma alanı kendi güvenli giriş ekranında açılır.</p>
           </div>
 
           <div className="access-hub-grid">
@@ -91,7 +90,6 @@ export default function LoginHub() {
             })}
           </div>
 
-          <p className="access-hub-note">Hangi alanı kullanacağınızdan emin değilseniz Kade Media ekibiyle iletişime geçin.</p>
         </motion.div>
       </section>
     </PageTransition>
