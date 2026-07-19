@@ -4,6 +4,28 @@ import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
 
+const PARTNER_FIELDS = new Set([
+  'id', 'slug', 'name', 'category', 'categoryEn', 'logo', 'color',
+  'descTr', 'descEn', 'longDescTr', 'longDescEn',
+  'servicesTr', 'servicesEn', 'resultsTr', 'resultsEn',
+]);
+
+export function sanitizePartnerUpdate(value) {
+  const clean = Object.fromEntries(Object.entries(value || {}).filter(([key]) => PARTNER_FIELDS.has(key)));
+  for (const key of ['id', 'slug']) {
+    if (clean[key] !== undefined && (typeof clean[key] !== 'string' || clean[key].length > 160 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(clean[key]))) return null;
+  }
+  for (const key of ['name', 'category', 'categoryEn', 'color']) {
+    if (clean[key] !== undefined) clean[key] = String(clean[key]).trim().slice(0, key === 'name' ? 100 : 120);
+  }
+  for (const key of ['descTr', 'descEn']) if (clean[key] !== undefined) clean[key] = String(clean[key]).slice(0, 500);
+  for (const key of ['longDescTr', 'longDescEn']) if (clean[key] !== undefined) clean[key] = String(clean[key]).slice(0, 5000);
+  for (const key of ['servicesTr', 'servicesEn', 'resultsTr', 'resultsEn']) {
+    if (clean[key] !== undefined) clean[key] = Array.isArray(clean[key]) ? clean[key].filter((item) => typeof item === 'string').map((item) => item.slice(0, 200)).slice(0, 50) : [];
+  }
+  return clean;
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
@@ -62,9 +84,12 @@ export default async function handler(req, res) {
     if (!user) return;
 
     try {
-      const { _id, ...updateData } = req.body;
+      const { _id, ...rawUpdateData } = req.body;
       if (!_id) return res.status(400).json({ error: 'Partner ID gerekli' });
       if (!isValidObjectId(_id)) return res.status(400).json({ error: 'Geçersiz ID' });
+
+      const updateData = sanitizePartnerUpdate(rawUpdateData);
+      if (!updateData) return res.status(400).json({ error: 'Partner verisi geçersiz' });
 
       updateData.updatedAt = new Date();
       const result = await collection.updateOne({ _id: new ObjectId(_id) }, { $set: updateData });

@@ -150,7 +150,7 @@ export default async function handler(req, res) {
 
     await col.insertOne(survey);
 
-    const surveyUrl = `${process.env.SITE_URL || 'https://kademedia.com'}/anket/${token}`;
+    const surveyUrl = `${process.env.SITE_URL || 'https://kadenewmedia.com'}/anket/${token}`;
     const transporter = makeTransporter();
     if (transporter) {
       const html = `

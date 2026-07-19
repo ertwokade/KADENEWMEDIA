@@ -6449,9 +6449,9 @@ function ReferralTrackingSection({ showToast }) {
           <h1>Referral <span>Takibi</span></h1>
           <p>Referans programından gelen lead'leri ve ödül durumlarını yönetin</p>
         </div>
-        <a href="/referans-programi" target="_blank" rel="noopener noreferrer" className="btn btn-outline">
-          Sayfayı Gör
-        </a>
+        <span className="btn btn-outline" aria-disabled="true" title="Public referans programı sayfası henüz yayınlanmadı">
+          Sayfa henüz yayında değil
+        </span>
       </div>
 
       <div className="admin-stats-grid" style={{ marginBottom: 18 }}>

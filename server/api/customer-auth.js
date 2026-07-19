@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { ObjectId } from 'mongodb'
 import { getDb, isValidObjectId } from './_lib/mongodb.js'
-import { createToken, verifyToken, createCsrfToken, getCookie } from './_lib/auth.js'
+import { createToken, verifyToken, getCookie, sessionVersionMatches } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
 import { rateLimitCheck } from './_lib/rateLimit.js'
 
@@ -59,6 +59,7 @@ export async function getActiveCustomerSession(req) {
     { projection: { password: 0 } }
   )
   if (!customer) return null
+  if (!sessionVersionMatches(session.sessionVersion, customer.sessionVersion)) return null
 
   return {
     session: {
@@ -113,7 +114,7 @@ async function handleRegister(req, res) {
 
   const { name, email, password, phone, consent } = parseBody(req)
 
-  if (!name || !email || !password) {
+  if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
     return res.status(400).json({ error: 'Ad, e-posta ve şifre gerekli' })
   }
   if (consent !== true) return res.status(400).json({ error: 'Aydınlatma metni onayı gereklidir' })
@@ -123,12 +124,15 @@ async function handleRegister(req, res) {
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) {
+  if (email.length > 254 || !emailRegex.test(email)) {
     return res.status(400).json({ error: 'Geçerli bir e-posta adresi girin' })
   }
 
-  if (typeof password !== 'string' || password.length < 12) {
-    return res.status(400).json({ error: 'Şifre en az 12 karakter olmalı' })
+  if (password.length < 12 || password.length > 128) {
+    return res.status(400).json({ error: 'Şifre 12–128 karakter arasında olmalı' })
+  }
+  if (phone != null && (typeof phone !== 'string' || phone.trim().length > 30)) {
+    return res.status(400).json({ error: 'Telefon numarası geçersiz' })
   }
 
   try {
@@ -153,6 +157,7 @@ async function handleRegister(req, res) {
       updatedAt: now,
       lastLoginAt: null,
       consentAt: now,
+      sessionVersion: 0,
     })
 
     const token = createToken({
@@ -160,6 +165,7 @@ async function handleRegister(req, res) {
       name: name.trim(),
       email: email.toLowerCase().trim(),
       role: 'customer',
+      sessionVersion: 0,
     })
 
     setCustomerCookie(req, res, token)
@@ -185,7 +191,7 @@ async function handleLogin(req, res) {
 
   const { email, password } = parseBody(req)
 
-  if (!email || !password) {
+  if (typeof email !== 'string' || typeof password !== 'string' || email.length > 254 || password.length > 128) {
     return res.status(400).json({ error: 'E-posta ve şifre gerekli' })
   }
 
@@ -216,6 +222,7 @@ async function handleLogin(req, res) {
       name: customer.name,
       email: customer.email,
       role: 'customer',
+      sessionVersion: Number(customer.sessionVersion || 0),
     })
 
     setCustomerCookie(req, res, token)

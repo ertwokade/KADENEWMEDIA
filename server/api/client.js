@@ -162,7 +162,7 @@ async function handleSurveys(req, res, db, user) {
       createdAt: new Date(), completedAt: null,
     };
     await col.insertOne(survey);
-    const surveyUrl = `${process.env.SITE_URL || 'https://kademedia.com'}/anket/${token}`;
+    const surveyUrl = `${process.env.SITE_URL || 'https://kadenewmedia.com'}/anket/${token}`;
     const transporter = makeTransporter();
     if (transporter) {
       const html = `<div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto"><div style="background:#111;padding:28px;text-align:center;border-radius:12px 12px 0 0"><h1 style="color:#eac321;margin:0">kade<span style="color:#fff">media</span></h1></div><div style="padding:32px;background:#fff;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none"><h2 style="color:#111">Memnuniyet Anketimiz</h2><p>Sayın ${escapeHtml(clientName)},</p><p>${projectName ? `<strong>${escapeHtml(projectName)}</strong> projemizin` : 'Çalışmamızın'} tamamlanmasının ardından görüşleriniz bizim için değerli.</p><div style="text-align:center;margin:28px 0"><a href="${surveyUrl}" style="background:#eac321;color:#111;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:1rem">Anketi Doldurun (1 dakika)</a></div></div></div>`;

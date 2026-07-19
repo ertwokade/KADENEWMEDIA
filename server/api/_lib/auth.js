@@ -230,6 +230,10 @@ export function getDefaultPermissions(role = 'viewer') {
   return { ...(DEFAULT_ROLE_PERMISSIONS[role] || DEFAULT_ROLE_PERMISSIONS.viewer) };
 }
 
+export function sessionVersionMatches(tokenVersion, storedVersion) {
+  return Number(tokenVersion || 0) === Number(storedVersion || 0);
+}
+
 function hasPermission(user, permission, { write = false } = {}) {
   if (!user) return false;
   if (user.role === 'admin') return true;
@@ -256,6 +260,7 @@ export async function getAuthorizedUser(req) {
 
   const dbUser = await db.collection('users').findOne({ $or: identityFilters }, { projection: { password: 0 } });
   if (!dbUser) return null;
+  if (!sessionVersionMatches(sessionUser.sessionVersion, dbUser.sessionVersion)) return null;
 
   return {
     ...sessionUser,

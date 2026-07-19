@@ -6,6 +6,7 @@ import { renderEmail } from '../../lib/email/templates'
 import { MockPaymentProvider } from '../../lib/payments/mockProvider'
 import { processVerifiedPaymentEvent } from '../../lib/payments/processor'
 import { signPaymentPayload } from '../../lib/payments/signature'
+import { getPaymentProduct } from '../../lib/payments/catalog'
 import type { PaymentEventStore, VerifiedPaymentEvent } from '../../lib/payments/types'
 
 test('AI mock is deterministic and never reports provider tokens', () => {
@@ -46,4 +47,12 @@ test('payment event processing is idempotent', async () => {
   assert.deepEqual(await processVerifiedPaymentEvent(event, store), { duplicate: false })
   assert.deepEqual(await processVerifiedPaymentEvent(event, store), { duplicate: true })
   assert.equal(updates, 1)
+})
+
+test('checkout amount and currency come only from the server catalog', () => {
+  const clientBody = { productId: 'sandbox-credit', amountMinor: 1, currency: 'USD' }
+  const product = getPaymentProduct(clientBody.productId)
+  assert.equal(product?.amountMinor, 10000)
+  assert.equal(product?.currency, 'TRY')
+  assert.equal(Object.isFrozen(product), true)
 })

@@ -30,6 +30,12 @@ export default async function handler(req, res) {
       if (!username || !password) {
         return res.status(400).json({ error: 'Kullanıcı adı ve şifre gerekli' });
       }
+      if (typeof username !== 'string' || !/^[a-zA-Z0-9_]{1,30}$/.test(username)) {
+        return res.status(400).json({ error: 'Geçersiz kullanıcı adı formatı' });
+      }
+      if (typeof password !== 'string' || password.length < 12 || password.length > 128) {
+        return res.status(400).json({ error: 'Şifre 12–128 karakter arasında olmalı' });
+      }
 
       const validRoles = ['admin', 'editor', 'viewer'];
       if (role && !validRoles.includes(role)) {
@@ -41,7 +47,7 @@ export default async function handler(req, res) {
         return res.status(409).json({ error: 'Bu kullanıcı adı zaten kullanılıyor' });
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 12);
       const newUser = {
         username,
         password: hashedPassword,
@@ -50,6 +56,7 @@ export default async function handler(req, res) {
         permissions: permissions || getDefaultPermissions(role || 'viewer'),
         createdAt: new Date(),
         updatedAt: new Date(),
+        sessionVersion: 0,
       };
 
       await db.collection('users').insertOne(newUser);
@@ -66,6 +73,15 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Kullanıcı ID gerekli' });
       }
       if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (username && (typeof username !== 'string' || !/^[a-zA-Z0-9_]{1,30}$/.test(username))) {
+        return res.status(400).json({ error: 'Geçersiz kullanıcı adı formatı' });
+      }
+      if (role && !['admin', 'editor', 'viewer'].includes(role)) {
+        return res.status(400).json({ error: 'Geçersiz rol' });
+      }
+      if (password && (typeof password !== 'string' || password.length < 12 || password.length > 128)) {
+        return res.status(400).json({ error: 'Şifre 12–128 karakter arasında olmalı' });
+      }
 
       const { email: emailUpdate } = req.body;
       const updateData = { updatedAt: new Date() };
@@ -75,12 +91,13 @@ export default async function handler(req, res) {
         if (!permissions) updateData.permissions = getDefaultPermissions(role);
       }
       if (permissions) updateData.permissions = permissions;
-      if (password) updateData.password = await bcrypt.hash(password, 10);
+      if (password) updateData.password = await bcrypt.hash(password, 12);
       if (emailUpdate !== undefined) updateData.email = emailUpdate;
 
+      const shouldRevokeSessions = Boolean(password || role || permissions);
       await db.collection('users').updateOne(
         { _id: new ObjectId(id) },
-        { $set: updateData }
+        { $set: updateData, ...(shouldRevokeSessions ? { $inc: { sessionVersion: 1 } } : {}) }
       );
       logActivity(db, { action: 'Kullanıcı güncellendi', detail: `${username || id}`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Kullanıcı güncellendi' });

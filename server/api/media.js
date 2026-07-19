@@ -2,8 +2,7 @@ import { ObjectId } from 'mongodb';
 import { getDb, isValidObjectId } from './_lib/mongodb.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
-
-const MAX_BASE64_SIZE = 2 * 1024 * 1024; // 2MB base64 limit
+import { validateMediaUpload } from './_lib/uploadValidation.js';
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -44,25 +43,18 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { name, data, mimeType, alt, tags } = req.body;
 
-    if (!name || !data || !mimeType) {
+    if (typeof name !== 'string' || !name.trim() || !data || !mimeType) {
       return res.status(400).json({ error: 'Dosya adı, veri ve MIME türü zorunludur' });
     }
+    const validation = validateMediaUpload(data, mimeType);
+    if (!validation.ok) return res.status(validation.status).json({ error: validation.error });
 
-    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'application/pdf'];
-    if (!allowedMimes.includes(mimeType)) {
-      return res.status(400).json({ error: 'Desteklenmeyen dosya türü' });
-    }
-
-    if (data.length > MAX_BASE64_SIZE * 1.4) {
-      return res.status(413).json({ error: 'Dosya boyutu çok büyük (max 2MB)' });
-    }
-
-    const sizeBytes = Math.round((data.length * 3) / 4);
+    const sizeBytes = validation.sizeBytes;
     const isImage = mimeType.startsWith('image/');
     const isVideo = mimeType.startsWith('video/');
 
     const media = {
-      name: String(name).slice(0, 200),
+      name: name.trim().slice(0, 200),
       mimeType,
       type: isImage ? 'image' : isVideo ? 'video' : 'document',
       sizeBytes,

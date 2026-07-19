@@ -9,7 +9,7 @@ import {
   isSettingsOwnerOnlyRoute,
 } from '@/lib/featureAccess'
 import { stripBasePath } from '@/lib/appConfig'
-import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
+import { distributedRateLimit, getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { supabaseCookieOptions } from '@/lib/supabase/cookieOptions'
 
 function allowedMutationOrigins(request: NextRequest) {
@@ -178,11 +178,23 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAiApi && user) {
-    const limit = rateLimit(getRateLimitKey(request, 'ai-user', user.id), 30, 60_000)
+    const idempotencyKey = request.headers.get('idempotency-key')?.trim().slice(0, 200) || undefined
+    const limit = await distributedRateLimit('ai-user', {
+      identity: user.id,
+      minuteLimit: 30,
+      dailyLimit: 500,
+      cost: pathname === '/api/image' || pathname === '/api/transcribe' ? 5 : 1,
+      idempotencyKey,
+    })
     if (!limit.allowed) {
+      const message = limit.reason === 'duplicate'
+        ? 'Bu istek daha önce işlendi.'
+        : limit.reason === 'backend_unavailable'
+          ? 'Kota servisi geçici olarak kullanılamıyor.'
+          : 'Kullanıcı kotası aşıldı. Lütfen kısa süre sonra tekrar deneyin.'
       return NextResponse.json(
-        { error: 'Kullanıcı kotası aşıldı. Lütfen kısa süre sonra tekrar deneyin.' },
-        { status: 429, headers: rateLimitHeaders(limit) }
+        { error: message },
+        { status: limit.status, headers: rateLimitHeaders(limit) }
       )
     }
   }

@@ -48,6 +48,26 @@ const routes = [
 
 const escapeHtml = (value) => String(value).replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 const serializeJsonLd = (value) => JSON.stringify(value).replaceAll('<', '\\u003c')
+const protectedRoutes = new Set([
+  '/admin', '/musteri-panel', '/organizasyon-kiti',
+  '/organizasyon-kiti/plan/fractional-new-media-director',
+  '/organizasyon-kiti/medya-yol-haritasi', '/organizasyon-kiti/yonetim-toplantilari',
+  '/organizasyon-kiti/ekip-surecler', '/organizasyon-kiti/stratejik-kararlar',
+  '/organizasyon-kiti/notlar', '/kade-kit-business', '/proje-takip',
+])
+
+function staticFallback(route, title, description) {
+  const pageName = title.split(' | ')[0]
+  const protectedCopy = protectedRoutes.has(route)
+    ? 'Bu alan yalnız yetkili kullanıcıların güvenli oturumuyla açılır.'
+    : description
+  return `<main data-static-route-fallback="${escapeHtml(route)}" style="max-width:880px;margin:0 auto;padding:48px 24px;font-family:Inter,system-ui,sans-serif;color:#17130a;background:#fbfaf4;line-height:1.6">
+      <nav aria-label="Temel navigasyon"><a href="/">Ana sayfa</a> · <a href="/hizmetler">Hizmetler</a> · <a href="/paketler">Paketler</a> · <a href="/iletisim">İletişim</a></nav>
+      <h1>${escapeHtml(pageName)}</h1>
+      <p>${escapeHtml(protectedCopy)}</p>
+      ${protectedRoutes.has(route) ? '<p><a href="/giris">Güvenli giriş ekranına dön</a></p>' : '<p><a href="/teklif-al">Projeniz için teklif isteyin</a></p>'}
+    </main>`
+}
 
 function structuredData(route, title, description, noindex) {
   if (noindex) return ''
@@ -105,6 +125,8 @@ function render(route, title, description, noindex) {
     .replace(/<meta name="twitter:title" content="[^"]*"\s*\/>/, `<meta name="twitter:title" content="${escapeHtml(title)}" />`)
     .replace(/<meta name="twitter:description" content="[^"]*"\s*\/>/, `<meta name="twitter:description" content="${escapeHtml(description)}" />`)
     .replace(/\s*<meta name="twitter:site" content="[^"]*"\s*\/>/, '')
+    .replace('<div id="root"></div>', `<div id="root">${staticFallback(route, title, description)}</div>`)
+    .replace(/\s*<noscript>[\s\S]*?<\/noscript>/, '')
   if (schemaMarkup) html = html.replace('</head>', `    ${schemaMarkup}\n  </head>`)
   return html
 }

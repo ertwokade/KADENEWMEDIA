@@ -3,7 +3,7 @@ import express from 'express'
 import apiHandler from './api/[...path].js'
 
 const app = express()
-app.use(express.json({ limit: '10mb' }))
+app.use(express.json({ limit: '3mb' }))
 
 // Güvenlik başlıkları
 app.use((req, res, next) => {
@@ -28,12 +28,12 @@ app.use('/api', (req, res) => {
   })
 
   apiHandler(handlerReq, res).catch((err) => {
-    console.error('API Error:', err)
-    res.status(500).json({ error: err.message || 'API error' })
+    console.error('API Error:', err instanceof Error ? err.message : 'unknown')
+    res.status(500).json({ error: 'Sunucu hatası' })
   })
 })
 
-const PORT = 3001
+const PORT = Number(process.env.PORT) || 3001
 app.listen(PORT, () => {
   console.log(`✅ API Server: http://localhost:${PORT}`)
   console.log(`📦 MongoDB: ${process.env.MONGODB_URI ? '✅ URI loaded' : '❌ Missing MONGODB_URI'}`)

@@ -21,7 +21,11 @@ function sanitizePost(post) {
 }
 
 function sanitizeBlogInput(input) {
-  const clean = { ...input };
+  const mutableFields = new Set([
+    'titleTr', 'titleEn', 'excerptTr', 'excerptEn', 'contentTr', 'contentEn',
+    'category', 'categoryEn', 'image', 'color', 'readTime', 'slug', 'publishAt', 'published',
+  ]);
+  const clean = Object.fromEntries(Object.entries(input || {}).filter(([key]) => mutableFields.has(key)));
   for (const key of ['titleTr', 'titleEn']) {
     if (clean[key] !== undefined) clean[key] = stripHtml(clean[key], 300);
   }
@@ -36,6 +40,17 @@ function sanitizeBlogInput(input) {
   return clean;
 }
 
+export function publicBlogFilter(now = new Date()) {
+  return {
+    published: { $ne: false },
+    $or: [
+      { publishAt: { $exists: false } },
+      { publishAt: null },
+      { publishAt: { $lte: now } },
+    ],
+  };
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
@@ -46,13 +61,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const now = new Date();
-      const posts = await collection.find({
-        $or: [
-          { publishAt: { $exists: false } },
-          { publishAt: null },
-          { publishAt: { $lte: now } },
-        ],
-      }).sort({ createdAt: -1 }).toArray();
+      const posts = await collection.find(publicBlogFilter(now)).sort({ createdAt: -1 }).limit(200).toArray();
       return res.status(200).json(posts.map(sanitizePost));
     } catch (error) {
       console.error('Blog GET error:', error);
@@ -75,6 +84,7 @@ export default async function handler(req, res) {
       if (!titleTr || !slug) return res.status(400).json({ error: 'Başlık ve slug gerekli' });
       if (titleTr.length > 300) return res.status(400).json({ error: 'Başlık çok uzun (max 300)' });
       if (slug.length > 200) return res.status(400).json({ error: 'Slug çok uzun (max 200)' });
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return res.status(400).json({ error: 'Slug formatı geçersiz' });
       if (contentTr && contentTr.length > 200000) return res.status(400).json({ error: 'İçerik çok uzun (max 200.000 karakter)' });
 
       const existing = await collection.findOne({ slug });
@@ -112,6 +122,12 @@ export default async function handler(req, res) {
       if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz Post ID' });
 
       const updateData = sanitizeBlogInput(rawUpdateData);
+      if (updateData.slug !== undefined && (typeof updateData.slug !== 'string' || updateData.slug.length > 200 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(updateData.slug))) {
+        return res.status(400).json({ error: 'Slug formatı geçersiz' });
+      }
+      if (updateData.contentTr?.length > 200000 || updateData.contentEn?.length > 200000) {
+        return res.status(400).json({ error: 'İçerik çok uzun' });
+      }
       updateData.updatedAt = new Date();
       if (updateData.readTime) updateData.readTime = parseInt(updateData.readTime);
       if (updateData.publishAt !== undefined) {

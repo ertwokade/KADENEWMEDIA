@@ -1,6 +1,6 @@
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
-import { requireAuth } from './_lib/auth.js';
+import { getAuthorizedUser } from './_lib/auth.js';
 import { getDb } from './_lib/mongodb.js';
 
 async function logAiUsage(scope, model, usageMeta) {
@@ -35,7 +35,8 @@ export default async function handler(req, res) {
   }
 
   const { message, lang, history, adminMode } = req.body || {};
-  const isAdmin = adminMode === true && !!requireAuth(req);
+  const adminUser = adminMode === true ? await getAuthorizedUser(req) : null;
+  const isAdmin = adminMode === true && Boolean(adminUser);
 
   if (!isAdmin) {
     const rl = await rateLimitCheck(req, { namespace: 'chat', maxRequests: 20 });
@@ -81,6 +82,7 @@ export default async function handler(req, res) {
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
       {
         method: 'POST',
+        signal: AbortSignal.timeout(25000),
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: promptText }] }],
@@ -90,8 +92,8 @@ export default async function handler(req, res) {
     );
 
     if (!apiRes.ok) {
-      const errText = await apiRes.text().catch(() => '');
-      console.error('Gemini API error:', apiRes.status, errText);
+      await apiRes.body?.cancel().catch(() => {});
+      console.error('Gemini API error status:', apiRes.status);
       if (isAdmin) {
         return res.status(502).json({ error: `Gemini API hatası (${apiRes.status}). API anahtarınızı doğrulayın.` });
       }
@@ -110,9 +112,9 @@ export default async function handler(req, res) {
     }
     return res.status(200).json({ reply: null, fallback: true });
   } catch (err) {
-    console.error('Chat handler error:', err);
+    console.error('Chat handler error:', err instanceof Error ? err.message : 'unknown');
     if (isAdmin) {
-      return res.status(500).json({ error: 'AI servisi hata verdi: ' + (err.message || 'bilinmeyen') });
+      return res.status(500).json({ error: 'AI servisi isteği tamamlanamadı.' });
     }
     return res.status(200).json({ reply: null, fallback: true });
   }

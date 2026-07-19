@@ -3,6 +3,9 @@ import bcrypt from 'bcryptjs'
 import { getDb } from './_lib/mongodb.js'
 import { cors } from './_lib/cors.js'
 import { buildPackageObject } from './_lib/packages.js'
+import { requireAdmin } from './_lib/auth.js'
+import { validateShopierPayment } from './_lib/shopierCatalog.js'
+import { reconcileShopierOrders } from './_lib/shopierReconciliation.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -16,7 +19,7 @@ function isProductionRuntime() {
   return process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production'
 }
 
-function verifyShopierSignature(body, apiSecret) {
+export function verifyShopierSignature(body, apiSecret) {
   if (!apiSecret || isJwt(apiSecret)) {
     return false
   }
@@ -27,6 +30,16 @@ function verifyShopierSignature(body, apiSecret) {
   try {
     return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
   } catch { return false }
+}
+
+export async function reserveShopierOrder(collection, order) {
+  try {
+    await collection.insertOne(order)
+    return true
+  } catch (error) {
+    if (error?.code === 11000) return false
+    throw error
+  }
 }
 
 function parseBody(req) {
@@ -52,6 +65,13 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+
+  if (req.query?.action === 'reconcile') {
+    if (!(await requireAdmin(req, res))) return
+    const db = await getDb()
+    const summary = await reconcileShopierOrders(db, { limit: req.body?.limit })
+    return res.status(200).json({ success: true, summary })
+  }
 
   const body = parseBody(req)
   const apiSecret = process.env.SHOPIER_API_SECRET
@@ -84,23 +104,43 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'buyer_email geçersiz' })
   }
 
+  const orderId = platform_order_id ? String(platform_order_id).trim().slice(0, 120) : ''
+  if (!orderId || !/^[A-Za-z0-9._:-]{1,120}$/.test(orderId)) {
+    return res.status(400).json({ error: 'platform_order_id eksik veya geçersiz' })
+  }
+
+  let packageGranted = false
+  const paymentValidation = validateShopierPayment(body)
+
   try {
     const db = await getDb()
     await db.collection('shopier_orders').createIndex({ shopierOrderId: 1 }, { unique: true, sparse: true }).catch(() => {})
 
-    const orderId = platform_order_id ? String(platform_order_id).trim().slice(0, 120) : null
-    if (orderId) {
-      const existingOrder = await db.collection('shopier_orders').findOne({ shopierOrderId: orderId })
-      if (existingOrder) {
-        return res.status(200).json({ success: true, duplicate: true })
-      }
+    // Siparişi paket yetkisi vermeden önce atomik olarak rezerve et. Unique index,
+    // eşzamanlı webhook replay'lerinde yalnızca tek isteğin ilerlemesini sağlar.
+    const reserved = await reserveShopierOrder(db.collection('shopier_orders'), {
+      shopierOrderId: orderId,
+      state: 'processing',
+      email,
+      productReference: String(product_reference || '').slice(0, 120),
+      receivedAt: new Date(),
+    })
+    if (!reserved) return res.status(200).json({ success: true, duplicate: true })
+
+    if (!paymentValidation.ok) {
+      await db.collection('shopier_orders').updateOne(
+        { shopierOrderId: orderId, state: 'processing' },
+        { $set: { state: 'rejected', reason: paymentValidation.reason, updatedAt: new Date() } }
+      )
+      return res.status(200).json({ success: true, rejected: true, reason: paymentValidation.reason })
     }
 
     // Paket nesnesini oluştur
-    const pkg = buildPackageObject(product_reference, {
+    const pkg = buildPackageObject(paymentValidation.product.internalPackageId, {
       source: 'shopier',
       shopierOrderId: orderId,
-      price: product_price ? parseFloat(product_price) : null,
+      price: paymentValidation.product.unitAmountMinor / 100,
+      currency: paymentValidation.product.currency,
     })
 
     if (!pkg) {
@@ -114,6 +154,10 @@ export default async function handler(req, res) {
         platform_order_id: orderId,
         receivedAt: new Date(),
       })
+      await db.collection('shopier_orders').updateOne(
+        { shopierOrderId: orderId },
+        { $set: { state: 'ignored', reason: 'unknown_reference', updatedAt: new Date() } }
+      )
       return res.status(200).json({ success: true, note: 'unknown_reference' })
     }
 
@@ -137,33 +181,48 @@ export default async function handler(req, res) {
         source: 'shopier',
       })
       customer = { _id: result.insertedId, name: buyer_name || email, email }
-      console.log(`✅ Shopier: yeni müşteri oluşturuldu ${email}`)
     } else {
       // Mevcut müşteriye paket ekle
       await db.collection('customers').updateOne(
         { email },
         { $push: { packages: pkg }, $set: { updatedAt: new Date() } }
       )
-      console.log(`✅ Shopier: paket eklendi ${email} → ${pkg.name}`)
     }
+    packageGranted = true
 
-    // Shopier sipariş kaydı tut
-    await db.collection('shopier_orders').insertOne({
-      customerId: customer._id.toString(),
-      email,
-      packageId: pkg.id,
-      packageName: pkg.name,
-      productReference: product_reference,
-      price: pkg.price,
-      shopierOrderId: orderId,
-      receivedAt: new Date(),
-    })
+    // Rezerve edilen siparişi tamamla; tekrar insert ederek yarış penceresi açma.
+    await db.collection('shopier_orders').updateOne(
+      { shopierOrderId: orderId, state: 'processing' },
+      { $set: {
+        state: 'completed',
+        customerId: customer._id.toString(),
+        packageId: pkg.id,
+        packageName: pkg.name,
+        productReference: product_reference,
+        price: pkg.price,
+        currency: paymentValidation.product.currency,
+        completedAt: new Date(),
+      } }
+    )
 
     return res.status(200).json({ success: true })
   } catch (err) {
     if (err?.code === 11000) {
       return res.status(200).json({ success: true, duplicate: true })
     }
+    try {
+      const db = await getDb()
+      if (orderId) {
+        if (packageGranted) {
+          await db.collection('shopier_orders').updateOne(
+            { shopierOrderId: orderId },
+            { $set: { state: 'completed_with_record_error', updatedAt: new Date() } }
+          )
+        } else {
+          await db.collection('shopier_orders').deleteOne({ shopierOrderId: orderId, state: 'processing' })
+        }
+      }
+    } catch { /* keep the original failure response */ }
     console.error('Shopier webhook error:', err.message)
     return res.status(500).json({ error: 'Sunucu hatası' })
   }

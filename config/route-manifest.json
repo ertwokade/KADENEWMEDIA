@@ -1,0 +1,2605 @@
+{
+  "schemaVersion": 1,
+  "expectedCount": 169,
+  "generatedFrom": "Kade Media full-site audit inventory",
+  "routes": [
+    {
+      "route": "/",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/"
+    },
+    {
+      "route": "/hakkimizda",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/hakkimizda"
+    },
+    {
+      "route": "/hizmetler",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/hizmetler"
+    },
+    {
+      "route": "/new-media-ajansi",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/new-media-ajansi"
+    },
+    {
+      "route": "/iletisim",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/iletisim"
+    },
+    {
+      "route": "/paketler",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/paketler"
+    },
+    {
+      "route": "/partnerler",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/partnerler"
+    },
+    {
+      "route": "/kariyer",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kariyer"
+    },
+    {
+      "route": "/portfolio",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/portfolio"
+    },
+    {
+      "route": "/ekip",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/ekip"
+    },
+    {
+      "route": "/basari-hikayeleri",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/basari-hikayeleri"
+    },
+    {
+      "route": "/kvkk",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kvkk"
+    },
+    {
+      "route": "/gizlilik",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/gizlilik"
+    },
+    {
+      "route": "/cerez-politikasi",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/cerez-politikasi"
+    },
+    {
+      "route": "/admin",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "admin"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/admin"
+    },
+    {
+      "route": "/sss",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/sss"
+    },
+    {
+      "route": "/referanslar",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/referanslar"
+    },
+    {
+      "route": "/tesekkur",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/tesekkur"
+    },
+    {
+      "route": "/teklif-al",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/teklif-al"
+    },
+    {
+      "route": "/giris",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/giris"
+    },
+    {
+      "route": "/giris/danismanlik",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/giris/danismanlik"
+    },
+    {
+      "route": "/musteri-panel",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/musteri-panel"
+    },
+    {
+      "route": "/fiyat-hesaplama",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": false,
+      "expectedStatus": 404,
+      "testPath": "/fiyat-hesaplama"
+    },
+    {
+      "route": "/basin",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": false,
+      "expectedStatus": 404,
+      "testPath": "/basin"
+    },
+    {
+      "route": "/neden-biz",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": false,
+      "expectedStatus": 404,
+      "testPath": "/neden-biz"
+    },
+    {
+      "route": "/referans-programi",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": false,
+      "expectedStatus": 404,
+      "testPath": "/referans-programi"
+    },
+    {
+      "route": "/podcast-webinar",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": false,
+      "expectedStatus": 404,
+      "testPath": "/podcast-webinar"
+    },
+    {
+      "route": "/bulten-arsivi",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": false,
+      "expectedStatus": 404,
+      "testPath": "/bulten-arsivi"
+    },
+    {
+      "route": "/links",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 308,
+      "testPath": "/links"
+    },
+    {
+      "route": "/kadelinks",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 308,
+      "testPath": "/kadelinks"
+    },
+    {
+      "route": "/blog",
+      "type": "dynamic",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/blog"
+    },
+    {
+      "route": "/blog/:slug",
+      "type": "dynamic",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": false,
+      "expectedStatus": 404,
+      "testPath": "/blog/audit-not-found"
+    },
+    {
+      "route": "/partnerler/:id",
+      "type": "dynamic",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": false,
+      "expectedStatus": 404,
+      "testPath": "/partnerler/000000000000000000000000"
+    },
+    {
+      "route": "/teklif-al?paket=:paketId",
+      "type": "dynamic",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/teklif-al?paket=baslangic"
+    },
+    {
+      "route": "/hizmetler/sosyal-medya-yonetimi",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/hizmetler/sosyal-medya-yonetimi"
+    },
+    {
+      "route": "/hizmetler/icerik-uretimi",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/hizmetler/icerik-uretimi"
+    },
+    {
+      "route": "/hizmetler/reklam-yonetimi",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/hizmetler/reklam-yonetimi"
+    },
+    {
+      "route": "/hizmetler/video-produksiyon",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/hizmetler/video-produksiyon"
+    },
+    {
+      "route": "/hizmetler/strateji-danismanlik",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/hizmetler/strateji-danismanlik"
+    },
+    {
+      "route": "/hizmetler/web-sitesi-tasarimi",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/hizmetler/web-sitesi-tasarimi"
+    },
+    {
+      "route": "/organizasyon-kiti",
+      "type": "protected",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/organizasyon-kiti"
+    },
+    {
+      "route": "/organizasyon-kiti/plan/fractional-new-media-director",
+      "type": "protected",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/organizasyon-kiti/plan/fractional-new-media-director"
+    },
+    {
+      "route": "/organizasyon-kiti/medya-yol-haritasi",
+      "type": "protected",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/organizasyon-kiti/medya-yol-haritasi"
+    },
+    {
+      "route": "/organizasyon-kiti/yonetim-toplantilari",
+      "type": "protected",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/organizasyon-kiti/yonetim-toplantilari"
+    },
+    {
+      "route": "/organizasyon-kiti/ekip-surecler",
+      "type": "protected",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/organizasyon-kiti/ekip-surecler"
+    },
+    {
+      "route": "/organizasyon-kiti/stratejik-kararlar",
+      "type": "protected",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/organizasyon-kiti/stratejik-kararlar"
+    },
+    {
+      "route": "/organizasyon-kiti/notlar",
+      "type": "protected",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/organizasyon-kiti/notlar"
+    },
+    {
+      "route": "/kade-kit-business",
+      "type": "protected",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kade-kit-business"
+    },
+    {
+      "route": "/proje-takip",
+      "type": "protected",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/proje-takip"
+    },
+    {
+      "route": "/kadeai",
+      "type": "page",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai"
+    },
+    {
+      "route": "/kadeai/auth",
+      "type": "page",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/auth"
+    },
+    {
+      "route": "/kadeai/auth/callback",
+      "type": "page",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 307,
+      "testPath": "/kadeai/auth/callback"
+    },
+    {
+      "route": "/kadeai/login",
+      "type": "page",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/login"
+    },
+    {
+      "route": "/kadeai/logout",
+      "type": "page",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/logout"
+    },
+    {
+      "route": "/kadeai/onboarding",
+      "type": "page",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/onboarding"
+    },
+    {
+      "route": "/kadeai/reset-password",
+      "type": "page",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/reset-password"
+    },
+    {
+      "route": "/kadeai/dashboard",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard"
+    },
+    {
+      "route": "/kadeai/dashboard/ab-test",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/ab-test"
+    },
+    {
+      "route": "/kadeai/dashboard/ai-thumbnail",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/ai-thumbnail"
+    },
+    {
+      "route": "/kadeai/dashboard/analytics",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/analytics"
+    },
+    {
+      "route": "/kadeai/dashboard/bio-link",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/bio-link"
+    },
+    {
+      "route": "/kadeai/dashboard/bulk",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/bulk"
+    },
+    {
+      "route": "/kadeai/dashboard/calendar",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/calendar"
+    },
+    {
+      "route": "/kadeai/dashboard/carousel",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/carousel"
+    },
+    {
+      "route": "/kadeai/dashboard/clickbait-detector",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/clickbait-detector"
+    },
+    {
+      "route": "/kadeai/dashboard/clip-generator",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/clip-generator"
+    },
+    {
+      "route": "/kadeai/dashboard/collab-mail",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/collab-mail"
+    },
+    {
+      "route": "/kadeai/dashboard/comment-analysis",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/comment-analysis"
+    },
+    {
+      "route": "/kadeai/dashboard/competitor",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/competitor"
+    },
+    {
+      "route": "/kadeai/dashboard/content-plan",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/content-plan"
+    },
+    {
+      "route": "/kadeai/dashboard/description",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/description"
+    },
+    {
+      "route": "/kadeai/dashboard/dubbing",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/dubbing"
+    },
+    {
+      "route": "/kadeai/dashboard/faq",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/faq"
+    },
+    {
+      "route": "/kadeai/dashboard/hashtag",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/hashtag"
+    },
+    {
+      "route": "/kadeai/dashboard/history",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/history"
+    },
+    {
+      "route": "/kadeai/dashboard/hook",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/hook"
+    },
+    {
+      "route": "/kadeai/dashboard/ideas",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/ideas"
+    },
+    {
+      "route": "/kadeai/dashboard/operations",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/operations"
+    },
+    {
+      "route": "/kadeai/dashboard/performance",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/performance"
+    },
+    {
+      "route": "/kadeai/dashboard/quote-extractor",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/quote-extractor"
+    },
+    {
+      "route": "/kadeai/dashboard/retention-analysis",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/retention-analysis"
+    },
+    {
+      "route": "/kadeai/dashboard/settings",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "owner:demirk314@gmail.com"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/settings"
+    },
+    {
+      "route": "/kadeai/dashboard/shopier",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "configured-owner"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/shopier"
+    },
+    {
+      "route": "/kadeai/dashboard/social-audit",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/social-audit"
+    },
+    {
+      "route": "/kadeai/dashboard/templates",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/templates"
+    },
+    {
+      "route": "/kadeai/dashboard/text-generator",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/text-generator"
+    },
+    {
+      "route": "/kadeai/dashboard/thread",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/thread"
+    },
+    {
+      "route": "/kadeai/dashboard/title",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/title"
+    },
+    {
+      "route": "/kadeai/dashboard/trends",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/trends"
+    },
+    {
+      "route": "/kadeai/dashboard/viral-score",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/viral-score"
+    },
+    {
+      "route": "/kadeai/dashboard/youtube-seo",
+      "type": "protected",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/dashboard/youtube-seo"
+    },
+    {
+      "route": "/api/auth",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/auth"
+    },
+    {
+      "route": "/api/auth/login",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "POST"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/auth/login"
+    },
+    {
+      "route": "/api/auth/change-password",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/auth/change-password"
+    },
+    {
+      "route": "/api/blog",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/blog"
+    },
+    {
+      "route": "/api/calendar-invite",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/calendar-invite"
+    },
+    {
+      "route": "/api/chat",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/chat"
+    },
+    {
+      "route": "/api/client",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/client"
+    },
+    {
+      "route": "/api/contact",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/contact"
+    },
+    {
+      "route": "/api/content",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/content"
+    },
+    {
+      "route": "/api/crm",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/crm"
+    },
+    {
+      "route": "/api/customer-auth",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/customer-auth"
+    },
+    {
+      "route": "/api/customer-portal",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/customer-portal"
+    },
+    {
+      "route": "/api/customers",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/customers"
+    },
+    {
+      "route": "/api/media",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/media"
+    },
+    {
+      "route": "/api/messages",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/messages"
+    },
+    {
+      "route": "/api/newsletter",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "POST"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/newsletter"
+    },
+    {
+      "route": "/api/notifications",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/notifications"
+    },
+    {
+      "route": "/api/ops",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/ops"
+    },
+    {
+      "route": "/api/partners",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/partners"
+    },
+    {
+      "route": "/api/proposals",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/proposals"
+    },
+    {
+      "route": "/api/referrals",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/referrals"
+    },
+    {
+      "route": "/api/reminders",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/reminders"
+    },
+    {
+      "route": "/api/seed",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "POST"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/seed"
+    },
+    {
+      "route": "/api/shopier",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/shopier"
+    },
+    {
+      "route": "/api/sitemap",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/sitemap"
+    },
+    {
+      "route": "/api/subscriptions",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/subscriptions"
+    },
+    {
+      "route": "/api/surveys",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/surveys"
+    },
+    {
+      "route": "/api/tasks",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/tasks"
+    },
+    {
+      "route": "/api/users",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "customer"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/api/users"
+    },
+    {
+      "route": "/sitemap.xml",
+      "type": "api",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/sitemap.xml"
+    },
+    {
+      "route": "/kadeai/api/assistant",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/assistant"
+    },
+    {
+      "route": "/kadeai/api/auth/logout",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/auth/logout"
+    },
+    {
+      "route": "/kadeai/api/auth/password",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/auth/password"
+    },
+    {
+      "route": "/kadeai/api/auth/recovery",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/auth/recovery"
+    },
+    {
+      "route": "/kadeai/api/auth/recovery-session",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/auth/recovery-session"
+    },
+    {
+      "route": "/kadeai/api/auth/update-password",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/auth/update-password"
+    },
+    {
+      "route": "/kadeai/api/backend/health",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/backend/health"
+    },
+    {
+      "route": "/kadeai/api/calendar",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/calendar"
+    },
+    {
+      "route": "/kadeai/api/config",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/config"
+    },
+    {
+      "route": "/kadeai/api/env-status",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "owner:demirk314@gmail.com"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/env-status"
+    },
+    {
+      "route": "/kadeai/api/health",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/health"
+    },
+    {
+      "route": "/kadeai/api/history",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET",
+        "POST",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/history"
+    },
+    {
+      "route": "/kadeai/api/image",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/image"
+    },
+    {
+      "route": "/kadeai/api/operations-state",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET",
+        "PUT"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/operations-state"
+    },
+    {
+      "route": "/kadeai/api/payments/checkout",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/payments/checkout"
+    },
+    {
+      "route": "/kadeai/api/payments/status",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/payments/status"
+    },
+    {
+      "route": "/kadeai/api/payments/webhook",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/payments/webhook"
+    },
+    {
+      "route": "/kadeai/api/profile",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET",
+        "PUT"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/profile"
+    },
+    {
+      "route": "/kadeai/api/templates",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/templates"
+    },
+    {
+      "route": "/kadeai/api/transcribe",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/transcribe"
+    },
+    {
+      "route": "/kadeai/api/youtube/comments",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/youtube/comments"
+    },
+    {
+      "route": "/kadeai/api/generate/analytics",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/analytics"
+    },
+    {
+      "route": "/kadeai/api/generate/bio-link",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/bio-link"
+    },
+    {
+      "route": "/kadeai/api/generate/bulk",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/bulk"
+    },
+    {
+      "route": "/kadeai/api/generate/carousel",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/carousel"
+    },
+    {
+      "route": "/kadeai/api/generate/clickbait-detector",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/clickbait-detector"
+    },
+    {
+      "route": "/kadeai/api/generate/clips",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/clips"
+    },
+    {
+      "route": "/kadeai/api/generate/collab-mail",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/collab-mail"
+    },
+    {
+      "route": "/kadeai/api/generate/comment-analysis",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/comment-analysis"
+    },
+    {
+      "route": "/kadeai/api/generate/competitor",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/competitor"
+    },
+    {
+      "route": "/kadeai/api/generate/content-plan",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/content-plan"
+    },
+    {
+      "route": "/kadeai/api/generate/description",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/description"
+    },
+    {
+      "route": "/kadeai/api/generate/faq",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/faq"
+    },
+    {
+      "route": "/kadeai/api/generate/hashtag",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/hashtag"
+    },
+    {
+      "route": "/kadeai/api/generate/hook",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/hook"
+    },
+    {
+      "route": "/kadeai/api/generate/ideas",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/ideas"
+    },
+    {
+      "route": "/kadeai/api/generate/performance",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/performance"
+    },
+    {
+      "route": "/kadeai/api/generate/quote-extractor",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/quote-extractor"
+    },
+    {
+      "route": "/kadeai/api/generate/retention-analysis",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/retention-analysis"
+    },
+    {
+      "route": "/kadeai/api/generate/social-audit",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/social-audit"
+    },
+    {
+      "route": "/kadeai/api/generate/text-generator",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/text-generator"
+    },
+    {
+      "route": "/kadeai/api/generate/thread",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/thread"
+    },
+    {
+      "route": "/kadeai/api/generate/title",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/title"
+    },
+    {
+      "route": "/kadeai/api/generate/translate",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/translate"
+    },
+    {
+      "route": "/kadeai/api/generate/trends",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/trends"
+    },
+    {
+      "route": "/kadeai/api/generate/tts",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/tts"
+    },
+    {
+      "route": "/kadeai/api/generate/viral-score",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/viral-score"
+    },
+    {
+      "route": "/kadeai/api/generate/youtube-seo",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "POST"
+      ],
+      "access": "private",
+      "roles": [
+        "authenticated"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/generate/youtube-seo"
+    }
+  ]
+}

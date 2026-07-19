@@ -26,6 +26,7 @@ import tasks from '../server/api/tasks.js'
 import users from '../server/api/users.js'
 import { validateCsrf } from '../server/api/_lib/csrf.js'
 import { validateQuery } from '../server/api/_lib/validation.js'
+import { validateRequestBodySize } from '../server/api/_lib/requestLimits.js'
 
 const handlers = {
   auth,
@@ -98,8 +99,9 @@ function isPublicPost(req) {
   if (route === 'auth' && (!action || action === 'login')) return true
   // Customer register/login — unauthenticated by definition
   if (route === 'customer-auth' && (!action || action === 'login' || action === 'register')) return true
-  // Shopier webhook — external POST with its own signature verification
-  if (route === 'shopier') return true
+  // Shopier webhook — external POST with its own signature verification.
+  // Admin reconciliation is intentionally excluded and uses cookie auth + CSRF.
+  if (route === 'shopier' && !req.query?.action) return true
   // Public contact actions
   if (route === 'contact' && (!action || PUBLIC_ACTIONS.has(action))) return true
   // Public survey response
@@ -110,6 +112,8 @@ function isPublicPost(req) {
 const ALLOWED_KEY_RE = /^[a-zA-Z0-9_-]{1,40}$/;
 
 export default async function handler(req, res) {
+  res.setHeader('Cache-Control', 'private, no-store, max-age=0')
+  res.setHeader('Pragma', 'no-cache')
   // Strip Vercel's internal routing param and any unrecognised keys
   // (Vercel's infrastructure may inject dotted or internal params that would fail validation)
   const rawQuery = req.query || {};
@@ -123,9 +127,10 @@ export default async function handler(req, res) {
   req.query = sanitizedQuery;
 
   if (!validateQuery(req, res)) return
+  const route = normalizeRoute(req)
+  if (!validateRequestBodySize(req, res, route)) return
   if (!isPublicPost(req) && !validateCsrf(req, res)) return
 
-  const route = normalizeRoute(req)
   const routeHandler = handlers[route]
 
   if (!routeHandler) {

@@ -7,6 +7,7 @@ Growth modules:   port 8473 → unified as /growth/* routes
 Run: uvicorn main:app --reload --host 0.0.0.0 --port 8472
 """
 
+import asyncio
 import inspect
 import json
 import html
@@ -104,21 +105,30 @@ _rate_buckets: Dict[str, tuple[int, float]] = {}
 
 @app.middleware("http")
 async def security_gate(request: Request, call_next):
+    def secured(response):
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Cache-Control"] = "no-store"
+        return response
+
     if request.url.path in {"/health", "/growth/health"} or (
         request.url.path == "/oauth/youtube/callback" and request.method == "GET"
     ):
-        return await call_next(request)
+        return secured(await call_next(request))
 
     if not core_settings.backend_token:
-        return JSONResponse({"detail": "Backend authentication is not configured."}, status_code=503)
+        return secured(JSONResponse({"detail": "Backend authentication is not configured."}, status_code=503))
     authorization = request.headers.get("authorization", "")
     provided = authorization[7:] if authorization.lower().startswith("bearer ") else ""
     if not provided or not secrets.compare_digest(provided, core_settings.backend_token):
-        return JSONResponse({"detail": "Unauthorized"}, status_code=401)
+        return secured(JSONResponse({"detail": "Unauthorized"}, status_code=401))
 
     content_length = request.headers.get("content-length")
     if content_length and content_length.isdigit() and int(content_length) > 2 * 1024 * 1024:
-        return JSONResponse({"detail": "Request body too large"}, status_code=413)
+        return secured(JSONResponse({"detail": "Request body too large"}, status_code=413))
+
+    if request.method == "POST" and not request.headers.get("content-type", "").lower().startswith("application/json"):
+        return secured(JSONResponse({"detail": "Unsupported media type"}, status_code=415))
 
     client = request.client.host if request.client else "unknown"
     now = time.monotonic()
@@ -130,15 +140,15 @@ async def security_gate(request: Request, call_next):
     if now >= reset_at:
         count, reset_at = 0, now + 60
     if count >= 60:
-        return JSONResponse({"detail": "Too many requests"}, status_code=429, headers={"Retry-After": str(max(1, int(reset_at - now)))})
+        return secured(JSONResponse({"detail": "Too many requests"}, status_code=429, headers={"Retry-After": str(max(1, int(reset_at - now))) }))
     _rate_buckets[client] = (count + 1, reset_at)
-    return await call_next(request)
+    return secured(await call_next(request))
 
 
 # ─── Health ──────────────────────────────────────────────────────────────────
 @app.get("/health")
 async def health():
-    return {"status": "ok", "version": "1.0.0", "modules": ["autoedit", "growth"]}
+    return {"status": "ok"}
 
 
 # ─── WebSocket ───────────────────────────────────────────────────────────────
@@ -246,14 +256,20 @@ async def _run_module(fn, *args, **kwargs) -> Dict[str, Any]:
             if not candidate.is_file():
                 raise HTTPException(status_code=404, detail="Video file was not found.")
             kwargs["video_path"] = str(candidate)
-        result = fn(*args, **kwargs)
-        if inspect.isawaitable(result):
-            result = await result
+        if inspect.iscoroutinefunction(fn):
+            result = await asyncio.wait_for(fn(*args, **kwargs), timeout=core_settings.provider_timeout_seconds)
+        else:
+            result = await asyncio.wait_for(
+                asyncio.to_thread(fn, *args, **kwargs),
+                timeout=core_settings.provider_timeout_seconds,
+            )
         return {"success": True, "data": jsonable_encoder(result)}
     except HTTPException:
         raise
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Video file was not found.")
+    except asyncio.TimeoutError as exc:
+        raise HTTPException(status_code=504, detail="Processing timed out.") from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail="Processing failed.") from exc
 

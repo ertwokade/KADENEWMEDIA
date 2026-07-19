@@ -9,6 +9,7 @@ class Settings:
     encryption_key = os.environ.get("ENCRYPTION_KEY", "")
     backend_token = os.environ.get("KADE_BACKEND_TOKEN", "")
     environment = os.environ.get("KADE_ENV", "development").lower()
+    provider_timeout_seconds = min(300.0, max(1.0, float(os.environ.get("KADE_PROVIDER_TIMEOUT_SECONDS", "60"))))
     media_root = Path(os.environ.get("KADE_MEDIA_ROOT", str(Path.cwd() / "media"))).resolve()
     allowed_origins = tuple(
         origin.strip()

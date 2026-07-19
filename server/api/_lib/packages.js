@@ -284,6 +284,7 @@ export function buildPackageObject(reference, extra = {}) {
     source: extra.source || 'manual',
     shopierOrderId: extra.shopierOrderId || null,
     price: extra.price ?? def.price ?? null,
+    currency: extra.currency || null,
   }
 }
 

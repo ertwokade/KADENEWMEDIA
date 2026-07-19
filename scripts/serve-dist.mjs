@@ -48,6 +48,11 @@ const server = createServer(async (req, res) => {
   headers(res)
   const url = new URL(req.url || '/', `http://${req.headers.host || '127.0.0.1'}`)
 
+  if (url.pathname === '/links' || url.pathname === '/kadelinks' || url.pathname.startsWith('/kadelinks/')) {
+    res.writeHead(308, { Location: 'https://kadirardademir.com/links' })
+    return res.end()
+  }
+
   if (url.pathname === '/sitemap.xml') {
     const xml = await readFile(new URL('../dist-sitemap.xml', import.meta.url), 'utf8').catch(() => '')
     if (xml) {

@@ -1,6 +1,6 @@
-const BASE = 'https://kadenewmedia.com';
+const DEFAULT_BASE = 'https://kadenewmedia.com';
 
-const STATIC_PAGES = [
+export const STATIC_PAGES = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },
   { loc: '/hizmetler', changefreq: 'monthly', priority: '0.9' },
   { loc: '/new-media-ajansi', changefreq: 'monthly', priority: '0.9' },
@@ -22,7 +22,7 @@ const STATIC_PAGES = [
   { loc: '/cerez-politikasi', changefreq: 'yearly', priority: '0.3' },
 ];
 
-function escapeXml(str) {
+export function escapeXml(str) {
   return String(str || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -31,16 +31,29 @@ function escapeXml(str) {
     .replace(/'/g, '&apos;');
 }
 
-function urlEntry({ loc, lastmod, changefreq, priority }) {
+export function normalizeSiteBaseUrl(value = process.env.SITE_URL) {
+  try {
+    const parsed = new URL(value || DEFAULT_BASE);
+    if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password) {
+      return DEFAULT_BASE;
+    }
+    return parsed.origin;
+  } catch {
+    return DEFAULT_BASE;
+  }
+}
+
+function urlEntry({ loc, lastmod, changefreq, priority }, base = normalizeSiteBaseUrl()) {
   const mod = lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : '';
-  return `  <url>\n    <loc>${escapeXml(BASE + loc)}</loc>${mod}\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+  return `  <url>\n    <loc>${escapeXml(base + loc)}</loc>${mod}\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
   try {
-    const staticEntries = STATIC_PAGES.map(p => urlEntry(p)).join('\n');
+    const base = normalizeSiteBaseUrl();
+    const staticEntries = STATIC_PAGES.map(p => urlEntry(p, base)).join('\n');
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${staticEntries}\n</urlset>`;
 
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');

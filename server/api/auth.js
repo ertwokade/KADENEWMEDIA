@@ -97,7 +97,12 @@ async function handleLogin(req, res) {
       return res.status(401).json({ error: 'Geçersiz kullanıcı adı veya şifre' });
     }
 
-    const token = createToken({ id: user._id.toString(), username: user.username, role: user.role });
+    const token = createToken({
+      id: user._id.toString(),
+      username: user.username,
+      role: user.role,
+      sessionVersion: Number(user.sessionVersion || 0),
+    });
     const csrfToken = setAuthCookies(req, res, token);
 
     logActivity(db, { action: 'Admin girişi yapıldı', detail: `${user.username} giriş yaptı`, type: 'system', icon: '🔐', user: user.username }).catch(() => {});
@@ -136,14 +141,16 @@ async function handleChangePassword(req, res) {
   }
 
   try {
-    const { currentPassword, newPassword } = req.body;
+    let body = req.body;
+    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+    const { currentPassword, newPassword } = body || {};
 
-    if (!currentPassword || !newPassword) {
+    if (typeof currentPassword !== 'string' || typeof newPassword !== 'string') {
       return res.status(400).json({ error: 'Mevcut şifre ve yeni şifre gerekli' });
     }
 
-    if (newPassword.length < 12) {
-      return res.status(400).json({ error: 'Yeni şifre en az 12 karakter olmalı' });
+    if (newPassword.length < 12 || newPassword.length > 128 || currentPassword.length > 128) {
+      return res.status(400).json({ error: 'Yeni şifre 12–128 karakter arasında olmalı' });
     }
 
     const db = await getDb();
@@ -158,11 +165,20 @@ async function handleChangePassword(req, res) {
       return res.status(401).json({ error: 'Mevcut şifre hatalı' });
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const sessionVersion = Number(dbUser.sessionVersion || 0) + 1;
     await db.collection('users').updateOne(
       { username: user.username },
-      { $set: { password: hashedPassword, updatedAt: new Date() } }
+      { $set: { password: hashedPassword, sessionVersion, updatedAt: new Date() } }
     );
+
+    const token = createToken({
+      id: dbUser._id.toString(),
+      username: dbUser.username,
+      role: dbUser.role,
+      sessionVersion,
+    });
+    setAuthCookies(req, res, token);
 
     return res.status(200).json({ message: 'Şifre başarıyla değiştirildi' });
   } catch (error) {
