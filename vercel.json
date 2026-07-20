@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run legacy:build",
+  "outputDirectory": "dist",
   "crons": [
     {
       "path": "/api/reminders?action=check",
