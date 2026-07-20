@@ -1,0 +1,28 @@
+{
+  "name": "@kade/editor-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ranges": "./src/ranges.ts",
+    "./schema": "./src/schema.ts",
+    "./captions": "./src/captions.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint src test --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage.enabled=false"
+  },
+  "dependencies": {
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "eslint": "latest",
+    "typescript": "latest",
+    "typescript-eslint": "latest",
+    "vitest": "latest"
+  }
+}

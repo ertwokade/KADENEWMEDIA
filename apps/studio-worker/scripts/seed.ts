@@ -1,0 +1,22 @@
+import "dotenv/config";
+import { createReadStream } from "node:fs";
+import { stat } from "node:fs/promises";
+import { resolve } from "node:path";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { assets, getDb, processingJobs, projects } from "@kade/db";
+import { createIngestQueue, createStorageClient, getEnv } from "@kade/shared";
+
+const fixture = resolve("fixtures/generated/kade-studio-demo.mp4");
+await stat(fixture);
+const db = getDb();
+const [project] = await db.insert(projects).values({ name: "Kade Studio Demo", status: "uploading" }).returning();
+if (!project) throw new Error("Demo projesi oluşturulamadı.");
+const key = `projects/${project.id}/original/demo.mp4`;
+await createStorageClient().send(new PutObjectCommand({ Bucket: getEnv().S3_BUCKET, Key: key, Body: createReadStream(fixture), ContentType: "video/mp4" }));
+const [asset] = await db.insert(assets).values({ projectId: project.id, originalFilename: "kade-studio-demo.mp4", mimeType: "video/mp4", originalStorageKey: key }).returning();
+if (!asset) throw new Error("Demo asset oluşturulamadı.");
+const [processing] = await db.insert(processingJobs).values({ projectId: project.id, assetId: asset.id, type: "ingest" }).returning();
+const queue = createIngestQueue(); const bull = await queue.add("ingest", { assetId: asset.id, processingJobId: processing!.id });
+await db.update(processingJobs).set({ bullJobId: bull.id }).where((await import("drizzle-orm")).eq(processingJobs.id, processing!.id));
+await queue.close();
+console.log(`Demo project: ${project.id}`);

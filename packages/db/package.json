@@ -1,0 +1,21 @@
+{
+  "name": "@kade/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts", "./schema": "./src/schema.ts" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "generate": "drizzle-kit generate",
+    "migrate": "tsx src/migrate.ts",
+    "studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@kade/editor-core": "workspace:*",
+    "drizzle-orm": "latest",
+    "pg": "latest"
+  },
+  "devDependencies": { "@types/node": "latest", "@types/pg": "latest", "dotenv": "latest", "drizzle-kit": "latest", "eslint": "latest", "tsx": "latest", "typescript": "latest", "typescript-eslint": "latest" }
+}

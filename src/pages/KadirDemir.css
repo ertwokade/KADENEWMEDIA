@@ -1,0 +1,255 @@
+.kd-page {
+  min-height: 100vh;
+  background: #050505;
+}
+
+.kd-main {
+  min-height: 100vh;
+  background: #050505;
+  padding: 20px 16px;
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .kd-main {
+    padding: 32px 24px;
+  }
+}
+
+.kd-shell {
+  width: 100%;
+  max-width: 646px;
+}
+
+.kd-card {
+  border-radius: 2rem;
+  background: #2d64d8;
+  box-shadow: 0 28px 60px rgba(12, 31, 88, 0.28);
+  overflow: hidden;
+}
+
+.kd-cover {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  aspect-ratio: 0.83;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .kd-cover {
+    aspect-ratio: 0.8;
+  }
+}
+
+.kd-cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.kd-cover-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(0, 0, 0, 0.08) 30%,
+    rgba(44, 94, 204, 0.56) 74%,
+    rgba(45, 100, 216, 0.98) 100%
+  );
+}
+
+.kd-cover-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+.kd-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #000;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(6px);
+  border: none;
+  cursor: pointer;
+  transition: background 0.16s ease;
+}
+
+.kd-icon-btn:hover {
+  background: #fff;
+}
+
+.kd-cover-bottom {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 80px 24px 32px;
+  text-align: center;
+  color: #fff;
+}
+
+@media (min-width: 640px) {
+  .kd-cover-bottom {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+.kd-cover-inner {
+  margin: 0 auto;
+  max-width: 560px;
+}
+
+.kd-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.kd-name {
+  font-family: var(--font-display, 'TikTokSans', 'Outfit', sans-serif);
+  font-size: 2.65rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .kd-name {
+    font-size: 3.35rem;
+  }
+}
+
+.kd-badge {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  fill: #27c2ff;
+  color: #27c2ff;
+  margin-top: 4px;
+}
+
+.kd-tagline {
+  margin: 4px 0 0;
+  font-family: var(--font-secondary, 'TikTokSans', 'Inter', sans-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.kd-links-wrap {
+  position: relative;
+  padding: 24px 16px 40px;
+}
+
+@media (min-width: 640px) {
+  .kd-links-wrap {
+    padding: 24px 32px 48px;
+  }
+}
+
+.kd-links {
+  display: grid;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.kd-link {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 74px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(180deg, rgba(110, 159, 247, 0.98), rgba(99, 148, 239, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  color: #f7fbff;
+  text-decoration: none;
+  transition: transform 0.16s ease, filter 0.16s ease;
+}
+
+.kd-link:hover {
+  transform: scale(1.01);
+  filter: brightness(1.05);
+}
+
+.kd-link-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.kd-link-label {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-secondary, 'TikTokSans', 'Inter', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #f7fbff;
+}
+
+@media (min-width: 640px) {
+  .kd-link-label {
+    font-size: 1.12rem;
+  }
+}
+
+.kd-link-arrow {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.kd-footer {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.kd-footer-link {
+  font-family: var(--font-secondary, 'TikTokSans', 'Inter', sans-serif);
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+}
+
+.kd-footer-link:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.kd-toast {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  border-radius: 999px;
+  white-space: nowrap;
+  z-index: 5;
+}

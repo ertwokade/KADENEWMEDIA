@@ -30,6 +30,10 @@ dist-ssr
 *.sw?
 .vercel
 .playwright-cli/
+output/
+.next/
+coverage/
+fixtures/generated/
 
 ai-website-cloner-template/
 

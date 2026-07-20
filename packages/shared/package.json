@@ -1,0 +1,20 @@
+{
+  "name": "@kade/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint src --max-warnings=0",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "latest",
+    "@aws-sdk/s3-request-presigner": "latest",
+    "bullmq": "latest",
+    "ioredis": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": { "@types/node": "latest", "eslint": "latest", "typescript": "latest", "typescript-eslint": "latest" }
+}

@@ -53,6 +53,7 @@ const OrganizationKitDashboard = lazy(() => import('./pages/OrganizationKitDashb
 const OrganizationKitPlan = lazy(() => import('./pages/OrganizationKitPlan'))
 const OrganizationKitSection = lazy(() => import('./pages/OrganizationKitSection'))
 const KadeKitBusinessStudio = lazy(() => import('./pages/KadeKitBusinessStudio'))
+const KadirDemir = lazy(() => import('./pages/KadirDemir'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -138,7 +139,8 @@ function App() {
   const isAdmin = location.pathname === '/admin'
   const isHome = location.pathname === '/'
   const isLoginArea = location.pathname.startsWith('/giris')
-  const hideShell = isAdmin || isHome || isLoginArea
+  const isKadirDemir = location.pathname === '/kadirdemir'
+  const hideShell = isAdmin || isHome || isLoginArea || isKadirDemir
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 
@@ -227,6 +229,7 @@ function App() {
           />
         ))}
         <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
+        <Route path="/kadirdemir" element={<LazyRoute><KadirDemir /></LazyRoute>} />
         <Route path="/proje-takip" element={<LazyRoute><CustomerRouteGuard><ProjectTracking /></CustomerRouteGuard></LazyRoute>} />
         <Route path="/links" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
         <Route path="/kadelinks" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
