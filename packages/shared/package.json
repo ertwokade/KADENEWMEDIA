@@ -16,5 +16,5 @@
     "ioredis": "latest",
     "zod": "latest"
   },
-  "devDependencies": { "@types/node": "latest", "eslint": "latest", "typescript": "latest", "typescript-eslint": "latest" }
+  "devDependencies": { "@types/node": "latest", "eslint": "^9.39.5", "typescript": "^5.9.3", "typescript-eslint": "latest" }
 }

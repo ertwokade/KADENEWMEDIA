@@ -34,6 +34,8 @@ output/
 .next/
 coverage/
 fixtures/generated/
+apps/studio-worker/fixtures/
+**/*.tsbuildinfo
 
 ai-website-cloner-template/
 

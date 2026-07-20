@@ -1,0 +1,21 @@
+import { mkdir, rm, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { execa } from "execa";
+import { buildAssFile, buildCaptionCues, buildFfmpegFilterScript, createMockTranscript, type TimelineState } from "@kade/editor-core";
+import { createDerivatives, detectSilences, probeMedia } from "../src/media";
+
+const fixture = fileURLToPath(new URL("../../../fixtures/generated/kade-studio-demo.mp4", import.meta.url));
+const outputDir = fileURLToPath(new URL("../../../fixtures/generated/media-smoke", import.meta.url));
+await rm(outputDir, { recursive: true, force: true }); await mkdir(outputDir, { recursive: true });
+const sourceProbe = await probeMedia(fixture); const durationMs = Math.round(Number(sourceProbe.format.duration) * 1000);
+const derivatives = await createDerivatives(fixture, outputDir, true, durationMs); const silences = await detectSilences(derivatives.audio);
+if (silences.length < 2) throw new Error(`En az iki sessizlik bekleniyordu, bulunan: ${silences.length}`);
+const state: TimelineState = { schemaVersion: 1, primaryAssetId: "00000000-0000-4000-8000-000000000001", fps: 30, canvas: { aspectRatio: "9:16", width: 360, height: 640, fitMode: "cover" }, includedRanges: [{ id: "a", sourceStartMs: 0, sourceEndMs: 3000 }, { id: "b", sourceStartMs: 4000, sourceEndMs: 8000 }, { id: "c", sourceStartMs: 10_000, sourceEndMs: 14_000 }], captions: { enabled: false, preset: "kade-clean", language: "tr" }, overlays: [] };
+const assPath = resolve(outputDir, "captions.ass"); const filterPath = resolve(outputDir, "filter.txt"); const output = resolve(outputDir, "vertical.mp4");
+await writeFile(assPath, buildAssFile(buildCaptionCues(createMockTranscript(durationMs), state.includedRanges), state.canvas.width, state.canvas.height, state.captions.preset));
+await writeFile(filterPath, buildFfmpegFilterScript(state));
+await execa("ffmpeg", ["-hide_banner", "-y", "-i", derivatives.mezzanine, "-filter_complex_script", filterPath, "-map", "[vout]", "-map", "[aout]", "-c:v", "libx264", "-preset", "ultrafast", "-c:a", "aac", "-pix_fmt", "yuv420p", "-movflags", "+faststart", output]);
+const verified = await probeMedia(output); const video = verified.streams.find((stream) => stream.codec_type === "video"); const exportedDurationMs = Math.round(Number(verified.format.duration) * 1000);
+if (video?.codec_name !== "h264" || video.width !== 360 || video.height !== 640 || exportedDurationMs >= durationMs) throw new Error(`Export doğrulaması başarısız: ${JSON.stringify({ video, exportedDurationMs, durationMs })}`);
+console.log(JSON.stringify({ sourceDurationMs: durationMs, exportedDurationMs, silences, codec: video.codec_name, resolution: `${video.width}x${video.height}`, proxy: derivatives.proxy }, null, 2));

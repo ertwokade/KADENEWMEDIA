@@ -31,10 +31,11 @@
     "@types/react-dom": "latest",
     "dotenv": "latest",
     "dotenv-cli": "latest",
-    "eslint": "latest",
+    "eslint": "^9.39.5",
     "eslint-config-next": "latest",
+    "execa": "latest",
     "tailwindcss": "latest",
-    "typescript": "latest",
+    "typescript": "^5.9.3",
     "vitest": "latest"
   }
 }

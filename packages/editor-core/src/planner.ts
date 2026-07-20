@@ -42,7 +42,7 @@ export function validateEditPlan(plan: unknown, sentences: TranscriptSentence[],
 type ApplyContext = { durationMs: number; words: TranscriptWord[]; sentences: TranscriptSentence[]; silences: Array<{ startMs: number; endMs: number }> };
 
 export function applyEditPlan(state: TimelineState, plan: EditPlan, context: ApplyContext) {
-  let next = structuredClone(state);
+  const next = structuredClone(state);
   const report: string[] = [];
   const beforeDurationMs = getOutputDuration(next);
   for (const operation of plan.operations) {
@@ -71,7 +71,7 @@ export function applyEditPlan(state: TimelineState, plan: EditPlan, context: App
       next.captions = { ...next.captions, enabled: operation.enabled, preset: operation.preset };
       report.push(`Kade ${operation.preset} altyazıları ${operation.enabled ? "açıldı" : "kapatıldı"}`);
     } else if (operation.type === "add_title") {
-      next.overlays.push({ id: randomUUID(), ...operation });
+      next.overlays.push({ id: randomUUID(), type: "title", text: operation.text, timelineStartMs: operation.timelineStartMs, durationMs: operation.durationMs, position: operation.position });
       report.push(`“${operation.text}” başlık kartı eklendi`);
     }
   }

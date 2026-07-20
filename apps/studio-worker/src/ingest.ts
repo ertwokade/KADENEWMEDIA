@@ -31,7 +31,7 @@ export async function ingestProcessor(job: Job<IngestData>) {
     const video = probe.streams.find((stream) => stream.codec_type === "video");
     const audioStream = probe.streams.find((stream) => stream.codec_type === "audio");
     await progress(job, 15);
-    const output = await createDerivatives(input, join(temp, "output"), Boolean(video));
+    const output = await createDerivatives(input, join(temp, "output"), Boolean(video), durationMs);
     await progress(job, 55);
     const silences = await detectSilences(output.audio);
     const base = `projects/${asset.projectId}/assets/${asset.id}`;

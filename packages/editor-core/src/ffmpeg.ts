@@ -33,7 +33,7 @@ export function buildFfmpegFilterScript(state: TimelineState, options: { assPath
   });
   lines.push(`[${videoLabel}]format=yuv420p[vout]`);
   lines.push("[ca]anull[aout]");
-  return `${lines.join(";\n")};\n`;
+  return `${lines.join(";\n")}\n`;
 }
 
 export function compileTimeline(state: TimelineState) {

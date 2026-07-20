@@ -1,12 +1,12 @@
 import "dotenv/config";
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
-import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { assets, getDb, processingJobs, projects } from "@kade/db";
 import { createIngestQueue, createStorageClient, getEnv } from "@kade/shared";
 
-const fixture = resolve("fixtures/generated/kade-studio-demo.mp4");
+const fixture = fileURLToPath(new URL("../../../fixtures/generated/kade-studio-demo.mp4", import.meta.url));
 await stat(fixture);
 const db = getDb();
 const [project] = await db.insert(projects).values({ name: "Kade Studio Demo", status: "uploading" }).returning();

@@ -5,7 +5,7 @@ import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { execa } from "execa";
 import OpenAI from "openai";
 import { createStorageClient, getEnv } from "@kade/shared";
-import type { TranscriptWord } from "@kade/editor-core";
+import { createMockTranscript, type TranscriptWord } from "@kade/editor-core";
 
 export type Probe = { format: { duration?: string; format_name?: string }; streams: Array<{ codec_type?: string; codec_name?: string; width?: number; height?: number; avg_frame_rate?: string; channels?: number }> };
 
@@ -30,7 +30,7 @@ export async function probeMedia(path: string): Promise<Probe> {
 
 const run = (args: string[]) => execa("ffmpeg", ["-hide_banner", "-y", ...args], { stderr: "pipe" });
 
-export async function createDerivatives(input: string, outputDir: string, hasVideo: boolean) {
+export async function createDerivatives(input: string, outputDir: string, hasVideo: boolean, durationMs: number) {
   await mkdir(outputDir, { recursive: true });
   const proxy = `${outputDir}/proxy.mp4`;
   const mezzanine = `${outputDir}/mezzanine.mp4`;
@@ -48,9 +48,9 @@ export async function createDerivatives(input: string, outputDir: string, hasVid
   await run(["-i", audio, "-filter_complex", "showwavespic=s=1400x220:colors=0xE9FF70", "-frames:v", "1", waveform]);
   const thumbnails: string[] = [];
   if (hasVideo) {
-    for (const [index, position] of ["10%", "50%", "90%"].entries()) {
+    for (const [index, ratio] of [0.1, 0.5, 0.9].entries()) {
       const target = `${outputDir}/thumb-${index + 1}.jpg`;
-      await run(["-ss", position, "-i", input, "-frames:v", "1", "-vf", "scale=480:-2", "-q:v", "3", target]);
+      await run(["-ss", ((durationMs / 1000) * ratio).toFixed(3), "-i", input, "-frames:v", "1", "-vf", "scale=480:-2", "-q:v", "3", target]);
       thumbnails.push(target);
     }
   }
@@ -64,16 +64,7 @@ export async function detectSilences(audioPath: string) {
   return starts.map((startMs, index) => ({ startMs: Math.round(startMs), endMs: Math.round(ends[index] ?? startMs) })).filter((range) => range.endMs > range.startMs);
 }
 
-const mockVocabulary = ["Kade", "Studio", "ile", "ııı", "fikrini", "anlat", "şey", "sonra", "kurguyu", "timeline", "üzerinde", "kontrol", "et", "yani", "hikâyeni", "güçlendir."];
-export function createMockTranscript(durationMs: number): TranscriptWord[] {
-  const usable = Math.max(1_000, durationMs - 200);
-  const count = Math.max(4, Math.min(80, Math.floor(usable / 650)));
-  const slot = usable / count;
-  return Array.from({ length: count }, (_, wordIndex) => {
-    const text = mockVocabulary[wordIndex % mockVocabulary.length]!;
-    return { wordIndex, text, normalizedText: text.toLocaleLowerCase("tr-TR").replace(/[.,!?]/g, ""), startMs: Math.round(wordIndex * slot), endMs: Math.min(durationMs, Math.round(wordIndex * slot + slot * 0.72)), confidence: 0.99 };
-  });
-}
+export { createMockTranscript };
 
 async function transcribeOne(client: OpenAI, audioPath: string, offsetMs: number): Promise<{ language: string; words: TranscriptWord[] }> {
   const response = await client.audio.transcriptions.create({ file: createReadStream(audioPath), model: getEnv().OPENAI_TRANSCRIPTION_MODEL, response_format: "verbose_json", timestamp_granularities: ["word", "segment"], language: "tr" });

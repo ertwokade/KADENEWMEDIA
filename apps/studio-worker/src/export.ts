@@ -36,8 +36,8 @@ export async function exportProcessor(job: Job<ExportData>) {
     await writeAss(script, buildFfmpegFilterScript(state, state.captions.enabled ? { assPath: ass } : {}));
     const durationMs = getOutputDuration(state);
     const subprocess = execa("ffmpeg", ["-hide_banner", "-y", "-i", input, "-filter_complex_script", script, "-map", "[vout]", "-map", "[aout]", "-c:v", "libx264", "-preset", process.env.NODE_ENV === "test" ? "ultrafast" : "medium", "-crf", "20", "-c:a", "aac", "-b:a", "192k", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "-progress", "pipe:1", "-nostats", output], { stdout: "pipe", stderr: "pipe" });
-    for await (const line of subprocess.stdout) {
-      const match = line.match(/^out_time_ms=(\d+)/);
+    for await (const chunk of subprocess.stdout) {
+      const match = String(chunk).match(/out_time_ms=(\d+)/);
       if (match) {
         const progress = Math.min(95, Math.max(5, Math.round((Number(match[1]) / 1000 / durationMs) * 90)));
         await job.updateProgress(progress); await db.update(exportsTable).set({ progress }).where(eq(exportsTable.id, record.id));

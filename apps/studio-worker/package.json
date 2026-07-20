@@ -10,7 +10,8 @@
     "lint": "eslint src scripts --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "fixture": "tsx scripts/create-fixture.ts",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "test:media": "tsx scripts/media-smoke.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "latest",
@@ -24,5 +25,5 @@
     "execa": "latest",
     "openai": "latest"
   },
-  "devDependencies": { "@types/node": "latest", "eslint": "latest", "tsx": "latest", "typescript": "latest", "typescript-eslint": "latest" }
+  "devDependencies": { "@types/node": "latest", "eslint": "^9.39.5", "tsx": "latest", "typescript": "^5.9.3", "typescript-eslint": "latest" }
 }

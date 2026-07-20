@@ -1,0 +1,71 @@
+name: kade-studio
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: kade
+      POSTGRES_PASSWORD: kade
+      POSTGRES_DB: kade_studio
+    ports: ["5432:5432"]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U kade -d kade_studio"], interval: 3s, timeout: 3s, retries: 20 }
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: ["redis_data:/data"]
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 3s, timeout: 3s, retries: 20 }
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: kade
+      MINIO_ROOT_PASSWORD: kade-local-secret
+      MINIO_API_CORS_ALLOW_ORIGIN: http://localhost:3000,http://127.0.0.1:3000
+    ports: ["9000:9000", "9001:9001"]
+    volumes: ["minio_data:/data"]
+    healthcheck: { test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"], interval: 3s, timeout: 3s, retries: 20 }
+  minio-init:
+    image: minio/mc:latest
+    depends_on: { minio: { condition: service_healthy } }
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["mc alias set local http://minio:9000 kade kade-local-secret && mc mb --ignore-existing local/kade-studio && mc anonymous set none local/kade-studio"]
+    restart: "no"
+  migrate:
+    build: { context: ., dockerfile: apps/studio-worker/Dockerfile }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://kade:kade@postgres:5432/kade_studio
+    command: ["pnpm", "db:migrate"]
+    depends_on: { postgres: { condition: service_healthy } }
+    restart: "no"
+  web:
+    build: { context: ., dockerfile: apps/studio-web/Dockerfile }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://kade:kade@postgres:5432/kade_studio
+      REDIS_URL: redis://redis:6379
+      S3_ENDPOINT: http://minio:9000
+      S3_PUBLIC_ENDPOINT: http://localhost:9000
+    ports: ["3000:3000"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+      minio-init: { condition: service_completed_successfully }
+    healthcheck: { test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"], interval: 5s, timeout: 5s, retries: 30 }
+  worker:
+    build: { context: ., dockerfile: apps/studio-worker/Dockerfile }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://kade:kade@postgres:5432/kade_studio
+      REDIS_URL: redis://redis:6379
+      S3_ENDPOINT: http://minio:9000
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+      minio-init: { condition: service_completed_successfully }
+    restart: unless-stopped
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
