@@ -253,3 +253,16 @@
   white-space: nowrap;
   z-index: 5;
 }
+
+.kd-loading-card {
+  border-radius: 2rem;
+  min-height: 620px;
+  background: linear-gradient(100deg, #111 40%, #1c1c1c 50%, #111 60%);
+  background-size: 200% 100%;
+  animation: kd-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes kd-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

@@ -16,6 +16,7 @@ import {
   HiOutlineDocumentReport, HiOutlineClipboardCheck,
   HiOutlineTemplate, HiOutlineStar, HiOutlineCollection,
   HiOutlineUserGroup, HiOutlineGlobe, HiOutlineCalculator,
+  HiOutlineLink, HiOutlineIdentification,
 } from 'react-icons/hi'
 import PageTransition from '../components/PageTransition'
 import BasinEditor from './admin/editors/BasinEditor'
@@ -33,6 +34,8 @@ import {
   getBlogsApi, createBlogApi, updateBlogApi, deleteBlogApi,
   getContentApi, updateContentApi,
   getPartnersApi, createPartnerApi, updatePartnerApi, deletePartnerApi,
+  getLinkProfilesApi, createLinkProfileApi, updateLinkProfileApi, deleteLinkProfileApi,
+  getShortLinksApi, createShortLinkApi, updateShortLinkApi, deleteShortLinkApi,
   getMessagesApi, markMessageReadApi, deleteMessageApi,
   getUsersApi, createUserApi, updateUserApi, deleteUserApi,
   sendCalendarInviteApi,
@@ -2306,6 +2309,435 @@ function PartnersSection({ showToast }) {
                         ? <button className="table-action-btn danger" onClick={() => handleDelete(p._id)}><HiOutlineTrash size={14} /> Sil</button>
                         : <button className="table-action-btn danger" onClick={() => handleDelete(null)}><HiOutlineTrash size={14} /> Sil</button>
                       }
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ========== LINK PROFILES (link-in-bio sayfaları) ==========
+const LINK_ICON_OPTIONS = [
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'x', label: 'X (Twitter)' },
+  { value: 'tiktok', label: 'TikTok' },
+  { value: 'whatsapp', label: 'WhatsApp' },
+  { value: 'website', label: 'Website' },
+  { value: 'email', label: 'E-posta' },
+  { value: 'custom', label: 'Diğer' },
+]
+
+function profilePublicPath(slug) {
+  return `/@${slug}`
+}
+
+const emptyLinkProfileForm = () => ({
+  slug: '', name: '', handle: '', tagline: '', photo: '', active: true,
+  links: [{ label: '', url: '', icon: 'instagram' }],
+})
+
+function LinkProfilesSection({ showToast }) {
+  const [profiles, setProfiles] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingProfile, setEditingProfile] = useState(null)
+  const [form, setForm] = useState(emptyLinkProfileForm())
+
+  const fetchProfiles = async () => {
+    try {
+      const data = await getLinkProfilesApi()
+      setProfiles(Array.isArray(data) ? data : [])
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchProfiles() }, [])
+
+  const resetForm = () => {
+    setForm(emptyLinkProfileForm())
+    setEditingProfile(null)
+    setShowForm(false)
+  }
+
+  const handleEdit = (profile) => {
+    setForm({
+      slug: profile.slug || '', name: profile.name || '', handle: profile.handle || '',
+      tagline: profile.tagline || '', photo: profile.photo || '', active: profile.active !== false,
+      links: profile.links?.length ? profile.links.map((l) => ({ ...l })) : [{ label: '', url: '', icon: 'instagram' }],
+    })
+    setEditingProfile(profile)
+    setShowForm(true)
+  }
+
+  const updateLink = (index, field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      links: prev.links.map((l, i) => (i === index ? { ...l, [field]: value } : l)),
+    }))
+  }
+
+  const addLink = () => setForm((prev) => ({ ...prev, links: [...prev.links, { label: '', url: '', icon: 'instagram' }] }))
+  const removeLink = (index) => setForm((prev) => ({ ...prev, links: prev.links.filter((_, i) => i !== index) }))
+
+  const handleSave = async () => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — yazma işlemi yapılamaz.', 'error'); return }
+    if (!form.slug.trim() || !form.name.trim()) { showToast('Slug ve isim gerekli', 'error'); return }
+    const payload = {
+      slug: form.slug.trim().toLowerCase(),
+      name: form.name.trim(),
+      handle: form.handle.trim(),
+      tagline: form.tagline.trim(),
+      photo: form.photo,
+      active: form.active,
+      links: form.links.filter((l) => l.label.trim() && l.url.trim()),
+    }
+    try {
+      if (editingProfile?._id) {
+        await updateLinkProfileApi({ ...payload, _id: editingProfile._id })
+        showToast('Profil güncellendi!', 'success')
+      } else {
+        await createLinkProfileApi(payload)
+        showToast('Profil oluşturuldu!', 'success')
+      }
+      resetForm()
+      fetchProfiles()
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
+    if (!window.confirm('Bu link profilini silmek istediğinize emin misiniz?')) return
+    try {
+      await deleteLinkProfileApi(id)
+      showToast('Profil silindi!', 'success')
+      fetchProfiles()
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Link <span>Sayfaları</span></h1>
+          <p>Ekip üyeleri için link-in-bio (linktree tarzı) profil sayfaları oluşturun ve düzenleyin</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
+          <HiOutlinePlus size={18} /> Yeni Profil
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {showForm && (
+          <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
+            <motion.div className="admin-modal" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <h3>{editingProfile ? 'Profili Düzenle' : 'Yeni Link Profili'}</h3>
+                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+              </div>
+              <div className="admin-form" style={{ border: 'none', padding: 0 }}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Slug (URL)</label>
+                    <input type="text" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="ayse-yilmaz" />
+                    <small style={{ color: 'var(--text-secondary)' }}>Yayınlanacak adres: kadenewmedia.com{profilePublicPath(form.slug || 'slug')}</small>
+                  </div>
+                  <div className="form-group">
+                    <label>İsim</label>
+                    <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ayşe Yılmaz" />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Rozet / Kullanıcı Adı</label>
+                    <input type="text" value={form.handle} onChange={(e) => setForm({ ...form, handle: e.target.value })} placeholder="@ayseyilmaz" />
+                  </div>
+                  <div className="form-group">
+                    <label>Etiket (unvan)</label>
+                    <input type="text" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="Kreatif Direktör, Kade Media" />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Kapak Fotoğrafı</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <label style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      padding: '7px 14px', borderRadius: 8, border: '1px dashed var(--border)',
+                      cursor: 'pointer', fontSize: '0.82rem', color: 'var(--text-secondary)',
+                      background: 'var(--bg-secondary)',
+                    }}>
+                      📁 Fotoğraf Yükle
+                      <input type="file" accept="image/*" style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files[0]
+                          if (!file) return
+                          if (file.size > 2 * 1024 * 1024) { alert('Dosya 2MB\'den küçük olmalı!'); return }
+                          const reader = new FileReader()
+                          reader.onload = (ev) => setForm({ ...form, photo: ev.target.result })
+                          reader.readAsDataURL(file)
+                        }}
+                      />
+                    </label>
+                    {form.photo && (
+                      <img src={form.photo} alt="Önizleme" style={{ height: 48, width: 48, objectFit: 'cover', borderRadius: 8, background: 'var(--bg-secondary)' }} />
+                    )}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
+                    Yayında
+                  </label>
+                </div>
+
+                <div className="form-group">
+                  <label>Linkler</label>
+                  {form.links.map((link, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+                      <select value={link.icon} onChange={(e) => updateLink(i, 'icon', e.target.value)} style={{ padding: '8px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
+                        {LINK_ICON_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
+                      <input type="text" value={link.label} onChange={(e) => updateLink(i, 'label', e.target.value)} placeholder="Etiket (örn. Instagram)" style={{ flex: 1 }} />
+                      <input type="url" value={link.url} onChange={(e) => updateLink(i, 'url', e.target.value)} placeholder="https://..." style={{ flex: 2 }} />
+                      <button type="button" className="table-action-btn danger" onClick={() => removeLink(i)}><HiOutlineTrash size={14} /></button>
+                    </div>
+                  ))}
+                  <button type="button" className="btn btn-outline" onClick={addLink}><HiOutlinePlus size={14} /> Link Ekle</button>
+                </div>
+
+                <div className="admin-form-actions">
+                  <button className="btn btn-outline" onClick={resetForm}>İptal</button>
+                  <button className="btn btn-primary" onClick={handleSave}>
+                    <HiOutlineSave size={16} /> {editingProfile ? 'Güncelle' : 'Oluştur'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="admin-table-wrapper">
+        <div className="admin-table-header">
+          <h3>Link Profilleri ({profiles.length})</h3>
+        </div>
+        {loading ? (
+          <div className="admin-empty-state"><p>Yükleniyor...</p></div>
+        ) : profiles.length === 0 ? (
+          <div className="admin-empty-state">
+            <div className="empty-icon">🔗</div>
+            <h3>Henüz link profili yok</h3>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Fotoğraf</th>
+                <th>İsim</th>
+                <th>Adres</th>
+                <th>Durum</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {profiles.map((p) => (
+                <tr key={p._id}>
+                  <td>
+                    {p.photo
+                      ? <img src={p.photo} alt={p.name} style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 8 }} />
+                      : <span style={{ fontSize: '1.5rem' }}>🔗</span>}
+                  </td>
+                  <td><strong>{p.name}</strong></td>
+                  <td><a href={profilePublicPath(p.slug)} target="_blank" rel="noreferrer">{profilePublicPath(p.slug)}</a></td>
+                  <td><span className="status-badge" style={{ background: p.active !== false ? '#00bb7f20' : '#ff235720', color: p.active !== false ? '#00bb7f' : '#ff2357' }}>{p.active !== false ? 'Yayında' : 'Pasif'}</span></td>
+                  <td>
+                    <div className="table-actions">
+                      <button className="table-action-btn" onClick={() => handleEdit(p)}><HiOutlinePencil size={14} /> Düzenle</button>
+                      <button className="table-action-btn danger" onClick={() => handleDelete(p._id)}><HiOutlineTrash size={14} /> Sil</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ========== SHORT LINKS (kısa link sistemi) ==========
+const emptyShortLinkForm = () => ({ slug: '', target: '', label: '', active: true })
+
+function ShortLinksSection({ showToast }) {
+  const [links, setLinks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingLink, setEditingLink] = useState(null)
+  const [form, setForm] = useState(emptyShortLinkForm())
+
+  const fetchLinks = async () => {
+    try {
+      const data = await getShortLinksApi()
+      setLinks(Array.isArray(data) ? data : [])
+    } catch (err) {
+      showToast(err.message, 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchLinks() }, [])
+
+  const resetForm = () => {
+    setForm(emptyShortLinkForm())
+    setEditingLink(null)
+    setShowForm(false)
+  }
+
+  const handleEdit = (link) => {
+    setForm({ slug: link.slug || '', target: link.target || '', label: link.label || '', active: link.active !== false })
+    setEditingLink(link)
+    setShowForm(true)
+  }
+
+  const handleSave = async () => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — yazma işlemi yapılamaz.', 'error'); return }
+    if (!form.slug.trim() || !form.target.trim()) { showToast('Slug ve hedef URL gerekli', 'error'); return }
+    const payload = { slug: form.slug.trim().toLowerCase(), target: form.target.trim(), label: form.label.trim(), active: form.active }
+    try {
+      if (editingLink?._id) {
+        await updateShortLinkApi({ ...payload, _id: editingLink._id })
+        showToast('Kısa link güncellendi!', 'success')
+      } else {
+        await createShortLinkApi(payload)
+        showToast('Kısa link oluşturuldu!', 'success')
+      }
+      resetForm()
+      fetchLinks()
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (isLocalMode()) { showToast('Sunucu bağlantısı yok — silme işlemi yapılamaz.', 'error'); return }
+    if (!window.confirm('Bu kısa linki silmek istediğinize emin misiniz?')) return
+    try {
+      await deleteShortLinkApi(id)
+      showToast('Kısa link silindi!', 'success')
+      fetchLinks()
+    } catch (err) {
+      showToast(err.message, 'error')
+    }
+  }
+
+  const copyLink = (slug) => {
+    const url = `${window.location.origin}/s/${slug}`
+    navigator.clipboard?.writeText(url).then(() => showToast('Kopyalandı: ' + url, 'success')).catch(() => {})
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Kısa <span>Linkler</span></h1>
+          <p>kadenewmedia.com/s/... üzerinden yönlendiren kısa linkler oluşturun, tıklamaları takip edin</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
+          <HiOutlinePlus size={18} /> Yeni Kısa Link
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {showForm && (
+          <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
+            <motion.div className="admin-modal" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
+              <div className="admin-modal-header">
+                <h3>{editingLink ? 'Linki Düzenle' : 'Yeni Kısa Link'}</h3>
+                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+              </div>
+              <div className="admin-form" style={{ border: 'none', padding: 0 }}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Kısa Kod</label>
+                    <input type="text" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="kampanya" />
+                    <small style={{ color: 'var(--text-secondary)' }}>kadenewmedia.com/s/{form.slug || 'kod'}</small>
+                  </div>
+                  <div className="form-group">
+                    <label>Not (opsiyonel)</label>
+                    <input type="text" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Nereden geldiğini hatırlamak için" />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Hedef URL</label>
+                  <input type="url" value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value })} placeholder="https://..." />
+                </div>
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
+                    Aktif
+                  </label>
+                </div>
+                <div className="admin-form-actions">
+                  <button className="btn btn-outline" onClick={resetForm}>İptal</button>
+                  <button className="btn btn-primary" onClick={handleSave}>
+                    <HiOutlineSave size={16} /> {editingLink ? 'Güncelle' : 'Oluştur'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="admin-table-wrapper">
+        <div className="admin-table-header">
+          <h3>Kısa Linkler ({links.length})</h3>
+        </div>
+        {loading ? (
+          <div className="admin-empty-state"><p>Yükleniyor...</p></div>
+        ) : links.length === 0 ? (
+          <div className="admin-empty-state">
+            <div className="empty-icon">✂️</div>
+            <h3>Henüz kısa link yok</h3>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Kısa Link</th>
+                <th>Hedef</th>
+                <th>Tıklama</th>
+                <th>Durum</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {links.map((l) => (
+                <tr key={l._id}>
+                  <td><code>/s/{l.slug}</code></td>
+                  <td style={{ maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.target}</td>
+                  <td>{l.clicks || 0}</td>
+                  <td><span className="status-badge" style={{ background: l.active !== false ? '#00bb7f20' : '#ff235720', color: l.active !== false ? '#00bb7f' : '#ff2357' }}>{l.active !== false ? 'Aktif' : 'Pasif'}</span></td>
+                  <td>
+                    <div className="table-actions">
+                      <button className="table-action-btn" onClick={() => copyLink(l.slug)}><HiOutlineLink size={14} /> Kopyala</button>
+                      <button className="table-action-btn" onClick={() => handleEdit(l)}><HiOutlinePencil size={14} /> Düzenle</button>
+                      <button className="table-action-btn danger" onClick={() => handleDelete(l._id)}><HiOutlineTrash size={14} /> Sil</button>
                     </div>
                   </td>
                 </tr>
@@ -7242,6 +7674,8 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     content: 'content',
     partners: 'partners',
     portfolio: 'portfolio',
+    'link-profiles': 'linkProfiles',
+    'short-links': 'shortLinks',
     newsletter: 'messages',
     media: 'media',
     'ai-content': 'aiContent',
@@ -7286,6 +7720,8 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     { id: 'content', label: 'İçerik Yönetimi', icon: HiOutlinePencilAlt },
     { id: 'partners', label: 'Partnerler', icon: HiOutlineUsers },
     { id: 'portfolio', label: 'Portföy', icon: HiOutlineViewBoards },
+    { id: 'link-profiles', label: 'Link Sayfaları', icon: HiOutlineIdentification },
+    { id: 'short-links', label: 'Kısa Linkler', icon: HiOutlineLink },
     { id: 'newsletter', label: 'Newsletter', icon: HiOutlineMail },
     { id: 'media', label: 'Medya Kütüphanesi', icon: HiOutlinePhotograph },
     { id: 'ai-content', label: 'AI İçerik Üretici', icon: HiOutlineSparkles },
@@ -7464,6 +7900,8 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
         {activeSection === 'blog' && <BlogSection showToast={showToast} />}
         {activeSection === 'content' && <ContentSection showToast={showToast} />}
         {activeSection === 'partners' && <PartnersSection showToast={showToast} />}
+        {activeSection === 'link-profiles' && <LinkProfilesSection showToast={showToast} />}
+        {activeSection === 'short-links' && <ShortLinksSection showToast={showToast} />}
         {activeSection === 'portfolio' && <PortfolioSection showToast={showToast} />}
         {activeSection === 'messages' && <MessagesSection showToast={showToast} onNewMessageCount={(count) => setUnreadCount(count)} />}
         {activeSection === 'calendar' && <CalendarSection showToast={showToast} />}

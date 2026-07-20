@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { CustomerProvider } from './contexts/CustomerContext'
 import { OrganizationSchema } from './components/StructuredData'
-import { Routes, Route, useLocation } from 'react-router-dom'
-import { trackPageviewApi, heartbeatApi, getSessionApi } from './api'
+import { Routes, Route, useLocation, useParams, Navigate } from 'react-router-dom'
+import { trackPageviewApi, heartbeatApi, getSessionApi, resolveShortLinkApi, recordShortLinkClickApi } from './api'
 import PageHeroCanvas from './components/PageHeroCanvas'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -53,7 +53,7 @@ const OrganizationKitDashboard = lazy(() => import('./pages/OrganizationKitDashb
 const OrganizationKitPlan = lazy(() => import('./pages/OrganizationKitPlan'))
 const OrganizationKitSection = lazy(() => import('./pages/OrganizationKitSection'))
 const KadeKitBusinessStudio = lazy(() => import('./pages/KadeKitBusinessStudio'))
-const KadirDemir = lazy(() => import('./pages/KadirDemir'))
+const LinkProfile = lazy(() => import('./pages/LinkProfile'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -100,6 +100,28 @@ function ExternalRedirect({ to }) {
   return <PageLoader />
 }
 
+function ShortLinkRedirect() {
+  const { slug } = useParams()
+  const [notFound, setNotFound] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    resolveShortLinkApi(slug)
+      .then((data) => {
+        if (cancelled || !data?.target) return
+        recordShortLinkClickApi(slug).catch(() => {})
+        window.location.replace(data.target)
+      })
+      .catch(() => {
+        if (!cancelled) setNotFound(true)
+      })
+    return () => { cancelled = true }
+  }, [slug])
+
+  if (notFound) return <NotFound />
+  return <PageLoader />
+}
+
 const ROUTE_THEMES = {
   '/': 'home',
   '/hakkimizda': 'about',
@@ -139,8 +161,8 @@ function App() {
   const isAdmin = location.pathname === '/admin'
   const isHome = location.pathname === '/'
   const isLoginArea = location.pathname.startsWith('/giris')
-  const isKadirDemir = location.pathname === '/kadirdemir'
-  const hideShell = isAdmin || isHome || isLoginArea || isKadirDemir
+  const isLinkProfile = location.pathname.startsWith('/@') || location.pathname === '/kadirdemir'
+  const hideShell = isAdmin || isHome || isLoginArea || isLinkProfile
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 
@@ -229,7 +251,9 @@ function App() {
           />
         ))}
         <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
-        <Route path="/kadirdemir" element={<LazyRoute><KadirDemir /></LazyRoute>} />
+        <Route path="/kadirdemir" element={<Navigate to="/@kadirdemir" replace />} />
+        <Route path="/:handle" element={<LazyRoute><LinkProfile /></LazyRoute>} />
+        <Route path="/s/:slug" element={<ShortLinkRedirect />} />
         <Route path="/proje-takip" element={<LazyRoute><CustomerRouteGuard><ProjectTracking /></CustomerRouteGuard></LazyRoute>} />
         <Route path="/links" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
         <Route path="/kadelinks" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />

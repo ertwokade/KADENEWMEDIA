@@ -10,6 +10,7 @@ import client from '../server/api/client.js'
 import contact from '../server/api/contact.js'
 import content from '../server/api/content.js'
 import crm from '../server/api/crm.js'
+import linkProfiles from '../server/api/linkProfiles.js'
 import media from '../server/api/media.js'
 import messages from '../server/api/messages.js'
 import notifications from '../server/api/notifications.js'
@@ -19,6 +20,7 @@ import proposals from '../server/api/proposals.js'
 import referrals from '../server/api/referrals.js'
 import reminders from '../server/api/reminders.js'
 import seed from '../server/api/seed.js'
+import shortLinks from '../server/api/shortLinks.js'
 import sitemap from '../server/api/sitemap.js'
 import subscriptions from '../server/api/subscriptions.js'
 import surveys from '../server/api/surveys.js'
@@ -41,6 +43,7 @@ const handlers = {
   contact,
   content,
   crm,
+  linkprofiles: linkProfiles,
   media,
   messages,
   notifications,
@@ -50,6 +53,7 @@ const handlers = {
   referrals,
   reminders,
   seed,
+  shortlinks: shortLinks,
   sitemap,
   subscriptions,
   surveys,

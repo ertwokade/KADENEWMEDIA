@@ -325,6 +325,90 @@ export async function deletePartnerApi(id) {
   return handleResponse(res);
 }
 
+// Link Profiles
+export async function getLinkProfilesApi() {
+  const res = await fetch(`${API_BASE}/linkprofiles`);
+  return handleResponse(res);
+}
+
+export async function getLinkProfileBySlugApi(slug) {
+  const res = await fetch(`${API_BASE}/linkprofiles?slug=${encodeURIComponent(slug)}`);
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+export async function createLinkProfileApi(data) {
+  const res = await fetch(`${API_BASE}/linkprofiles`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateLinkProfileApi(data) {
+  const res = await fetch(`${API_BASE}/linkprofiles`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteLinkProfileApi(id) {
+  const res = await fetch(`${API_BASE}/linkprofiles?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// Short Links
+export async function getShortLinksApi() {
+  const res = await fetch(`${API_BASE}/shortlinks`);
+  return handleResponse(res);
+}
+
+export async function resolveShortLinkApi(slug) {
+  const res = await fetch(`${API_BASE}/shortlinks?slug=${encodeURIComponent(slug)}`);
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+export async function recordShortLinkClickApi(slug) {
+  const res = await fetch(`${API_BASE}/shortlinks?action=click`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ slug }),
+  });
+  if (res.status === 204) return null;
+  return handleResponse(res, { reloadOnUnauthorized: false });
+}
+
+export async function createShortLinkApi(data) {
+  const res = await fetch(`${API_BASE}/shortlinks`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateShortLinkApi(data) {
+  const res = await fetch(`${API_BASE}/shortlinks`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteShortLinkApi(id) {
+  const res = await fetch(`${API_BASE}/shortlinks?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
 // Messages
 export async function getMessagesApi() {
   const res = await fetch(`${API_BASE}/messages`, {

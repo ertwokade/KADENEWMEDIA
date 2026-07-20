@@ -8,7 +8,7 @@ const querySchema = z.record(
 
 const allowedActions = new Set([
   'active-visitors', 'activity', 'ai-usage', 'analytics', 'analyzer-lead',
-  'apply', 'change-password', 'check', 'csrf', 'file', 'ga4', 'heartbeat',
+  'apply', 'change-password', 'check', 'click', 'csrf', 'file', 'ga4', 'heartbeat',
   'login', 'logout', 'newsletter', 'notes', 'pageview', 'reply',
   'send-invite', 'send-newsletter', 'sitemap', 'smtp-test', 'submit',
   'subscribers', 'session', 'unsubscribe',
