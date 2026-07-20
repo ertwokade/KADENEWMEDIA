@@ -12,10 +12,10 @@ export default function Careers() {
   const isEN = lang !== 'tr'
 
   useSEO({
-    title: lang === 'tr' ? 'Kade Media Kariyer | Genel Başvuru Bilgileri' : 'Careers | Kade Media',
+    title: lang === 'tr' ? 'Kade New Media Kariyer | Genel Başvuru Bilgileri' : 'Careers | Kade New Media',
     description: lang === 'tr'
-      ? 'Kade Media’daki kariyer olanakları ve genel başvuru süreci hakkında bilgi alın; uzmanlık alanınızı ve çalışmalarınızı bizimle paylaşın.'
-      : 'Kade Media careers and general application information.',
+      ? 'Kade New Media’daki kariyer olanakları ve genel başvuru süreci hakkında bilgi alın; uzmanlık alanınızı ve çalışmalarınızı bizimle paylaşın.'
+      : 'Kade New Media careers and general application information.',
     path: '/kariyer',
   })
 

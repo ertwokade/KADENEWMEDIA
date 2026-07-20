@@ -241,7 +241,7 @@ function DashboardSection({ stats, onNavigate }) {
       <div className="admin-page-header">
         <div>
           <h1>Gösterge <span>Paneli</span></h1>
-          <p>Kade Media yönetim paneline hoş geldiniz — {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p>Kade New Media yönetim paneline hoş geldiniz — {new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
         </div>
         <a href="/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ gap: 8, fontSize: '0.88rem' }}>
           ⚡ Siteyi Görüntüle
@@ -1082,21 +1082,21 @@ function ContentSection({ showToast }) {
   // Memoize data props to prevent child editors from resetting form state on re-render
   // (isDirty state change triggers re-render; inline fallback objects would create new refs each time)
   const heroData = useMemo(() => content.hero || {
-    tr: { title1: 'Dijital Dünyada Markanıza', title2: 'Kademe Atlatıyoruz ⚡', subtitle: 'Kade Media olarak sosyal medya stratejileri, kreatif içerik üretimi ve dijital pazarlama çözümleriyle markanızı zirveye taşıyoruz.' },
-    en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
+    tr: { title1: 'Dijital Dünyada Markanıza', title2: 'Kademe Atlatıyoruz ⚡', subtitle: 'Kade New Media olarak sosyal medya stratejileri, kreatif içerik üretimi ve dijital pazarlama çözümleriyle markanızı zirveye taşıyoruz.' },
+    en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade New Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
   }, [content.hero])
   const statsData = useMemo(() => content.stats || { clients: '10+', followers: '500+', campaigns: '50+', satisfaction: '98%' }, [content.stats])
   const servicesData = useMemo(() => content.services || { items: [] }, [content.services])
   const faqData = useMemo(() => content.faq || {
     tr: [
-      { q: 'Kade Media ne tür hizmetler sunuyor?', a: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi (Meta, Google, TikTok), video prodüksiyon ve dijital strateji danışmanlığı hizmetleri sunuyoruz.' },
+      { q: 'Kade New Media ne tür hizmetler sunuyor?', a: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi (Meta, Google, TikTok), video prodüksiyon ve dijital strateji danışmanlığı hizmetleri sunuyoruz.' },
       { q: 'Minimum sözleşme süresi ne kadar?', a: 'Minimum 3 aylık sözleşme yapıyoruz. Dijital pazarlamada sonuçlar zaman alır, bu süre stratejimizin etkisini görmeniz için idealdir.' },
       { q: 'Reklam bütçesi paket fiyatına dahil mi?', a: 'Hayır, reklam bütçesi paket fiyatlarına dahil değildir. Reklam yönetim hizmeti dahildir ancak reklam harcaması ayrıca faturalandırılır.' },
       { q: 'Sonuçları ne zaman görmeye başlarım?', a: 'Organik büyüme stratejilerinde 1-3 ay içinde belirgin sonuçlar görülebilir. Reklam kampanyalarında ise ilk hafta içinde sonuçlar alınmaya başlanır.' },
       { q: 'Hangi sektörlere hizmet veriyorsunuz?', a: 'Yiyecek & içecek, teknoloji, moda, sağlık, fitness, e-ticaret ve daha birçok sektörde deneyimimiz var. Her sektöre özel stratejiler geliştiriyoruz.' },
     ],
     en: [
-      { q: 'What kind of services does Kade Media offer?', a: 'We offer social media management, content production, ad management (Meta, Google, TikTok), video production, and digital strategy consulting services.' },
+      { q: 'What kind of services does Kade New Media offer?', a: 'We offer social media management, content production, ad management (Meta, Google, TikTok), video production, and digital strategy consulting services.' },
       { q: 'What is the minimum contract period?', a: 'We require a minimum 3-month contract. Results in digital marketing take time, and this period is ideal for seeing the impact of our strategy.' },
       { q: 'Is the ad budget included in the package price?', a: 'No, the ad budget is not included in package prices. Ad management service is included, but ad spend is billed separately.' },
       { q: 'When will I start seeing results?', a: 'Organic growth strategies can show significant results within 1-3 months. For ad campaigns, results can be seen within the first week.' },
@@ -1282,8 +1282,8 @@ function ContentSection({ showToast }) {
 }
 
 const HERO_EDITOR_DEFAULTS = {
-  tr: { title1: 'Dijital Dunyada Markaniza', title2: 'Kademe Atlatiyoruz ⚡', subtitle: 'Kade Media olarak sosyal medya stratejileri, kreatif icerik uretimi ve dijital pazarlama cozumleriyle markanizi zirveye tasiyoruz.' },
-  en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
+  tr: { title1: 'Dijital Dunyada Markaniza', title2: 'Kademe Atlatiyoruz ⚡', subtitle: 'Kade New Media olarak sosyal medya stratejileri, kreatif icerik uretimi ve dijital pazarlama cozumleriyle markanizi zirveye tasiyoruz.' },
+  en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade New Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
 }
 
 function HeroEditor({ data, onSave }) {
@@ -2467,7 +2467,7 @@ function LinkProfilesSection({ showToast }) {
                   </div>
                   <div className="form-group">
                     <label>Etiket (unvan)</label>
-                    <input type="text" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="Kreatif Direktör, Kade Media" />
+                    <input type="text" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="Kreatif Direktör, Kade New Media" />
                   </div>
                 </div>
                 <div className="form-group">
@@ -3097,7 +3097,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                             type="text"
                             value={replySubject}
                             onChange={e => setReplySubject(e.target.value)}
-                            placeholder={`Re: Kade Media — ${selectedMessage.service && selectedMessage.service !== '-' ? selectedMessage.service : 'İletişim'}`}
+                            placeholder={`Re: Kade New Media — ${selectedMessage.service && selectedMessage.service !== '-' ? selectedMessage.service : 'İletişim'}`}
                             style={{ fontSize: '0.85rem' }}
                           />
                         </div>
@@ -3266,7 +3266,7 @@ function SettingsSection({ showToast }) {
   const [smtpTesting, setSmtpTesting] = useState(false)
   const [smtpResult, setSmtpResult] = useState(null)
   const [siteSettings, setSiteSettings] = useState({
-    businessName: 'Kade Media',
+    businessName: 'Kade New Media',
     phone: '+90 506 729 34 23',
     email: 'hello@kademedia.com',
     address: 'Biruni Teknopark, Zeytinburnu/İstanbul',
@@ -5960,20 +5960,20 @@ function ProposalBuilderSection({ showToast }) {
 // ========== EMAIL SABLONLARI ==========
 const defaultTemplates = [
   {
-    id: 1, isim: 'İlk Temas', konu: 'Merhaba [İsim] — Kade Media',
-    metin: 'Merhaba [İsim],\n\nKade Media olarak sizinle iletişime geçmekten mutluluk duyuyoruz. İhtiyaçlarınızı değerlendirmek üzere 30 dakikalık ücretsiz bir keşif görüşmesi planlayabilir miyiz?\n\nSaygılarımızla,\nKade Media Ekibi',
+    id: 1, isim: 'İlk Temas', konu: 'Merhaba [İsim] — Kade New Media',
+    metin: 'Merhaba [İsim],\n\nKade New Media olarak sizinle iletişime geçmekten mutluluk duyuyoruz. İhtiyaçlarınızı değerlendirmek üzere 30 dakikalık ücretsiz bir keşif görüşmesi planlayabilir miyiz?\n\nSaygılarımızla,\nKade New Media Ekibi',
   },
   {
     id: 2, isim: 'Teklif Takip', konu: 'Teklifimiz Hakkında — [İsim]',
-    metin: 'Merhaba [İsim],\n\nGeçen hafta ilettiğimiz teklif hakkında bir güncelleme almak istedik. Herhangi bir sorunuz varsa veya teklifimizi görüşmek isterseniz lütfen bize yazın.\n\nSaygılarımızla,\nKade Media',
+    metin: 'Merhaba [İsim],\n\nGeçen hafta ilettiğimiz teklif hakkında bir güncelleme almak istedik. Herhangi bir sorunuz varsa veya teklifimizi görüşmek isterseniz lütfen bize yazın.\n\nSaygılarımızla,\nKade New Media',
   },
   {
-    id: 3, isim: 'Hoş Geldiniz', konu: 'Kade Media\'ya Hoş Geldiniz!',
-    metin: 'Merhaba [İsim],\n\nSizi Kade Media ailesine dahil etmekten büyük mutluluk duyuyoruz! Onboarding sürecini başlatmak için ekibimiz en kısa sürede sizinle iletişime geçecek.\n\nGörüşmek üzere,\nKade Media Ekibi',
+    id: 3, isim: 'Hoş Geldiniz', konu: 'Kade New Media\'ya Hoş Geldiniz!',
+    metin: 'Merhaba [İsim],\n\nSizi Kade New Media ailesine dahil etmekten büyük mutluluk duyuyoruz! Onboarding sürecini başlatmak için ekibimiz en kısa sürede sizinle iletişime geçecek.\n\nGörüşmek üzere,\nKade New Media Ekibi',
   },
   {
     id: 4, isim: 'Aylık Rapor', konu: '[Ay] Aylık Performans Raporu',
-    metin: 'Merhaba [İsim],\n\n[Ay] ayı performans raporunuz hazır. Bu ay elde ettiğiniz sonuçları aşağıda bulabilirsiniz:\n\n• Takipçi büyümesi: [Rakam]\n• Erişim: [Rakam]\n• Etkileşim oranı: [Rakam]\n\nDetaylı rapor eklidir.\n\nSaygılarımızla,\nKade Media',
+    metin: 'Merhaba [İsim],\n\n[Ay] ayı performans raporunuz hazır. Bu ay elde ettiğiniz sonuçları aşağıda bulabilirsiniz:\n\n• Takipçi büyümesi: [Rakam]\n• Erişim: [Rakam]\n• Etkileşim oranı: [Rakam]\n\nDetaylı rapor eklidir.\n\nSaygılarımızla,\nKade New Media',
   },
 ]
 
@@ -7441,7 +7441,7 @@ h1{color:#111;border-bottom:3px solid #eac321;padding-bottom:12px}
   <div><strong>${period}</strong> Performans Raporu</div>
 </div>
 <h1>${clientName} — Aylık Rapor</h1>
-<p><strong>Dönem:</strong> ${period} &nbsp;|&nbsp; <strong>Hazırlayan:</strong> Kade Media Ekibi</p>
+<p><strong>Dönem:</strong> ${period} &nbsp;|&nbsp; <strong>Hazırlayan:</strong> Kade New Media Ekibi</p>
 <div class="grid">
   ${metrics.followers ? `<div class="metric"><div class="metric-val">${metrics.followers}</div><div class="metric-lbl">Takipçi Büyümesi</div></div>` : ''}
   ${metrics.reach ? `<div class="metric"><div class="metric-val">${metrics.reach}</div><div class="metric-lbl">Erişim</div></div>` : ''}
@@ -7454,7 +7454,7 @@ h1{color:#111;border-bottom:3px solid #eac321;padding-bottom:12px}
   ${metrics.newLeads ? `<div class="metric"><div class="metric-val">${metrics.newLeads}</div><div class="metric-lbl">Yeni Lead</div></div>` : ''}
 </div>
 ${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong><p style="margin:8px 0 0">${metrics.notes}</p></div>` : ''}
-<div class="footer">Kade Media Dijital Pazarlama | hello@kademedia.com | 0506 729 34 23 | kadenewmedia.com</div>
+<div class="footer">Kade New Media Dijital Pazarlama | hello@kademedia.com | 0506 729 34 23 | kadenewmedia.com</div>
 </body></html>`
 
     const blob = new Blob([html], { type: 'text/html' })

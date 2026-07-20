@@ -22,8 +22,8 @@ import './Services.css'
 export default function Services() {
   const { t } = useLanguage()
   useSEO({
-    title: 'New Media ve Dijital Medya Hizmetleri | Kade Media',
-    description: 'Kade Media’nın sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetleri.',
+    title: 'New Media ve Dijital Medya Hizmetleri | Kade New Media',
+    description: 'Kade New Media’nın sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetleri.',
     keywords: 'new media, yeni medya, medya ajansı, dijital medya ajansı, sosyal medya ajansı hizmetleri, sosyal medya yönetimi istanbul, instagram ajansı, tiktok ajansı, içerik üretimi, meta reklam ajansı, google ads ajansı, video prodüksiyon, dijital ajans',
     path: '/hizmetler',
   })

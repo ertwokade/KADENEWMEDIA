@@ -11,8 +11,8 @@ export default function Blog() {
   const { lang } = useLanguage()
   const isEN = lang === 'en'
   useSEO({
-    title: isEN ? 'Blog | Kade Media' : 'Blog | Kade Media',
-    description: isEN ? 'Verified Kade Media articles and practical notes.' : 'Doğrulanmış Kade Media yazıları ve pratik notları.',
+    title: isEN ? 'Blog | Kade New Media' : 'Blog | Kade New Media',
+    description: isEN ? 'Verified Kade New Media articles and practical notes.' : 'Doğrulanmış Kade New Media yazıları ve pratik notları.',
     path: '/blog',
     noindex: true,
   })

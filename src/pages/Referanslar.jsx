@@ -11,8 +11,8 @@ export default function Referanslar() {
   const { lang } = useLanguage()
   const isEN = lang === 'en'
   useSEO({
-    title: isEN ? 'Client References | Kade Media' : 'Müşteri Referansları | Kade Media',
-    description: isEN ? 'Verified Kade Media client references.' : 'Doğrulanmış Kade Media müşteri referansları.',
+    title: isEN ? 'Client References | Kade New Media' : 'Müşteri Referansları | Kade New Media',
+    description: isEN ? 'Verified Kade New Media client references.' : 'Doğrulanmış Kade New Media müşteri referansları.',
     path: '/referanslar',
     noindex: true,
   })

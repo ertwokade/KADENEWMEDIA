@@ -1,6 +1,6 @@
 // Single source of truth for the /new-media-ajansi page content — used by the
 // live page and scripts/generate-static-routes.mjs for the static prerender.
-export const SERVICE_DESCRIPTION = 'İstanbul merkezli Kade Media ile new media stratejisi, sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon ve web tasarımı.'
+export const SERVICE_DESCRIPTION = 'İstanbul merkezli Kade New Media ile new media stratejisi, sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon ve web tasarımı.'
 
 export const SERVICES = [
   {
@@ -47,8 +47,8 @@ export const FAQS = [
     cevap: 'New media ajansı; sosyal medya, dijital reklam, içerik, video, web ve veri analizini tek iletişim stratejisinde birleştirir. Amaç yalnızca paylaşım yapmak değil, markanın dijital kanallardaki bütün deneyimini planlamaktır.',
   },
   {
-    soru: 'Kade Media ile Kade New Media aynı marka mı?',
-    cevap: 'Evet. Resmî marka adı Kade Media’dır. Kade, Kademedia, Kade New Media ve Kadenewmedia ifadeleri markanın çevrimiçi aramalarda kullanılan alternatif yazımlarıdır. Resmî web adresi kadenewmedia.com’dur.',
+    soru: 'Kade New Media ile Kade New Media aynı marka mı?',
+    cevap: 'Evet. Resmî marka adı Kade New Media’dır. Kade, Kademedia, Kade New Media ve Kadenewmedia ifadeleri markanın çevrimiçi aramalarda kullanılan alternatif yazımlarıdır. Resmî web adresi kadenewmedia.com’dur.',
   },
   {
     soru: 'Hangi hizmetle başlamalıyım?',

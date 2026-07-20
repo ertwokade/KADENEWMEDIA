@@ -12,10 +12,10 @@ export default function Portfolio() {
   const isEN = lang === 'en'
 
   useSEO({
-    title: isEN ? 'Portfolio | Kade Media' : 'Portfolyo | Kade Media',
+    title: isEN ? 'Portfolio | Kade New Media' : 'Portfolyo | Kade New Media',
     description: isEN
-      ? 'Kade Media portfolio information. Approved project details will be published with client permission.'
-      : 'Kade Media portfolyo bilgileri. Onaylı proje detayları müşteri izniyle yayınlanır.',
+      ? 'Kade New Media portfolio information. Approved project details will be published with client permission.'
+      : 'Kade New Media portfolyo bilgileri. Onaylı proje detayları müşteri izniyle yayınlanır.',
     path: '/portfolio',
   })
 

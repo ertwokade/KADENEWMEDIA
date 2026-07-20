@@ -6,8 +6,8 @@ import { FadeIn } from '../components/Animations'
 
 export default function ProjectTracking() {
   useSEO({
-    title: 'Proje Takip | Kade Media',
-    description: 'Kade Media müşteri proje ve teslimat özeti.',
+    title: 'Proje Takip | Kade New Media',
+    description: 'Kade New Media müşteri proje ve teslimat özeti.',
     path: '/proje-takip',
     noindex: true,
   })

@@ -26,7 +26,7 @@ export default function NotificationPrompt() {
       const permission = await Notification.requestPermission()
       await savePushSubscriptionApi({ permission, endpoint: '', keys: {} })
       if (permission === 'granted') {
-        new Notification('Kade Media', {
+        new Notification('Kade New Media', {
           body: 'Yeni rehberler ve ajans güncellemeleri için bildirimler aktif.',
           icon: '/logo-icon.svg',
         })

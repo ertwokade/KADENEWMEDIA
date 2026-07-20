@@ -1,9 +1,9 @@
 // Merkezi marka & iletişim bilgisi — TEK kaynak.
 // Aynı bilgi sayfalarda farklı/eski marka adıyla tekrarlanmasın diye buradan kullanılır.
 export const BRAND = {
-  name: 'Kade Media',
-  alternateNames: ['Kade New Media', 'Kademedia', 'Kadenewmedia', 'Kade'],
-  legalName: 'Kade Media',
+  name: 'Kade New Media',
+  alternateNames: ['Kade Media', 'Kademedia', 'Kadenewmedia', 'Kade'],
+  legalName: 'Kade New Media',
   email: 'thekademedia@gmail.com',
   city: 'İstanbul',
   address: 'Biruni Teknopark, Zeytinburnu/İstanbul',

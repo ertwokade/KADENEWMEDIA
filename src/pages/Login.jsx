@@ -19,8 +19,8 @@ export default function Login() {
   const navigate = useNavigate()
 
   useSEO({
-    title: 'Danışmanlık Girişi | Kade Media',
-    description: 'Kade Media danışmanlık ve müşteri hesabınıza giriş yapın veya yeni hesap oluşturun.',
+    title: 'Danışmanlık Girişi | Kade New Media',
+    description: 'Kade New Media danışmanlık ve müşteri hesabınıza giriş yapın veya yeni hesap oluşturun.',
     path: '/giris/danismanlik',
     noindex: true,
   })
@@ -78,9 +78,9 @@ export default function Login() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <h1 className="visually-hidden">Kade Media müşteri girişi</h1>
+          <h1 className="visually-hidden">Kade New Media müşteri girişi</h1>
           <Link to="/" className="login-logo">
-            <img src="/logo.png" alt="Kade Media" width="514" height="180" />
+            <img src="/logo.png" alt="Kade New Media" width="514" height="180" />
           </Link>
 
           <div className="login-tabs">

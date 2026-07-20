@@ -1,11 +1,11 @@
 .kd-page {
   min-height: 100vh;
-  background: #050505;
+  background: #fdf6e3;
 }
 
 .kd-main {
   min-height: 100vh;
-  background: #050505;
+  background: #fdf6e3;
   padding: 20px 16px;
   display: flex;
   justify-content: center;
@@ -24,8 +24,8 @@
 
 .kd-card {
   border-radius: 2rem;
-  background: #2d64d8;
-  box-shadow: 0 28px 60px rgba(12, 31, 88, 0.28);
+  background: linear-gradient(135deg, #e8b93a 0%, #e0a81f 100%);
+  box-shadow: 0 28px 60px rgba(224, 168, 31, 0.35);
   overflow: hidden;
 }
 
@@ -57,10 +57,10 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.05) 0%,
-    rgba(0, 0, 0, 0.08) 30%,
-    rgba(44, 94, 204, 0.56) 74%,
-    rgba(45, 100, 216, 0.98) 100%
+    rgba(23, 19, 10, 0.05) 0%,
+    rgba(23, 19, 10, 0.1) 30%,
+    rgba(224, 168, 31, 0.6) 74%,
+    rgba(224, 168, 31, 0.98) 100%
   );
 }
 
@@ -82,9 +82,9 @@
   width: 48px;
   height: 48px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.8);
-  color: #000;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  background: rgba(23, 19, 10, 0.85);
+  color: #fdf6e3;
+  box-shadow: 0 8px 20px rgba(23, 19, 10, 0.2);
   backdrop-filter: blur(6px);
   border: none;
   cursor: pointer;
@@ -92,7 +92,7 @@
 }
 
 .kd-icon-btn:hover {
-  background: #fff;
+  background: #17130a;
 }
 
 .kd-cover-bottom {
@@ -101,7 +101,7 @@
   bottom: 0;
   padding: 80px 24px 32px;
   text-align: center;
-  color: #fff;
+  color: #17130a;
 }
 
 @media (min-width: 640px) {
@@ -141,8 +141,8 @@
   width: 30px;
   height: 30px;
   flex-shrink: 0;
-  fill: #27c2ff;
-  color: #27c2ff;
+  fill: #17130a;
+  color: #17130a;
   margin-top: 4px;
 }
 
@@ -151,7 +151,7 @@
   font-family: var(--font-secondary, 'TikTokSans', 'Inter', sans-serif);
   font-size: 1.25rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(23, 19, 10, 0.82);
 }
 
 .kd-links-wrap {
@@ -178,17 +178,17 @@
   min-height: 74px;
   padding: 0 24px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(180deg, rgba(110, 159, 247, 0.98), rgba(99, 148, 239, 0.98));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  color: #f7fbff;
+  border: 1px solid rgba(23, 19, 10, 0.12);
+  background: linear-gradient(180deg, #fffbf0 0%, #fff2cc 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  color: #17130a;
   text-decoration: none;
   transition: transform 0.16s ease, filter 0.16s ease;
 }
 
 .kd-link:hover {
   transform: scale(1.01);
-  filter: brightness(1.05);
+  filter: brightness(1.03);
 }
 
 .kd-link-icon {
@@ -199,8 +199,8 @@
   width: 40px;
   height: 40px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(23, 19, 10, 0.14);
+  color: #17130a;
 }
 
 .kd-link-label {
@@ -210,7 +210,7 @@
   font-size: 1.05rem;
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: #f7fbff;
+  color: #17130a;
 }
 
 @media (min-width: 640px) {
@@ -221,7 +221,7 @@
 
 .kd-link-arrow {
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(23, 19, 10, 0.5);
 }
 
 .kd-footer {
@@ -232,12 +232,12 @@
 .kd-footer-link {
   font-family: var(--font-secondary, 'TikTokSans', 'Inter', sans-serif);
   font-size: 0.92rem;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(23, 19, 10, 0.65);
   text-decoration: none;
 }
 
 .kd-footer-link:hover {
-  color: rgba(255, 255, 255, 0.95);
+  color: #17130a;
 }
 
 .kd-toast {
@@ -245,8 +245,8 @@
   top: -4px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.85);
-  color: #fff;
+  background: #17130a;
+  color: #fdf6e3;
   font-size: 0.85rem;
   padding: 8px 16px;
   border-radius: 999px;
@@ -257,7 +257,7 @@
 .kd-loading-card {
   border-radius: 2rem;
   min-height: 620px;
-  background: linear-gradient(100deg, #111 40%, #1c1c1c 50%, #111 60%);
+  background: linear-gradient(100deg, #f2e6c9 40%, #fff2cc 50%, #f2e6c9 60%);
   background-size: 200% 100%;
   animation: kd-shimmer 1.4s ease-in-out infinite;
 }

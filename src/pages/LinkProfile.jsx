@@ -27,7 +27,7 @@ const FALLBACK_PROFILES = {
   kadirdemir: {
     name: 'Kadir Demir',
     handle: '@kadirdemir',
-    tagline: 'Kurucu & CEO, Kade Media',
+    tagline: 'Kurucu & CEO, Kade New Media',
     photo: '/kadir.jpg',
     active: true,
     links: [
@@ -72,7 +72,7 @@ export default function LinkProfile() {
   }, [slug])
 
   useSEO({
-    title: profile ? `${profile.name} | Kade Media` : 'Kade Media',
+    title: profile ? `${profile.name} | Kade New Media` : 'Kade New Media',
     description: profile ? `${profile.name} — ${profile.tagline || ''}` : undefined,
     path: `/@${slug}`,
     image: profile?.photo,
@@ -80,7 +80,7 @@ export default function LinkProfile() {
 
   const handleShare = async () => {
     const shareData = {
-      title: profile?.name || 'Kade Media',
+      title: profile?.name || 'Kade New Media',
       text: profile?.tagline || '',
       url: window.location.href,
     }
@@ -128,7 +128,7 @@ export default function LinkProfile() {
                 <div className="kd-cover-gradient" aria-hidden="true" />
 
                 <div className="kd-cover-topbar">
-                  <Link to="/" className="kd-icon-btn" aria-label="Kade Media'ya dön">
+                  <Link to="/" className="kd-icon-btn" aria-label="Kade New Media'ya dön">
                     <FiArrowLeft size={18} />
                   </Link>
                   <button type="button" className="kd-icon-btn" onClick={handleShare} aria-label="Paylaş">
@@ -171,7 +171,7 @@ export default function LinkProfile() {
                 </div>
 
                 <footer className="kd-footer">
-                  <Link to="/" className="kd-footer-link">Kade Media</Link>
+                  <Link to="/" className="kd-footer-link">Kade New Media</Link>
                 </footer>
               </div>
             </section>

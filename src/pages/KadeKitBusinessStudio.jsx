@@ -79,7 +79,7 @@ export default function KadeKitBusinessStudio() {
   const { entitlements } = useCustomer()
 
   useSEO({
-    title: 'Kade Kit Business Studio | Kade Media',
+    title: 'Kade Kit Business Studio | Kade New Media',
     description: 'Kade Kit Business üretim merkezi: yorum analizi, prodüksiyon CRM, Banana Studio, Vibe Coding ve AI Radar.',
     path: '/kade-kit-business',
     noindex: true,

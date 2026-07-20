@@ -3,9 +3,9 @@
 // FAQPage structured data for crawlers that don't execute JavaScript.
 export const FAQ_ITEMS = [
   {
-    soru: 'Kade Media hangi hizmetleri sunuyor?',
+    soru: 'Kade New Media hangi hizmetleri sunuyor?',
     cevap: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi, video prodüksiyon, strateji danışmanlığı ve web sitesi tasarımı için kapsam oluşturuyoruz.',
-    soruEn: 'What services does Kade Media offer?',
+    soruEn: 'What services does Kade New Media offer?',
     cevapEn: 'We scope social media management, content production, ad management, video production, strategy consulting, and website design services.',
   },
   {

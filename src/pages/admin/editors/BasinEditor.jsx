@@ -7,7 +7,7 @@ const BASIN_DEFAULTS = {
   ctaTitle: 'Röportaj veya iş birliği mi istiyorsunuz?',
   ctaSubtitle: 'Sosyal medya, dijital pazarlama ve ajansçılık konularında görüş almak için bize ulaşın.',
   companyInfo: [
-    { etiket: 'Şirket Adı', deger: 'Kade Media Dijital Pazarlama A.Ş.' },
+    { etiket: 'Şirket Adı', deger: 'Kade New Media Dijital Pazarlama A.Ş.' },
     { etiket: 'Kuruluş', deger: '2022, İstanbul' },
     { etiket: 'Merkez', deger: 'Biruni Teknopark, İstanbul' },
     { etiket: 'Çalışan Sayısı', deger: '10-25 kişi' },
@@ -21,8 +21,8 @@ const BASIN_DEFAULTS = {
     { isim: 'Marka Renkleri & Tipografi', format: 'PDF', aciklama: 'Hex kodları, font aileleri, kullanım rehberi', ikon: '🎨', url: '' },
   ],
   news: [
-    { tarih: 'Mart 2025', kaynak: 'Dijital Pazarlama Dergisi', baslik: 'Türkiye\'nin Yükselen Sosyal Medya Ajansları: Kade Media\'nın Büyüme Hikayesi', ozet: 'Biruni Teknopark merkezli ajans, kuruluşundan bu yana 150+ müşteriye ulaştı. Kurucusuyla yapılan röportaj.', ikon: '📰', renk: '#6C63FF', link: '' },
-    { tarih: 'Şubat 2025', kaynak: 'StartupIstanbul', baslik: 'Teknopark\'tan Dünyaya: Kade Media\'nın Ajans Modeli', ozet: 'İstanbul\'daki teknoloji ekosisteminde öne çıkan ajans modellerini inceleyen köşe yazısı.', ikon: '🚀', renk: '#eac321', link: '' },
+    { tarih: 'Mart 2025', kaynak: 'Dijital Pazarlama Dergisi', baslik: 'Türkiye\'nin Yükselen Sosyal Medya Ajansları: Kade New Media\'nın Büyüme Hikayesi', ozet: 'Biruni Teknopark merkezli ajans, kuruluşundan bu yana 150+ müşteriye ulaştı. Kurucusuyla yapılan röportaj.', ikon: '📰', renk: '#6C63FF', link: '' },
+    { tarih: 'Şubat 2025', kaynak: 'StartupIstanbul', baslik: 'Teknopark\'tan Dünyaya: Kade New Media\'nın Ajans Modeli', ozet: 'İstanbul\'daki teknoloji ekosisteminde öne çıkan ajans modellerini inceleyen köşe yazısı.', ikon: '🚀', renk: '#eac321', link: '' },
   ],
 }
 

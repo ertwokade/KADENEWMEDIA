@@ -51,7 +51,7 @@ export default function CustomerPortal() {
   const [error, setError] = useState('')
 
   useSEO({
-    title: 'Müşteri Paneli | Kade Media',
+    title: 'Müşteri Paneli | Kade New Media',
     description: 'Paketlerinizi, danışmanlık hizmetlerinizi ve özelliklerinizi yönetin.',
     path: '/musteri-panel',
     noindex: true,

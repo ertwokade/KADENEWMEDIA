@@ -8,8 +8,8 @@ import './CaseStudies.css'
 
 export default function CaseStudies() {
   useSEO({
-    title: 'Vaka Çalışmaları | Kade Media',
-    description: 'Müşteri izniyle yayınlanan, doğrulanmış Kade Media vaka çalışmaları.',
+    title: 'Vaka Çalışmaları | Kade New Media',
+    description: 'Müşteri izniyle yayınlanan, doğrulanmış Kade New Media vaka çalışmaları.',
     path: '/basari-hikayeleri',
     noindex: true,
   })

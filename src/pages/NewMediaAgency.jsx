@@ -28,7 +28,7 @@ const SERVICES = SERVICES_DATA.map((service, i) => ({ ...service, icon: SERVICE_
 
 export default function NewMediaAgency() {
   useSEO({
-    title: 'New Media Ajansı İstanbul | Kade Media',
+    title: 'New Media Ajansı İstanbul | Kade New Media',
     description: SERVICE_DESCRIPTION,
     keywords: 'new media ajansı, yeni medya ajansı, medya ajansı, dijital medya ajansı, sosyal medya ajansı istanbul, kade media, kade new media, kademedia, kadenewmedia',
     path: '/new-media-ajansi',
@@ -54,7 +54,7 @@ export default function NewMediaAgency() {
               Yeni medyada <span>strateji, içerik ve performans</span> tek planda
             </h1>
             <p className="section-subtitle new-media-lead">
-              Kade Media, İstanbul merkezli new media ve dijital medya ajansı olarak sosyal medya,
+              Kade New Media, İstanbul merkezli new media ve dijital medya ajansı olarak sosyal medya,
               içerik, reklam, video ve web hizmetlerini markanızın hedefleri etrafında birleştirir.
             </p>
             <div className="new-media-actions">
@@ -74,11 +74,11 @@ export default function NewMediaAgency() {
           <FadeIn direction="right">
             <p>
               New media; sosyal ağları, arama motorlarını, dijital reklamı, içerik formatlarını,
-              videoyu ve web deneyimini birlikte kapsar. Kade Media bu alanları marka görünürlüğü,
+              videoyu ve web deneyimini birlikte kapsar. Kade New Media bu alanları marka görünürlüğü,
               talep toplama ve sürdürülebilir iletişim hedefleri için ortak bir plan içinde yönetir.
             </p>
             <p>
-              Resmî marka adımız <strong>Kade Media</strong>’dır. Kade, Kademedia, Kade New Media
+              Resmî marka adımız <strong>Kade New Media</strong>’dır. Kade, Kademedia, Kade New Media
               ve Kadenewmedia aramalarında markamıza ait resmî adres <strong>kadenewmedia.com</strong>’dur.
             </p>
           </FadeIn>

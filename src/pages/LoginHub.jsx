@@ -8,7 +8,7 @@ import './LoginHub.css'
 const workspaces = [
   {
     title: 'Danışmanlıklarım',
-    description: 'Danışmanlık planınıza, projelerinize ve Kade Media müşteri panelinize erişin.',
+    description: 'Danışmanlık planınıza, projelerinize ve Kade New Media müşteri panelinize erişin.',
     cta: 'Danışmanlık girişine git',
     to: '/giris/danismanlik',
     icon: HiOutlineBriefcase,
@@ -26,7 +26,7 @@ const workspaces = [
 
 export default function LoginHub() {
   useSEO({
-    title: 'Çalışma Alanı Seçimi | Kade Media',
+    title: 'Çalışma Alanı Seçimi | Kade New Media',
     description: 'Danışmanlık ve Content AI çalışma alanlarından kullanmak istediğinizi seçin.',
     path: '/giris',
     noindex: true,
@@ -41,8 +41,8 @@ export default function LoginHub() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <Link to="/" className="access-hub-brand" aria-label="Kade Media ana sayfa">
-            <img src="/logo.png" alt="Kade Media" width="514" height="180" />
+          <Link to="/" className="access-hub-brand" aria-label="Kade New Media ana sayfa">
+            <img src="/logo.png" alt="Kade New Media" width="514" height="180" />
           </Link>
 
           <div className="access-hub-heading">

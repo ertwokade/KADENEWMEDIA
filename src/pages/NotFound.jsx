@@ -21,7 +21,7 @@ export default function NotFound() {
   const [arama, setArama] = useState('')
 
   useSEO({
-    title: lang === 'tr' ? 'Sayfa Bulunamadı | Kade Media' : 'Page Not Found | Kade Media',
+    title: lang === 'tr' ? 'Sayfa Bulunamadı | Kade New Media' : 'Page Not Found | Kade New Media',
     description: lang === 'tr' ? 'Aradığınız sayfa bulunamadı.' : 'The page you are looking for was not found.',
     path: location.pathname,
     noindex: true,

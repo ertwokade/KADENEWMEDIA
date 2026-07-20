@@ -14,8 +14,8 @@ export default function SSS() {
   const [open, setOpen] = useState(null)
 
   useSEO({
-    title: lang === 'tr' ? 'Dijital Pazarlama Sık Sorulan Sorular | Kade Media' : 'FAQ | Kade Media',
-    description: lang === 'tr' ? 'Kade Media’nın hizmetleri, teklif süreci, çalışma biçimi, teslimat ve iletişim adımları hakkında sık sorulan soruların yanıtlarını inceleyin.' : 'Frequently asked questions about Kade Media services and proposals.',
+    title: lang === 'tr' ? 'Dijital Pazarlama Sık Sorulan Sorular | Kade New Media' : 'FAQ | Kade New Media',
+    description: lang === 'tr' ? 'Kade New Media’nın hizmetleri, teklif süreci, çalışma biçimi, teslimat ve iletişim adımları hakkında sık sorulan soruların yanıtlarını inceleyin.' : 'Frequently asked questions about Kade New Media services and proposals.',
     path: '/sss',
   })
 

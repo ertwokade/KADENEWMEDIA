@@ -137,7 +137,7 @@ export default function ServiceDetail() {
   const deliverables = service ? (lang === 'tr' ? service.deliverablesTr : service.deliverablesEn) : []
 
   useSEO({
-    title: title ? `${title} | Kade Media` : 'Hizmet | Kade Media',
+    title: title ? `${title} | Kade New Media` : 'Hizmet | Kade New Media',
     description: desc,
     path: `/hizmetler/${slug}`,
     image: 'https://kadenewmedia.com/og-image.png',

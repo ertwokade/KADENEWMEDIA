@@ -26,8 +26,8 @@ export default function Tesekkur() {
   const title = submitted ? 'Talebiniz alındı' : 'Talep durumu doğrulanamadı'
 
   useSEO({
-    title: 'Talep Durumu | Kade Media',
-    description: 'Kade Media iletişim talebi durum bilgisi.',
+    title: 'Talep Durumu | Kade New Media',
+    description: 'Kade New Media iletişim talebi durum bilgisi.',
     path: '/tesekkur',
     noindex: true,
   })

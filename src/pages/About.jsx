@@ -30,8 +30,8 @@ export default function About() {
   const storyP1 = t('about.storyP1')
   const storyP2 = t('about.storyP2')
   useSEO({
-    title: 'Kade Media Hakkında | New Media Ajansı İstanbul',
-    description: 'Kade Media; Kade New Media, Kademedia ve Kadenewmedia adlarıyla da aranan İstanbul merkezli new media ve dijital pazarlama ajansıdır.',
+    title: 'Kade New Media Hakkında | New Media Ajansı İstanbul',
+    description: 'Kade New Media; Kade New Media, Kademedia ve Kadenewmedia adlarıyla da aranan İstanbul merkezli new media ve dijital pazarlama ajansıdır.',
     keywords: 'kade media, kade, kademedia, kade new media, kadenewmedia, new media ajansı, medya ajansı istanbul, dijital ajans',
     path: '/hakkimizda',
   })
@@ -130,7 +130,7 @@ export default function About() {
                   >
                     <motion.img
                       src="/logo-icon.svg"
-                      alt="Kade Media Logo"
+                      alt="Kade New Media Logo"
                       className="lightning-svg"
                       animate={{ rotate: [0, 2, -2, 0] }}
                       transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}

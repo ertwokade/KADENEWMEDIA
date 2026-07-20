@@ -11,8 +11,8 @@ export default function Partners() {
   const { lang } = useLanguage()
   const isEN = lang === 'en'
   useSEO({
-    title: isEN ? 'Business Partners | Kade Media' : 'İş Ortakları | Kade Media',
-    description: isEN ? 'Verified Kade Media business partner information.' : 'Doğrulanmış Kade Media iş ortaklığı bilgileri.',
+    title: isEN ? 'Business Partners | Kade New Media' : 'İş Ortakları | Kade New Media',
+    description: isEN ? 'Verified Kade New Media business partner information.' : 'Doğrulanmış Kade New Media iş ortaklığı bilgileri.',
     path: '/partnerler',
     noindex: true,
   })

@@ -6,8 +6,8 @@ import { BRAND } from '../config/brand'
 
 export default function KVKK() {
   useSEO({
-    title: 'KVKK Aydınlatma Metni | Kade Media',
-    description: 'Kade Media’nın kişisel verileri hangi amaçlarla ve hukuki sebeplerle işlediğini açıklayan KVKK aydınlatma metnini inceleyin.',
+    title: 'KVKK Aydınlatma Metni | Kade New Media',
+    description: 'Kade New Media’nın kişisel verileri hangi amaçlarla ve hukuki sebeplerle işlediğini açıklayan KVKK aydınlatma metnini inceleyin.',
     path: '/kvkk',
   })
 
@@ -24,7 +24,7 @@ export default function KVKK() {
               <h2>1. Veri Sorumlusu</h2>
               <p>
                 Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca
-                <strong> Kade Media</strong> tarafından,
+                <strong> Kade New Media</strong> tarafından,
                 veri sorumlusu sıfatıyla hazırlanmıştır.
               </p>
 

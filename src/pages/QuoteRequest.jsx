@@ -74,10 +74,10 @@ export default function QuoteRequest() {
   })
 
   useSEO({
-    title: lang === 'tr' ? 'Dijital Pazarlama Teklifi Al | Kade Media' : 'Get Quote | Custom Service Request',
+    title: lang === 'tr' ? 'Dijital Pazarlama Teklifi Al | Kade New Media' : 'Get Quote | Custom Service Request',
     description: lang === 'tr'
-      ? 'İhtiyacınız olan sosyal medya, içerik, reklam, video veya web hizmetlerini seçin; projeniz için Kade Media’dan yazılı teklif isteyin.'
-      : 'Choose the scope for Kade Media services and submit a written quote request.',
+      ? 'İhtiyacınız olan sosyal medya, içerik, reklam, video veya web hizmetlerini seçin; projeniz için Kade New Media’dan yazılı teklif isteyin.'
+      : 'Choose the scope for Kade New Media services and submit a written quote request.',
     path: '/teklif-al',
   })
 

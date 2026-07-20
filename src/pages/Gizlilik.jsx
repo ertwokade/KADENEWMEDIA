@@ -6,8 +6,8 @@ import { BRAND } from '../config/brand'
 
 export default function Gizlilik() {
   useSEO({
-    title: 'Gizlilik Politikası | Kade Media',
-    description: 'Kade Media web sitesinde kişisel verilerin nasıl toplandığı, kullanıldığı, korunduğu ve hangi haklara sahip olduğunuz hakkında bilgi alın.',
+    title: 'Gizlilik Politikası | Kade New Media',
+    description: 'Kade New Media web sitesinde kişisel verilerin nasıl toplandığı, kullanıldığı, korunduğu ve hangi haklara sahip olduğunuz hakkında bilgi alın.',
     path: '/gizlilik',
   })
 
@@ -23,7 +23,7 @@ export default function Gizlilik() {
 
               <h2>1. Genel Bilgi</h2>
               <p>
-                Kade Media olarak kişisel verilerinizin güvenliğine büyük önem veriyoruz. Bu Gizlilik
+                Kade New Media olarak kişisel verilerinizin güvenliğine büyük önem veriyoruz. Bu Gizlilik
                 Politikası, web sitemizi (<strong>kadenewmedia.com</strong>) kullanırken hangi verilerin
                 toplandığını ve bu verilerin nasıl kullanıldığını açıklamaktadır.
               </p>

@@ -116,7 +116,7 @@ const kitDocument = kitHtml
 
 export default function OrganizationKitDashboard() {
   useSEO({
-    title: 'Kade Organizasyon Kiti | Kade Media',
+    title: 'Kade Organizasyon Kiti | Kade New Media',
     description: 'Kade Organizasyon Kiti arayüzü: üretim, notlar, yorum analizi ve operasyon araçları.',
     path: '/organizasyon-kiti',
     noindex: true,

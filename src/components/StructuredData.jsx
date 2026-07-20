@@ -122,11 +122,11 @@ export function ArticleSchema({ title, description, image, datePublished, dateMo
       dateModified: dateModified || datePublished,
       author: {
         '@type': 'Organization',
-        name: author || 'Kade Media',
+        name: author || 'Kade New Media',
       },
       publisher: {
         '@type': 'Organization',
-        name: 'Kade Media',
+        name: 'Kade New Media',
         logo: { '@type': 'ImageObject', url: `${BASE_URL}/logo.png` },
       },
     })
@@ -147,7 +147,7 @@ export function ServiceSchema({ name, description, url }) {
       url: `${BASE_URL}${url}`,
       provider: {
         '@type': 'Organization',
-        name: 'Kade Media',
+        name: 'Kade New Media',
         url: BASE_URL,
       },
       areaServed: {

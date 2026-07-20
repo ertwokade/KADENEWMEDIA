@@ -15,10 +15,10 @@ export default function Packages() {
   const isEN = lang === 'en'
 
   useSEO({
-    title: isEN ? 'Service Packages | Kade Media' : 'Sosyal Medya Hizmet Kapsamları | Kade Media',
+    title: isEN ? 'Service Packages | Kade New Media' : 'Sosyal Medya Hizmet Kapsamları | Kade New Media',
     description: isEN
-      ? 'Review Kade Media service scopes and request a written quote tailored to your needs.'
-      : 'Düzenli içerik, reklam yönetimi ve proje bazlı prodüksiyon ihtiyaçlarına göre şekillenen Kade Media hizmet kapsamlarını inceleyin.',
+      ? 'Review Kade New Media service scopes and request a written quote tailored to your needs.'
+      : 'Düzenli içerik, reklam yönetimi ve proje bazlı prodüksiyon ihtiyaçlarına göre şekillenen Kade New Media hizmet kapsamlarını inceleyin.',
     path: '/paketler',
   })
 
