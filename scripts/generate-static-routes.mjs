@@ -2,6 +2,11 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import { FAQ_ITEMS } from '../src/data/faq.js'
+import { translations } from '../src/i18n/translations.js'
+import { SERVICES as NMA_SERVICES, PROCESS as NMA_PROCESS, FAQS as NMA_FAQS } from '../src/data/newMediaAgency.js'
+import { PACKAGE_SCOPES, PACKAGE_FAQS } from '../src/data/packages.js'
+
+const tr = translations.tr
 
 const BASE = 'https://kadenewmedia.com'
 const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
@@ -57,10 +62,51 @@ const protectedRoutes = new Set([
   '/organizasyon-kiti/notlar', '/kade-kit-business', '/proje-takip',
 ])
 
-function faqSection() {
+function faqSection(items, heading = 'Sık Sorulan Sorular') {
   return `
-      <h2>Sık Sorulan Sorular</h2>
-      ${FAQ_ITEMS.map((item) => `<h3>${escapeHtml(item.soru)}</h3>\n      <p>${escapeHtml(item.cevap)}</p>`).join('\n      ')}`
+      <h2>${escapeHtml(heading)}</h2>
+      ${items.map((item) => `<h3>${escapeHtml(item.soru)}</h3>\n      <p>${escapeHtml(item.cevap)}</p>`).join('\n      ')}`
+}
+
+const packageFaqItems = PACKAGE_FAQS.map(({ tr: [soru, cevap] }) => ({ soru, cevap }))
+
+function extraContent(route) {
+  if (route === '/sss') return faqSection(FAQ_ITEMS)
+
+  if (route === '/hakkimizda') {
+    return `
+      <h2>${escapeHtml(tr.about.storyTitle)}</h2>
+      <p>${escapeHtml(tr.about.storyP1)}</p>
+      <p>${escapeHtml(tr.about.storyP2)}</p>
+      <h2>Değerlerimiz</h2>
+      ${['creativity', 'transparency', 'quality', 'passion', 'teamwork', 'reliability'].map((key) => `<h3>${escapeHtml(tr.about[key])}</h3>\n      <p>${escapeHtml(tr.about[`${key}Desc`])}</p>`).join('\n      ')}`
+  }
+
+  if (route === '/hizmetler') {
+    return `
+      <h2>Hizmetlerimiz</h2>
+      ${NMA_SERVICES.map((s) => `<h3><a href="${s.to}">${escapeHtml(s.title)}</a></h3>\n      <p>${escapeHtml(s.description)}</p>`).join('\n      ')}`
+  }
+
+  if (route === '/paketler') {
+    return `
+      <h2>Hizmet Kapsamları</h2>
+      ${PACKAGE_SCOPES.map((p) => `<h3>${escapeHtml(p.nameTr)}</h3>\n      <p>${escapeHtml(p.descTr)}</p>`).join('\n      ')}
+      ${faqSection(packageFaqItems, 'Net Koşullar')}`
+  }
+
+  if (route === '/new-media-ajansi') {
+    return `
+      <h2>Yeni medya nedir?</h2>
+      <p>New media; sosyal ağları, arama motorlarını, dijital reklamı, içerik formatlarını, videoyu ve web deneyimini birlikte kapsar. Kade Media bu alanları marka görünürlüğü, talep toplama ve sürdürülebilir iletişim hedefleri için ortak bir plan içinde yönetir.</p>
+      <h2>Hizmetler</h2>
+      ${NMA_SERVICES.map((s) => `<h3><a href="${s.to}">${escapeHtml(s.title)}</a></h3>\n      <p>${escapeHtml(s.description)}</p>`).join('\n      ')}
+      <h2>Çalışma modeli</h2>
+      ${NMA_PROCESS.map(([n, t, d]) => `<h3>${escapeHtml(n)}. ${escapeHtml(t)}</h3>\n      <p>${escapeHtml(d)}</p>`).join('\n      ')}
+      ${faqSection(NMA_FAQS)}`
+  }
+
+  return ''
 }
 
 function staticFallback(route, title, description) {
@@ -73,7 +119,7 @@ function staticFallback(route, title, description) {
       <h1>${escapeHtml(pageName)}</h1>
       <p>${escapeHtml(protectedCopy)}</p>
       ${protectedRoutes.has(route) ? '<p><a href="/giris">Güvenli giriş ekranına dön</a></p>' : '<p><a href="/teklif-al">Projeniz için teklif isteyin</a></p>'}
-      ${route === '/sss' ? faqSection() : ''}
+      ${extraContent(route)}
     </main>`
 }
 
@@ -111,11 +157,12 @@ function structuredData(route, title, description, noindex) {
     })
   }
 
-  if (route === '/sss') {
+  const faqSources = { '/sss': FAQ_ITEMS, '/paketler': packageFaqItems, '/new-media-ajansi': NMA_FAQS }
+  if (faqSources[route]) {
     schemas.push({
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: FAQ_ITEMS.map((item) => ({
+      mainEntity: faqSources[route].map((item) => ({
         '@type': 'Question',
         name: item.soru,
         acceptedAnswer: { '@type': 'Answer', text: item.cevap },

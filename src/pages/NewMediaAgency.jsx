@@ -20,73 +20,11 @@ import { BreadcrumbSchema, FAQSchema, ServiceSchema } from '../components/Struct
 import PageTransition from '../components/PageTransition'
 import PageBgAnimation from '../components/PageBgAnimation'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import { SERVICE_DESCRIPTION, SERVICES as SERVICES_DATA, PROCESS, FAQS } from '../data/newMediaAgency'
 import './NewMediaAgency.css'
 
-const SERVICE_DESCRIPTION = 'İstanbul merkezli Kade Media ile new media stratejisi, sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon ve web tasarımı.'
-
-const SERVICES = [
-  {
-    icon: HiOutlineGlobe,
-    title: 'Sosyal Medya Yönetimi',
-    description: 'Instagram, TikTok, LinkedIn, Facebook ve YouTube için strateji, içerik takvimi, yayın ve topluluk yönetimi.',
-    to: '/hizmetler/sosyal-medya-yonetimi',
-  },
-  {
-    icon: HiOutlinePencilAlt,
-    title: 'İçerik Üretimi',
-    description: 'Marka diline uygun görsel, metin, kısa video, fotoğraf ve kampanya içeriklerinin planlanması ve üretimi.',
-    to: '/hizmetler/icerik-uretimi',
-  },
-  {
-    icon: HiOutlineChartBar,
-    title: 'Dijital Reklam',
-    description: 'Meta, Google ve TikTok reklamlarında hedefleme, kreatif test, bütçe takibi ve performans analizi.',
-    to: '/hizmetler/reklam-yonetimi',
-  },
-  {
-    icon: HiOutlineFilm,
-    title: 'Video Prodüksiyon',
-    description: 'Reels, TikTok, YouTube ve reklam projeleri için senaryo, çekim, kurgu ve motion graphics.',
-    to: '/hizmetler/video-produksiyon',
-  },
-  {
-    icon: HiOutlineChatAlt2,
-    title: 'New Media Stratejisi',
-    description: 'Marka, hedef kitle ve kanal verilerinden hareketle içerik, reklam ve büyüme yol haritası.',
-    to: '/hizmetler/strateji-danismanlik',
-  },
-  {
-    icon: HiOutlineCode,
-    title: 'Web Tasarımı',
-    description: 'Mobil uyumlu, hızlı ve teklif toplamaya odaklı web sitesi tasarımı ve geliştirme hizmetleri.',
-    to: '/hizmetler/web-sitesi-tasarimi',
-  },
-]
-
-const PROCESS = [
-  ['01', 'Keşif ve analiz', 'Markanızı, hedef kitlenizi, mevcut kanallarınızı ve ticari hedefinizi birlikte netleştiririz.'],
-  ['02', 'Strateji ve üretim', 'Doğru kanal, içerik formatı, reklam yaklaşımı ve üretim takvimini tek plan içinde kurarız.'],
-  ['03', 'Yayın ve ölçüm', 'İçerikleri yayınlar, kampanyaları izler ve doğrulanabilir verilerle sonraki adımları planlarız.'],
-]
-
-const FAQS = [
-  {
-    soru: 'New media ajansı ne yapar?',
-    cevap: 'New media ajansı; sosyal medya, dijital reklam, içerik, video, web ve veri analizini tek iletişim stratejisinde birleştirir. Amaç yalnızca paylaşım yapmak değil, markanın dijital kanallardaki bütün deneyimini planlamaktır.',
-  },
-  {
-    soru: 'Kade Media ile Kade New Media aynı marka mı?',
-    cevap: 'Evet. Resmî marka adı Kade Media’dır. Kade, Kademedia, Kade New Media ve Kadenewmedia ifadeleri markanın çevrimiçi aramalarda kullanılan alternatif yazımlarıdır. Resmî web adresi kadenewmedia.com’dur.',
-  },
-  {
-    soru: 'Hangi hizmetle başlamalıyım?',
-    cevap: 'Başlangıç noktası hedefinize ve mevcut durumunuza göre belirlenir. Görünürlük için içerik ve sosyal medya, talep toplamak için reklam ve dönüşüm odaklı web, marka iletişimi için ise bütünleşik new media planı değerlendirilebilir.',
-  },
-  {
-    soru: 'Teklif süreci nasıl ilerliyor?',
-    cevap: 'İhtiyaç, kanal, içerik hacmi, prodüksiyon gereksinimi ve reklam kapsamı yazılı olarak netleştirilir. Ücret, takvim, KDV, medya bütçesi ve varsa üçüncü taraf maliyetleri teklif aşamasında belirtilir.',
-  },
-]
+const SERVICE_ICONS = [HiOutlineGlobe, HiOutlinePencilAlt, HiOutlineChartBar, HiOutlineFilm, HiOutlineChatAlt2, HiOutlineCode]
+const SERVICES = SERVICES_DATA.map((service, i) => ({ ...service, icon: SERVICE_ICONS[i] }))
 
 export default function NewMediaAgency() {
   useSEO({
