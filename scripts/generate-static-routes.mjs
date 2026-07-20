@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
+import { FAQ_ITEMS } from '../src/data/faq.js'
 
 const BASE = 'https://kadenewmedia.com'
 const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
@@ -56,6 +57,12 @@ const protectedRoutes = new Set([
   '/organizasyon-kiti/notlar', '/kade-kit-business', '/proje-takip',
 ])
 
+function faqSection() {
+  return `
+      <h2>Sık Sorulan Sorular</h2>
+      ${FAQ_ITEMS.map((item) => `<h3>${escapeHtml(item.soru)}</h3>\n      <p>${escapeHtml(item.cevap)}</p>`).join('\n      ')}`
+}
+
 function staticFallback(route, title, description) {
   const pageName = title.split(' | ')[0]
   const protectedCopy = protectedRoutes.has(route)
@@ -66,6 +73,7 @@ function staticFallback(route, title, description) {
       <h1>${escapeHtml(pageName)}</h1>
       <p>${escapeHtml(protectedCopy)}</p>
       ${protectedRoutes.has(route) ? '<p><a href="/giris">Güvenli giriş ekranına dön</a></p>' : '<p><a href="/teklif-al">Projeniz için teklif isteyin</a></p>'}
+      ${route === '/sss' ? faqSection() : ''}
     </main>`
 }
 
@@ -103,10 +111,21 @@ function structuredData(route, title, description, noindex) {
     })
   }
 
+  if (route === '/sss') {
+    schemas.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: FAQ_ITEMS.map((item) => ({
+        '@type': 'Question',
+        name: item.soru,
+        acceptedAnswer: { '@type': 'Answer', text: item.cevap },
+      })),
+    })
+  }
+
+  const schemaIds = { Service: 'schema-service', FAQPage: 'schema-faq' }
   return schemas.map((schema) => {
-    const id = schema['@type'] === 'Service'
-      ? 'schema-service'
-      : isServiceDetail ? 'jsonld-breadcrumb' : 'schema-breadcrumb'
+    const id = schemaIds[schema['@type']] || (isServiceDetail ? 'jsonld-breadcrumb' : 'schema-breadcrumb')
     return `<script id="${id}" type="application/ld+json">${serializeJsonLd(schema)}</script>`
   }).join('\n    ')
 }

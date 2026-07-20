@@ -6,9 +6,9 @@ export const BRAND = {
   legalName: 'Kade Media',
   email: 'thekademedia@gmail.com',
   city: 'İstanbul',
-  address: '',
-  phone: '',
-  whatsapp: '',
+  address: 'Biruni Teknopark, Zeytinburnu/İstanbul',
+  phone: '+90 506 729 34 23',
+  whatsapp: 'https://wa.me/905067293423',
   social: {},
 }
 

@@ -1,0 +1,31 @@
+# Kade Media
+
+> İstanbul merkezli new media ve dijital medya ajansı. Sosyal medya yönetimi, içerik üretimi, dijital reklam yönetimi, video prodüksiyon, strateji danışmanlığı ve web sitesi tasarımı hizmetleri sunar. Ayrıca "Kade New Media", "Kademedia" ve "Kadenewmedia" adlarıyla da bilinir.
+
+Kade Media, markaların sosyal medya ve dijital varlığını uçtan uca yönetir: içerik planlama, yayın takvimi, topluluk yönetimi, reklam kampanyaları, video prodüksiyon ve performans raporlama. Türkiye merkezli çalışır, iletişim: thekademedia@gmail.com.
+
+## Hizmetler
+
+- [Tüm Hizmetler](https://kadenewmedia.com/hizmetler): Sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetlerine genel bakış.
+- [Sosyal Medya Yönetimi](https://kadenewmedia.com/hizmetler/sosyal-medya-yonetimi): Instagram, Facebook, TikTok ve LinkedIn için içerik planlama, yayın takvimi, topluluk yönetimi, raporlama ve marka iletişimi.
+- [İçerik Üretimi](https://kadenewmedia.com/hizmetler/icerik-uretimi): Görsel, video ve metin içerikleri; içerik stratejisi, grafik tasarım, metin yazımı, fotoğraf çekimi ve sosyal medya tasarımları.
+- [Dijital Reklam Yönetimi](https://kadenewmedia.com/hizmetler/reklam-yonetimi): Meta, Google Ads ve TikTok Ads kampanyaları için planlama, hedefleme, A/B testleri, yeniden pazarlama ve performans analizi.
+- [Video Prodüksiyon](https://kadenewmedia.com/hizmetler/video-produksiyon): Reels, TikTok, YouTube ve reklam projeleri için senaryo, çekim, kurgu, motion graphics ve prodüksiyon.
+- [Dijital Strateji ve Danışmanlık](https://kadenewmedia.com/hizmetler/strateji-danismanlik): Marka ve rakip analizi, hedef ve KPI belirleme, dijital pazarlama yol haritası, büyüme planı.
+- [Web Sitesi Tasarımı ve Geliştirme](https://kadenewmedia.com/hizmetler/web-sitesi-tasarimi): Mobil uyumlu web sitesi tasarımı, UI/UX, geliştirme, CMS ve e-ticaret entegrasyonu.
+- [New Media Ajansı](https://kadenewmedia.com/new-media-ajansi): İstanbul merkezli new media stratejisi ve fractional new media director hizmeti.
+
+## Kurumsal
+
+- [Hakkımızda](https://kadenewmedia.com/hakkimizda): Kade Media'nın kim olduğu, ajans yaklaşımı.
+- [Ekip](https://kadenewmedia.com/ekip): Kade Media ekibiyle tanışın.
+- [Hizmet Kapsamları](https://kadenewmedia.com/paketler): Düzenli içerik, reklam yönetimi ve proje bazlı prodüksiyon ihtiyaçlarına göre şekillenen hizmet kapsamları.
+- [Sık Sorulan Sorular](https://kadenewmedia.com/sss): Hizmetler, teklif süreci, fiyatlandırma, hesap erişimi ve içerik hakları hakkında yanıtlar.
+- [İletişim](https://kadenewmedia.com/iletisim): Proje talepleri için iletişim kanalları.
+- [Teklif Al](https://kadenewmedia.com/teklif-al): İhtiyaca göre yazılı teklif talep etme formu.
+
+## Politikalar
+
+- [KVKK Aydınlatma Metni](https://kadenewmedia.com/kvkk)
+- [Gizlilik Politikası](https://kadenewmedia.com/gizlilik)
+- [Çerez Politikası](https://kadenewmedia.com/cerez-politikasi)

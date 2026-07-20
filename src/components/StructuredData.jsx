@@ -21,6 +21,8 @@ function removeSchema(id) {
 // Organization schema — injected globally once
 export function OrganizationSchema() {
   useEffect(() => {
+    const sameAs = Object.values(BRAND.social || {}).filter(Boolean)
+
     injectSchema('schema-organization', {
       '@context': 'https://schema.org',
       '@type': 'Organization',
@@ -30,6 +32,14 @@ export function OrganizationSchema() {
       logo: `${BASE_URL}/logo.png`,
       description: 'İstanbul merkezli new media, dijital medya ve pazarlama ajansı.',
       email: BRAND.email,
+      telephone: BRAND.phone || undefined,
+      address: BRAND.address ? {
+        '@type': 'PostalAddress',
+        streetAddress: BRAND.address,
+        addressLocality: BRAND.city,
+        addressCountry: 'TR',
+      } : undefined,
+      ...(sameAs.length > 0 ? { sameAs } : {}),
       knowsAbout: [
         'New media',
         'Dijital medya',
@@ -42,6 +52,7 @@ export function OrganizationSchema() {
       contactPoint: {
         '@type': 'ContactPoint',
         email: BRAND.email,
+        telephone: BRAND.phone || undefined,
         contactType: 'sales',
         areaServed: 'TR',
         availableLanguage: ['Turkish'],
