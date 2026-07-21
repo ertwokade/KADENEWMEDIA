@@ -2,11 +2,6 @@ import { Link } from 'react-router-dom'
 import { BRAND, SOCIAL_LINKS } from '../config/brand'
 import './Footer.css'
 
-// Anasayfa (site.html) footer'ının birebir React versiyonu:
-// asimetrik dev display "BİRLİKTE HARİKA İŞLER BAŞARALIM",
-// altta e-posta + sosyal linkler, en altta ince yasal satır.
-// Marka/iletişim bilgisi merkezi config'ten (src/config/brand.js).
-
 export default function Footer() {
   return (
     <footer className="kfoot">
@@ -36,6 +31,7 @@ export default function Footer() {
           <Link to="/kvkk">KVKK</Link>
           <Link to="/gizlilik">GİZLİLİK</Link>
           <Link to="/cerez-politikasi">ÇEREZ</Link>
+          <Link to="/telif-haklari">TELİF HAKLARI</Link>
           <Link to="/sss">SSS</Link>
         </div>
       </div>
