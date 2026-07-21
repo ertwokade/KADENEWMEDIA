@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { FaInstagram, FaYoutube, FaLinkedinIn, FaXTwitter, FaTiktok, FaWhatsapp } from 'react-icons/fa6'
-import { FiShare2, FiArrowUpRight, FiArrowLeft, FiGlobe, FiLink, FiMail } from 'react-icons/fi'
+import { FiShare2, FiArrowUpRight, FiGlobe, FiLink, FiMail } from 'react-icons/fi'
 import { HiBadgeCheck } from 'react-icons/hi'
 import { getLinkProfileBySlugApi } from '../api'
 import { useSEO } from '../hooks/useSEO'
+import { useLanguage } from '../i18n/LanguageContext'
 import PageTransition from '../components/PageTransition'
 import NotFound from './NotFound'
 import './LinkProfile.css'
@@ -46,8 +47,13 @@ const FALLBACK_PROFILES = {
   },
 }
 
+const PROFILE_TAGLINE_EN = {
+  kadirdemir: 'Founder & CEO, Kade New Media',
+}
+
 export default function LinkProfile() {
   const { handle = '' } = useParams()
+  const { lang, setLang } = useLanguage()
   // Bio pages live at /@handle — anything without the @ prefix isn't a profile URL.
   const slug = handle.startsWith('@') ? handle.slice(1) : ''
   const [profile, setProfile] = useState(null)
@@ -136,12 +142,26 @@ export default function LinkProfile() {
                 {profile.photo && (
                   <img className="kd-cover-img" src={profile.photo} alt={profile.name} loading="eager" />
                 )}
+                <div className="kd-cover-tint" aria-hidden="true" />
                 <div className="kd-cover-gradient" aria-hidden="true" />
 
                 <div className="kd-cover-topbar">
-                  <Link to="/" className="kd-icon-btn" aria-label="Kade New Media'ya dön">
-                    <FiArrowLeft size={18} />
-                  </Link>
+                  <div className="kd-lang-toggle" role="group" aria-label="Dil seçimi">
+                    <button
+                      type="button"
+                      className={lang === 'tr' ? 'kd-lang-btn is-active' : 'kd-lang-btn'}
+                      onClick={() => setLang('tr')}
+                    >
+                      TR
+                    </button>
+                    <button
+                      type="button"
+                      className={lang === 'en' ? 'kd-lang-btn is-active' : 'kd-lang-btn'}
+                      onClick={() => setLang('en')}
+                    >
+                      EN
+                    </button>
+                  </div>
                   <button type="button" className="kd-icon-btn" onClick={handleShare} aria-label="Paylaş">
                     <FiShare2 size={18} />
                   </button>
@@ -155,7 +175,11 @@ export default function LinkProfile() {
                     <h1 className="kd-name">{profile.handle || profile.name}</h1>
                     <HiBadgeCheck className="kd-badge" aria-hidden="true" />
                   </div>
-                  {profile.tagline && <p className="kd-tagline">{profile.tagline}</p>}
+                  {profile.tagline && (
+                    <p className="kd-tagline">
+                      {lang === 'en' ? PROFILE_TAGLINE_EN[slug] || profile.tagline : profile.tagline}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -183,6 +207,13 @@ export default function LinkProfile() {
                 </div>
 
                 <footer className="kd-footer">
+                  <nav className="kd-footer-nav" aria-label="Yasal bağlantılar">
+                    <Link to="/gizlilik" className="kd-footer-sublink">{lang === 'en' ? 'Privacy' : 'Gizlilik'}</Link>
+                    <span className="kd-footer-dot" aria-hidden="true">·</span>
+                    <Link to="/kvkk" className="kd-footer-sublink">KVKK</Link>
+                    <span className="kd-footer-dot" aria-hidden="true">·</span>
+                    <Link to="/hakkimizda" className="kd-footer-sublink">{lang === 'en' ? 'About' : 'Hakkımızda'}</Link>
+                  </nav>
                   <Link to="/" className="kd-footer-link">Kade New Media</Link>
                 </footer>
               </div>

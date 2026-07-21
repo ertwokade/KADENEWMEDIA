@@ -164,6 +164,7 @@ function App() {
   const isLinkProfile = location.pathname.startsWith('/@') || location.pathname === '/kadirdemir'
   const hideShell = isAdmin || isHome || isLoginArea || isLinkProfile
   const isAppUI = isAdmin
+    || isLinkProfile
     || location.pathname.startsWith('/organizasyon-kiti')
     || location.pathname === '/kade-kit-business'
     || location.pathname === '/musteri-panel'

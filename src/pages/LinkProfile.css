@@ -47,18 +47,24 @@
   height: 100%;
   object-fit: cover;
   object-position: center 20%;
-  filter: contrast(1.06) saturate(1.08);
+  filter: contrast(1.1) saturate(1.05) brightness(0.78);
+}
+
+.kd-cover-tint {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 65% at 50% 32%, rgba(14, 11, 8, 0.1) 0%, rgba(14, 11, 8, 0.6) 100%),
+    rgba(14, 11, 8, 0.42);
+  mix-blend-mode: multiply;
 }
 
 .kd-cover-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(14, 11, 8, 0) 55%,
-    rgba(14, 11, 8, 0.55) 85%,
-    #000 100%
-  );
+  background:
+    linear-gradient(180deg, rgba(14, 11, 8, 0.35) 0%, rgba(14, 11, 8, 0) 22%, rgba(14, 11, 8, 0) 50%, rgba(14, 11, 8, 0.6) 80%, #000 100%),
+    radial-gradient(120% 90% at 50% 100%, rgba(14, 11, 8, 0.55) 0%, rgba(14, 11, 8, 0) 60%);
 }
 
 .kd-cover-topbar {
@@ -92,6 +98,36 @@
 .kd-icon-btn:hover {
   background: rgba(var(--kd-accent-rgb, 212, 148, 63), 0.2);
   border-color: rgba(var(--kd-accent-rgb, 212, 148, 63), 0.45);
+}
+
+.kd-lang-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(17, 15, 13, 0.65);
+  border: 1px solid rgba(var(--kd-accent-rgb, 212, 148, 63), 0.25);
+  box-shadow: 0 1px 0 rgba(244, 235, 224, 0.06) inset;
+  backdrop-filter: blur(8px);
+}
+
+.kd-lang-btn {
+  border: 0;
+  background: transparent;
+  color: rgba(246, 238, 227, 0.7);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.kd-lang-btn.is-active {
+  background: linear-gradient(180deg, #e8b468 0%, var(--kd-accent, #d4943f) 100%);
+  color: #1a1208;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset;
 }
 
 .kd-cover-bottom {
@@ -211,6 +247,31 @@
 .kd-footer {
   margin-top: 28px;
   text-align: center;
+}
+
+.kd-footer-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.kd-footer-sublink {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 0.76rem;
+  color: rgba(246, 238, 227, 0.4);
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+
+.kd-footer-sublink:hover {
+  color: rgba(246, 238, 227, 0.75);
+}
+
+.kd-footer-dot {
+  color: rgba(246, 238, 227, 0.3);
+  font-size: 0.76rem;
 }
 
 .kd-footer-link {
