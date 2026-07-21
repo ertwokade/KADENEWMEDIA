@@ -30,6 +30,12 @@ scipy==1.17.1
 anthropic>=0.40.0
 cryptography>=42.0.0
 
+# ─── Video Fabrikası (vendored mpturbo motoru) ───────────────────────────────
+# Konu/senaryodan otomatik video üretimi. edge-tts ücretsiz seslendirme sağlar.
+moviepy==2.2.1
+edge-tts==7.2.7
+faster-whisper==1.1.0
+
 # ─── Dev ─────────────────────────────────────────────────────────────────────
 pytest==9.0.3
 pytest-asyncio==1.4.0

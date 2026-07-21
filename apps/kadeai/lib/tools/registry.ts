@@ -51,6 +51,7 @@ const brandBasics: ProfileField[] = ['brand.name', 'brand.niche', 'brand.audienc
 
 export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('overview', 'Genel Bakış', 'platform', '/dashboard', 'layout-dashboard', 'Araçlara ve çalışma alanına genel bakış.', [], false),
+  tool('packages', 'Paketler', 'platform', '/dashboard/packages', 'circle-dollar', 'Abonelik paketleri ve satın alma.', [], false),
   tool('operations', 'Operasyon Merkezi', 'operations', '/dashboard/operations?view=dashboard', 'layout-dashboard', 'Bütçe, görev ve üretim özeti.', [], false),
   tool('sentscan', 'SentScan', 'operations', '/dashboard/operations?view=comments', 'message-square', 'Yorum ve transkript analizi.', [], false),
   tool('production-crm', 'Prodüksiyon CRM', 'operations', '/dashboard/operations?view=crm', 'clapperboard', 'Prodüksiyon, görev, bütçe ve envanter.', [], false),
@@ -70,6 +71,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('collab-mail', 'Kolaborasyon Maili', 'production', '/dashboard/collab-mail', 'mail', 'Marka iş birliği e-postası üretir.', ['profile.displayName', 'brand.name', 'brand.niche']),
   tool('bulk', 'Toplu İçerik', 'production', '/dashboard/bulk', 'copy', 'Birden fazla platform için toplu içerik üretir.', brandBasics),
 
+  tool('video-factory', 'Video Fabrikası', 'media', '/dashboard/video-factory', 'clapperboard', 'Konu veya senaryodan otomatik video üretir.', ['brand.name']),
   tool('ai-thumbnail', 'AI Thumbnail', 'media', '/dashboard/ai-thumbnail', 'image-plus', 'Görsel arka plan ve thumbnail kompozisyonu üretir.', ['brand.name']),
   tool('clip-generator', 'Klip Üretici', 'media', '/dashboard/clip-generator', 'scissors', 'Video veya transkriptten klip önerileri çıkarır.', [], false),
   tool('dubbing', 'Dublaj & Çeviri', 'media', '/dashboard/dubbing', 'mic', 'Dublaj ve çeviri iş akışı.', [], false, 'coming-soon'),

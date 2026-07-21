@@ -44,6 +44,8 @@ export async function POST(request: NextRequest) {
 
     const orderId = randomUUID()
     const analyticsConsent = request.headers.get('x-kade-analytics-consent') === 'granted'
+    // 15 dk kuralı: her bekleyen sipariş/kişiye özel teklif 15 dk geçerlidir.
+    const expiresAt = new Date(Date.now() + 15 * 60_000).toISOString()
     const { error } = await admin.from('payment_orders').insert({
       id: orderId,
       user_id: user.id,
@@ -54,6 +56,7 @@ export async function POST(request: NextRequest) {
       status: 'pending',
       idempotency_key: idempotencyKey,
       analytics_consent: analyticsConsent,
+      expires_at: expiresAt,
     })
     if (error) {
       if (error.code === '23505') {

@@ -1,10 +1,20 @@
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'cancelled'
 
+export type PlanTier = 'baslangic' | 'pro' | 'sinirsiz'
+export type BillingPeriod = 'weekly' | 'monthly' | 'yearly'
+
 export interface PaymentProduct {
   id: string
   name: string
   amountMinor: number
   currency: 'TRY'
+  /** Paket meta verisi (dinamik/kişiye özel teklifler için opsiyonel). */
+  tier?: PlanTier
+  period?: BillingPeriod
+  /** true: KadeAI kendi API anahtarlarıyla sunar. false: kullanıcı kendi anahtarını girer. */
+  apiIncluded?: boolean
+  /** Erişilecek özellik anahtarları (featureAccess ile eşleşir). */
+  features?: readonly string[]
 }
 
 export interface PaymentCheckout {

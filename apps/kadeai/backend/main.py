@@ -408,6 +408,47 @@ async def broll_suggest(req: BrollSuggestRequest):
     )
 
 
+# ── Video Fabrikası (senaryodan otomatik video) ──────────────────────────────
+
+class VideoFactoryRequest(BaseModel):
+    subject: str = Field(min_length=2, max_length=300)
+    script: str = Field(default="", max_length=8000)
+    language: Literal["tr", "en"] = "tr"
+    aspect: Literal["portrait", "landscape"] = "portrait"
+    voice_name: Optional[str] = None
+
+
+@app.post("/video-factory")
+async def video_factory(req: VideoFactoryRequest):
+    """Konu/senaryodan tam video üretir (vendored KadeAI Video Fabrikası motoru).
+
+    Not: Uzun sürebilir; motor bağımlılıkları kurulu değilse 503 döner.
+    Üretim tamamen backend içinde çalışır, dış servise yalnızca AI/stok görüntü
+    çağrıları gider.
+    """
+    try:
+        from modules.video_factory import generate_video, VideoEngineUnavailable
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Video motoru yüklenemedi.") from exc
+
+    try:
+        result = await asyncio.to_thread(
+            generate_video,
+            subject=req.subject,
+            script=req.script,
+            language=req.language,
+            aspect=req.aspect,
+            voice_name=req.voice_name,
+        )
+        return {"success": True, "data": jsonable_encoder(result)}
+    except VideoEngineUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail="Video üretimi başarısız.") from exc
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 #  GROWTH ANALYTICS ROUTES (Growth AI)
 # ══════════════════════════════════════════════════════════════════════════════

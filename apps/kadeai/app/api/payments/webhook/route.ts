@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPaymentProvider } from '@/lib/payments/server'
+import { grantEntitlementForOrder } from '@/lib/payments/entitlements'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
@@ -31,8 +32,23 @@ export async function POST(request: NextRequest) {
       .eq('id', event.orderId).eq('provider', provider.name)
     if (updateError) throw new Error('Ödeme durumu güncellenemedi.')
     const { data: order } = await admin.from('payment_orders')
-      .select('user_id, analytics_consent').eq('id', event.orderId).maybeSingle()
+      .select('id, user_id, product_id, analytics_consent, expires_at').eq('id', event.orderId).maybeSingle()
     if (order) {
+      // Ödeme başarılıysa paket yetkisini OTOMATİK ver.
+      // Süresi geçmiş (15dk) kişiye özel teklifler için de ödeme geldiyse
+      // Shopier onayına güveniriz; yine de expired ise loglayıp yetki veririz
+      // çünkü para tahsil edilmiştir.
+      if (event.status === 'paid') {
+        try {
+          await grantEntitlementForOrder(admin, {
+            id: order.id,
+            user_id: order.user_id,
+            product_id: order.product_id,
+          })
+        } catch (grantError) {
+          captureApiError(grantError, '/api/payments/webhook#grant')
+        }
+      }
       const analyticsEvent = event.status === 'paid' ? 'payment_completed' : 'payment_failed'
       void captureServerAnalytics(analyticsEvent, order.user_id, order.analytics_consent === true)
     }
