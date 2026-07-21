@@ -22,7 +22,7 @@ export default function CaseStudies() {
         <div className="container">
           <FadeIn><div className="section-badge"><HiOutlineDocumentText size={14} />Vaka çalışmaları</div></FadeIn>
           <FadeIn delay={0.1}><h1 className="section-title">Doğrulanmış <span>sonuç arşivi</span></h1></FadeIn>
-          <FadeIn delay={0.2}><p className="section-subtitle">Kampanya sonuçları ve müşteri isimleri yalnızca ölçüm kaynağı ve yayın izni doğrulandıktan sonra paylaşılır. Şu anda public vaka çalışması bulunmuyor.</p></FadeIn>
+          <FadeIn delay={0.2}><p className="section-subtitle">Kampanya sonuçlarını ve müşteri isimlerini ancak ölçüm kaynağı ve yayın izni doğrulandıktan sonra paylaşıyoruz. Şu anda yayında bir vaka çalışması yok.</p></FadeIn>
         </div>
       </section>
       <section className="section"><div className="container"><div className="case-cta glass-card"><h2>Projeniz için kapsam oluşturalım</h2><Link to="/teklif-al" className="btn btn-primary">Teklif al<HiOutlineArrowRight size={16} /></Link></div></div></section>

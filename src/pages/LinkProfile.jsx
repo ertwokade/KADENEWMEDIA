@@ -9,6 +9,12 @@ import PageTransition from '../components/PageTransition'
 import NotFound from './NotFound'
 import './LinkProfile.css'
 
+function hexToRgbTriplet(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '')
+  if (!m) return null
+  return `${parseInt(m[1], 16)}, ${parseInt(m[2], 16)}, ${parseInt(m[3], 16)}`
+}
+
 const ICONS = {
   instagram: FaInstagram,
   youtube: FaYoutube,
@@ -115,9 +121,14 @@ export default function LinkProfile() {
     )
   }
 
+  const accentRgb = hexToRgbTriplet(profile.accentColor)
+  const pageStyle = accentRgb
+    ? { '--kd-accent': profile.accentColor, '--kd-accent-rgb': accentRgb }
+    : undefined
+
   return (
     <PageTransition>
-      <div className="kd-page">
+      <div className="kd-page" style={pageStyle}>
         <main className="kd-main">
           <div className="kd-shell">
             <section className="kd-card">
@@ -136,14 +147,15 @@ export default function LinkProfile() {
                   </button>
                 </div>
 
-                <div className="kd-cover-bottom">
-                  <div className="kd-cover-inner">
-                    <div className="kd-name-row">
-                      <h1 className="kd-name">{profile.handle || profile.name}</h1>
-                      <HiBadgeCheck className="kd-badge" aria-hidden="true" />
-                    </div>
-                    {profile.tagline && <p className="kd-tagline">{profile.tagline}</p>}
+              </div>
+
+              <div className="kd-cover-bottom">
+                <div className="kd-cover-inner">
+                  <div className="kd-name-row">
+                    <h1 className="kd-name">{profile.handle || profile.name}</h1>
+                    <HiBadgeCheck className="kd-badge" aria-hidden="true" />
                   </div>
+                  {profile.tagline && <p className="kd-tagline">{profile.tagline}</p>}
                 </div>
               </div>
 

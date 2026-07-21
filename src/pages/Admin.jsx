@@ -2338,8 +2338,11 @@ function profilePublicPath(slug) {
   return `/@${slug}`
 }
 
+const LINK_PROFILE_ACCENT_PRESETS = ['#d4943f', '#e0a81f', '#3fb6d4', '#8f6ad4', '#d4423f', '#4fd47a']
+
 const emptyLinkProfileForm = () => ({
   slug: '', name: '', handle: '', tagline: '', photo: '', active: true,
+  accentColor: '#d4943f',
   links: [{ label: '', url: '', icon: 'instagram' }],
 })
 
@@ -2373,6 +2376,7 @@ function LinkProfilesSection({ showToast }) {
     setForm({
       slug: profile.slug || '', name: profile.name || '', handle: profile.handle || '',
       tagline: profile.tagline || '', photo: profile.photo || '', active: profile.active !== false,
+      accentColor: profile.accentColor || '#d4943f',
       links: profile.links?.length ? profile.links.map((l) => ({ ...l })) : [{ label: '', url: '', icon: 'instagram' }],
     })
     setEditingProfile(profile)
@@ -2399,6 +2403,7 @@ function LinkProfilesSection({ showToast }) {
       tagline: form.tagline.trim(),
       photo: form.photo,
       active: form.active,
+      accentColor: form.accentColor || '#d4943f',
       links: form.links.filter((l) => l.label.trim() && l.url.trim()),
     }
     try {
@@ -2496,6 +2501,41 @@ function LinkProfilesSection({ showToast }) {
                     )}
                   </div>
                 </div>
+                <div className="form-group">
+                  <label>Vurgu Rengi</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <input
+                      type="color"
+                      value={form.accentColor}
+                      onChange={(e) => setForm({ ...form, accentColor: e.target.value })}
+                      style={{ width: 48, height: 36, border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', background: 'none', padding: 2 }}
+                    />
+                    <input
+                      type="text"
+                      value={form.accentColor}
+                      onChange={(e) => setForm({ ...form, accentColor: e.target.value })}
+                      placeholder="#d4943f"
+                      style={{ flex: 1, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.88rem' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                    {LINK_PROFILE_ACCENT_PRESETS.map((hex) => (
+                      <button
+                        key={hex}
+                        type="button"
+                        onClick={() => setForm({ ...form, accentColor: hex })}
+                        title={hex}
+                        style={{
+                          width: 26, height: 26, borderRadius: '50%', background: hex, cursor: 'pointer',
+                          border: form.accentColor?.toLowerCase() === hex ? '2px solid var(--text-primary)' : '1px solid var(--border)',
+                          padding: 0,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <small style={{ color: 'var(--text-secondary)' }}>Profil sayfasındaki parlama, rozet ve link kenarlıklarının rengini belirler.</small>
+                </div>
+
                 <div className="form-group">
                   <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />

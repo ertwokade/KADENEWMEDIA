@@ -46,7 +46,7 @@ export default function Portfolio() {
             <p className="section-subtitle">
               {isEN
                 ? 'Project names, visuals, and results are published only after client permission and verification. Below is what we produce, how we work, and what a case study contains.'
-                : 'Proje adları, görselleri ve sonuçları yalnızca müşteri izni ve doğrulama sonrasında yayınlanır. Aşağıda ne ürettiğimizi, nasıl çalıştığımızı ve bir vakanın neleri içerdiğini görebilirsin.'}
+                : 'Proje adlarını, görselleri ve sonuçları ancak müşteri izni ve doğrulama sonrasında paylaşıyoruz. Aşağıda ne ürettiğimizi, nasıl çalıştığımızı ve bir vakanın neleri içerdiğini görebilirsin.'}
             </p>
           </FadeIn>
         </div>

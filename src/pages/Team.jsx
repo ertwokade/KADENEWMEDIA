@@ -16,7 +16,7 @@ const defaultTeam = [
     name: 'Kadir Demir',
     roleTr: 'Kurucu & CEO',
     roleEn: 'Founder & CEO',
-    bioTr: 'Dijital pazarlama ve sosyal medya stratejisi odaklı. Müşteri büyümesini ve ajans vizyonunu birlikte yönetiyor.',
+    bioTr: 'Dijital pazarlama ve sosyal medya stratejisi üzerine çalışıyor; müşteri ilişkileri ve ajansın genel gidişatı da onun sorumluluğunda.',
     bioEn: 'Focused on digital marketing and social media strategy. Drives client growth and agency vision.',
     image: '/kadir.jpg',
     social: {},
@@ -32,7 +32,7 @@ export default function Team() {
   useSEO({
     title: lang === 'tr' ? 'Kade New Media Ekibi | İstanbul Dijital Pazarlama Ajansı' : 'Our Team | Kade New Media',
     description: lang === 'tr'
-      ? 'Kade New Media’nın sosyal medya, içerik üretimi, reklam ve dijital projelerde birlikte çalışan İstanbul merkezli ekibiyle tanışın.'
+      ? 'Sosyal medya, içerik üretimi, reklam ve dijital projelerde birlikte çalıştığımız İstanbul merkezli ekibimizle tanışın.'
       : 'Meet the Kade New Media team. Passionate and experienced digital marketing professionals.',
     path: '/ekip',
   })
@@ -54,13 +54,13 @@ export default function Team() {
           </FadeIn>
           <FadeIn delay={0.1}>
             <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              {lang === 'tr' ? 'Tutkulu Ekibimizle Tanışın' : 'Meet Our Passionate Team'}
+              {lang === 'tr' ? 'Ekibimizle Tanışın' : 'Meet Our Passionate Team'}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="section-subtitle">
               {lang === 'tr'
-                ? 'Deneyimli ve yaratıcı ekibimiz, markanızı dijital dünyada zirveye taşımak için çalışıyor.'
+                ? 'Markanızı dijital dünyada büyütmek için birlikte çalışıyoruz.'
                 : 'Our experienced and creative team works to take your brand to the top in the digital world.'}
             </p>
           </FadeIn>

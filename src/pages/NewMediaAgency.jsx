@@ -54,8 +54,8 @@ export default function NewMediaAgency() {
               Yeni medyada <span>strateji, içerik ve performans</span> tek planda
             </h1>
             <p className="section-subtitle new-media-lead">
-              Kade New Media, İstanbul merkezli new media ve dijital medya ajansı olarak sosyal medya,
-              içerik, reklam, video ve web hizmetlerini markanızın hedefleri etrafında birleştirir.
+              Kade New Media, İstanbul merkezli bir new media ve dijital medya ajansı. Sosyal medya,
+              içerik, reklam, video ve web hizmetlerini markanızın hedefleri etrafında bir araya getiriyoruz.
             </p>
             <div className="new-media-actions">
               <Link className="btn btn-primary" to="/teklif-al">Projenizi paylaşın <HiOutlineArrowRight /></Link>
@@ -73,13 +73,15 @@ export default function NewMediaAgency() {
           </FadeIn>
           <FadeIn direction="right">
             <p>
-              New media; sosyal ağları, arama motorlarını, dijital reklamı, içerik formatlarını,
-              videoyu ve web deneyimini birlikte kapsar. Kade New Media bu alanları marka görünürlüğü,
-              talep toplama ve sürdürülebilir iletişim hedefleri için ortak bir plan içinde yönetir.
+              New media dediğimizde sosyal ağlardan arama motorlarına, dijital reklamdan videoya ve
+              web deneyimine kadar geniş bir alandan bahsediyoruz. Bu kanalları ayrı ayrı değil,
+              markanızın görünürlüğü, talep yaratma ve sürdürülebilir iletişim hedefleri etrafında
+              tek bir plan içinde yönetiyoruz.
             </p>
             <p>
-              Resmî marka adımız <strong>Kade New Media</strong>’dır. Kade, Kademedia, Kade New Media
-              ve Kadenewmedia aramalarında markamıza ait resmî adres <strong>kadenewmedia.com</strong>’dur.
+              Markamızın adı <strong>Kade New Media</strong>. İnternette Kade, Kademedia veya
+              Kadenewmedia şeklinde arandığında da karşınıza çıkan resmi adresimiz
+              <strong> kadenewmedia.com</strong>.
             </p>
           </FadeIn>
         </div>

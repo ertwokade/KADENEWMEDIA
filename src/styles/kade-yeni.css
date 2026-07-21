@@ -483,10 +483,16 @@ html, body, #root {
 .login-logo, .login-logo::after { color: #17130a !important; }
 }
 
-/* altın imleç — app'te de (anasayfanın 3D okunun karşılığı) */
+/* altın imleç — sadece pazarlama sayfalarında (anasayfanın 3D okunun karşılığı).
+   Admin ve panel/araç sayfalarında (Kade AI dahil) normal imleç kullanılır,
+   bkz. App.jsx'te body.kade-app-ui sınıfı. */
 @media (pointer: fine) {
   html, body, a, button, .btn {
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='30' viewBox='0 0 26 30'%3E%3Cpath d='M2 1l8 26 4.5-10.5L25 12z' fill='%23e8b435' stroke='%23a9780e' stroke-width='1.6'/%3E%3C/svg%3E") 2 1, auto !important;
+  }
+  body.kade-app-ui,
+  body.kade-app-ui * {
+    cursor: auto !important;
   }
 }
 

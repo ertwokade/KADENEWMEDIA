@@ -76,7 +76,7 @@ export default function QuoteRequest() {
   useSEO({
     title: lang === 'tr' ? 'Dijital Pazarlama Teklifi Al | Kade New Media' : 'Get Quote | Custom Service Request',
     description: lang === 'tr'
-      ? 'İhtiyacınız olan sosyal medya, içerik, reklam, video veya web hizmetlerini seçin; projeniz için Kade New Media’dan yazılı teklif isteyin.'
+      ? 'İhtiyacınız olan sosyal medya, içerik, reklam, video veya web hizmetlerini seçin ve projeniz için Kade New Media’dan yazılı teklif isteyin.'
       : 'Choose the scope for Kade New Media services and submit a written quote request.',
     path: '/teklif-al',
   })
@@ -388,7 +388,7 @@ export default function QuoteRequest() {
                 </div>
                 <p className="quote-summary-note">
                   {T(
-                    'Net teklif; brief, hedef ve üretim kapsamı görüşmesinden sonra hazırlanır.',
+                    'Net teklif, brief ve kapsam görüşmesinin ardından hazırlanır.',
                     'Final quote is prepared after a brief & scope meeting.'
                   )}
                 </p>

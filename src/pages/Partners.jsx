@@ -38,7 +38,7 @@ export default function Partners() {
         <div className="container">
           <FadeIn><div className="section-badge"><HiOutlineOfficeBuilding size={14} />{isEN ? 'Business partners' : 'İş ortakları'}</div></FadeIn>
           <FadeIn delay={0.1}><h1 className="section-title">{isEN ? 'Verified ' : 'Doğrulanmış '}<span>{isEN ? 'partnerships' : 'iş ortaklıkları'}</span></h1></FadeIn>
-          <FadeIn delay={0.2}><p className="section-subtitle">{isEN ? 'Partner identities and logos are published only with permission. Below are the ad platforms we work on and how we structure partnerships.' : 'Partner kimlikleri ve logoları yalnızca izinle yayınlanır. Aşağıda üzerinde çalıştığımız reklam platformlarını ve iş birliği modellerimizi görebilirsin.'}</p></FadeIn>
+          <FadeIn delay={0.2}><p className="section-subtitle">{isEN ? 'Partner identities and logos are published only with permission. Below are the ad platforms we work on and how we structure partnerships.' : 'Partner kimliklerini ve logolarını yalnızca izinle yayınlıyoruz. Aşağıda üzerinde çalıştığımız reklam platformlarını ve iş birliği modellerimizi görebilirsin.'}</p></FadeIn>
         </div>
       </section>
 

@@ -141,5 +141,12 @@ export default async function handler(req, res) {
     return res.status(404).json({ error: 'API endpoint not found' })
   }
 
-  return routeHandler(req, res)
+  try {
+    return await routeHandler(req, res)
+  } catch (error) {
+    console.error(`API Error [${route}]:`, error instanceof Error ? error.message : error)
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.' })
+    }
+  }
 }

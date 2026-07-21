@@ -5,6 +5,7 @@ import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const HEX_COLOR_RE = /^#[0-9a-f]{6}$/i;
 const LINK_FIELDS = new Set(['label', 'url', 'icon']);
 
 function sanitizeLinks(value) {
@@ -24,7 +25,7 @@ function sanitizeLinks(value) {
     .slice(0, 20);
 }
 
-const PROFILE_FIELDS = new Set(['slug', 'name', 'handle', 'tagline', 'photo', 'links', 'active']);
+const PROFILE_FIELDS = new Set(['slug', 'name', 'handle', 'tagline', 'photo', 'links', 'active', 'accentColor']);
 
 export function sanitizeProfileUpdate(value) {
   const clean = Object.fromEntries(Object.entries(value || {}).filter(([key]) => PROFILE_FIELDS.has(key)));
@@ -37,6 +38,9 @@ export function sanitizeProfileUpdate(value) {
   if (clean.photo !== undefined) clean.photo = String(clean.photo).slice(0, 2_000_000);
   if (clean.links !== undefined) clean.links = sanitizeLinks(clean.links);
   if (clean.active !== undefined) clean.active = Boolean(clean.active);
+  if (clean.accentColor !== undefined) {
+    clean.accentColor = HEX_COLOR_RE.test(clean.accentColor) ? clean.accentColor : '#d4943f';
+  }
   return clean;
 }
 
@@ -89,6 +93,7 @@ export default async function handler(req, res) {
         photo: clean.photo || '',
         links: clean.links || [],
         active: clean.active !== false,
+        accentColor: clean.accentColor || '#d4943f',
         createdAt: new Date(),
         updatedAt: new Date(),
       };

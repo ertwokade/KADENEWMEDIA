@@ -31,7 +31,7 @@ export default function About() {
   const storyP2 = t('about.storyP2')
   useSEO({
     title: 'Kade New Media Hakkında | New Media Ajansı İstanbul',
-    description: 'Kade New Media; Kade New Media, Kademedia ve Kadenewmedia adlarıyla da aranan İstanbul merkezli new media ve dijital pazarlama ajansıdır.',
+    description: 'Kade New Media, İstanbul merkezli bir new media ve dijital pazarlama ajansı — Kademedia ve Kadenewmedia adlarıyla da aranıyoruz.',
     keywords: 'kade media, kade, kademedia, kade new media, kadenewmedia, new media ajansı, medya ajansı istanbul, dijital ajans',
     path: '/hakkimizda',
   })

@@ -66,8 +66,8 @@ export default function Tesekkur() {
           <FadeIn delay={0.3}>
             <p className="tesekkur-alt">
               {submitted
-                ? 'İletişim talebiniz sunucu tarafından başarıyla kaydedildi.'
-                : 'Bu sayfa doğrudan veya yenilenerek açıldı. Daha önce gönderilmiş bir talebin durumunu bu ekrandan doğrulayamıyoruz.'}
+                ? 'Mesajınızı aldık, kaydedildi.'
+                : 'Bu sayfayı doğrudan açmış ya da yenilemiş görünüyorsunuz. Bu ekrandan daha önce gönderdiğiniz bir talebin durumunu göremiyoruz.'}
             </p>
           </FadeIn>
 

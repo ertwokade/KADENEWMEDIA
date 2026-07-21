@@ -14,7 +14,7 @@ export default function Careers() {
   useSEO({
     title: lang === 'tr' ? 'Kade New Media Kariyer | Genel Başvuru Bilgileri' : 'Careers | Kade New Media',
     description: lang === 'tr'
-      ? 'Kade New Media’daki kariyer olanakları ve genel başvuru süreci hakkında bilgi alın; uzmanlık alanınızı ve çalışmalarınızı bizimle paylaşın.'
+      ? 'Kade New Media’da kariyer olanakları ve genel başvuru süreci hakkında bilgi bulabilirsin; uzmanlık alanını ve çalışmalarını bizimle paylaş.'
       : 'Kade New Media careers and general application information.',
     path: '/kariyer',
   })

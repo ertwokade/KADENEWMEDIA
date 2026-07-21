@@ -163,8 +163,20 @@ function App() {
   const isLoginArea = location.pathname.startsWith('/giris')
   const isLinkProfile = location.pathname.startsWith('/@') || location.pathname === '/kadirdemir'
   const hideShell = isAdmin || isHome || isLoginArea || isLinkProfile
+  const isAppUI = isAdmin
+    || location.pathname.startsWith('/organizasyon-kiti')
+    || location.pathname === '/kade-kit-business'
+    || location.pathname === '/musteri-panel'
+    || location.pathname === '/proje-takip'
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
+
+  // Dekoratif altın imleç sadece pazarlama sayfalarında kalsın — admin ve
+  // araç/panel sayfalarında (Kade AI panelleri dahil) normal imleç kullanılır.
+  useEffect(() => {
+    document.body.classList.toggle('kade-app-ui', isAppUI)
+    return () => document.body.classList.remove('kade-app-ui')
+  }, [isAppUI])
 
   useEffect(() => {
     // Don't track admin visits, avoid duplicate on first render

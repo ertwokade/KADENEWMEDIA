@@ -25,7 +25,7 @@ export default function Blog() {
         <div className="container">
           <FadeIn><div className="section-badge"><HiOutlineBookOpen size={14} />{isEN ? 'Blog' : 'Blog'}</div></FadeIn>
           <FadeIn delay={0.1}><h1 className="section-title">{isEN ? 'Source-checked ' : 'Kaynağı kontrol edilmiş '}<span>{isEN ? 'articles' : 'yazılar'}</span></h1></FadeIn>
-          <FadeIn delay={0.2}><p className="section-subtitle">{isEN ? 'Articles are published after their claims, dates, and sources are reviewed. No verified article is currently public.' : 'Yazılar; iddiaları, tarihleri ve kaynakları kontrol edildikten sonra yayınlanır. Şu anda public olarak doğrulanmış yazı bulunmuyor.'}</p></FadeIn>
+          <FadeIn delay={0.2}><p className="section-subtitle">{isEN ? 'Articles are published after their claims, dates, and sources are reviewed. No verified article is currently public.' : 'Yazıları; iddiaları, tarihleri ve kaynakları kontrol ettikten sonra yayınlıyoruz. Şu anda yayında doğrulanmış bir yazı yok.'}</p></FadeIn>
         </div>
       </section>
       <section className="section"><div className="container"><div className="blog-newsletter glass-card"><h2>{isEN ? 'Need a practical answer?' : 'Pratik bir yanıt mı arıyorsunuz?'}</h2><p>{isEN ? 'Tell us what you are working on.' : 'Üzerinde çalıştığınız konuyu bize anlatın.'}</p><Link to="/iletisim" className="btn btn-primary">{isEN ? 'Contact us' : 'İletişime geç'}<HiOutlineArrowRight size={16} /></Link></div></div></section>

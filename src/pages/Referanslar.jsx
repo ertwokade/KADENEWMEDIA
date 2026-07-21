@@ -38,7 +38,7 @@ export default function Referanslar() {
         <div className="container">
           <FadeIn><div className="section-badge"><HiOutlineThumbUp size={14} />{isEN ? 'Client references' : 'Müşteri referansları'}</div></FadeIn>
           <FadeIn delay={0.1}><h1 className="section-title">{isEN ? 'Permission-based ' : 'İzinli ve '}<span>{isEN ? 'testimonials' : 'doğrulanmış yorumlar'}</span></h1></FadeIn>
-          <FadeIn delay={0.2}><p className="section-subtitle">{isEN ? 'Names, companies, ratings, and statements are published only with explicit permission. Below is how we measure success and how a reference gets published.' : 'İsim, şirket, puan ve beyanlar yalnızca açık izinle yayınlanır. Aşağıda başarıyı nasıl ölçtüğümüzü ve bir referansın nasıl yayınlandığını görebilirsin.'}</p></FadeIn>
+          <FadeIn delay={0.2}><p className="section-subtitle">{isEN ? 'Names, companies, ratings, and statements are published only with explicit permission. Below is how we measure success and how a reference gets published.' : 'İsim, şirket, puan ve beyanları yalnızca açık izinle yayınlıyoruz. Aşağıda başarıyı nasıl ölçtüğümüzü ve bir referansın nasıl yayınlandığını görebilirsin.'}</p></FadeIn>
         </div>
       </section>
 

@@ -21,8 +21,8 @@ export default function Contact() {
   const { t } = useLanguage()
   const navigate = useNavigate()
   useSEO({
-    title: 'Kade New Media İletişim | Projenizi Paylaşın',
-    description: 'Sosyal medya, dijital pazarlama, içerik üretimi veya web projeniz için Kade New Media ile iletişime geçin ve ihtiyacınızı paylaşın.',
+    title: 'Kade New Media İletişim | Bize Ulaşın',
+    description: 'Sosyal medya, dijital pazarlama, içerik üretimi ya da web projeniz için bize yazın; ihtiyacınızı birlikte konuşalım.',
     keywords: 'sosyal medya ajansı iletişim, dijital pazarlama teklif, sosyal medya yönetim teklifi, kade media iletişim',
     path: '/iletisim',
   })
@@ -61,16 +61,16 @@ export default function Contact() {
     if (honeypot) return
     // Email format validation
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Geçerli bir e-posta adresi giriniz.')
+      setError('Geçerli bir e-posta adresi girin.')
       return
     }
     // Minimum message length
     if (formData.message.trim().length < 20) {
-      setError('Mesajınız en az 20 karakter olmalıdır.')
+      setError('Mesajınız en az 20 karakter olmalı.')
       return
     }
     if (!kvkkAccepted) {
-      setError('Devam etmek için KVKK onayını işaretlemeniz gerekmektedir.')
+      setError('Devam etmek için KVKK onay kutusunu işaretlemeniz gerekiyor.')
       return
     }
     setSending(true)
@@ -91,7 +91,7 @@ export default function Contact() {
           `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.services.join(', ') || '-'}\n\nMesaj:\n${formData.message}`
         )
         window.open(`mailto:${CONTACT.email}?subject=${subject}&body=${body}`, '_self')
-        setError(t('contact.fallbackMsg') || 'Sunucu şu an erişilemez. E-posta uygulamanız açılacak.')
+        setError(t('contact.fallbackMsg') || 'Formu şu an gönderemedik, e-posta uygulamanız açılıyor; oradan da ulaşabilirsiniz.')
       } else {
         setError(errorMsg || t('contact.errorMsg') || 'Mesaj gönderilemedi. Lütfen tekrar deneyin.')
       }
@@ -329,7 +329,7 @@ export default function Contact() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0 }}
                     >
-                      Talebiniz sunucu tarafından alındı.
+                      Mesajınız elimize ulaştı, teşekkürler.
                     </motion.span>
                   )}
                 </div>
