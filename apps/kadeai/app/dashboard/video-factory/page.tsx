@@ -61,7 +61,7 @@ export default function VideoFactoryPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950">
-      <TopBar />
+      <TopBar title="Video Fabrikası" />
       <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-zinc-100">Video Fabrikası</h1>
