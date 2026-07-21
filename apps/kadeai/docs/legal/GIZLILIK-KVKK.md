@@ -16,6 +16,7 @@
   (kullanıcı adına içerik yönetimi için, şifreli saklanır).
 
 ## 2. İşleme amaçları ve hukuki sebep
+- Sözleşmenin ifası (hizmet sunumu, paket yetkilendirmesi) — KVKK m.5/2-c.
 - Yasal yükümlülük (faturalandırma, kayıt) — KVKK m.5/2-ç.
 - Meşru menfaat (güvenlik, dolandırıcılık önleme, hizmet iyileştirme) — m.5/2-f.
 - Açık rıza (pazarlama iletileri gönderilecekse) — m.5/1.
