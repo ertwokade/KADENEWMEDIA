@@ -38,6 +38,7 @@ const Team = lazy(() => import('./pages/Team'))
 const KVKK = lazy(() => import('./pages/KVKK'))
 const Gizlilik = lazy(() => import('./pages/Gizlilik'))
 const CerezPolitikasi = lazy(() => import('./pages/CerezPolitikasi'))
+const TelifHaklari = lazy(() => import('./pages/TelifHaklari'))
 const CaseStudies = lazy(() => import('./pages/CaseStudies'))
 const Admin = lazy(() => import('./pages/Admin'))
 // New pages
@@ -227,51 +228,52 @@ function App() {
       {!hideShell && <PageHeroCanvas type={canvasTheme} />}
       {!hideShell && <Navbar />}
       <main id="main-content">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Home />} />
-        <Route path="/hakkimizda" element={<About />} />
-        <Route path="/hizmetler" element={<Services />} />
-        <Route path="/new-media-ajansi" element={<NewMediaAgency />} />
-        <Route path="/hizmetler/:slug" element={<ServiceDetail />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:slug" element={<BlogDetail />} />
-        <Route path="/iletisim" element={<Contact />} />
-        <Route path="/paketler" element={<LazyRoute><Packages /></LazyRoute>} />
-        <Route path="/partnerler" element={<LazyRoute><Partners /></LazyRoute>} />
-        <Route path="/partnerler/:id" element={<LazyRoute><PartnerDetail /></LazyRoute>} />
-        <Route path="/kariyer" element={<LazyRoute><Careers /></LazyRoute>} />
-        <Route path="/portfolio" element={<LazyRoute><Portfolio /></LazyRoute>} />
-        <Route path="/ekip" element={<LazyRoute><Team /></LazyRoute>} />
-        <Route path="/basari-hikayeleri" element={<LazyRoute><CaseStudies /></LazyRoute>} />
-        <Route path="/kvkk" element={<LazyRoute><KVKK /></LazyRoute>} />
-        <Route path="/gizlilik" element={<LazyRoute><Gizlilik /></LazyRoute>} />
-        <Route path="/cerez-politikasi" element={<LazyRoute><CerezPolitikasi /></LazyRoute>} />
-        <Route path="/admin" element={<ProtectedAdminRoute />} />
-        <Route path="/sss" element={<LazyRoute><SSS /></LazyRoute>} />
-        <Route path="/referanslar" element={<LazyRoute><Referanslar /></LazyRoute>} />
-        <Route path="/tesekkur" element={<LazyRoute><Tesekkur /></LazyRoute>} />
-        <Route path="/teklif-al" element={<LazyRoute><QuoteRequest /></LazyRoute>} />
-        <Route path="/giris" element={<LazyRoute><LoginHub /></LazyRoute>} />
-        <Route path="/giris/danismanlik" element={<LazyRoute><Login /></LazyRoute>} />
-        <Route path="/musteri-panel" element={<LazyRoute><CustomerPortal /></LazyRoute>} />
-        <Route path="/organizasyon-kiti" element={<LazyRoute><OrganizationKitGuard><OrganizationKitDashboard /></OrganizationKitGuard></LazyRoute>} />
-        <Route path="/organizasyon-kiti/plan/fractional-new-media-director" element={<LazyRoute><OrganizationKitGuard><OrganizationKitPlan /></OrganizationKitGuard></LazyRoute>} />
-        {['medya-yol-haritasi', 'yonetim-toplantilari', 'ekip-surecler', 'stratejik-kararlar', 'notlar'].map(section => (
-          <Route
-            key={section}
-            path={`/organizasyon-kiti/${section}`}
-            element={<LazyRoute><OrganizationKitGuard><OrganizationKitSection /></OrganizationKitGuard></LazyRoute>}
-          />
-        ))}
-        <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
-        <Route path="/kadirdemir" element={<Navigate to="/@kadirdemir" replace />} />
-        <Route path="/:handle" element={<LazyRoute><LinkProfile /></LazyRoute>} />
-        <Route path="/s/:slug" element={<ShortLinkRedirect />} />
-        <Route path="/proje-takip" element={<LazyRoute><CustomerRouteGuard><ProjectTracking /></CustomerRouteGuard></LazyRoute>} />
-        <Route path="/links" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
-        <Route path="/kadelinks" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Home />} />
+          <Route path="/hakkimizda" element={<About />} />
+          <Route path="/hizmetler" element={<Services />} />
+          <Route path="/new-media-ajansi" element={<NewMediaAgency />} />
+          <Route path="/hizmetler/:slug" element={<ServiceDetail />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
+          <Route path="/iletisim" element={<Contact />} />
+          <Route path="/paketler" element={<LazyRoute><Packages /></LazyRoute>} />
+          <Route path="/partnerler" element={<LazyRoute><Partners /></LazyRoute>} />
+          <Route path="/partnerler/:id" element={<LazyRoute><PartnerDetail /></LazyRoute>} />
+          <Route path="/kariyer" element={<LazyRoute><Careers /></LazyRoute>} />
+          <Route path="/portfolio" element={<LazyRoute><Portfolio /></LazyRoute>} />
+          <Route path="/ekip" element={<LazyRoute><Team /></LazyRoute>} />
+          <Route path="/basari-hikayeleri" element={<LazyRoute><CaseStudies /></LazyRoute>} />
+          <Route path="/kvkk" element={<LazyRoute><KVKK /></LazyRoute>} />
+          <Route path="/gizlilik" element={<LazyRoute><Gizlilik /></LazyRoute>} />
+          <Route path="/cerez-politikasi" element={<LazyRoute><CerezPolitikasi /></LazyRoute>} />
+          <Route path="/telif-haklari" element={<LazyRoute><TelifHaklari /></LazyRoute>} />
+          <Route path="/admin" element={<ProtectedAdminRoute />} />
+          <Route path="/sss" element={<LazyRoute><SSS /></LazyRoute>} />
+          <Route path="/referanslar" element={<LazyRoute><Referanslar /></LazyRoute>} />
+          <Route path="/tesekkur" element={<LazyRoute><Tesekkur /></LazyRoute>} />
+          <Route path="/teklif-al" element={<LazyRoute><QuoteRequest /></LazyRoute>} />
+          <Route path="/giris" element={<LazyRoute><LoginHub /></LazyRoute>} />
+          <Route path="/giris/danismanlik" element={<LazyRoute><Login /></LazyRoute>} />
+          <Route path="/musteri-panel" element={<LazyRoute><CustomerPortal /></LazyRoute>} />
+          <Route path="/organizasyon-kiti" element={<LazyRoute><OrganizationKitGuard><OrganizationKitDashboard /></OrganizationKitGuard></LazyRoute>} />
+          <Route path="/organizasyon-kiti/plan/fractional-new-media-director" element={<LazyRoute><OrganizationKitGuard><OrganizationKitPlan /></OrganizationKitGuard></LazyRoute>} />
+          {['medya-yol-haritasi', 'yonetim-toplantilari', 'ekip-surecler', 'stratejik-kararlar', 'notlar'].map(section => (
+            <Route
+              key={section}
+              path={`/organizasyon-kiti/${section}`}
+              element={<LazyRoute><OrganizationKitGuard><OrganizationKitSection /></OrganizationKitGuard></LazyRoute>}
+            />
+          ))}
+          <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
+          <Route path="/kadirdemir" element={<Navigate to="/@kadirdemir" replace />} />
+          <Route path="/:handle" element={<LazyRoute><LinkProfile /></LazyRoute>} />
+          <Route path="/s/:slug" element={<ShortLinkRedirect />} />
+          <Route path="/proje-takip" element={<LazyRoute><CustomerRouteGuard><ProjectTracking /></CustomerRouteGuard></LazyRoute>} />
+          <Route path="/links" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
+          <Route path="/kadelinks" element={<ExternalRedirect to="https://kadirardademir.com/links" />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </main>
       {!hideShell && <Footer />}
       {!isAdmin && <CookieBanner />}
