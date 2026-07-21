@@ -1,4 +1,5 @@
 import type { BillingPeriod, PaymentProduct, PlanTier } from './types'
+import { getPricingSnapshot } from './pricingConfig'
 
 /**
  * KadeAI paket kataloğu.
@@ -6,31 +7,15 @@ import type { BillingPeriod, PaymentProduct, PlanTier } from './types'
  * Ürünler; tier (Başlangıç/Pro/Sınırsız) × periyot (haftalık/aylık/yıllık) ×
  * API dahil/hariç kombinasyonlarından FİYAT MODELİ ile otomatik üretilir.
  *
- * 💡 Fiyatları değiştirmek için yalnızca `TIER_MONTHLY_TRY`, `PERIOD_FACTOR` ve
- *    `API_EXCLUDED_DISCOUNT` sabitlerini düzenlemen yeterli.
+ * 💡 Fiyatlar artık admin panelinden (bkz. app/api/payments/admin/pricing/route.ts)
+ * yeniden deploy etmeden düzenlenebilir — bkz. pricingConfig.ts. Oradaki
+ * DEFAULT_TIER_MONTHLY_TRY / DEFAULT_PERIOD_FACTOR / DEFAULT_API_EXCLUDED_DISCOUNT
+ * değerleri, veritabanında hiç override yokken ya da veritabanına erişilemezken
+ * kullanılan güvenli varsayılanlardır.
  *
  * Not: Kişiye özel / 15 dk geçerli teklifler bu katalogda YER ALMAZ; onlar
  * çalışma anında `createDynamicOffer()` ile üretilir (bkz. offers.ts).
  */
-
-// —— Fiyat modeli (TRY, kuruş cinsinden minor unit) ————————————————————————
-
-/** Aylık taban fiyat (API dahil, TL). Kolayca değiştir. */
-const TIER_MONTHLY_TRY: Record<PlanTier, number> = {
-  baslangic: 499,
-  pro: 999,
-  sinirsiz: 1999,
-}
-
-/** Periyot çarpanı: haftalık ~ ayın 1/3'ü, yıllıkta 2 ay bedava (×10). */
-const PERIOD_FACTOR: Record<BillingPeriod, number> = {
-  weekly: 0.35,
-  monthly: 1,
-  yearly: 10,
-}
-
-/** "API hariç" (kendi anahtarını getir) paketlerde indirim oranı. */
-const API_EXCLUDED_DISCOUNT = 0.4
 
 // —— Özellik matrisi (featureAccess ile eşleşir) ——————————————————————————
 
@@ -78,8 +63,9 @@ export function buildProductId(tier: PlanTier, period: BillingPeriod, apiInclude
 }
 
 function priceMinor(tier: PlanTier, period: BillingPeriod, apiIncluded: boolean): number {
-  const base = TIER_MONTHLY_TRY[tier] * PERIOD_FACTOR[period]
-  const withApi = apiIncluded ? base : base * (1 - API_EXCLUDED_DISCOUNT)
+  const snapshot = getPricingSnapshot()
+  const base = snapshot.tierMonthlyTry[tier] * snapshot.periodFactor[period]
+  const withApi = apiIncluded ? base : base * (1 - snapshot.apiExcludedDiscount)
   // TL → kuruş, tam sayıya yuvarla
   return Math.round(withApi * 100)
 }
@@ -98,8 +84,15 @@ function buildProduct(tier: PlanTier, period: BillingPeriod, apiIncluded: boolea
   })
 }
 
-const CATALOG: Readonly<Record<string, PaymentProduct>> = Object.freeze(
-  Object.fromEntries(
+/**
+ * Katalog artık modül yüklenirken bir kez donmuş (frozen) bir nesne olarak
+ * üretilmiyor — her çağrıda `getPricingSnapshot()`'un güncel (varsayılan ya da
+ * admin panelinden güncellenmiş) değerleriyle YENİDEN hesaplanıyor. Bu sayede
+ * admin panelinden yapılan bir fiyat değişikliği, sunucu yeniden başlatılmadan
+ * (cache TTL'i içinde) devreye girer.
+ */
+function buildCatalog(): Record<string, PaymentProduct> {
+  return Object.fromEntries(
     TIERS.flatMap((tier) =>
       PERIODS.flatMap((period) =>
         [true, false].map((apiIncluded) => {
@@ -108,10 +101,10 @@ const CATALOG: Readonly<Record<string, PaymentProduct>> = Object.freeze(
         }),
       ),
     ),
-  ),
-)
+  )
+}
 
-// Geriye dönük uyumluluk: eski sandbox test ürünü
+// Geriye dönük uyumluluk: eski sandbox test ürünü (sabit fiyat, override edilmez)
 const LEGACY: Readonly<Record<string, PaymentProduct>> = Object.freeze({
   'sandbox-credit': Object.freeze({
     id: 'sandbox-credit',
@@ -121,15 +114,23 @@ const LEGACY: Readonly<Record<string, PaymentProduct>> = Object.freeze({
   }),
 })
 
-const PRODUCTS: Readonly<Record<string, PaymentProduct>> = Object.freeze({ ...LEGACY, ...CATALOG })
-
 export function getPaymentProduct(productId: string): PaymentProduct | undefined {
-  return PRODUCTS[productId]
+  if (LEGACY[productId]) return LEGACY[productId]
+  for (const tier of TIERS) {
+    for (const period of PERIODS) {
+      for (const apiIncluded of [true, false]) {
+        if (buildProductId(tier, period, apiIncluded) === productId) {
+          return buildProduct(tier, period, apiIncluded)
+        }
+      }
+    }
+  }
+  return undefined
 }
 
 /** UI için: tüm paketleri döndürür. */
 export function listPackages(): PaymentProduct[] {
-  return Object.values(CATALOG)
+  return Object.values(buildCatalog())
 }
 
 /** Bir planın kaç gün sürdüğü (yetki bitiş tarihini hesaplamak için). */
