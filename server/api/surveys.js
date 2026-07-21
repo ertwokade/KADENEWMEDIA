@@ -1,6 +1,5 @@
-import { ObjectId } from 'mongodb';
 import nodemailer from 'nodemailer';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import { cors } from './_lib/cors.js';
@@ -29,11 +28,28 @@ function cleanHeader(str, max = 200) {
   return String(str || '').replace(/[\r\n]+/g, ' ').trim().slice(0, max);
 }
 
+function mapSurvey(row) {
+  if (!row) return row;
+  return {
+    _id: row.id,
+    clientName: row.client_name,
+    clientEmail: row.client_email,
+    clientCompany: row.client_company,
+    projectName: row.project_name,
+    token: row.token,
+    score: row.score,
+    category: row.category,
+    comment: row.comment,
+    sentBy: row.sent_by,
+    createdAt: row.created_at,
+    completedAt: row.completed_at,
+  };
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const db = await getDb();
-  const col = db.collection('surveys');
+  const supabase = getSupabase();
 
   // Public: Submit survey response (no auth required — token-based access)
   if (req.method === 'POST' && req.query.action === 'submit') {
@@ -48,25 +64,25 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Puan 0-10 arasında olmalıdır' });
     }
 
-    const survey = await col.findOne({ token: String(token) });
+    const { data: survey, error: surveyError } = await supabase.from('kade_surveys').select('*').eq('token', String(token)).maybeSingle();
+    if (surveyError) throw surveyError;
     if (!survey) return res.status(404).json({ error: 'Anket bulunamadı veya süresi dolmuş' });
-    if (survey.completedAt) return res.status(409).json({ error: 'Bu anket zaten doldurulmuş' });
+    if (survey.completed_at) return res.status(409).json({ error: 'Bu anket zaten doldurulmuş' });
 
     let category = 'pasif';
     if (npsScore >= 9) category = 'destekci';
     else if (npsScore <= 6) category = 'kizgin';
 
-    await col.updateOne(
-      { token: String(token) },
-      {
-        $set: {
-          score: npsScore,
-          category,
-          comment: String(comment || '').slice(0, 500),
-          completedAt: new Date(),
-        },
-      }
-    );
+    const { error: updateError } = await supabase
+      .from('kade_surveys')
+      .update({
+        score: npsScore,
+        category,
+        comment: String(comment || '').slice(0, 500),
+        completed_at: new Date(),
+      })
+      .eq('token', String(token));
+    if (updateError) throw updateError;
 
     // Notify admin if low score
     if (npsScore <= 6 && process.env.MAIL_TO) {
@@ -76,8 +92,8 @@ export default async function handler(req, res) {
           await transporter.sendMail({
             from: `"Kade Media" <${process.env.SMTP_USER}>`,
             to: process.env.MAIL_TO,
-            subject: cleanHeader(`⚠️ Düşük NPS Puanı: ${npsScore}/10 — ${survey.clientName}`),
-            html: `<p>Müşteri <strong>${escapeHtml(survey.clientName)}</strong> NPS anketi için <strong>${npsScore}/10</strong> verdi.</p><p>Kategori: ${category}</p>${comment ? `<p>Yorum: ${escapeHtml(comment)}</p>` : ''}`,
+            subject: cleanHeader(`⚠️ Düşük NPS Puanı: ${npsScore}/10 — ${survey.client_name}`),
+            html: `<p>Müşteri <strong>${escapeHtml(survey.client_name)}</strong> NPS anketi için <strong>${npsScore}/10</strong> verdi.</p><p>Kategori: ${category}</p>${comment ? `<p>Yorum: ${escapeHtml(comment)}</p>` : ''}`,
           });
         } catch (e) {
           console.error('NPS bildirim hatası:', e.message);
@@ -97,12 +113,16 @@ export default async function handler(req, res) {
     const { token, stats } = req.query;
 
     if (token) {
-      const item = await col.findOne({ token: String(token) });
-      return item ? res.json(item) : res.status(404).json({ error: 'Bulunamadı' });
+      const { data, error } = await supabase.from('kade_surveys').select('*').eq('token', String(token)).maybeSingle();
+      if (error) throw error;
+      return data ? res.json(mapSurvey(data)) : res.status(404).json({ error: 'Bulunamadı' });
     }
 
     if (stats === 'true') {
-      const all = await col.find({ completedAt: { $exists: true } }).toArray();
+      // Mongo eşdeğeri: { completedAt: { $exists: true } } — completedAt alanı her belgede
+      // (null olsa bile) mevcut olduğundan tüm kayıtlar eşleşir; davranış aynen korunuyor.
+      const { data: all, error } = await supabase.from('kade_surveys').select('*');
+      if (error) throw error;
       if (all.length === 0) return res.json({ avgScore: 0, npsScore: 0, total: 0, categories: {} });
 
       const avgScore = all.reduce((s, i) => s + i.score, 0) / all.length;
@@ -122,8 +142,9 @@ export default async function handler(req, res) {
       });
     }
 
-    const items = await col.find({}).sort({ createdAt: -1 }).limit(100).toArray();
-    return res.json(items);
+    const { data: items, error } = await supabase.from('kade_surveys').select('*').order('created_at', { ascending: false }).limit(100);
+    if (error) throw error;
+    return res.json(items.map(mapSurvey));
   }
 
   // POST — send survey to client
@@ -134,21 +155,21 @@ export default async function handler(req, res) {
     }
 
     const token = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-    const survey = {
-      clientName: String(clientName).slice(0, 100),
-      clientEmail: String(clientEmail).slice(0, 200),
-      clientCompany: String(clientCompany || '').slice(0, 100),
-      projectName: String(projectName || '').slice(0, 100),
+    const surveyInsert = {
+      client_name: String(clientName).slice(0, 100),
+      client_email: String(clientEmail).slice(0, 200),
+      client_company: String(clientCompany || '').slice(0, 100),
+      project_name: String(projectName || '').slice(0, 100),
       token,
       score: null,
       category: null,
       comment: null,
-      sentBy: user.username,
-      createdAt: new Date(),
-      completedAt: null,
+      sent_by: user.username,
+      completed_at: null,
     };
 
-    await col.insertOne(survey);
+    const { error } = await supabase.from('kade_surveys').insert(surveyInsert);
+    if (error) throw error;
 
     const surveyUrl = `${process.env.SITE_URL || 'https://kadenewmedia.com'}/anket/${token}`;
     const transporter = makeTransporter();
@@ -188,8 +209,9 @@ export default async function handler(req, res) {
   // DELETE
   if (req.method === 'DELETE') {
     const { id } = req.query;
-    if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-    await col.deleteOne({ _id: new ObjectId(id) });
+    if (!id || !isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+    const { error } = await supabase.from('kade_surveys').delete().eq('id', id);
+    if (error) throw error;
     return res.json({ success: true });
   }
 

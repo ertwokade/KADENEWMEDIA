@@ -1,4 +1,4 @@
-import { getDb } from './_lib/mongodb.js';
+import { getSupabase } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
@@ -50,18 +50,18 @@ export default async function handler(req, res) {
     if (!rl.allowed) return res.status(204).end();
 
     try {
-      const db = await getDb();
+      const supabase = getSupabase();
       let body = req.body;
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       const { sessionId: rawSid, path: rawPath } = body || {};
       const sessionId = typeof rawSid === 'string' ? rawSid.slice(0, 64) : null;
       if (!sessionId) return res.status(400).json({ error: 'sessionId required' });
       const path = typeof rawPath === 'string' ? rawPath.slice(0, 200) : '/';
-      await db.collection('visitor_sessions').updateOne(
-        { sessionId },
-        { $set: { sessionId, lastSeen: new Date(), path } },
-        { upsert: true }
+      const { error } = await supabase.from('kade_visitor_sessions').upsert(
+        { session_id: sessionId, last_seen: new Date().toISOString(), path },
+        { onConflict: 'session_id' }
       );
+      if (error) throw error;
       return res.status(200).json({ ok: true });
     } catch (err) {
       console.error('Heartbeat error:', err);
@@ -76,13 +76,17 @@ export default async function handler(req, res) {
     if (!rl.allowed) return res.status(429).json({ error: `Çok fazla istek. ${rl.retryAfter} dakika sonra tekrar deneyin.` });
 
     try {
-      const db = await getDb();
-      const cutoff = new Date(Date.now() - 45 * 1000);
-      const count = await db.collection('visitor_sessions').countDocuments({ lastSeen: { $gte: cutoff } });
-      // Opportunistic cleanup: remove sessions older than 1 hour
-      const purge = new Date(Date.now() - 60 * 60 * 1000);
-      db.collection('visitor_sessions').deleteMany({ lastSeen: { $lt: purge } }).catch(() => {});
-      return res.status(200).json({ activeUsers: count });
+      const supabase = getSupabase();
+      const cutoff = new Date(Date.now() - 45 * 1000).toISOString();
+      const { count, error } = await supabase
+        .from('kade_visitor_sessions')
+        .select('*', { count: 'exact', head: true })
+        .gte('last_seen', cutoff);
+      if (error) throw error;
+      // Opportunistic cleanup: remove sessions older than 1 hour (fire-and-forget)
+      const purge = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      supabase.from('kade_visitor_sessions').delete().lt('last_seen', purge).then(() => {}, () => {});
+      return res.status(200).json({ activeUsers: count || 0 });
     } catch (err) {
       console.error('Active visitors error:', err);
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -93,28 +97,30 @@ export default async function handler(req, res) {
   if (action === 'ai-usage' && req.method === 'GET') {
     if (!(await requirePermission(req, res, ['aiContent', 'content']))) return;
     try {
-      const db = await getDb();
-      const col = db.collection('ai_usage');
+      const supabase = getSupabase();
       const now = Date.now();
-      const startOfDay = new Date(new Date().setHours(0, 0, 0, 0));
-      const startOfMinute = new Date(now - 60 * 1000);
-      const startOf30d = new Date(now - 30 * 24 * 60 * 60 * 1000);
+      const startOfDay = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+      const startOfMinute = new Date(now - 60 * 1000).toISOString();
+      const startOf30d = new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-      const [todayCount, lastMinute, total30d, tokenAgg] = await Promise.all([
-        col.countDocuments({ createdAt: { $gte: startOfDay } }),
-        col.countDocuments({ createdAt: { $gte: startOfMinute } }),
-        col.countDocuments({ createdAt: { $gte: startOf30d } }),
-        col.aggregate([
-          { $match: { createdAt: { $gte: startOfDay } } },
-          { $group: { _id: null, totalTokens: { $sum: '$totalTokens' } } },
-        ]).toArray(),
+      const [todayRes, lastMinuteRes, total30dRes, tokensRes] = await Promise.all([
+        supabase.from('kade_ai_usage').select('*', { count: 'exact', head: true }).gte('created_at', startOfDay),
+        supabase.from('kade_ai_usage').select('*', { count: 'exact', head: true }).gte('created_at', startOfMinute),
+        supabase.from('kade_ai_usage').select('*', { count: 'exact', head: true }).gte('created_at', startOf30d),
+        supabase.from('kade_ai_usage').select('total_tokens').gte('created_at', startOfDay),
       ]);
+      if (todayRes.error) throw todayRes.error;
+      if (lastMinuteRes.error) throw lastMinuteRes.error;
+      if (total30dRes.error) throw total30dRes.error;
+      if (tokensRes.error) throw tokensRes.error;
+
+      const tokensToday = (tokensRes.data || []).reduce((sum, row) => sum + (row.total_tokens || 0), 0);
 
       return res.status(200).json({
-        today: todayCount,
-        lastMinute,
-        last30Days: total30d,
-        tokensToday: tokenAgg?.[0]?.totalTokens || 0,
+        today: todayRes.count || 0,
+        lastMinute: lastMinuteRes.count || 0,
+        last30Days: total30dRes.count || 0,
+        tokensToday,
         limits: { rpm: 10, rpd: 250, tier: 'free' },
       });
     } catch (err) {
@@ -129,24 +135,35 @@ export default async function handler(req, res) {
     if (!rl.allowed) return res.status(204).end();
 
     try {
-      const db = await getDb();
+      const supabase = getSupabase();
       let body = req.body;
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       const { path: rawPath, referrer: rawReferrer } = body || {};
       const path = typeof rawPath === 'string' ? rawPath.slice(0, 200) : '/';
       const referrer = typeof rawReferrer === 'string' ? rawReferrer.slice(0, 500) : '';
       const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      const finalPath = path || '/';
 
-      // Increment daily counter for this path
-      await db.collection('pageviews').updateOne(
-        { date: today, path: path || '/' },
-        {
-          $inc: { count: 1 },
-          $setOnInsert: { date: today, path: path || '/' },
-          $set: { updatedAt: new Date() },
-        },
-        { upsert: true }
-      );
+      // Increment daily counter for this path (read-then-write — low traffic, no RPC needed)
+      const { data: existingPv, error: pvSelectErr } = await supabase
+        .from('kade_pageviews')
+        .select('id, count')
+        .eq('date', today)
+        .eq('path', finalPath)
+        .maybeSingle();
+      if (pvSelectErr) throw pvSelectErr;
+      if (existingPv) {
+        const { error: pvUpdateErr } = await supabase
+          .from('kade_pageviews')
+          .update({ count: (existingPv.count || 0) + 1, updated_at: new Date().toISOString() })
+          .eq('id', existingPv.id);
+        if (pvUpdateErr) throw pvUpdateErr;
+      } else {
+        const { error: pvInsertErr } = await supabase
+          .from('kade_pageviews')
+          .insert({ date: today, path: finalPath, count: 1, updated_at: new Date().toISOString() });
+        if (pvInsertErr) throw pvInsertErr;
+      }
 
       // Track referrer source with platform-level detail
       let source = 'direct';
@@ -175,11 +192,22 @@ export default async function handler(req, res) {
         }
       }
 
-      await db.collection('traffic_sources').updateOne(
-        { date: today, source, detail: sourceDetail },
-        { $inc: { count: 1 }, $setOnInsert: { date: today, source, detail: sourceDetail } },
-        { upsert: true }
-      );
+      let tsQuery = supabase.from('kade_traffic_sources').select('id, count').eq('date', today).eq('source', source);
+      tsQuery = sourceDetail === null ? tsQuery.is('detail', null) : tsQuery.eq('detail', sourceDetail);
+      const { data: existingTs, error: tsSelectErr } = await tsQuery.maybeSingle();
+      if (tsSelectErr) throw tsSelectErr;
+      if (existingTs) {
+        const { error: tsUpdateErr } = await supabase
+          .from('kade_traffic_sources')
+          .update({ count: (existingTs.count || 0) + 1 })
+          .eq('id', existingTs.id);
+        if (tsUpdateErr) throw tsUpdateErr;
+      } else {
+        const { error: tsInsertErr } = await supabase
+          .from('kade_traffic_sources')
+          .insert({ date: today, source, detail: sourceDetail, count: 1 });
+        if (tsInsertErr) throw tsInsertErr;
+      }
 
       return res.status(200).json({ ok: true });
     } catch (err) {
@@ -193,7 +221,7 @@ export default async function handler(req, res) {
     if (!(await requirePermission(req, res, ['analytics', 'dashboard']))) return;
 
     try {
-      const db = await getDb();
+      const supabase = getSupabase();
       const period = req.query?.period || 'week';
 
       // Build date range
@@ -207,40 +235,47 @@ export default async function handler(req, res) {
       }
       const startDate = dates[0];
 
-      // Daily totals
-      const dailyRaw = await db.collection('pageviews')
-        .aggregate([
-          { $match: { date: { $gte: startDate } } },
-          { $group: { _id: '$date', total: { $sum: '$count' } } },
-          { $sort: { _id: 1 } },
-        ])
-        .toArray();
+      // Raw pageview rows for the period — aggregation done in JS (low volume, no SQL needed)
+      const { data: pvRows, error: pvErr } = await supabase
+        .from('kade_pageviews')
+        .select('date, path, count')
+        .gte('date', startDate);
+      if (pvErr) throw pvErr;
 
+      // Daily totals
       const dailyMap = {};
-      dailyRaw.forEach(d => { dailyMap[d._id] = d.total; });
+      (pvRows || []).forEach(r => { dailyMap[r.date] = (dailyMap[r.date] || 0) + (r.count || 0); });
       const dailyData = dates.map(d => ({ date: d, count: dailyMap[d] || 0 }));
 
       // Total visits in period
       const totalVisits = dailyData.reduce((s, d) => s + d.count, 0);
 
       // Page breakdown
-      const pageRaw = await db.collection('pageviews')
-        .aggregate([
-          { $match: { date: { $gte: startDate } } },
-          { $group: { _id: '$path', total: { $sum: '$count' } } },
-          { $sort: { total: -1 } },
-          { $limit: 8 },
-        ])
-        .toArray();
+      const pageMap = {};
+      (pvRows || []).forEach(r => { pageMap[r.path] = (pageMap[r.path] || 0) + (r.count || 0); });
+      const pageRaw = Object.entries(pageMap)
+        .map(([path, total]) => ({ _id: path, total }))
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 8);
 
       // Traffic sources — grouped with platform-level detail
-      const sourceRaw = await db.collection('traffic_sources')
-        .aggregate([
-          { $match: { date: { $gte: startDate } } },
-          { $group: { _id: { source: '$source', detail: '$detail' }, total: { $sum: '$count' } } },
-          { $sort: { total: -1 } },
-        ])
-        .toArray();
+      const { data: tsRows, error: tsErr } = await supabase
+        .from('kade_traffic_sources')
+        .select('source, detail, count')
+        .gte('date', startDate);
+      if (tsErr) throw tsErr;
+
+      const sourceMap = new Map();
+      (tsRows || []).forEach(r => {
+        const key = JSON.stringify([r.source, r.detail]);
+        sourceMap.set(key, (sourceMap.get(key) || 0) + (r.count || 0));
+      });
+      const sourceRaw = Array.from(sourceMap.entries())
+        .map(([key, total]) => {
+          const [srcKey, detail] = JSON.parse(key);
+          return { _id: { source: srcKey, detail }, total };
+        })
+        .sort((a, b) => b.total - a.total);
 
       // Group by source, collect details
       const srcGroups = {};
@@ -284,13 +319,13 @@ export default async function handler(req, res) {
       const prevStartStr = prevStart.toISOString().slice(0, 10);
       const prevEndStr = prevEnd.toISOString().slice(0, 10);
 
-      const prevRaw = await db.collection('pageviews')
-        .aggregate([
-          { $match: { date: { $gte: prevStartStr, $lt: prevEndStr } } },
-          { $group: { _id: null, total: { $sum: '$count' } } },
-        ])
-        .toArray();
-      const prevTotal = prevRaw[0]?.total || 0;
+      const { data: prevRows, error: prevErr } = await supabase
+        .from('kade_pageviews')
+        .select('count')
+        .gte('date', prevStartStr)
+        .lt('date', prevEndStr);
+      if (prevErr) throw prevErr;
+      const prevTotal = (prevRows || []).reduce((s, r) => s + (r.count || 0), 0);
       const growth = prevTotal > 0 ? Math.round(((totalVisits - prevTotal) / prevTotal) * 100) : null;
 
       return res.status(200).json({ dailyData, totalVisits, growth, pages, sources, period });
@@ -346,11 +381,15 @@ export default async function handler(req, res) {
   // ── Dynamic sitemap (GET /api/content?action=sitemap) — no auth ──
   if (action === 'sitemap' && req.method === 'GET') {
     try {
-      const db2 = await getDb();
-      const [blogs, partners] = await Promise.all([
-        db2.collection('blogs').find({ published: { $ne: false } }, { projection: { slug: 1, updatedAt: 1, createdAt: 1 } }).toArray(),
-        db2.collection('partners').find({}, { projection: { slug: 1, updatedAt: 1 } }).toArray(),
+      const supabase2 = getSupabase();
+      const [blogsRes, partnersRes] = await Promise.all([
+        supabase2.from('kade_blogs').select('slug, updated_at, created_at').or('published.is.null,published.eq.true'),
+        supabase2.from('kade_partners').select('slug, updated_at'),
       ]);
+      if (blogsRes.error) throw blogsRes.error;
+      if (partnersRes.error) throw partnersRes.error;
+      const blogs = blogsRes.data || [];
+      const partners = partnersRes.data || [];
       const base = 'https://kadenewmedia.com';
       const today = new Date().toISOString().slice(0, 10);
       const staticUrls = [
@@ -381,12 +420,12 @@ export default async function handler(req, res) {
       }
       for (const b of blogs) {
         if (!b.slug) continue;
-        const lastmod = (b.updatedAt || b.createdAt || new Date()).toISOString().slice(0, 10);
+        const lastmod = String(b.updated_at || b.created_at || new Date().toISOString()).slice(0, 10);
         xml += `  <url>\n    <loc>${base}/blog/${b.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
       }
       for (const p of partners) {
         if (!p.slug) continue;
-        const lastmod = (p.updatedAt || new Date()).toISOString().slice(0, 10);
+        const lastmod = String(p.updated_at || new Date().toISOString()).slice(0, 10);
         xml += `  <url>\n    <loc>${base}/partnerler/${p.slug}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.6</priority>\n  </url>\n`;
       }
       xml += '</urlset>';
@@ -399,18 +438,23 @@ export default async function handler(req, res) {
     }
   }
 
-  const db = await getDb();
-  const collection = db.collection('siteContent');
+  const supabase = getSupabase();
 
   // GET - Get site content (public)
   if (req.method === 'GET') {
     try {
       const section = req.query.section;
       if (section) {
-        const content = await collection.findOne({ section });
+        const { data: content, error } = await supabase
+          .from('kade_site_content')
+          .select('*')
+          .eq('section', section)
+          .maybeSingle();
+        if (error) throw error;
         return res.status(200).json(content || { section, data: {} });
       }
-      const allContent = await collection.find({}).toArray();
+      const { data: allContent, error } = await supabase.from('kade_site_content').select('*');
+      if (error) throw error;
       return res.status(200).json(allContent);
     } catch (error) {
       console.error('Content GET error:', error);
@@ -429,18 +473,10 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Section ve data gerekli' });
       }
 
-      await collection.updateOne(
-        { section },
-        {
-          $set: {
-            section,
-            data,
-            updatedAt: new Date()
-          },
-          $setOnInsert: { createdAt: new Date() }
-        },
-        { upsert: true }
-      );
+      const { error } = await supabase
+        .from('kade_site_content')
+        .upsert({ section, data, updated_at: new Date().toISOString() }, { onConflict: 'section' });
+      if (error) throw error;
 
       return res.status(200).json({ message: 'İçerik güncellendi' });
     } catch (error) {

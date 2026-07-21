@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
-import { getDb } from './_lib/mongodb.js'
+import { getSupabase } from './_lib/supabase.js'
 import { getDefaultPermissions, requireAdmin } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
 import { rateLimitCheck } from './_lib/rateLimit.js'
@@ -31,21 +31,21 @@ export default async function handler(req, res) {
   if (!seedSecret || !adminPassword) return res.status(503).json({ error: 'Seed configuration is incomplete' })
   if (!timingSafeEqualString(req.body?.secret, seedSecret)) return res.status(403).json({ error: 'Forbidden' })
 
-  const db = await getDb()
-  const users = db.collection('users')
-  const userCount = await users.countDocuments()
+  const supabase = getSupabase()
+  const { count: userCount, error: countError } = await supabase.from('kade_users').select('id', { count: 'exact', head: true })
+  if (countError) throw countError
   if (userCount > 0 && !(await requireAdmin(req, res))) return
 
-  await users.createIndex({ username: 1 }, { unique: true })
-  const existingAdmin = await users.findOne({ username: 'kade' })
+  const { data: existingAdmin, error: findError } = await supabase.from('kade_users').select('id').eq('username', 'kade').maybeSingle()
+  if (findError) throw findError
   if (!existingAdmin) {
-    await users.insertOne({
+    const { error: insertError } = await supabase.from('kade_users').insert({
       username: 'kade',
-      password: await bcrypt.hash(adminPassword, 12),
+      password_hash: await bcrypt.hash(adminPassword, 12),
       role: 'admin',
       permissions: getDefaultPermissions('admin'),
-      createdAt: new Date(),
     })
+    if (insertError) throw insertError
   }
 
   return res.status(200).json({

@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './mongodb.js';
+import { getSupabase, isValidUuid, isNotFound } from './supabase.js';
 
 export const AUTH_COOKIE_NAME = 'kade_admin_session';
 export const CSRF_COOKIE_NAME = 'kade_csrf';
@@ -258,20 +257,28 @@ export async function getAuthorizedUser(req) {
   const sessionUser = requireAuth(req);
   if (!sessionUser) return null;
 
-  const db = await getDb();
-  const identityFilters = [];
-  if (isValidObjectId(sessionUser.id)) identityFilters.push({ _id: new ObjectId(sessionUser.id) });
-  if (sessionUser.username) identityFilters.push({ username: sessionUser.username });
-  if (identityFilters.length === 0) return null;
+  const supabase = getSupabase();
+  let query = supabase
+    .from('kade_users')
+    .select('id, username, email, role, permissions, session_version, created_at, updated_at');
 
-  const dbUser = await db.collection('users').findOne({ $or: identityFilters }, { projection: { password: 0 } });
+  if (isValidUuid(sessionUser.id)) {
+    query = query.eq('id', sessionUser.id);
+  } else if (sessionUser.username) {
+    query = query.eq('username', sessionUser.username);
+  } else {
+    return null;
+  }
+
+  const { data: dbUser, error } = await query.maybeSingle();
+  if (error && !isNotFound(error)) throw error;
   if (!dbUser) return null;
-  if (!sessionVersionMatches(sessionUser.sessionVersion, dbUser.sessionVersion)) return null;
+  if (!sessionVersionMatches(sessionUser.sessionVersion, dbUser.session_version)) return null;
 
   return {
     ...sessionUser,
     ...dbUser,
-    id: dbUser._id.toString(),
+    id: dbUser.id,
     username: dbUser.username || sessionUser.username,
     role: dbUser.role || sessionUser.role || 'viewer',
     permissions: dbUser.permissions || getDefaultPermissions(dbUser.role || sessionUser.role || 'viewer'),

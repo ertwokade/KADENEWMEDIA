@@ -1,7 +1,6 @@
-import { getDb, isValidObjectId } from './_lib/mongodb.js'
+import { getSupabase, isValidUuid } from './_lib/supabase.js'
 import { requirePermission } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
-import { ObjectId } from 'mongodb'
 import { buildEntitlementsFromPackages, buildPackageObject, PACKAGE_DEFINITIONS } from './_lib/packages.js'
 
 export default async function handler(req, res) {
@@ -57,18 +56,55 @@ function cleanCustomPackage(value) {
   }
 }
 
+function packageRowToObject(p) {
+  return {
+    id: p.id,
+    reference: p.reference,
+    name: p.name,
+    consultingArea: p.consulting_area,
+    features: p.features || [],
+    access: p.access || {},
+    purchasedAt: p.purchased_at,
+    expiresAt: p.expires_at,
+    status: p.status,
+    source: p.source,
+    shopierOrderId: p.shopier_order_id,
+    price: p.price,
+    currency: p.currency,
+  }
+}
+
 async function handleList(req, res) {
   try {
-    const db = await getDb()
-    const customers = await db.collection('customers')
-      .find({}, { projection: { password: 0 } })
-      .sort({ createdAt: -1 })
-      .toArray()
-    return res.status(200).json(customers.map(c => ({
-      ...c,
-      _id: c._id.toString(),
-      entitlements: buildEntitlementsFromPackages(c.packages || []),
-    })))
+    const supabase = getSupabase()
+    const { data: customers, error } = await supabase
+      .from('kade_customers')
+      .select('id, name, email, phone, status, source, session_version, consent_at, last_login_at, created_at, updated_at')
+      .order('created_at', { ascending: false })
+    if (error) throw error
+
+    const { data: allPackages, error: pkgError } = await supabase
+      .from('kade_customer_packages')
+      .select('*')
+      .in('customer_id', customers.map((c) => c.id).length ? customers.map((c) => c.id) : ['00000000-0000-0000-0000-000000000000'])
+    if (pkgError) throw pkgError
+
+    const packagesByCustomer = new Map()
+    for (const row of allPackages || []) {
+      const list = packagesByCustomer.get(row.customer_id) || []
+      list.push(packageRowToObject(row))
+      packagesByCustomer.set(row.customer_id, list)
+    }
+
+    return res.status(200).json(customers.map((c) => {
+      const packages = packagesByCustomer.get(c.id) || []
+      return {
+        ...c,
+        _id: c.id,
+        packages,
+        entitlements: buildEntitlementsFromPackages(packages),
+      }
+    }))
   } catch (err) {
     console.error('Customers list error:', err.message)
     return res.status(500).json({ error: 'Müşteriler yüklenemedi' })
@@ -92,7 +128,7 @@ function handlePackageDefinitions(req, res) {
 async function handleAddPackage(req, res) {
   const { customerId, reference, customPackage } = parseBody(req)
 
-  if (!isValidObjectId(customerId)) return res.status(400).json({ error: 'Geçerli müşteri ID gerekli' })
+  if (!isValidUuid(customerId)) return res.status(400).json({ error: 'Geçerli müşteri ID gerekli' })
 
   let pkg
   if (reference && reference !== 'custom') {
@@ -102,7 +138,6 @@ async function handleAddPackage(req, res) {
     const clean = cleanCustomPackage(customPackage)
     if (!clean) return res.status(400).json({ error: 'Özel paket bilgisi geçersiz' })
     pkg = {
-      id: `custom-${Date.now()}`,
       reference: 'custom',
       name: clean.name,
       consultingArea: clean.consultingArea,
@@ -120,12 +155,25 @@ async function handleAddPackage(req, res) {
   }
 
   try {
-    const db = await getDb()
-    await db.collection('customers').updateOne(
-      { _id: new ObjectId(customerId) },
-      { $push: { packages: pkg }, $set: { updatedAt: new Date() } }
-    )
-    return res.status(200).json({ success: true, package: pkg })
+    const supabase = getSupabase()
+    const { data: created, error } = await supabase.from('kade_customer_packages').insert({
+      customer_id: customerId,
+      reference: pkg.reference,
+      name: pkg.name,
+      consulting_area: pkg.consultingArea,
+      features: pkg.features,
+      access: pkg.access,
+      status: pkg.status,
+      source: pkg.source,
+      shopier_order_id: pkg.shopierOrderId,
+      price: pkg.price,
+      currency: pkg.currency || null,
+      purchased_at: pkg.purchasedAt instanceof Date ? pkg.purchasedAt.toISOString() : pkg.purchasedAt,
+      expires_at: pkg.expiresAt instanceof Date ? pkg.expiresAt.toISOString() : pkg.expiresAt,
+    }).select().single()
+    if (error) throw error
+
+    return res.status(200).json({ success: true, package: packageRowToObject(created) })
   } catch (err) {
     console.error('Add package error:', err.message)
     return res.status(500).json({ error: 'Paket eklenirken hata oluştu' })
@@ -134,16 +182,18 @@ async function handleAddPackage(req, res) {
 
 async function handleUpdatePackage(req, res) {
   const { customerId, packageId, status } = parseBody(req)
-  if (!isValidObjectId(customerId) || typeof packageId !== 'string' || packageId.length > 160 || !PACKAGE_STATUSES.has(status)) {
+  if (!isValidUuid(customerId) || !isValidUuid(packageId) || !PACKAGE_STATUSES.has(status)) {
     return res.status(400).json({ error: 'customerId, packageId veya durum geçersiz' })
   }
 
   try {
-    const db = await getDb()
-    await db.collection('customers').updateOne(
-      { _id: new ObjectId(customerId), 'packages.id': packageId },
-      { $set: { 'packages.$.status': status, updatedAt: new Date() } }
-    )
+    const supabase = getSupabase()
+    const { error } = await supabase
+      .from('kade_customer_packages')
+      .update({ status })
+      .eq('id', packageId)
+      .eq('customer_id', customerId)
+    if (error) throw error
     return res.status(200).json({ success: true })
   } catch (err) {
     return res.status(500).json({ error: 'Paket güncellenemedi' })
@@ -152,16 +202,18 @@ async function handleUpdatePackage(req, res) {
 
 async function handleRemovePackage(req, res) {
   const { customerId, packageId } = parseBody(req)
-  if (!isValidObjectId(customerId) || typeof packageId !== 'string' || packageId.length > 160) {
+  if (!isValidUuid(customerId) || !isValidUuid(packageId)) {
     return res.status(400).json({ error: 'customerId veya packageId geçersiz' })
   }
 
   try {
-    const db = await getDb()
-    await db.collection('customers').updateOne(
-      { _id: new ObjectId(customerId) },
-      { $pull: { packages: { id: packageId } }, $set: { updatedAt: new Date() } }
-    )
+    const supabase = getSupabase()
+    const { error } = await supabase
+      .from('kade_customer_packages')
+      .delete()
+      .eq('id', packageId)
+      .eq('customer_id', customerId)
+    if (error) throw error
     return res.status(200).json({ success: true })
   } catch (err) {
     return res.status(500).json({ error: 'Paket kaldırılamadı' })
@@ -170,16 +222,14 @@ async function handleRemovePackage(req, res) {
 
 async function handleUpdateStatus(req, res) {
   const { customerId, status } = parseBody(req)
-  if (!isValidObjectId(customerId) || !CUSTOMER_STATUSES.has(status)) {
+  if (!isValidUuid(customerId) || !CUSTOMER_STATUSES.has(status)) {
     return res.status(400).json({ error: 'customerId veya status geçersiz' })
   }
 
   try {
-    const db = await getDb()
-    await db.collection('customers').updateOne(
-      { _id: new ObjectId(customerId) },
-      { $set: { status, updatedAt: new Date() } }
-    )
+    const supabase = getSupabase()
+    const { error } = await supabase.from('kade_customers').update({ status }).eq('id', customerId)
+    if (error) throw error
     return res.status(200).json({ success: true })
   } catch (err) {
     return res.status(500).json({ error: 'Durum güncellenemedi' })
@@ -188,11 +238,12 @@ async function handleUpdateStatus(req, res) {
 
 async function handleDeleteCustomer(req, res) {
   const { customerId } = parseBody(req)
-  if (!isValidObjectId(customerId)) return res.status(400).json({ error: 'Geçerli customerId gerekli' })
+  if (!isValidUuid(customerId)) return res.status(400).json({ error: 'Geçerli customerId gerekli' })
 
   try {
-    const db = await getDb()
-    await db.collection('customers').deleteOne({ _id: new ObjectId(customerId) })
+    const supabase = getSupabase()
+    const { error } = await supabase.from('kade_customers').delete().eq('id', customerId)
+    if (error) throw error
     return res.status(200).json({ success: true })
   } catch (err) {
     return res.status(500).json({ error: 'Müşteri silinemedi' })

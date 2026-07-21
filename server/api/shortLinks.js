@@ -1,5 +1,4 @@
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid, isUniqueViolation } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
@@ -22,11 +21,26 @@ function sanitizeLinkUpdate(value) {
   return clean;
 }
 
+function rowToLink(row) {
+  if (!row) return row;
+  return {
+    _id: row.id,
+    id: row.id,
+    slug: row.slug,
+    target: row.target,
+    label: row.label,
+    active: row.active,
+    clicks: row.clicks,
+    lastClickAt: row.last_click_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const db = await getDb();
-  const collection = db.collection('shortLinks');
+  const supabase = getSupabase();
 
   // GET - public resolve by slug, or admin list of all short links
   if (req.method === 'GET') {
@@ -34,15 +48,17 @@ export default async function handler(req, res) {
       const slug = req.query?.slug;
       if (slug) {
         if (typeof slug !== 'string' || !SLUG_RE.test(slug)) return res.status(400).json({ error: 'Geçersiz slug' });
-        const link = await collection.findOne({ slug, active: { $ne: false } });
+        const { data: link, error } = await supabase.from('kade_short_links').select('slug, target').eq('slug', slug).eq('active', true).maybeSingle();
+        if (error) throw error;
         if (!link) return res.status(404).json({ error: 'Link bulunamadı' });
         return res.status(200).json({ slug: link.slug, target: link.target });
       }
 
       const user = await requirePermission(req, res, 'shortLinks');
       if (!user) return;
-      const links = await collection.find({}).sort({ createdAt: -1 }).toArray();
-      return res.status(200).json(links);
+      const { data, error } = await supabase.from('kade_short_links').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json(data.map(rowToLink));
     } catch (error) {
       console.error('ShortLinks GET error:', error);
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -55,7 +71,16 @@ export default async function handler(req, res) {
       try {
         const slug = req.body?.slug;
         if (typeof slug !== 'string' || !SLUG_RE.test(slug)) return res.status(400).json({ error: 'Geçersiz slug' });
-        await collection.updateOne({ slug }, { $inc: { clicks: 1 }, $set: { lastClickAt: new Date() } });
+
+        const { data: existing, error: findError } = await supabase.from('kade_short_links').select('id, clicks').eq('slug', slug).maybeSingle();
+        if (findError) throw findError;
+        if (existing) {
+          const { error: updError } = await supabase
+            .from('kade_short_links')
+            .update({ clicks: (existing.clicks || 0) + 1, last_click_at: new Date().toISOString() })
+            .eq('id', existing.id);
+          if (updError) throw updError;
+        }
         return res.status(204).end();
       } catch (error) {
         console.error('ShortLinks click error:', error);
@@ -72,21 +97,24 @@ export default async function handler(req, res) {
       if (!clean.slug) return res.status(400).json({ error: 'Slug gerekli' });
       if (!clean.target) return res.status(400).json({ error: 'Hedef URL gerekli' });
 
-      const existing = await collection.findOne({ slug: clean.slug });
+      const { data: existing, error: existingError } = await supabase.from('kade_short_links').select('id').eq('slug', clean.slug).maybeSingle();
+      if (existingError) throw existingError;
       if (existing) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor' });
 
-      const link = {
+      const row = {
         slug: clean.slug,
         target: clean.target,
         label: clean.label || '',
         active: clean.active !== false,
         clicks: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
-      const result = await collection.insertOne(link);
-      logActivity(db, { action: 'Kısa link oluşturuldu', detail: link.slug, type: 'create', icon: '🔗', user: user.username }).catch(() => {});
-      return res.status(201).json({ ...link, _id: result.insertedId });
+      const { data, error } = await supabase.from('kade_short_links').insert(row).select().single();
+      if (error) {
+        if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor' });
+        throw error;
+      }
+      logActivity({ action: 'Kısa link oluşturuldu', detail: data.slug, type: 'create', icon: '🔗', user: user.username }).catch(() => {});
+      return res.status(201).json(rowToLink(data));
     } catch (error) {
       console.error('ShortLinks POST error:', error);
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -101,21 +129,26 @@ export default async function handler(req, res) {
     try {
       const { _id, ...rawUpdateData } = req.body || {};
       if (!_id) return res.status(400).json({ error: 'Link ID gerekli' });
-      if (!isValidObjectId(_id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(_id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
       const updateData = sanitizeLinkUpdate(rawUpdateData);
       if (!updateData) return res.status(400).json({ error: 'Link verisi geçersiz' });
 
       if (updateData.slug) {
-        const clash = await collection.findOne({ slug: updateData.slug, _id: { $ne: new ObjectId(_id) } });
+        const { data: clash, error: clashError } = await supabase.from('kade_short_links').select('id').eq('slug', updateData.slug).neq('id', _id).maybeSingle();
+        if (clashError) throw clashError;
         if (clash) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor' });
       }
 
-      updateData.updatedAt = new Date();
-      const result = await collection.updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
-      if (result.matchedCount === 0) return res.status(404).json({ error: 'Link bulunamadı' });
+      const row = { ...updateData, updated_at: new Date().toISOString() };
+      const { data, error } = await supabase.from('kade_short_links').update(row).eq('id', _id).select('id');
+      if (error) {
+        if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor' });
+        throw error;
+      }
+      if (!data || data.length === 0) return res.status(404).json({ error: 'Link bulunamadı' });
 
-      logActivity(db, { action: 'Kısa link güncellendi', detail: updateData.slug || _id, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
+      logActivity({ action: 'Kısa link güncellendi', detail: updateData.slug || _id, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Link güncellendi' });
     } catch (error) {
       console.error('ShortLinks PUT error:', error);
@@ -131,13 +164,16 @@ export default async function handler(req, res) {
     try {
       const queryId = req.body?.id || req.query.id;
       if (!queryId) return res.status(400).json({ error: 'Link ID gerekli' });
-      if (!isValidObjectId(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
 
-      const link = await collection.findOne({ _id: new ObjectId(queryId) });
-      const result = await collection.deleteOne({ _id: new ObjectId(queryId) });
-      if (result.deletedCount === 0) return res.status(404).json({ error: 'Link bulunamadı' });
+      const { data: link, error: findError } = await supabase.from('kade_short_links').select('slug').eq('id', queryId).maybeSingle();
+      if (findError) throw findError;
 
-      logActivity(db, { action: 'Kısa link silindi', detail: link?.slug || queryId, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      const { data, error } = await supabase.from('kade_short_links').delete().eq('id', queryId).select('id');
+      if (error) throw error;
+      if (!data || data.length === 0) return res.status(404).json({ error: 'Link bulunamadı' });
+
+      logActivity({ action: 'Kısa link silindi', detail: link?.slug || queryId, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Link silindi' });
     } catch (error) {
       console.error('ShortLinks DELETE error:', error);

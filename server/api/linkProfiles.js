@@ -1,5 +1,4 @@
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid, isUniqueViolation } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
@@ -44,11 +43,41 @@ export function sanitizeProfileUpdate(value) {
   return clean;
 }
 
+function profileInputToRow(clean) {
+  const row = {};
+  if (clean.slug !== undefined) row.slug = clean.slug;
+  if (clean.name !== undefined) row.name = clean.name;
+  if (clean.handle !== undefined) row.handle = clean.handle;
+  if (clean.tagline !== undefined) row.tagline = clean.tagline;
+  if (clean.photo !== undefined) row.photo = clean.photo;
+  if (clean.links !== undefined) row.links = clean.links;
+  if (clean.active !== undefined) row.active = clean.active;
+  if (clean.accentColor !== undefined) row.accent_color = clean.accentColor;
+  return row;
+}
+
+function rowToProfile(row) {
+  if (!row) return row;
+  return {
+    _id: row.id,
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    handle: row.handle,
+    tagline: row.tagline,
+    photo: row.photo,
+    links: row.links,
+    active: row.active,
+    accentColor: row.accent_color,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const db = await getDb();
-  const collection = db.collection('linkProfiles');
+  const supabase = getSupabase();
 
   // GET - public single profile by slug, or admin list of all profiles
   if (req.method === 'GET') {
@@ -56,15 +85,17 @@ export default async function handler(req, res) {
       const slug = req.query?.slug;
       if (slug) {
         if (typeof slug !== 'string' || !SLUG_RE.test(slug)) return res.status(400).json({ error: 'Geçersiz slug' });
-        const profile = await collection.findOne({ slug, active: { $ne: false } });
+        const { data: profile, error } = await supabase.from('kade_link_profiles').select('*').eq('slug', slug).eq('active', true).maybeSingle();
+        if (error) throw error;
         if (!profile) return res.status(404).json({ error: 'Profil bulunamadı' });
-        return res.status(200).json(profile);
+        return res.status(200).json(rowToProfile(profile));
       }
 
       const user = await requirePermission(req, res, 'linkProfiles');
       if (!user) return;
-      const profiles = await collection.find({}).sort({ createdAt: -1 }).toArray();
-      return res.status(200).json(profiles);
+      const { data, error } = await supabase.from('kade_link_profiles').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json(data.map(rowToProfile));
     } catch (error) {
       console.error('LinkProfiles GET error:', error);
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -82,10 +113,11 @@ export default async function handler(req, res) {
       if (!clean.slug) return res.status(400).json({ error: 'Slug gerekli' });
       if (!clean.name?.trim()) return res.status(400).json({ error: 'İsim gerekli' });
 
-      const existing = await collection.findOne({ slug: clean.slug });
+      const { data: existing, error: existingError } = await supabase.from('kade_link_profiles').select('id').eq('slug', clean.slug).maybeSingle();
+      if (existingError) throw existingError;
       if (existing) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor' });
 
-      const profile = {
+      const row = profileInputToRow({
         slug: clean.slug,
         name: clean.name || '',
         handle: clean.handle || '',
@@ -94,12 +126,14 @@ export default async function handler(req, res) {
         links: clean.links || [],
         active: clean.active !== false,
         accentColor: clean.accentColor || '#d4943f',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      const result = await collection.insertOne(profile);
-      logActivity(db, { action: 'Link profili oluşturuldu', detail: profile.name, type: 'create', icon: '🔗', user: user.username }).catch(() => {});
-      return res.status(201).json({ ...profile, _id: result.insertedId });
+      });
+      const { data, error } = await supabase.from('kade_link_profiles').insert(row).select().single();
+      if (error) {
+        if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor' });
+        throw error;
+      }
+      logActivity({ action: 'Link profili oluşturuldu', detail: data.name, type: 'create', icon: '🔗', user: user.username }).catch(() => {});
+      return res.status(201).json(rowToProfile(data));
     } catch (error) {
       console.error('LinkProfiles POST error:', error);
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -114,21 +148,28 @@ export default async function handler(req, res) {
     try {
       const { _id, ...rawUpdateData } = req.body || {};
       if (!_id) return res.status(400).json({ error: 'Profil ID gerekli' });
-      if (!isValidObjectId(_id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(_id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
       const updateData = sanitizeProfileUpdate(rawUpdateData);
       if (!updateData) return res.status(400).json({ error: 'Profil verisi geçersiz' });
 
       if (updateData.slug) {
-        const clash = await collection.findOne({ slug: updateData.slug, _id: { $ne: new ObjectId(_id) } });
+        const { data: clash, error: clashError } = await supabase.from('kade_link_profiles').select('id').eq('slug', updateData.slug).neq('id', _id).maybeSingle();
+        if (clashError) throw clashError;
         if (clash) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor' });
       }
 
-      updateData.updatedAt = new Date();
-      const result = await collection.updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
-      if (result.matchedCount === 0) return res.status(404).json({ error: 'Profil bulunamadı' });
+      const row = profileInputToRow(updateData);
+      row.updated_at = new Date().toISOString();
 
-      logActivity(db, { action: 'Link profili güncellendi', detail: updateData.name || _id, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
+      const { data, error } = await supabase.from('kade_link_profiles').update(row).eq('id', _id).select('id');
+      if (error) {
+        if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor' });
+        throw error;
+      }
+      if (!data || data.length === 0) return res.status(404).json({ error: 'Profil bulunamadı' });
+
+      logActivity({ action: 'Link profili güncellendi', detail: updateData.name || _id, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Profil güncellendi' });
     } catch (error) {
       console.error('LinkProfiles PUT error:', error);
@@ -144,13 +185,16 @@ export default async function handler(req, res) {
     try {
       const queryId = req.body?.id || req.query.id;
       if (!queryId) return res.status(400).json({ error: 'Profil ID gerekli' });
-      if (!isValidObjectId(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
 
-      const profile = await collection.findOne({ _id: new ObjectId(queryId) });
-      const result = await collection.deleteOne({ _id: new ObjectId(queryId) });
-      if (result.deletedCount === 0) return res.status(404).json({ error: 'Profil bulunamadı' });
+      const { data: profile, error: findError } = await supabase.from('kade_link_profiles').select('name').eq('id', queryId).maybeSingle();
+      if (findError) throw findError;
 
-      logActivity(db, { action: 'Link profili silindi', detail: profile?.name || queryId, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      const { data, error } = await supabase.from('kade_link_profiles').delete().eq('id', queryId).select('id');
+      if (error) throw error;
+      if (!data || data.length === 0) return res.status(404).json({ error: 'Profil bulunamadı' });
+
+      logActivity({ action: 'Link profili silindi', detail: profile?.name || queryId, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Profil silindi' });
     } catch (error) {
       console.error('LinkProfiles DELETE error:', error);

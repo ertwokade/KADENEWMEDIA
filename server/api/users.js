@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid, isUniqueViolation } from './_lib/supabase.js';
 import { getDefaultPermissions, requireAdmin } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
@@ -11,16 +10,17 @@ export default async function handler(req, res) {
   const user = await requireAdmin(req, res);
   if (!user) return;
 
-  const db = await getDb();
+  const supabase = getSupabase();
 
   try {
     // GET - List all users
     if (req.method === 'GET') {
-      const users = await db.collection('users')
-        .find({}, { projection: { password: 0 } })
-        .sort({ createdAt: -1 })
-        .toArray();
-      return res.status(200).json(users);
+      const { data, error } = await supabase
+        .from('kade_users')
+        .select('id, username, email, role, permissions, session_version, created_at, updated_at')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json(data);
     }
 
     // POST - Create new user
@@ -42,26 +42,23 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Geçersiz rol. Geçerli roller: admin, editor, viewer' });
       }
 
-      const existing = await db.collection('users').findOne({ username });
-      if (existing) {
-        return res.status(409).json({ error: 'Bu kullanıcı adı zaten kullanılıyor' });
-      }
-
       const hashedPassword = await bcrypt.hash(password, 12);
       const newUser = {
         username,
-        password: hashedPassword,
+        password_hash: hashedPassword,
         email: req.body.email || '',
         role: role || 'viewer',
         permissions: permissions || getDefaultPermissions(role || 'viewer'),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        sessionVersion: 0,
+        session_version: 0,
       };
 
-      await db.collection('users').insertOne(newUser);
-      const { password: _, ...safeUser } = newUser;
-      logActivity(db, { action: 'Kullanıcı oluşturuldu', detail: `${username} - ${role || 'viewer'} rolü`, type: 'create', icon: '👤', user: user.username }).catch(() => {});
+      const { data: created, error } = await supabase.from('kade_users').insert(newUser).select().single();
+      if (error) {
+        if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu kullanıcı adı zaten kullanılıyor' });
+        throw error;
+      }
+      const { password_hash: _, ...safeUser } = created;
+      logActivity({ action: 'Kullanıcı oluşturuldu', detail: `${username} - ${role || 'viewer'} rolü`, type: 'create', icon: '👤', user: user.username }).catch(() => {});
       return res.status(201).json(safeUser);
     }
 
@@ -72,7 +69,7 @@ export default async function handler(req, res) {
       if (!id) {
         return res.status(400).json({ error: 'Kullanıcı ID gerekli' });
       }
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
       if (username && (typeof username !== 'string' || !/^[a-zA-Z0-9_]{1,30}$/.test(username))) {
         return res.status(400).json({ error: 'Geçersiz kullanıcı adı formatı' });
       }
@@ -84,22 +81,29 @@ export default async function handler(req, res) {
       }
 
       const { email: emailUpdate } = req.body;
-      const updateData = { updatedAt: new Date() };
+      const updateData = {};
       if (username) updateData.username = username;
       if (role) {
         updateData.role = role;
         if (!permissions) updateData.permissions = getDefaultPermissions(role);
       }
       if (permissions) updateData.permissions = permissions;
-      if (password) updateData.password = await bcrypt.hash(password, 12);
+      if (password) updateData.password_hash = await bcrypt.hash(password, 12);
       if (emailUpdate !== undefined) updateData.email = emailUpdate;
 
       const shouldRevokeSessions = Boolean(password || role || permissions);
-      await db.collection('users').updateOne(
-        { _id: new ObjectId(id) },
-        { $set: updateData, ...(shouldRevokeSessions ? { $inc: { sessionVersion: 1 } } : {}) }
-      );
-      logActivity(db, { action: 'Kullanıcı güncellendi', detail: `${username || id}`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
+      if (shouldRevokeSessions) {
+        const { data: current, error: fetchError } = await supabase.from('kade_users').select('session_version').eq('id', id).maybeSingle();
+        if (fetchError) throw fetchError;
+        updateData.session_version = Number(current?.session_version || 0) + 1;
+      }
+
+      const { error } = await supabase.from('kade_users').update(updateData).eq('id', id);
+      if (error) {
+        if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu kullanıcı adı zaten kullanılıyor' });
+        throw error;
+      }
+      logActivity({ action: 'Kullanıcı güncellendi', detail: `${username || id}`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Kullanıcı güncellendi' });
     }
 
@@ -109,16 +113,17 @@ export default async function handler(req, res) {
       if (!id) {
         return res.status(400).json({ error: 'Kullanıcı ID gerekli' });
       }
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
       // Prevent deleting yourself
-      const targetUser = await db.collection('users').findOne({ _id: new ObjectId(id) });
+      const { data: targetUser } = await supabase.from('kade_users').select('username').eq('id', id).maybeSingle();
       if (targetUser && targetUser.username === user.username) {
         return res.status(400).json({ error: 'Kendinizi silemezsiniz' });
       }
 
-      await db.collection('users').deleteOne({ _id: new ObjectId(id) });
-      logActivity(db, { action: 'Kullanıcı silindi', detail: `${targetUser?.username || id}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      const { error } = await supabase.from('kade_users').delete().eq('id', id);
+      if (error) throw error;
+      logActivity({ action: 'Kullanıcı silindi', detail: `${targetUser?.username || id}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Kullanıcı silindi' });
     }
 

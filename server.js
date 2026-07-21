@@ -36,6 +36,6 @@ app.use('/api', (req, res) => {
 const PORT = Number(process.env.PORT) || 3001
 app.listen(PORT, () => {
   console.log(`✅ API Server: http://localhost:${PORT}`)
-  console.log(`📦 MongoDB: ${process.env.MONGODB_URI ? '✅ URI loaded' : '❌ Missing MONGODB_URI'}`)
+  console.log(`📦 Supabase: ${process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ credentials loaded' : '❌ Missing SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY'}`)
   console.log(`📧 SMTP: ${process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS ? `✅ ${process.env.SMTP_HOST}:${process.env.SMTP_PORT || 587}` : '❌ Missing SMTP config'}`)
 })

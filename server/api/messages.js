@@ -1,7 +1,6 @@
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
-import { ObjectId } from 'mongodb';
 import { logActivity } from './notifications.js';
 import nodemailer from 'nodemailer';
 
@@ -16,14 +15,23 @@ function cleanHeader(str, max = 200) {
   return String(str || '').replace(/[\r\n]+/g, ' ').trim().slice(0, max);
 }
 
+function mapMessage(m) {
+  if (!m) return m;
+  return { ...m, _id: m.id, consentAt: m.consent_at, createdAt: m.created_at };
+}
+
+function mapNote(n) {
+  if (!n) return n;
+  return { ...n, _id: n.id, messageId: n.message_id, createdBy: n.created_by, createdAt: n.created_at };
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
   const user = await requirePermission(req, res, 'messages', { write: req.method !== 'GET' });
   if (!user) return;
 
-  const db = await getDb();
-  const collection = db.collection('messages');
+  const supabase = getSupabase();
   const action = req.query?.action;
 
   // ── Email reply (POST ?action=reply) ──
@@ -33,9 +41,10 @@ export default async function handler(req, res) {
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       const { id, replyText, subject } = body || {};
       if (!id || !replyText?.trim()) return res.status(400).json({ error: 'id ve replyText gerekli' });
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
-      const message = await collection.findOne({ _id: new ObjectId(id) });
+      const { data: message, error: findError } = await supabase.from('kade_messages').select('*').eq('id', id).maybeSingle();
+      if (findError) throw findError;
       if (!message) return res.status(404).json({ error: 'Mesaj bulunamadı' });
 
       const smtpHost = process.env.SMTP_HOST;
@@ -76,15 +85,15 @@ export default async function handler(req, res) {
       });
 
       // Mark as replied in notes
-      await db.collection('notes').insertOne({
-        messageId: id,
+      const { error: noteError } = await supabase.from('kade_message_notes').insert({
+        message_id: id,
         text: `E-posta yanıtı gönderildi: "${replyText.substring(0, 80)}${replyText.length > 80 ? '...' : ''}"`,
         type: 'email',
-        createdBy: user.username,
-        createdAt: new Date(),
+        created_by: user.username,
       });
+      if (noteError) throw noteError;
 
-      logActivity(db, { action: 'E-posta yanıtı gönderildi', detail: `${message.name} (${message.email})`, type: 'message', icon: '📤', user: user.username }).catch(() => {});
+      logActivity({ action: 'E-posta yanıtı gönderildi', detail: `${message.name} (${message.email})`, type: 'message', icon: '📤', user: user.username }).catch(() => {});
 
       return res.status(200).json({ message: 'E-posta başarıyla gönderildi!' });
     } catch (error) {
@@ -96,8 +105,9 @@ export default async function handler(req, res) {
   // GET - List all messages
   if (req.method === 'GET') {
     try {
-      const messages = await collection.find({}).sort({ createdAt: -1 }).toArray();
-      return res.status(200).json(messages);
+      const { data: messages, error } = await supabase.from('kade_messages').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json(messages.map(mapMessage));
     } catch (error) {
       console.error('Messages GET error:', error);
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -111,7 +121,7 @@ export default async function handler(req, res) {
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       const { id, status, read } = body || {};
       if (!id) return res.status(400).json({ error: 'id gerekli' });
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
       const update = {};
 
       if (status !== undefined) {
@@ -123,7 +133,8 @@ export default async function handler(req, res) {
         update.read = true;
       }
 
-      await collection.updateOne({ _id: new ObjectId(id) }, { $set: update });
+      const { error } = await supabase.from('kade_messages').update(update).eq('id', id);
+      if (error) throw error;
       return res.status(200).json({ message: 'Güncellendi' });
     } catch (error) {
       console.error('Messages PUT error:', error);
@@ -136,10 +147,12 @@ export default async function handler(req, res) {
     try {
       const queryId = req.body?.id || req.query.id;
       if (!queryId) return res.status(400).json({ error: 'id gerekli' });
-      if (!isValidObjectId(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
-      const msg = await collection.findOne({ _id: new ObjectId(queryId) });
-      await collection.deleteOne({ _id: new ObjectId(queryId) });
-      logActivity(db, { action: 'Mesaj silindi', detail: `${msg?.name || ''} - ${msg?.subject || ''}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      if (!isValidUuid(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
+      const { data: msg, error: findError } = await supabase.from('kade_messages').select('*').eq('id', queryId).maybeSingle();
+      if (findError) throw findError;
+      const { error } = await supabase.from('kade_messages').delete().eq('id', queryId);
+      if (error) throw error;
+      logActivity({ action: 'Mesaj silindi', detail: `${msg?.name || ''} - ${msg?.subject || ''}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Mesaj silindi' });
     } catch (error) {
       console.error('Messages DELETE error:', error);
@@ -149,13 +162,12 @@ export default async function handler(req, res) {
 
   // ── Notes (CRM) — ?action=notes ──
   if (action === 'notes') {
-    const notesCol = db.collection('notes');
-
     if (req.method === 'GET') {
       const messageId = req.query?.messageId;
       if (!messageId) return res.status(400).json({ error: 'messageId gerekli' });
-      const notes = await notesCol.find({ messageId }).sort({ createdAt: -1 }).toArray();
-      return res.status(200).json(notes);
+      const { data: notes, error } = await supabase.from('kade_message_notes').select('*').eq('message_id', messageId).order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json(notes.map(mapNote));
     }
 
     if (req.method === 'POST') {
@@ -163,16 +175,18 @@ export default async function handler(req, res) {
       if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
       const { messageId, text, type } = body || {};
       if (!messageId || !text?.trim()) return res.status(400).json({ error: 'messageId ve text gerekli' });
-      const note = { messageId, text: text.trim(), type: type || 'note', createdBy: user.username, createdAt: new Date() };
-      const result = await notesCol.insertOne(note);
-      return res.status(201).json({ ...note, _id: result.insertedId });
+      const note = { message_id: messageId, text: text.trim(), type: type || 'note', created_by: user.username };
+      const { data, error } = await supabase.from('kade_message_notes').insert(note).select().single();
+      if (error) throw error;
+      return res.status(201).json(mapNote(data));
     }
 
     if (req.method === 'DELETE') {
       const id = req.query?.id;
       if (!id) return res.status(400).json({ error: 'id gerekli' });
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-      await notesCol.deleteOne({ _id: new ObjectId(id) });
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      const { error } = await supabase.from('kade_message_notes').delete().eq('id', id);
+      if (error) throw error;
       return res.status(200).json({ success: true });
     }
 

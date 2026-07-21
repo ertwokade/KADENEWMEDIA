@@ -1,12 +1,11 @@
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const db = await getDb();
+  const supabase = getSupabase();
   const action = req.query?.action;
 
   // ── Activity Log (GET /api/notifications?action=activity) ──
@@ -16,13 +15,11 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
       const filter = req.query?.type;
-      const match = filter && filter !== 'all' ? { type: filter } : {};
-      const logs = await db.collection('activity_log')
-        .find(match)
-        .sort({ createdAt: -1 })
-        .limit(100)
-        .toArray();
-      return res.status(200).json(logs);
+      let query = supabase.from('kade_activity_log').select('*').order('created_at', { ascending: false }).limit(100);
+      if (filter && filter !== 'all') query = query.eq('type', filter);
+      const { data, error } = await query;
+      if (error) throw error;
+      return res.status(200).json(data);
     }
 
     if (req.method === 'POST') {
@@ -31,16 +28,15 @@ export default async function handler(req, res) {
       const { action: logAction, detail, type, icon } = body || {};
       if (!logAction) return res.status(400).json({ error: 'action gerekli' });
 
-      const log = {
+      const { data, error } = await supabase.from('kade_activity_log').insert({
         action: logAction,
         detail: detail || '',
         type: type || 'system',
         icon: icon || '⚙️',
         user: user.username,
-        createdAt: new Date(),
-      };
-      await db.collection('activity_log').insertOne(log);
-      return res.status(201).json(log);
+      }).select().single();
+      if (error) throw error;
+      return res.status(201).json(data);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
@@ -49,16 +45,16 @@ export default async function handler(req, res) {
   const user = await requirePermission(req, res, 'dashboard');
   if (!user) return;
 
-  const collection = db.collection('notifications');
-
   // GET — bildirimleri getir
   if (req.method === 'GET') {
-    const notifications = await collection
-      .find({ userId: user.id })
-      .sort({ createdAt: -1 })
-      .limit(50)
-      .toArray();
-    return res.status(200).json(notifications);
+    const { data, error } = await supabase
+      .from('kade_notifications')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    return res.status(200).json(data);
   }
 
   // PUT — okundu işaretle
@@ -71,19 +67,23 @@ export default async function handler(req, res) {
     const { id, markAllRead } = body || {};
 
     if (markAllRead) {
-      await collection.updateMany(
-        { userId: user.id, read: false },
-        { $set: { read: true } }
-      );
+      const { error } = await supabase
+        .from('kade_notifications')
+        .update({ read: true })
+        .eq('user_id', user.id)
+        .eq('read', false);
+      if (error) throw error;
       return res.status(200).json({ success: true });
     }
 
     if (id) {
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-      await collection.updateOne(
-        { _id: new ObjectId(id), userId: user.id },
-        { $set: { read: true } }
-      );
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      const { error } = await supabase
+        .from('kade_notifications')
+        .update({ read: true })
+        .eq('id', id)
+        .eq('user_id', user.id);
+      if (error) throw error;
       return res.status(200).json({ success: true });
     }
 
@@ -96,26 +96,28 @@ export default async function handler(req, res) {
     if (!id) {
       return res.status(400).json({ error: 'id gerekli' });
     }
-    if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-    await collection.deleteOne({ _id: new ObjectId(id), userId: user.id });
+    if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+    const { error } = await supabase.from('kade_notifications').delete().eq('id', id).eq('user_id', user.id);
+    if (error) throw error;
     return res.status(200).json({ success: true });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
 }
 
-// Helper: Bildirim olusturma (diger API'lerden cagrilabilir)
-export async function createNotification(db, { userId, type, title, message, link }) {
+// Helper: Bildirim oluşturma (diğer API'lerden çağrılabilir)
+export async function createNotification({ userId, type, title, message, link }) {
   try {
-    await db.collection('notifications').insertOne({
-      userId,
+    const supabase = getSupabase();
+    const { error } = await supabase.from('kade_notifications').insert({
+      user_id: userId,
       type: type || 'info',
       title,
       message,
       link: link || null,
       read: false,
-      createdAt: new Date(),
     });
+    if (error) throw error;
     return true;
   } catch (err) {
     console.error('Notification write failed:', err.message);
@@ -123,17 +125,18 @@ export async function createNotification(db, { userId, type, title, message, lin
   }
 }
 
-// Helper: Aktivite logu (diger API'lerden cagrilabilir)
-export async function logActivity(db, { action, detail, type, icon, user }) {
+// Helper: Aktivite logu (diğer API'lerden çağrılabilir)
+export async function logActivity({ action, detail, type, icon, user }) {
   try {
-    await db.collection('activity_log').insertOne({
+    const supabase = getSupabase();
+    const { error } = await supabase.from('kade_activity_log').insert({
       action,
       detail: detail || '',
       type: type || 'system',
       icon: icon || 'system',
       user: user || 'sistem',
-      createdAt: new Date(),
     });
+    if (error) throw error;
     return true;
   } catch (err) {
     console.error('Activity log write failed:', err.message);

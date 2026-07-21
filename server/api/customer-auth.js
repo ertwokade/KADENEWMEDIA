@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { ObjectId } from 'mongodb'
-import { getDb, isValidObjectId } from './_lib/mongodb.js'
+import { getSupabase, isValidUuid, isUniqueViolation } from './_lib/supabase.js'
 import { createToken, verifyToken, getCookie, sessionVersionMatches } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
 import { rateLimitCheck } from './_lib/rateLimit.js'
@@ -51,20 +50,45 @@ export function getCustomerSession(req) {
 
 export async function getActiveCustomerSession(req) {
   const session = getCustomerSession(req)
-  if (!session || !isValidObjectId(session.id)) return null
+  if (!session || !isValidUuid(session.id)) return null
 
-  const db = await getDb()
-  const customer = await db.collection('customers').findOne(
-    { _id: new ObjectId(session.id), status: { $ne: 'inactive' } },
-    { projection: { password: 0 } }
-  )
+  const supabase = getSupabase()
+  const { data: customer, error } = await supabase
+    .from('kade_customers')
+    .select('id, name, email, phone, status, source, session_version, consent_at, last_login_at, created_at, updated_at')
+    .eq('id', session.id)
+    .neq('status', 'inactive')
+    .maybeSingle()
+  if (error) throw error
   if (!customer) return null
-  if (!sessionVersionMatches(session.sessionVersion, customer.sessionVersion)) return null
+  if (!sessionVersionMatches(session.sessionVersion, customer.session_version)) return null
+
+  const { data: packageRows, error: pkgError } = await supabase
+    .from('kade_customer_packages')
+    .select('*')
+    .eq('customer_id', customer.id)
+  if (pkgError) throw pkgError
+
+  customer.packages = (packageRows || []).map((p) => ({
+    id: p.id,
+    reference: p.reference,
+    name: p.name,
+    consultingArea: p.consulting_area,
+    features: p.features || [],
+    access: p.access || {},
+    purchasedAt: p.purchased_at,
+    expiresAt: p.expires_at,
+    status: p.status,
+    source: p.source,
+    shopierOrderId: p.shopier_order_id,
+    price: p.price,
+    currency: p.currency,
+  }))
 
   return {
     session: {
       ...session,
-      id: customer._id.toString(),
+      id: customer.id,
       name: customer.name,
       email: customer.email,
     },
@@ -136,34 +160,30 @@ async function handleRegister(req, res) {
   }
 
   try {
-    const db = await getDb()
-    await db.collection('customers').createIndex({ email: 1 }, { unique: true }).catch(() => {})
-    const existing = await db.collection('customers').findOne({ email: email.toLowerCase().trim() })
-    if (existing) {
-      return res.status(409).json({ error: 'Bu e-posta adresi zaten kayıtlı' })
-    }
+    const supabase = getSupabase()
+    const now = new Date().toISOString()
 
-    const hashedPassword = await bcrypt.hash(password, 10)
-    const now = new Date()
-
-    const result = await db.collection('customers').insertOne({
+    const { data: created, error } = await supabase.from('kade_customers').insert({
       name: name.trim(),
       email: email.toLowerCase().trim(),
       phone: phone?.trim() || null,
-      password: hashedPassword,
-      packages: [],
+      password_hash: await bcrypt.hash(password, 10),
       status: 'active',
-      createdAt: now,
-      updatedAt: now,
-      lastLoginAt: null,
-      consentAt: now,
-      sessionVersion: 0,
-    })
+      source: 'manual',
+      last_login_at: null,
+      consent_at: now,
+      session_version: 0,
+    }).select('id, name, email').single()
+
+    if (error) {
+      if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu e-posta adresi zaten kayıtlı' })
+      throw error
+    }
 
     const token = createToken({
-      id: result.insertedId.toString(),
-      name: name.trim(),
-      email: email.toLowerCase().trim(),
+      id: created.id,
+      name: created.name,
+      email: created.email,
       role: 'customer',
       sessionVersion: 0,
     })
@@ -171,12 +191,9 @@ async function handleRegister(req, res) {
     setCustomerCookie(req, res, token)
 
     return res.status(201).json({
-      customer: { id: result.insertedId.toString(), name: name.trim(), email: email.toLowerCase().trim() },
+      customer: { id: created.id, name: created.name, email: created.email },
     })
   } catch (err) {
-    if (err?.code === 11000) {
-      return res.status(409).json({ error: 'Bu e-posta adresi zaten kayıtlı' })
-    }
     console.error('Customer register error:', err.message)
     return res.status(500).json({ error: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.' })
   }
@@ -196,8 +213,13 @@ async function handleLogin(req, res) {
   }
 
   try {
-    const db = await getDb()
-    const customer = await db.collection('customers').findOne({ email: email.toLowerCase().trim() })
+    const supabase = getSupabase()
+    const { data: customer, error: findError } = await supabase
+      .from('kade_customers')
+      .select('id, name, email, password_hash, status, session_version')
+      .eq('email', email.toLowerCase().trim())
+      .maybeSingle()
+    if (findError) throw findError
 
     if (!customer) {
       return res.status(401).json({ error: 'E-posta adresi veya şifre hatalı' })
@@ -207,28 +229,29 @@ async function handleLogin(req, res) {
       return res.status(403).json({ error: 'Hesabınız askıya alınmış. Lütfen destek ile iletişime geçin.' })
     }
 
-    const valid = await bcrypt.compare(password, customer.password)
+    const valid = await bcrypt.compare(password, customer.password_hash)
     if (!valid) {
       return res.status(401).json({ error: 'E-posta adresi veya şifre hatalı' })
     }
 
-    await db.collection('customers').updateOne(
-      { _id: customer._id },
-      { $set: { lastLoginAt: new Date() } }
-    )
+    const { error: updateError } = await supabase
+      .from('kade_customers')
+      .update({ last_login_at: new Date().toISOString() })
+      .eq('id', customer.id)
+    if (updateError) throw updateError
 
     const token = createToken({
-      id: customer._id.toString(),
+      id: customer.id,
       name: customer.name,
       email: customer.email,
       role: 'customer',
-      sessionVersion: Number(customer.sessionVersion || 0),
+      sessionVersion: Number(customer.session_version || 0),
     })
 
     setCustomerCookie(req, res, token)
 
     return res.status(200).json({
-      customer: { id: customer._id.toString(), name: customer.name, email: customer.email },
+      customer: { id: customer.id, name: customer.name, email: customer.email },
     })
   } catch (err) {
     console.error('Customer login error:', err.message)

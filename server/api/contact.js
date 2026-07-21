@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid, isUniqueViolation } from './_lib/supabase.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import { requireAdmin, requirePermission } from './_lib/auth.js';
@@ -66,14 +65,15 @@ export default async function handler(req, res) {
   if (action === 'subscribers') {
     const user = await requirePermission(req, res, 'messages', { write: req.method !== 'GET' });
     if (!user) return;
-    const db = await getDb();
+    const supabase = getSupabase();
 
     if (req.method === 'GET') {
       try {
-        const subscribers = await db.collection('newsletter')
-          .find({})
-          .sort({ createdAt: -1 })
-          .toArray();
+        const { data: subscribers, error } = await supabase
+          .from('kade_newsletter')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
         return res.status(200).json(subscribers);
       } catch (err) {
         return res.status(500).json({ error: 'Sunucu hatası' });
@@ -84,9 +84,10 @@ export default async function handler(req, res) {
       try {
         const id = req.query?.id;
         if (!id) return res.status(400).json({ error: 'id gerekli' });
-        if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-        await db.collection('newsletter').deleteOne({ _id: new ObjectId(id) });
-        logActivity(db, { action: 'Newsletter abonesi silindi', detail: '', type: 'delete', icon: '📧', user: user.username }).catch(() => {});
+        if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+        const { error } = await supabase.from('kade_newsletter').delete().eq('id', id);
+        if (error) throw error;
+        logActivity({ action: 'Newsletter abonesi silindi', detail: '', type: 'delete', icon: '📧', user: user.username }).catch(() => {});
         return res.status(200).json({ success: true });
       } catch (err) {
         return res.status(500).json({ error: 'Sunucu hatası' });
@@ -116,8 +117,9 @@ export default async function handler(req, res) {
     if (!transporter) return res.status(400).json({ error: 'SMTP yapılandırılmamış' });
 
     try {
-      const db = await getDb();
-      const subscribers = await db.collection('newsletter').find({ status: { $ne: 'unsubscribed' } }).toArray();
+      const supabase = getSupabase();
+      const { data: subscribers, error } = await supabase.from('kade_newsletter').select('*').neq('status', 'unsubscribed');
+      if (error) throw error;
       if (subscribers.length === 0) return res.status(200).json({ sent: 0, message: 'Abone bulunamadı' });
 
       let sent = 0;
@@ -142,7 +144,7 @@ export default async function handler(req, res) {
         }
       }
 
-      logActivity(db, { action: 'Newsletter gönderildi', detail: `${sent} aboneye: "${subject}"`, type: 'create', icon: '📧', user: user.username }).catch(() => {});
+      logActivity({ action: 'Newsletter gönderildi', detail: `${sent} aboneye: "${subject}"`, type: 'create', icon: '📧', user: user.username }).catch(() => {});
       return res.status(200).json({ sent, total: subscribers.length, ...(errors.length ? { errors } : {}) });
     } catch (err) {
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -180,11 +182,12 @@ export default async function handler(req, res) {
       return res.status(403).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2>Geçersiz veya süresi dolmuş abonelik iptal bağlantısı.</h2></body></html>');
     }
     try {
-      const db = await getDb();
-      await db.collection('newsletter').updateOne(
-        { email: email.toLowerCase() },
-        { $set: { status: 'unsubscribed', unsubscribedAt: new Date() } }
-      );
+      const supabase = getSupabase();
+      const { error } = await supabase
+        .from('kade_newsletter')
+        .update({ status: 'unsubscribed', unsubscribed_at: new Date().toISOString() })
+        .eq('email', email.toLowerCase());
+      if (error) throw error;
       return res.status(200).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2 style="color:#eac321">Aboneliğiniz iptal edildi.</h2><p style="color:#888">Kade Media bülteninden başarıyla çıktınız.</p></body></html>');
     } catch {
       return res.status(500).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2>Bir hata oluştu, lütfen tekrar deneyin.</h2></body></html>');
@@ -246,8 +249,8 @@ export default async function handler(req, res) {
     let notified = false;
     // Save to DB
     try {
-      const db = await getDb();
-      await db.collection('messages').insertOne({
+      const supabase = getSupabase();
+      const { error: insertError } = await supabase.from('kade_messages').insert({
         name: name.trim(),
         email: email.trim().toLowerCase(),
         phone: phone?.trim() || '-',
@@ -255,15 +258,15 @@ export default async function handler(req, res) {
         service: service || '-',
         message: message.trim(),
         source: 'iletisim-formu',
-        consentAt: new Date(),
+        consent_at: new Date().toISOString(),
         status: 'yeni',
         read: false,
-        createdAt: new Date(),
       });
+      if (insertError) throw insertError;
       persisted = true;
-      logActivity(db, { action: 'Yeni mesaj alındı', detail: `${name.trim()} - ${service || 'Genel'}`, type: 'message', icon: '✉️', user: 'sistem' }).catch(() => {});
+      logActivity({ action: 'Yeni mesaj alındı', detail: `${name.trim()} - ${service || 'Genel'}`, type: 'message', icon: '✉️', user: 'sistem' }).catch(() => {});
     } catch (dbErr) {
-      console.error('MongoDB save failed (non-critical):', dbErr.message);
+      console.error('Supabase save failed (non-critical):', dbErr.message);
     }
 
     // Send notification email to team
@@ -362,18 +365,18 @@ async function handleNewsletter(req, res) {
     return res.status(400).json({ error: 'Geçerli bir e-posta adresi giriniz.' });
   }
   try {
-    const db = await getDb();
-    const collection = db.collection('newsletter');
-    const existing = await collection.findOne({ email: email.toLowerCase() });
-    if (existing) {
-      return res.status(200).json({ message: 'Bu e-posta zaten kayıtlı.' });
-    }
-    await collection.insertOne({
+    const supabase = getSupabase();
+    const { error } = await supabase.from('kade_newsletter').insert({
       email: email.toLowerCase(),
       status: 'active',
-      createdAt: new Date(),
       source: 'website',
     });
+    if (error) {
+      if (isUniqueViolation(error)) {
+        return res.status(200).json({ message: 'Bu e-posta zaten kayıtlı.' });
+      }
+      throw error;
+    }
     return res.status(200).json({ message: 'Aboneliğiniz başarıyla oluşturuldu!' });
   } catch (err) {
     console.error('Newsletter error:', err);

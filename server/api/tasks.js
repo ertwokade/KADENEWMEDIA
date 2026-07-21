@@ -1,7 +1,25 @@
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+
+function mapTask(row) {
+  if (!row) return row;
+  return {
+    _id: row.id,
+    title: row.title,
+    description: row.description,
+    assignedTo: row.assigned_to,
+    assignedBy: row.assigned_by,
+    dueDate: row.due_date,
+    priority: row.priority,
+    status: row.status,
+    relatedMessageId: row.related_message_id,
+    relatedClientName: row.related_client_name,
+    completedAt: row.completed_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -9,24 +27,25 @@ export default async function handler(req, res) {
   const user = await requirePermission(req, res, 'tasks', { write: req.method !== 'GET' });
   if (!user) return;
 
-  const db = await getDb();
-  const col = db.collection('tasks');
+  const supabase = getSupabase();
 
   // GET — list or single
   if (req.method === 'GET') {
     const { id, assignedTo, status, priority } = req.query;
     if (id) {
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-      const item = await col.findOne({ _id: new ObjectId(id) });
-      if (!item) return res.status(404).json({ error: 'Görev bulunamadı' });
-      return res.json(item);
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      const { data, error } = await supabase.from('kade_tasks').select('*').eq('id', id).maybeSingle();
+      if (error) throw error;
+      if (!data) return res.status(404).json({ error: 'Görev bulunamadı' });
+      return res.json(mapTask(data));
     }
-    const filter = {};
-    if (assignedTo) filter.assignedTo = assignedTo;
-    if (status) filter.status = status;
-    if (priority) filter.priority = priority;
-    const items = await col.find(filter).sort({ createdAt: -1 }).toArray();
-    return res.json(items);
+    let query = supabase.from('kade_tasks').select('*').order('created_at', { ascending: false });
+    if (assignedTo) query = query.eq('assigned_to', assignedTo);
+    if (status) query = query.eq('status', status);
+    if (priority) query = query.eq('priority', priority);
+    const { data, error } = await query;
+    if (error) throw error;
+    return res.json(data.map(mapTask));
   }
 
   // POST — create task
@@ -39,46 +58,55 @@ export default async function handler(req, res) {
     const task = {
       title: String(title).slice(0, 200),
       description: String(description || '').slice(0, 1000),
-      assignedTo: String(assignedTo || '').slice(0, 100),
-      assignedBy: user.username,
-      dueDate: dueDate ? new Date(dueDate) : null,
+      assigned_to: String(assignedTo || '').slice(0, 100),
+      assigned_by: user.username,
+      due_date: dueDate ? new Date(dueDate) : null,
       priority: validPriorities.includes(priority) ? priority : 'orta',
       status: 'beklemede',
-      relatedMessageId: relatedMessageId ? String(relatedMessageId).slice(0, 50) : null,
-      relatedClientName: String(relatedClientName || '').slice(0, 100),
-      completedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      related_message_id: relatedMessageId ? String(relatedMessageId).slice(0, 50) : null,
+      related_client_name: String(relatedClientName || '').slice(0, 100),
+      completed_at: null,
     };
 
-    const result = await col.insertOne(task);
-    task._id = result.insertedId;
-    return res.status(201).json(task);
+    const { data, error } = await supabase.from('kade_tasks').insert(task).select().single();
+    if (error) throw error;
+    return res.status(201).json(mapTask(data));
   }
 
   // PUT — update task
   if (req.method === 'PUT') {
     const { id, ...updates } = req.body;
-    if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+    if (!id || !isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
     const allowed = ['title', 'description', 'assignedTo', 'dueDate', 'priority', 'status', 'relatedClientName'];
+    const columnMap = {
+      title: 'title',
+      description: 'description',
+      assignedTo: 'assigned_to',
+      dueDate: 'due_date',
+      priority: 'priority',
+      status: 'status',
+      relatedClientName: 'related_client_name',
+    };
     const safeUpdates = {};
     for (const key of allowed) {
-      if (updates[key] !== undefined) safeUpdates[key] = updates[key];
+      if (updates[key] !== undefined) safeUpdates[columnMap[key]] = updates[key];
     }
-    if (updates.status === 'tamamlandi') safeUpdates.completedAt = new Date();
-    safeUpdates.updatedAt = new Date();
+    if (updates.status === 'tamamlandi') safeUpdates.completed_at = new Date();
+    safeUpdates.updated_at = new Date();
 
-    const result = await col.updateOne({ _id: new ObjectId(id) }, { $set: safeUpdates });
-    if (result.matchedCount === 0) return res.status(404).json({ error: 'Görev bulunamadı' });
+    const { data, error } = await supabase.from('kade_tasks').update(safeUpdates).eq('id', id).select();
+    if (error) throw error;
+    if (!data || data.length === 0) return res.status(404).json({ error: 'Görev bulunamadı' });
     return res.json({ success: true });
   }
 
   // DELETE
   if (req.method === 'DELETE') {
     const { id } = req.query;
-    if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-    await col.deleteOne({ _id: new ObjectId(id) });
+    if (!id || !isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+    const { error } = await supabase.from('kade_tasks').delete().eq('id', id);
+    if (error) throw error;
     return res.json({ success: true });
   }
 

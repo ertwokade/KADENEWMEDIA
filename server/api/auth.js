@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { getDb } from './_lib/mongodb.js';
+import { getSupabase } from './_lib/supabase.js';
 import { clearAuthCookies, createToken, getAuthorizedUser, getDefaultPermissions, requireAuth, setAuthCookies, setCsrfCookie } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
@@ -73,14 +73,22 @@ async function handleLogin(req, res) {
       return res.status(400).json({ error: 'Geçersiz kullanıcı adı formatı' });
     }
 
-    const db = await getDb();
+    const supabase = getSupabase();
 
-    const userCount = await db.collection('users').countDocuments();
-    if (userCount === 0) {
+    const { count: userCount, error: countError } = await supabase
+      .from('kade_users')
+      .select('id', { count: 'exact', head: true });
+    if (countError) throw countError;
+    if (!userCount) {
       return res.status(503).json({ error: 'Yönetici hesabı yapılandırılmamış. Güvenli seed işlemini çalıştırın.' });
     }
 
-    const user = await db.collection('users').findOne({ username });
+    const { data: user, error: findError } = await supabase
+      .from('kade_users')
+      .select('id, username, password_hash, role, session_version')
+      .eq('username', username)
+      .maybeSingle();
+    if (findError) throw findError;
 
     if (!user) {
       return res.status(401).json({ error: 'Geçersiz kullanıcı adı veya şifre' });
@@ -88,7 +96,7 @@ async function handleLogin(req, res) {
 
     let valid = false;
     try {
-      valid = await bcrypt.compare(password, user.password);
+      valid = await bcrypt.compare(password, user.password_hash);
     } catch (bcryptErr) {
       console.error('bcrypt compare hatası:', bcryptErr.message);
     }
@@ -98,21 +106,21 @@ async function handleLogin(req, res) {
     }
 
     const token = createToken({
-      id: user._id.toString(),
+      id: user.id,
       username: user.username,
       role: user.role,
-      sessionVersion: Number(user.sessionVersion || 0),
+      sessionVersion: Number(user.session_version || 0),
     });
     const csrfToken = setAuthCookies(req, res, token);
 
-    logActivity(db, { action: 'Admin girişi yapıldı', detail: `${user.username} giriş yaptı`, type: 'system', icon: '🔐', user: user.username }).catch(() => {});
+    logActivity({ action: 'Admin girişi yapıldı', detail: `${user.username} giriş yaptı`, type: 'system', icon: '🔐', user: user.username }).catch(() => {});
 
     return res.status(200).json({
       csrfToken,
       user: {
         username: user.username,
         role: user.role,
-        permissions: user.permissions || getDefaultPermissions(user.role),
+        permissions: getDefaultPermissions(user.role),
       }
     });
   } catch (error) {
@@ -121,12 +129,12 @@ async function handleLogin(req, res) {
     if (
       msg.includes('bad auth') || error.code === 8000 ||
       msg.includes('Authentication failed') ||
-      msg.includes('MONGODB_URI') ||
-      msg.includes('tanımlı değil')
+      msg.includes('SUPABASE_URL') || msg.includes('SUPABASE_SERVICE_ROLE_KEY') ||
+      msg.includes('tanımlı değil') || msg.includes('Invalid API key')
     ) {
       return res.status(500).json({ error: 'Veritabanı bağlantı hatası. Lütfen yöneticinize başvurun.' });
     }
-    if (msg.includes('timed out') || msg.includes('ECONNREFUSED') || msg.includes('ETIMEDOUT') || error.name === 'MongoNetworkError') {
+    if (msg.includes('timed out') || msg.includes('ECONNREFUSED') || msg.includes('ETIMEDOUT') || msg.includes('fetch failed')) {
       return res.status(503).json({ error: 'Veritabanına ulaşılamıyor. Lütfen birkaç saniye sonra tekrar deneyin.' });
     }
     return res.status(500).json({ error: 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.' });
@@ -153,27 +161,33 @@ async function handleChangePassword(req, res) {
       return res.status(400).json({ error: 'Yeni şifre 12–128 karakter arasında olmalı' });
     }
 
-    const db = await getDb();
-    const dbUser = await db.collection('users').findOne({ username: user.username });
+    const supabase = getSupabase();
+    const { data: dbUser, error: findError } = await supabase
+      .from('kade_users')
+      .select('id, username, password_hash, role, session_version')
+      .eq('username', user.username)
+      .maybeSingle();
+    if (findError) throw findError;
 
     if (!dbUser) {
       return res.status(404).json({ error: 'Kullanıcı bulunamadı' });
     }
 
-    const valid = await bcrypt.compare(currentPassword, dbUser.password);
+    const valid = await bcrypt.compare(currentPassword, dbUser.password_hash);
     if (!valid) {
       return res.status(401).json({ error: 'Mevcut şifre hatalı' });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 12);
-    const sessionVersion = Number(dbUser.sessionVersion || 0) + 1;
-    await db.collection('users').updateOne(
-      { username: user.username },
-      { $set: { password: hashedPassword, sessionVersion, updatedAt: new Date() } }
-    );
+    const sessionVersion = Number(dbUser.session_version || 0) + 1;
+    const { error: updateError } = await supabase
+      .from('kade_users')
+      .update({ password_hash: hashedPassword, session_version: sessionVersion, updated_at: new Date().toISOString() })
+      .eq('username', user.username);
+    if (updateError) throw updateError;
 
     const token = createToken({
-      id: dbUser._id.toString(),
+      id: dbUser.id,
       username: dbUser.username,
       role: dbUser.role,
       sessionVersion,

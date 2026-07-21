@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
-import { getDb } from './_lib/mongodb.js'
+import { getSupabase, isUniqueViolation } from './_lib/supabase.js'
 import { cors } from './_lib/cors.js'
 import { buildPackageObject } from './_lib/packages.js'
 import { requireAdmin } from './_lib/auth.js'
@@ -32,14 +32,13 @@ export function verifyShopierSignature(body, apiSecret) {
   } catch { return false }
 }
 
-export async function reserveShopierOrder(collection, order) {
-  try {
-    await collection.insertOne(order)
-    return true
-  } catch (error) {
-    if (error?.code === 11000) return false
-    throw error
-  }
+// Siparişi paket yetkisi vermeden önce atomik olarak rezerve et. Unique index,
+// eşzamanlı webhook replay'lerinde yalnızca tek isteğin ilerlemesini sağlar.
+export async function reserveShopierOrder(supabase, order) {
+  const { error } = await supabase.from('kade_shopier_orders').insert(order)
+  if (!error) return true
+  if (isUniqueViolation(error)) return false
+  throw error
 }
 
 function parseBody(req) {
@@ -66,10 +65,11 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
+  const supabase = getSupabase()
+
   if (req.query?.action === 'reconcile') {
     if (!(await requireAdmin(req, res))) return
-    const db = await getDb()
-    const summary = await reconcileShopierOrders(db, { limit: req.body?.limit })
+    const summary = await reconcileShopierOrders(supabase, { limit: req.body?.limit })
     return res.status(200).json({ success: true, summary })
   }
 
@@ -113,25 +113,21 @@ export default async function handler(req, res) {
   const paymentValidation = validateShopierPayment(body)
 
   try {
-    const db = await getDb()
-    await db.collection('shopier_orders').createIndex({ shopierOrderId: 1 }, { unique: true, sparse: true }).catch(() => {})
-
-    // Siparişi paket yetkisi vermeden önce atomik olarak rezerve et. Unique index,
-    // eşzamanlı webhook replay'lerinde yalnızca tek isteğin ilerlemesini sağlar.
-    const reserved = await reserveShopierOrder(db.collection('shopier_orders'), {
-      shopierOrderId: orderId,
+    const reserved = await reserveShopierOrder(supabase, {
+      shopier_order_id: orderId,
       state: 'processing',
       email,
-      productReference: String(product_reference || '').slice(0, 120),
-      receivedAt: new Date(),
+      product_reference: String(product_reference || '').slice(0, 120),
     })
     if (!reserved) return res.status(200).json({ success: true, duplicate: true })
 
     if (!paymentValidation.ok) {
-      await db.collection('shopier_orders').updateOne(
-        { shopierOrderId: orderId, state: 'processing' },
-        { $set: { state: 'rejected', reason: paymentValidation.reason, updatedAt: new Date() } }
-      )
+      const { error } = await supabase
+        .from('kade_shopier_orders')
+        .update({ state: 'rejected', reason: paymentValidation.reason, updated_at: new Date().toISOString() })
+        .eq('shopier_order_id', orderId)
+        .eq('state', 'processing')
+      if (error) throw error
       return res.status(200).json({ success: true, rejected: true, reason: paymentValidation.reason })
     }
 
@@ -146,80 +142,99 @@ export default async function handler(req, res) {
     if (!pkg) {
       // Bilinmeyen ürün — yine de kaydı tut (admin görebilsin)
       console.warn(`Shopier webhook: bilinmeyen product_reference: ${product_reference}`)
-      await db.collection('shopier_unknown_orders').insertOne({
+      const { error: unknownError } = await supabase.from('kade_shopier_unknown_orders').insert({
         buyer_email: email,
         buyer_name: String(buyer_name || '').slice(0, 200),
         product_reference: String(product_reference || '').slice(0, 120),
         product_price: String(product_price || '').slice(0, 40),
         platform_order_id: orderId,
-        receivedAt: new Date(),
       })
-      await db.collection('shopier_orders').updateOne(
-        { shopierOrderId: orderId },
-        { $set: { state: 'ignored', reason: 'unknown_reference', updatedAt: new Date() } }
-      )
+      if (unknownError) throw unknownError
+      const { error: updateError } = await supabase
+        .from('kade_shopier_orders')
+        .update({ state: 'ignored', reason: 'unknown_reference', updated_at: new Date().toISOString() })
+        .eq('shopier_order_id', orderId)
+      if (updateError) throw updateError
       return res.status(200).json({ success: true, note: 'unknown_reference' })
     }
 
     // Müşteri bul ya da oluştur
-    let customer = await db.collection('customers').findOne({ email })
+    let { data: customer, error: findError } = await supabase
+      .from('kade_customers')
+      .select('id, name, email')
+      .eq('email', email)
+      .maybeSingle()
+    if (findError) throw findError
 
     if (!customer) {
       // Yeni müşteri oluştur (şifresiz — müşteri sonradan şifresi sıfırlayabilir)
       const tempPassword = await bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10)
-      const now = new Date()
-      const result = await db.collection('customers').insertOne({
+      const { data: created, error: createError } = await supabase.from('kade_customers').insert({
         name: buyer_name || email,
         email,
         phone: null,
-        password: tempPassword,
-        packages: [pkg],
+        password_hash: tempPassword,
         status: 'active',
-        createdAt: now,
-        updatedAt: now,
-        lastLoginAt: null,
         source: 'shopier',
-      })
-      customer = { _id: result.insertedId, name: buyer_name || email, email }
-    } else {
-      // Mevcut müşteriye paket ekle
-      await db.collection('customers').updateOne(
-        { email },
-        { $push: { packages: pkg }, $set: { updatedAt: new Date() } }
-      )
+        last_login_at: null,
+      }).select('id, name, email').single()
+      if (createError) throw createError
+      customer = created
     }
+
+    const { error: pkgInsertError } = await supabase.from('kade_customer_packages').insert({
+      customer_id: customer.id,
+      reference: pkg.reference,
+      name: pkg.name,
+      consulting_area: pkg.consultingArea,
+      features: pkg.features,
+      access: pkg.access,
+      status: pkg.status,
+      source: pkg.source,
+      shopier_order_id: pkg.shopierOrderId,
+      price: pkg.price,
+      currency: pkg.currency || paymentValidation.product.currency || null,
+      purchased_at: pkg.purchasedAt instanceof Date ? pkg.purchasedAt.toISOString() : pkg.purchasedAt,
+      expires_at: pkg.expiresAt instanceof Date ? pkg.expiresAt.toISOString() : pkg.expiresAt,
+    })
+    if (pkgInsertError) throw pkgInsertError
     packageGranted = true
 
     // Rezerve edilen siparişi tamamla; tekrar insert ederek yarış penceresi açma.
-    await db.collection('shopier_orders').updateOne(
-      { shopierOrderId: orderId, state: 'processing' },
-      { $set: {
+    const { error: completeError } = await supabase
+      .from('kade_shopier_orders')
+      .update({
         state: 'completed',
-        customerId: customer._id.toString(),
-        packageId: pkg.id,
-        packageName: pkg.name,
-        productReference: product_reference,
+        customer_id: customer.id,
+        package_id: pkg.id,
+        package_name: pkg.name,
+        product_reference: String(product_reference || ''),
         price: pkg.price,
         currency: paymentValidation.product.currency,
-        completedAt: new Date(),
-      } }
-    )
+        completed_at: new Date().toISOString(),
+      })
+      .eq('shopier_order_id', orderId)
+      .eq('state', 'processing')
+    if (completeError) throw completeError
 
     return res.status(200).json({ success: true })
   } catch (err) {
-    if (err?.code === 11000) {
+    if (isUniqueViolation(err)) {
       return res.status(200).json({ success: true, duplicate: true })
     }
     try {
-      const db = await getDb()
       if (orderId) {
         if (packageGranted) {
-          await db.collection('shopier_orders').updateOne(
-            { shopierOrderId: orderId },
-            { $set: { state: 'completed_with_record_error', updatedAt: new Date() } }
-          )
+          await supabase
+            .from('kade_shopier_orders')
+            .update({ state: 'completed_with_record_error', updated_at: new Date().toISOString() })
+            .eq('shopier_order_id', orderId)
         } else {
-          await db.collection('shopier_orders').deleteOne({ shopierOrderId: orderId, state: 'processing' })
+          await supabase
+            .from('kade_shopier_orders')
+            .delete()
+            .eq('shopier_order_id', orderId)
+            .eq('state', 'processing')
         }
       }
     } catch { /* keep the original failure response */ }

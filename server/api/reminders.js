@@ -1,10 +1,9 @@
-import { ObjectId } from 'mongodb';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid } from './_lib/supabase.js';
 import { requireAuth, requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
-import { logActivity, createNotification } from './_lib/notify.js';
+import { logActivity, createNotification } from './notifications.js';
 
 function makeTransporter() {
   const host = process.env.SMTP_HOST;
@@ -36,6 +35,27 @@ function escapeICS(str) {
 
 function cleanHeader(str, max = 200) {
   return String(str || '').replace(/[\r\n]+/g, ' ').trim().slice(0, max);
+}
+
+function mapReminder(r) {
+  if (!r) return r;
+  return {
+    _id: r.id,
+    id: r.id,
+    title: r.title,
+    description: r.description,
+    remindAt: r.remind_at,
+    emails: r.emails,
+    assignedUsers: r.assigned_users,
+    priority: r.priority,
+    category: r.category,
+    repeat: r.repeat,
+    status: r.status,
+    createdBy: r.created_by,
+    lastSentAt: r.last_sent_at,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  };
 }
 
 function getEmails(reminder) {
@@ -75,8 +95,7 @@ function verifyVercelSignature(req) {
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const db = await getDb();
-  const collection = db.collection('reminders');
+  const supabase = getSupabase();
   const action = req.query?.action;
 
   // ── Cron: Zamanı gelen hatırlatıcıları gönder (GET veya POST, auth VEYA CRON_SECRET) ──
@@ -97,10 +116,12 @@ export default async function handler(req, res) {
 
     try {
       const now = new Date();
-      const pending = await collection.find({
-        status: 'active',
-        remindAt: { $lte: now },
-      }).toArray();
+      const { data: pending, error: pendingError } = await supabase
+        .from('kade_reminders')
+        .select('*')
+        .eq('status', 'active')
+        .lte('remind_at', now.toISOString());
+      if (pendingError) throw pendingError;
 
       if (pending.length === 0) return res.status(200).json({ sent: 0, notifications: 0, total: 0, smtpConfigured: !!makeTransporter() });
 
@@ -135,7 +156,7 @@ export default async function handler(req, res) {
                     ${reminder.description ? `<p style="color:#ccc;line-height:1.8;margin:0 0 16px;padding:14px;background:#1a1a1a;border-radius:8px;border-left:3px solid ${color};">${escapeHtml(reminder.description)}</p>` : ''}
                     <table style="width:100%;border-collapse:collapse;">
                       <tr><td style="padding:8px 0;color:#888;width:120px;">Öncelik</td><td style="padding:8px 0;color:${color};font-weight:600;">${label}</td></tr>
-                      <tr><td style="padding:8px 0;color:#888;">Tarih</td><td style="padding:8px 0;color:#fff;">${new Date(reminder.remindAt).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })}</td></tr>
+                      <tr><td style="padding:8px 0;color:#888;">Tarih</td><td style="padding:8px 0;color:#fff;">${new Date(reminder.remind_at).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })}</td></tr>
                       ${reminder.category ? `<tr><td style="padding:8px 0;color:#888;">Kategori</td><td style="padding:8px 0;color:#fff;">${escapeHtml(reminder.category)}</td></tr>` : ''}
                     </table>
                     <div style="text-align:center;margin:24px 0;">
@@ -158,10 +179,10 @@ export default async function handler(req, res) {
         }
 
         // Sistem içi bildirim oluştur (assignedUsers varsa)
-        if (reminder.assignedUsers && Array.isArray(reminder.assignedUsers) && reminder.assignedUsers.length > 0) {
-          for (const userId of reminder.assignedUsers) {
+        if (reminder.assigned_users && Array.isArray(reminder.assigned_users) && reminder.assigned_users.length > 0) {
+          for (const userId of reminder.assigned_users) {
             try {
-              await createNotification(db, {
+              await createNotification({
                 userId,
                 type: 'reminder',
                 title: `⏰ ${reminder.title}`,
@@ -178,20 +199,22 @@ export default async function handler(req, res) {
 
         // Tekrarlayan mı?
         if (reminder.repeat && reminder.repeat !== 'none') {
-          const next = new Date(reminder.remindAt);
+          const next = new Date(reminder.remind_at);
           if (reminder.repeat === 'daily') next.setDate(next.getDate() + 1);
           else if (reminder.repeat === 'weekly') next.setDate(next.getDate() + 7);
           else if (reminder.repeat === 'monthly') next.setMonth(next.getMonth() + 1);
 
-          await collection.updateOne(
-            { _id: reminder._id },
-            { $set: { remindAt: next, lastSentAt: now } }
-          );
+          const { error: updError } = await supabase
+            .from('kade_reminders')
+            .update({ remind_at: next.toISOString(), last_sent_at: now.toISOString() })
+            .eq('id', reminder.id);
+          if (updError) throw updError;
         } else {
-          await collection.updateOne(
-            { _id: reminder._id },
-            { $set: { status: 'sent', lastSentAt: now } }
-          );
+          const { error: updError } = await supabase
+            .from('kade_reminders')
+            .update({ status: 'sent', last_sent_at: now.toISOString() })
+            .eq('id', reminder.id);
+          if (updError) throw updError;
         }
       }
 
@@ -215,9 +238,11 @@ export default async function handler(req, res) {
   // ── GET — Tüm hatırlatıcıları getir ──
   if (req.method === 'GET') {
     const status = req.query?.status;
-    const filter = status && status !== 'all' ? { status } : {};
-    const reminders = await collection.find(filter).sort({ remindAt: 1 }).toArray();
-    return res.status(200).json(reminders);
+    let query = supabase.from('kade_reminders').select('*').order('remind_at', { ascending: true });
+    if (status && status !== 'all') query = query.eq('status', status);
+    const { data: reminders, error } = await query;
+    if (error) throw error;
+    return res.status(200).json(reminders.map(mapReminder));
   }
 
   // ── POST — Yeni hatırlatıcı oluştur ──
@@ -238,21 +263,21 @@ export default async function handler(req, res) {
     const reminder = {
       title: title.trim(),
       description: description?.trim() || '',
-      remindAt: new Date(remindAt),
+      remind_at: new Date(remindAt).toISOString(),
       emails: emailList,
-      assignedUsers: Array.isArray(assignedUsers) ? assignedUsers : [],
+      assigned_users: Array.isArray(assignedUsers) ? assignedUsers : [],
       priority: priority || 'medium',
       category: category?.trim() || '',
       repeat: repeat || 'none',
       status: 'active',
-      createdBy: user.username,
-      createdAt: new Date(),
-      lastSentAt: null,
+      created_by: user.username,
+      last_sent_at: null,
     };
 
-    const result = await collection.insertOne(reminder);
-    logActivity(db, { action: 'Yeni hatırlatıcı oluşturuldu', detail: title.trim(), type: 'create', icon: '⏰', user: user.username }).catch(() => {});
-    return res.status(201).json({ ...reminder, _id: result.insertedId });
+    const { data: created, error } = await supabase.from('kade_reminders').insert(reminder).select().single();
+    if (error) throw error;
+    logActivity({ action: 'Yeni hatırlatıcı oluşturuldu', detail: title.trim(), type: 'create', icon: '⏰', user: user.username }).catch(() => {});
+    return res.status(201).json(mapReminder(created));
   }
 
   // ── PUT — Hatırlatıcı güncelle ──
@@ -262,22 +287,23 @@ export default async function handler(req, res) {
 
     const { id, title, description, remindAt, emails, priority, category, repeat, status, assignedUsers } = body || {};
     if (!id) return res.status(400).json({ error: 'id gerekli' });
-    if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+    if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
     const update = {};
     if (title !== undefined) update.title = title.trim();
     if (description !== undefined) update.description = description.trim();
-    if (remindAt !== undefined) update.remindAt = new Date(remindAt);
+    if (remindAt !== undefined) update.remind_at = new Date(remindAt).toISOString();
     if (emails !== undefined) update.emails = Array.isArray(emails) ? emails.filter(e => e && e.includes('@')) : [];
-    if (assignedUsers !== undefined) update.assignedUsers = Array.isArray(assignedUsers) ? assignedUsers : [];
+    if (assignedUsers !== undefined) update.assigned_users = Array.isArray(assignedUsers) ? assignedUsers : [];
     if (priority !== undefined) update.priority = priority;
     if (category !== undefined) update.category = category.trim();
     if (repeat !== undefined) update.repeat = repeat;
     if (status !== undefined) update.status = status;
-    update.updatedAt = new Date();
+    update.updated_at = new Date().toISOString();
 
-    await collection.updateOne({ _id: new ObjectId(id) }, { $set: update });
-    logActivity(db, { action: 'Hatırlatıcı güncellendi', detail: title || id, type: 'update', icon: '⏰', user: user.username }).catch(() => {});
+    const { error } = await supabase.from('kade_reminders').update(update).eq('id', id);
+    if (error) throw error;
+    logActivity({ action: 'Hatırlatıcı güncellendi', detail: title || id, type: 'update', icon: '⏰', user: user.username }).catch(() => {});
     return res.status(200).json({ success: true });
   }
 
@@ -285,9 +311,10 @@ export default async function handler(req, res) {
   if (req.method === 'DELETE') {
     const id = req.query?.id;
     if (!id) return res.status(400).json({ error: 'id gerekli' });
-    if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-    await collection.deleteOne({ _id: new ObjectId(id) });
-    logActivity(db, { action: 'Hatırlatıcı silindi', detail: id, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+    if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+    const { error } = await supabase.from('kade_reminders').delete().eq('id', id);
+    if (error) throw error;
+    logActivity({ action: 'Hatırlatıcı silindi', detail: id, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
     return res.status(200).json({ success: true });
   }
 
@@ -312,9 +339,12 @@ export default async function handler(req, res) {
     const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const emails = (Array.isArray(customEmails) ? customEmails : []).filter(e => typeof e === 'string' && EMAIL_RE.test(e.trim())).map(e => e.trim());
     if (recipients && recipients.length > 0) {
-      const validIds = recipients.filter(id => isValidObjectId(id)).map(id => new ObjectId(id));
-      const users = await db.collection('users').find({ _id: { $in: validIds } }).project({ email: 1 }).toArray();
-      users.forEach(u => { if (u.email) emails.push(u.email); });
+      const validIds = recipients.filter(id => isValidUuid(id));
+      if (validIds.length > 0) {
+        const { data: users, error: usersError } = await supabase.from('kade_users').select('email').in('id', validIds);
+        if (usersError) throw usersError;
+        users.forEach(u => { if (u.email) emails.push(u.email); });
+      }
     }
     if (emails.length === 0) return res.status(400).json({ error: 'Geçerli e-posta adresi bulunamadı' });
 

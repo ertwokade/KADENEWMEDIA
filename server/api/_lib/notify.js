@@ -1,16 +1,18 @@
 // Shared notification/activity helpers imported by API handlers.
+import { getSupabase } from './supabase.js';
 
-export async function createNotification(db, { userId, type, title, message, link }) {
+export async function createNotification({ userId, type, title, message, link }) {
   try {
-    await db.collection('notifications').insertOne({
-      userId,
+    const supabase = getSupabase();
+    const { error } = await supabase.from('kade_notifications').insert({
+      user_id: userId,
       type: type || 'info',
       title,
       message,
       link: link || null,
       read: false,
-      createdAt: new Date(),
     });
+    if (error) throw error;
     return true;
   } catch (err) {
     console.error('Notification write failed:', err.message);
@@ -18,20 +20,20 @@ export async function createNotification(db, { userId, type, title, message, lin
   }
 }
 
-export async function logActivity(db, { action, detail, type, icon, user }) {
+export async function logActivity({ action, detail, type, icon, user }) {
   try {
-    await db.collection('activity_log').insertOne({
+    const supabase = getSupabase();
+    const { error } = await supabase.from('kade_activity_log').insert({
       action,
       detail: detail || '',
       type: type || 'system',
       icon: icon || 'system',
       user: user || 'sistem',
-      createdAt: new Date(),
     });
+    if (error) throw error;
     return true;
   } catch (err) {
     console.error('Activity log write failed:', err.message);
     return false;
   }
 }
-

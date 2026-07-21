@@ -1,6 +1,5 @@
 import nodemailer from 'nodemailer';
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
@@ -89,16 +88,19 @@ export default async function handler(req, res) {
       .map(e => e.trim());
 
     if (recipients && recipients.length > 0) {
-      const db = await getDb();
-      const validIds = recipients.filter(id => isValidObjectId(id)).map(id => new ObjectId(id));
-      const users = await db.collection('users')
-        .find({ _id: { $in: validIds } })
-        .project({ username: 1, email: 1 })
-        .toArray();
+      const supabase = getSupabase();
+      const validIds = recipients.filter(id => isValidUuid(id));
+      if (validIds.length > 0) {
+        const { data: users, error: usersError } = await supabase
+          .from('kade_users')
+          .select('username, email')
+          .in('id', validIds);
+        if (usersError) throw usersError;
 
-      users.forEach(u => {
-        if (u.email) emails.push(u.email);
-      });
+        users.forEach(u => {
+          if (u.email) emails.push(u.email);
+        });
+      }
     }
 
     if (emails.length === 0) {

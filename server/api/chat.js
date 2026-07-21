@@ -1,19 +1,19 @@
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import { getAuthorizedUser } from './_lib/auth.js';
-import { getDb } from './_lib/mongodb.js';
+import { getSupabase } from './_lib/supabase.js';
 
 async function logAiUsage(scope, model, usageMeta) {
   try {
-    const db = await getDb();
-    await db.collection('ai_usage').insertOne({
+    const supabase = getSupabase();
+    const { error } = await supabase.from('kade_ai_usage').insert({
       scope,
       model,
-      promptTokens: usageMeta?.promptTokenCount || 0,
-      outputTokens: usageMeta?.candidatesTokenCount || 0,
-      totalTokens: usageMeta?.totalTokenCount || 0,
-      createdAt: new Date(),
+      prompt_tokens: usageMeta?.promptTokenCount || 0,
+      output_tokens: usageMeta?.candidatesTokenCount || 0,
+      total_tokens: usageMeta?.totalTokenCount || 0,
     });
+    if (error) throw error;
   } catch (e) { /* non-fatal */ }
 }
 

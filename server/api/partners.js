@@ -1,5 +1,4 @@
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid, isUniqueViolation } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
@@ -26,17 +25,65 @@ export function sanitizePartnerUpdate(value) {
   return clean;
 }
 
+// DB'de `id` UUID PK'dir (değişmez); eski Mongo şemasında `id` alanı slug değeriydi.
+// Geriye dönük uyumluluk için gelen `id`/`slug` alanlarını `slug` koluna eşliyoruz.
+function partnerInputToRow(clean) {
+  const row = {};
+  const slugValue = clean.slug !== undefined ? clean.slug : clean.id;
+  if (slugValue !== undefined) row.slug = slugValue;
+  if (clean.name !== undefined) row.name = clean.name;
+  if (clean.category !== undefined) row.category = clean.category;
+  if (clean.categoryEn !== undefined) row.category_en = clean.categoryEn;
+  if (clean.logo !== undefined) row.logo = clean.logo;
+  if (clean.color !== undefined) row.color = clean.color;
+  if (clean.descTr !== undefined) row.desc_tr = clean.descTr;
+  if (clean.descEn !== undefined) row.desc_en = clean.descEn;
+  if (clean.longDescTr !== undefined) row.long_desc_tr = clean.longDescTr;
+  if (clean.longDescEn !== undefined) row.long_desc_en = clean.longDescEn;
+  if (clean.servicesTr !== undefined) row.services_tr = clean.servicesTr;
+  if (clean.servicesEn !== undefined) row.services_en = clean.servicesEn;
+  if (clean.resultsTr !== undefined) row.results_tr = clean.resultsTr;
+  if (clean.resultsEn !== undefined) row.results_en = clean.resultsEn;
+  return row;
+}
+
+// `id` cevapta eski slug-tabanlı davranışı korumak için `slug` değerini taşır;
+// gerçek Postgres UUID PK `_id` alanında döner (Admin.jsx güncelleme/silme için kullanıyor).
+function rowToPartner(row) {
+  if (!row) return row;
+  return {
+    _id: row.id,
+    id: row.slug,
+    slug: row.slug,
+    name: row.name,
+    category: row.category,
+    categoryEn: row.category_en,
+    logo: row.logo,
+    color: row.color,
+    descTr: row.desc_tr,
+    descEn: row.desc_en,
+    longDescTr: row.long_desc_tr,
+    longDescEn: row.long_desc_en,
+    servicesTr: row.services_tr,
+    servicesEn: row.services_en,
+    resultsTr: row.results_tr,
+    resultsEn: row.results_en,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
-  const db = await getDb();
-  const collection = db.collection('partners');
+  const supabase = getSupabase();
 
   // GET - List all partners (public)
   if (req.method === 'GET') {
     try {
-      const partners = await collection.find({}).sort({ createdAt: -1 }).toArray();
-      return res.status(200).json(partners);
+      const { data, error } = await supabase.from('kade_partners').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json(data.map(rowToPartner));
     } catch (error) {
       console.error('Partners GET error:', error);
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -63,15 +110,18 @@ export default async function handler(req, res) {
         .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
         .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
         .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      const partner = {
-        id: slug, name, category, categoryEn, logo, color,
+      const row = partnerInputToRow({
+        slug, name, category, categoryEn, logo, color,
         descTr, descEn, longDescTr, longDescEn,
         servicesTr, servicesEn, resultsTr, resultsEn,
-        createdAt: new Date(), updatedAt: new Date(),
-      };
-      const result = await collection.insertOne(partner);
-      logActivity(db, { action: 'Partner eklendi', detail: `${req.body.name || ''}`, type: 'create', icon: '🤝', user: user.username }).catch(() => {});
-      return res.status(201).json({ ...partner, _id: result.insertedId });
+      });
+      const { data, error } = await supabase.from('kade_partners').insert(row).select().single();
+      if (error) {
+        if (isUniqueViolation(error)) return res.status(400).json({ error: 'Bu slug zaten kullanılıyor' });
+        throw error;
+      }
+      logActivity({ action: 'Partner eklendi', detail: `${req.body.name || ''}`, type: 'create', icon: '🤝', user: user.username }).catch(() => {});
+      return res.status(201).json(rowToPartner(data));
     } catch (error) {
       console.error('Partners POST error:', error);
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -86,16 +136,22 @@ export default async function handler(req, res) {
     try {
       const { _id, ...rawUpdateData } = req.body;
       if (!_id) return res.status(400).json({ error: 'Partner ID gerekli' });
-      if (!isValidObjectId(_id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(_id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
       const updateData = sanitizePartnerUpdate(rawUpdateData);
       if (!updateData) return res.status(400).json({ error: 'Partner verisi geçersiz' });
 
-      updateData.updatedAt = new Date();
-      const result = await collection.updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
-      if (result.matchedCount === 0) return res.status(404).json({ error: 'Partner bulunamadı' });
+      const row = partnerInputToRow(updateData);
+      row.updated_at = new Date().toISOString();
 
-      logActivity(db, { action: 'Partner güncellendi', detail: `${updateData.name || _id}`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
+      const { data, error } = await supabase.from('kade_partners').update(row).eq('id', _id).select('id');
+      if (error) {
+        if (isUniqueViolation(error)) return res.status(400).json({ error: 'Bu slug zaten kullanılıyor' });
+        throw error;
+      }
+      if (!data || data.length === 0) return res.status(404).json({ error: 'Partner bulunamadı' });
+
+      logActivity({ action: 'Partner güncellendi', detail: `${updateData.name || _id}`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Partner güncellendi' });
     } catch (error) {
       console.error('Partners PUT error:', error);
@@ -111,13 +167,16 @@ export default async function handler(req, res) {
     try {
       const queryId = req.body?.id || req.query.id;
       if (!queryId) return res.status(400).json({ error: 'Partner ID gerekli' });
-      if (!isValidObjectId(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(queryId)) return res.status(400).json({ error: 'Geçersiz ID' });
 
-      const partner = await collection.findOne({ _id: new ObjectId(queryId) });
-      const result = await collection.deleteOne({ _id: new ObjectId(queryId) });
-      if (result.deletedCount === 0) return res.status(404).json({ error: 'Partner bulunamadı' });
+      const { data: partner, error: findError } = await supabase.from('kade_partners').select('name').eq('id', queryId).maybeSingle();
+      if (findError) throw findError;
 
-      logActivity(db, { action: 'Partner silindi', detail: `${partner?.name || queryId}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      const { data, error } = await supabase.from('kade_partners').delete().eq('id', queryId).select('id');
+      if (error) throw error;
+      if (!data || data.length === 0) return res.status(404).json({ error: 'Partner bulunamadı' });
+
+      logActivity({ action: 'Partner silindi', detail: `${partner?.name || queryId}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Partner silindi' });
     } catch (error) {
       console.error('Partners DELETE error:', error);

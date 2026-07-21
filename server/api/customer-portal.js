@@ -35,12 +35,12 @@ async function handleGetProfile(req, res, customer) {
 
     return res.status(200).json({
       customer: {
-        id: customer._id.toString(),
+        id: customer.id,
         name: customer.name,
         email: customer.email,
         phone: customer.phone,
-        createdAt: customer.createdAt,
-        lastLoginAt: customer.lastLoginAt,
+        createdAt: customer.created_at,
+        lastLoginAt: customer.last_login_at,
       },
       consultingAreas,
       features,

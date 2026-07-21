@@ -1,6 +1,5 @@
-import { ObjectId } from 'mongodb';
 import nodemailer from 'nodemailer';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 
@@ -24,29 +23,53 @@ function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function mapProposal(row) {
+  if (!row) return row;
+  return {
+    _id: row.id,
+    proposalNumber: row.proposal_number,
+    clientName: row.client_name,
+    clientEmail: row.client_email,
+    clientPhone: row.client_phone,
+    clientCompany: row.client_company,
+    services: row.services,
+    totalAmount: row.total_amount,
+    currency: row.currency,
+    validUntil: row.valid_until,
+    notes: row.notes,
+    messageId: row.message_id,
+    status: row.status,
+    sentAt: row.sent_at,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
   const user = await requirePermission(req, res, 'proposals', { write: req.method !== 'GET' });
   if (!user) return;
 
-  const db = await getDb();
-  const col = db.collection('proposals');
+  const supabase = getSupabase();
 
   // GET — list proposals or single
   if (req.method === 'GET') {
     const { id, messageId, status } = req.query;
     if (id) {
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-      const item = await col.findOne({ _id: new ObjectId(id) });
-      if (!item) return res.status(404).json({ error: 'Teklif bulunamadı' });
-      return res.json(item);
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      const { data, error } = await supabase.from('kade_proposals').select('*').eq('id', id).maybeSingle();
+      if (error) throw error;
+      if (!data) return res.status(404).json({ error: 'Teklif bulunamadı' });
+      return res.json(mapProposal(data));
     }
-    const filter = {};
-    if (messageId) filter.messageId = messageId;
-    if (status) filter.status = status;
-    const items = await col.find(filter).sort({ createdAt: -1 }).toArray();
-    return res.json(items);
+    let query = supabase.from('kade_proposals').select('*').order('created_at', { ascending: false });
+    if (messageId) query = query.eq('message_id', messageId);
+    if (status) query = query.eq('status', status);
+    const { data, error } = await query;
+    if (error) throw error;
+    return res.json(data.map(mapProposal));
   }
 
   // POST — create proposal
@@ -62,31 +85,30 @@ export default async function handler(req, res) {
     }
 
     const proposalNumber = `KM-${Date.now().toString().slice(-6)}`;
-    const proposal = {
-      proposalNumber,
-      clientName: String(clientName).slice(0, 100),
-      clientEmail: String(clientEmail).slice(0, 200),
-      clientPhone: String(clientPhone || '').slice(0, 20),
-      clientCompany: String(clientCompany || '').slice(0, 100),
+    const proposalInsert = {
+      proposal_number: proposalNumber,
+      client_name: String(clientName).slice(0, 100),
+      client_email: String(clientEmail).slice(0, 200),
+      client_phone: String(clientPhone || '').slice(0, 20),
+      client_company: String(clientCompany || '').slice(0, 100),
       services: services.slice(0, 20).map(s => ({
         name: String(s.name || '').slice(0, 100),
         description: String(s.description || '').slice(0, 300),
         amount: Number(s.amount) || 0,
         quantity: Number(s.quantity) || 1,
       })),
-      totalAmount: Number(totalAmount) || 0,
+      total_amount: Number(totalAmount) || 0,
       currency: String(currency || 'TRY').slice(0, 5),
-      validUntil: validUntil ? new Date(validUntil) : null,
+      valid_until: validUntil ? new Date(validUntil) : null,
       notes: String(notes || '').slice(0, 1000),
-      messageId: messageId ? String(messageId).slice(0, 50) : null,
+      message_id: messageId ? String(messageId).slice(0, 50) : null,
       status: 'taslak',
-      createdBy: user.username,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      created_by: user.username,
     };
 
-    const result = await col.insertOne(proposal);
-    proposal._id = result.insertedId;
+    const { data: inserted, error: insertError } = await supabase.from('kade_proposals').insert(proposalInsert).select().single();
+    if (insertError) throw insertError;
+    let proposal = mapProposal(inserted);
 
     // Send email if requested
     if (sendEmail && clientEmail) {
@@ -131,8 +153,14 @@ export default async function handler(req, res) {
             subject: `Teklif ${proposalNumber} — Kade Media`,
             html,
           });
-          await col.updateOne({ _id: result.insertedId }, { $set: { status: 'gonderildi', sentAt: new Date() } });
-          proposal.status = 'gonderildi';
+          const { data: updated, error: updateError } = await supabase
+            .from('kade_proposals')
+            .update({ status: 'gonderildi', sent_at: new Date() })
+            .eq('id', proposal._id)
+            .select()
+            .single();
+          if (updateError) throw updateError;
+          proposal = mapProposal(updated);
         } catch (err) {
           console.error('Teklif e-posta hatası:', err.message);
         }
@@ -145,25 +173,39 @@ export default async function handler(req, res) {
   // PUT — update proposal status or details
   if (req.method === 'PUT') {
     const { id, ...updates } = req.body;
-    if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+    if (!id || !isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
     const allowed = ['status', 'notes', 'validUntil', 'totalAmount', 'services', 'clientName', 'clientEmail', 'clientPhone', 'clientCompany', 'currency'];
+    const columnMap = {
+      status: 'status',
+      notes: 'notes',
+      validUntil: 'valid_until',
+      totalAmount: 'total_amount',
+      services: 'services',
+      clientName: 'client_name',
+      clientEmail: 'client_email',
+      clientPhone: 'client_phone',
+      clientCompany: 'client_company',
+      currency: 'currency',
+    };
     const safeUpdates = {};
     for (const key of allowed) {
-      if (updates[key] !== undefined) safeUpdates[key] = updates[key];
+      if (updates[key] !== undefined) safeUpdates[columnMap[key]] = updates[key];
     }
-    safeUpdates.updatedAt = new Date();
+    safeUpdates.updated_at = new Date();
 
-    const result = await col.updateOne({ _id: new ObjectId(id) }, { $set: safeUpdates });
-    if (result.matchedCount === 0) return res.status(404).json({ error: 'Teklif bulunamadı' });
+    const { data, error } = await supabase.from('kade_proposals').update(safeUpdates).eq('id', id).select();
+    if (error) throw error;
+    if (!data || data.length === 0) return res.status(404).json({ error: 'Teklif bulunamadı' });
     return res.json({ success: true });
   }
 
   // DELETE
   if (req.method === 'DELETE') {
     const { id } = req.query;
-    if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-    await col.deleteOne({ _id: new ObjectId(id) });
+    if (!id || !isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+    const { error } = await supabase.from('kade_proposals').delete().eq('id', id);
+    if (error) throw error;
     return res.json({ success: true });
   }
 

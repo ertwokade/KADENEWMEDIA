@@ -1,8 +1,28 @@
-import { ObjectId } from 'mongodb';
-import { getDb, isValidObjectId } from './_lib/mongodb.js';
+import { getSupabase, isValidUuid } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { validateMediaUpload } from './_lib/uploadValidation.js';
+
+const LIST_COLUMNS = 'id, name, mime_type, type, size_bytes, alt, tags, uploaded_by, created_at, updated_at';
+
+function rowToMedia(row) {
+  if (!row) return row;
+  const item = {
+    _id: row.id,
+    id: row.id,
+    name: row.name,
+    mimeType: row.mime_type,
+    type: row.type,
+    sizeBytes: row.size_bytes,
+    alt: row.alt,
+    tags: row.tags,
+    uploadedBy: row.uploaded_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+  if (row.data !== undefined) item.data = row.data;
+  return item;
+}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -10,33 +30,32 @@ export default async function handler(req, res) {
   const user = await requirePermission(req, res, ['media', 'content'], { write: req.method !== 'GET' });
   if (!user) return;
 
-  const db = await getDb();
-  const col = db.collection('media');
+  const supabase = getSupabase();
 
   // GET — list media or single item (include file payload when action=file)
   if (req.method === 'GET') {
     const { id, type, search, action } = req.query;
     if (id) {
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
       if (action === 'file') {
-        const item = await col.findOne({ _id: new ObjectId(id) });
+        const { data: item, error } = await supabase.from('kade_media').select('data, mime_type, name').eq('id', id).maybeSingle();
+        if (error) throw error;
         if (!item) return res.status(404).json({ error: 'Medya bulunamadı' });
-        return res.json({ data: item.data, mimeType: item.mimeType, name: item.name });
+        return res.json({ data: item.data, mimeType: item.mime_type, name: item.name });
       }
-      const item = await col.findOne({ _id: new ObjectId(id) }, { projection: { data: 0 } });
+      const { data: item, error } = await supabase.from('kade_media').select(LIST_COLUMNS).eq('id', id).maybeSingle();
+      if (error) throw error;
       if (!item) return res.status(404).json({ error: 'Medya bulunamadı' });
-      return res.json(item);
+      return res.json(rowToMedia(item));
     }
 
-    const filter = {};
-    if (type) filter.type = type;
-    if (search) filter.name = { $regex: escapeRegex(search).slice(0, 100), $options: 'i' };
+    let query = supabase.from('kade_media').select(LIST_COLUMNS);
+    if (type) query = query.eq('type', type);
+    if (search) query = query.ilike('name', `%${String(search).slice(0, 100)}%`);
 
-    const items = await col.find(filter, { projection: { data: 0 } })
-      .sort({ createdAt: -1 })
-      .limit(100)
-      .toArray();
-    return res.json(items);
+    const { data: items, error } = await query.order('created_at', { ascending: false }).limit(100);
+    if (error) throw error;
+    return res.json(items.map(rowToMedia));
   }
 
   // POST — upload media (base64)
@@ -53,37 +72,35 @@ export default async function handler(req, res) {
     const isImage = mimeType.startsWith('image/');
     const isVideo = mimeType.startsWith('video/');
 
-    const media = {
+    const row = {
       name: name.trim().slice(0, 200),
-      mimeType,
+      mime_type: mimeType,
       type: isImage ? 'image' : isVideo ? 'video' : 'document',
-      sizeBytes,
+      size_bytes: sizeBytes,
       alt: String(alt || '').slice(0, 200),
       tags: Array.isArray(tags) ? tags.slice(0, 10).map(t => String(t).slice(0, 50)) : [],
       data,
-      uploadedBy: user.username,
-      createdAt: new Date(),
+      uploaded_by: user.username,
     };
 
-    const result = await col.insertOne(media);
-    const { data: _d, ...publicItem } = media;
-    publicItem._id = result.insertedId;
-    return res.status(201).json(publicItem);
+    const { data: created, error } = await supabase.from('kade_media').insert(row).select(LIST_COLUMNS).single();
+    if (error) throw error;
+    return res.status(201).json(rowToMedia(created));
   }
 
-  // GET data — get actual base64 for a specific item (separate endpoint pattern)
   // PUT — update metadata
   if (req.method === 'PUT') {
     const { id, alt, name, tags } = req.body;
-    if (!id || !isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+    if (!id || !isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
 
-    const updates = { updatedAt: new Date() };
+    const updates = { updated_at: new Date().toISOString() };
     if (alt !== undefined) updates.alt = String(alt).slice(0, 200);
     if (name !== undefined) updates.name = String(name).slice(0, 200);
     if (Array.isArray(tags)) updates.tags = tags.slice(0, 10).map(t => String(t).slice(0, 50));
 
-    const result = await col.updateOne({ _id: new ObjectId(id) }, { $set: updates });
-    if (result.matchedCount === 0) return res.status(404).json({ error: 'Medya bulunamadı' });
+    const { data, error } = await supabase.from('kade_media').update(updates).eq('id', id).select('id');
+    if (error) throw error;
+    if (!data || data.length === 0) return res.status(404).json({ error: 'Medya bulunamadı' });
     return res.json({ success: true });
   }
 
@@ -92,15 +109,17 @@ export default async function handler(req, res) {
     const { id, ids } = req.query;
 
     if (ids) {
-      const idList = ids.split(',').filter(i => isValidObjectId(i)).map(i => new ObjectId(i));
+      const idList = ids.split(',').filter(i => isValidUuid(i));
       if (idList.length === 0) return res.status(400).json({ error: 'Geçersiz ID listesi' });
-      const result = await col.deleteMany({ _id: { $in: idList } });
-      return res.json({ deleted: result.deletedCount });
+      const { data, error } = await supabase.from('kade_media').delete().in('id', idList).select('id');
+      if (error) throw error;
+      return res.json({ deleted: data?.length || 0 });
     }
 
     if (id) {
-      if (!isValidObjectId(id)) return res.status(400).json({ error: 'Geçersiz ID' });
-      await col.deleteOne({ _id: new ObjectId(id) });
+      if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
+      const { error } = await supabase.from('kade_media').delete().eq('id', id);
+      if (error) throw error;
       return res.json({ success: true });
     }
 
@@ -108,8 +127,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
-}
-
-function escapeRegex(value) {
-  return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
