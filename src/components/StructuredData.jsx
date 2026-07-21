@@ -160,3 +160,30 @@ export function ServiceSchema({ name, description, url }) {
 
   return null
 }
+
+// Person schema — kisisel link-in-bio sayfalari (/@handle) icin.
+// Kadir Demir gibi kisilerin arama motorlarinda (Knowledge Graph)
+// ayri bir varlik olarak taninmasina yardimci olur.
+export function PersonSchema({ name, jobTitle, image, sameAs, url }) {
+  useEffect(() => {
+    if (!name) return
+    const links = (sameAs || []).filter(Boolean)
+    injectSchema('schema-person', {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name,
+      jobTitle: jobTitle || undefined,
+      image: image || undefined,
+      url: url || undefined,
+      worksFor: {
+        '@type': 'Organization',
+        name: 'Kade New Media',
+        url: BASE_URL,
+      },
+      ...(links.length > 0 ? { sameAs: links } : {}),
+    })
+    return () => removeSchema('schema-person')
+  }, [name, jobTitle, image, sameAs, url])
+
+  return null
+}

@@ -4,9 +4,10 @@ import { FaInstagram, FaYoutube, FaLinkedinIn, FaXTwitter, FaTiktok, FaWhatsapp 
 import { FiShare2, FiArrowUpRight, FiGlobe, FiLink, FiMail } from 'react-icons/fi'
 import { HiBadgeCheck } from 'react-icons/hi'
 import { getLinkProfileBySlugApi } from '../api'
-import { useSEO } from '../hooks/useSEO'
+import { useSEO, BASE_URL } from '../hooks/useSEO'
 import { useLanguage } from '../i18n/LanguageContext'
 import PageTransition from '../components/PageTransition'
+import { PersonSchema } from '../components/StructuredData'
 import NotFound from './NotFound'
 import './LinkProfile.css'
 
@@ -28,8 +29,6 @@ const ICONS = {
   custom: FiLink,
 }
 
-// Guarantees kadenewmedia.com/@kadirdemir keeps working even before the admin
-// creates the matching DB record, or if the API is briefly unreachable.
 const FALLBACK_PROFILES = {
   kadirdemir: {
     name: 'Kadir Demir',
@@ -54,10 +53,9 @@ const PROFILE_TAGLINE_EN = {
 export default function LinkProfile() {
   const { handle = '' } = useParams()
   const { lang, setLang } = useLanguage()
-  // Bio pages live at /@handle — anything without the @ prefix isn't a profile URL.
   const slug = handle.startsWith('@') ? handle.slice(1) : ''
   const [profile, setProfile] = useState(null)
-  const [status, setStatus] = useState(slug ? 'loading' : 'not-found') // loading | ready | not-found
+  const [status, setStatus] = useState(slug ? 'loading' : 'not-found')
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -134,6 +132,13 @@ export default function LinkProfile() {
 
   return (
     <PageTransition>
+      <PersonSchema
+        name={profile.name}
+        jobTitle={profile.tagline}
+        image={profile.photo ? (profile.photo.startsWith('http') ? profile.photo : `${BASE_URL}${profile.photo}`) : undefined}
+        sameAs={(profile.links || []).map((link) => link.url)}
+        url={`${BASE_URL}/@${slug}`}
+      />
       <div className="kd-page" style={pageStyle}>
         <main className="kd-main">
           <div className="kd-shell">
