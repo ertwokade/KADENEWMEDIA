@@ -27,6 +27,7 @@ import PodcastWebinarEditor from './admin/editors/PodcastWebinarEditor'
 import CaseStudiesEditor from './admin/editors/CaseStudiesEditor'
 import NewsletterArchiveEditor from './admin/editors/NewsletterArchiveEditor'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
+import { PACKAGE_SCOPES } from '../data/packages'
 import { getPackageEntitlements } from '../config/entitlements'
 import {
   apiFetch,
@@ -1104,13 +1105,11 @@ function ContentSection({ showToast }) {
     ],
   }, [content.faq])
   const testimonialsData = useMemo(() => content.testimonials || { items: [] }, [content.testimonials])
+  // NOT: Bu içerik, canlı /paketler sayfasındaki 3 sabit kapsamla (baslangic/buyume/ozel,
+  // bkz. src/data/packages.js) id üzerinden eşleşir. Yalnızca fiyat alanları admin'den
+  // düzenlenir; isim/açıklama/özellik metinleri kürate edilmiş statik içerik olarak kalır.
   const packagesData = useMemo(() => content.packages || {
-    items: [
-      { nameTr: 'Başlangıç', nameEn: 'Starter', priceTRY: '11.900', popular: false, featuresTr: '2 Platform (Instagram + 1), Ayda 16 içerik, Temel grafik tasarım, Topluluk yönetimi, İçerik takvimi, Aylık performans raporu', featuresEn: '2 Platforms (Instagram + 1), 16 posts/month, Basic graphic design, Community management, Content calendar, Monthly performance report' },
-      { nameTr: 'Profesyonel', nameEn: 'Professional', priceTRY: '24.900', popular: true, featuresTr: '4 Platform, Ayda 30 içerik, Profesyonel tasarım, Topluluk yönetimi, İçerik takvimi, 2 haftada bir raporlama, Temel reklam yönetimi, Ayda 4 Reels, Rakip analizi', featuresEn: '4 Platforms, 30 posts/month, Professional design, Community management, Content calendar, Bi-weekly reporting, Basic ad management, 4 Reels/month, Competitor analysis' },
-      { nameTr: 'Kurumsal', nameEn: 'Enterprise', priceTRY: '54.900', popular: false, featuresTr: 'Tüm platformlar, Sınırsız içerik, Premium tasarım, Topluluk yönetimi, İçerik takvimi, Haftalık raporlama, Gelişmiş reklam yönetimi, Ayda 12 Reels, Rakip analizi, Kriz yönetimi, Özel strateji danışmanı, Öncelikli destek', featuresEn: 'All platforms, Unlimited content, Premium design, Community management, Content calendar, Weekly reporting, Advanced ad management, 12 Reels/month, Competitor analysis, Crisis management, Dedicated strategist, Priority support' },
-      { nameTr: 'Özel', nameEn: 'Custom', priceTRY: '', popular: false, featuresTr: 'Kurumsaldaki her şey, Özel strateji ve yol haritası, Çoklu marka yönetimi, Uluslararası pazar desteği, Size özel ekip, SLA anlaşması', featuresEn: 'Everything in Enterprise, Custom strategy & roadmap, Multi-brand management, International market support, Dedicated team, SLA agreement' },
-    ]
+    items: PACKAGE_SCOPES.map((scope) => ({ id: scope.id, priceTRY: '', priceUSD: '', priceNote: '' })),
   }, [content.packages])
   const aboutData = useMemo(() => content.about || {}, [content.about])
   const footerData = useMemo(() => content.footer || {}, [content.footer])
@@ -1737,14 +1736,17 @@ function TestimonialsEditor({ data, onSave }) {
 
 // ========== PACKAGES EDITOR ==========
 function PackagesEditor({ data, onSave }) {
-  const emptyItem = {
-    nameTr: '', nameEn: '', descTr: '', descEn: '',
-    priceTRY: '', priceUSD: '', tier: 'starter', popular: false,
-    featuresTr: '', featuresEn: '',
-  }
-  const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
+  // İsim/açıklama/özellikler src/data/packages.js içinde kürate edilmiş statik
+  // içerik olarak kalır (TR/EN tutarlılığı ve hukuki dil burada korunuyor).
+  // Bu form yalnızca canlı /paketler sayfasına gerçekten yansıyan fiyat
+  // alanlarını düzenler — id, PACKAGE_SCOPES ile eşleşir.
+  const buildItems = (source) => PACKAGE_SCOPES.map((scope) => {
+    const existing = source?.find((it) => it.id === scope.id)
+    return { id: scope.id, priceTRY: existing?.priceTRY || '', priceUSD: existing?.priceUSD || '', priceNote: existing?.priceNote || '' }
+  })
+  const [items, setItems] = useState(buildItems(data.items))
 
-  useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
+  useEffect(() => { setItems(buildItems(data.items)) }, [data])
   const updateItem = (index, field, value) => {
     const updated = [...items]
     updated[index] = { ...updated[index], [field]: value }
@@ -1755,62 +1757,34 @@ function PackagesEditor({ data, onSave }) {
     <div className="admin-form">
       <h3>Paketler & Fiyatlandırma</h3>
       <p style={{ color: 'var(--text-tertiary)', fontSize: '0.85rem', marginBottom: 16 }}>
-        Paket özelliklerini virgülle ayırarak yazın.
+        Paket adı, açıklaması ve özellikleri sitede sabit metin olarak yönetilir. Burada
+        yalnızca canlı /paketler sayfasında gösterilecek fiyatı girin. Fiyat alanı boş
+        bırakılırsa o paket için sayfa yalnızca "Teklif al" düğmesini göstermeye devam eder —
+        onaylı fiyatınız olmadan bir şey yazmayın.
       </p>
-      {items.map((item, i) => (
-        <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <strong style={{ color: 'var(--text-primary)' }}>Paket {i + 1}</strong>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--gray-lighter)', fontSize: '0.85rem', cursor: 'pointer' }}>
-                <input type="checkbox" checked={item.popular || false} onChange={(e) => updateItem(i, 'popular', e.target.checked)} /> Popüler
-              </label>
-              {items.length > 1 && (
-                <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
-                  onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
-                  <HiOutlineTrash size={14} />
-                </button>
-              )}
+      {items.map((item, i) => {
+        const scope = PACKAGE_SCOPES.find((s) => s.id === item.id)
+        return (
+          <div key={item.id} className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
+            <div style={{ marginBottom: 12 }}>
+              <strong style={{ color: 'var(--text-primary)' }}>{scope?.nameTr}</strong>
+              <span style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem', marginLeft: 8 }}>({scope?.nameEn})</span>
+            </div>
+            <div className="form-row">
+              <div className="form-group"><label>Fiyat (TRY)</label>
+                <input type="text" value={item.priceTRY} onChange={(e) => updateItem(i, 'priceTRY', e.target.value)} placeholder="Boş = fiyat gösterilmez" />
+              </div>
+              <div className="form-group"><label>Fiyat (USD)</label>
+                <input type="text" value={item.priceUSD} onChange={(e) => updateItem(i, 'priceUSD', e.target.value)} placeholder="Boş = fiyat gösterilmez" />
+              </div>
+            </div>
+            <div className="form-group"><label>Fiyat notu (opsiyonel, TR)</label>
+              <input type="text" value={item.priceNote} onChange={(e) => updateItem(i, 'priceNote', e.target.value)} placeholder='örn. "başlangıç fiyatı"' />
             </div>
           </div>
-          <div className="form-row">
-            <div className="form-group"><label>Paket Adı (TR)</label>
-              <input type="text" value={item.nameTr || ''} onChange={(e) => updateItem(i, 'nameTr', e.target.value)} />
-            </div>
-            <div className="form-group"><label>Paket Adı (EN)</label>
-              <input type="text" value={item.nameEn || ''} onChange={(e) => updateItem(i, 'nameEn', e.target.value)} />
-            </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group"><label>Açıklama (TR)</label>
-              <textarea rows="2" value={item.descTr || ''} onChange={(e) => updateItem(i, 'descTr', e.target.value)} />
-            </div>
-            <div className="form-group"><label>Açıklama (EN)</label>
-              <textarea rows="2" value={item.descEn || ''} onChange={(e) => updateItem(i, 'descEn', e.target.value)} />
-            </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group"><label>Fiyat (TRY)</label>
-              <input type="text" value={item.priceTRY || ''} onChange={(e) => updateItem(i, 'priceTRY', e.target.value)} placeholder="7.500" />
-            </div>
-            <div className="form-group"><label>Fiyat (USD)</label>
-              <input type="text" value={item.priceUSD || ''} onChange={(e) => updateItem(i, 'priceUSD', e.target.value)} placeholder="220" />
-            </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group"><label>Özellikler (TR, virgülle)</label>
-              <textarea rows="3" value={item.featuresTr || ''} onChange={(e) => updateItem(i, 'featuresTr', e.target.value)} placeholder="2 Platform Yönetimi, Aylık 20 İçerik, ..." />
-            </div>
-            <div className="form-group"><label>Özellikler (EN, virgülle)</label>
-              <textarea rows="3" value={item.featuresEn || ''} onChange={(e) => updateItem(i, 'featuresEn', e.target.value)} placeholder="2 Platform Management, 20 Monthly Posts, ..." />
-            </div>
-          </div>
-        </div>
-      ))}
+        )
+      })}
       <div className="admin-form-actions" style={{ gap: 12 }}>
-        <button className="btn btn-outline" onClick={() => setItems([...items, { ...emptyItem }])}>
-          <HiOutlinePlus size={16} /> Yeni Paket Ekle
-        </button>
         <button className="btn btn-primary" onClick={() => onSave({ items })}>
           <HiOutlineSave size={16} /> Kaydet
         </button>

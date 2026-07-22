@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiOutlineArrowRight, HiOutlineCheck, HiOutlineSparkles } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { getContentApi } from '../api'
 import { FAQSchema } from '../components/StructuredData'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
@@ -13,6 +15,25 @@ import './Packages.css'
 export default function Packages() {
   const { lang } = useLanguage()
   const isEN = lang === 'en'
+  // Paket adı/açıklaması/özellikleri sabit kürate içerik; sadece fiyat admin
+  // panelinden geliyor. API erişilemezse (veya hiç fiyat girilmemişse) sayfa
+  // sessizce fiyatsız haline döner — kırık bir görünüm oluşmaz.
+  const [prices, setPrices] = useState({})
+
+  useEffect(() => {
+    let cancelled = false
+    getContentApi('packages')
+      .then((res) => {
+        if (cancelled || !res?.data?.items) return
+        const map = {}
+        for (const item of res.data.items) {
+          if (item?.id) map[item.id] = item
+        }
+        setPrices(map)
+      })
+      .catch(() => { /* statik, fiyatsız görünümde kal */ })
+    return () => { cancelled = true }
+  }, [])
 
   useSEO({
     title: isEN ? 'Service Packages | Kade New Media' : 'Sosyal Medya Hizmet Kapsamları | Kade New Media',
@@ -54,11 +75,20 @@ export default function Packages() {
             {PACKAGE_SCOPES.map((pkg) => {
               const name = isEN ? pkg.nameEn : pkg.nameTr
               const features = isEN ? pkg.featuresEn : pkg.featuresTr
+              const price = prices[pkg.id]
+              const hasPrice = Boolean(price?.priceTRY || price?.priceUSD)
               return (
                 <StaggerItem key={pkg.id}>
                   <motion.article className="package-card glass-card pkg-v2" whileHover={{ y: -4 }}>
                     <div className="pkg-tag">{isEN ? 'Scope' : 'Kapsam'}</div>
                     <h2 className="pkg-name">{name}</h2>
+                    {hasPrice && (
+                      <div className="pkg-price">
+                        {price.priceTRY && <span className="pkg-price-amount">{price.priceTRY} ₺</span>}
+                        {price.priceUSD && <span className="pkg-price-amount pkg-price-secondary">${price.priceUSD}</span>}
+                        {price.priceNote && <span className="pkg-price-note">{price.priceNote}</span>}
+                      </div>
+                    )}
                     <p className="package-desc">{isEN ? pkg.descEn : pkg.descTr}</p>
                     <div className="package-features">
                       {features.map((feature) => (
