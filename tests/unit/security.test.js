@@ -87,23 +87,30 @@ test('Shopier webhook signature rejects forged payloads', () => {
 })
 
 test('Shopier order reservation is an atomic replay gate', async () => {
-  const inserts = []
+  // Not: gerçek kod Mongo'dan Supabase'e taşındığından (bkz. server/api/shopier.js),
+  // bu mock artık `supabase.from(table).insert(order)` şeklindeki PostgREST arayüzünü
+  // taklit ediyor; benzersizlik `kade_shopier_orders_order_id_uidx` unique index'i ile
+  // aynı şekilde 23505 (unique_violation) hatasıyla temsil ediliyor.
+  const inserted = []
   let entitlementsGranted = 0
-  const collection = {
-    async insertOne(order) {
-      if (inserts.some((item) => item.shopierOrderId === order.shopierOrderId)) {
-        const error = new Error('duplicate')
-        error.code = 11000
-        throw error
+  const supabase = {
+    from() {
+      return {
+        async insert(order) {
+          if (inserted.some((item) => item.shopier_order_id === order.shopier_order_id)) {
+            return { error: { code: '23505', message: 'duplicate key value violates unique constraint' } }
+          }
+          inserted.push(order)
+          return { error: null }
+        },
       }
-      inserts.push(order)
     },
   }
   async function processReplay() {
-    if (await reserveShopierOrder(collection, { shopierOrderId: 'order-1' })) entitlementsGranted += 1
+    if (await reserveShopierOrder(supabase, { shopier_order_id: 'order-1' })) entitlementsGranted += 1
   }
   await Promise.all(Array.from({ length: 20 }, () => processReplay()))
-  assert.equal(inserts.length, 1)
+  assert.equal(inserted.length, 1)
   assert.equal(entitlementsGranted, 1)
 })
 
@@ -120,35 +127,90 @@ test('Shopier product catalog is server-owned and validates amount, currency and
 })
 
 test('Shopier reconciliation never grants an entitlement and is state-idempotent', async () => {
+  // Not: gerçek kod Supabase/PostgREST kullanıyor (bkz. server/api/_lib/shopierReconciliation.js);
+  // bu mock o zincirleme sorgu arayüzünü (.from().select().in().lte().order().limit(),
+  // .from().update().eq().in()) taklit ediyor. Sadece `order-a`nın gerçek bir
+  // `kade_customer_packages` kaydı var; bu yüzden yalnız o sipariş uzlaştırılabilir,
+  // `order-b` ise entitlement bulunamadığı için `needs_review` olarak işaretlenmeli —
+  // reconciliation asla kendisi bir entitlement OLUŞTURMAMALI.
+  const RECONCILABLE_STATES = ['processing', 'completed_with_record_error']
   const orders = [
-    { _id: 'a', shopierOrderId: 'order-a', state: 'processing', receivedAt: new Date(0) },
-    { _id: 'b', shopierOrderId: 'order-b', state: 'completed_with_record_error', receivedAt: new Date(0) },
+    { id: 'a', shopier_order_id: 'order-a', state: 'processing' },
+    { id: 'b', shopier_order_id: 'order-b', state: 'completed_with_record_error' },
   ]
-  const collections = {
-    shopier_orders: {
-      find() {
-        return { sort() { return this }, limit() { return this }, async toArray() { return orders.filter((order) => ['processing', 'completed_with_record_error'].includes(order.state)) } }
-      },
-      async updateOne(filter, update) {
-        const order = orders.find((item) => item._id === filter._id && filter.state.$in.includes(item.state))
-        if (!order) return { modifiedCount: 0 }
-        Object.assign(order, update.$set)
-        return { modifiedCount: 1 }
-      },
-    },
-    customers: {
-      async findOne(filter) {
-        return filter['packages.shopierOrderId'] === 'order-a'
-          ? { _id: { toString: () => 'customer-a' }, packages: [{ id: 'package-a', shopierOrderId: 'order-a' }] }
-          : null
-      },
+  const packagesByOrderId = { 'order-a': { id: 'package-a', customer_id: 'customer-a' } }
+
+  const supabase = {
+    from(table) {
+      if (table === 'kade_shopier_orders') {
+        return {
+          select() {
+            return {
+              in() {
+                return {
+                  lte() {
+                    return {
+                      order() {
+                        return {
+                          limit() {
+                            return {
+                              data: orders
+                                .filter((o) => RECONCILABLE_STATES.includes(o.state))
+                                .map(({ id, shopier_order_id }) => ({ id, shopier_order_id })),
+                              error: null,
+                            }
+                          },
+                        }
+                      },
+                    }
+                  },
+                }
+              },
+            }
+          },
+          update(patch) {
+            return {
+              eq(_col, id) {
+                return {
+                  in(_col2, states) {
+                    const order = orders.find((o) => o.id === id && states.includes(o.state))
+                    if (!order) return { error: null, count: 0 }
+                    Object.assign(order, patch)
+                    return { error: null, count: 1 }
+                  },
+                }
+              },
+            }
+          },
+        }
+      }
+      if (table === 'kade_customer_packages') {
+        return {
+          select() {
+            return {
+              eq(_col, shopierOrderId) {
+                return {
+                  limit() {
+                    return {
+                      maybeSingle() {
+                        return { data: packagesByOrderId[shopierOrderId] || null, error: null }
+                      },
+                    }
+                  },
+                }
+              },
+            }
+          },
+        }
+      }
+      throw new Error(`beklenmeyen tablo: ${table}`)
     },
   }
-  const db = { collection: (name) => collections[name] }
-  assert.deepEqual(await reconcileShopierOrders(db, { staleBefore: new Date() }), { inspected: 2, reconciled: 1, needsReview: 1 })
+
+  assert.deepEqual(await reconcileShopierOrders(supabase, { staleBefore: new Date() }), { inspected: 2, reconciled: 1, needsReview: 1 })
   assert.equal(orders[0].state, 'completed_reconciled')
   assert.equal(orders[1].state, 'needs_review')
-  assert.deepEqual(await reconcileShopierOrders(db, { staleBefore: new Date() }), { inspected: 0, reconciled: 0, needsReview: 0 })
+  assert.deepEqual(await reconcileShopierOrders(supabase, { staleBefore: new Date() }), { inspected: 0, reconciled: 0, needsReview: 0 })
 })
 
 test('public blog filter excludes drafts and future publication dates', () => {

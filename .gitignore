@@ -8,9 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+node_modules_*
 dist
 dist-ssr
 *.local
+
+# Bozuk/yarım kalmış paket yöneticisi işlemlerinden kalan geçici dosyalar
+_tmp_*
 
 # Environment variables
 .env
