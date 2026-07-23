@@ -34,6 +34,7 @@ işlerden önce gelmeli.
 | SQL/kod enjeksiyonu | tüm `server/api/**` | Supabase query builder tutarlı kullanılıyor; `.rpc()`, ham SQL string birleştirme veya `eval`/`new Function` **hiçbir yerde bulunamadı** |
 | Seed/bootstrap endpoint | `seed.js` | Production'da varsayılan olarak 404 (yalnızca `SEED_ENDPOINT_ENABLED=true` ile açılıyor), saatte 3 istek sınırı, timing-safe secret karşılaştırma, sahte demo veri eklemiyor |
 | Rol/izin modeli | `_lib/auth.js` | `requirePermission`/`requireAdmin` her admin route'unda backend zorunlu (frontend değil) — Faz 4'te doğrulandı, `system-health`/`coupons`/`shopier orders` gibi yeni rotalar da bu desene uydu |
+| Rate limit mimarisi | `_lib/rateLimit.js` | İyi tasarlanmış: Upstash Redis (`UPSTASH_REDIS_REST_URL/TOKEN`) yapılandırılıysa kalıcı/dağıtık sayaç kullanıyor; production'da Redis yapılandırılmış ama erişilemezse **fail-closed** (isteği reddediyor, brute-force'a açık bırakmıyor); Redis hiç yapılandırılmamışsa bellek-içi sayaca düşüyor (Vercel'de fonksiyon örnekleri arası paylaşılmaz — zayıflatılmış ama arka planda çalışmaya devam eder) ve production'da uyarı logluyor. `.env.example`'da zaten belgeli — yalnızca canlıda provizyon edilmesi gerekiyor (blocker #1 ile aynı kök neden: eksik prod kredensiyalleri) |
 
 ## 2. Bu turda bulunan ve düzeltilen gerçek zayıflıklar
 
@@ -49,7 +50,6 @@ işlerden önce gelmeli.
 - **`apps/kadeai` ve `apps/studio-web`/`studio-worker`** — bu denetim yalnızca kök `kademedia` API katmanını kapsadı.
 - **Gerçek penetrasyon testi / otomatik tarama** — kod incelemesi false-negative riskini tamamen ortadan kaldırmaz; canlı ortamda bağımsız bir pentest önerilir.
 - **BYOK / kullanıcı API anahtarı saklama** — henüz tasarlanmadı bile (bkz. `docs/05` §5) — şifreleme anahtarı yönetimi ayrı, aceleye getirilmemesi gereken bir güvenlik projesi.
-- **Rate limit deposunun kalıcılığı** — `_lib/rateLimit.js`'in bellek-içi mi yoksa Supabase-destekli mi olduğu bu denetimde doğrulanmadı; serverless (Vercel) ortamda bellek-içi bir sayaç fonksiyon örnekleri arasında paylaşılmaz, bu gerçek bir etkinlik farkı yaratabilir — Faz 8'in devamında doğrulanmalı.
 - **Bağımlılık/tedarik zinciri taraması** (`npm audit`, Dependabot, SBOM) — bu turda çalıştırılmadı.
 - **Gizli anahtar rotasyon politikası ve sızıntı taraması** (git geçmişinde secret var mı) — bu turda yapılmadı.
 - **Threat model belgesi** (`docs/THREAT_MODEL_TR.md`) — henüz oluşturulmadı, bu denetimin bulguları oraya girdi olarak kullanılmalı.
