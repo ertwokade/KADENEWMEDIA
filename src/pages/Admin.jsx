@@ -4602,14 +4602,15 @@ function AnalyticsSection() {
 
       {/* GA4 Setup Notice */}
       {dataSource === 'internal' && !loading && (
-        <div className="admin-form" style={{ marginBottom: 16, padding: '12px 16px', background: 'rgba(234,195,33,0.06)', border: '1px solid rgba(234,195,33,0.15)' }}>
+        // GA4 yapılandırılmadığında dahili analitik gösteriliyor. Önceki sürüm
+        // burada ham .env değişken adlarını (GA4_PRIVATE_KEY vb.) canlı ekrana
+        // döküyordu — kurulum talimatı, üretim analitik ekranında görünmemeli
+        // (Öncelik 7). Kısa, teknik olmayan bir bilgi notuyla değiştirildi;
+        // gerçek kurulum ortam değişkenleri "Sistem Sağlığı" ekranından
+        // (yalnızca var/yok olarak) izlenir.
+        <div className="admin-form" style={{ marginBottom: 16, padding: '10px 16px', background: 'rgba(234,195,33,0.06)', border: '1px solid rgba(234,195,33,0.15)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-            <span>Google Analytics 4 entegrasyonu icin <code style={{ background: 'var(--bg-tertiary)', padding: '1px 6px', borderRadius: 4, fontSize: '0.78rem' }}>.env</code> dosyasina su degiskenleri ekleyin:</span>
-          </div>
-          <div style={{ marginTop: 8, fontSize: '0.75rem', color: 'var(--text-tertiary)', fontFamily: 'monospace', lineHeight: 1.8 }}>
-            GA4_PROPERTY_ID=123456789<br />
-            GA4_CLIENT_EMAIL=xxx@xxx.iam.gserviceaccount.com<br />
-            GA4_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+            <span>ℹ️ Şu an <strong>dahili analitik</strong> gösteriliyor. Google Analytics 4 bağlamak için sunucu ortam değişkenlerinin yapılandırılması gerekir (sistem yöneticisi).</span>
           </div>
         </div>
       )}

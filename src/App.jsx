@@ -61,7 +61,13 @@ const TooManyRequests = lazy(() => import('./pages/TooManyRequests'))
 const Maintenance = lazy(() => import('./pages/Maintenance'))
 
 function PageLoader() {
-  return <div style={{ minHeight: '60vh' }} />
+  // Lazy chunk inerken tamamen boş ekran yerine hafif, markalı bir spinner
+  // göster — geçiş sırasında "donmuş" hissini azaltır (Öncelik 3).
+  return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }} aria-live="polite" aria-busy="true">
+      <span className="kade-page-spinner" role="status" aria-label="Yükleniyor" />
+    </div>
+  )
 }
 
 function LazyRoute({ children }) {

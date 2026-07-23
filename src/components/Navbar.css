@@ -2,7 +2,10 @@
 .knav {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 1000;
+  /* Dekoratif overlay'lerin (GrainOverlay z-index:9998, koyu temadaki dekoratif
+     rozet vb.) nav linklerini kapatmasını önlemek için nav en üst etkileşim
+     katmanı olmalı (Öncelik 5). */
+  z-index: 10000;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,7 +58,7 @@
 .knav-giris {
   position: fixed;
   right: 56px; bottom: 24px;
-  z-index: 1001;
+  z-index: 10001;
   display: inline-flex; align-items: center; gap: 8px;
   background: linear-gradient(135deg, #f5d84a, #e0a81f);
   color: #17130a;

@@ -52,7 +52,27 @@ export async function POST(request: NextRequest) {
     if (action === 'login') {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) {
-        return NextResponse.json({ error: 'E-posta veya parola hatalı.' }, { status: 401, headers })
+        // Gerçek red sebebini sunucu loguna yaz — Vercel loglarından
+        // (veya Supabase Dashboard → Authentication → Logs) teşhis için.
+        // Yanıtta hassas ayrımı (hesap var/yok) ASLA sızdırma: Supabase
+        // `invalid_credentials`'ı yanlış-şifre ile hesap-yok için kasten
+        // aynı döndürür (account enumeration önlemi) — bunu koruyoruz.
+        console.error('[kadeai/login] signIn reddedildi:', {
+          code: (error as { code?: string }).code,
+          status: error.status,
+          message: error.message,
+        })
+        // `email_not_confirmed` güvenli şekilde ayırt edilebilir ve en sık
+        // "doğru şifre ama yine giremiyorum" nedenidir — kullanıcıya yardımcı ol.
+        const code = (error as { code?: string }).code
+        if (code === 'email_not_confirmed' || /email not confirmed/i.test(error.message)) {
+          return NextResponse.json({
+            error: 'E-posta adresiniz henüz doğrulanmamış. Kayıt sırasında gönderilen doğrulama bağlantısına tıklayın veya kayıt ekranından tekrar deneyin.',
+          }, { status: 401, headers })
+        }
+        return NextResponse.json({
+          error: 'E-posta veya parola hatalı. Kade AI hesabınız yoksa önce "Kayıt Ol" sekmesinden oluşturun (Kade AI girişi, ana sitedeki hesabınızdan ayrıdır).',
+        }, { status: 401, headers })
       }
       return NextResponse.json({ ok: true, next: appRoutes.dashboard }, { headers })
     }
@@ -67,6 +87,17 @@ export async function POST(request: NextRequest) {
       },
     })
     if (error) {
+      console.error('[kadeai/signup] kayıt reddedildi:', {
+        code: (error as { code?: string }).code,
+        status: error.status,
+        message: error.message,
+      })
+      const code = (error as { code?: string }).code
+      if (code === 'user_already_exists' || code === 'email_exists' || /already registered|already exists/i.test(error.message)) {
+        return NextResponse.json({
+          error: 'Bu e-posta ile zaten bir Kade AI hesabı var. "Giriş Yap" sekmesinden giriş yapın.',
+        }, { status: 400, headers })
+      }
       return NextResponse.json({ error: 'Kayıt işlemi tamamlanamadı. Bilgileri kontrol edip tekrar deneyin.' }, { status: 400, headers })
     }
 

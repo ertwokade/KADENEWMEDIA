@@ -181,7 +181,7 @@ export default function ServiceDetail() {
           <FadeIn>
             <Link to="/hizmetler" className="partner-back" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: 16 }}>
               <HiOutlineArrowLeft size={16} />
-              {lang === 'tr' ? '← Tüm Hizmetler' : '← All Services'}
+              {lang === 'tr' ? 'Tüm Hizmetler' : 'All Services'}
             </Link>
           </FadeIn>
           <FadeIn delay={0.1}>

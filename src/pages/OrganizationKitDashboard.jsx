@@ -107,12 +107,24 @@ const kadeThemeOverride = `
   </style>
 `
 
+// app.js orijinalde <head>'de `defer` ile yükleniyordu (DOM hazır olunca
+// çalışır). Inline'a çevrilince `defer` kaybolur; head içinde inline bir
+// script body DOM'u parse edilmeden çalışır ve app.js'in başlatması
+// (DOMContentLoaded) srcDoc iframe'de güvenilmez hale gelir — sağ çalışma
+// alanının hiç render olmamasının olası nedeni buydu (Öncelik 8). Çözüm:
+// head'deki tag'i kaldır, inline script'i </body> öncesine enjekte et; bu,
+// orijinal `defer` semantiğini (tüm DOM parse edildikten sonra çalıştır)
+// birebir korur. Ayrıca ?raw ile gelen BOM (U+FEFF) temizlenir.
+const kitJsClean = kitJs.charCodeAt(0) === 0xFEFF ? kitJs.slice(1) : kitJs
+const inlineAppJs = `<script>${kitJsClean.replace(/<\/script/gi, '<\\/script')}</script>`
+
 const kitDocument = kitHtml
   .replace(/Kade Kit Business/g, 'Kade Organizasyon Kiti')
   .replace(/AI Üretim Merkezi/g, 'Organizasyon Kiti')
   .replace('<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>', lucideFallback)
   .replace('<link rel="stylesheet" href="styles.css"/>', `<style>${kitCss}</style>${kadeThemeOverride}`)
-  .replace('<script src="app.js" defer></script>', `<script>${kitJs.replace(/<\/script/gi, '<\\/script')}</script>`)
+  .replace('<script src="app.js" defer></script>', '')
+  .replace('</body>', `${inlineAppJs}</body>`)
 
 export default function OrganizationKitDashboard() {
   useSEO({

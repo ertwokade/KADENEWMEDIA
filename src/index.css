@@ -995,6 +995,23 @@ body::after {
   mix-blend-mode: screen;
 }
 
+.kade-page-spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid rgba(224, 168, 31, 0.22);
+  border-top-color: var(--primary, #e0a81f);
+  animation: kade-spin 0.7s linear infinite;
+}
+
+@keyframes kade-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kade-page-spinner { animation-duration: 1.4s; }
+}
+
 .container {
   max-width: min(1280px, calc(100vw - 40px)) !important;
 }

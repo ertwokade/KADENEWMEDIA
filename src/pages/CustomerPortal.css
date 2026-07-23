@@ -326,7 +326,9 @@
 
 .cp-card-subtitle {
   font-size: 0.8rem;
-  color: var(--gray);
+  /* --gray açık temada #e6d9ba (açık bej) => krem kartta görünmez.
+     Panel açık-şema tasarlandığı için sabit, kontrastlı koyu ton (WCAG AA). */
+  color: rgba(23, 19, 10, 0.62);
 }
 
 .cp-card-empty {
@@ -470,7 +472,7 @@
 
 .cp-stat-label {
   font-size: 0.78rem;
-  color: var(--gray);
+  color: rgba(23, 19, 10, 0.62);
 }
 
 /* Support banner */
