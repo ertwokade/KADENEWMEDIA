@@ -60,7 +60,7 @@ Bekliyor · İnceleniyor · Uygulanıyor · Test ediliyor · Tamamlandı · Kıs
 | REQ-VIDEO-001 | §17 ChatCut alternatifi AI video editör | Bekliyor | Faz 6 — yeni ürün, `docs/10_CHATCUT_ALTERNATIVE_FEASIBILITY_TR.md` önce gerekli |
 | REQ-COMMERCE-008 | §18 Creator/influencer ve kampanya yönetimi | Bekliyor | Faz 7 |
 | REQ-COMMERCE-009 | §19 Ajans+SaaS iş modeli belgesi | Bekliyor | Faz 7, `docs/AGENCY_AND_SAAS_BUSINESS_MODEL_TR.md` |
-| REQ-ODOO-001 | §20 Odoo değerlendirmesi ve karar | Bekliyor | Faz 7, `docs/09_ODOO_DECISION_TR.md` |
+| REQ-ODOO-001 | §20 Odoo değerlendirmesi ve karar | Tamamlandı | `docs/09_ODOO_DECISION_TR.md` — karar: **kurulmayacak**. Mevcut CRM/teklif/fatura/abonelik sistemleri operasyonel ihtiyacı zaten karşılıyor, şartnamenin kendi 6 ön-koşulundan ilki (gerçek operasyonel fayda) bile sağlanmadığı için diğerleri değerlendirilmedi. Yeniden açılma koşulları (gerçek muhasebe/e-fatura zorunluluğu, creator-ağı ölçeği, proje-yönetimi ihtiyacı) belgede net |
 | REQ-LEGAL-001 | §21 Fikri mülkiyet ve içerik koruma sistemi | Bekliyor | Faz 8 |
 | REQ-LEGAL-002 | §22 Hukuki yükümlülükler (KVKK, e-ticaret, tüketici, mesafeli satış, telif) | Bekliyor | Faz 8 — **hukukçu onayı gerektirir, bkz. BLOCKERS** |
 | REQ-SEC-001 | §23 Kapsamlı güvenlik denetimi (OWASP tam liste) | Kısmen tamamlandı | Faz 8'in kod-seviyesi kısmı erken başlatıldı — `docs/07_SECURITY_AUDIT_TR.md` yalnızca kök `kademedia` API katmanının statik kod incelemesini kapsıyor (canlı pentest değil). 1 gerçek yetki-atlatma açığı bulunup düzeltildi (`chat.js` `adminMode` bypass). `apps/kadeai`/`apps/studio-web`, canlı pentest, bağımlılık taraması, `docs/THREAT_MODEL_TR.md` hâlâ açık |
