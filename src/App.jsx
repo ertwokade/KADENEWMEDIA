@@ -55,6 +55,10 @@ const OrganizationKitPlan = lazy(() => import('./pages/OrganizationKitPlan'))
 const OrganizationKitSection = lazy(() => import('./pages/OrganizationKitSection'))
 const KadeKitBusinessStudio = lazy(() => import('./pages/KadeKitBusinessStudio'))
 const LinkProfile = lazy(() => import('./pages/LinkProfile'))
+const Unauthorized = lazy(() => import('./pages/Unauthorized'))
+const Forbidden = lazy(() => import('./pages/Forbidden'))
+const TooManyRequests = lazy(() => import('./pages/TooManyRequests'))
+const Maintenance = lazy(() => import('./pages/Maintenance'))
 
 function PageLoader() {
   return <div style={{ minHeight: '60vh' }} />
@@ -248,6 +252,10 @@ function App() {
           <Route path="/gizlilik" element={<LazyRoute><Gizlilik /></LazyRoute>} />
           <Route path="/cerez-politikasi" element={<LazyRoute><CerezPolitikasi /></LazyRoute>} />
           <Route path="/telif-haklari" element={<LazyRoute><TelifHaklari /></LazyRoute>} />
+          <Route path="/401" element={<LazyRoute><Unauthorized /></LazyRoute>} />
+          <Route path="/403" element={<LazyRoute><Forbidden /></LazyRoute>} />
+          <Route path="/429" element={<LazyRoute><TooManyRequests /></LazyRoute>} />
+          <Route path="/bakim" element={<LazyRoute><Maintenance /></LazyRoute>} />
           <Route path="/admin" element={<ProtectedAdminRoute />} />
           <Route path="/sss" element={<LazyRoute><SSS /></LazyRoute>} />
           <Route path="/referanslar" element={<LazyRoute><Referanslar /></LazyRoute>} />
