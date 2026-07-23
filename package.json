@@ -26,6 +26,7 @@
     "legacy:build": "vite build && node -e \"require('fs').renameSync('dist/index.html','dist/app.html')\" && node scripts/generate-static-routes.mjs",
     "legacy:lint": "eslint .",
     "legacy:test:unit": "node --test tests/unit/*.test.js",
+    "legacy:test:e2e": "playwright test",
     "dev:api": "node server.js",
     "dev:kadeai": "npm --prefix apps/kadeai run dev",
     "build:kadeai": "npm --prefix apps/kadeai run build",
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.61.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",

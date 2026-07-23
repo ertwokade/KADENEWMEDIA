@@ -25,6 +25,8 @@ Canlı belge — her fazda güncellenir, kapatılan blockerlar silinmez, "Kapat�
 
 | 17 | Mesafeli satış hukuki sayfaları hiç yok ama satış zaten canlı | REQ-LEGAL-002 | Shopier ile gerçek ödeme akışı çalışıyor ama Mesafeli Satış Sözleşmesi, Ön Bilgilendirme Formu ve Cayma/İptal/İade Politikası sayfaları hiç yok (bkz. `docs/08_LEGAL_COMPLIANCE_CHECKLIST_TR.md` §2) — 6502 Tüketici Koruma Kanunu ve Mesafeli Sözleşmeler Yönetmeliği açısından somut bir hukuki risk | Hukukçuya bu üç belgeyi öncelikli olarak yazdırın; içerik gelince sayfa/route eklemek düşük efor | Açık, **en yüksek öncelikli hukuki blocker** |
 
+| 18 | Ana sayfa (`/`) konsola hydration hatası basıyor | REQ-SEO-000, REQ-CODE-010 | `public/site.html`, ayrı bir Next.js derlemesinden alınmış vendored statik export (kaynak bu repoda yok, yalnızca minified `_next/static/chunks/*` dosyaları var). E2E testleriyle (bu turda kuruldu) "Minified React error #418" (hydration metin uyuşmazlığı) tespit edildi — sayfa görsel olarak çökmüyor ama konsola hata basıyor, bu SEO/performans metriklerini (Lighthouse vb.) etkileyebilir | Kaynak proje (site.html'in üretildiği Next.js projesi) bulunup hydration mismatch'in kök nedeni orada düzeltilip yeniden export edilmeli — bu repodaki minified dosyalar güvenle yamanamaz | Açık, düşük-orta öncelik (görsel etkisi yok, teknik SEO/temizlik meselesi) |
+
 ## Kapatılan blockerlar (bu oturumda)
 
 | # | Blocker | Nasıl kapatıldı |

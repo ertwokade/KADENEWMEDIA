@@ -35,6 +35,9 @@ _tmp_*
 .vercel
 .playwright-cli/
 output/
+test-results/
+playwright-report/
+blob-report/
 .next/
 coverage/
 fixtures/generated/
