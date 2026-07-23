@@ -89,16 +89,17 @@ inline mesajlar var. Bu düşük-orta öncelikli bir Faz 8 işi — kritik deği
 mevcut davranış (JSON hata + admin'de redirect) kullanıcıyı bilgilendiriyor, sadece
 görsel olarak tutarlı değil.
 
-## 5. Erişilebilirlik/hareket (§6.1)
+## 5. Erişilebilirlik/hareket (§6.1) — güncellendi
 
-- `prefers-reduced-motion` desteği: **doğrulanmadı**, kod taramasında `matchMedia` veya CSS `@media (prefers-reduced-motion)` kullanımı bu turda aranmadı — Faz 8'de ele alınacak.
-- Framer Motion (kök) ve muhtemelen kadeai'de de animasyon kütüphaneleri var — reduced-motion uyumu ayrıca doğrulanmalı.
+- `prefers-reduced-motion`: 12 CSS/JS dosyasında zaten kısmi destek vardı (`AuroraBackground.css`, `kade-motion.js` vb.) ama site genelinde her yerde kullanılan `PageTransition.jsx` (her sayfa geçişi) ve `Animations.jsx` (`FadeIn`/`StaggerContainer`/`ScaleIn` — transform/scale tabanlı) bu tercihi **hiç kontrol etmiyordu**. **Düzeltildi:** `src/main.jsx`'te uygulama kökü `<MotionConfig reducedMotion="user">` ile sarıldı — Framer Motion'ın resmi mekanizması, OS/tarayıcı `prefers-reduced-motion` sinyali verdiğinde TÜM `motion.*` bileşenlerindeki transform tabanlı animasyonları (`y`/`x`/`scale`) otomatik devre dışı bırakır, opacity geçişlerini korur — tek satırlık, düşük riskli, tüm siteyi kapsayan bir çözüm (her bileşeni tek tek değiştirmek yerine).
+- `apps/kadeai` bu turda incelenmedi.
 
 ## 6. Sonuç
 
-**Design token seviyesinde iş neredeyse yok** (marka rengi zaten tutarlı, iki
-uygulama bilinçli olarak farklı yoğunluk seviyelerinde). **Asıl eksik**: (a) 401/
-403/429/bakım sayfaları, (b) reduced-motion doğrulaması, (c) referans ürünlerden
-(rekt/YouMind/ChatCut) hangi UI fikirlerinin alınacağına dair karar (§6.2, ayrı
-belge). Bu üçü Faz 8'de ele alınacak — şu an kritik commerce/security işini
-geciktirmeyecek şekilde ertelendi.
+**Design token seviyesinde iş yok** (marka rengi zaten tutarlı, iki
+uygulama bilinçli olarak farklı yoğunluk seviyelerinde). Faz 8 için
+planlanan üç eksikten ikisi artık kapalı: (a) 401/403/429/bakım
+sayfaları — Faz 2'de eklendi, (b) reduced-motion — bu turda `MotionConfig`
+ile kapatıldı. Kalan: (c) referans ürünlerden (rekt/YouMind/ChatCut)
+hangi UI fikirlerinin alınacağına dair karar — `docs/REFERENCE_PRODUCT_GAP_ANALYSIS_TR.md`'de
+tamamlandı. **Bu belgenin kapsamındaki hiçbir madde artık açık değil.**

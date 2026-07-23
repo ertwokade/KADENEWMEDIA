@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { MotionConfig } from 'framer-motion'
 import { BrowserRouter } from 'react-router-dom'
 import { LanguageProvider } from './i18n/LanguageContext'
 import { ThemeProvider } from './i18n/ThemeContext'
@@ -26,13 +27,15 @@ if ('serviceWorker' in navigator) {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <BrowserRouter>
-        <ThemeProvider>
-          <LanguageProvider>
-            <App />
-          </LanguageProvider>
-        </ThemeProvider>
-      </BrowserRouter>
+      <MotionConfig reducedMotion="user">
+        <BrowserRouter>
+          <ThemeProvider>
+            <LanguageProvider>
+              <App />
+            </LanguageProvider>
+          </ThemeProvider>
+        </BrowserRouter>
+      </MotionConfig>
     </ErrorBoundary>
   </React.StrictMode>,
 )

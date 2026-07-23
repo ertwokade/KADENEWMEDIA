@@ -34,7 +34,7 @@ Bekliyor · İnceleniyor · Uygulanıyor · Test ediliyor · Tamamlandı · Kıs
 
 | Kimlik | Gereksinim (şartname bölümü) | Durum | Not |
 |---|---|---|---|
-| REQ-DESIGN-001 | §6 Tasarım sistemi ve tokenlar, ortak bileşenler | Bekliyor | Faz 2 |
+| REQ-DESIGN-001 | §6 Tasarım sistemi ve tokenlar, ortak bileşenler | Tamamlandı | `docs/04_DESIGN_SYSTEM_TR.md` — token/bileşen envanteri zaten yapılmıştı; bu turda son açık madde (reduced-motion) kapatıldı: `PageTransition.jsx`/`Animations.jsx` `prefers-reduced-motion`'ı hiç kontrol etmiyordu, `src/main.jsx`'te `<MotionConfig reducedMotion="user">` ile tüm site kapsamında düzeltildi (tek satır, düşük risk) |
 | REQ-DESIGN-002 | §6.2 Referans ürün (rekt/YouMind/ChatCut) fikir değerlendirmesi | Tamamlandı | `docs/REFERENCE_PRODUCT_GAP_ANALYSIS_TR.md` — 3 site canlı incelendi (WebFetch), 15 fikir "doğrudan değer/MVP sonrası/gereksiz/hukuki riskli" olarak sınıflandırıldı. Ortak sonuç: kredi/kullanım bazlı erişim modeli ve tek-akışlı çoklu-format üretim pazar standardı — bu, bağımsız olarak zaten tespit edilmiş `docs/05` UsageLimit önceliğini doğruladı. Hiçbir metin/görsel kopyalanmadı |
 | REQ-CONTENT-001 | §7 Marka metinleri, misyon/vizyon, marka adı tutarlılığı | Bekliyor | Faz 2/8 |
 | REQ-COMMERCE-001 | §8.1 Ticari veri modeli (Product/Plan/Price/Entitlement/Order/...) | Bekliyor | Faz 2/3 — en büyük mimari karar |
