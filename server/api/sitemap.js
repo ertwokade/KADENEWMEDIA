@@ -1,3 +1,5 @@
+import { getSupabase } from './_lib/supabase.js';
+
 const DEFAULT_BASE = 'https://kadenewmedia.com';
 
 export const STATIC_PAGES = [
@@ -11,6 +13,11 @@ export const STATIC_PAGES = [
   { loc: '/kariyer', changefreq: 'monthly', priority: '0.7' },
   { loc: '/sss', changefreq: 'monthly', priority: '0.7' },
   { loc: '/ekip', changefreq: 'monthly', priority: '0.6' },
+  { loc: '/portfolio', changefreq: 'monthly', priority: '0.7' },
+  { loc: '/partnerler', changefreq: 'monthly', priority: '0.7' },
+  { loc: '/basari-hikayeleri', changefreq: 'monthly', priority: '0.7' },
+  { loc: '/referanslar', changefreq: 'monthly', priority: '0.6' },
+  { loc: '/blog', changefreq: 'weekly', priority: '0.9' },
   { loc: '/hizmetler/sosyal-medya-yonetimi', changefreq: 'monthly', priority: '0.8' },
   { loc: '/hizmetler/icerik-uretimi', changefreq: 'monthly', priority: '0.8' },
   { loc: '/hizmetler/reklam-yonetimi', changefreq: 'monthly', priority: '0.8' },
@@ -20,6 +27,7 @@ export const STATIC_PAGES = [
   { loc: '/kvkk', changefreq: 'yearly', priority: '0.3' },
   { loc: '/gizlilik', changefreq: 'yearly', priority: '0.3' },
   { loc: '/cerez-politikasi', changefreq: 'yearly', priority: '0.3' },
+  { loc: '/telif-haklari', changefreq: 'yearly', priority: '0.3' },
 ];
 
 export function escapeXml(str) {
@@ -53,8 +61,40 @@ export default async function handler(req, res) {
 
   try {
     const base = normalizeSiteBaseUrl();
-    const staticEntries = STATIC_PAGES.map(p => urlEntry(p, base)).join('\n');
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${staticEntries}\n</urlset>`;
+    const staticEntries = STATIC_PAGES.map(p => urlEntry(p, base));
+
+    // Yayınlanmış blog yazıları ve partnerler — canonical, başarılı yanıt veren
+    // URL'ler dışında sitemap'e hiçbir şey eklenmez (şartname §24).
+    let dynamicEntries = [];
+    try {
+      const supabase = getSupabase();
+      const [blogsRes, partnersRes] = await Promise.all([
+        supabase.from('kade_blogs').select('slug, updated_at, created_at').or('published.is.null,published.eq.true'),
+        supabase.from('kade_partners').select('slug, updated_at'),
+      ]);
+      const blogs = blogsRes.error ? [] : (blogsRes.data || []);
+      const partners = partnersRes.error ? [] : (partnersRes.data || []);
+      dynamicEntries = [
+        ...blogs.filter(b => b.slug).map(b => urlEntry({
+          loc: `/blog/${b.slug}`,
+          lastmod: String(b.updated_at || b.created_at || '').slice(0, 10) || undefined,
+          changefreq: 'monthly',
+          priority: '0.7',
+        }, base)),
+        ...partners.filter(p => p.slug).map(p => urlEntry({
+          loc: `/partnerler/${p.slug}`,
+          lastmod: String(p.updated_at || '').slice(0, 10) || undefined,
+          changefreq: 'monthly',
+          priority: '0.6',
+        }, base)),
+      ];
+    } catch (dynamicErr) {
+      // Supabase erişilemezse sitemap statik sayfalarla devam eder — tamamen
+      // başarısız olup 500 dönmek, dinamik URL'lerin eksik kalmasından daha kötü.
+      console.error('Sitemap dynamic entries error:', dynamicErr.message);
+    }
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...staticEntries, ...dynamicEntries].join('\n')}\n</urlset>`;
 
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');

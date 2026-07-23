@@ -409,10 +409,13 @@ export default async function handler(req, res) {
         { loc: '/hizmetler/video-produksiyon', priority: '0.8', freq: 'monthly' },
         { loc: '/hizmetler/strateji-danismanlik', priority: '0.8', freq: 'monthly' },
         { loc: '/basari-hikayeleri', priority: '0.7', freq: 'monthly' },
-        { loc: '/roi-hesaplayici', priority: '0.7', freq: 'monthly' },
+        { loc: '/sss', priority: '0.6', freq: 'monthly' },
+        { loc: '/referanslar', priority: '0.6', freq: 'monthly' },
+        { loc: '/teklif-al', priority: '0.8', freq: 'monthly' },
         { loc: '/kvkk', priority: '0.3', freq: 'yearly' },
         { loc: '/gizlilik', priority: '0.3', freq: 'yearly' },
         { loc: '/cerez-politikasi', priority: '0.3', freq: 'yearly' },
+        { loc: '/telif-haklari', priority: '0.3', freq: 'yearly' },
       ];
       let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
       for (const u of staticUrls) {
