@@ -20,7 +20,12 @@ export async function createNotification({ userId, type, title, message, link })
   }
 }
 
-export async function logActivity({ action, detail, type, icon, user }) {
+// target_type/target_id/before/after kolonları migration
+// 202607230001_kademedia_audit_and_quote_states.sql ile eklenir (henüz canlıya
+// uygulanmadı — bkz. docs/BLOCKERS_TR.md #1). Migration uygulanana kadar bu
+// alanlar sağlansa bile insert hata verir; fonksiyon bunu yutar (aşağıdaki
+// try/catch), yalnızca o log satırı yazılmaz — çağıran işlemler etkilenmez.
+export async function logActivity({ action, detail, type, icon, user, targetType, targetId, before, after }) {
   try {
     const supabase = getSupabase();
     const { error } = await supabase.from('kade_activity_log').insert({
@@ -29,6 +34,10 @@ export async function logActivity({ action, detail, type, icon, user }) {
       type: type || 'system',
       icon: icon || 'system',
       user: user || 'sistem',
+      target_type: targetType || null,
+      target_id: targetId || null,
+      before: before || null,
+      after: after || null,
     });
     if (error) throw error;
     return true;
