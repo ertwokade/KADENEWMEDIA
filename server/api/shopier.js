@@ -3,9 +3,10 @@ import bcrypt from 'bcryptjs'
 import { getSupabase, isUniqueViolation } from './_lib/supabase.js'
 import { cors } from './_lib/cors.js'
 import { buildPackageObject } from './_lib/packages.js'
-import { requireAdmin } from './_lib/auth.js'
+import { requireAdmin, requirePermission } from './_lib/auth.js'
 import { validateShopierPayment } from './_lib/shopierCatalog.js'
 import { reconcileShopierOrders } from './_lib/shopierReconciliation.js'
+import { logActivity } from './notifications.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -55,8 +56,92 @@ function parseBody(req) {
   return b || {}
 }
 
+function mapShopierOrder(row) {
+  if (!row) return row
+  return {
+    _id: row.id,
+    id: row.id,
+    shopierOrderId: row.shopier_order_id,
+    state: row.state,
+    email: row.email,
+    productReference: row.product_reference,
+    customerId: row.customer_id,
+    packageName: row.package_name,
+    price: row.price,
+    currency: row.currency,
+    reason: row.reason,
+    receivedAt: row.received_at,
+    completedAt: row.completed_at,
+    refundedAt: row.refunded_at,
+    refundedBy: row.refunded_by,
+    updatedAt: row.updated_at,
+  }
+}
+
+// Shopier'ın herkese açık webhook API'sinde otomatik iade/chargeback bildirimi
+// yok (yalnızca status=1 "ödeme başarılı" callback'i gelir) — bu yüzden iade
+// admin tarafından manuel olarak işaretlenir. state CHECK'ine 'refunded'/
+// 'partially_refunded' migration 202607230003 ile eklendi (henüz canlıya
+// uygulanmadı, bkz. docs/BLOCKERS_TR.md #1/#14).
+async function handleListOrders(req, res, supabase) {
+  const user = await requirePermission(req, res, 'invoices')
+  if (!user) return
+
+  const { data, error } = await supabase
+    .from('kade_shopier_orders')
+    .select('*')
+    .order('received_at', { ascending: false })
+    .limit(200)
+  if (error) throw error
+  return res.status(200).json((data || []).map(mapShopierOrder))
+}
+
+async function handleMarkRefunded(req, res, supabase) {
+  const user = await requirePermission(req, res, 'invoices', { write: true })
+  if (!user) return
+
+  const orderId = String(req.body?.orderId || '').trim()
+  if (!orderId) return res.status(400).json({ error: 'orderId gerekli' })
+
+  const { data: order, error: findError } = await supabase
+    .from('kade_shopier_orders')
+    .select('id, shopier_order_id, state')
+    .eq('shopier_order_id', orderId)
+    .maybeSingle()
+  if (findError) throw findError
+  if (!order) return res.status(404).json({ error: 'Sipariş bulunamadı' })
+  if (!['completed', 'completed_reconciled', 'completed_with_record_error'].includes(order.state)) {
+    return res.status(400).json({ error: `Bu sipariş "${order.state}" durumunda, yalnızca tamamlanmış siparişler iade edilebilir` })
+  }
+
+  const nowIso = new Date().toISOString()
+  const { error: updateError } = await supabase
+    .from('kade_shopier_orders')
+    .update({ state: 'refunded', refunded_at: nowIso, refunded_by: user.username, updated_at: nowIso })
+    .eq('shopier_order_id', orderId)
+  if (updateError) throw updateError
+
+  // İlişkili paketi de pasifleştir (varsa) — böylece iade edilen sipariş
+  // sessizce erişim vermeye devam etmez.
+  const { error: pkgError } = await supabase
+    .from('kade_customer_packages')
+    .update({ status: 'expired' })
+    .eq('shopier_order_id', orderId)
+    .eq('status', 'active')
+  if (pkgError) throw pkgError
+
+  logActivity({ action: 'Sipariş iade olarak işaretlendi', detail: orderId, type: 'update', icon: '↩️', user: user.username, targetType: 'shopier_order', targetId: order.id }).catch(() => {})
+  return res.status(200).json({ success: true })
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return
+
+  const supabase = getSupabase()
+
+  if (req.method === 'GET' && req.query?.action === 'orders') {
+    return handleListOrders(req, res, supabase)
+  }
 
   // GET isteği → Shopier'in URL doğrulama kontrolü
   if (req.method === 'GET') {
@@ -65,12 +150,14 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const supabase = getSupabase()
-
   if (req.query?.action === 'reconcile') {
     if (!(await requireAdmin(req, res))) return
     const summary = await reconcileShopierOrders(supabase, { limit: req.body?.limit })
     return res.status(200).json({ success: true, summary })
+  }
+
+  if (req.query?.action === 'refund') {
+    return handleMarkRefunded(req, res, supabase)
   }
 
   const body = parseBody(req)

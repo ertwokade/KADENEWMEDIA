@@ -40,6 +40,7 @@ import {
   getMessagesApi, markMessageReadApi, deleteMessageApi,
   getUsersApi, createUserApi, updateUserApi, deleteUserApi, getSystemHealthApi,
   getCouponsApi, createCouponApi, updateCouponApi, deleteCouponApi,
+  getShopierOrdersApi, markShopierOrderRefundedApi,
   sendCalendarInviteApi,
   seedApi,
   updateMessageStatusApi,
@@ -5265,6 +5266,107 @@ function CouponsSection({ showToast }) {
   )
 }
 
+// ========== SHOPIER ORDERS SECTION ==========
+// Shopier'ın herkese açık API'sinde otomatik iade webhook'u yok — bu yüzden
+// "İade Et" burada admin tarafından tetiklenen MANUEL bir işlemdir (bkz.
+// server/api/shopier.js handleMarkRefunded).
+function ShopierOrdersSection({ showToast }) {
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [refundingId, setRefundingId] = useState(null)
+
+  const stateLabels = {
+    processing: 'İşleniyor', completed: 'Tamamlandı', completed_reconciled: 'Tamamlandı (mutabakat)',
+    rejected: 'Reddedildi', ignored: 'Yok sayıldı', needs_review: 'İncelenmeli',
+    completed_with_record_error: 'Tamamlandı (kayıt hatası)', refunded: 'İade Edildi', partially_refunded: 'Kısmi İade',
+  }
+  const stateColors = {
+    completed: '#2ECC71', completed_reconciled: '#2ECC71', processing: '#eac321',
+    rejected: '#E91E63', ignored: '#888', needs_review: '#FF9800',
+    completed_with_record_error: '#FF9800', refunded: '#6C63FF', partially_refunded: '#6C63FF',
+  }
+  const refundableStates = ['completed', 'completed_reconciled', 'completed_with_record_error']
+
+  const load = useCallback(() => {
+    setLoading(true)
+    getShopierOrdersApi()
+      .then(data => setOrders(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const handleRefund = async (order) => {
+    if (!window.confirm(`"${order.shopierOrderId}" siparişini iade edilmiş olarak işaretlemek istediğinize emin misiniz? Bağlı paket varsa otomatik olarak pasifleştirilecek.`)) return
+    setRefundingId(order._id)
+    try {
+      await markShopierOrderRefundedApi(order.shopierOrderId)
+      showToast('Sipariş iade olarak işaretlendi', 'success')
+      load()
+    } catch (err) {
+      showToast(err.message || 'İşlem başarısız', 'error')
+    } finally {
+      setRefundingId(null)
+    }
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Ödeme <span>Kayıtları</span></h1>
+          <p>Shopier webhook üzerinden gelen tüm sipariş denemeleri</p>
+        </div>
+        <button onClick={load} className="table-action-btn" disabled={loading}>{loading ? '⏳' : '🔄'} Yenile</button>
+      </div>
+
+      <div className="admin-form" style={{ padding: '12px 18px', marginBottom: 20, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+        ℹ️ Shopier otomatik iade/chargeback bildirimi göndermez — bir müşteriye Shopier panelinden iade yaptığınızda buradan da "İade Et" ile işaretlemeniz gerekir, aksi halde müşterinin paket erişimi otomatik kapanmaz.
+      </div>
+
+      <div className="admin-table-wrapper">
+        <div className="admin-table-header"><h3>Siparişler ({orders.length})</h3></div>
+        {loading ? (
+          <div className="admin-empty-state"><p>Yükleniyor...</p></div>
+        ) : orders.length === 0 ? (
+          <div className="admin-empty-state"><div className="empty-icon">💳</div><h3>Henüz sipariş yok</h3></div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr><th>Sipariş</th><th>E-posta</th><th>Paket</th><th>Tutar</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr>
+            </thead>
+            <tbody>
+              {orders.map((o) => (
+                <tr key={o._id}>
+                  <td style={{ fontFamily: 'monospace', fontSize: '0.78rem' }}>{o.shopierOrderId}</td>
+                  <td style={{ fontSize: '0.82rem' }}>{o.email || '—'}</td>
+                  <td style={{ fontSize: '0.82rem' }}>{o.packageName || o.productReference || '—'}</td>
+                  <td>{o.price != null ? `${o.currency === 'USD' ? '$' : '₺'}${Number(o.price).toLocaleString('tr-TR')}` : '—'}</td>
+                  <td>
+                    <span className="status-badge" style={{ background: `${stateColors[o.state] || '#888'}20`, color: stateColors[o.state] || '#888' }}>
+                      {stateLabels[o.state] || o.state}
+                    </span>
+                    {o.reason && <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{o.reason}</div>}
+                  </td>
+                  <td style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>{o.receivedAt ? new Date(o.receivedAt).toLocaleString('tr-TR') : '—'}</td>
+                  <td>
+                    {refundableStates.includes(o.state) && (
+                      <button className="table-action-btn danger" disabled={refundingId === o._id} onClick={() => handleRefund(o)}>
+                        ↩️ {refundingId === o._id ? 'İşleniyor...' : 'İade Et'}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ========== SYSTEM HEALTH SECTION ==========
 function SystemHealthSection() {
   const [health, setHealth] = useState(null)
@@ -8092,6 +8194,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     'portal-customers': 'portalCustomers',
     'customer-profiles': 'customerProfiles',
     invoices: 'invoices',
+    'shopier-orders': 'invoices',
     coupons: 'coupons',
     tasks: 'tasks',
     subscriptions: 'subscriptions',
@@ -8143,6 +8246,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     { id: 'portal-customers', label: 'Portal Müşterileri', icon: HiOutlineGlobe },
     { id: 'customer-profiles', label: 'Müşteri Profilleri', icon: HiOutlineUserGroup },
     { id: 'invoices', label: 'Fatura & Ödeme', icon: HiOutlineCurrencyDollar },
+    { id: 'shopier-orders', label: 'Ödeme Kayıtları (Shopier)', icon: HiOutlineCurrencyDollar },
     { id: 'coupons', label: 'Kupon/Kampanya', icon: HiOutlineTag },
     { id: 'tasks', label: 'Görevler', icon: HiOutlineClipboardList },
     { id: 'subscriptions', label: 'Abonelikler', icon: HiOutlineRefresh },
@@ -8321,6 +8425,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
         {activeSection === 'activity' && <ActivityLogSection />}
         {activeSection === 'system-health' && <SystemHealthSection />}
         {activeSection === 'coupons' && <CouponsSection showToast={showToast} />}
+        {activeSection === 'shopier-orders' && <ShopierOrdersSection showToast={showToast} />}
         {activeSection === 'newsletter' && <NewsletterSection showToast={showToast} />}
         {activeSection === 'reminders' && <RemindersSection showToast={showToast} />}
         {activeSection === 'settings' && <SettingsSection showToast={showToast} />}

@@ -20,9 +20,12 @@ Canlı belge — her fazda güncellenir, kapatılan blockerlar silinmez, "Kapat�
 
 | 14 | Kupon sistemi ödeme akışına kablolanmadı | REQ-ADMIN-005, REQ-COMMERCE-006 | `kade_coupons` tablosu + admin CRUD + saf doğrulama mantığı (`_lib/coupons.js`) hazır ama `server/api/shopier.js`'teki `validateShopierPayment()` kupon indirimini uygulamıyor — bilinçli olarak ertelendi çünkü ödeme tutarı doğrulaması canlı webhook testi olmadan güvenle değiştirilemez | Blocker #1 çözülüp canlı ortamda test edilebildiğinde: `validateShopierPayment()`'a kupon parametresi eklenip `applyCouponDiscount()` ile indirimli tutar hesaplanmalı, `used_count` atomik artırılmalı | Açık, düşük risk (yalnızca admin CRUD canlı, ödeme etkilenmiyor) |
 
+| 15 | `apps/kadeai` tarafında da Shopier iade durumu ele alınmıyor | REQ-COMMERCE-006 | Kök tarafında bu turda çözüldü (bkz. kapatılan blockerlar) ama `apps/kadeai/lib/payments/shopierProvider.ts`/`entitlements` tablosu aynı boşluğu taşıyor — iki sistem kasıtlı olarak ayrı tutulduğu için (docs/02 karar #3) kadeai tarafında ayrıca ele alınmalı | Faz 3/5 devamında kadeai'de aynı desenle (manuel admin iade işaretleme + entitlement iptali) ele alınmalı | Açık, orta öncelik |
+
 ## Kapatılan blockerlar (bu oturumda)
 
 | # | Blocker | Nasıl kapatıldı |
 |---|---|---|
 | — | `apps/kadeai` production build ağ kısıtı nedeniyle önceki oturumda doğrulanamamıştı | Bu oturumda ağ erişimi vardı, `npm run build` başarıyla tamamlandı (bkz. `docs/01_CURRENT_STATE_AUDIT_TR.md`) |
 | — | 26 Haziran sürümü bulunamıyor/belirsizdi | Üç aşamalı arama ile kesin olarak bulundu ve izole çalıştırıldı (bkz. `docs/LEGACY_PAGE_GAP_ANALYSIS_TR.md`) |
+| — | Shopier iade/chargeback durumu hiçbir sistemde ele alınmıyordu (docs/05'in Faz 3 öncelik #1'i) | İncelendi: Shopier'ın herkese açık API'si otomatik iade webhook'u göndermiyor (yalnızca status=1 ödeme-başarılı callback'i var, kod incelemesiyle doğrulandı). Bu yüzden gerçekçi çözüm otomatik değil, **admin tarafından manuel iade işaretleme**. `kade_shopier_orders.state`'e `refunded/partially_refunded` eklendi (migration, uygulanmadı), `server/api/shopier.js`'e admin-only `?action=orders` (liste) ve `?action=refund` (iade işaretle + bağlı paketi pasifleştir) eklendi, yeni "Ödeme Kayıtları" admin ekranı eklendi. `apps/kadeai` tarafında (`shopierProvider.ts`) aynı boşluk hâlâ açık — iki sistem kasıtlı olarak birleştirilmediği için (bkz. docs/02 karar #3) orada ayrıca ele alınmalı |

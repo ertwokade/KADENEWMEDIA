@@ -453,6 +453,21 @@ export async function sendContactApi(data) {
   return handleResponse(res);
 }
 
+// Shopier orders (admin only — 'invoices' izni)
+export async function getShopierOrdersApi() {
+  const res = await fetch(`${API_BASE}/shopier?action=orders`, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function markShopierOrderRefundedApi(orderId) {
+  const res = await fetch(`${API_BASE}/shopier?action=refund`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ orderId }),
+  });
+  return handleResponse(res);
+}
+
 // Coupons (admin/editor)
 export async function getCouponsApi() {
   const res = await fetch(`${API_BASE}/coupons`, { headers: getAuthHeaders() });
