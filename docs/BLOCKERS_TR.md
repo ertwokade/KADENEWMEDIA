@@ -23,6 +23,8 @@ Canlı belge — her fazda güncellenir, kapatılan blockerlar silinmez, "Kapat�
 | 16 | Upstash Redis (kalıcı rate limit) canlıda yapılandırılmamış olabilir | REQ-SEC-001 | `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` `.env.example`'da belgeli ama gerçekten provizyon edilip edilmediği doğrulanmadı. Yapılandırılmazsa `_lib/rateLimit.js` bellek-içi sayaca düşer — Vercel'de fonksiyon örnekleri arası paylaşılmadığı için dağıtık brute-force koruması zayıflar (kod kendisi doğru tasarlanmış, bkz. `docs/07_SECURITY_AUDIT_TR.md`) | Bir Upstash Redis instance'ı oluşturup bu iki env değişkenini Vercel'e ekleyin | Açık, orta öncelik |
 | 15 | `apps/kadeai` tarafında da Shopier iade durumu ele alınmıyor | REQ-COMMERCE-006 | Kök tarafında bu turda çözüldü (bkz. kapatılan blockerlar) ama `apps/kadeai/lib/payments/shopierProvider.ts`/`entitlements` tablosu aynı boşluğu taşıyor — iki sistem kasıtlı olarak ayrı tutulduğu için (docs/02 karar #3) kadeai tarafında ayrıca ele alınmalı | Faz 3/5 devamında kadeai'de aynı desenle (manuel admin iade işaretleme + entitlement iptali) ele alınmalı | Açık, orta öncelik |
 
+| 17 | Mesafeli satış hukuki sayfaları hiç yok ama satış zaten canlı | REQ-LEGAL-002 | Shopier ile gerçek ödeme akışı çalışıyor ama Mesafeli Satış Sözleşmesi, Ön Bilgilendirme Formu ve Cayma/İptal/İade Politikası sayfaları hiç yok (bkz. `docs/08_LEGAL_COMPLIANCE_CHECKLIST_TR.md` §2) — 6502 Tüketici Koruma Kanunu ve Mesafeli Sözleşmeler Yönetmeliği açısından somut bir hukuki risk | Hukukçuya bu üç belgeyi öncelikli olarak yazdırın; içerik gelince sayfa/route eklemek düşük efor | Açık, **en yüksek öncelikli hukuki blocker** |
+
 ## Kapatılan blockerlar (bu oturumda)
 
 | # | Blocker | Nasıl kapatıldı |
