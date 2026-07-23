@@ -5088,8 +5088,8 @@ function ActivityLogSection() {
     return `${Math.floor(hours / 24)} gün önce`
   }
 
-  const typeColors = { create: '#2ECC71', update: '#eac321', delete: '#E91E63', message: '#6C63FF', system: '#607D8B' }
-  const typeLabels = { create: 'Oluşturma', update: 'Güncelleme', delete: 'Silme', message: 'Mesaj', system: 'Sistem' }
+  const typeColors = { create: '#2ECC71', update: '#eac321', delete: '#E91E63', message: '#6C63FF', system: '#607D8B', security: '#FF5722' }
+  const typeLabels = { create: 'Oluşturma', update: 'Güncelleme', delete: 'Silme', message: 'Mesaj', system: 'Sistem', security: 'Güvenlik' }
 
   return (
     <div>
@@ -5104,7 +5104,7 @@ function ActivityLogSection() {
       </div>
 
       <div className="admin-tabs" style={{ marginBottom: 20 }}>
-        {['all', 'create', 'update', 'delete', 'message', 'system'].map(t => (
+        {['all', 'security', 'create', 'update', 'delete', 'message', 'system'].map(t => (
           <button key={t} className={`admin-tab ${filter === t ? 'active' : ''}`} onClick={() => setFilter(t)}>
             {t === 'all' ? 'Tümü' : typeLabels[t]}
           </button>

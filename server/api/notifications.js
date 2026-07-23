@@ -1,6 +1,44 @@
 import { getSupabase, isValidUuid } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
+import { createNotification, logActivity } from './_lib/notify.js';
+
+// Diğer API dosyaları bu iki fonksiyonu tarihsel olarak './notifications.js'ten
+// import ediyor; tek kaynak _lib/notify.js olacak şekilde burada yeniden export
+// ediliyor (önceden burada ayrı, senkron olmayan bir kopyaları vardı).
+export { createNotification, logActivity };
+
+function mapActivityLog(row) {
+  if (!row) return row;
+  return {
+    _id: row.id,
+    id: row.id,
+    action: row.action,
+    detail: row.detail,
+    type: row.type,
+    icon: row.icon,
+    user: row.user,
+    targetType: row.target_type,
+    targetId: row.target_id,
+    before: row.before,
+    after: row.after,
+    createdAt: row.created_at,
+  };
+}
+
+function mapNotification(row) {
+  if (!row) return row;
+  return {
+    _id: row.id,
+    id: row.id,
+    type: row.type,
+    title: row.title,
+    message: row.message,
+    link: row.link,
+    read: row.read,
+    createdAt: row.created_at,
+  };
+}
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -19,7 +57,7 @@ export default async function handler(req, res) {
       if (filter && filter !== 'all') query = query.eq('type', filter);
       const { data, error } = await query;
       if (error) throw error;
-      return res.status(200).json(data);
+      return res.status(200).json((data || []).map(mapActivityLog));
     }
 
     if (req.method === 'POST') {
@@ -36,7 +74,7 @@ export default async function handler(req, res) {
         user: user.username,
       }).select().single();
       if (error) throw error;
-      return res.status(201).json(data);
+      return res.status(201).json(mapActivityLog(data));
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
@@ -54,7 +92,7 @@ export default async function handler(req, res) {
       .order('created_at', { ascending: false })
       .limit(50);
     if (error) throw error;
-    return res.status(200).json(data);
+    return res.status(200).json((data || []).map(mapNotification));
   }
 
   // PUT — okundu işaretle
@@ -103,43 +141,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
-}
-
-// Helper: Bildirim oluşturma (diğer API'lerden çağrılabilir)
-export async function createNotification({ userId, type, title, message, link }) {
-  try {
-    const supabase = getSupabase();
-    const { error } = await supabase.from('kade_notifications').insert({
-      user_id: userId,
-      type: type || 'info',
-      title,
-      message,
-      link: link || null,
-      read: false,
-    });
-    if (error) throw error;
-    return true;
-  } catch (err) {
-    console.error('Notification write failed:', err.message);
-    return false;
-  }
-}
-
-// Helper: Aktivite logu (diğer API'lerden çağrılabilir)
-export async function logActivity({ action, detail, type, icon, user }) {
-  try {
-    const supabase = getSupabase();
-    const { error } = await supabase.from('kade_activity_log').insert({
-      action,
-      detail: detail || '',
-      type: type || 'system',
-      icon: icon || 'system',
-      user: user || 'sistem',
-    });
-    if (error) throw error;
-    return true;
-  } catch (err) {
-    console.error('Activity log write failed:', err.message);
-    return false;
-  }
 }
