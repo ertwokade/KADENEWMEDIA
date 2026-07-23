@@ -453,6 +453,38 @@ export async function sendContactApi(data) {
   return handleResponse(res);
 }
 
+// Coupons (admin/editor)
+export async function getCouponsApi() {
+  const res = await fetch(`${API_BASE}/coupons`, { headers: getAuthHeaders() });
+  return handleResponse(res);
+}
+
+export async function createCouponApi(data) {
+  const res = await fetch(`${API_BASE}/coupons`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateCouponApi(data) {
+  const res = await fetch(`${API_BASE}/coupons`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteCouponApi(id) {
+  const res = await fetch(`${API_BASE}/coupons?id=${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
 // System health (admin only)
 export async function getSystemHealthApi() {
   const res = await fetch(`${API_BASE}/system-health`, {

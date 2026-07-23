@@ -9,6 +9,7 @@ import chat from '../server/api/chat.js'
 import client from '../server/api/client.js'
 import contact from '../server/api/contact.js'
 import content from '../server/api/content.js'
+import coupons from '../server/api/coupons.js'
 import crm from '../server/api/crm.js'
 import linkProfiles from '../server/api/linkProfiles.js'
 import media from '../server/api/media.js'
@@ -43,6 +44,7 @@ const handlers = {
   client,
   contact,
   content,
+  coupons,
   crm,
   linkprofiles: linkProfiles,
   media,

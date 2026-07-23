@@ -16,7 +16,7 @@ import {
   HiOutlineDocumentReport, HiOutlineClipboardCheck,
   HiOutlineTemplate, HiOutlineStar, HiOutlineCollection,
   HiOutlineUserGroup, HiOutlineGlobe, HiOutlineCalculator,
-  HiOutlineLink, HiOutlineIdentification, HiOutlineStatusOnline,
+  HiOutlineLink, HiOutlineIdentification, HiOutlineStatusOnline, HiOutlineTag,
 } from 'react-icons/hi'
 import PageTransition from '../components/PageTransition'
 import BasinEditor from './admin/editors/BasinEditor'
@@ -39,6 +39,7 @@ import {
   getShortLinksApi, createShortLinkApi, updateShortLinkApi, deleteShortLinkApi,
   getMessagesApi, markMessageReadApi, deleteMessageApi,
   getUsersApi, createUserApi, updateUserApi, deleteUserApi, getSystemHealthApi,
+  getCouponsApi, createCouponApi, updateCouponApi, deleteCouponApi,
   sendCalendarInviteApi,
   seedApi,
   updateMessageStatusApi,
@@ -4110,6 +4111,7 @@ const PERMISSION_MODULES = [
   { key: 'portalCustomers', label: 'Müşteri Portalı' },
   { key: 'customerProfiles', label: 'Müşteri Profilleri' },
   { key: 'invoices', label: 'Faturalar' },
+  { key: 'coupons', label: 'Kupon/Kampanya' },
   { key: 'tasks', label: 'Görevler' },
   { key: 'subscriptions', label: 'Abonelikler' },
   { key: 'surveys', label: 'Anketler' },
@@ -5054,6 +5056,215 @@ function PortfolioSection({ showToast }) {
 }
 
 // ========== ACTIVITY LOG ==========
+// ========== COUPONS SECTION ==========
+// Yalnızca kupon TANIMLARINI yönetir (admin CRUD). Kuponun gerçek ödeme
+// akışına (Shopier checkout) uygulanması bu turda YAPILMADI — bkz.
+// server/api/coupons.js başındaki not ve docs/BLOCKERS_TR.md.
+function CouponsSection({ showToast }) {
+  const [coupons, setCoupons] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingCoupon, setEditingCoupon] = useState(null)
+  const emptyForm = { code: '', description: '', discountType: 'percent', discountValue: '', appliesTo: '', maxUses: '', validFrom: '', validUntil: '', active: true }
+  const [form, setForm] = useState(emptyForm)
+
+  const load = useCallback(() => {
+    setLoading(true)
+    getCouponsApi()
+      .then(data => setCoupons(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const resetForm = () => { setForm(emptyForm); setEditingCoupon(null); setShowForm(false) }
+
+  const handleEdit = (c) => {
+    setForm({
+      code: c.code,
+      description: c.description || '',
+      discountType: c.discountType,
+      discountValue: String(c.discountValue),
+      appliesTo: (c.appliesTo || []).join(', '),
+      maxUses: c.maxUses != null ? String(c.maxUses) : '',
+      validFrom: c.validFrom ? c.validFrom.slice(0, 10) : '',
+      validUntil: c.validUntil ? c.validUntil.slice(0, 10) : '',
+      active: c.active,
+    })
+    setEditingCoupon(c)
+    setShowForm(true)
+  }
+
+  const handleSave = async () => {
+    if (!form.code.trim()) return showToast('Kupon kodu gerekli', 'error')
+    if (!form.discountValue || Number(form.discountValue) <= 0) return showToast('Geçerli bir indirim değeri girin', 'error')
+
+    const payload = {
+      code: form.code,
+      description: form.description,
+      discountType: form.discountType,
+      discountValue: Number(form.discountValue),
+      appliesTo: form.appliesTo.split(',').map(s => s.trim()).filter(Boolean),
+      maxUses: form.maxUses ? Number(form.maxUses) : null,
+      validFrom: form.validFrom || null,
+      validUntil: form.validUntil || null,
+      active: form.active,
+    }
+
+    try {
+      if (editingCoupon) {
+        await updateCouponApi({ id: editingCoupon._id, ...payload })
+        showToast('Kupon güncellendi!', 'success')
+      } else {
+        await createCouponApi(payload)
+        showToast('Kupon oluşturuldu!', 'success')
+      }
+      resetForm()
+      load()
+    } catch (err) {
+      showToast(err.message || 'İşlem başarısız', 'error')
+    }
+  }
+
+  const handleDelete = async (c) => {
+    if (!window.confirm(`"${c.code}" kuponunu silmek istediğinize emin misiniz?`)) return
+    try {
+      await deleteCouponApi(c._id)
+      showToast('Kupon silindi', 'success')
+      load()
+    } catch (err) {
+      showToast(err.message || 'Silme başarısız', 'error')
+    }
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Kupon <span>/ Kampanya</span></h1>
+          <p>İndirim kodu tanımları — henüz ödeme akışına kablolanmadı, yalnızca tanım yönetimi</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
+          <HiOutlinePlus size={18} /> Yeni Kupon
+        </button>
+      </div>
+
+      <div className="admin-form" style={{ padding: '12px 18px', marginBottom: 20, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+        ⚠️ Bu kuponlar şu an yalnızca tanımlanıyor ve listeleniyor; checkout/ödeme akışına henüz bağlanmadı (canlı webhook testi gerektirdiği için bilinçli olarak ertelendi, bkz. docs/BLOCKERS_TR.md).
+      </div>
+
+      <AnimatePresence>
+        {showForm && (
+          <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
+            <motion.div className="admin-modal" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520 }}>
+              <div className="admin-modal-header">
+                <h3>{editingCoupon ? 'Kuponu Düzenle' : 'Yeni Kupon'}</h3>
+                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+              </div>
+              <div className="admin-form" style={{ border: 'none', padding: 0 }}>
+                <div className="form-group">
+                  <label>Kupon Kodu *</label>
+                  <input type="text" value={form.code} disabled={Boolean(editingCoupon)} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="ORNEK: KADE2026" />
+                </div>
+                <div className="form-group">
+                  <label>Açıklama</label>
+                  <input type="text" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="İç kullanım için not..." />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div className="form-group">
+                    <label>İndirim Tipi</label>
+                    <select value={form.discountType} onChange={(e) => setForm({ ...form, discountType: e.target.value })}>
+                      <option value="percent">Yüzde (%)</option>
+                      <option value="fixed">Sabit Tutar (₺)</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Değer *</label>
+                    <input type="number" min="0" step="0.01" value={form.discountValue} onChange={(e) => setForm({ ...form, discountValue: e.target.value })} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Geçerli Olduğu Paketler (referans, virgülle ayrılmış — boş = tüm paketler)</label>
+                  <input type="text" value={form.appliesTo} onChange={(e) => setForm({ ...form, appliesTo: e.target.value })} placeholder="sosyal-medya-starter, sosyal-medya-growth" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div className="form-group">
+                    <label>Başlangıç</label>
+                    <input type="date" value={form.validFrom} onChange={(e) => setForm({ ...form, validFrom: e.target.value })} />
+                  </div>
+                  <div className="form-group">
+                    <label>Bitiş</label>
+                    <input type="date" value={form.validUntil} onChange={(e) => setForm({ ...form, validUntil: e.target.value })} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Maksimum Kullanım (boş = sınırsız)</label>
+                  <input type="number" min="1" value={form.maxUses} onChange={(e) => setForm({ ...form, maxUses: e.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Aktif
+                  </label>
+                </div>
+                <div className="admin-form-actions">
+                  <button className="btn btn-outline" onClick={resetForm}>İptal</button>
+                  <button className="btn btn-primary" onClick={handleSave}><HiOutlineSave size={16} /> {editingCoupon ? 'Güncelle' : 'Oluştur'}</button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="admin-table-wrapper">
+        <div className="admin-table-header"><h3>Kuponlar ({coupons.length})</h3></div>
+        {loading ? (
+          <div className="admin-empty-state"><p>Yükleniyor...</p></div>
+        ) : coupons.length === 0 ? (
+          <div className="admin-empty-state">
+            <div className="empty-icon">🏷️</div>
+            <h3>Henüz kupon yok</h3>
+            <p>Yeni bir kupon tanımlayın</p>
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Kod</th><th>İndirim</th><th>Kapsam</th><th>Kullanım</th><th>Geçerlilik</th><th>Durum</th><th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {coupons.map((c) => (
+                <tr key={c._id}>
+                  <td><strong>{c.code}</strong>{c.description && <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>{c.description}</div>}</td>
+                  <td>{c.discountType === 'percent' ? `%${c.discountValue}` : `₺${c.discountValue}`}</td>
+                  <td style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{c.appliesTo?.length ? c.appliesTo.join(', ') : 'Tüm paketler'}</td>
+                  <td style={{ fontSize: '0.82rem' }}>{c.usedCount || 0}{c.maxUses ? ` / ${c.maxUses}` : ''}</td>
+                  <td style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>
+                    {c.validFrom ? new Date(c.validFrom).toLocaleDateString('tr-TR') : '—'} → {c.validUntil ? new Date(c.validUntil).toLocaleDateString('tr-TR') : '—'}
+                  </td>
+                  <td>
+                    <span className="status-badge" style={{ background: c.active ? '#2ECC7120' : '#88888820', color: c.active ? '#2ECC71' : '#888' }}>
+                      {c.active ? 'Aktif' : 'Pasif'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="table-actions">
+                      <button className="table-action-btn" onClick={() => handleEdit(c)}><HiOutlinePencil size={14} /> Düzenle</button>
+                      <button className="table-action-btn danger" onClick={() => handleDelete(c)}><HiOutlineTrash size={14} /> Sil</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ========== SYSTEM HEALTH SECTION ==========
 function SystemHealthSection() {
   const [health, setHealth] = useState(null)
@@ -7881,6 +8092,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     'portal-customers': 'portalCustomers',
     'customer-profiles': 'customerProfiles',
     invoices: 'invoices',
+    coupons: 'coupons',
     tasks: 'tasks',
     subscriptions: 'subscriptions',
     surveys: 'surveys',
@@ -7931,6 +8143,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     { id: 'portal-customers', label: 'Portal Müşterileri', icon: HiOutlineGlobe },
     { id: 'customer-profiles', label: 'Müşteri Profilleri', icon: HiOutlineUserGroup },
     { id: 'invoices', label: 'Fatura & Ödeme', icon: HiOutlineCurrencyDollar },
+    { id: 'coupons', label: 'Kupon/Kampanya', icon: HiOutlineTag },
     { id: 'tasks', label: 'Görevler', icon: HiOutlineClipboardList },
     { id: 'subscriptions', label: 'Abonelikler', icon: HiOutlineRefresh },
     { id: 'surveys', label: 'NPS Anketleri', icon: HiOutlineStar },
@@ -8107,6 +8320,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
         {activeSection === 'users' && <UsersSection showToast={showToast} />}
         {activeSection === 'activity' && <ActivityLogSection />}
         {activeSection === 'system-health' && <SystemHealthSection />}
+        {activeSection === 'coupons' && <CouponsSection showToast={showToast} />}
         {activeSection === 'newsletter' && <NewsletterSection showToast={showToast} />}
         {activeSection === 'reminders' && <RemindersSection showToast={showToast} />}
         {activeSection === 'settings' && <SettingsSection showToast={showToast} />}
