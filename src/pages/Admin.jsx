@@ -16,7 +16,7 @@ import {
   HiOutlineDocumentReport, HiOutlineClipboardCheck,
   HiOutlineTemplate, HiOutlineStar, HiOutlineCollection,
   HiOutlineUserGroup, HiOutlineGlobe, HiOutlineCalculator,
-  HiOutlineLink, HiOutlineIdentification,
+  HiOutlineLink, HiOutlineIdentification, HiOutlineStatusOnline,
 } from 'react-icons/hi'
 import PageTransition from '../components/PageTransition'
 import BasinEditor from './admin/editors/BasinEditor'
@@ -38,7 +38,7 @@ import {
   getLinkProfilesApi, createLinkProfileApi, updateLinkProfileApi, deleteLinkProfileApi,
   getShortLinksApi, createShortLinkApi, updateShortLinkApi, deleteShortLinkApi,
   getMessagesApi, markMessageReadApi, deleteMessageApi,
-  getUsersApi, createUserApi, updateUserApi, deleteUserApi,
+  getUsersApi, createUserApi, updateUserApi, deleteUserApi, getSystemHealthApi,
   sendCalendarInviteApi,
   seedApi,
   updateMessageStatusApi,
@@ -4101,6 +4101,7 @@ const PERMISSION_MODULES = [
   { key: 'users', label: 'Kullanıcılar' },
   { key: 'settings', label: 'Ayarlar' },
   { key: 'activity', label: 'Aktivite Günlüğü' },
+  { key: 'systemHealth', label: 'Sistem Sağlığı' },
   { key: 'backup', label: 'Yedekleme' },
   { key: 'media', label: 'Medya' },
   { key: 'crm', label: 'CRM' },
@@ -4121,7 +4122,7 @@ const PERMISSION_MODULES = [
 
 const ROLE_DEFAULT_PERMISSIONS = {
   admin: Object.fromEntries(PERMISSION_MODULES.map(m => [m.key, true])),
-  editor: Object.fromEntries(PERMISSION_MODULES.map(m => [m.key, !['users', 'settings', 'backup'].includes(m.key)])),
+  editor: Object.fromEntries(PERMISSION_MODULES.map(m => [m.key, !['users', 'settings', 'backup', 'systemHealth'].includes(m.key)])),
   viewer: Object.fromEntries(PERMISSION_MODULES.map(m => [m.key, ['dashboard', 'analytics', 'messages'].includes(m.key)])),
 }
 
@@ -5053,6 +5054,101 @@ function PortfolioSection({ showToast }) {
 }
 
 // ========== ACTIVITY LOG ==========
+// ========== SYSTEM HEALTH SECTION ==========
+function SystemHealthSection() {
+  const [health, setHealth] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await getSystemHealthApi()
+      setHealth(data)
+    } catch (err) {
+      setError(err.message || 'Sistem sağlığı bilgisi alınamadı')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const formatUptime = (seconds) => {
+    if (!seconds && seconds !== 0) return '—'
+    const h = Math.floor(seconds / 3600)
+    const m = Math.floor((seconds % 3600) / 60)
+    return `${h}s ${m}dk`
+  }
+
+  return (
+    <div>
+      <div className="admin-page-header">
+        <div>
+          <h1>Sistem <span>Sağlığı</span></h1>
+          <p>Veritabanı bağlantısı ve ortam yapılandırması özet durumu</p>
+        </div>
+        <button onClick={load} className="table-action-btn" disabled={loading}>
+          {loading ? '⏳' : '🔄'} Yenile
+        </button>
+      </div>
+
+      {error && (
+        <div className="admin-form" style={{ padding: '14px 18px', marginBottom: 20, borderColor: '#E91E63', color: '#E91E63' }}>{error}</div>
+      )}
+
+      {loading && !health ? (
+        <div className="admin-empty-state"><p>Yükleniyor...</p></div>
+      ) : health && (
+        <div style={{ display: 'grid', gap: 20 }}>
+          <div className="admin-form">
+            <h3 style={{ marginBottom: 12 }}>Supabase Bağlantısı</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span
+                className="status-badge"
+                style={{
+                  background: health.supabase.connected ? '#2ECC7120' : '#E91E6320',
+                  color: health.supabase.connected ? '#2ECC71' : '#E91E63',
+                }}
+              >
+                {health.supabase.connected ? '● Bağlı' : health.supabase.configured ? '● Yapılandırılmış ama bağlanamıyor' : '● Yapılandırılmamış'}
+              </span>
+              {health.supabase.latencyMs != null && (
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)' }}>{health.supabase.latencyMs}ms</span>
+              )}
+            </div>
+            {health.supabase.error && (
+              <p style={{ marginTop: 8, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{health.supabase.error}</p>
+            )}
+          </div>
+
+          <div className="admin-form">
+            <h3 style={{ marginBottom: 12 }}>Sunucu</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, fontSize: '0.85rem' }}>
+              <div><span style={{ color: 'var(--text-tertiary)' }}>Ortam:</span> {health.server.env}</div>
+              <div><span style={{ color: 'var(--text-tertiary)' }}>Node:</span> {health.server.nodeVersion}</div>
+              <div><span style={{ color: 'var(--text-tertiary)' }}>Çalışma süresi:</span> {formatUptime(health.server.uptimeSeconds)}</div>
+            </div>
+          </div>
+
+          <div className="admin-form">
+            <h3 style={{ marginBottom: 12 }}>Ortam Değişkenleri (yalnızca var/yok — değer gösterilmez)</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
+              {Object.entries(health.envVars).map(([key, { label, present }]) => (
+                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem' }}>
+                  <span style={{ color: present ? '#2ECC71' : '#E91E63' }}>{present ? '✓' : '✕'}</span>
+                  {label}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function ActivityLogSection() {
   const [logs, setLogs] = useState([])
   const [filter, setFilter] = useState('all')
@@ -7794,6 +7890,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     'email-templates': 'emailTemplates',
     users: 'users',
     activity: 'activity',
+    'system-health': 'systemHealth',
     backup: 'backup',
     settings: 'settings',
   }), [])
@@ -7846,6 +7943,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
   const systemNavItems = filterNavItems([
     { id: 'users', label: 'Kullanıcılar', icon: HiOutlineUsers },
     { id: 'activity', label: 'Aktivite Logu', icon: HiOutlineAnnotation },
+    { id: 'system-health', label: 'Sistem Sağlığı', icon: HiOutlineStatusOnline },
     { id: 'backup', label: 'Yedekleme', icon: HiOutlineDatabase },
     { id: 'settings', label: 'Ayarlar', icon: HiOutlineCog },
   ])
@@ -8008,6 +8106,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
         {activeSection === 'calendar' && <CalendarSection showToast={showToast} />}
         {activeSection === 'users' && <UsersSection showToast={showToast} />}
         {activeSection === 'activity' && <ActivityLogSection />}
+        {activeSection === 'system-health' && <SystemHealthSection />}
         {activeSection === 'newsletter' && <NewsletterSection showToast={showToast} />}
         {activeSection === 'reminders' && <RemindersSection showToast={showToast} />}
         {activeSection === 'settings' && <SettingsSection showToast={showToast} />}

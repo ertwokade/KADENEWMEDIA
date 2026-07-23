@@ -24,6 +24,7 @@ import shortLinks from '../server/api/shortLinks.js'
 import sitemap from '../server/api/sitemap.js'
 import subscriptions from '../server/api/subscriptions.js'
 import surveys from '../server/api/surveys.js'
+import systemHealth from '../server/api/system-health.js'
 import tasks from '../server/api/tasks.js'
 import users from '../server/api/users.js'
 import { validateCsrf } from '../server/api/_lib/csrf.js'
@@ -57,6 +58,7 @@ const handlers = {
   sitemap,
   subscriptions,
   surveys,
+  'system-health': systemHealth,
   tasks,
   users,
 }

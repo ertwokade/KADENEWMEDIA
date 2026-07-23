@@ -453,6 +453,14 @@ export async function sendContactApi(data) {
   return handleResponse(res);
 }
 
+// System health (admin only)
+export async function getSystemHealthApi() {
+  const res = await fetch(`${API_BASE}/system-health`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
 // Users (admin only)
 export async function getUsersApi() {
   const res = await fetch(`${API_BASE}/users`, {
