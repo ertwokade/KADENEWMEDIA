@@ -10,6 +10,7 @@ import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import { PACKAGE_SCOPES, PACKAGE_FAQS as FAQS } from '../data/packages'
+import { analytics } from '../utils/analytics'
 import './Packages.css'
 
 export default function Packages() {
@@ -99,6 +100,7 @@ export default function Packages() {
                       to={`/teklif-al?paket=${pkg.id}`}
                       className="btn btn-outline package-btn"
                       aria-label={`${name} ${isEN ? 'scope quote' : 'kapsamı için teklif al'}`}
+                      onClick={() => analytics.packageClick(pkg.id)}
                     >
                       {isEN ? 'Request a quote' : 'Teklif al'} <HiOutlineArrowRight size={16} />
                     </Link>
