@@ -35,7 +35,7 @@ Bekliyor · İnceleniyor · Uygulanıyor · Test ediliyor · Tamamlandı · Kıs
 | Kimlik | Gereksinim (şartname bölümü) | Durum | Not |
 |---|---|---|---|
 | REQ-DESIGN-001 | §6 Tasarım sistemi ve tokenlar, ortak bileşenler | Bekliyor | Faz 2 |
-| REQ-DESIGN-002 | §6.2 Referans ürün (rekt/YouMind/ChatCut) fikir değerlendirmesi | Bekliyor | Faz 2, `docs/REFERENCE_PRODUCT_GAP_ANALYSIS_TR.md` |
+| REQ-DESIGN-002 | §6.2 Referans ürün (rekt/YouMind/ChatCut) fikir değerlendirmesi | Tamamlandı | `docs/REFERENCE_PRODUCT_GAP_ANALYSIS_TR.md` — 3 site canlı incelendi (WebFetch), 15 fikir "doğrudan değer/MVP sonrası/gereksiz/hukuki riskli" olarak sınıflandırıldı. Ortak sonuç: kredi/kullanım bazlı erişim modeli ve tek-akışlı çoklu-format üretim pazar standardı — bu, bağımsız olarak zaten tespit edilmiş `docs/05` UsageLimit önceliğini doğruladı. Hiçbir metin/görsel kopyalanmadı |
 | REQ-CONTENT-001 | §7 Marka metinleri, misyon/vizyon, marka adı tutarlılığı | Bekliyor | Faz 2/8 |
 | REQ-COMMERCE-001 | §8.1 Ticari veri modeli (Product/Plan/Price/Entitlement/Order/...) | Bekliyor | Faz 2/3 — en büyük mimari karar |
 | REQ-COMMERCE-002 | §8.2 Haftalık/aylık/yıllık/tek seferlik/özel dönem desteği | Bekliyor | Faz 3 |
