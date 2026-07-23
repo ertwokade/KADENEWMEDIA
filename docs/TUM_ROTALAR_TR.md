@@ -1,0 +1,140 @@
+# Tüm Rotalar — `/` ile başlayan her şey
+
+Koddan doğrudan çıkarıldı (`src/App.jsx`, `api/[...path].js`, `apps/kadeai/app/**`, `apps/studio-web/app/**`, `vercel.json`). Dinamik segmentler (`:handle`, `:slug`, `:id`, `[projectId]`, `[exportId]`) gerçek değerlerle çalışır.
+
+**Özet:** Kök site 41 sayfa + 33 API · Kade AI 41 sayfa + 55 API · Kade Studio 4 sayfa + 11 API
+
+---
+
+## 1) Kök Site — Public Sayfalar (`kadenewmedia.com`)
+
+| Yol | Açıklama |
+|---|---|
+| `/` | Ana sayfa (⚠️ React değil, `public/site.html` statik export — bkz. BLOCKERS #18) |
+| `/hizmetler` | Hizmetler listesi |
+| `/hizmetler/:slug` | Hizmet detayı (sosyal-medya-yonetimi, icerik-uretimi, reklam-yonetimi, video-produksiyon, strateji-danismanlik, web-sitesi-tasarimi) |
+| `/new-media-ajansi` | New Media ajansı |
+| `/paketler` | Paketler / fiyatlandırma |
+| `/hakkimizda` | Hakkımızda |
+| `/iletisim` | İletişim |
+| `/teklif-al` | Teklif alma formu |
+| `/kariyer` | Kariyer |
+| `/sss` | Sık sorulan sorular |
+| `/ekip` | Ekip |
+| `/portfolio` | Portfolyo |
+| `/partnerler` | Partnerler listesi |
+| `/partnerler/:id` | Partner detayı (bu oturumda düzeltildi) |
+| `/basari-hikayeleri` | Başarı hikayeleri |
+| `/referanslar` | Referanslar |
+| `/blog` | Blog listesi (bu oturumda gerçek CMS'e bağlandı) |
+| `/blog/:slug` | Blog yazı detayı (bu oturumda düzeltildi) |
+| `/kade-kit-business` | Kade Kit Business |
+| `/:handle` | Link-in-bio profil sayfası (`/@handle`) |
+| `/s/:slug` | Kısa link yönlendirme çözücü |
+
+## 2) Kök Site — Kimlik & Korumalı Rotalar
+
+| Yol | Açıklama |
+|---|---|
+| `/giris` | Giriş hub'ı |
+| `/giris/danismanlik` | Danışmanlık girişi |
+| `/admin` | Admin paneli (oturum korumalı) |
+| `/musteri-panel` | Müşteri paneli |
+| `/proje-takip` | Proje takip (müşteri korumalı) |
+| `/organizasyon-kiti` | Organizasyon Kiti (guard'lı) |
+| `/organizasyon-kiti/plan/fractional-new-media-director` | Plan sayfası |
+
+## 3) Kök Site — Hukuki & Hata/Durum Sayfaları
+
+| Yol | Açıklama |
+|---|---|
+| `/kvkk` | KVKK aydınlatma metni |
+| `/gizlilik` | Gizlilik politikası |
+| `/cerez-politikasi` | Çerez politikası |
+| `/telif-haklari` | Telif hakları |
+| `/tesekkur` | Teşekkür / dönüşüm sayfası |
+| `/401` | Yetkisiz (bu oturumda eklendi) |
+| `/403` | Erişim engellendi (bu oturumda eklendi) |
+| `/429` | Çok fazla istek (bu oturumda eklendi) |
+| `/bakim` | Bakım sayfası (bu oturumda eklendi) |
+| `*` | 404 (bilinmeyen tüm rotalar) |
+
+## 4) Kök Site — Yönlendirmeler & Statik (`vercel.json`)
+
+| Yol | Hedef |
+|---|---|
+| `/links` | → `kadirardademir.com/links` (301) |
+| `/kadelinks` | → `kadirardademir.com/links` (301) |
+| `/kadelinks/:path*` | → `kadirardademir.com/links` (301) |
+| `/kadirdemir` | Link profil (özel handle) |
+| `/robots.txt` | Statik |
+| `/sitemap.xml` | → `/api/sitemap` (dinamik üretim) |
+
+## 5) Kök Site — API Uçları (`/api/*`)
+
+| Yol | İşlev |
+|---|---|
+| `/api/auth` | Admin girişi / oturum / CSRF / şifre değiştirme |
+| `/api/customer-auth` | Müşteri kayıt / giriş / oturum |
+| `/api/customer-portal` | Müşteri paneli verisi |
+| `/api/customers` | Müşteri yönetimi (admin) |
+| `/api/users` | Kullanıcı yönetimi (admin) |
+| `/api/shopier` | Ödeme webhook + sipariş listesi + iade (bu oturumda genişletildi) |
+| `/api/coupons` | Kupon/kampanya CRUD (bu oturumda eklendi) |
+| `/api/system-health` | Sistem sağlığı (bu oturumda eklendi) |
+| `/api/blog` | Blog CRUD + public liste |
+| `/api/partners` | Partner CRUD + public liste |
+| `/api/content` | Site içeriği / CMS |
+| `/api/media` | Medya kütüphanesi |
+| `/api/linkprofiles` | Link profilleri |
+| `/api/shortlinks` | Kısa linkler |
+| `/api/crm` | CRM |
+| `/api/proposals` | Teklifler |
+| `/api/subscriptions` | Abonelikler |
+| `/api/surveys` | Anketler |
+| `/api/referrals` | Referanslar |
+| `/api/reminders` | Hatırlatıcılar (cron: günlük 06:00) |
+| `/api/tasks` | Görevler |
+| `/api/client` | Müşteri kaynakları (subscriptions/surveys) |
+| `/api/ops` | Teklif talebi / fatura / onboarding / e-posta şablonu / ayarlar |
+| `/api/messages` | Mesajlar |
+| `/api/contact` | İletişim formu |
+| `/api/newsletter` | Newsletter (contact → action) |
+| `/api/notifications` | Bildirimler + aktivite logu |
+| `/api/calendar-invite` | Takvim daveti (ICS) |
+| `/api/chat` | AI sohbet / içerik üretimi (Gemini) |
+| `/api/sitemap` | Dinamik sitemap üretimi |
+| `/api/seed` | İlk admin oluşturma (prod'da varsayılan kapalı) |
+
+---
+
+## 6) Kade AI — Sayfalar (`kadenewmedia.com/kadeai/*`)
+
+| Yol | Açıklama |
+|---|---|
+| `/kadeai` | Ana sayfa |
+| `/kadeai/login` · `/kadeai/logout` · `/kadeai/auth` · `/kadeai/auth/callback` | Kimlik |
+| `/kadeai/onboarding` | Onboarding |
+| `/kadeai/reset-password` | Şifre sıfırlama |
+| `/kadeai/dashboard` | Panel ana sayfası |
+
+**Dashboard araçları** (`/kadeai/dashboard/*`):
+`ab-test` · `ai-thumbnail` · `analytics` · `bio-link` · `bulk` · `calendar` · `carousel` · `clickbait-detector` · `clip-generator` · `collab-mail` · `comment-analysis` · `competitor` · `content-plan` · `description` · `dubbing` · `faq` · `hashtag` · `history` · `hook` · `ideas` · `operations` · `packages` · `performance` · `quote-extractor` · `retention-analysis` · `settings` · `shopier` · `social-audit` · `templates` · `text-generator` · `thread` · `title` · `trends` · `video-factory` · `viral-score` · `youtube-seo`
+
+## 7) Kade AI — API Uçları (`/kadeai/api/*`)
+
+| Grup | Yollar |
+|---|---|
+| Kimlik | `/kadeai/api/auth/logout` · `/auth/password` · `/auth/recovery` · `/auth/recovery-session` · `/auth/update-password` |
+| Üretim (AI) | `/kadeai/api/generate/{analytics, bio-link, bulk, carousel, clickbait-detector, clips, collab-mail, comment-analysis, competitor, content-plan, description, faq, hashtag, hook, ideas, performance, quote-extractor, retention-analysis, social-audit, text-generator, thread, title, translate, trends, tts, viral-score, youtube-seo}` |
+| Ödeme | `/kadeai/api/payments/{checkout, status, webhook}` · `/payments/shopier/redirect` · `/payments/admin/custom-offer` · `/payments/admin/pricing` |
+| Medya | `/kadeai/api/{image, video, transcribe}` |
+| Diğer | `/kadeai/api/{assistant, calendar, config, env-status, health, history, operations-state, packages, profile, templates}` · `/backend/health` · `/youtube/comments` |
+
+---
+
+## 8) Kade Studio (`apps/studio-web` — ayrı ürün, ayrı domain)
+
+**Sayfalar:** `/` · `/login` · `/projects/new` · `/editor/[projectId]`
+
+**API:** `/api/auth/login` · `/api/health` · `/api/projects` · `/api/projects/[projectId]` · `/api/projects/[projectId]/{commands, exports, history, versions}` · `/api/exports/[exportId]/download` · `/api/uploads/{complete, presign}`
