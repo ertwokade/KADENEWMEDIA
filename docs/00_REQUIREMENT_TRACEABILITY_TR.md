@@ -63,7 +63,7 @@ Bekliyor · İnceleniyor · Uygulanıyor · Test ediliyor · Tamamlandı · Kıs
 | REQ-ODOO-001 | §20 Odoo değerlendirmesi ve karar | Bekliyor | Faz 7, `docs/09_ODOO_DECISION_TR.md` |
 | REQ-LEGAL-001 | §21 Fikri mülkiyet ve içerik koruma sistemi | Bekliyor | Faz 8 |
 | REQ-LEGAL-002 | §22 Hukuki yükümlülükler (KVKK, e-ticaret, tüketici, mesafeli satış, telif) | Bekliyor | Faz 8 — **hukukçu onayı gerektirir, bkz. BLOCKERS** |
-| REQ-SEC-001 | §23 Kapsamlı güvenlik denetimi (OWASP tam liste) | Bekliyor | Faz 8, `docs/07_SECURITY_AUDIT_TR.md`, `docs/THREAT_MODEL_TR.md` |
+| REQ-SEC-001 | §23 Kapsamlı güvenlik denetimi (OWASP tam liste) | Kısmen tamamlandı | Faz 8'in kod-seviyesi kısmı erken başlatıldı — `docs/07_SECURITY_AUDIT_TR.md` yalnızca kök `kademedia` API katmanının statik kod incelemesini kapsıyor (canlı pentest değil). 1 gerçek yetki-atlatma açığı bulunup düzeltildi (`chat.js` `adminMode` bypass). `apps/kadeai`/`apps/studio-web`, canlı pentest, bağımlılık taraması, `docs/THREAT_MODEL_TR.md` hâlâ açık |
 | REQ-SEC-002 | §22 Admin panelinde "güvenlik olayları" görünümü | Kısmen tamamlandı | Faz 4 — genel Aktivite Logu zaten vardı ama başarısız giriş denemesi/rate-limit tetiklenmesi gibi güvenlik olayları hiç loglanmıyordu. `server/api/auth.js`'e başarısız giriş (`bilinmeyen kullanıcı`/`yanlış şifre`) ve rate-limit-aşıldı olayları için `type: 'security'` logActivity çağrıları eklendi; `Admin.jsx` Aktivite Logu'na "Güvenlik" filtre sekmesi eklendi. Kapsamı sınırlı (yalnızca admin login akışı) — 403/CSRF-red gibi diğer olay türleri henüz kapsanmıyor |
 | REQ-SEO-000 | §24 404/redirect/route bütünlüğü | Bekliyor | Faz 8 |
 | REQ-MOBILE-001 | §25 Mobil, erişilebilirlik, performans | Bekliyor | Faz 8 |

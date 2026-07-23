@@ -1,6 +1,6 @@
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
-import { getAuthorizedUser } from './_lib/auth.js';
+import { requirePermission } from './_lib/auth.js';
 import { getSupabase } from './_lib/supabase.js';
 
 async function logAiUsage(scope, model, usageMeta) {
@@ -35,8 +35,13 @@ export default async function handler(req, res) {
   }
 
   const { message, lang, history, adminMode } = req.body || {};
-  const adminUser = adminMode === true ? await getAuthorizedUser(req) : null;
-  const isAdmin = adminMode === true && Boolean(adminUser);
+  // 'aiContent' izni: yalnızca admin/editor rolü varsayılan olarak açık,
+  // viewer kapalı (bkz. DEFAULT_ROLE_PERMISSIONS). UI zaten bu bölümü
+  // izinsiz kullanıcıya göstermiyor, ama doğrudan API çağrısıyla bu kontrol
+  // olmadan bypass edilebilirdi (daha yüksek karakter/token limiti +
+  // public rate limitinden muafiyet).
+  const isAdmin = adminMode === true && Boolean(await requirePermission(req, res, 'aiContent'));
+  if (adminMode === true && !isAdmin) return; // requirePermission zaten 401/403 yanıtını yazdı
 
   if (!isAdmin) {
     const rl = await rateLimitCheck(req, { namespace: 'chat', maxRequests: 20 });
