@@ -41,11 +41,12 @@ Bekliyor · İnceleniyor · Uygulanıyor · Test ediliyor · Tamamlandı · Kıs
 | REQ-COMMERCE-002 | §8.2 Haftalık/aylık/yıllık/tek seferlik/özel dönem desteği | Bekliyor | Faz 3 |
 | REQ-COMMERCE-003 | §8.3 Özellik/limit matrisi (admin yönetilebilir) | Bekliyor | Faz 3 |
 | REQ-COMMERCE-004 | §8.4 API anahtarı modelleri (yok/dahil/BYOK/hibrit) | Bekliyor | Faz 3 |
-| REQ-COMMERCE-005 | §8.5 Özel teklif durum makinesi (draft→...→completed) | Bekliyor | Faz 3 |
+| REQ-COMMERCE-005 | §8.5 Özel teklif durum makinesi (draft→...→completed) | Kısmen tamamlandı | Faz 3 — `kade_quotes` için teklif-talebi alt kümesi (draft/requested/reviewing/offered/revised/accepted/rejected/expired/cancelled) migration olarak hazırlandı, geriye dönük uyumlu CHECK eklendi; ödeme/sipariş durumları kasıtlı olarak `kade_shopier_orders`'da ayrı tutuluyor; migration canlıya henüz uygulanmadı (bkz. BLOCKERS #1) |
 | REQ-COMMERCE-006 | §8.6 Ödeme güvenliği (webhook, idempotency, fiyat snapshot) | Bekliyor | Faz 3 — kritik, kısmen apps/kadeai'de mevcut (bkz. docs/01) |
 | REQ-COMMERCE-007 | §8.7 Otomatik/granüler entitlement sistemi | Bekliyor | Faz 3 |
 | REQ-USER-001 | §9 Teklif alma ve satış hunisi (genişletilmiş form + admin lead pipeline) | Bekliyor | Faz 3/4 |
-| REQ-ADMIN-001 | §10 Admin panelini 44 modüllü ürün yönetim merkezine dönüştürme | Bekliyor | Faz 4 — mevcut admin ~30 fonksiyonel bölüm içeriyor (bkz. docs/01) |
+| REQ-ADMIN-001 | §10 Admin panelini 44 modüllü ürün yönetim merkezine dönüştürme | Kısmen tamamlandı | Faz 4 — mevcut admin ~30 fonksiyonel bölüm içeriyor (bkz. docs/01); bu turda roller/izinler modülü tamamlandı (aşağıya bkz.), kalan ~23 modül açık |
+| REQ-ADMIN-002 | §10 Roller/izinler yönetim ekranı (modül bazlı izin matrisi) | Tamamlandı | Faz 4 — backend (`kade_users.permissions`, `requirePermission()`) zaten mevcuttu ama admin UI'da izin matrisi hiç yoktu; bu turda `UsersSection`'a 30 modüllük checkbox izin grid'i eklendi (`src/pages/Admin.jsx`), rol değişince varsayılan izinlere sıfırlanıyor, mevcut izinler korunuyor. Ayrıca `server/api/users.js`'te bulunan gerçek bir regresyon düzeltildi: MongoDB→Supabase taşımasında `mapUser()` eklenmemişti, bu yüzden GET/POST yanıtları `_id`/`createdAt` yerine ham `id`/`created_at` dönüyordu ve admin kullanıcı tablosu (düzenle/sil) canlıda çalışmazdı |
 | REQ-USER-002 | §11 Müşteri paneli (22 modül) | Bekliyor | Faz 4 |
 | REQ-USER-003 | §12 `/@link` modülü (public+admin+kullanıcı) | Bekliyor | Faz 4 — mevcut `/@handle` sistemiyle kısmen örtüşüyor, bkz. docs/01 |
 | REQ-USER-004 | §13 Public `/demo` sayfası | Bekliyor | Faz 5 |
@@ -64,7 +65,7 @@ Bekliyor · İnceleniyor · Uygulanıyor · Test ediliyor · Tamamlandı · Kıs
 | REQ-SEO-001…017 | Ek A — SEO/AEO/GEO/AI görünürlüğü (17 alt belge) | Bekliyor | Faz 8 — **150+ canlı AI sorgusu ve API/hesap erişimi gerektiriyor, bkz. BLOCKERS** |
 | REQ-CODE-007 | §27 Analytics event şeması | Bekliyor | Faz 4 |
 | REQ-CODE-008 | §28 Bildirimler ve operasyon | Bekliyor | Faz 4 |
-| REQ-CODE-009 | §29 Veri/migration/audit log standardı | Bekliyor | Faz 2 |
+| REQ-CODE-009 | §29 Veri/migration/audit log standardı | Kısmen tamamlandı | Faz 2/3 — `kade_activity_log`'a `target_type/target_id/before/after` kolonları migration olarak hazırlandı (`202607230001_...sql`), `logActivity()` bu alanları destekleyecek şekilde genişletildi; migration canlıya uygulanana kadar bu alanlar sessizce yazılmaz (bkz. BLOCKERS #1). Mevcut ~40 çağrı noktasının `targetType/targetId` ile zenginleştirilmesi kısmi (yalnızca `users.js` bu turda güncellendi), kalanı düşük öncelikli takip işi |
 | REQ-CODE-010 | §30 Otomatik test senaryoları (ticaret/yetki/route/mobil/video/@link) | Bekliyor | Faz 9 |
 | REQ-LAUNCH-001 | §31 Satışa hazır olma kriterleri — final değerlendirme | Bekliyor | Faz 9 |
 

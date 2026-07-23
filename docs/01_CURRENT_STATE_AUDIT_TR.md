@@ -65,7 +65,8 @@ Tam satır-satır denetim bu turun kapsamı dışında (Faz 2+'da derinleşecek)
 | Bulgu | Önem | Konum | Not |
 |---|---|---|---|
 | 3 paralel lockfile | Düşük | kök | Karar gerektirir, hangisi source-of-truth belirlenmeli |
-| `Date.now()` render sırasında çağrılıyor | Düşük | `Admin.jsx:4995` civarı | React purity kuralı ihlali, lint zaten yakalıyor |
+| `Date.now()` render sırasında çağrılıyor | **Düzeltildi** | `Admin.jsx` (Activity/audit log bölümü) | Faz 3'te düzeltildi: `now` artık 60sn'lik `setInterval` ile bir state'te tutuluyor, render sırasında impure çağrı kalmadı; lint hata sayısı 26→25'e düştü |
+| Admin kullanıcı tablosu Supabase alan adlarıyla uyumsuzdu | **Düzeltildi** | `server/api/users.js` | Faz 4'te bulundu: MongoDB→Supabase taşımasında `mapUser()` eklenmemişti, GET/POST ham `id`/`created_at` dönüyordu ama `Admin.jsx` `u._id`/`u.createdAt` okuyordu — düzenle/sil canlıda çalışmazdı. `mapUser()` eklendi |
 | Gemini model adı sabit kod | Düşük | `server/api/chat.js` | Şartname §9'daki "model adını env/config'e bağla" kuralına aykırı |
 | Legacy `/paketler` admin editörü canlı sayfadan kopuktu | **Düzeltildi** | `Admin.jsx`, `Packages.jsx` | Bu oturumda (commit `9c2a6aa`) admin fiyat alanı gerçekten canlıya bağlandı; isim/açıklama kürate statik içerik olarak kalıyor (bkz. gerekçe o commit'te) |
 | Medya/fotoğraf base64 olarak DB'de | Orta | `kade_media`, `kade_link_profiles` | Ölçeklenmez, object storage'a taşıma önerilir (Faz 2/3 mimari kararı) |

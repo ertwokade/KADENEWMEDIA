@@ -4,6 +4,21 @@ import { getDefaultPermissions, requireAdmin } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
 
+function mapUser(u) {
+  if (!u) return u;
+  return {
+    _id: u.id,
+    id: u.id,
+    username: u.username,
+    email: u.email,
+    role: u.role,
+    permissions: u.permissions,
+    sessionVersion: u.session_version,
+    createdAt: u.created_at,
+    updatedAt: u.updated_at,
+  };
+}
+
 export default async function handler(req, res) {
   if (cors(req, res)) return;
 
@@ -20,7 +35,7 @@ export default async function handler(req, res) {
         .select('id, username, email, role, permissions, session_version, created_at, updated_at')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return res.status(200).json(data);
+      return res.status(200).json((data || []).map(mapUser));
     }
 
     // POST - Create new user
@@ -57,9 +72,8 @@ export default async function handler(req, res) {
         if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu kullanıcı adı zaten kullanılıyor' });
         throw error;
       }
-      const { password_hash: _, ...safeUser } = created;
-      logActivity({ action: 'Kullanıcı oluşturuldu', detail: `${username} - ${role || 'viewer'} rolü`, type: 'create', icon: '👤', user: user.username }).catch(() => {});
-      return res.status(201).json(safeUser);
+      logActivity({ action: 'Kullanıcı oluşturuldu', detail: `${username} - ${role || 'viewer'} rolü`, type: 'create', icon: '👤', user: user.username, targetType: 'user', targetId: created.id }).catch(() => {});
+      return res.status(201).json(mapUser(created));
     }
 
     // PUT - Update user
@@ -103,7 +117,7 @@ export default async function handler(req, res) {
         if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu kullanıcı adı zaten kullanılıyor' });
         throw error;
       }
-      logActivity({ action: 'Kullanıcı güncellendi', detail: `${username || id}`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
+      logActivity({ action: 'Kullanıcı güncellendi', detail: `${username || id}`, type: 'update', icon: '✏️', user: user.username, targetType: 'user', targetId: id }).catch(() => {});
       return res.status(200).json({ message: 'Kullanıcı güncellendi' });
     }
 
@@ -123,7 +137,7 @@ export default async function handler(req, res) {
 
       const { error } = await supabase.from('kade_users').delete().eq('id', id);
       if (error) throw error;
-      logActivity({ action: 'Kullanıcı silindi', detail: `${targetUser?.username || id}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      logActivity({ action: 'Kullanıcı silindi', detail: `${targetUser?.username || id}`, type: 'delete', icon: '🗑️', user: user.username, targetType: 'user', targetId: id }).catch(() => {});
       return res.status(200).json({ message: 'Kullanıcı silindi' });
     }
 

@@ -4084,13 +4084,54 @@ function CalendarSection({ showToast }) {
 }
 
 // ========== USERS MANAGEMENT ==========
+// Bu liste server/api/_lib/auth.js içindeki DEFAULT_ROLE_PERMISSIONS anahtarlarıyla
+// senkron tutulmalı — burada yalnızca görüntüleme/etiket amaçlı kopyalanmıştır.
+const PERMISSION_MODULES = [
+  { key: 'dashboard', label: 'Panel' },
+  { key: 'analytics', label: 'Analitik' },
+  { key: 'blog', label: 'Blog' },
+  { key: 'content', label: 'Site İçeriği' },
+  { key: 'partners', label: 'Partnerler' },
+  { key: 'portfolio', label: 'Portfolyo' },
+  { key: 'linkProfiles', label: 'Link Profilleri' },
+  { key: 'shortLinks', label: 'Kısa Linkler' },
+  { key: 'messages', label: 'Mesajlar' },
+  { key: 'calendar', label: 'Takvim' },
+  { key: 'reminders', label: 'Hatırlatıcılar' },
+  { key: 'users', label: 'Kullanıcılar' },
+  { key: 'settings', label: 'Ayarlar' },
+  { key: 'activity', label: 'Aktivite Günlüğü' },
+  { key: 'backup', label: 'Yedekleme' },
+  { key: 'media', label: 'Medya' },
+  { key: 'crm', label: 'CRM' },
+  { key: 'proposals', label: 'Teklifler' },
+  { key: 'quoteLeads', label: 'Teklif Talepleri' },
+  { key: 'portalCustomers', label: 'Müşteri Portalı' },
+  { key: 'customerProfiles', label: 'Müşteri Profilleri' },
+  { key: 'invoices', label: 'Faturalar' },
+  { key: 'tasks', label: 'Görevler' },
+  { key: 'subscriptions', label: 'Abonelikler' },
+  { key: 'surveys', label: 'Anketler' },
+  { key: 'referrals', label: 'Referanslar' },
+  { key: 'onboarding', label: 'Onboarding' },
+  { key: 'report', label: 'Rapor' },
+  { key: 'emailTemplates', label: 'E-posta Şablonları' },
+  { key: 'aiContent', label: 'AI İçerik' },
+]
+
+const ROLE_DEFAULT_PERMISSIONS = {
+  admin: Object.fromEntries(PERMISSION_MODULES.map(m => [m.key, true])),
+  editor: Object.fromEntries(PERMISSION_MODULES.map(m => [m.key, !['users', 'settings', 'backup'].includes(m.key)])),
+  viewer: Object.fromEntries(PERMISSION_MODULES.map(m => [m.key, ['dashboard', 'analytics', 'messages'].includes(m.key)])),
+}
+
 function UsersSection({ showToast }) {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
   const [form, setForm] = useState({
-    username: '', password: '', email: '', role: 'editor',
+    username: '', password: '', email: '', role: 'editor', permissions: ROLE_DEFAULT_PERMISSIONS.editor,
   })
 
   const roleLabels = { admin: 'Admin', editor: 'Editör', viewer: 'İzleyici' }
@@ -4111,20 +4152,30 @@ function UsersSection({ showToast }) {
   useEffect(() => { fetchUsers() }, [])
 
   const resetForm = () => {
-    setForm({ username: '', password: '', email: '', role: 'editor' })
+    setForm({ username: '', password: '', email: '', role: 'editor', permissions: ROLE_DEFAULT_PERMISSIONS.editor })
     setEditingUser(null)
     setShowForm(false)
   }
 
   const handleEdit = (u) => {
+    const role = u.role || 'viewer'
     setForm({
       username: u.username || '',
       password: '',
       email: u.email || '',
-      role: u.role || 'viewer',
+      role,
+      permissions: { ...ROLE_DEFAULT_PERMISSIONS[role], ...(u.permissions || {}) },
     })
     setEditingUser(u)
     setShowForm(true)
+  }
+
+  const handleRoleChange = (role) => {
+    setForm(f => ({ ...f, role, permissions: ROLE_DEFAULT_PERMISSIONS[role] || ROLE_DEFAULT_PERMISSIONS.viewer }))
+  }
+
+  const togglePermission = (key) => {
+    setForm(f => ({ ...f, permissions: { ...f.permissions, [key]: !f.permissions?.[key] } }))
   }
 
   const handleSave = async () => {
@@ -4143,6 +4194,7 @@ function UsersSection({ showToast }) {
           username: form.username,
           role: form.role,
           email: form.email,
+          permissions: form.permissions,
         }
         if (form.password) payload.password = form.password
         await updateUserApi(payload)
@@ -4153,6 +4205,7 @@ function UsersSection({ showToast }) {
           password: form.password,
           role: form.role,
           email: form.email,
+          permissions: form.permissions,
         })
         showToast('Kullanıcı oluşturuldu!', 'success')
       }
@@ -4247,12 +4300,40 @@ function UsersSection({ showToast }) {
                   <label>Rol</label>
                   <select
                     value={form.role}
-                    onChange={(e) => setForm({ ...form, role: e.target.value })}
+                    onChange={(e) => handleRoleChange(e.target.value)}
                   >
                     <option value="admin">Admin — Tam yetki</option>
                     <option value="editor">Editör — İçerik yönetimi</option>
                     <option value="viewer">İzleyici — Sadece görüntüleme</option>
                   </select>
+                </div>
+                <div className="form-group">
+                  <label>Modül İzinleri {form.role === 'admin' && <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}>(Admin her modüle her zaman erişir, aşağıdaki seçimler admin için etkisizdir)</span>}</label>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+                      gap: '6px 12px',
+                      maxHeight: 220,
+                      overflowY: 'auto',
+                      padding: '10px 12px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 8,
+                      opacity: form.role === 'admin' ? 0.5 : 1,
+                    }}
+                  >
+                    {PERMISSION_MODULES.map(({ key, label }) => (
+                      <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', fontWeight: 400, cursor: form.role === 'admin' ? 'not-allowed' : 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          disabled={form.role === 'admin'}
+                          checked={form.role === 'admin' ? true : Boolean(form.permissions?.[key])}
+                          onChange={() => togglePermission(key)}
+                        />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 <div className="admin-form-actions">
                   <button className="btn btn-outline" onClick={resetForm}>İptal</button>
@@ -4991,8 +5072,14 @@ function ActivityLogSection() {
 
   useEffect(() => { load(filter) }, [filter, load])
 
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60000)
+    return () => clearInterval(timer)
+  }, [])
+
   const formatTime = (dateStr) => {
-    const diff = Date.now() - new Date(dateStr).getTime()
+    const diff = now - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
     if (mins < 1) return 'Az önce'
     if (mins < 60) return `${mins} dk önce`
