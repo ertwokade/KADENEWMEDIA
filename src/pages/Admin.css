@@ -740,8 +740,12 @@
 
 .admin-stat-card .stat-label {
   /* Önceki: --text-tertiary (0.38 alpha) => küçük etiketlerde okunamıyordu.
-     --text-secondary (0.62 alpha) net kontrast sağlar (Öncelik 4). */
-  color: var(--text-secondary);
+     --text-secondary (0.62 alpha) net kontrast sağlar (Öncelik 4).
+     !important şart: src/index.css satır ~1250 ".stat-label{color:rgba(23,19,10,.56)!important}"
+     genel (public) sayfalar için tanımlı ama sınıf adı admin panelde de çakışıyor;
+     !important olmadan bu global kural kazanıyor ve etiket admin'in siyah
+     arka planında neredeyse görünmez hale geliyordu (canlı doğrulamada tespit edildi). */
+  color: var(--text-secondary) !important;
   font-size: 0.78rem;
   margin-top: 6px;
   font-weight: 500;

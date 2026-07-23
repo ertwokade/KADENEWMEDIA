@@ -115,14 +115,27 @@ const kadeThemeOverride = `
 // head'deki tag'i kaldır, inline script'i </body> öncesine enjekte et; bu,
 // orijinal `defer` semantiğini (tüm DOM parse edildikten sonra çalıştır)
 // birebir korur. Ayrıca ?raw ile gelen BOM (U+FEFF) temizlenir.
-const kitJsClean = kitJs.charCodeAt(0) === 0xFEFF ? kitJs.slice(1) : kitJs
+//
+// GERÇEK KÖK NEDEN (canlı doğrulamada bulundu): yalnızca app.js'in BOM'u
+// temizleniyordu, styles.css'in BOM'u temizlenmiyordu. `kitCss` doğrudan
+// bir <style> etiketine enjekte ediliyor (aşağıda) ve dosya `@import
+// url(...)` ile başlıyor; başında BOM olduğunda tarayıcı bu ilk kuralı
+// (ve onunla birlikte :root içindeki --sidebar-w gibi CSS custom
+// property tanımlarını) reddediyor. Sonuç: `.app-shell{grid-template-
+// columns:var(--sidebar-w) 1fr}` kuralı geçersiz değişkene düşüyor,
+// grid tek sütuna çöküyor, sağdaki "workspace" paneli sidebar'ın altına
+// (görünür alanın dışına) itiliyor — kullanıcı sadece sol menüyü görüyor.
+const stripBom = (text) => (text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text)
+const kitJsClean = stripBom(kitJs)
+const kitCssClean = stripBom(kitCss)
+const kitHtmlClean = stripBom(kitHtml)
 const inlineAppJs = `<script>${kitJsClean.replace(/<\/script/gi, '<\\/script')}</script>`
 
-const kitDocument = kitHtml
+const kitDocument = kitHtmlClean
   .replace(/Kade Kit Business/g, 'Kade Organizasyon Kiti')
   .replace(/AI Üretim Merkezi/g, 'Organizasyon Kiti')
   .replace('<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>', lucideFallback)
-  .replace('<link rel="stylesheet" href="styles.css"/>', `<style>${kitCss}</style>${kadeThemeOverride}`)
+  .replace('<link rel="stylesheet" href="styles.css"/>', `<style>${kitCssClean}</style>${kadeThemeOverride}`)
   .replace('<script src="app.js" defer></script>', '')
   .replace('</body>', `${inlineAppJs}</body>`)
 
