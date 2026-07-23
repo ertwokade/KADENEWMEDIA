@@ -72,7 +72,7 @@ Bekliyor · İnceleniyor · Uygulanıyor · Test ediliyor · Tamamlandı · Kıs
 | REQ-CODE-008 | §28 Bildirimler ve operasyon | Bekliyor | Faz 4 |
 | REQ-CODE-009 | §29 Veri/migration/audit log standardı | Kısmen tamamlandı | Faz 2/3/4 — `kade_activity_log`'a `target_type/target_id/before/after` kolonları migration olarak hazırlandı (`202607230001_...sql`); `logActivity()` bu alanları destekleyecek şekilde genişletildi ve migration uygulanana kadar `42703` hatasını yakalayıp otomatik olarak eski alan setiyle geri düşüyor (log yazımı hiç kesilmiyor, bkz. BLOCKERS #1). Faz 4'te ayrıca gerçek bir kod tekrarı bulundu ve giderildi: `server/api/notifications.js` içinde `logActivity`'nin bu güncellemeyi hiç görmeyen, senkron olmayan ikinci bir kopyası vardı — tüm çağrı noktaları aslında o kopyayı kullanıyordu, tek kaynak `_lib/notify.js` oldu. Mevcut ~40 çağrı noktasının `targetType/targetId` ile zenginleştirilmesi kısmi (yalnızca `users.js`/`auth.js` bu turda güncellendi), kalanı düşük öncelikli takip işi |
 | REQ-CODE-010 | §30 Otomatik test senaryoları (ticaret/yetki/route/mobil/video/@link) | Bekliyor | Faz 9 |
-| REQ-LAUNCH-001 | §31 Satışa hazır olma kriterleri — final değerlendirme | Bekliyor | Faz 9 |
+| REQ-LAUNCH-001 | §31 Satışa hazır olma kriterleri — final değerlendirme | Tamamlandı | `docs/11_LAUNCH_READINESS_TR.md` — 22 madde tek tek değerlendirildi: 7 tam, 8 kısmi, 6 karşılanmıyor, 1 N/A. Sınıflandırma: **"Testte hazır, production ödeme blocker"** (şartnamenin kendi terimiyle). "Satışa hazır" iddiası yapılmadı — 4 kritik eksik (hukuki sayfalar, prod kredensiyal, onaylı fiyat, backup/monitoring testi) net biçimde önceliklendirildi |
 
 ---
 
