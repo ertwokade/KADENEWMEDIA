@@ -5,6 +5,7 @@ import { FAQ_ITEMS } from '../src/data/faq.js'
 import { translations } from '../src/i18n/translations.js'
 import { SERVICES as NMA_SERVICES, PROCESS as NMA_PROCESS, FAQS as NMA_FAQS } from '../src/data/newMediaAgency.js'
 import { PACKAGE_SCOPES, PACKAGE_FAQS } from '../src/data/packages.js'
+import { SERVICE_DETAILS } from '../src/data/serviceDetails.js'
 
 const tr = translations.tr
 
@@ -31,6 +32,7 @@ const routes = [
   ['/kvkk', 'KVKK Aydınlatma Metni | Kade Media', 'Kade Media’nın kişisel verileri hangi amaçlarla ve hukuki sebeplerle işlediğini açıklayan KVKK aydınlatma metnini inceleyin.', false],
   ['/gizlilik', 'Gizlilik Politikası | Kade Media', 'Kade Media web sitesinde kişisel verilerin nasıl toplandığı, kullanıldığı, korunduğu ve hangi haklara sahip olduğunuz hakkında bilgi alın.', false],
   ['/cerez-politikasi', 'Çerez Politikası | Kade Media', 'Kade Media web sitesinde kullanılan çerez türlerini, kullanım amaçlarını ve çerez tercihlerinizi nasıl yönetebileceğinizi öğrenin.', false],
+  ['/telif-haklari', 'Telif Hakları | Kade Media', 'Kade Media web sitesindeki içerik, görsel, video ve tasarımların telif hakları, kullanım koşulları ve izin süreçleri hakkında bilgi alın.', false],
   ['/giris', 'Çalışma Alanı Seçimi | Kade Media', 'Danışmanlık ve Content AI çalışma alanlarından kullanmak istediğinizi seçin.', true],
   ['/giris/danismanlik', 'Danışmanlık Girişi | Kade Media', 'Kade Media danışmanlık ve müşteri hesabı giriş sayfası.', true],
   ['/musteri-panel', 'Müşteri Paneli | Kade Media', 'Korumalı müşteri alanı.', true],
@@ -70,8 +72,34 @@ function faqSection(items, heading = 'Sık Sorulan Sorular') {
 
 const packageFaqItems = PACKAGE_FAQS.map(({ tr: [soru, cevap] }) => ({ soru, cevap }))
 
+function bulletList(items) {
+  return `<ul>\n        ${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('\n        ')}\n      </ul>`
+}
+
 function extraContent(route) {
   if (route === '/sss') return faqSection(FAQ_ITEMS)
+
+  // Hizmet detayları ticari olarak en önemli sayfalar; ön-render çıktısında
+  // yalnız H1 + tek paragraf kalması Google'ın ilk taramasında "thin content"
+  // sinyali üretiyordu. Metin src/data/serviceDetails.js ile aynı kaynaktan gelir.
+  if (route.startsWith('/hizmetler/')) {
+    const detail = SERVICE_DETAILS[route.slice('/hizmetler/'.length)]
+    if (!detail) return ''
+    return `
+      <h2>Bu hizmet hangi sorunu çözüyor?</h2>
+      <p>${escapeHtml(detail.problemTr)}</p>
+      <h2>Kapsam</h2>
+      ${bulletList(detail.featuresTr)}
+      <h2>Teslim edilenler</h2>
+      ${bulletList(detail.deliverablesTr)}
+      <h2>Diğer hizmetler</h2>
+      <ul>
+        ${Object.entries(SERVICE_DETAILS)
+          .filter(([slug]) => slug !== route.slice('/hizmetler/'.length))
+          .map(([slug, s]) => `<li><a href="/hizmetler/${slug}">${escapeHtml(s.titleTr)}</a></li>`)
+          .join('\n        ')}
+      </ul>`
+  }
 
   if (route === '/hakkimizda') {
     return `
@@ -177,24 +205,45 @@ function structuredData(route, title, description, noindex) {
   }).join('\n    ')
 }
 
+// Bir replace hedefi şablonda bulunamazsa sessizce atlanması, canonical/robots
+// gibi kritik etiketlerin fark edilmeden kaybolmasına yol açar. Bu yüzden
+// eşleşmeyen her zorunlu değişim build'i düşürür.
+function replaceRequired(html, pattern, replacement, label) {
+  if (!pattern.test(html)) {
+    throw new Error(`generate-static-routes: şablonda "${label}" bulunamadı — index.html değişmiş olabilir.`)
+  }
+  // Fonksiyon formu: başlık/açıklama metinlerindeki "$&", "$1" gibi diziler
+  // replace tarafından özel desen olarak yorumlanmasın.
+  return html.replace(pattern, () => replacement)
+}
+
 function render(route, title, description, noindex) {
   const canonical = `${BASE}${route}`
   const schemaMarkup = structuredData(route, title, description, noindex)
   let html = template
-    .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`)
-    .replace(/<meta name="description" content="[^"]*"\s*\/>/, `<meta name="description" content="${escapeHtml(description)}" />`)
-    .replace(/<meta name="robots" content="[^"]*"\s*\/>/, `<meta name="robots" content="${noindex ? 'noindex, nofollow' : 'index, follow'}" />`)
-    .replace(/<link rel="canonical" href="[^"]*"\s*\/>/, `<link rel="canonical" href="${canonical}" />`)
-    .replace(/<meta property="og:title" content="[^"]*"\s*\/>/, `<meta property="og:title" content="${escapeHtml(title)}" />`)
-    .replace(/<meta property="og:description" content="[^"]*"\s*\/>/, `<meta property="og:description" content="${escapeHtml(description)}" />`)
-    .replace(/<meta property="og:url" content="[^"]*"\s*\/>/, `<meta property="og:url" content="${canonical}" />`)
-    .replace(/<meta name="twitter:title" content="[^"]*"\s*\/>/, `<meta name="twitter:title" content="${escapeHtml(title)}" />`)
-    .replace(/<meta name="twitter:description" content="[^"]*"\s*\/>/, `<meta name="twitter:description" content="${escapeHtml(description)}" />`)
+  html = replaceRequired(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`, 'title')
+  html = replaceRequired(html, /<meta name="description" content="[^"]*"\s*\/>/, `<meta name="description" content="${escapeHtml(description)}" />`, 'description')
+  // `nofollow` yerine `follow`: bu sayfalar indekslenmesin ama üzerlerindeki
+  // bağlantılar (ör. /partnerler -> /partnerler/:id) taranabilir kalsın.
+  html = replaceRequired(html, /<meta name="robots" content="[^"]*"\s*\/>/, `<meta name="robots" content="${noindex ? 'noindex, follow' : 'index, follow'}" />`, 'robots')
+  html = replaceRequired(html, /<meta property="og:title" content="[^"]*"\s*\/>/, `<meta property="og:title" content="${escapeHtml(title)}" />`, 'og:title')
+  html = replaceRequired(html, /<meta property="og:description" content="[^"]*"\s*\/>/, `<meta property="og:description" content="${escapeHtml(description)}" />`, 'og:description')
+  html = replaceRequired(html, /<meta name="twitter:title" content="[^"]*"\s*\/>/, `<meta name="twitter:title" content="${escapeHtml(title)}" />`, 'twitter:title')
+  html = replaceRequired(html, /<meta name="twitter:description" content="[^"]*"\s*\/>/, `<meta name="twitter:description" content="${escapeHtml(description)}" />`, 'twitter:description')
+  html = replaceRequired(html, /<div id="root"><\/div>/, `<div id="root">${staticFallback(route, title, description)}</div>`, 'root mount')
+  html = html
     .replace(/\s*<meta name="twitter:site" content="[^"]*"\s*\/>/, '')
-    .replace('<div id="root"></div>', `<div id="root">${staticFallback(route, title, description)}</div>`)
     .replace(/\s*<noscript>[\s\S]*?<\/noscript>/, '')
-  if (schemaMarkup) html = html.replace('</head>', `    ${schemaMarkup}\n  </head>`)
-  return html
+
+  // canonical + og:url şablonda sabit tanımlı değil (bkz. index.html yorumu);
+  // her rota için doğru mutlak URL ile buradan enjekte edilir.
+  const headTags = [
+    `<link rel="canonical" href="${canonical}" />`,
+    `<meta property="og:url" content="${canonical}" />`,
+    schemaMarkup,
+  ].filter(Boolean).join('\n    ')
+
+  return replaceRequired(html, /<\/head>/, `    ${headTags}\n  </head>`, '</head>')
 }
 
 for (const [route, title, description, noindex] of routes) {

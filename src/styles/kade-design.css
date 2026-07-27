@@ -1,7 +1,7 @@
 /* ===== KADE MEDIA — kade-style design system (scoped to .kade-home) ===== */
-@font-face { font-family: 'TikTokSans'; src: url('/fonts/TikTokSans.ttf') format('truetype'); font-weight: 100 900; font-display: swap; }
-@font-face { font-family: 'GeistMono'; src: url('/fonts/GeistMono[wght].ttf') format('truetype'); font-weight: 100 900; font-display: swap; }
-@font-face { font-family: 'DepartureMono'; src: url('/fonts/DepartureMono-Regular.otf') format('opentype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'TikTokSans'; src: url('/fonts/TikTokSans.woff2') format('woff2'), url('/fonts/TikTokSans.ttf') format('truetype'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'GeistMono'; src: url('/fonts/GeistMono[wght].woff2') format('woff2'), url('/fonts/GeistMono[wght].ttf') format('truetype'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'DepartureMono'; src: url('/fonts/DepartureMono-Regular.woff2') format('woff2'), url('/fonts/DepartureMono-Regular.otf') format('opentype'); font-weight: 400; font-display: swap; }
 
 .kade-home {
   --kbg: #fdf6e3;

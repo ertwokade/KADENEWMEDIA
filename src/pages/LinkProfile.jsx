@@ -81,11 +81,18 @@ export default function LinkProfile() {
     return () => { cancelled = true }
   }, [slug])
 
+  // Bu bileşen `/:handle` ile eşleşir ve site üzerindeki HER bilinmeyen tek
+  // segmentli URL'yi yakalar. Profil çözülmediğinde `index, follow` bırakmak
+  // sonsuz sayıda indekslenebilir soft-404 üretir; bu yüzden yalnız gerçek bir
+  // profil yüklendiğinde indekslenebilir olur. NotFound alt bileşen olduğu için
+  // effect'i önce çalışır ve buradaki değerler onu ezer — noindex burada set edilmeli.
+  const isRealProfile = status === 'ready' && Boolean(profile)
   useSEO({
-    title: profile ? `${profile.name} | Kade New Media` : 'Kade New Media',
-    description: profile ? `${profile.name} — ${profile.tagline || ''}` : undefined,
-    path: `/@${slug}`,
+    title: isRealProfile ? `${profile.name} | Kade New Media` : 'Sayfa Bulunamadı | Kade New Media',
+    description: isRealProfile ? `${profile.name} — ${profile.tagline || ''}` : undefined,
+    path: isRealProfile ? `/@${slug}` : `/${handle}`,
     image: profile?.photo,
+    noindex: !isRealProfile,
   })
 
   const handleShare = async () => {

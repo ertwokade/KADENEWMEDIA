@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 
+# Özel / oturum gerektiren alanlar
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
@@ -13,65 +14,185 @@ Disallow: /kade-kit-business/
 Disallow: /organizasyon-kiti
 Disallow: /organizasyon-kiti/
 
-# AI assistants and answer engines — explicitly welcome to read and cite this site.
+# Ham SPA kabukları: gerçek sayfalar bunların üzerinden değil kendi
+# URL'lerinden servis edilir. Doğrudan taranırlarsa ana sayfanın ve
+# alt sayfaların kopyası olarak görünürler.
+Disallow: /app.html
+Disallow: /site.html
+
+# Kısa link yönlendiricileri — indekslenecek içerik taşımaz.
+Disallow: /s/
+
+# Hata ve bakım ekranları
+Disallow: /401
+Disallow: /403
+Disallow: /429
+Disallow: /bakim
+
+# AI asistanları ve cevap motorları — siteyi okuyup kaynak göstermeleri serbest,
+# ancak özel alanlar herkes için kapalı.
 User-agent: GPTBot
 Allow: /
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: Claude-Web
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: Perplexity-User
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: GoogleOther
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: Amazonbot
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: meta-externalagent
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: CCBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: cohere-ai
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: Bytespider
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: YouBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 User-agent: Diffbot
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
 
 Sitemap: https://kadenewmedia.com/sitemap.xml

@@ -24,7 +24,6 @@
     <meta property="og:site_name" content="Kade New Media" />
     <meta property="og:title" content="Kade New Media | New Media ve Dijital Medya Ajansı" />
     <meta property="og:description" content="Kade New Media; İstanbul merkezli new media, dijital medya ve pazarlama ajansı. Sosyal medya, içerik, reklam ve prodüksiyon hizmetleri." />
-    <meta property="og:url" content="https://kadenewmedia.com/" />
     <meta property="og:locale" content="tr_TR" />
     <meta property="og:image" content="https://kadenewmedia.com/og-image.png" />
     <meta property="og:image:type" content="image/png" />
@@ -39,8 +38,15 @@
     <meta name="twitter:image" content="https://kadenewmedia.com/og-image.png" />
     <meta name="twitter:image:alt" content="Kade New Media — New Media ve Dijital Medya Ajansı" />
 
-    <!-- Canonical -->
-    <link rel="canonical" href="https://kadenewmedia.com/" />
+    <!--
+      Canonical ve og:url burada BİLEREK sabit tanımlanmaz.
+      Bu dosya build sonrası app.html olur ve /blog/:slug, /partnerler/:id, /@handle
+      gibi TÜM dinamik rotalara servis edilir. Sabit bir "/" canonical bırakmak,
+      bu URL'lerin tamamının kendini ana sayfanın kopyası ilan etmesine ve
+      Google tarafından indeksten düşürülmesine yol açıyordu.
+      - Statik ön-render edilen rotalara canonical'ı scripts/generate-static-routes.mjs enjekte eder.
+      - Dinamik rotalarda canonical'ı çalışma anında src/hooks/useSEO.js oluşturur.
+    -->
 
     <!-- JSON-LD: Organization -->
     <script type="application/ld+json">
@@ -62,9 +68,13 @@
     }
     </script>
 
+    <!-- Ana metin/başlık fontu; CSS ayrıştırılmadan keşfedilemediği için önceden yüklenir. -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/TikTokSans.woff2" crossorigin />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Space Grotesk kaldırıldı: projede hiçbir font-family bildiriminde kullanılmıyordu. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>Kade New Media | New Media, Medya ve Dijital Pazarlama Ajansı</title>
   </head>
   <body>

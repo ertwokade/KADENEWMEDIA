@@ -10,6 +10,11 @@
   ],
   "redirects": [
     {
+      "source": "/kadirdemir",
+      "destination": "/@kadirdemir",
+      "permanent": true
+    },
+    {
       "source": "/links",
       "destination": "https://kadirardademir.com/links",
       "permanent": true
@@ -43,7 +48,35 @@
       "destination": "/site.html"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/blog/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/partnerler/:id",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/s/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/@:handle",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/401",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/403",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/429",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/bakim",
       "destination": "/app.html"
     }
   ],

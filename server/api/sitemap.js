@@ -2,6 +2,12 @@ import { getSupabase } from './_lib/supabase.js';
 
 const DEFAULT_BASE = 'https://kadenewmedia.com';
 
+// Sitemap yalnız indekslenebilir URL'leri içerir.
+// `/portfolio`, `/partnerler`, `/blog`, `/referanslar`, `/basari-hikayeleri`
+// sayfaları içerik doğrulanana kadar `noindex` servis ediliyor; sitemap'te
+// bırakıldıklarında Search Console "Submitted URL marked 'noindex'" hatası
+// üretiyor ve sitemap'in tamamına olan güveni düşürüyordu. İçerik yayına
+// alındığında hem burada hem scripts/generate-static-routes.mjs içinde açılmalı.
 export const STATIC_PAGES = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },
   { loc: '/hizmetler', changefreq: 'monthly', priority: '0.9' },
@@ -13,11 +19,6 @@ export const STATIC_PAGES = [
   { loc: '/kariyer', changefreq: 'monthly', priority: '0.7' },
   { loc: '/sss', changefreq: 'monthly', priority: '0.7' },
   { loc: '/ekip', changefreq: 'monthly', priority: '0.6' },
-  { loc: '/portfolio', changefreq: 'monthly', priority: '0.7' },
-  { loc: '/partnerler', changefreq: 'monthly', priority: '0.7' },
-  { loc: '/basari-hikayeleri', changefreq: 'monthly', priority: '0.7' },
-  { loc: '/referanslar', changefreq: 'monthly', priority: '0.6' },
-  { loc: '/blog', changefreq: 'weekly', priority: '0.9' },
   { loc: '/hizmetler/sosyal-medya-yonetimi', changefreq: 'monthly', priority: '0.8' },
   { loc: '/hizmetler/icerik-uretimi', changefreq: 'monthly', priority: '0.8' },
   { loc: '/hizmetler/reklam-yonetimi', changefreq: 'monthly', priority: '0.8' },
