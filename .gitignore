@@ -56,3 +56,7 @@ kade-site-snapshot-*/
 /sticker_img/
 /bgm.mp3
 /GLASS_SHADER_SPEC.md
+
+# Gizli anahtarlar (vercel link .env.local üretir); şablon dosya takipte kalır.
+.env*
+!.env.example
