@@ -12,6 +12,14 @@ export function getSupabase() {
     throw new Error('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY ortam değişkenleri tanımlı değil. Vercel Dashboard > Settings > Environment Variables kısmından ayarlayın.');
   }
 
+  // `vercel env pull`, "Sensitive" işaretli değişkenlerin değerini geri
+  // okuyamaz ve dosyaya "[SENSITIVE]" metnini yazar. Bu durumda hata
+  // supabase-js'ten "Invalid supabaseUrl" olarak geliyor ve asıl nedeni
+  // gizliyordu.
+  if (url === '[SENSITIVE]' || serviceKey === '[SENSITIVE]') {
+    throw new Error('Supabase bilgileri maskeli ("[SENSITIVE]"). Vercel\'de bu değişkenler Sensitive işaretli olduğu için geri okunamıyor; gerçek değerleri Supabase panelinden alıp ortam dosyanıza yazın.');
+  }
+
   client = createClient(url, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
