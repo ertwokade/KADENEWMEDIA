@@ -3,14 +3,11 @@
    app'in tamamına taşır: /admin, /giris, /paketler, kit panelleri…
    Onaylı v2 statik şablonla aynı token'lar:
      bg #fbfaf4 · elevated #efede7 · ink #17130a · gold #e0a81f
-     display: TikTokSans wdth 120 UPPERCASE · mono: GeistMono
+     tek aile: Poppins (400/500/600/700) — bkz. styles/kade-tokens.css
      etiket: "— LABEL" mono, .2em tracking · kart: düz border, r6-8
    En son import edilir (main.jsx) — paylaşılan sınıfları override eder.
    ===================================================================== */
 
-@font-face { font-family:'TikTokSans'; src:url('/fonts/TikTokSans.woff2') format('woff2'); font-weight:100 900; font-display:swap; }
-@font-face { font-family:'GeistMono'; src:url('/fonts/GeistMono[wght].woff2') format('woff2'); font-weight:100 900; font-display:swap; }
-@font-face { font-family:'DepartureMono'; src:url('/fonts/DepartureMono-Regular.woff2') format('woff2'); font-weight:400; font-display:swap; }
 
 :root, [data-theme="light"] {
   --bg-primary: #fbfaf4;
@@ -24,15 +21,13 @@
   --ky-gold: #e0a81f;
   --ky-gold-deep: #c8901a;
   --ky-line: rgba(23, 19, 10, 0.11);
-  --ky-mono: 'GeistMono', ui-monospace, monospace;
-  --ky-tech: 'DepartureMono', ui-monospace, monospace;
 }
 html, body, #root { background: #fbfaf4 !important; }
 
 /* ---------- 1) BAŞLIKLAR: anasayfa display dili ---------- */
 .section-title,
 [class*="-hero"] h1.section-title {
-  font-family: 'TikTokSans', sans-serif !important;
+  font-family: var(--font-sans);
   font-variation-settings: "wdth" 120 !important;
   font-weight: 800 !important;
   text-transform: uppercase !important;
@@ -123,7 +118,7 @@ html, body, #root { background: #fbfaf4 !important; }
 /* ---------- 6) NAVBAR: statik şablonla birebir ---------- */
 .navbar { font-family: var(--ky-mono); }
 .navbar .logo-word {
-  font-family: 'TikTokSans', sans-serif !important;
+  font-family: var(--font-sans);
   font-variation-settings: "wght" 700, "wdth" 120 !important;
   font-weight: 700 !important;
   font-size: 16px !important;
@@ -170,7 +165,7 @@ html, body, #root { background: #fbfaf4 !important; }
 }
 .stat-label, .story-stat-label {
   font-family: var(--ky-mono) !important;
-  font-size: 11px !important;
+  font-size: var(--fs-2xs) !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
 }
@@ -196,7 +191,7 @@ html, body, #root { background: #fbfaf4 !important; }
   --border-strong: rgba(23, 19, 10, 0.18);
   --shadow-sm: none; --shadow-md: none; --shadow-lg: none; --shadow-glow: none;
   --radius-sm: 4px; --radius-md: 6px; --radius-lg: 8px; --radius-xl: 10px;
-  --font: 'TikTokSans', system-ui, sans-serif;
+  /* --font kade-tokens.css'te Poppins'e bağlıdır; burada yeniden tanımlanmaz. */
 }
 .admin-dashboard, .admin-login-container {
   background: #fbfaf4 !important;
@@ -222,7 +217,7 @@ html, body, #root { background: #fbfaf4 !important; }
 
 /* kadeadmin wordmark: display dili */
 .admin-logo {
-  font-family: 'TikTokSans', sans-serif !important;
+  font-family: var(--font-sans);
   font-variation-settings: "wdth" 120 !important;
   font-weight: 800 !important;
   text-transform: uppercase !important;
@@ -230,7 +225,7 @@ html, body, #root { background: #fbfaf4 !important; }
 }
 .admin-logo span { color: #e0a81f !important; }
 .admin-page-header h1 {
-  font-family: 'TikTokSans', sans-serif !important;
+  font-family: var(--font-sans);
   font-variation-settings: "wdth" 120 !important;
   text-transform: uppercase !important;
   font-weight: 800 !important;
@@ -326,13 +321,13 @@ html, body, #root { background: #fbfaf4 !important; }
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   font-size: 12.5px !important;
 }
 .cookie-banner .cookie-icon { display: none !important; }
 .cookie-banner .btn, .cookie-banner .cookie-btn {
-  font-family: 'DepartureMono', ui-monospace, monospace !important;
-  font-size: 11.5px !important;
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs) !important;
   text-transform: uppercase !important;
   border-radius: 999px !important;
 }
@@ -377,7 +372,7 @@ html, body, #root {
   margin: 0 auto !important;
 }
 .login-logo {
-  font-family: 'TikTokSans', sans-serif !important;
+  font-family: var(--font-sans);
   font-variation-settings: "wdth" 120 !important;
   font-weight: 800 !important;
   text-transform: uppercase !important;
@@ -395,8 +390,8 @@ html, body, #root {
   box-shadow: 0 0 0 3px rgba(224, 168, 31, 0.12) !important;
 }
 .login-legal {
-  font-family: 'GeistMono', ui-monospace, monospace !important;
-  font-size: 10.5px !important;
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs) !important;
   letter-spacing: 0.04em !important;
 }
 .login-logo::after { content: none; }
@@ -450,7 +445,7 @@ html, body, #root {
   border: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   font-size: 12px !important;
   letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
@@ -467,14 +462,14 @@ html, body, #root {
 .login-input {
   border-radius: 4px !important;
   padding-left: 14px !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   font-size: 13px !important;
 }
 /* buton: dev gradient hap -> düz gold, mono */
 .login-submit, .login-card .btn-primary {
   background: #e0a81f !important;
   border-radius: 4px !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   font-weight: 600 !important;
   letter-spacing: 0.08em !important;
   box-shadow: none !important;
@@ -553,7 +548,7 @@ html, body, #root {
   border: 1px solid transparent !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   font-size: 12px !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
@@ -583,7 +578,7 @@ html, body, #root {
   border: 1px solid rgba(23,19,10,0.12) !important;
   border-radius: 4px !important;
   box-shadow: none !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   font-size: 13px !important;
 }
 
@@ -621,15 +616,15 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 }
 .portfolio-card-category, [class*="-card-category"] {
   color: #c8901a !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
-  font-size: 11px !important;
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs) !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
 }
 .case-duration-tag, .case-platform-tag, .case-metric-label, .case-mini-label,
 .case-summary-label, .portfolio-metric-label {
   color: rgba(23,19,10,0.55) !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   text-transform: uppercase !important;
   letter-spacing: 0.08em !important;
   background: none !important;
@@ -644,7 +639,7 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
   background: none !important;
 }
 .kk-eyebrow {
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   letter-spacing: 0.2em !important;
   text-transform: uppercase !important;
   color: #c8901a !important;
@@ -662,7 +657,7 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
   background: none !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   font-size: 12px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.06em !important;
@@ -677,15 +672,15 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
   border-radius: 0 !important;
   box-shadow: none !important;
   color: #c8901a !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
-  font-size: 11px !important;
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs) !important;
   letter-spacing: 0.14em !important;
   text-transform: uppercase !important;
   padding: 0 !important;
 }
 .kk-badge::before { content: '★ '; }
 .kk-price, .kk-amount {
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   color: #17130a !important;
   -webkit-text-fill-color: #17130a !important;
   background: none !important;
@@ -699,7 +694,7 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 /* --- portfolio metrik sayıları: inline renk -> ink mono --- */
 .portfolio-metric-value {
   color: #17130a !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   font-weight: 600 !important;
 }
 .portfolio-card-header { border-bottom: 1px solid rgba(23,19,10,0.11) !important; }
@@ -714,7 +709,7 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 }
 .ist-ikon { display: none !important; }
 .ist-rakam {
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   color: #17130a !important;
   -webkit-text-fill-color: #17130a !important;
   background: none !important;
@@ -730,7 +725,7 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
   border: 1px solid transparent !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans);
   font-size: 12px !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
@@ -747,7 +742,7 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 .sayfalama-btn {
   background: none !important; border: 1px solid rgba(23,19,10,0.2) !important;
   border-radius: 4px !important; box-shadow: none !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important; text-transform: uppercase !important;
+  font-family: var(--font-sans); text-transform: uppercase !important;
 }
 
 /* =====================================================================
@@ -784,8 +779,8 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 /* --- PARTNER kartları: mavi/renkli kategori → gold mono; emoji logo gizle --- */
 .partner-category {
   color: #c8901a !important;
-  font-family: 'GeistMono', ui-monospace, monospace !important;
-  font-size: 11px !important;
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs) !important;
   letter-spacing: 0.12em !important;
   text-transform: uppercase !important;
 }

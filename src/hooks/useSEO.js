@@ -26,7 +26,17 @@ function setCanonical(url) {
   el.setAttribute('href', url)
 }
 
-export function useSEO({ title, description, keywords, path = '/', image, type = 'website', noindex = false, baseUrl = BASE_URL }) {
+export function useSEO({
+  title,
+  description,
+  keywords,
+  path = '/',
+  image,
+  type = 'website',
+  noindex = false,
+  nofollow = false,
+  baseUrl = BASE_URL,
+}) {
   useEffect(() => {
     // Avoid double-appending "Kade New Media"
     let fullTitle
@@ -46,7 +56,10 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
 
     setMeta('description', description)
     if (keywords) setMeta('keywords', keywords)
-    setMeta('robots', noindex ? 'noindex, nofollow' : 'index, follow')
+    // Public arşiv/listeler (/blog, /partnerler vb.) indekslenmeyebilir ama
+    // üzerlerindeki doğrulanmış detay bağlantıları taranabilir kalmalıdır.
+    // `nofollow` yalnız gerçekten gerekli özel akışlarda açıkça seçilir.
+    setMeta('robots', noindex ? `noindex, ${nofollow ? 'nofollow' : 'follow'}` : 'index, follow')
     setMeta('author', 'Kade New Media')
 
     // Open Graph
@@ -72,5 +85,5 @@ export function useSEO({ title, description, keywords, path = '/', image, type =
     twitterSite?.remove()
 
     setCanonical(canonicalUrl)
-  }, [title, description, keywords, path, image, type, noindex, baseUrl])
+  }, [title, description, keywords, path, image, type, noindex, nofollow, baseUrl])
 }

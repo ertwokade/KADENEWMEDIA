@@ -4,11 +4,13 @@ import { test } from 'node:test'
 import { createCsrfToken, sessionVersionMatches, verifyCsrfToken } from '../../server/api/_lib/auth.js'
 import { validateMediaUpload } from '../../server/api/_lib/uploadValidation.js'
 import { validateRequestBodySize } from '../../server/api/_lib/requestLimits.js'
+import { isValidQueryId } from '../../server/api/_lib/validation.js'
 import { reserveShopierOrder, verifyShopierSignature } from '../../server/api/shopier.js'
 import { getShopierProduct, parseMoneyToMinor, validateShopierPayment } from '../../server/api/_lib/shopierCatalog.js'
 import { reconcileShopierOrders } from '../../server/api/_lib/shopierReconciliation.js'
 import { publicBlogFilter } from '../../server/api/blog.js'
 import { sanitizePartnerUpdate } from '../../server/api/partners.js'
+import { isKnownContentSection, isPublicContentSection } from '../../server/api/content.js'
 import apiHandler from '../../api/[...path].js'
 
 function responseDouble() {
@@ -64,6 +66,22 @@ test('media validation checks file signature instead of trusting MIME', () => {
 test('mass assignment drops protected partner fields', () => {
   const clean = sanitizePartnerUpdate({ name: 'Partner', role: 'admin', owner: 'attacker', status: 'approved', createdAt: 'forged' })
   assert.deepEqual(clean, { name: 'Partner' })
+})
+
+test('API query IDs accept legacy ObjectId and current Supabase UUID values', () => {
+  assert.equal(isValidQueryId('507f1f77bcf86cd799439011'), true)
+  assert.equal(isValidQueryId('550e8400-e29b-41d4-a716-446655440000'), true)
+  assert.equal(isValidQueryId('550e8400-e29b-11d4-c716-446655440000'), false, 'UUID variant must be valid')
+  assert.equal(isValidQueryId('not-an-id'), false)
+})
+
+test('anonymous content access is limited to the explicit public section allow-list', () => {
+  assert.equal(isKnownContentSection('footer'), true)
+  assert.equal(isPublicContentSection('footer'), true)
+  assert.equal(isKnownContentSection('calendar'), true)
+  assert.equal(isPublicContentSection('calendar'), false)
+  assert.equal(isKnownContentSection('typo-section'), false)
+  assert.equal(isPublicContentSection('typo-section'), false)
 })
 
 test('API dispatcher applies no-store even to unknown endpoints', async () => {

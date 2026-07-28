@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   HiOutlineMail,
+  HiOutlinePhone,
   HiOutlineLocationMarker,
   HiOutlinePaperAirplane,
   HiOutlineCheck,
 } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { useSiteContent } from '../hooks/useSiteContent'
 import { sendContactApi } from '../api'
 import { analytics } from '../utils/analytics'
 import { CONTACT } from '../utils/constants'
@@ -20,6 +22,7 @@ import './Contact.css'
 export default function Contact() {
   const { t } = useLanguage()
   const navigate = useNavigate()
+  const { content: contact } = useSiteContent('footer', CONTACT)
   useSEO({
     title: 'Kade New Media İletişim | Bize Ulaşın',
     description: 'Sosyal medya, dijital pazarlama, içerik üretimi ya da web projeniz için bize yazın; ihtiyacınızı birlikte konuşalım.',
@@ -90,7 +93,7 @@ export default function Contact() {
         const body = encodeURIComponent(
           `Ad: ${formData.name}\nE-posta: ${formData.email}\nTelefon: ${formData.phone || '-'}\nŞirket: ${formData.company || '-'}\nHizmet: ${formData.services.join(', ') || '-'}\n\nMesaj:\n${formData.message}`
         )
-        window.open(`mailto:${CONTACT.email}?subject=${subject}&body=${body}`, '_self')
+        window.open(`mailto:${contact.email || CONTACT.email}?subject=${subject}&body=${body}`, '_self')
         setError(t('contact.fallbackMsg') || 'Formu şu an gönderemedik, e-posta uygulamanız açılıyor; oradan da ulaşabilirsiniz.')
       } else {
         setError(errorMsg || t('contact.errorMsg') || 'Mesaj gönderilemedi. Lütfen tekrar deneyin.')
@@ -105,13 +108,19 @@ export default function Contact() {
     {
       icon: HiOutlineMail,
       title: t('contact.email'),
-      value: CONTACT.email,
-      link: `mailto:${CONTACT.email}`,
+      value: contact.email || CONTACT.email,
+      link: `mailto:${contact.email || CONTACT.email}`,
+    },
+    {
+      icon: HiOutlinePhone,
+      title: t('contact.phone') || 'Telefon',
+      value: contact.phone || CONTACT.phone,
+      link: `tel:${String(contact.phone || CONTACT.phone).replace(/[^\d+]/g, '')}`,
     },
     {
       icon: HiOutlineLocationMarker,
       title: t('contact.address'),
-      value: CONTACT.address,
+      value: contact.address || CONTACT.address,
       link: null,
     },
   ]

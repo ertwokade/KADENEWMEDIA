@@ -22,6 +22,17 @@ const allowedResources = new Set([
   'subscriptions', 'surveys', 'tasks',
 ]);
 
+// Geçiş döneminde bazı eski kayıtlar 24 karakterlik Mongo ObjectId, güncel
+// Supabase tabloları ise UUID kullanıyor. Dispatcher yalnız ObjectId kabul
+// ettiğinde handler'a ulaşmadan bütün UUID tabanlı DELETE istekleri 400 ile
+// kesiliyordu (blog, partner, link profili, kısa link vb.).
+const MONGO_ID_RE = /^[a-fA-F0-9]{24}$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export function isValidQueryId(value) {
+  return typeof value === 'string' && (MONGO_ID_RE.test(value) || UUID_RE.test(value));
+}
+
 function first(value) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -44,7 +55,7 @@ export function validateQuery(req, res) {
   }
 
   const id = first(query.id);
-  if (id && !/^[a-fA-F0-9]{24}$/.test(id)) {
+  if (id && !isValidQueryId(id)) {
     res.status(400).json({ error: 'Invalid ID' });
     return false;
   }

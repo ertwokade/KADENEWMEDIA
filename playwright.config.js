@@ -1,10 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
-// Canlı Supabase kredensiyali olmadan çalıştırılır — bu yüzden testler
-// "sayfa çöküyor mu / yetkisiz erişim engelleniyor mu / mobilde yatay
-// taşma var mı" gibi backend-veri-bağımsız senaryolara odaklanır.
-// Gerçek veri gerektiren (ödeme, admin CRUD sonucu) senaryolar canlı
-// ortamda ayrıca test edilmeli (bkz. docs/BLOCKERS_TR.md #1).
+// Production-benzeri dist sunucusu gerçek 404/redirect davranışını korur ve
+// veri gerektirmeyen API çağrılarına deterministik yanıt verir. Admin CRUD
+// akışları ilgili testte ayrıca route mock'larıyla doğrulanır; Supabase'e
+// veya production analytics'e yazılmaz.
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
@@ -15,16 +14,11 @@ export default defineConfig({
     baseURL: 'http://localhost:4173',
     trace: 'retain-on-failure',
   },
-  // vite preview YERİNE dev server kullanılıyor: prod'daki `/` → site.html
-  // rewrite'ı yalnızca vite.config.js'teki serveStaticLandingAtRoot dev
-  // middleware'inde taklit ediliyor, `vite preview` bunu bilmiyor (denendi,
-  // preview modunda `/` 404 veriyordu çünkü build sonrası dist/index.html
-  // app.html olarak yeniden adlandırılıyor).
   webServer: {
-    command: 'npx vite --port 4173',
+    command: 'npm run legacy:build && PORT=4173 node scripts/serve-dist.mjs',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
-    timeout: 60_000,
+    timeout: 120_000,
   },
   projects: [
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },

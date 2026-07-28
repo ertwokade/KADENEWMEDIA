@@ -17,6 +17,7 @@ export default function Portfolio() {
       ? 'Kade New Media portfolio information. Approved project details will be published with client permission.'
       : 'Kade New Media portfolyo bilgileri. Onaylı proje detayları müşteri izniyle yayınlanır.',
     path: '/portfolio',
+    noindex: true,
   })
 
   const caps = [

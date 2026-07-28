@@ -1,8 +1,32 @@
-import { getSupabase } from './_lib/supabase.js';
+import { getSupabase, isUniqueViolation } from './_lib/supabase.js';
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import jwt from 'jsonwebtoken';
+
+// Site yöneticisinin kod değiştirmeden güncellediği içerik bölümleri.
+// Listeyi merkezi tutmak hem yazım hatasıyla ölü kayıt oluşmasını hem de
+// public GET /api/content çağrısının takvim gibi iç verileri sızdırmasını
+// engeller.
+export const CONTENT_SECTIONS = new Set([
+  'hero', 'stats', 'services', 'faq', 'testimonials', 'packages',
+  'priceCalculator', 'about', 'footer', 'careers', 'basin', 'nedenBiz',
+  'tesekkur', 'referralProgram', 'podcastWebinar', 'caseStudies',
+  'newsletterArchive', 'calendar', 'portfolio',
+]);
+
+export const PUBLIC_CONTENT_SECTIONS = new Set([
+  'hero', 'stats', 'services', 'faq', 'testimonials', 'packages',
+  'about', 'footer', 'careers', 'tesekkur', 'caseStudies', 'portfolio',
+]);
+
+export function isKnownContentSection(section) {
+  return typeof section === 'string' && CONTENT_SECTIONS.has(section);
+}
+
+export function isPublicContentSection(section) {
+  return typeof section === 'string' && PUBLIC_CONTENT_SECTIONS.has(section);
+}
 
 // ── GA4 helpers (kept in this file to stay within Vercel 12-function limit) ──
 let _ga4Token = null;
@@ -162,12 +186,18 @@ export default async function handler(req, res) {
         const { error: pvInsertErr } = await supabase
           .from('kade_pageviews')
           .insert({ date: today, path: finalPath, count: 1, updated_at: new Date().toISOString() });
-        if (pvInsertErr) throw pvInsertErr;
+        // (date, path) unique — eşzamanlı iki ziyaret aynı satırı yaratmaya
+        // çalıştığında ikincisi reddedilir; bu bir hata değil.
+        if (pvInsertErr && !isUniqueViolation(pvInsertErr)) throw pvInsertErr;
       }
 
-      // Track referrer source with platform-level detail
+      // Track referrer source with platform-level detail.
+      // NOT: kade_traffic_sources.detail kolonu şemada `TEXT NOT NULL DEFAULT ''`.
+      // Buranın varsayılanı `null` iken referrer'sız (doğrudan) her ziyaret
+      // not-null ihlaliyle 500 üretiyordu — yani sitedeki gezinmelerin çoğu.
+      // Boş string hem şemaya hem unique index'e (date, source, detail) uyar.
       let source = 'direct';
-      let sourceDetail = null;
+      let sourceDetail = '';
       const ref = (referrer || '').toLowerCase();
 
       if (ref.trim()) {
@@ -192,9 +222,13 @@ export default async function handler(req, res) {
         }
       }
 
-      let tsQuery = supabase.from('kade_traffic_sources').select('id, count').eq('date', today).eq('source', source);
-      tsQuery = sourceDetail === null ? tsQuery.is('detail', null) : tsQuery.eq('detail', sourceDetail);
-      const { data: existingTs, error: tsSelectErr } = await tsQuery.maybeSingle();
+      const { data: existingTs, error: tsSelectErr } = await supabase
+        .from('kade_traffic_sources')
+        .select('id, count')
+        .eq('date', today)
+        .eq('source', source)
+        .eq('detail', sourceDetail)
+        .maybeSingle();
       if (tsSelectErr) throw tsSelectErr;
       if (existingTs) {
         const { error: tsUpdateErr } = await supabase
@@ -206,13 +240,19 @@ export default async function handler(req, res) {
         const { error: tsInsertErr } = await supabase
           .from('kade_traffic_sources')
           .insert({ date: today, source, detail: sourceDetail, count: 1 });
-        if (tsInsertErr) throw tsInsertErr;
+        // Eşzamanlı iki ziyaret aynı (date, source, detail) satırını yaratmaya
+        // çalışabilir; unique index ikincisini reddeder. Sayaç bir tık eksik
+        // kalır ama bu, isteği hataya düşürmekten iyidir.
+        if (tsInsertErr && !isUniqueViolation(tsInsertErr)) throw tsInsertErr;
       }
 
       return res.status(200).json({ ok: true });
     } catch (err) {
+      // Ziyaretçi analitiği "best-effort"tür: sayfanın çalışmasıyla ilgisi yok.
+      // 500 döndürmek her ziyaretçinin konsoluna hata basıyordu. Hata sunucu
+      // logunda tam olarak kalır; istemciye kaydedilmediği bilgisi gider.
       console.error('Pageview error:', err);
-      return res.status(500).json({ error: 'Sunucu hatası' });
+      return res.status(202).json({ ok: false, recorded: false });
     }
   }
 
@@ -448,6 +488,12 @@ export default async function handler(req, res) {
     try {
       const section = req.query.section;
       if (section) {
+        if (!isKnownContentSection(section)) {
+          return res.status(400).json({ error: 'Geçersiz içerik bölümü' });
+        }
+        if (!isPublicContentSection(section)) {
+          if (!(await requirePermission(req, res, 'content'))) return;
+        }
         const { data: content, error } = await supabase
           .from('kade_site_content')
           .select('*')
@@ -456,6 +502,9 @@ export default async function handler(req, res) {
         if (error) throw error;
         return res.status(200).json(content || { section, data: {} });
       }
+      // Bölümsüz liste yalnız admin içerik ekranı içindir. Önceden anonim
+      // çağrı calendar/portfolio dâhil tüm satırları dökebiliyordu.
+      if (!(await requirePermission(req, res, 'content'))) return;
       const { data: allContent, error } = await supabase.from('kade_site_content').select('*');
       if (error) throw error;
       return res.status(200).json(allContent);
@@ -472,7 +521,10 @@ export default async function handler(req, res) {
     try {
       const { section, data } = req.body;
 
-      if (!section || !data) {
+      if (!isKnownContentSection(section)) {
+        return res.status(400).json({ error: 'Geçersiz içerik bölümü' });
+      }
+      if (!data || typeof data !== 'object' || Array.isArray(data)) {
         return res.status(400).json({ error: 'Section ve data gerekli' });
       }
 

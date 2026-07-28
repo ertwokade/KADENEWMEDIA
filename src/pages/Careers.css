@@ -9,6 +9,55 @@
   overflow: hidden;
 }
 
+.careers-job-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: var(--space-5, 20px);
+}
+
+.careers-job-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  padding: clamp(20px, 4vw, 30px);
+}
+
+.careers-job-card h3 {
+  font-size: var(--fs-xl, 1.35rem);
+}
+
+.careers-job-card p,
+.careers-job-card li {
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.careers-job-card ul {
+  display: grid;
+  gap: 8px;
+  list-style: disc;
+  padding-left: 20px;
+}
+
+.careers-job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.careers-job-meta span {
+  padding: 5px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill, 999px);
+  color: var(--text-secondary);
+  font-size: var(--fs-xs, 0.75rem);
+}
+
+.careers-job-card .btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
 /* Perks */
 .perks-grid {
   display: grid;

@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-family: 'TikTokSans', sans-serif;
+  font-family: var(--font-sans);
   font-variation-settings: "wdth" 120;
   font-weight: 800;
   font-size: clamp(40px, 6svw, 110px);
@@ -33,7 +33,7 @@
   flex-wrap: wrap;
   gap: 12px;
   margin-top: clamp(48px, 9vh, 110px);
-  font-family: 'GeistMono', ui-monospace, monospace;
+  font-family: var(--font-sans);
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -63,8 +63,8 @@
   margin-top: 34px;
   padding-top: 18px;
   border-top: 1px solid rgba(23, 19, 10, 0.08);
-  font-family: 'GeistMono', ui-monospace, monospace;
-  font-size: 11px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(23, 19, 10, 0.45);

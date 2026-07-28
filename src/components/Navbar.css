@@ -10,14 +10,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 56px;
-  font-family: 'GeistMono', ui-monospace, monospace;
+  font-family: var(--font-sans);
   background: linear-gradient(var(--bg-primary, #fbfaf4) 55%, transparent);
   pointer-events: none;
 }
 .knav > * { pointer-events: auto; }
 
 .knav-brand {
-  font-family: 'TikTokSans', sans-serif;
+  font-family: var(--font-sans);
   font-variation-settings: "wght" 700, "wdth" 120;
   font-weight: 700;
   font-size: 16px;
@@ -62,7 +62,7 @@
   display: inline-flex; align-items: center; gap: 8px;
   background: linear-gradient(135deg, #f5d84a, #e0a81f);
   color: #17130a;
-  font-family: 'DepartureMono', ui-monospace, monospace;
+  font-family: var(--font-sans);
   font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
   padding: 10px 20px; border-radius: 999px;
   text-decoration: none;
@@ -86,7 +86,7 @@
   padding: 8px 20px 18px;
 }
 .knav-mlink {
-  font-family: 'GeistMono', ui-monospace, monospace;
+  font-family: var(--font-sans);
   font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase;
   color: var(--ky-ink, #17130a); text-decoration: none;
   background: none; border: none; text-align: left; cursor: pointer;

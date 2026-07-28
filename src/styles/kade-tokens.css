@@ -1,0 +1,290 @@
+/* ============================================================================
+   KADE — MERKEZİ TASARIM SİSTEMİ (tek kaynak)
+   ----------------------------------------------------------------------------
+   Bu dosya sitenin TEK font ve token kaynağıdır. Public site, admin paneli,
+   müşteri paneli, giriş ekranları, Organizasyon Kiti ve hata sayfaları
+   buradaki değişkenleri miras alır.
+
+   Sıra önemli: index.css bu dosyayı EN BAŞTA import eder ki diğer tüm
+   sayfa CSS'leri bu tokenların üzerine yazabilsin.
+
+   KURAL: Yeni bir `font-family` bildirimi yazmayın. Metin için
+   `var(--font-sans)`, gerçek kod blokları için `var(--font-mono)` kullanın.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1) POPPINS — self-host, latin + latin-ext (Türkçe ı İ ğ Ğ ş Ş için gerekli)
+   Yalnızca kullanılan 4 ağırlık yüklenir: 400 / 500 / 600 / 700.
+   Toplam ~53 KB (8 dosya). Google Fonts'a runtime bağımlılık yoktur, bu yüzden
+   CSP'nin font-src/style-src kuralları için harici izin gerekmez.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-500-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-600-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-600-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-700-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* -------------------------------------------------------------------------
+     2) FONT AİLELERİ — tek doğruluk kaynağı
+     Aşağıdaki takma adlar geriye dönük uyumluluk içindir: kod tabanındaki
+     mevcut `var(--font-primary)`, `var(--ky-mono)` gibi ~70 kullanım
+     dokunulmadan Poppins'e döner. Yeni kodda `--font-sans` kullanın.
+  ------------------------------------------------------------------------- */
+  --font-sans: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* geriye dönük takma adlar → hepsi Poppins */
+  --font-primary: var(--font-sans);
+  --font-secondary: var(--font-sans);
+  --font-display: var(--font-sans);
+  --font-serif: var(--font-sans);
+  --font: var(--font-sans);
+  --ky-mono: var(--font-sans);
+  --ky-tech: var(--font-sans);
+  --kf-display: var(--font-sans);
+  --kf-mono: var(--font-sans);
+  --kf-tech: var(--font-sans);
+
+  /* -------------------------------------------------------------------------
+     3) MARKA RENKLERİ — mevcut kurumsal kimlik korunur (altın + krem + mürekkep)
+  ------------------------------------------------------------------------- */
+  --kade-gold: #e0a81f;
+  --kade-gold-deep: #c8901a;
+  --kade-gold-soft: #fff2cc;
+  --kade-ink: #17130a;
+  --kade-ink-2: rgba(23, 19, 10, 0.72);
+  --kade-ink-3: rgba(23, 19, 10, 0.55);
+  --kade-ink-4: rgba(23, 19, 10, 0.38);
+  --kade-canvas: #fdf6e3;
+  --kade-surface: #fbfaf4;
+  --kade-surface-2: rgba(23, 19, 10, 0.035);
+  --kade-surface-3: rgba(23, 19, 10, 0.07);
+
+  /* durum renkleri — WCAG AA kontrastı krem zemin üzerinde doğrulandı */
+  --kade-success: #1c7a4a;
+  --kade-success-bg: rgba(28, 122, 74, 0.1);
+  --kade-danger: #b3261e;
+  --kade-danger-bg: rgba(179, 38, 30, 0.1);
+  --kade-warning: #8a5a00;
+  --kade-warning-bg: rgba(224, 168, 31, 0.16);
+  --kade-info: #1b5e9c;
+  --kade-info-bg: rgba(27, 94, 156, 0.1);
+
+  /* çizgi ve kenarlıklar */
+  --kade-line: rgba(23, 19, 10, 0.12);
+  --kade-line-strong: rgba(23, 19, 10, 0.28);
+
+  /* -------------------------------------------------------------------------
+     4) TİPOGRAFİ ÖLÇEĞİ — mobilde min 15px gövde, akıcı büyüme
+  ------------------------------------------------------------------------- */
+  /* --fs-2xs yalnız etiket/rozet/eyebrow içindir. Masaüstünde 11px kabul
+     edilebilir; mobilde okunmadığı için aşağıdaki breakpoint'te 12px'e
+     yükselir (tek noktadan, sayfa başına yama gerekmeden). */
+  --fs-2xs: 0.6875rem;  /* 11px */
+  --fs-xs: 0.75rem;     /* 12px */
+  --fs-sm: 0.8125rem;   /* 13px */
+  --fs-base: 0.9375rem; /* 15px — mobil gövde alt sınırı */
+  --fs-md: 1rem;        /* 16px */
+  --fs-lg: 1.125rem;    /* 18px */
+  --fs-xl: clamp(1.25rem, 1.05rem + 0.8vw, 1.5rem);
+  --fs-2xl: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
+  --fs-3xl: clamp(1.875rem, 1.4rem + 2.2vw, 2.75rem);
+  --fs-4xl: clamp(2.25rem, 1.5rem + 3.4vw, 3.75rem);
+  --fs-5xl: clamp(2.75rem, 1.6rem + 5.2vw, 5rem);
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.1;
+  --lh-heading: 1.2;
+  --lh-snug: 1.45;
+  --lh-body: 1.6;
+  --lh-relaxed: 1.75;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.08em;
+
+  /* -------------------------------------------------------------------------
+     5) BOŞLUK / DÜZEN
+  ------------------------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  --container-max: 1200px;
+  --container-narrow: 860px;
+  --container-pad: clamp(16px, 4vw, 32px);
+  --section-y: clamp(56px, 8vw, 104px);
+
+  /* -------------------------------------------------------------------------
+     6) KENAR / GÖLGE / GEÇİŞ
+  ------------------------------------------------------------------------- */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(23, 19, 10, 0.06), 0 1px 3px rgba(23, 19, 10, 0.05);
+  --shadow-md: 0 4px 12px rgba(23, 19, 10, 0.08);
+  --shadow-lg: 0 12px 32px rgba(23, 19, 10, 0.1);
+  --shadow-xl: 0 24px 60px rgba(23, 19, 10, 0.14);
+  --shadow-focus: 0 0 0 3px rgba(224, 168, 31, 0.35);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.15s;
+  --dur-normal: 0.25s;
+  --dur-slow: 0.4s;
+
+  /* dokunma hedefi alt sınırı (WCAG 2.1 AA — 24px, hedefimiz 44px) */
+  --tap-min: 44px;
+}
+
+/* ---------------------------------------------------------------------------
+   7) GLOBAL MİRAS — Poppins'in gerçekten her yerde uygulanmasını garantiler.
+   Tarayıcılar form elemanlarına ve dialog'a kendi UA fontunu verir; bunlar
+   açıkça `inherit` edilmezse Poppins uygulanmaz.
+--------------------------------------------------------------------------- */
+html {
+  font-family: var(--font-sans);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea,
+dialog,
+fieldset,
+legend,
+label,
+option,
+::placeholder,
+::file-selector-button,
+[contenteditable],
+[role='button'],
+[role='dialog'],
+[role='menu'],
+[role='listbox'],
+[role='tooltip'] {
+  font-family: inherit;
+}
+
+/* Gerçek kod/teknik çıktı — okunabilirlik için monospace kalır. */
+code,
+kbd,
+samp,
+pre,
+.kade-code,
+.nt-code {
+  font-family: var(--font-mono);
+}
+
+/* ---------------------------------------------------------------------------
+   8) MOBİL OKUNABİLİRLİK ALT SINIRI
+   Etiket/rozet ölçeği mobilde 12px'in altına düşmemeli. Token üzerinden
+   yükseltmek, onlarca sayfa CSS'ine tek tek media query eklemekten hem
+   daha az kod hem de kaçak bırakmayan bir çözüm.
+--------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  :root {
+    --fs-2xs: 0.75rem; /* 11px → 12px */
+  }
+}
+
+/* Hareket azaltma tercihi — WCAG 2.3.3 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

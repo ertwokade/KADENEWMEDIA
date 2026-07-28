@@ -70,7 +70,7 @@
 
 .pgrid-category {
   display: inline-block;
-  font-size: 0.68rem;
+  font-size: var(--fs-2xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;

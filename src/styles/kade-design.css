@@ -1,7 +1,4 @@
 /* ===== KADE MEDIA — kade-style design system (scoped to .kade-home) ===== */
-@font-face { font-family: 'TikTokSans'; src: url('/fonts/TikTokSans.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
-@font-face { font-family: 'GeistMono'; src: url('/fonts/GeistMono[wght].woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
-@font-face { font-family: 'DepartureMono'; src: url('/fonts/DepartureMono-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
 
 .kade-home {
   --kbg: #fdf6e3;
@@ -10,9 +7,6 @@
   --kline: rgba(23, 19, 10, 0.12);
   --kade: #e0a81f;
   --kade-deep: #c8901a;
-  --kf-display: 'TikTokSans', sans-serif;
-  --kf-mono: 'GeistMono', monospace;
-  --kf-tech: 'DepartureMono', monospace;
   background: var(--kbg);
   color: var(--kfg);
   font-family: var(--kf-mono);
@@ -36,7 +30,7 @@
   display: flex; justify-content: space-between; align-items: center; font-size: 12px; pointer-events: none;
 }
 .kade-nav { top: 0; align-items: flex-start; }
-.kade-status { bottom: 0; font-size: 11.5px; letter-spacing: 0.04em; }
+.kade-status { bottom: 0; font-size: var(--fs-2xs); letter-spacing: 0.04em; }
 .kade-nav a, .kade-nav button, .kade-status a { pointer-events: auto; cursor: none; background: none; border: none; color: var(--kfg); font: inherit; text-decoration: none; }
 .kade-brand { font-weight: 700; letter-spacing: 0.04em; }
 .kade-navlinks { display: flex; gap: 30px; }
@@ -74,5 +68,5 @@ body.kade-cursor-on, body.kade-cursor-on * { cursor: none !important; }
   .kade-intro .km { justify-self: start; }
   .kade-navlinks { gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
   .kade-bring { font-size: clamp(34px, 12vw, 72px); }
-  .kade-status { font-size: 9px; }
+  .kade-status { font-size: var(--fs-2xs); }
 }

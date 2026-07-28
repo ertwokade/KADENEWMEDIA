@@ -1,7 +1,12 @@
 /* ==========================================
    KADE MEDIA - GLOBAL STYLES
-   Yeni arayüz (kade) — açık/krem tema, TikTokSans/GeistMono
+   Yeni arayüz (kade) — açık/krem tema, Poppins
+   ------------------------------------------
+   kade-tokens.css TEK font ve tasarım-token kaynağıdır ve en başta
+   import edilir; buradaki ve sayfa CSS'lerindeki kurallar onun üzerine
+   yazar. Font ailesi için yeni bildirim eklemeyin — var(--font-sans).
    ========================================== */
+@import './styles/kade-tokens.css';
 @import './styles/kade-design.css';
 
 :root {
@@ -27,11 +32,8 @@
   --gradient-card: linear-gradient(145deg, rgba(224,168,31,0.06) 0%, rgba(224,168,31,0) 100%);
   --gradient-glow: radial-gradient(circle at center, rgba(224,168,31,0.14) 0%, transparent 70%);
 
-  /* Typography — kade */
-  --font-display: 'TikTokSans', 'Outfit', sans-serif;
-  --font-primary: 'TikTokSans', 'Outfit', sans-serif;
-  --font-secondary: 'TikTokSans', 'Inter', sans-serif;
-  --font-mono: 'GeistMono', ui-monospace, monospace;
+  /* Typography — kade-tokens.css'te tanımlıdır (Poppins). Burada yeniden
+     tanımlamayın; import sırası nedeniyle tokenları ezer. */
 
   /* Spacing */
   --section-padding: 100px 0;
@@ -902,10 +904,7 @@ input, textarea {
   --gradient-glow: radial-gradient(circle at center, rgba(224, 168, 31, 0.14), transparent 70%);
   --shadow-glow: 0 10px 40px rgba(23, 19, 10, 0.08);
   --shadow-glow-strong: 0 20px 60px rgba(23, 19, 10, 0.12);
-  --font-display: 'TikTokSans', 'Outfit', system-ui, sans-serif;
-  --font-primary: 'TikTokSans', 'Outfit', system-ui, sans-serif;
-  --font-secondary: 'TikTokSans', 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-serif: 'Newsreader', Georgia, serif;
+  /* Font aileleri kade-tokens.css'ten miras alınır (Poppins). */
   --section-padding: clamp(82px, 12vh, 150px) 0;
   --container-width: 1280px;
   color-scheme: light;
@@ -1588,7 +1587,7 @@ iframe {
 
   .hero-content::after {
     max-width: calc(100vw - 56px);
-    font-size: 0.66rem;
+    font-size: var(--fs-2xs);
     line-height: 1.4;
   }
 
@@ -1646,26 +1645,28 @@ iframe {
   transform: translateY(-3px) !important;
 }
 
-/* mono editorial etiketler/chip'ler */
+/* editorial etiketler/chip'ler — Poppins medium, tokenlanmış ölçek.
+   Eski 10.5px değeri mobilde okunmuyordu; alt sınır --fs-2xs (11px). */
 .service-tag, .package-tag, .tag, .badge, .chip, .pill, .tech-tag, .skill-tag,
 .feature-tag, .category-tag, .filter-btn {
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans) !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
-  font-size: 10.5px !important;
-  border-radius: 3px !important;
+  letter-spacing: var(--tracking-wide) !important;
+  font-size: var(--fs-2xs) !important;
+  font-weight: var(--fw-semibold) !important;
+  border-radius: var(--radius-xs) !important;
 }
 
 /* editorial butonlar (özel sayfalar hariç) */
 .btn:not(.kk-buy):not(.demo-btn):not(.kl-btn) {
-  font-family: 'GeistMono', ui-monospace, monospace !important;
+  font-family: var(--font-sans) !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  font-weight: 700 !important;
-  font-size: 0.8rem !important;
+  letter-spacing: var(--tracking-wide) !important;
+  font-weight: var(--fw-semibold) !important;
+  font-size: var(--fs-sm) !important;
 }
 
-/* editorial section eyebrow'ları zaten mono; başlıkları display'e sabitle */
+/* başlıklar tek display ailesine sabitlenir */
 .section-title, [class*="-hero"] h1, .hero-title, .page-title {
-  font-family: 'TikTokSans', 'Outfit', sans-serif !important;
+  font-family: var(--font-sans) !important;
 }

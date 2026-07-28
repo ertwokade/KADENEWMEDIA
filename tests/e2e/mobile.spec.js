@@ -13,8 +13,14 @@ test.describe('mobile-chromium', () => {
 
   for (const route of KEY_ROUTES) {
     test(`no horizontal overflow on ${route}`, async ({ page }) => {
-      await page.goto(route)
-      await page.waitForLoadState('networkidle')
+      await page.goto(route, { waitUntil: 'domcontentloaded' })
+      await expect(page.locator('body')).toBeVisible()
+      // Vendored ana sayfa snapshot'ı uzun ömürlü/arka plan istekleri
+      // başlatabildiğinden `networkidle` güvenilir bir layout hazır sinyali
+      // değildir. İki paint turu, ölçülecek geometri için yeterlidir.
+      await page.evaluate(() => new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve))
+      }))
       const { scrollWidth, clientWidth } = await page.evaluate(() => ({
         scrollWidth: document.documentElement.scrollWidth,
         clientWidth: document.documentElement.clientWidth,

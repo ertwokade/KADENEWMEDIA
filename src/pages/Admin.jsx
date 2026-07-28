@@ -28,6 +28,8 @@ import CaseStudiesEditor from './admin/editors/CaseStudiesEditor'
 import NewsletterArchiveEditor from './admin/editors/NewsletterArchiveEditor'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
 import { PACKAGE_SCOPES } from '../data/packages'
+import { SERVICE_DETAILS } from '../data/serviceDetails'
+import { ABOUT_CONTENT_FALLBACK } from '../data/about'
 import { getPackageEntitlements } from '../config/entitlements'
 import {
   apiFetch,
@@ -79,8 +81,13 @@ function Toast({ message, type, onClose }) {
   }, [onClose])
 
   return (
-    <div className={`admin-toast ${type}`}>
-      {type === 'success' ? '✓' : '✕'} {message}
+    <div
+      className={`admin-toast ${type}`}
+      role={type === 'error' ? 'alert' : 'status'}
+      aria-live={type === 'error' ? 'assertive' : 'polite'}
+    >
+      <span aria-hidden="true">{type === 'success' ? '✓' : '✕'}</span>{' '}
+      <span>{message}</span>
       <div className="toast-progress" />
     </div>
   )
@@ -1062,25 +1069,34 @@ function ContentSection({ showToast }) {
     setActiveTab(tabId)
   }
 
+  // Her sekmenin public sitedeki gerçek karşılığı.
+  //   route  : değişikliğin göründüğü sayfa (önizleme bağlantısı)
+  //   status  'live'      → sayfa yayında ve bu veriyi okuyor
+  //           'static'    → sayfa yayında ama metni kodda sabit; buradaki
+  //                         kayıt public sitede GÖRÜNMEZ (bkz. docs/content-admin-matrix.md)
+  //           'no-page'   → hedef sayfa sitede yok, URL 404 dönüyor
+  // Bu alan olmadan yönetici, hiçbir yere yansımayan ekranlarda içerik girip
+  // "kaydedildi" bildirimi alıyordu.
   const tabs = [
-    { id: 'hero', label: '🏠 Hero', desc: 'Anasayfa başlık ve açıklama' },
-    { id: 'stats', label: '📊 İstatistikler', desc: 'Sayaç verileri' },
-    { id: 'services', label: '⚡ Hizmetler', desc: 'Hizmet kartları' },
-    { id: 'faq', label: '❓ SSS', desc: 'Sıkça sorulan sorular' },
-    { id: 'testimonials', label: '💬 Referanslar', desc: 'Müşteri yorumları' },
-    { id: 'packages', label: '💰 Paketler', desc: 'Fiyatlandırma' },
-    { id: 'priceCalculator', label: '🧮 Fiyat Hesaplayıcı', desc: '/fiyat-hesaplama katsayıları' },
-    { id: 'about', label: '👥 Hakkımızda', desc: 'Hakkımızda sayfası' },
-    { id: 'footer', label: '🦶 Footer', desc: 'Alt bilgi, iletişim ve sosyal medya' },
-    { id: 'careers', label: '💼 Kariyer', desc: 'İş ilanları' },
-    { id: 'basin', label: '📰 Basın', desc: '/basin sayfası içeriği' },
-    { id: 'nedenBiz', label: '💡 Neden Biz', desc: '/neden-biz sayfası içeriği' },
-    { id: 'tesekkur', label: '🙏 Teşekkür', desc: '/tesekkur sayfası içeriği' },
-    { id: 'referralProgram', label: '🎁 Referans Programı', desc: '/referans-programi sayfası içeriği' },
-    { id: 'podcastWebinar', label: '🎙️ Podcast & Webinar', desc: '/podcast-webinar sayfası içeriği' },
-    { id: 'caseStudies', label: '🏆 Başarı Hikayeleri', desc: '/basari-hikayeleri sayfası içeriği' },
-    { id: 'newsletterArchive', label: '📧 Bülten Arşivi', desc: '/bulten-arsivi sayfası içeriği' },
+    { id: 'hero', label: '🏠 Hero', desc: 'Anasayfa başlık ve açıklama', route: '/', status: 'static' },
+    { id: 'stats', label: '📊 İstatistikler', desc: 'Sayaç verileri', route: '/', status: 'static' },
+    { id: 'services', label: '⚡ Hizmetler', desc: 'Hizmet kartları', route: '/hizmetler', status: 'live' },
+    { id: 'faq', label: '❓ SSS', desc: 'Sıkça sorulan sorular', route: '/sss', status: 'live' },
+    { id: 'testimonials', label: '💬 Referanslar', desc: 'Müşteri yorumları', route: '/referanslar', status: 'static' },
+    { id: 'packages', label: '💰 Paketler', desc: 'Fiyatlandırma', route: '/paketler', status: 'live' },
+    { id: 'priceCalculator', label: '🧮 Fiyat Hesaplayıcı', desc: 'Fiyat hesaplama katsayıları', route: '/fiyat-hesaplama', status: 'no-page' },
+    { id: 'about', label: '👥 Hakkımızda', desc: 'Hikâye, istatistik ve ekip', route: '/hakkimizda', status: 'live' },
+    { id: 'footer', label: '🦶 Footer', desc: 'Alt bilgi, iletişim ve sosyal medya', route: '/iletisim', status: 'live' },
+    { id: 'careers', label: '💼 Kariyer', desc: 'İş ilanları', route: '/kariyer', status: 'live' },
+    { id: 'basin', label: '📰 Basın', desc: 'Basın sayfası içeriği', route: '/basin', status: 'no-page' },
+    { id: 'nedenBiz', label: '💡 Neden Biz', desc: 'Neden Biz sayfası içeriği', route: '/neden-biz', status: 'no-page' },
+    { id: 'tesekkur', label: '🙏 Teşekkür', desc: 'Teşekkür sayfası içeriği', route: '/tesekkur', status: 'static' },
+    { id: 'referralProgram', label: '🎁 Referans Programı', desc: 'Referans programı sayfası içeriği', route: '/referans-programi', status: 'no-page' },
+    { id: 'podcastWebinar', label: '🎙️ Podcast & Webinar', desc: 'Podcast & webinar sayfası içeriği', route: '/podcast-webinar', status: 'no-page' },
+    { id: 'caseStudies', label: '🏆 Başarı Hikayeleri', desc: 'Başarı hikayeleri sayfası içeriği', route: '/basari-hikayeleri', status: 'static' },
+    { id: 'newsletterArchive', label: '📧 Bülten Arşivi', desc: 'Bülten arşivi sayfası içeriği', route: '/bulten-arsivi', status: 'no-page' },
   ]
+  const activeTabMeta = tabs.find((tab) => tab.id === activeTab)
 
   // Memoize data props to prevent child editors from resetting form state on re-render
   // (isDirty state change triggers re-render; inline fallback objects would create new refs each time)
@@ -1089,7 +1105,25 @@ function ContentSection({ showToast }) {
     en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade New Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
   }, [content.hero])
   const statsData = useMemo(() => content.stats || { clients: '10+', followers: '500+', campaigns: '50+', satisfaction: '98%' }, [content.stats])
-  const servicesData = useMemo(() => content.services || { items: [] }, [content.services])
+  const servicesData = useMemo(() => {
+    const defaults = Object.entries(SERVICE_DETAILS).map(([slug, service]) => ({
+      slug,
+      titleTr: service.titleTr,
+      titleEn: service.titleEn,
+      descTr: service.descTr,
+      descEn: service.descEn,
+      featuresTr: service.featuresTr.join(', '),
+      featuresEn: service.featuresEn.join(', '),
+    }))
+    const saved = Array.isArray(content.services?.items) ? content.services.items : []
+    return {
+      items: defaults.map((item, index) => ({
+        ...item,
+        ...(saved.find((candidate) => candidate?.slug === item.slug) || saved[index] || {}),
+        slug: item.slug,
+      })),
+    }
+  }, [content.services])
   const faqData = useMemo(() => content.faq || {
     tr: [
       { q: 'Kade New Media ne tür hizmetler sunuyor?', a: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi (Meta, Google, TikTok), video prodüksiyon ve dijital strateji danışmanlığı hizmetleri sunuyoruz.' },
@@ -1113,7 +1147,11 @@ function ContentSection({ showToast }) {
   const packagesData = useMemo(() => content.packages || {
     items: PACKAGE_SCOPES.map((scope) => ({ id: scope.id, priceTRY: '', priceUSD: '', priceNote: '' })),
   }, [content.packages])
-  const aboutData = useMemo(() => content.about || {}, [content.about])
+  const aboutData = useMemo(() => ({
+    ...ABOUT_CONTENT_FALLBACK,
+    ...(content.about || {}),
+    team: content.about?.team?.length ? content.about.team : ABOUT_CONTENT_FALLBACK.team,
+  }), [content.about])
   const footerData = useMemo(() => content.footer || {}, [content.footer])
   const careersData = useMemo(() => content.careers || { tr: [], en: [] }, [content.careers])
   const basinData = useMemo(() => content.basin || {}, [content.basin])
@@ -1145,18 +1183,51 @@ function ContentSection({ showToast }) {
         </div>
       </div>
 
-      <div className="admin-tabs">
+      <div className="admin-tabs" role="tablist">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={`admin-tab ${activeTab === tab.id ? 'active' : ''}${isDirty && activeTab !== tab.id ? '' : ''}`}
+            role="tab"
+            type="button"
+            aria-selected={activeTab === tab.id}
+            title={tab.status === 'live' ? `${tab.desc} — ${tab.route} sayfasında yayında`
+              : tab.status === 'no-page' ? `${tab.desc} — ${tab.route} sayfası sitede yok`
+              : `${tab.desc} — ${tab.route} sayfasındaki metin kodda sabit`}
+            className={`admin-tab ${activeTab === tab.id ? 'active' : ''} admin-tab--${tab.status}`}
             onClick={() => handleTabChange(tab.id)}
           >
             {tab.label}
-            {isDirty && activeTab === tab.id && <span style={{ marginLeft: 4, color: '#E91E63', fontSize: '0.65rem' }}>●</span>}
+            {tab.status !== 'live' && (
+              <span className="admin-tab-flag" aria-hidden="true">{tab.status === 'no-page' ? '⚠' : '·'}</span>
+            )}
+            {isDirty && activeTab === tab.id && <span className="admin-tab-dirty" aria-label="kaydedilmemiş değişiklik">●</span>}
           </button>
         ))}
       </div>
+
+      {activeTabMeta && activeTabMeta.status !== 'live' && (
+        <div
+          className={`admin-content-notice admin-content-notice--${activeTabMeta.status}`}
+          role="status"
+        >
+          {activeTabMeta.status === 'no-page' ? (
+            <>
+              <strong>Bu ekranın hedef sayfası sitede yok.</strong>{' '}
+              <code>{activeTabMeta.route}</code> adresi şu anda 404 dönüyor. Buraya
+              girdiğiniz içerik veritabanına kaydedilir ancak ziyaretçiler göremez.
+              Sayfa yayına alındığında mevcut kayıt kullanılacaktır.
+            </>
+          ) : (
+            <>
+              <strong>Bu bölümün metni şu an kodda sabit.</strong>{' '}
+              <a href={activeTabMeta.route} target="_blank" rel="noopener noreferrer">{activeTabMeta.route}</a>{' '}
+              sayfası arama motorlarında ön-render edilmiş HTML üzerinden görüldüğü
+              için metin build sırasında sabitlenir. Buradaki kayıt saklanır ama
+              sayfada görünmez — değişiklik için geliştirici desteği gerekir.
+            </>
+          )}
+        </div>
+      )}
 
       <div onInput={() => setIsDirty(true)} onChange={() => setIsDirty(true)}>
       {activeTab === 'hero' && (
@@ -1483,43 +1554,47 @@ function FooterEditor({ data, onSave }) {
       <h3>Footer & İletişim Bilgileri</h3>
       <div className="form-row">
         <div className="form-group">
-          <label>E-posta</label>
-          <input type="email" value={form.email || ''} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <label htmlFor="footer-email">E-posta</label>
+          <input id="footer-email" type="email" value={form.email || ''} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </div>
         <div className="form-group">
-          <label>Telefon</label>
-          <input type="text" value={form.phone || ''} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <label htmlFor="footer-phone">Telefon</label>
+          <input id="footer-phone" type="text" value={form.phone || ''} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
         </div>
       </div>
       <div className="form-group">
-        <label>Adres</label>
-        <input type="text" value={form.address || ''} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+        <label htmlFor="footer-address">Adres</label>
+        <input id="footer-address" type="text" value={form.address || ''} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+      </div>
+      <div className="form-group">
+        <label htmlFor="footer-city">Şehir</label>
+        <input id="footer-city" type="text" value={form.city || ''} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="İstanbul" />
       </div>
       <h3 style={{ marginTop: 24 }}>Sosyal Medya Linkleri</h3>
       <div className="form-row">
         <div className="form-group">
-          <label>Instagram</label>
-          <input type="url" value={form.instagram || ''} onChange={(e) => setForm({ ...form, instagram: e.target.value })} />
+          <label htmlFor="footer-instagram">Instagram</label>
+          <input id="footer-instagram" type="url" value={form.instagram || ''} onChange={(e) => setForm({ ...form, instagram: e.target.value })} />
         </div>
         <div className="form-group">
-          <label>YouTube</label>
-          <input type="url" value={form.youtube || ''} onChange={(e) => setForm({ ...form, youtube: e.target.value })} />
-        </div>
-      </div>
-      <div className="form-row">
-        <div className="form-group">
-          <label>TikTok</label>
-          <input type="url" value={form.tiktok || ''} onChange={(e) => setForm({ ...form, tiktok: e.target.value })} />
-        </div>
-        <div className="form-group">
-          <label>LinkedIn</label>
-          <input type="url" value={form.linkedin || ''} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} />
+          <label htmlFor="footer-youtube">YouTube</label>
+          <input id="footer-youtube" type="url" value={form.youtube || ''} onChange={(e) => setForm({ ...form, youtube: e.target.value })} />
         </div>
       </div>
       <div className="form-row">
         <div className="form-group">
-          <label>WhatsApp</label>
-          <input type="url" value={form.whatsapp || ''} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
+          <label htmlFor="footer-tiktok">TikTok</label>
+          <input id="footer-tiktok" type="url" value={form.tiktok || ''} onChange={(e) => setForm({ ...form, tiktok: e.target.value })} />
+        </div>
+        <div className="form-group">
+          <label htmlFor="footer-linkedin">LinkedIn</label>
+          <input id="footer-linkedin" type="url" value={form.linkedin || ''} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} />
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="footer-whatsapp">WhatsApp</label>
+          <input id="footer-whatsapp" type="url" value={form.whatsapp || ''} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
         </div>
       </div>
       <div className="admin-form-actions">
@@ -1533,10 +1608,9 @@ function FooterEditor({ data, onSave }) {
 
 // ========== SERVICES EDITOR ==========
 function ServicesEditor({ data, onSave }) {
-  const emptyItem = { titleTr: '', titleEn: '', descTr: '', descEn: '', featuresTr: '', featuresEn: '' }
-  const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
+  const [items, setItems] = useState(data.items || [])
 
-  useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
+  useEffect(() => { setItems(data.items || []) }, [data])
   const updateItem = (index, field, value) => {
     const updated = [...items]
     updated[index] = { ...updated[index], [field]: value }
@@ -1553,12 +1627,7 @@ function ServicesEditor({ data, onSave }) {
         <div key={i} className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <strong style={{ color: 'var(--text-primary)' }}>Hizmet {i + 1}</strong>
-            {items.length > 1 && (
-              <button className="btn btn-outline" style={{ padding: '4px 12px', fontSize: '0.8rem' }}
-                onClick={() => setItems(items.filter((_, idx) => idx !== i))}>
-                <HiOutlineTrash size={14} /> Sil
-              </button>
-            )}
+            <code>/hizmetler/{item.slug}</code>
           </div>
           <div className="form-row">
             <div className="form-group"><label>Başlık (TR)</label>
@@ -1586,10 +1655,7 @@ function ServicesEditor({ data, onSave }) {
           </div>
         </div>
       ))}
-      <div className="admin-form-actions" style={{ gap: 12 }}>
-        <button className="btn btn-outline" onClick={() => setItems([...items, { ...emptyItem }])}>
-          <HiOutlinePlus size={16} /> Yeni Hizmet Ekle
-        </button>
+      <div className="admin-form-actions">
         <button className="btn btn-primary" onClick={() => onSave({ items })}>
           <HiOutlineSave size={16} /> Kaydet
         </button>
@@ -1802,9 +1868,9 @@ function AboutEditor({ data, onSave }) {
     storyEn: data.storyEn || '',
     missionTr: data.missionTr || '',
     missionEn: data.missionEn || '',
-    experience: data.experience || '3+',
-    teamSize: data.teamSize || '4+',
-    clients: data.clients || '20+',
+    experience: data.experience || '—',
+    teamSize: data.teamSize || '—',
+    clients: data.clients || '—',
     team: data.team || [],
   })
   const [langTab, setLangTab] = useState('tr')
@@ -1816,9 +1882,9 @@ function AboutEditor({ data, onSave }) {
       storyEn: data.storyEn || '',
       missionTr: data.missionTr || '',
       missionEn: data.missionEn || '',
-      experience: data.experience || '3+',
-      teamSize: data.teamSize || '4+',
-      clients: data.clients || '20+',
+      experience: data.experience || '—',
+      teamSize: data.teamSize || '—',
+      clients: data.clients || '—',
       team: data.team || [],
     })
   }, [data])
@@ -1881,8 +1947,8 @@ function AboutEditor({ data, onSave }) {
             <div className="form-group"><label>Ad Soyad</label>
               <input type="text" value={member.name || ''} onChange={(e) => updateTeam(i, 'name', e.target.value)} />
             </div>
-            <div className="form-group"><label>Avatar (İnisiyaller)</label>
-              <input type="text" value={member.avatar || ''} onChange={(e) => updateTeam(i, 'avatar', e.target.value)} maxLength={3} />
+            <div className="form-group"><label>Görsel yolu/URL veya inisiyal</label>
+              <input type="text" value={member.avatar || member.image || ''} onChange={(e) => updateTeam(i, 'avatar', e.target.value)} placeholder="/ekip/isim.jpg veya KD" />
             </div>
           </div>
           <div className="form-row">
@@ -1895,6 +1961,9 @@ function AboutEditor({ data, onSave }) {
           </div>
           <div className="form-group"><label>Kısa Bio (TR)</label>
             <input type="text" value={member.bioTr || ''} onChange={(e) => updateTeam(i, 'bioTr', e.target.value)} placeholder="Kısa biyografi..." />
+          </div>
+          <div className="form-group"><label>Kısa Bio (EN)</label>
+            <input type="text" value={member.bioEn || ''} onChange={(e) => updateTeam(i, 'bioEn', e.target.value)} placeholder="Short biography..." />
           </div>
           <div className="form-row">
             <div className="form-group"><label>LinkedIn</label>
@@ -2329,7 +2398,7 @@ function LinkProfilesSection({ showToast }) {
   const [editingProfile, setEditingProfile] = useState(null)
   const [form, setForm] = useState(emptyLinkProfileForm())
 
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     try {
       const data = await getLinkProfilesApi()
       setProfiles(Array.isArray(data) ? data : [])
@@ -2338,9 +2407,9 @@ function LinkProfilesSection({ showToast }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [showToast])
 
-  useEffect(() => { fetchProfiles() }, [])
+  useEffect(() => { fetchProfiles() }, [fetchProfiles])
 
   const resetForm = () => {
     setForm(emptyLinkProfileForm())
@@ -2605,7 +2674,7 @@ function ShortLinksSection({ showToast }) {
   const [editingLink, setEditingLink] = useState(null)
   const [form, setForm] = useState(emptyShortLinkForm())
 
-  const fetchLinks = async () => {
+  const fetchLinks = useCallback(async () => {
     try {
       const data = await getShortLinksApi()
       setLinks(Array.isArray(data) ? data : [])
@@ -2614,9 +2683,9 @@ function ShortLinksSection({ showToast }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [showToast])
 
-  useEffect(() => { fetchLinks() }, [])
+  useEffect(() => { fetchLinks() }, [fetchLinks])
 
   const resetForm = () => {
     setForm(emptyShortLinkForm())
@@ -7918,6 +7987,15 @@ function OnboardingSection({ showToast }) {
 }
 
 // ========== RAPOR EXPORT ==========
+function escapeReportHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;')
+}
+
 function ReportExportSection({ showToast }) {
   const [loading, setLoading] = useState(false)
   const [clientName, setClientName] = useState('')
@@ -7932,10 +8010,17 @@ function ReportExportSection({ showToast }) {
     if (!clientName) { showToast('Müşteri adı giriniz', 'error'); return }
     setLoading(true)
 
+    const safeClientName = escapeReportHtml(clientName)
+    const safePeriod = escapeReportHtml(period)
+    const safeMetrics = Object.fromEntries(
+      Object.entries(metrics).map(([key, value]) => [key, escapeReportHtml(value)])
+    )
     const html = `<!DOCTYPE html>
 <html lang="tr"><head><meta charset="UTF-8">
 <style>
-body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#111}
+@font-face{font-family:Poppins;src:url("https://kadenewmedia.com/fonts/poppins/poppins-latin-400-normal.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:Poppins;src:url("https://kadenewmedia.com/fonts/poppins/poppins-latin-700-normal.woff2") format("woff2");font-weight:700 900;font-display:swap}
+body{font-family:Poppins,Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#111}
 h1{color:#111;border-bottom:3px solid #eac321;padding-bottom:12px}
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
 .logo{font-size:1.6rem;font-weight:900}
@@ -7949,22 +8034,22 @@ h1{color:#111;border-bottom:3px solid #eac321;padding-bottom:12px}
 </style></head><body>
 <div class="header">
   <div class="logo">kade<span>media</span></div>
-  <div><strong>${period}</strong> Performans Raporu</div>
+  <div><strong>${safePeriod}</strong> Performans Raporu</div>
 </div>
-<h1>${clientName} — Aylık Rapor</h1>
-<p><strong>Dönem:</strong> ${period} &nbsp;|&nbsp; <strong>Hazırlayan:</strong> Kade New Media Ekibi</p>
+<h1>${safeClientName} — Aylık Rapor</h1>
+<p><strong>Dönem:</strong> ${safePeriod} &nbsp;|&nbsp; <strong>Hazırlayan:</strong> Kade New Media Ekibi</p>
 <div class="grid">
-  ${metrics.followers ? `<div class="metric"><div class="metric-val">${metrics.followers}</div><div class="metric-lbl">Takipçi Büyümesi</div></div>` : ''}
-  ${metrics.reach ? `<div class="metric"><div class="metric-val">${metrics.reach}</div><div class="metric-lbl">Erişim</div></div>` : ''}
-  ${metrics.engagement ? `<div class="metric"><div class="metric-val">${metrics.engagement}%</div><div class="metric-lbl">Etkileşim Oranı</div></div>` : ''}
-  ${metrics.clicks ? `<div class="metric"><div class="metric-val">${metrics.clicks}</div><div class="metric-lbl">Tıklamalar</div></div>` : ''}
-  ${metrics.adSpend ? `<div class="metric"><div class="metric-val">₺${metrics.adSpend}</div><div class="metric-lbl">Reklam Harcaması</div></div>` : ''}
-  ${metrics.adROI ? `<div class="metric"><div class="metric-val">${metrics.adROI}x</div><div class="metric-lbl">Reklam ROI</div></div>` : ''}
-  ${metrics.contentPieces ? `<div class="metric"><div class="metric-val">${metrics.contentPieces}</div><div class="metric-lbl">Üretilen İçerik</div></div>` : ''}
-  ${metrics.videoViews ? `<div class="metric"><div class="metric-val">${metrics.videoViews}</div><div class="metric-lbl">Video Görüntüleme</div></div>` : ''}
-  ${metrics.newLeads ? `<div class="metric"><div class="metric-val">${metrics.newLeads}</div><div class="metric-lbl">Yeni Lead</div></div>` : ''}
+  ${metrics.followers ? `<div class="metric"><div class="metric-val">${safeMetrics.followers}</div><div class="metric-lbl">Takipçi Büyümesi</div></div>` : ''}
+  ${metrics.reach ? `<div class="metric"><div class="metric-val">${safeMetrics.reach}</div><div class="metric-lbl">Erişim</div></div>` : ''}
+  ${metrics.engagement ? `<div class="metric"><div class="metric-val">${safeMetrics.engagement}%</div><div class="metric-lbl">Etkileşim Oranı</div></div>` : ''}
+  ${metrics.clicks ? `<div class="metric"><div class="metric-val">${safeMetrics.clicks}</div><div class="metric-lbl">Tıklamalar</div></div>` : ''}
+  ${metrics.adSpend ? `<div class="metric"><div class="metric-val">₺${safeMetrics.adSpend}</div><div class="metric-lbl">Reklam Harcaması</div></div>` : ''}
+  ${metrics.adROI ? `<div class="metric"><div class="metric-val">${safeMetrics.adROI}x</div><div class="metric-lbl">Reklam ROI</div></div>` : ''}
+  ${metrics.contentPieces ? `<div class="metric"><div class="metric-val">${safeMetrics.contentPieces}</div><div class="metric-lbl">Üretilen İçerik</div></div>` : ''}
+  ${metrics.videoViews ? `<div class="metric"><div class="metric-val">${safeMetrics.videoViews}</div><div class="metric-lbl">Video Görüntüleme</div></div>` : ''}
+  ${metrics.newLeads ? `<div class="metric"><div class="metric-val">${safeMetrics.newLeads}</div><div class="metric-lbl">Yeni Lead</div></div>` : ''}
 </div>
-${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong><p style="margin:8px 0 0">${metrics.notes}</p></div>` : ''}
+${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong><p style="margin:8px 0 0">${safeMetrics.notes}</p></div>` : ''}
 <div class="footer">Kade New Media Dijital Pazarlama | hello@kademedia.com | 0506 729 34 23 | kadenewmedia.com</div>
 </body></html>`
 
@@ -7972,7 +8057,7 @@ ${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `rapor-${clientName.replace(/\s+/g, '-').toLowerCase()}-${period.replace(/\s+/g, '-')}.html`
+    a.download = `rapor-${clientName.replace(/[^\p{L}\p{N}]+/gu, '-').toLowerCase()}-${period.replace(/[^\p{L}\p{N}]+/gu, '-')}.html`
     a.click()
     URL.revokeObjectURL(url)
     showToast('Rapor indirildi (HTML formatında, tarayıcıdan PDF olarak kaydedin)')
@@ -8099,9 +8184,9 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     } catch { /* ignore */ }
   }
 
-  const showToast = (message, type = 'success') => {
+  const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type })
-  }
+  }, [])
 
   const toggleDarkMode = () => {
     const next = !darkMode

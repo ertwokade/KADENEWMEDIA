@@ -72,9 +72,35 @@ for (const route of PUBLIC_ROUTES) {
   })
 }
 
-test('unknown route shows 404, not a blank page', async ({ page }) => {
-  await page.goto('/bu-route-hicbir-zaman-var-olmayacak')
+test('unknown route returns HTTP 404 with a noindex page', async ({ page }) => {
+  const response = await page.goto('/bu-route-hicbir-zaman-var-olmayacak')
+  expect(response?.status()).toBe(404)
   await expect(page.locator('body')).not.toBeEmpty()
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
+})
+
+test('invalid fixed service route also returns HTTP 404', async ({ page }) => {
+  const response = await page.goto('/hizmetler/gecersiz-hizmet')
+  expect(response?.status()).toBe(404)
+})
+
+test('public archive routes remain noindex, follow after hydration', async ({ page }) => {
+  for (const route of ['/blog', '/portfolio', '/partnerler', '/referanslar', '/basari-hikayeleri']) {
+    await page.goto(route)
+    await expect(page.locator('meta[name="robots"]'), route).toHaveAttribute('content', 'noindex, follow')
+  }
+})
+
+test('legacy redirects preserve their targets and status', async ({ request }) => {
+  const localProfile = await request.get('/kadirdemir', { maxRedirects: 0 })
+  expect(localProfile.status()).toBe(308)
+  expect(localProfile.headers().location).toBe('/@kadirdemir')
+
+  for (const route of ['/links', '/kadelinks', '/kadelinks/eski']) {
+    const response = await request.get(route, { maxRedirects: 0 })
+    expect(response.status(), route).toBe(308)
+    expect(response.headers().location, route).toBe('https://kadirardademir.com/links')
+  }
 })
 
 test('previously-broken blog detail route no longer 404s at the routing level', async ({ page }) => {

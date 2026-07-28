@@ -53,6 +53,11 @@ const server = createServer(async (req, res) => {
     return res.end()
   }
 
+  if (url.pathname === '/kadirdemir') {
+    res.writeHead(308, { Location: '/@kadirdemir' })
+    return res.end()
+  }
+
   if (url.pathname === '/sitemap.xml') {
     const xml = await readFile(new URL('../dist-sitemap.xml', import.meta.url), 'utf8').catch(() => '')
     if (xml) {
@@ -74,6 +79,28 @@ const server = createServer(async (req, res) => {
     const body = await readFile(file)
     res.writeHead(200, { 'Content-Type': types[extname(file)] || 'application/octet-stream' })
     return res.end(body)
+  }
+
+  // vercel.json'daki dinamik rota rewrite'ları. Buradaki liste production ile
+  // BİREBİR aynı olmalı: fazladan bir desen eklemek, bilinmeyen URL'lerin
+  // 404 yerine indekslenebilir HTTP 200 dönmesine yol açar (blanket SPA
+  // rewrite sorunu). tests/unit/routes.test.js bu eşleşmeyi doğrular.
+  const SPA_REWRITES = [
+    /^\/blog\/[^/]+$/,
+    /^\/partnerler\/[^/]+$/,
+    /^\/s\/[^/]+$/,
+    /^\/@[^/]+$/,
+    /^\/401$/,
+    /^\/403$/,
+    /^\/429$/,
+    /^\/bakim$/,
+  ]
+  if (SPA_REWRITES.some((re) => re.test(url.pathname))) {
+    const shell = await readFile(join(root, 'app.html')).catch(() => null)
+    if (shell) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+      return res.end(shell)
+    }
   }
 
   const notFound = await readFile(join(root, '404.html')).catch(() => Buffer.from('Not found'))

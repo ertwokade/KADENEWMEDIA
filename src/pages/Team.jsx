@@ -3,31 +3,19 @@ import { HiOutlineUserGroup } from 'react-icons/hi'
 import { FaLinkedinIn, FaInstagram } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { useSiteContent } from '../hooks/useSiteContent'
+import { ABOUT_CONTENT_FALLBACK } from '../data/about'
+import { isImageSource, toBadgeText } from '../utils/mediaValue'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Team.css'
 
-// Yalnızca doğrulanmış gerçek kişi. Placeholder isimler kaldırıldı; ekip
-// büyüdükçe (veya admin panelinden) buraya gerçek üyeler eklenir. Gerçek veri
-// yoksa uydurma isim gösterilmez — bunun yerine açık pozisyonlar / roller sunulur.
-const defaultTeam = [
-  {
-    name: 'Kadir Demir',
-    roleTr: 'Kurucu & CEO',
-    roleEn: 'Founder & CEO',
-    bioTr: 'Dijital pazarlama ve sosyal medya stratejisi üzerine çalışıyor; müşteri ilişkileri ve ajansın genel gidişatı da onun sorumluluğunda.',
-    bioEn: 'Focused on digital marketing and social media strategy. Drives client growth and agency vision.',
-    image: '/kadir.jpg',
-    social: {},
-    color: '#eac321',
-  },
-]
-
 const socialIcons = { linkedin: FaLinkedinIn, instagram: FaInstagram }
 
 export default function Team() {
   const { lang } = useLanguage()
+  const { content } = useSiteContent('about', ABOUT_CONTENT_FALLBACK)
 
   useSEO({
     title: lang === 'tr' ? 'Kade New Media Ekibi | İstanbul Dijital Pazarlama Ajansı' : 'Our Team | Kade New Media',
@@ -37,7 +25,15 @@ export default function Team() {
     path: '/ekip',
   })
 
-  const team = defaultTeam
+  const team = (content.team || ABOUT_CONTENT_FALLBACK.team).map((member) => {
+    const media = member.image || member.avatar
+    return {
+      ...member,
+      image: isImageSource(media) ? media : '',
+      initials: isImageSource(media) ? '' : toBadgeText(media, member.name),
+      color: member.color || '#eac321',
+    }
+  })
 
   return (
     <PageTransition>
@@ -81,7 +77,7 @@ export default function Team() {
                       <img src={member.image} alt={member.name} />
                     ) : (
                       <span className="team-card-initials" style={{ color: member.color }}>
-                        {member.name.split(' ').map(n => n[0]).join('')}
+                        {member.initials || member.name.split(' ').map(n => n[0]).join('')}
                       </span>
                     )}
                   </div>

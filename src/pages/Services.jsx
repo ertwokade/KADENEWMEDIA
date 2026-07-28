@@ -14,13 +14,15 @@ import {
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { useSiteContent } from '../hooks/useSiteContent'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './Services.css'
 
 export default function Services() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
+  const { content } = useSiteContent('services', { items: [] })
   useSEO({
     title: 'New Media ve Dijital Medya Hizmetleri | Kade New Media',
     description: 'Kade New Media’nın sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetleri.',
@@ -28,7 +30,7 @@ export default function Services() {
     path: '/hizmetler',
   })
 
-  const services = [
+  const baseServices = [
     {
       icon: HiOutlineGlobe,
       slug: 'sosyal-medya-yonetimi',
@@ -78,6 +80,20 @@ export default function Services() {
       platforms: [FaInstagram, FaLinkedinIn],
     },
   ]
+  const overrides = Array.isArray(content.items) ? content.items : []
+  const services = baseServices.map((service, index) => {
+    const custom = overrides.find((item) => item?.slug === service.slug) || overrides[index] || {}
+    const featureValue = lang === 'en' ? custom.featuresEn : custom.featuresTr
+    const customFeatures = Array.isArray(featureValue)
+      ? featureValue.filter(Boolean)
+      : String(featureValue || '').split(',').map((item) => item.trim()).filter(Boolean)
+    return {
+      ...service,
+      title: (lang === 'en' ? custom.titleEn : custom.titleTr) || service.title,
+      desc: (lang === 'en' ? custom.descEn : custom.descTr) || service.desc,
+      features: customFeatures.length ? customFeatures : service.features,
+    }
+  })
 
   const process = [
     { step: '01', title: t('services.processStep1'), desc: t('services.processStep1Desc') },

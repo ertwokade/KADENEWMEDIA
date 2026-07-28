@@ -1,6 +1,7 @@
 import { HiOutlineBriefcase, HiOutlineMail } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { useSiteContent } from '../hooks/useSiteContent'
 import { BRAND } from '../config/brand'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
@@ -10,6 +11,10 @@ import './Careers.css'
 export default function Careers() {
   const { lang } = useLanguage()
   const isEN = lang !== 'tr'
+  const { content: careers } = useSiteContent('careers', { tr: [], en: [] })
+  const { content: contact } = useSiteContent('footer', BRAND)
+  const jobs = (isEN ? careers.en : careers.tr).filter((job) => job?.title)
+  const applicationEmail = contact.email || BRAND.email
 
   useSEO({
     title: lang === 'tr' ? 'Kade New Media Kariyer | Genel Başvuru Bilgileri' : 'Careers | Kade New Media',
@@ -53,15 +58,56 @@ export default function Careers() {
             </h1>
             <p className="section-subtitle">
               {lang === 'tr'
-                ? 'Şu anda doğrulanmış açık pozisyon bulunmuyor. Ama nasıl bir ekip olduğumuzu, hangi alanlarda çalıştığımızı ve başvuru sürecini aşağıda görebilirsin — genel başvuruya her zaman açığız.'
-                : 'There are currently no verified open positions. Below is who we are, the fields we work in, and how to apply — general applications are always welcome.'}
+                ? (jobs.length
+                    ? `${jobs.length} açık pozisyon için detayları aşağıda inceleyebilir, uygun rol için başvurunu e-posta ile gönderebilirsin.`
+                    : 'Şu anda doğrulanmış açık pozisyon bulunmuyor. Ama nasıl bir ekip olduğumuzu, hangi alanlarda çalıştığımızı ve başvuru sürecini aşağıda görebilirsin — genel başvuruya her zaman açığız.')
+                : (jobs.length
+                    ? `Review ${jobs.length} open role${jobs.length > 1 ? 's' : ''} below and apply by email.`
+                    : 'There are currently no verified open positions. Below is who we are, the fields we work in, and how to apply — general applications are always welcome.')}
             </p>
-            <a className="btn btn-primary" href={`mailto:${BRAND.email}?subject=Kade%20Media%20Genel%20Başvuru`}>
+            <a className="btn btn-primary" href={`mailto:${applicationEmail}?subject=Kade%20Media%20Genel%20Başvuru`}>
               <HiOutlineMail size={17} /> {lang === 'tr' ? 'Genel başvuru gönder' : 'Send an application'}
             </a>
           </FadeIn>
         </div>
       </section>
+
+      {jobs.length > 0 && (
+        <section className="section careers-openings" aria-labelledby="careers-openings-title">
+          <div className="container">
+            <div className="pf-head">
+              <h2 id="careers-openings-title" className="section-badge">
+                {isEN ? 'Open roles' : 'Açık pozisyonlar'}
+              </h2>
+              <span className="pf-idx">{jobs.length}</span>
+            </div>
+            <div className="careers-job-grid">
+              {jobs.map((job, index) => (
+                <article className="careers-job-card glass-card" key={`${job.title}-${index}`}>
+                  <div className="careers-job-meta">
+                    {[job.department, job.location, job.type].filter(Boolean).map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
+                  </div>
+                  <h3>{job.title}</h3>
+                  {job.description && <p>{job.description}</p>}
+                  {Array.isArray(job.requirements) && job.requirements.length > 0 && (
+                    <ul>
+                      {job.requirements.map((requirement) => <li key={requirement}>{requirement}</li>)}
+                    </ul>
+                  )}
+                  <a
+                    className="btn btn-outline"
+                    href={`mailto:${applicationEmail}?subject=${encodeURIComponent(`Kade Media Başvuru — ${job.title}`)}`}
+                  >
+                    <HiOutlineMail size={16} /> {isEN ? 'Apply' : 'Başvur'}
+                  </a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="section pf-block">
         <div className="container">

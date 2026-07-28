@@ -10,25 +10,37 @@ import {
 } from 'react-icons/hi'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
+import { useSiteContent } from '../hooks/useSiteContent'
+import { ABOUT_CONTENT_FALLBACK } from '../data/about'
+import { isImageSource, toBadgeText } from '../utils/mediaValue'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import './About.css'
 
-// Placeholder ekip isimleri kaldırıldı (bkz. CONTENT_REQUIRED.md). Yalnızca
-// doğrulanabilir kurucu; gerçek ekip admin/content'ten gelir.
-const defaultTeam = [
-  { name: 'Kadir Demir', roleTr: 'Kurucu & CEO', roleEn: 'Founder & CEO', color: '#eac321', avatar: '/kadir.jpg' },
-]
-
-const defaultStats = { experience: '—', teamSize: '—', clients: '—' }
-
 export default function About() {
   const { t, lang } = useLanguage()
-  const team = defaultTeam
-  const stats = defaultStats
-  const storyP1 = t('about.storyP1')
-  const storyP2 = t('about.storyP2')
+  const { content } = useSiteContent('about', ABOUT_CONTENT_FALLBACK)
+  const team = (content.team || ABOUT_CONTENT_FALLBACK.team).map((member) => {
+    const media = member.image || member.avatar
+    return {
+      ...member,
+      color: member.color || '#eac321',
+      image: isImageSource(media) ? media : '',
+      initials: isImageSource(media) ? '' : toBadgeText(media, member.name),
+    }
+  })
+  const stats = {
+    experience: content.experience || '—',
+    teamSize: content.teamSize || '—',
+    clients: content.clients || '—',
+  }
+  const storyP1 = lang === 'en'
+    ? (content.storyEn || t('about.storyP1'))
+    : (content.storyTr || t('about.storyP1'))
+  const storyP2 = lang === 'en'
+    ? (content.missionEn || t('about.storyP2'))
+    : (content.missionTr || t('about.storyP2'))
   useSEO({
     title: 'Kade New Media Hakkında | New Media Ajansı İstanbul',
     description: 'Kade New Media, İstanbul merkezli bir new media ve dijital pazarlama ajansı — Kademedia ve Kadenewmedia adlarıyla da aranıyoruz.',
@@ -208,11 +220,11 @@ export default function About() {
                     className="team-avatar"
                     style={{ background: `linear-gradient(135deg, ${member.color}40, ${member.color}10)` }}
                   >
-                    {member.avatar ? (
-                      <img src={member.avatar} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                    {member.image ? (
+                      <img src={member.image} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                     ) : (
                       <span style={{ color: member.color }}>
-                        {member.name.charAt(0)}
+                        {member.initials}
                       </span>
                     )}
                   </div>

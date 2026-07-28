@@ -74,20 +74,24 @@
     }
     </script>
 
-    <!-- Ana metin/başlık fontu; CSS ayrıştırılmadan keşfedilemediği için önceden yüklenir. -->
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/TikTokSans.woff2" crossorigin />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Space Grotesk kaldırıldı: projede hiçbir font-family bildiriminde kullanılmıyordu. -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!--
+      Tek font ailesi: Poppins (self-host, latin + latin-ext).
+      Tanımların tamamı src/styles/kade-tokens.css içindedir.
+      Yalnızca ilk boyanın ihtiyaç duyduğu iki dosya preload edilir; kalan
+      ağırlıklar CSS'ten keşfedilip gerektiğinde indirilir.
+      Google Fonts bağlantısı bilerek kaldırıldı: dört aile (Inter, Newsreader,
+      Outfit, Plus Jakarta Sans) render-blocking olarak yükleniyor ve hiçbiri
+      artık kullanılmıyordu.
+    -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/poppins/poppins-400-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/poppins/poppins-600-latin.woff2" crossorigin />
     <title>Kade New Media | New Media, Medya ve Dijital Pazarlama Ajansı</title>
   </head>
   <body>
     <div id="root"></div>
     <noscript>
-      <div style="max-width:760px;margin:0 auto;padding:48px 24px;font-family:'GeistMono',ui-monospace,monospace;color:#17130a;background:#fbfaf4;line-height:1.6">
-        <h1 style="font-family:'TikTokSans',sans-serif;font-weight:800;text-transform:uppercase;font-size:2rem;letter-spacing:-.02em">Kade New Media</h1>
+      <div style="max-width:760px;margin:0 auto;padding:48px 24px;font-family:Poppins,system-ui,sans-serif;color:#17130a;background:#fbfaf4;line-height:1.6">
+        <h1 style="font-family:Poppins,system-ui,sans-serif;font-weight:800;text-transform:uppercase;font-size:2rem;letter-spacing:-.02em">Kade New Media</h1>
         <p>Kade New Media; Kade New Media, Kademedia ve Kadenewmedia adlarıyla da aranan İstanbul merkezli new media ve dijital medya ajansıdır. Sosyal medya yönetimi, içerik üretimi, reklam ve prodüksiyon hizmetleri sunar.</p>
         <p><strong>Bu sayfayı görüntülemek için JavaScript gerekli.</strong> Aşağıdaki bölümlerden devam edebilirsiniz:</p>
         <ul>

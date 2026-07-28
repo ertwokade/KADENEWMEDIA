@@ -39,8 +39,8 @@
   display: block;
   margin-bottom: 14px;
   color: #FFD400;
-  font-family: 'GeistMono', ui-monospace, monospace;
-  font-size: 11px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs);
   font-weight: 700;
   letter-spacing: 0.16em;
 }
@@ -48,7 +48,7 @@
 .access-hub-heading h1 {
   margin: 0;
   color: #fff;
-  font-family: 'TikTokSans', sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(2.25rem, 5vw, 4.75rem);
   font-weight: 750;
   letter-spacing: -0.055em;
@@ -113,8 +113,8 @@
 .access-hub-number {
   align-self: flex-start;
   color: rgba(255, 255, 255, 0.34);
-  font-family: 'GeistMono', ui-monospace, monospace;
-  font-size: 11px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs);
   letter-spacing: 0.1em;
 }
 
@@ -126,7 +126,7 @@
 }
 
 .access-hub-card-copy strong {
-  font-family: 'TikTokSans', sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(1.65rem, 3vw, 2.3rem);
   font-weight: 750;
   letter-spacing: -0.035em;
@@ -145,8 +145,8 @@
   padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   color: #FFD400;
-  font-family: 'GeistMono', ui-monospace, monospace;
-  font-size: 11px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-2xs);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;

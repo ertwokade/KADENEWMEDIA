@@ -6,6 +6,7 @@ import { useSEO } from '../hooks/useSEO'
 import { getPartnersApi } from '../api'
 import { BreadcrumbSchema } from '../components/StructuredData'
 import { analytics } from '../utils/analytics'
+import { isImageSource, toBadgeText } from '../utils/mediaValue'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
@@ -64,8 +65,13 @@ export default function PartnerDetail() {
           </FadeIn>
           <FadeIn delay={0.1}>
             <div className="partner-detail-header">
+              {/* `logo` alanı hem görsel URL'si hem emoji tutabiliyor; emoji
+                  <img src> olarak verilince tarayıcı göreli yol sanıp 404
+                  isteği atıyordu. Ayrım isImageSource() ile yapılır. */}
               <div className="partner-detail-logo" style={{ borderColor: partner.color || 'var(--border-color)', background: `${partner.color || '#eac321'}15` }}>
-                {partner.logo ? <img src={partner.logo} alt={name} style={{ width: '60%', height: '60%', objectFit: 'contain' }} /> : name.charAt(0)}
+                {isImageSource(partner.logo)
+                  ? <img src={partner.logo} alt={name} loading="lazy" style={{ width: '60%', height: '60%', objectFit: 'contain' }} />
+                  : <span aria-hidden="true">{toBadgeText(partner.logo, name)}</span>}
               </div>
               <div>
                 {category && <div className="partner-detail-category" style={{ color: partner.color || 'var(--primary)' }}>{category}</div>}

@@ -53,7 +53,7 @@ function drawBolt(ctx, width, height) {
 function drawGlyph(char) {
   return (ctx, width, height) => {
     ctx.fillStyle = '#fff'
-    ctx.font = `800 ${Math.floor(height * 0.9)}px Sora, Inter, system-ui, sans-serif`
+    ctx.font = `800 ${Math.floor(height * 0.9)}px Poppins, system-ui, sans-serif`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(char, width / 2, height / 2)

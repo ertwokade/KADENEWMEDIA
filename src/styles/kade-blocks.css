@@ -41,12 +41,12 @@
   position: absolute; top: 0; right: 0; z-index: 2;
   background: #c0fe04; color: #17130a;
   font-family: var(--ky-mono, ui-monospace, monospace);
-  font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+  font-size: var(--fs-2xs); letter-spacing: 0.05em; text-transform: uppercase;
   padding: 2px 8px; transform: translateZ(22px);
 }
 .pf-no {
   position: absolute; left: 14px; bottom: 2px; z-index: 1;
-  font-family: 'TikTokSans', sans-serif;
+  font-family: var(--font-sans);
   font-variation-settings: "wdth" 120; font-weight: 800;
   font-size: clamp(48px, 6vw, 82px); line-height: 0.8;
   color: rgba(23,19,10,.10); transform: translateZ(14px);
@@ -79,7 +79,7 @@
   color: var(--ky-gold-deep, #c8901a); font-size: 14px;
 }
 .pf-proc-main h3 {
-  margin: 0 0 5px; font-family: 'TikTokSans', sans-serif;
+  margin: 0 0 5px; font-family: var(--font-sans);
   font-variation-settings: "wdth" 120; font-weight: 800;
   text-transform: uppercase; letter-spacing: -0.01em;
   font-size: clamp(17px, 2.2vw, 23px); color: var(--ky-ink, #17130a);
@@ -90,7 +90,7 @@
 }
 .pf-proc-tag {
   font-family: var(--ky-mono, ui-monospace, monospace);
-  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  font-size: var(--fs-2xs); letter-spacing: 0.08em; text-transform: uppercase;
   color: rgba(23,19,10,.45); white-space: nowrap;
 }
 
@@ -101,7 +101,7 @@
 @media (max-width: 560px) {
   /* mobilde 2 sütun kalsın (tek sütun kareler devasa oluyor) */
   .pf-row { flex-direction: column; align-items: flex-start; gap: 2px; }
-  .pf-row .pf-c { font-size: 11px; }
+  .pf-row .pf-c { font-size: var(--fs-2xs); }
   .pf-no { font-size: clamp(38px, 12vw, 56px); }
   .pf-proc-row { grid-template-columns: 44px 1fr; gap: 14px; }
   .pf-proc-tag { display: none; }
