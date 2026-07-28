@@ -16,17 +16,18 @@
 }
 .knav > * { pointer-events: auto; }
 
+/* Marka: artık metin değil, merkezi Logo bileşeni (components/system/Logo).
+   Oran korunur — genişlik verilir, yükseklik otomatik. */
 .knav-brand {
-  font-family: var(--font-sans);
-  font-variation-settings: "wght" 700, "wdth" 120;
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--ky-ink, #17130a);
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
   padding: 8px;
+  color: var(--kade-ink);
+  text-decoration: none;
 }
+.knav-brand img { display: block; height: auto; }
+.knav-brand:focus-visible { outline: 2px solid var(--kade-ink); outline-offset: 2px; }
 
 .knav-links { display: flex; align-items: center; gap: 0 22px; }
 .knav-link {

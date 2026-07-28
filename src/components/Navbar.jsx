@@ -3,21 +3,30 @@ import { Link, useLocation } from 'react-router-dom'
 import { HiMenuAlt3, HiX, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
 import { useTheme } from '../i18n/ThemeContext'
 import { useCustomer } from '../contexts/CustomerContext'
+import Logo from './system/Logo'
+import { BRAND } from '../config/brand'
 import './Navbar.css'
 
-// Anasayfa (site.html "hello") nav'ının birebir React versiyonu:
-// solda kade media wordmark (wdth 120), sağda 13px mono linkler + TEMA,
-// sağ altta sabit GİRİŞ gold hapı. Arama/TR-EN/TEKLİF AL şablonda yok.
-// static:true → sayfa artık statik HTML (vercel.json rewrite); SPA router
-// yakalamasın diye tam yükleme (<a href>) ile gidilir.
+// Site geneli navigasyon.
+//
+// NOT: Bu linkler daha önce `static: true` ile <a href> olarak render
+// ediliyordu; ana sayfa ayrı bir statik snapshot olduğu için SPA router'ın
+// devralmaması gerekiyordu. Snapshot emekliye ayrıldı ve `/` artık React
+// uygulamasının parçası — linkler <Link> ile SPA geçişi yapar, böylece
+// sayfa geçiş animasyonu çalışır ve her tıklamada tam yükleme olmaz.
 const NAV_LINKS = [
-  { name: 'HİZMETLER', path: '/hizmetler', static: true },
-  { name: 'PAKETLER', path: '/paketler', static: true },
-  { name: 'PORTFOLYO', path: '/portfolio', static: true },
-  { name: 'HAKKIMIZDA', path: '/hakkimizda', static: true },
-  { name: 'BLOG', path: '/blog', static: true },
-  { name: 'İLETİŞİM', path: '/iletisim', static: true },
+  { name: 'HİZMETLER', path: '/hizmetler' },
+  { name: 'PORTFOLYO', path: '/portfolio' },
+  { name: 'PAKETLER', path: '/paketler' },
+  { name: 'HAKKIMIZDA', path: '/hakkimizda' },
+  { name: 'BLOG', path: '/blog' },
+  { name: 'İLETİŞİM', path: '/iletisim' },
 ]
+
+/** Alt rotalarda da üst menü öğesi aktif görünmeli (/hizmetler/:slug gibi). */
+function isActive(pathname, path) {
+  return pathname === path || pathname.startsWith(`${path}/`)
+}
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -75,22 +84,22 @@ export default function Navbar() {
   return (
     <>
       <nav className="knav">
-        <a href="/" className="knav-brand">kade media</a>
+        {/* Logo dosyaları yüklendiğinde yalnız config/brandAssets.js değişir;
+            buraya dokunulmaz. */}
+        <Link to="/" className="knav-brand" aria-label={`${BRAND.name} — ana sayfa`}>
+          <Logo variant="primary" width={118} decorative />
+        </Link>
 
         <div className="knav-links">
           {NAV_LINKS.map((l) => (
-            l.static ? (
-              <a key={l.path} href={l.path} className={`knav-link ${location.pathname === l.path ? 'active' : ''}`} aria-current={location.pathname === l.path ? 'page' : undefined}>{l.name}</a>
-            ) : (
-              <Link
-                key={l.path}
-                to={l.path}
-                className={`knav-link ${location.pathname === l.path ? 'active' : ''}`}
-                aria-current={location.pathname === l.path ? 'page' : undefined}
-              >
-                {l.name}
-              </Link>
-            )
+            <Link
+              key={l.path}
+              to={l.path}
+              className={`knav-link ${isActive(location.pathname, l.path) ? 'active' : ''}`}
+              aria-current={isActive(location.pathname, l.path) ? 'page' : undefined}
+            >
+              {l.name}
+            </Link>
           ))}
           <button type="button" className="knav-link knav-tema" onClick={toggleTheme} aria-label={themeLabel} title={themeLabel}>
             <ThemeIcon size={13} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />
@@ -112,18 +121,14 @@ export default function Navbar() {
         {isOpen && (
           <div id="mobile-navigation" ref={mobileMenuRef} className="knav-mobile" role="navigation" aria-label="Mobil navigasyon">
             {NAV_LINKS.map((l) => (
-              l.static ? (
-                <a key={l.path} href={l.path} className={`knav-mlink ${location.pathname === l.path ? 'active' : ''}`} aria-current={location.pathname === l.path ? 'page' : undefined}>{l.name}</a>
-              ) : (
-                <Link
-                  key={l.path}
-                  to={l.path}
-                  className={`knav-mlink ${location.pathname === l.path ? 'active' : ''}`}
-                  aria-current={location.pathname === l.path ? 'page' : undefined}
-                >
-                  {l.name}
-                </Link>
-              )
+              <Link
+                key={l.path}
+                to={l.path}
+                className={`knav-mlink ${isActive(location.pathname, l.path) ? 'active' : ''}`}
+                aria-current={isActive(location.pathname, l.path) ? 'page' : undefined}
+              >
+                {l.name}
+              </Link>
             ))}
             <button type="button" className="knav-mlink" onClick={toggleTheme} aria-label={themeLabel}><ThemeIcon size={15} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 7 }} />TEMA</button>
           </div>
