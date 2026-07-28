@@ -67,7 +67,10 @@
   font-size: var(--fs-2xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(23, 19, 10, 0.45);
+  /* Eski değer rgba(23,19,10,0.45) idi: krem zemin üzerinde 2,97:1 kontrast
+     veriyordu ve 11 sayfada WCAG 2.1 AA (4.5:1) ihlali üretiyordu. Token
+     AA-güvenli ikincil metin tonudur. */
+  color: var(--kade-ink-3);
 }
 .kfoot-legal-links { display: flex; gap: 18px; }
 .kfoot-legal-links a { color: inherit; text-decoration: none; }

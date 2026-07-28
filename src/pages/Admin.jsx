@@ -31,6 +31,7 @@ import { PACKAGE_SCOPES } from '../data/packages'
 import { SERVICE_DETAILS } from '../data/serviceDetails'
 import { ABOUT_CONTENT_FALLBACK } from '../data/about'
 import { getPackageEntitlements } from '../config/entitlements'
+import { useDialogBehavior } from '../hooks/useDialog'
 import {
   apiFetch,
   loginApi, logoutApi, getSessionApi, changePasswordApi,
@@ -672,7 +673,7 @@ function BlogSection({ showToast }) {
             onClick={() => resetForm()}
           >
             <motion.div
-              className="admin-modal"
+              className="admin-modal" role="dialog" aria-modal="true"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -680,7 +681,7 @@ function BlogSection({ showToast }) {
             >
               <div className="admin-modal-header">
                 <h3>{editingBlog ? 'Yazıyı Düzenle' : 'Yeni Blog Yazısı'}</h3>
-                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={resetForm}><HiOutlineX size={18} /></button>
               </div>
 
               <div className="admin-form" style={{ border: 'none', padding: 0 }}>
@@ -2183,10 +2184,10 @@ function PartnersSection({ showToast }) {
       <AnimatePresence>
         {showForm && (
           <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
-            <motion.div className="admin-modal" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
+            <motion.div className="admin-modal" role="dialog" aria-modal="true" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
               <div className="admin-modal-header">
                 <h3>{editingPartner ? 'Partneri Düzenle' : 'Yeni Partner'}</h3>
-                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={resetForm}><HiOutlineX size={18} /></button>
               </div>
               <div className="admin-form" style={{ border: 'none', padding: 0 }}>
                 <div className="form-row">
@@ -2493,10 +2494,10 @@ function LinkProfilesSection({ showToast }) {
       <AnimatePresence>
         {showForm && (
           <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
-            <motion.div className="admin-modal" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
+            <motion.div className="admin-modal" role="dialog" aria-modal="true" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
               <div className="admin-modal-header">
                 <h3>{editingProfile ? 'Profili Düzenle' : 'Yeni Link Profili'}</h3>
-                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={resetForm}><HiOutlineX size={18} /></button>
               </div>
               <div className="admin-form" style={{ border: 'none', padding: 0 }}>
                 <div className="form-row">
@@ -2750,10 +2751,10 @@ function ShortLinksSection({ showToast }) {
       <AnimatePresence>
         {showForm && (
           <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
-            <motion.div className="admin-modal" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
+            <motion.div className="admin-modal" role="dialog" aria-modal="true" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
               <div className="admin-modal-header">
                 <h3>{editingLink ? 'Linki Düzenle' : 'Yeni Kısa Link'}</h3>
-                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={resetForm}><HiOutlineX size={18} /></button>
               </div>
               <div className="admin-form" style={{ border: 'none', padding: 0 }}>
                 <div className="form-row">
@@ -3084,10 +3085,10 @@ function MessagesSection({ showToast, onNewMessageCount }) {
       <AnimatePresence>
         {selectedMessage && (
           <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedMessage(null)}>
-            <motion.div className="admin-modal" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
+            <motion.div className="admin-modal" role="dialog" aria-modal="true" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} onClick={(e) => e.stopPropagation()}>
               <div className="admin-modal-header">
                 <h3>Lead Detayı</h3>
-                <button className="admin-modal-close" onClick={() => setSelectedMessage(null)}><HiOutlineX size={18} /></button>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={() => setSelectedMessage(null)}><HiOutlineX size={18} /></button>
               </div>
               <div style={{ display: 'grid', gap: 12 }}>
                 <div><strong style={{ color: 'var(--accent)' }}>Ad:</strong> {selectedMessage.name}</div>
@@ -3951,7 +3952,7 @@ function CalendarSection({ showToast }) {
             onClick={() => setShowEventForm(false)}
           >
             <motion.div
-              className="admin-modal"
+              className="admin-modal" role="dialog" aria-modal="true"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -3960,7 +3961,7 @@ function CalendarSection({ showToast }) {
             >
               <div className="admin-modal-header">
                 <h3>{editingEvent ? 'İçeriği Düzenle' : 'Yeni İçerik Planla'}</h3>
-                <button className="admin-modal-close" onClick={() => setShowEventForm(false)}>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={() => setShowEventForm(false)}>
                   <HiOutlineX size={18} />
                 </button>
               </div>
@@ -4330,7 +4331,7 @@ function UsersSection({ showToast }) {
             onClick={resetForm}
           >
             <motion.div
-              className="admin-modal"
+              className="admin-modal" role="dialog" aria-modal="true"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -4339,7 +4340,7 @@ function UsersSection({ showToast }) {
             >
               <div className="admin-modal-header">
                 <h3>{editingUser ? 'Kullanıcıyı Düzenle' : 'Yeni Kullanıcı'}</h3>
-                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={resetForm}><HiOutlineX size={18} /></button>
               </div>
               <div className="admin-form" style={{ border: 'none', padding: 0 }}>
                 <div className="form-group">
@@ -5034,10 +5035,10 @@ function PortfolioSection({ showToast }) {
       <AnimatePresence>
         {showForm && (
           <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
-            <motion.div className="admin-modal" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={e => e.stopPropagation()}>
+            <motion.div className="admin-modal" role="dialog" aria-modal="true" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={e => e.stopPropagation()}>
               <div className="admin-modal-header">
                 <h3>{editing ? 'Projeyi Düzenle' : 'Yeni Proje Ekle'}</h3>
-                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={resetForm}><HiOutlineX size={18} /></button>
               </div>
               <div className="admin-form" style={{ border: 'none', padding: 0 }}>
                 <div className="form-row">
@@ -5228,10 +5229,10 @@ function CouponsSection({ showToast }) {
       <AnimatePresence>
         {showForm && (
           <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
-            <motion.div className="admin-modal" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <motion.div className="admin-modal" role="dialog" aria-modal="true" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={(e) => e.stopPropagation()} style={{ maxWidth: 520 }}>
               <div className="admin-modal-header">
                 <h3>{editingCoupon ? 'Kuponu Düzenle' : 'Yeni Kupon'}</h3>
-                <button className="admin-modal-close" onClick={resetForm}><HiOutlineX size={18} /></button>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={resetForm}><HiOutlineX size={18} /></button>
               </div>
               <div className="admin-form" style={{ border: 'none', padding: 0 }}>
                 <div className="form-group">
@@ -8128,6 +8129,21 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
   const [unreadCount, setUnreadCount] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+  // Paneldeki dokuz modal ayrı bileşenlerde tanımlı ve hiçbirinde Escape,
+  // odak tuzağı veya odak geri verme yoktu. Davranış burada bir kez kurulur.
+  useDialogBehavior()
+
+  // Mobilde menü tam ekranı kaplıyor; Escape ile kapanmadığında klavye
+  // kullanıcısı arkadaki içeriğe dönemiyordu.
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setSidebarOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [sidebarOpen])
   const [navGroupsOpen, setNavGroupsOpen] = useState(() => {
     try {
       const saved = localStorage.getItem('kade_admin_nav_groups')
@@ -8388,6 +8404,10 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
   const renderNavItem = (item) => (
     <button
       key={item.id}
+      type="button"
+      // Hangi bölümün açık olduğu görsel olarak belliydi ama ekran okuyucuya
+      // bildirilmiyordu.
+      aria-current={activeSection === item.id ? 'page' : undefined}
       className={`sidebar-nav-item ${activeSection === item.id ? 'active' : ''}`}
       onClick={() => {
         setActiveSection(item.id)
@@ -8406,16 +8426,26 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     <div className={`admin-dashboard ${darkMode ? 'dark' : ''}`}>
       <div className="admin-grid-bg" />
 
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Button — ikon-only olduğu için erişilebilir ada ve
+          açık/kapalı durumunu bildiren aria-expanded'a ihtiyaç duyar;
+          ikisi de yoktu, ekran okuyucu düğmeyi adsız okuyordu. */}
       <button
+        type="button"
         className="mobile-menu-btn"
+        aria-label={sidebarOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+        aria-expanded={sidebarOpen}
+        aria-controls="admin-sidebar"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
-        <HiOutlineMenuAlt3 size={20} />
+        <HiOutlineMenuAlt3 size={20} aria-hidden="true" />
       </button>
 
       {/* Sidebar */}
-      <aside className={`admin-sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${sidebarOpen ? 'mobile-open' : ''}`}>
+      <aside
+        id="admin-sidebar"
+        aria-label="Yönetim menüsü"
+        className={`admin-sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${sidebarOpen ? 'mobile-open' : ''}`}
+      >
         <div className="sidebar-header">
           <div className="sidebar-brand">
             <div className="admin-logo">kade<span>admin</span></div>

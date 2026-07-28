@@ -241,3 +241,44 @@ test('public blog filter excludes drafts and future publication dates', () => {
   assert.deepEqual(filter.published, { $ne: false })
   assert.deepEqual(filter.$or.at(-1), { publishAt: { $lte: now } })
 })
+
+test('kullanıcıya gösterilen hata mesajları teknik sızıntı içermez', async () => {
+  const { isSafeUserMessage, toUserMessage, GENERIC_ERROR_MESSAGE } =
+    await import('../../src/utils/userMessage.js')
+
+  // Sunucudan sızabilecek gerçek desenler — hiçbiri ekrana basılmamalı.
+  const leaks = [
+    'SequelizeConnectionError: password authentication failed for user "postgres" at /var/task/db.js:42',
+    'TypeError: Cannot read properties of undefined (reading "id")',
+    'connect ECONNREFUSED 127.0.0.1:5432',
+    'Error: getaddrinfo ENOTFOUND db.supabase.co',
+    'at /home/runner/app/server/api/blog.js:118',
+    'SELECT id, title FROM kade_blogs WHERE slug = $1',
+    '{"code":"23502","details":null,"hint":null}',
+    'Invalid api_key provided: sk_live_51H...',
+  ]
+  for (const message of leaks) {
+    assert.equal(isSafeUserMessage(message), false, `sızıntı geçti: ${message}`)
+    assert.equal(toUserMessage(message), GENERIC_ERROR_MESSAGE, `sızıntı gösterildi: ${message}`)
+  }
+
+  // Kullanıcıya yönelik anlamlı mesajlar korunmalı — jenerikleştirmek
+  // doğrulama geri bildirimini işe yaramaz hâle getirir.
+  const safe = [
+    'Doğrulama hatası',
+    'Bu e-posta adresi zaten kayıtlı.',
+    'Mesajınız en az 20 karakter olmalı.',
+    'Yetkisiz erişim',
+    'Çok fazla istek. 5 dakika sonra tekrar deneyin.',
+    'Dosya boyutu çok büyük (max 2MB)',
+  ]
+  for (const message of safe) {
+    assert.equal(isSafeUserMessage(message), true, `geçerli mesaj engellendi: ${message}`)
+    assert.equal(toUserMessage(message), message)
+  }
+
+  // Boş/eksik girdi jenerik mesaja düşer.
+  assert.equal(toUserMessage(null), GENERIC_ERROR_MESSAGE)
+  assert.equal(toUserMessage(''), GENERIC_ERROR_MESSAGE)
+  assert.equal(toUserMessage(new Error('Doğrulama hatası')), 'Doğrulama hatası')
+})

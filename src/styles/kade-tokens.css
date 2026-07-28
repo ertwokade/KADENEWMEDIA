@@ -111,9 +111,18 @@
   --kade-gold: #e0a81f;
   --kade-gold-deep: #c8901a;
   --kade-gold-soft: #fff2cc;
+  /* Mürekkep tonları — krem zemin (#fbfaf4 / #fdf6e3) üzerinde ölçülmüştür.
+     WCAG 2.1 AA küçük metin için 4.5:1, büyük metin (≥18.66px bold veya
+     ≥24px) için 3:1 ister.
+       --kade-ink    : 16.9:1  her boyutta güvenli
+       --kade-ink-2  :  8.4:1  her boyutta güvenli
+       --kade-ink-3  :  5.2:1  küçük metin dahil AA (ikincil metin için)
+       --kade-ink-4  :  2.4:1  AA'yı GEÇMEZ — yalnız devre dışı kontrol,
+                               ayraç ve dekoratif öğelerde kullanın; asla
+                               okunması gereken metinde değil. */
   --kade-ink: #17130a;
   --kade-ink-2: rgba(23, 19, 10, 0.72);
-  --kade-ink-3: rgba(23, 19, 10, 0.55);
+  --kade-ink-3: rgba(23, 19, 10, 0.62);
   --kade-ink-4: rgba(23, 19, 10, 0.38);
   --kade-canvas: #fdf6e3;
   --kade-surface: #fbfaf4;

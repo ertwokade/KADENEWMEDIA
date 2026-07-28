@@ -25,6 +25,11 @@ mock'lu Playwright ile masaüstü ve mobil projede doğrulandı.
 | Rapor export | Alanlar escape edilmeden HTML'e yazılıyor ve Arial kullanıyordu | HTML escape, güvenli dosya adı ve Poppins |
 | Form/a11y | Footer label'ları input'a bağlı değildi; toast semantiği yoktu | `htmlFor/id`, `status/alert` live region |
 | Hata yönetimi | CRUD testinde hata yolunun başarı gibi görünmesi otomatik korunmuyordu | Başarı payload'ı ve 422 mesajı için E2E regresyon testleri |
+| Hata mesajı sızıntısı | Sunucudan gelen ham hata (ORM/sürücü/yığın izi) doğrudan ziyaretçiye basılıyordu | `src/utils/userMessage.js`: teknik desenler jenerik mesaja çevrilir, anlamlı doğrulama mesajları korunur |
+| Admin mobil düzen | `.admin-main` 390 px ekranda 510 px'e çıkıyor, tüm panel yatay kayıyordu | Flex item'a `min-width: 0`; inline `gridTemplateColumns` mobilde tek sütuna indirildi |
+| Modal erişilebilirliği | Dokuz modalda Escape, odak tuzağı, odak geri verme ve dialog semantiği yoktu | `src/hooks/useDialog.js` admin kökünde bir kez kurulur; `role="dialog"`, `aria-modal`, `aria-label="Kapat"` |
+| Mobil menü | İkon-only düğmenin erişilebilir adı ve `aria-expanded` durumu yoktu | `aria-label`, `aria-expanded`, `aria-controls`; Escape ile kapanma; aktif bölümde `aria-current` |
+| Renk kontrastı | Footer ikincil metni krem zeminde 2,97:1 — 11 sayfada WCAG AA ihlali | `--kade-ink-3` 0,55 → 0,62 alfa (5,2:1); token yorumunda her tonun ölçülen oranı belgelendi |
 
 ## Auth ve izin sınırı
 
@@ -54,9 +59,19 @@ katmanında da uygulanır.
 ## Test kanıtı
 
 - Legacy lint: 0 hata, 0 uyarı.
-- Birim test: 45/45 başarılı.
-- Admin içerik CRUD: 4/4 odaklı Playwright testi başarılı.
-- Tam Playwright E2E: 90/90 başarılı (desktop + mobile Chromium).
+- Birim test: 46/46 başarılı.
+- Admin CRUD (`tests/e2e/admin-crud.spec.js`): 10/10 — liste, boş liste, silme
+  onayı/iptali, silme sonrası liste tazeleme, silme hatası, modal açılış/kapanış,
+  kısmi kayıtta veri kaybı olmaması, `no-page`/`static` uyarıları.
+- Admin responsive (`tests/e2e/admin-responsive.spec.js`): 11/11 — 390/768/1440
+  yatay taşma, tablo kaydırma, modal taşması ve Escape, sabit çubuk çakışması,
+  dokunma hedefi boyutu.
+- Form akışları (`tests/e2e/forms.spec.js`): 10/10 — KVKK zorunluluğu, e-posta ve
+  uzunluk doğrulaması, Türkçe karakter bütünlüğü, `/tesekkur` yönlendirmesi,
+  hata yolunda yanlış başarı olmaması, çift gönderim koruması, teknik hata sızıntısı.
+- Erişilebilirlik (`tests/e2e/accessibility.spec.js`): axe-core WCAG 2.1 AA
+  (wcag2a/2aa/21a/21aa) 13 rota + 4 mobil rota, 17/17 — serious/critical ihlal yok.
+- Tam Playwright E2E: 186/186 başarılı, 2 atlandı (desktop + mobile Chromium).
 - SEO ve Poppins doğrulayıcıları başarılı.
 - Production build 38 rota giriş dosyasıyla başarılı.
 
@@ -67,7 +82,9 @@ katmanında da uygulanır.
    Fonksiyonel değişiklikten bağımsız bir refactor planı gerekir.
 2. Mock'lu CRUD hata/başarı davranışını doğrular; gerçek Supabase, SMTP,
    Shopier, push ve dosya storage entegrasyonlarında bu turda production write
-   testi yapılmadı.
+   testi yapılmadı. Admin kimlik bilgisi paylaşılmadığından 34 bölümün
+   tamamı gerçek oturumla tek tek gezilmedi; yetki sınırı sunucu tarafında
+   (tüm korumalı uçlar 401) ve E2E ile doğrulandı.
 3. Public içerik hydration sonrasında admin verisini okur; SEO'nun ilk HTML
    yanıtına veritabanı içeriğini taşımak SSR/build-time fetch gerektirir.
 4. Dinamik geçersiz slug'ların gerçek HTTP 404 vermesi statik SPA rewrite

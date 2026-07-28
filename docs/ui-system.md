@@ -45,6 +45,46 @@ ve istemci bundle'ına gömülü anahtarı kaldırır. Her iki script idempotent
 `public/404.html`, `public/offline.html`, Organizasyon Kiti iframe kabuğu,
 canvas yazıları ve admin HTML raporu da Poppins'e taşındı.
 
+## Renk kontrastı
+
+Mürekkep tonları krem zemin (#fbfaf4 / #fdf6e3) üzerinde ölçülmüştür:
+
+| Token | Oran | Kullanım |
+|---|---:|---|
+| `--kade-ink` | 16,9:1 | Ana metin, başlık |
+| `--kade-ink-2` | 8,4:1 | İkincil metin |
+| `--kade-ink-3` | 5,2:1 | Yardımcı metin — küçük punto dahil AA |
+| `--kade-ink-4` | 2,4:1 | **AA'yı geçmez** — yalnız devre dışı kontrol, ayraç, dekoratif |
+
+Footer ikincil metni önceden `rgba(23,19,10,0.45)` (2,97:1) idi ve 11 sayfada
+WCAG 2.1 AA ihlali üretiyordu; `--kade-ink-3` tokenına bağlanarak tek noktadan
+çözüldü.
+
+## Modal ve dialog davranışı
+
+`src/hooks/useDialog.js` iki API sunar:
+
+- `useDialogBehavior()` — admin kökünde bir kez çağrılır, DOM'da açık olan
+  modalı yönetir. Dokuz modal ayrı bileşenlerde tanımlı olduğu için her birini
+  sarmalamak yerine merkezi davranış tercih edildi.
+- `useDialogRef(open, onClose)` — yeni modallarda tercih edilen bileşen içi yol.
+
+Her ikisi de Escape ile kapatma, odak tuzağı, açılışta odağı içeri taşıma,
+kapanışta çağırana geri verme ve arka plan kaydırmasını durdurma sağlar.
+Modallar `role="dialog"`, `aria-modal="true"` taşır; kapatma düğmelerinin
+`aria-label="Kapat"` erişilebilir adı vardır.
+
+## Admin düzen kuralları
+
+- `.admin-main` bir flex item'dır; `min-width: 0` olmadan varsayılan
+  `min-width: auto` yüzünden 390 px ekranda 510 px'e çıkıp paneli yatay
+  kaydırıyordu.
+- Yeni kodda inline `gridTemplateColumns` yerine `.admin-grid-2/3/4`
+  sınıflarını kullanın: inline stil media query ile ezilemez. Mevcut 30+
+  inline grid için dar ekranda tek sütuna indiren merkezi bir kural vardır.
+- Geniş tablolar `.admin-table-wrapper` içinde `overflow-x: auto` ile kendi
+  kapsayıcısında kayar; gövde asla yatay kaymaz.
+
 ## Responsive ve erişilebilirlik
 
 - Kritik public rotalarda 390 px yatay taşma testi bulunur.
@@ -57,6 +97,12 @@ canvas yazıları ve admin HTML raporu da Poppins'e taşındı.
 - Görünür focus halkası ve hareket azaltma tercihi otomatik test edilir.
 - Emoji logo değerleri `<img src>` yapılmaz; URL/path/data görselleri ayrı
   doğrulanır.
+- Admin mobil menü düğmesi `aria-label` + `aria-expanded` + `aria-controls`
+  taşır, Escape ile kapanır; aktif bölüm `aria-current="page"` bildirir.
+- axe-core ile WCAG 2.1 AA taraması 13 masaüstü + 4 mobil rotada çalışır
+  (`tests/e2e/accessibility.spec.js`); serious/critical ihlal build'i düşürür.
+  Ana sayfa kapsam dışıdır: kaynağı bu repoda olmayan minified snapshot'tır.
+- Dokunma hedefleri admin panelinde 24 px alt sınırıyla test edilir.
 
 ## Görsel doğrulama
 

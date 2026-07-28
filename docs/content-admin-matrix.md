@@ -52,6 +52,23 @@ Anonim erişim yalnız açık allow-list section'larıyla mümkündür; `calenda
 diğer iç/admin section'ları `content` yetkisi ister. Bilinmeyen section hem GET
 hem PUT için 400 döner.
 
+## Form akışları
+
+| Form | Rota | Doğrulama | Test |
+|---|---|---|---|
+| İletişim | `/iletisim` | E-posta formatı, min 20 karakter mesaj, KVKK onayı, honeypot | 10/10 E2E |
+| Teklif al | `/teklif-al` | Alan etiketleri ve zorunluluk işaretleri | a11y testi |
+| Newsletter | Global | Public POST, CSRF muaf, rate limit | Birim |
+
+Doğrulanan davranışlar: KVKK onayı olmadan istek gitmez; geçersiz e-posta ve
+kısa mesaj backend'e ulaşmaz; Türkçe karakterler gövdede bozulmaz; başarıda
+`/tesekkur`'a yönlendirilir; API hatasında başarı bildirimi gösterilmez ve
+yönlendirme yapılmaz; gönderim sırasında buton kilitlenir (çift gönderim
+koruması); sunucudan sızan teknik hata metni ziyaretçiye gösterilmez.
+
+Testler backend'i mock'lar — production'a gerçek başvuru veya e-posta
+gönderilmemiştir.
+
 ## İçerik değişikliğinin SEO etkisi
 
 React hydration sonrasında admin içeriği kullanıcıya görünür; fakat ön-render

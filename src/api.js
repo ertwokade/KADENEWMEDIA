@@ -1,3 +1,5 @@
+import { toUserMessage } from './utils/userMessage';
+
 const API_BASE = '/api';
 
 const CSRF_COOKIE = 'kade_csrf';
@@ -94,7 +96,11 @@ async function handleResponse(res, { reloadOnUnauthorized = true } = {}) {
     if (String(message).includes('ALLOWED_ORIGINS')) {
       throw new Error('Sunucu ayarı güncellendi. Lütfen sayfayı yenileyip tekrar deneyin.');
     }
-    throw new Error(message);
+    // Sunucudan beklenmedik biçimde bir ORM/sürücü hatası veya yığın izi
+    // sızarsa, mesaj olduğu gibi ekrana basılıyordu (veritabanı türü,
+    // kullanıcı adı, dosya yolu). Teknik görünen metinler jenerik
+    // karşılığıyla değiştirilir; anlamlı doğrulama mesajları korunur.
+    throw new Error(toUserMessage(message, 'Bir hata oluştu. Lütfen tekrar deneyin.'));
   }
   return data;
 }

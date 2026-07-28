@@ -646,12 +646,62 @@
 /* ===== MAIN CONTENT ===== */
 .admin-main {
   flex: 1;
+  /* Flex item'ın varsayılan `min-width: auto` değeri, içerik genişse
+     kutunun küçülmesini engeller. Bu yüzden 390 px ekranda .admin-main
+     510 px'e çıkıyor ve tüm admin paneli yatay kayıyordu. `min-width: 0`
+     kutunun kapsayıcıya sığmasına izin verir; geniş içerik (tablolar)
+     kendi `overflow-x: auto` sarmalayıcısında kayar. */
+  min-width: 0;
   margin-left: var(--sidebar-width);
   padding: 28px 32px;
   min-height: 100vh;
   position: relative;
   z-index: 1;
   transition: margin-left var(--transition);
+}
+
+/* Aynı gerekçe iç kapsayıcılar için: grid/flex çocukları da taşmayı
+   yukarı taşıyabilir. */
+.admin-main > *,
+.admin-page-header,
+.admin-table-wrapper {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Yeniden kullanılabilir responsive grid sınıfları.
+   YENİ KODDA inline `gridTemplateColumns` yerine bunları kullanın:
+   inline stil media query ile ezilemediği için dar ekranlarda sütunlar
+   tek sütuna düşemez ve panel yatay kayar. */
+.admin-grid-2,
+.admin-grid-3,
+.admin-grid-4 {
+  display: grid;
+  gap: var(--space-5, 20px);
+  min-width: 0;
+}
+.admin-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.admin-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.admin-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 1024px) {
+  .admin-grid-3,
+  .admin-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .admin-grid-2,
+  .admin-grid-3,
+  .admin-grid-4 { grid-template-columns: minmax(0, 1fr); }
+
+  /* Mevcut ekranlarda 30'dan fazla inline `gridTemplateColumns` var ve
+     inline stil normal kurallarla ezilemez. Bunları tek tek değiştirmek
+     yüksek regresyon riski taşıdığından, dar ekranda hepsini tek sütuna
+     indiren tek bir kural kullanılır. Grid sütunları zaten mobilde tek
+     sütun olmalı, dolayısıyla davranış her durumda doğrudur. */
+  .admin-main [style*="grid-template-columns"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
 }
 
 .admin-sidebar.collapsed ~ .admin-main {
