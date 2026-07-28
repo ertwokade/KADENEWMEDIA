@@ -17,6 +17,7 @@ import { CONTACT } from '../utils/constants'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import { PageHero, ContactCTA } from '../components/system'
 import './Contact.css'
 
 export default function Contact() {
@@ -127,29 +128,16 @@ export default function Contact() {
 
   return (
     <PageTransition>
-      <section className="contact-hero">
-        <PageBgAnimation type="contact" />
-        <div className="grid-bg" />
-        <div className="glow-effect" style={{ top: '-150px', left: '50%', transform: 'translateX(-50%)' }} />
-        <div className="container">
-          <FadeIn>
-            <div className="section-badge">
-              <HiOutlineMail size={14} />
-              {t('contact.badge')}
-            </div>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              {t('contact.title')} <span>{t('contact.titleHighlight')}</span> {t('contact.titleEnd')}
-            </h1>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="section-subtitle">
-              {t('contact.subtitle')}
-            </p>
-          </FadeIn>
-        </div>
-      </section>
+      {/* Hero ortak PageHero bileşenine taşındı; form mantığı değişmedi. */}
+      <PageHero
+        eyebrow={t('contact.badge')}
+        title="Projenizi konuşalım"
+        lead={t('contact.subtitle')}
+        meta={[
+          ['E-posta', contact.email || CONTACT.email],
+          ['Konum', CONTACT.city || 'İstanbul'],
+        ]}
+      />
 
       <section className="section">
         <div className="container">
@@ -360,6 +348,12 @@ export default function Contact() {
               yok (bkz. CONTENT_REQUIRED.md). Doğrulanınca yeniden eklenir. */}
         </div>
       </section>
+      <ContactCTA
+        title="Hazırsanız başlayalım"
+        text="Formu doldurmak yerine doğrudan yazmak isterseniz e-posta adresimiz her zaman açık."
+        primary={{ to: '/teklif-al', label: 'Teklif formu' }}
+        secondary={{ to: '/hizmetler', label: 'Hizmetleri gör' }}
+      />
     </PageTransition>
   )
 }

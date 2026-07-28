@@ -243,3 +243,156 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================================
+   HAKKIMIZDA — 2026 tasarım sistemi
+   ========================================================================== */
+
+.ab-manifesto__text {
+  margin: 0;
+  max-width: 24ch;
+  font-size: clamp(1.75rem, 4.6vw, 4rem);
+  font-weight: var(--fw-bold);
+  line-height: 1.05;
+  letter-spacing: var(--tracking-tight);
+}
+
+/* Hikâye */
+.ab-story { display: grid; gap: var(--space-6); max-width: 72ch; }
+.ab-story__p {
+  margin: 0;
+  font-size: var(--fs-lg);
+  line-height: var(--lh-relaxed);
+  color: var(--kade-ink-2);
+}
+
+/* Değerler */
+.ab-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--kade-line);
+  border: 1px solid var(--kade-line);
+}
+.ab-value {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+  background: var(--kade-surface);
+  min-width: 0;
+}
+.ab-value__index {
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wider);
+  color: var(--kade-gold-deep);
+  font-variant-numeric: tabular-nums;
+}
+.ab-value__title {
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-heading);
+}
+.ab-value__text {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--kade-ink-2);
+}
+
+/* Prensipler */
+.ab-principles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--kade-line);
+}
+.ab-principle {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: var(--space-6);
+  padding-block: var(--space-8);
+  border-bottom: 1px solid var(--kade-line);
+}
+.ab-principle__step {
+  font-size: var(--fs-sm);
+  color: var(--kade-gold-deep);
+  font-variant-numeric: tabular-nums;
+}
+.ab-principle__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-heading);
+}
+.ab-principle__text {
+  margin: 0;
+  max-width: 62ch;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--kade-ink-2);
+}
+
+/* Ekip */
+.ab-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-8);
+}
+.ab-member { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+.ab-member__avatar {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--kade-surface-2);
+  display: grid;
+  place-items: center;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: var(--fw-bold);
+  color: var(--kade-ink-3);
+}
+.ab-member__avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ab-member__name { margin: 0; font-size: var(--fs-lg); font-weight: var(--fw-semibold); }
+.ab-member__role {
+  margin: 0;
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--kade-gold-deep);
+}
+.ab-member__bio {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--kade-ink-2);
+}
+
+/* Hizmet alanları */
+.ab-fields {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.ab-fields li {
+  padding: 8px 16px;
+  border: 1px solid var(--kade-line);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  color: var(--kade-ink-2);
+}
+
+.ab-more { margin-top: var(--space-10); display: flex; justify-content: flex-end; }
+
+@media (max-width: 1024px) {
+  .ab-values { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 768px) {
+  .ab-values { grid-template-columns: minmax(0, 1fr); }
+  .ab-principle { grid-template-columns: 48px minmax(0, 1fr); gap: var(--space-4); }
+  .ab-more { justify-content: flex-start; }
+}

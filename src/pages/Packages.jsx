@@ -1,25 +1,36 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { HiOutlineArrowRight, HiOutlineCheck, HiOutlineSparkles } from 'react-icons/hi'
-import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { getContentApi } from '../api'
+import { PACKAGE_SCOPES, PACKAGE_FAQS } from '../data/packages'
 import { FAQSchema } from '../components/StructuredData'
 import PageTransition from '../components/PageTransition'
-import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
-import PageBgAnimation from '../components/PageBgAnimation'
-import { PACKAGE_SCOPES, PACKAGE_FAQS as FAQS } from '../data/packages'
-import { analytics } from '../utils/analytics'
+import {
+  Container,
+  Section,
+  PageHero,
+  Reveal,
+  SectionHeading,
+  Button,
+  LinkArrow,
+  ContactCTA,
+} from '../components/system'
 import './Packages.css'
 
+/**
+ * ÇALIŞMA MODELİ / KAPSAMLAR — /paketler
+ *
+ * Paket adı, açıklaması ve kapsamı kürate edilmiş sabit içeriktir; YALNIZCA
+ * fiyat alanları admin panelinden gelir. Fiyat girilmemişse sayfa sessizce
+ * fiyatsız hâline döner — uydurma tutar gösterilmez.
+ */
 export default function Packages() {
-  const { lang } = useLanguage()
-  const isEN = lang === 'en'
-  // Paket adı/açıklaması/özellikleri sabit kürate içerik; sadece fiyat admin
-  // panelinden geliyor. API erişilemezse (veya hiç fiyat girilmemişse) sayfa
-  // sessizce fiyatsız haline döner — kırık bir görünüm oluşmaz.
   const [prices, setPrices] = useState({})
+
+  useSEO({
+    title: 'Sosyal Medya Hizmet Kapsamları | Kade New Media',
+    description: 'Düzenli içerik, reklam yönetimi ve proje bazlı prodüksiyon ihtiyaçlarına göre şekillenen Kade New Media hizmet kapsamlarını inceleyin.',
+    path: '/paketler',
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -32,97 +43,101 @@ export default function Packages() {
         }
         setPrices(map)
       })
-      .catch(() => { /* statik, fiyatsız görünümde kal */ })
+      .catch(() => { /* fiyatsız görünümde kal */ })
     return () => { cancelled = true }
   }, [])
 
-  useSEO({
-    title: isEN ? 'Service Packages | Kade New Media' : 'Sosyal Medya Hizmet Kapsamları | Kade New Media',
-    description: isEN
-      ? 'Review Kade New Media service scopes and request a written quote tailored to your needs.'
-      : 'Düzenli içerik, reklam yönetimi ve proje bazlı prodüksiyon ihtiyaçlarına göre şekillenen Kade New Media hizmet kapsamlarını inceleyin.',
-    path: '/paketler',
-  })
+  const faqItems = PACKAGE_FAQS.map(({ tr: [soru, cevap] }) => ({ soru, cevap }))
 
   return (
     <PageTransition>
-      <FAQSchema items={FAQS.map(({ tr, en }) => ({ soru: tr[0], cevap: tr[1], soruEn: en[0], cevapEn: en[1] }))} />
-      <section className="packages-hero">
-        <PageBgAnimation type="packages" />
-        <div className="grid-bg" />
-        <div className="glow-effect" style={{ top: '-150px', left: '-150px' }} />
-        <div className="container">
-          <FadeIn>
-            <div className="section-badge"><HiOutlineSparkles size={14} />{isEN ? 'Service scopes' : 'Hizmet kapsamları'}</div>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              {isEN ? <>Choose the <span>right scope</span></> : <>İhtiyacınıza uygun <span>kapsamı seçin</span></>}
-            </h1>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="section-subtitle">
-              {isEN
-                ? 'Packages describe the working scope. Final fees, taxes, media spend, and additional costs are confirmed in the written quote.'
-                : 'Paketler çalışma kapsamını tanımlar. Nihai ücret, KDV, reklam bütçesi ve ek maliyetler yazılı teklifte netleştirilir.'}
-            </p>
-          </FadeIn>
-        </div>
-      </section>
+      <FAQSchema items={faqItems} />
 
-      <section className="section">
-        <div className="container">
-          <StaggerContainer className="packages-grid" staggerDelay={0.12}>
-            {PACKAGE_SCOPES.map((pkg) => {
-              const name = isEN ? pkg.nameEn : pkg.nameTr
-              const features = isEN ? pkg.featuresEn : pkg.featuresTr
-              const price = prices[pkg.id]
-              const hasPrice = Boolean(price?.priceTRY || price?.priceUSD)
+      <PageHero
+        eyebrow="Çalışma modelimiz"
+        title="İhtiyacınıza uygun kapsam"
+        lead="Paket adları değil, kapsamlar üzerinden çalışıyoruz. Her kapsam yazılı olarak tanımlanır; ihtiyacınıza göre birleştirilebilir."
+        meta={[['Kapsam', String(PACKAGE_SCOPES.length)], ['Sözleşme', 'Aylık veya proje bazlı']]}
+        actions={<Button to="/teklif-al" variant="primary">Size özel teklif alın</Button>}
+      />
+
+      {/* ── KAPSAMLAR ────────────────────────────────────────────── */}
+      <Section>
+        <Container>
+          <SectionHeading
+            eyebrow="Kapsamlar"
+            title="Nasıl çalışıyoruz"
+            index={`01 — ${String(PACKAGE_SCOPES.length).padStart(2, '0')}`}
+          />
+          <div className="pk-grid">
+            {PACKAGE_SCOPES.map((scope, index) => {
+              const price = prices[scope.id]
               return (
-                <StaggerItem key={pkg.id}>
-                  <motion.article className="package-card glass-card pkg-v2" whileHover={{ y: -4 }}>
-                    <div className="pkg-tag">{isEN ? 'Scope' : 'Kapsam'}</div>
-                    <h2 className="pkg-name">{name}</h2>
-                    {hasPrice && (
-                      <div className="pkg-price">
-                        {price.priceTRY && <span className="pkg-price-amount">{price.priceTRY} ₺</span>}
-                        {price.priceUSD && <span className="pkg-price-amount pkg-price-secondary">${price.priceUSD}</span>}
-                        {price.priceNote && <span className="pkg-price-note">{price.priceNote}</span>}
-                      </div>
-                    )}
-                    <p className="package-desc">{isEN ? pkg.descEn : pkg.descTr}</p>
-                    <div className="package-features">
-                      {features.map((feature) => (
-                        <div key={feature} className="feature-item included"><HiOutlineCheck size={15} /><span>{feature}</span></div>
-                      ))}
-                    </div>
-                    <Link
-                      to={`/teklif-al?paket=${pkg.id}`}
-                      className="btn btn-outline package-btn"
-                      aria-label={`${name} ${isEN ? 'scope quote' : 'kapsamı için teklif al'}`}
-                      onClick={() => analytics.packageClick(pkg.id)}
-                    >
-                      {isEN ? 'Request a quote' : 'Teklif al'} <HiOutlineArrowRight size={16} />
-                    </Link>
-                  </motion.article>
-                </StaggerItem>
+                <Reveal key={scope.id} className="pk-card" delay={index * 80}>
+                  <div className="pk-card__head">
+                    <span className="pk-card__index">{String(index + 1).padStart(2, '0')}</span>
+                    <h3 className="pk-card__title">{scope.nameTr}</h3>
+                    <p className="pk-card__desc">{scope.descTr}</p>
+                  </div>
+
+                  {/* Fiyat YALNIZCA admin'de girilmişse gösterilir. */}
+                  {(price?.priceTRY || price?.priceUSD) && (
+                    <p className="pk-card__price">
+                      {price.priceTRY && <span>{price.priceTRY}</span>}
+                      {price.priceNote && <small>{price.priceNote}</small>}
+                    </p>
+                  )}
+
+                  <ul className="pk-card__features">
+                    {scope.featuresTr.map((feature) => (
+                      <li key={feature}>
+                        <span className="pk-card__check" aria-hidden="true">✓</span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button to="/teklif-al" variant="outline" className="pk-card__cta">
+                    Bu kapsam için teklif al
+                  </Button>
+                </Reveal>
               )
             })}
-          </StaggerContainer>
-        </div>
-      </section>
-
-      <section className="section faq-section">
-        <div className="container">
-          <div className="section-header"><h2 className="section-title">{isEN ? 'Clear ' : 'Net '}<span>{isEN ? 'terms' : 'koşullar'}</span></h2></div>
-          <div className="faq-grid">
-            {FAQS.map((faq) => {
-              const [question, answer] = isEN ? faq.en : faq.tr
-              return <article className="faq-card glass-card" key={question}><h3>{question}</h3><p>{answer}</p></article>
-            })}
           </div>
-        </div>
-      </section>
+
+          {/* Fiyat listesi yayınlanmıyor — bunu gizlemek yerine açıkça söyle. */}
+          <Reveal className="pk-note">
+            <p>
+              Sabit fiyat listesi yayınlamıyoruz: kapsam, kanal sayısı ve üretim
+              hacmi projeden projeye değişiyor. Kısa bir brief sonrası yazılı ve
+              kalem kalem ayrıştırılmış teklif hazırlıyoruz.
+            </p>
+            <LinkArrow to="/teklif-al">Teklif formunu doldur</LinkArrow>
+          </Reveal>
+        </Container>
+      </Section>
+
+      {/* ── NET KOŞULLAR ─────────────────────────────────────────── */}
+      <Section>
+        <Container>
+          <SectionHeading eyebrow="Net koşullar" title="Sık sorulan sorular" index="02" />
+          <div className="pk-faq">
+            {faqItems.map((item, index) => (
+              <Reveal key={item.soru} delay={Math.min(index, 4) * 70}>
+                <details className="pk-faq__item">
+                  <summary className="pk-faq__q">{item.soru}</summary>
+                  <p className="pk-faq__a">{item.cevap}</p>
+                </details>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      <ContactCTA
+        title="Kapsamı birlikte belirleyelim"
+        text="İhtiyacınızı paylaşın; hangi kapsamın uygun olduğunu ve neyi kapsamadığını açıkça yazalım."
+      />
     </PageTransition>
   )
 }

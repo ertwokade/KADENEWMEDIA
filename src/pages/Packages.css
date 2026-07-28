@@ -455,3 +455,142 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================================
+   ÇALIŞMA MODELİ / KAPSAMLAR — 2026 tasarım sistemi
+   ========================================================================== */
+
+.pk-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--kade-line);
+  border: 1px solid var(--kade-line);
+}
+
+.pk-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-6) var(--space-10);
+  background: var(--kade-surface);
+  min-width: 0;
+}
+
+.pk-card__head { display: flex; flex-direction: column; gap: var(--space-3); }
+.pk-card__index {
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wider);
+  color: var(--kade-gold-deep);
+  font-variant-numeric: tabular-nums;
+}
+.pk-card__title {
+  margin: 0;
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tracking-tight);
+}
+.pk-card__desc {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--kade-ink-2);
+}
+
+.pk-card__price {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--space-4);
+  border-top: 2px solid var(--kade-gold);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+.pk-card__price small {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--kade-ink-3);
+}
+
+.pk-card__features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+  flex: 1;
+}
+.pk-card__features li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+.pk-card__check { color: var(--kade-gold-deep); flex: 0 0 auto; }
+.pk-card__cta { align-self: flex-start; }
+
+.pk-note {
+  margin-top: var(--space-12);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--kade-line);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.pk-note p {
+  margin: 0;
+  max-width: 68ch;
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  color: var(--kade-ink-2);
+}
+
+/* SSS */
+.pk-faq { border-top: 1px solid var(--kade-line); }
+.pk-faq__item { border-bottom: 1px solid var(--kade-line); }
+.pk-faq__q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: var(--tap-min);
+  padding-block: var(--space-5);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  list-style: none;
+}
+.pk-faq__q::-webkit-details-marker { display: none; }
+.pk-faq__q::after {
+  content: '+';
+  flex: 0 0 auto;
+  font-size: 1.4em;
+  font-weight: var(--fw-light);
+  color: var(--kade-gold-deep);
+  transition: transform var(--dur-ui) var(--ease-out);
+}
+.pk-faq__item[open] .pk-faq__q::after { transform: rotate(45deg); }
+.pk-faq__q:focus-visible { outline: 2px solid var(--kade-ink); outline-offset: 2px; }
+.pk-faq__a {
+  margin: 0;
+  padding-bottom: var(--space-6);
+  max-width: 68ch;
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  color: var(--kade-ink-2);
+}
+
+@media (max-width: 1024px) {
+  .pk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 768px) {
+  .pk-grid { grid-template-columns: minmax(0, 1fr); }
+  .pk-card__cta { align-self: stretch; }
+}
