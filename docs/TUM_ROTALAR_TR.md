@@ -1,76 +1,122 @@
 # Tüm Rotalar — `/` ile başlayan her şey
 
-Koddan doğrudan çıkarıldı (`src/App.jsx`, `api/[...path].js`, `apps/kadeai/app/**`, `apps/studio-web/app/**`, `vercel.json`). Dinamik segmentler (`:handle`, `:slug`, `:id`, `[projectId]`, `[exportId]`) gerçek değerlerle çalışır.
+Koddan doğrudan çıkarıldı (`src/App.jsx`, `scripts/generate-static-routes.mjs`,
+`server/api/sitemap.js`, `public/robots.txt`, `vercel.json`, `api/[...path].js`,
+`apps/kadeai/app/**`, `apps/studio-web/app/**`).
+Dinamik segmentler (`:handle`, `:slug`, `:id`, `[projectId]`, `[exportId]`) gerçek değerlerle çalışır.
 
-**Özet:** Kök site 41 sayfa + 33 API · Kade AI 41 sayfa + 55 API · Kade Studio 4 sayfa + 11 API
+**Son güncelleme:** 28 Temmuz 2026 — teknik SEO düzeltmeleri sonrası, canlıda doğrulandı.
+
+> **Önemli:** Aşağıda listelenmeyen her `/` isteği artık **HTTP 404** döner.
+> Daha önce `vercel.json`'daki blanket rewrite yüzünden bilinmeyen tüm URL'ler
+> HTTP 200 + ana sayfa canonical'ı veriyordu; sonsuz duplicate URL alanı
+> oluşuyor ve site indekslenemiyordu.
 
 ---
 
-## 1) Kök Site — Public Sayfalar (`kadenewmedia.com`)
+## 1) Kök Site — İndekslenen Sayfalar (20)
+
+Hepsi ön-render'lı, tek ve doğru canonical'a sahip, `sitemap.xml` içinde.
 
 | Yol | Açıklama |
 |---|---|
-| `/` | Ana sayfa (⚠️ React değil, `public/site.html` statik export — bkz. BLOCKERS #18) |
-| `/hizmetler` | Hizmetler listesi |
-| `/hizmetler/:slug` | Hizmet detayı (sosyal-medya-yonetimi, icerik-uretimi, reklam-yonetimi, video-produksiyon, strateji-danismanlik, web-sitesi-tasarimi) |
-| `/new-media-ajansi` | New Media ajansı |
-| `/paketler` | Paketler / fiyatlandırma |
+| `/` | Ana sayfa (React değil — `public/site.html` statik snapshot, `vercel.json` rewrite) |
 | `/hakkimizda` | Hakkımızda |
-| `/iletisim` | İletişim |
-| `/teklif-al` | Teklif alma formu |
-| `/kariyer` | Kariyer |
+| `/hizmetler` | Hizmetler listesi |
+| `/new-media-ajansi` | New Media ajansı |
+| `/paketler` | Hizmet kapsamları |
 | `/sss` | Sık sorulan sorular |
 | `/ekip` | Ekip |
-| `/portfolio` | Portfolyo |
-| `/partnerler` | Partnerler listesi |
-| `/partnerler/:id` | Partner detayı (bu oturumda düzeltildi) |
-| `/basari-hikayeleri` | Başarı hikayeleri |
-| `/referanslar` | Referanslar |
-| `/blog` | Blog listesi (bu oturumda gerçek CMS'e bağlandı) |
-| `/blog/:slug` | Blog yazı detayı (bu oturumda düzeltildi) |
-| `/kade-kit-business` | Kade Kit Business |
-| `/:handle` | Link-in-bio profil sayfası (`/@handle`) |
-| `/s/:slug` | Kısa link yönlendirme çözücü |
-
-## 2) Kök Site — Kimlik & Korumalı Rotalar
-
-| Yol | Açıklama |
-|---|---|
-| `/giris` | Giriş hub'ı |
-| `/giris/danismanlik` | Danışmanlık girişi |
-| `/admin` | Admin paneli (oturum korumalı) |
-| `/musteri-panel` | Müşteri paneli |
-| `/proje-takip` | Proje takip (müşteri korumalı) |
-| `/organizasyon-kiti` | Organizasyon Kiti (guard'lı) |
-| `/organizasyon-kiti/plan/fractional-new-media-director` | Plan sayfası |
-
-## 3) Kök Site — Hukuki & Hata/Durum Sayfaları
-
-| Yol | Açıklama |
-|---|---|
+| `/kariyer` | Kariyer |
+| `/iletisim` | İletişim |
+| `/teklif-al` | Teklif alma formu |
 | `/kvkk` | KVKK aydınlatma metni |
 | `/gizlilik` | Gizlilik politikası |
 | `/cerez-politikasi` | Çerez politikası |
 | `/telif-haklari` | Telif hakları |
-| `/tesekkur` | Teşekkür / dönüşüm sayfası |
-| `/401` | Yetkisiz (bu oturumda eklendi) |
-| `/403` | Erişim engellendi (bu oturumda eklendi) |
-| `/429` | Çok fazla istek (bu oturumda eklendi) |
-| `/bakim` | Bakım sayfası (bu oturumda eklendi) |
-| `*` | 404 (bilinmeyen tüm rotalar) |
+| `/hizmetler/sosyal-medya-yonetimi` | Hizmet detayı |
+| `/hizmetler/icerik-uretimi` | Hizmet detayı |
+| `/hizmetler/reklam-yonetimi` | Hizmet detayı |
+| `/hizmetler/video-produksiyon` | Hizmet detayı |
+| `/hizmetler/strateji-danismanlik` | Hizmet detayı |
+| `/hizmetler/web-sitesi-tasarimi` | Hizmet detayı |
 
-## 4) Kök Site — Yönlendirmeler & Statik (`vercel.json`)
+## 2) Kök Site — Herkese Açık ama `noindex`
 
-| Yol | Hedef |
+İçerik doğrulanana kadar indekslenmiyor. `follow` bilinçli: link değeri detay
+sayfalarına aksın diye. Sitemap'te **yer almazlar** (aksi halde Search Console
+"Submitted URL marked 'noindex'" hatası verir).
+
+| Yol | Robots |
 |---|---|
-| `/links` | → `kadirardademir.com/links` (301) |
-| `/kadelinks` | → `kadirardademir.com/links` (301) |
-| `/kadelinks/:path*` | → `kadirardademir.com/links` (301) |
-| `/kadirdemir` | Link profil (özel handle) |
-| `/robots.txt` | Statik |
-| `/sitemap.xml` | → `/api/sitemap` (dinamik üretim) |
+| `/blog` | `noindex, follow` |
+| `/portfolio` | `noindex, follow` |
+| `/partnerler` | `noindex, follow` |
+| `/referanslar` | `noindex, follow` |
+| `/basari-hikayeleri` | `noindex, follow` |
 
-## 5) Kök Site — API Uçları (`/api/*`)
+## 3) Kök Site — Özel Alanlar (robots.txt'de engelli + `noindex`)
+
+| Yol | Açıklama |
+|---|---|
+| `/admin` | Admin paneli (oturum korumalı) |
+| `/giris` | Giriş hub'ı |
+| `/giris/danismanlik` | Danışmanlık girişi |
+| `/musteri-panel` | Müşteri paneli |
+| `/proje-takip` | Proje takip (müşteri korumalı) |
+| `/kade-kit-business` | Kade Kit Business |
+| `/tesekkur` | Teşekkür / dönüşüm sayfası |
+| `/organizasyon-kiti` | Organizasyon Kiti (guard'lı) |
+| `/organizasyon-kiti/medya-yol-haritasi` | Bölüm |
+| `/organizasyon-kiti/yonetim-toplantilari` | Bölüm |
+| `/organizasyon-kiti/ekip-surecler` | Bölüm |
+| `/organizasyon-kiti/stratejik-kararlar` | Bölüm |
+| `/organizasyon-kiti/notlar` | Bölüm |
+| `/organizasyon-kiti/plan/fractional-new-media-director` | Plan sayfası |
+
+## 4) Kök Site — Dinamik Rotalar (ön-render yok, SPA çözer)
+
+| Yol | Açıklama | Kayıt yoksa |
+|---|---|---|
+| `/blog/:slug` | Blog yazı detayı | `noindex` |
+| `/partnerler/:id` | Partner detayı | `noindex` |
+| `/hizmetler/:slug` | 6 gerçek slug ön-render'lı | **404** |
+| `/@:handle` | Link-in-bio profil sayfası | `noindex` |
+| `/:handle` | `@` ile başlamıyorsa NotFound | `noindex` |
+| `/s/:slug` | Kısa link çözücü (robots.txt'de engelli) | — |
+
+## 5) Kök Site — Hata & Bakım Ekranları
+
+robots.txt'de engelli. `*` (bilinmeyen rota) artık sunucu tarafında gerçek 404 döner.
+
+| Yol | Açıklama |
+|---|---|
+| `/401` | Yetkisiz |
+| `/403` | Erişim engellendi |
+| `/429` | Çok fazla istek |
+| `/bakim` | Bakım sayfası |
+
+## 6) Kök Site — Yönlendirmeler (sunucu tarafı)
+
+| Yol | Hedef | Tip |
+|---|---|---|
+| `/kadirdemir` | `/@kadirdemir` | 301 |
+| `/links` | `kadirardademir.com/links` | 301 |
+| `/kadelinks` | `kadirardademir.com/links` | 301 |
+| `/kadelinks/:path*` | `kadirardademir.com/links` | 301 |
+| `www.kadenewmedia.com` | `kadenewmedia.com` | 308 |
+| `http://` | `https://` | 308 |
+
+## 7) Kök Site — Özel Uç Noktalar
+
+| Yol | Açıklama |
+|---|---|
+| `/robots.txt` | Statik |
+| `/sitemap.xml` | → `/api/sitemap` (25 URL: 20 statik + 5 partner detayı) |
+| `/kadeai` | → `kadeai.vercel.app` (rewrite, `noindex`) |
+| `/api/*` | robots.txt'de engelli |
+
+## 8) Kök Site — API Uçları (`/api/*`)
 
 | Yol | İşlev |
 |---|---|
@@ -108,7 +154,7 @@ Koddan doğrudan çıkarıldı (`src/App.jsx`, `api/[...path].js`, `apps/kadeai/
 
 ---
 
-## 6) Kade AI — Sayfalar (`kadenewmedia.com/kadeai/*`)
+## 9) Kade AI — Sayfalar (`kadenewmedia.com/kadeai/*`)
 
 | Yol | Açıklama |
 |---|---|
@@ -121,7 +167,7 @@ Koddan doğrudan çıkarıldı (`src/App.jsx`, `api/[...path].js`, `apps/kadeai/
 **Dashboard araçları** (`/kadeai/dashboard/*`):
 `ab-test` · `ai-thumbnail` · `analytics` · `bio-link` · `bulk` · `calendar` · `carousel` · `clickbait-detector` · `clip-generator` · `collab-mail` · `comment-analysis` · `competitor` · `content-plan` · `description` · `dubbing` · `faq` · `hashtag` · `history` · `hook` · `ideas` · `operations` · `packages` · `performance` · `quote-extractor` · `retention-analysis` · `settings` · `shopier` · `social-audit` · `templates` · `text-generator` · `thread` · `title` · `trends` · `video-factory` · `viral-score` · `youtube-seo`
 
-## 7) Kade AI — API Uçları (`/kadeai/api/*`)
+## 10) Kade AI — API Uçları (`/kadeai/api/*`)
 
 | Grup | Yollar |
 |---|---|
@@ -133,7 +179,7 @@ Koddan doğrudan çıkarıldı (`src/App.jsx`, `api/[...path].js`, `apps/kadeai/
 
 ---
 
-## 8) Kade Studio (`apps/studio-web` — ayrı ürün, ayrı domain)
+## 11) Kade Studio (`apps/studio-web` — ayrı ürün, ayrı domain)
 
 **Sayfalar:** `/` · `/login` · `/projects/new` · `/editor/[projectId]`
 
