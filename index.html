@@ -48,11 +48,17 @@
       - Dinamik rotalarda canonical'ı çalışma anında src/hooks/useSEO.js oluşturur.
     -->
 
-    <!-- JSON-LD: Organization -->
+    <!--
+      JSON-LD: Organization (ham HTML / ilk tarama için).
+      Uygulama çalışınca src/components/StructuredData.jsx aynı kuruluş için
+      daha zengin bir düğüm enjekte ediyor. Ortak "@id" olmadan Google sayfada
+      iki ayrı kuruluş varlığı görüyordu; aynı @id ikisini tek düğümde birleştirir.
+    -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
+      "@id": "https://kadenewmedia.com/#organization",
       "name": "Kade New Media",
       "alternateName": ["Kade New Media", "Kademedia", "Kadenewmedia", "Kade"],
       "url": "https://kadenewmedia.com/",

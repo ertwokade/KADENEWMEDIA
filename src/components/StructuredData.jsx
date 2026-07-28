@@ -26,6 +26,9 @@ export function OrganizationSchema() {
     injectSchema('schema-organization', {
       '@context': 'https://schema.org',
       '@type': 'Organization',
+      // index.html'deki statik Organization ile aynı @id: iki düğüm tek
+      // kuruluş varlığında birleşsin (yinelenen varlık tanımını önler).
+      '@id': `${BASE_URL}/#organization`,
       name: BRAND.name,
       alternateName: BRAND.alternateNames,
       url: BASE_URL,
