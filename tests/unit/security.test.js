@@ -69,10 +69,14 @@ test('mass assignment drops protected partner fields', () => {
 })
 
 test('API query IDs accept legacy ObjectId and current Supabase UUID values', () => {
-  assert.equal(isValidQueryId('507f1f77bcf86cd799439011'), true)
-  assert.equal(isValidQueryId('550e8400-e29b-41d4-a716-446655440000'), true)
-  assert.equal(isValidQueryId('550e8400-e29b-11d4-c716-446655440000'), false, 'UUID variant must be valid')
-  assert.equal(isValidQueryId('not-an-id'), false)
+  assert.equal(isValidQueryId('507f1f77bcf86cd799439011'), true, '24 karakterlik eski Mongo ObjectId kabul edilmeli')
+  // Supabase `gen_random_uuid()` v4 üretir: sürüm hanesi 4, variant hanesi 8/9/a/b.
+  assert.equal(isValidQueryId('550e8400-e29b-41d4-a716-446655440000'), true, 'RFC 4122 v4 UUID kabul edilmeli')
+  // Sürüm/variant haneleri uymayan dizi reddedilir; aksi hâlde dispatcher
+  // rastgele UUID-benzeri girdiyi handler'a taşır.
+  assert.equal(isValidQueryId('550e8400-e29b-11d4-c716-446655440000'), false, 'geçersiz variant reddedilmeli')
+  assert.equal(isValidQueryId('00000000-0000-0000-0000-000000000000'), false, 'nil UUID reddedilmeli')
+  assert.equal(isValidQueryId('not-an-id'), false, 'ID olmayan dize reddedilmeli')
 })
 
 test('anonymous content access is limited to the explicit public section allow-list', () => {
