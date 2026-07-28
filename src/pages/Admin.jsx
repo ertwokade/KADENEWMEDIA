@@ -31,6 +31,8 @@ import { PACKAGE_SCOPES } from '../data/packages'
 import { SERVICE_DETAILS } from '../data/serviceDetails'
 import { ABOUT_CONTENT_FALLBACK } from '../data/about'
 import { getPackageEntitlements } from '../config/entitlements'
+import { PROJECT_CATEGORIES, normalizeProjects, hasDetailContent, slugify } from '../data/projects'
+import { SERVICES as NMA_SERVICES } from '../data/newMediaAgency'
 import { useDialogBehavior } from '../hooks/useDialog'
 import {
   apiFetch,
@@ -4960,178 +4962,589 @@ function AnalyticsSection() {
 }
 
 // ========== PORTFOLIO MANAGEMENT ==========
-const DEFAULT_PORTFOLIO = [
-  { id: 1, titleTr: 'Flavora Sosyal Medya Kampanyası', titleEn: 'Flavora Social Media Campaign', category: 'Social Media', partner: 'Flavora', emoji: '🍕', color: '#FFD700', metricKey: 'reach', metricVal: '2M+' },
-  { id: 2, titleTr: 'TechVibe Ürün Lansmanı', titleEn: 'TechVibe Product Launch', category: 'Launch', partner: 'TechVibe', emoji: '💻', color: '#6C63FF', metricKey: 'downloads', metricVal: '500K+' },
-  { id: 3, titleTr: 'GreenLife E-Ticaret Büyümesi', titleEn: 'GreenLife E-Commerce Growth', category: 'E-Commerce', partner: 'GreenLife', emoji: '🌿', color: '#2ECC71', metricKey: 'sales', metricVal: '%400' },
-]
-
+/**
+ * PORTFOLYO YÖNETİMİ
+ *
+ * Public `/portfolio` ve `/portfolio/:slug` sayfalarını besler.
+ * Veri modeli src/data/projects.js içinde tanımlıdır; aynı sözleşme hem
+ * burada hem public tarafta kullanılır.
+ *
+ * NOT: Buradaki liste bilerek BOŞ başlar. Önceki sürümde örnek olarak
+ * uydurma müşteri adları ve performans rakamları ("2M+ erişim", "%400
+ * satış") sabit veri olarak duruyordu; bunlar yanlışlıkla yayına çıkabilir
+ * ve doğrulanmamış iddia oluştururdu.
+ */
 function PortfolioSection({ showToast }) {
-  const [items, setItems] = useState(DEFAULT_PORTFOLIO)
+  const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState(null)
-  const [form, setForm] = useState({ titleTr: '', titleEn: '', category: '', partner: '', emoji: '📸', color: '#eac321', metricKey: '', metricVal: '' })
+  const [query, setQuery] = useState('')
+  const [form, setForm] = useState(emptyProjectForm())
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setLoading(true)
     getPortfolioApi()
-      .then(res => { if (res?.data?.items?.length) setItems(res.data.items) })
-      .catch(() => {})
+      .then((res) => setItems(normalizeProjects(res?.data?.items)))
+      .catch((err) => showToast(err.message, 'error'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [showToast])
 
-  const saveToDb = async (updatedItems) => {
+  useEffect(() => { load() }, [load])
+
+  const persist = async (nextItems, successMessage) => {
+    if (saving) return false
+    setSaving(true)
     try {
-      await updateContentApi('portfolio', { items: updatedItems })
-    } catch (err) { showToast(err.message, 'error') }
+      await updateContentApi('portfolio', { items: nextItems })
+      setItems(nextItems)
+      showToast(successMessage, 'success')
+      return true
+    } catch (err) {
+      // Kayıt başarısızsa listeyi DEĞİŞTİRME: ekranda kaydedilmiş gibi
+      // görünüp aslında kaydedilmemiş olmasın.
+      showToast(err.message, 'error')
+      return false
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const resetForm = () => { setForm({ titleTr: '', titleEn: '', category: '', partner: '', emoji: '📸', color: '#eac321', metricKey: '', metricVal: '' }); setEditing(null); setShowForm(false) }
+  const resetForm = () => { setForm(emptyProjectForm()); setEditing(null); setShowForm(false) }
 
-  const handleEdit = (item) => {
-    setForm({ titleTr: item.titleTr, titleEn: item.titleEn, category: item.category, partner: item.partner, emoji: item.emoji, color: item.color, metricKey: item.metricKey, metricVal: item.metricVal })
-    setEditing(item)
+  const openNew = () => { setForm(emptyProjectForm()); setEditing(null); setShowForm(true) }
+
+  const openEdit = (project) => {
+    setForm({
+      ...emptyProjectForm(),
+      ...project,
+      summary: { ...emptyProjectForm().summary, ...project.summary },
+      process: project.process.length ? project.process : [],
+      media: project.media.length ? project.media : [],
+      results: project.results.length ? project.results : [],
+      services: project.services || [],
+    })
+    setEditing(project)
     setShowForm(true)
   }
 
   const handleSave = async () => {
-    if (!form.titleTr) { showToast('Başlık zorunludur', 'error'); return }
-    let updated
-    if (editing) {
-      updated = items.map(i => i.id === editing.id ? { ...i, ...form } : i)
-      showToast('Portfolyo öğesi güncellendi!', 'success')
-    } else {
-      updated = [...items, { id: Date.now(), ...form }]
-      showToast('Portfolyo öğesi eklendi!', 'success')
-    }
-    setItems(updated)
-    await saveToDb(updated)
-    resetForm()
+    const title = form.title.trim()
+    if (!title) { showToast('Proje adı zorunludur.', 'error'); return }
+
+    const slug = (form.slug.trim() || slugify(title))
+    if (!slug) { showToast('Geçerli bir URL adresi (slug) üretilemedi.', 'error'); return }
+
+    // Slug benzersiz olmalı: iki proje aynı adrese düşerse detay sayfası
+    // hep ilkini gösterir ve ikinci kayıt erişilemez hâle gelir.
+    const clash = items.some((item) => item.slug === slug && item.slug !== editing?.slug)
+    if (clash) { showToast(`"${slug}" adresi başka bir projede kullanılıyor.`, 'error'); return }
+
+    const payload = { ...form, title, slug }
+    const next = editing
+      ? items.map((item) => (item.slug === editing.slug ? payload : item))
+      : [...items, payload]
+
+    const ok = await persist(normalizeProjects(next), editing ? 'Proje güncellendi.' : 'Proje eklendi.')
+    if (ok) resetForm()
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Bu öğeyi silmek istediğinize emin misiniz?')) return
-    const updated = items.filter(i => i.id !== id)
-    setItems(updated)
-    await saveToDb(updated)
-    showToast('Portfolyo öğesi silindi!', 'success')
+  const handleDelete = async (project) => {
+    if (!window.confirm(`"${project.title}" projesini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) return
+    await persist(items.filter((item) => item.slug !== project.slug), 'Proje silindi.')
   }
 
-  const emojis = ['📸', '🍕', '💻', '🌿', '👗', '🐾', '💪', '🎬', '🎨', '🚀', '📱', '🛒']
+  const togglePublished = async (project) => {
+    const next = items.map((item) =>
+      item.slug === project.slug ? { ...item, published: !item.published } : item)
+    await persist(next, project.published ? 'Proje yayından kaldırıldı.' : 'Proje yayınlandı.')
+  }
+
+  const move = async (project, direction) => {
+    const index = items.findIndex((item) => item.slug === project.slug)
+    const target = index + direction
+    if (index === -1 || target < 0 || target >= items.length) return
+    const next = [...items]
+    const [moved] = next.splice(index, 1)
+    next.splice(target, 0, moved)
+    // Sıra alanı yeniden numaralanır; normalizeProjects buna göre sıralar.
+    await persist(next.map((item, i) => ({ ...item, order: i })), 'Sıralama güncellendi.')
+  }
+
+  const visible = query.trim()
+    ? items.filter((item) => `${item.title} ${item.client} ${item.category}`.toLowerCase().includes(query.trim().toLowerCase()))
+    : items
+
+  const slugPreview = form.slug.trim() || slugify(form.title) || 'proje-adresi'
 
   return (
     <div>
       <div className="admin-page-header">
         <div>
           <h1>Portföy <span>Yönetimi</span></h1>
-          <p>Başarı hikayelerinizi yönetin</p>
+          <p>Public /portfolio sayfasını ve proje detaylarını buradan yönetirsiniz.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
+        <button className="btn btn-primary" type="button" onClick={openNew}>
           <HiOutlinePlus size={18} /> Yeni Proje
         </button>
       </div>
 
-      {/* Form Modal */}
+      <div className="admin-table-wrapper">
+        <div className="admin-table-header">
+          <input
+            type="search"
+            className="admin-search"
+            placeholder="Proje, müşteri veya kategori ara…"
+            aria-label="Projelerde ara"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <span className="admin-table-count">{visible.length} / {items.length} proje</span>
+        </div>
+
+        {loading ? (
+          <div className="admin-empty-state"><p>Yükleniyor…</p></div>
+        ) : visible.length === 0 ? (
+          <div className="admin-empty-state">
+            <p>{items.length === 0 ? 'Henüz proje eklenmemiş.' : 'Aramanıza uyan proje yok.'}</p>
+            {items.length === 0 && (
+              <p className="admin-empty-hint">
+                Proje eklenene kadar public portfolyo sayfası “yakında” durumu gösterir.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th scope="col">Sıra</th>
+                  <th scope="col">Proje</th>
+                  <th scope="col">Kategori</th>
+                  <th scope="col">Yıl</th>
+                  <th scope="col">Durum</th>
+                  <th scope="col">İşlemler</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map((project, index) => (
+                  <tr key={project.slug}>
+                    <td>
+                      <div className="admin-order-controls">
+                        <button
+                          type="button"
+                          className="table-action-btn"
+                          aria-label={`${project.title} projesini yukarı taşı`}
+                          disabled={index === 0 || saving}
+                          onClick={() => move(project, -1)}
+                        >↑</button>
+                        <button
+                          type="button"
+                          className="table-action-btn"
+                          aria-label={`${project.title} projesini aşağı taşı`}
+                          disabled={index === visible.length - 1 || saving}
+                          onClick={() => move(project, 1)}
+                        >↓</button>
+                      </div>
+                    </td>
+                    <td>
+                      <strong>{project.title}</strong>
+                      <div className="admin-cell-sub">
+                        /portfolio/{project.slug}
+                        {project.client ? ` · ${project.client}` : ''}
+                      </div>
+                    </td>
+                    <td>{project.category}</td>
+                    <td>{project.year || '—'}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className={`admin-status-pill ${project.published ? 'is-live' : 'is-draft'}`}
+                        onClick={() => togglePublished(project)}
+                        disabled={saving}
+                        aria-label={project.published
+                          ? `${project.title} projesini yayından kaldır`
+                          : `${project.title} projesini yayınla`}
+                      >
+                        {project.published ? 'Yayında' : 'Taslak'}
+                      </button>
+                      {!hasDetailContent(project) && (
+                        <div className="admin-cell-warn" title="Detay içeriği olmayan proje listede tıklanamaz ve sitemap'e girmez">
+                          detay içeriği yok
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <div className="table-actions">
+                        {project.published && hasDetailContent(project) && (
+                          <a
+                            className="table-action-btn"
+                            href={`/portfolio/${project.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >Önizle</a>
+                        )}
+                        <button type="button" className="table-action-btn" onClick={() => openEdit(project)}>
+                          <HiOutlinePencil size={14} /> Düzenle
+                        </button>
+                        <button type="button" className="table-action-btn danger" onClick={() => handleDelete(project)}>
+                          <HiOutlineTrash size={14} /> Sil
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
       <AnimatePresence>
         {showForm && (
           <motion.div className="admin-modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm}>
-            <motion.div className="admin-modal" role="dialog" aria-modal="true" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} onClick={e => e.stopPropagation()}>
+            <motion.div
+              className="admin-modal admin-modal--wide" role="dialog" aria-modal="true"
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="admin-modal-header">
-                <h3>{editing ? 'Projeyi Düzenle' : 'Yeni Proje Ekle'}</h3>
-                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={resetForm}><HiOutlineX size={18} /></button>
+                <h3>{editing ? 'Projeyi Düzenle' : 'Yeni Proje'}</h3>
+                <button className="admin-modal-close" type="button" aria-label="Kapat" onClick={resetForm}>
+                  <HiOutlineX size={18} />
+                </button>
               </div>
+
               <div className="admin-form" style={{ border: 'none', padding: 0 }}>
+                {/* ── Temel bilgiler ── */}
+                <h4 className="admin-form-section">Temel bilgiler</h4>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Başlık (TR) *</label>
-                    <input type="text" value={form.titleTr} onChange={e => setForm({ ...form, titleTr: e.target.value })} placeholder="Proje başlığı..." />
+                    <label htmlFor="pf-title">Proje adı <span aria-hidden="true">*</span></label>
+                    <input
+                      id="pf-title" type="text" required value={form.title}
+                      onChange={(e) => setForm({ ...form, title: e.target.value })}
+                      placeholder="Örn. Yaz kampanyası içerik serisi"
+                    />
+                    <small className="form-hint">Adres: /portfolio/<strong>{slugPreview}</strong></small>
                   </div>
                   <div className="form-group">
-                    <label>Başlık (EN)</label>
-                    <input type="text" value={form.titleEn} onChange={e => setForm({ ...form, titleEn: e.target.value })} placeholder="Project title..." />
+                    <label htmlFor="pf-slug">URL adresi (slug)</label>
+                    <input
+                      id="pf-slug" type="text" value={form.slug}
+                      onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                      placeholder="otomatik üretilir"
+                    />
+                    <small className="form-hint">Boş bırakırsanız proje adından üretilir. Yayındaki bir projenin adresini değiştirmek eski bağlantıları kırar.</small>
                   </div>
                 </div>
+
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Kategori</label>
-                    <input type="text" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Social Media" />
+                    <label htmlFor="pf-client">Müşteri</label>
+                    <input id="pf-client" type="text" value={form.client}
+                      onChange={(e) => setForm({ ...form, client: e.target.value })}
+                      placeholder="Yayın izni alınmış müşteri adı" />
                   </div>
                   <div className="form-group">
-                    <label>Partner</label>
-                    <input type="text" value={form.partner} onChange={e => setForm({ ...form, partner: e.target.value })} placeholder="Marka adı" />
+                    <label htmlFor="pf-year">Yıl</label>
+                    <input id="pf-year" type="text" inputMode="numeric" value={form.year}
+                      onChange={(e) => setForm({ ...form, year: e.target.value })} placeholder="2026" />
                   </div>
                 </div>
+
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Ana Metrik Adı</label>
-                    <input type="text" value={form.metricKey} onChange={e => setForm({ ...form, metricKey: e.target.value })} placeholder="reach, sales, followers..." />
+                    <label htmlFor="pf-category">Kategori</label>
+                    <select id="pf-category" value={form.category}
+                      onChange={(e) => setForm({ ...form, category: e.target.value })}>
+                      {PROJECT_CATEGORIES.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="form-group">
-                    <label>Ana Metrik Değeri</label>
-                    <input type="text" value={form.metricVal} onChange={e => setForm({ ...form, metricVal: e.target.value })} placeholder="2M+, %400..." />
+                    <label htmlFor="pf-order">Sıra</label>
+                    <input id="pf-order" type="number" value={form.order}
+                      onChange={(e) => setForm({ ...form, order: Number(e.target.value) || 0 })} />
+                    <small className="form-hint">Küçük sayı önce gösterilir.</small>
                   </div>
                 </div>
+
                 <div className="form-group">
-                  <label>İkon</label>
-                  <div className="emoji-grid">
-                    {emojis.map(e => (
-                      <button key={e} type="button" className={`emoji-btn ${form.emoji === e ? 'selected' : ''}`} onClick={() => setForm({ ...form, emoji: e })}>{e}</button>
-                    ))}
+                  <label htmlFor="pf-excerpt">Kısa açıklama</label>
+                  <textarea id="pf-excerpt" rows={2} value={form.excerpt}
+                    onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
+                    placeholder="Kartlarda ve arama sonuçlarında görünen bir-iki cümle." />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="pf-cover">Kapak görseli (URL)</label>
+                    <input id="pf-cover" type="url" value={form.cover}
+                      onChange={(e) => setForm({ ...form, cover: e.target.value })}
+                      placeholder="https://… veya /img/…" />
+                    <small className="form-hint">Boş bırakılırsa aşağıdaki simge gösterilir.</small>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="pf-cover-alt">Kapak alt metni</label>
+                    <input id="pf-cover-alt" type="text" value={form.coverAlt}
+                      onChange={(e) => setForm({ ...form, coverAlt: e.target.value })}
+                      placeholder="Görselde ne olduğunu anlatın" />
                   </div>
                 </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="pf-emoji">Görsel yoksa simge</label>
+                    <input id="pf-emoji" type="text" maxLength={4} value={form.emoji}
+                      onChange={(e) => setForm({ ...form, emoji: e.target.value })} placeholder="📸" />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="pf-published">Yayın durumu</label>
+                    <select id="pf-published" value={form.published ? 'yes' : 'no'}
+                      onChange={(e) => setForm({ ...form, published: e.target.value === 'yes' })}>
+                      <option value="yes">Yayında</option>
+                      <option value="no">Taslak</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* ── Proje özeti ── */}
+                <h4 className="admin-form-section">Proje özeti</h4>
+                <p className="form-hint">Bu alanlar boş bırakılırsa detay sayfasında ilgili bölüm hiç gösterilmez.</p>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="pf-problem">Müşterinin problemi</label>
+                    <textarea id="pf-problem" rows={3} value={form.summary.problem}
+                      onChange={(e) => setForm({ ...form, summary: { ...form.summary, problem: e.target.value } })} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="pf-goal">Projenin amacı</label>
+                    <textarea id="pf-goal" rows={3} value={form.summary.goal}
+                      onChange={(e) => setForm({ ...form, summary: { ...form.summary, goal: e.target.value } })} />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="pf-approach">Kullanılan yaklaşım</label>
+                    <textarea id="pf-approach" rows={3} value={form.summary.approach}
+                      onChange={(e) => setForm({ ...form, summary: { ...form.summary, approach: e.target.value } })} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="pf-role">Kade New Media’nın rolü</label>
+                    <textarea id="pf-role" rows={3} value={form.summary.role}
+                      onChange={(e) => setForm({ ...form, summary: { ...form.summary, role: e.target.value } })} />
+                  </div>
+                </div>
+
+                {/* ── Süreç ── */}
+                <RepeatableList
+                  legend="Süreç adımları"
+                  hint="Araştırma, strateji, üretim, dağıtım gibi adımlar."
+                  items={form.process}
+                  onChange={(process) => setForm({ ...form, process })}
+                  createItem={() => ({ title: '', text: '' })}
+                  addLabel="Adım ekle"
+                  renderFields={(item, update, index) => (
+                    <>
+                      <div className="form-group">
+                        <label htmlFor={`pf-step-title-${index}`}>Adım başlığı</label>
+                        <input id={`pf-step-title-${index}`} type="text" value={item.title}
+                          onChange={(e) => update({ ...item, title: e.target.value })} />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor={`pf-step-text-${index}`}>Açıklama</label>
+                        <textarea id={`pf-step-text-${index}`} rows={2} value={item.text}
+                          onChange={(e) => update({ ...item, text: e.target.value })} />
+                      </div>
+                    </>
+                  )}
+                />
+
+                {/* ── Medya ── */}
+                <RepeatableList
+                  legend="Görsel anlatım"
+                  hint="Görsel veya video adresleri. Açılmazsa alan boş kalmaz, simge gösterilir."
+                  items={form.media}
+                  onChange={(media) => setForm({ ...form, media })}
+                  createItem={() => ({ type: 'image', src: '', poster: '', alt: '', layout: 'full' })}
+                  addLabel="Medya ekle"
+                  renderFields={(item, update, index) => (
+                    <>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label htmlFor={`pf-media-src-${index}`}>Adres (URL)</label>
+                          <input id={`pf-media-src-${index}`} type="url" value={item.src}
+                            onChange={(e) => update({ ...item, src: e.target.value })} />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor={`pf-media-alt-${index}`}>Alt metni</label>
+                          <input id={`pf-media-alt-${index}`} type="text" value={item.alt}
+                            onChange={(e) => update({ ...item, alt: e.target.value })} />
+                        </div>
+                      </div>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label htmlFor={`pf-media-type-${index}`}>Tür</label>
+                          <select id={`pf-media-type-${index}`} value={item.type}
+                            onChange={(e) => update({ ...item, type: e.target.value })}>
+                            <option value="image">Görsel</option>
+                            <option value="video">Video</option>
+                          </select>
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor={`pf-media-layout-${index}`}>Yerleşim</label>
+                          <select id={`pf-media-layout-${index}`} value={item.layout}
+                            onChange={(e) => update({ ...item, layout: e.target.value })}>
+                            <option value="full">Tam genişlik</option>
+                            <option value="split">İki kolon</option>
+                            <option value="portrait">Dikey</option>
+                            <option value="landscape">Yatay</option>
+                          </select>
+                        </div>
+                      </div>
+                      {item.type === 'video' && (
+                        <div className="form-group">
+                          <label htmlFor={`pf-media-poster-${index}`}>Kapak görseli (poster)</label>
+                          <input id={`pf-media-poster-${index}`} type="url" value={item.poster}
+                            onChange={(e) => update({ ...item, poster: e.target.value })} />
+                          <small className="form-hint">Video açılmazsa bu görsel gösterilir.</small>
+                        </div>
+                      )}
+                    </>
+                  )}
+                />
+
+                {/* ── Sonuçlar ── */}
+                <RepeatableList
+                  legend="Sonuçlar"
+                  hint="YALNIZCA doğrulanmış rakamları girin. Boş bırakılırsa sonuç bölümü gösterilmez."
+                  items={form.results}
+                  onChange={(results) => setForm({ ...form, results })}
+                  createItem={() => ({ label: '', value: '', note: '' })}
+                  addLabel="Sonuç ekle"
+                  renderFields={(item, update, index) => (
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor={`pf-result-label-${index}`}>Ölçüt</label>
+                        <input id={`pf-result-label-${index}`} type="text" value={item.label}
+                          onChange={(e) => update({ ...item, label: e.target.value })} placeholder="Erişim" />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor={`pf-result-value-${index}`}>Değer</label>
+                        <input id={`pf-result-value-${index}`} type="text" value={item.value}
+                          onChange={(e) => update({ ...item, value: e.target.value })} placeholder="1,2 M" />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor={`pf-result-note-${index}`}>Not</label>
+                        <input id={`pf-result-note-${index}`} type="text" value={item.note}
+                          onChange={(e) => update({ ...item, note: e.target.value })} placeholder="3 aylık dönem" />
+                      </div>
+                    </div>
+                  )}
+                />
+
+                {/* ── İlgili hizmetler ── */}
+                <h4 className="admin-form-section">İlgili hizmetler</h4>
+                <div className="admin-checkbox-grid">
+                  {NMA_SERVICES.map((service) => (
+                    <label key={service.to} className="admin-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={form.services.includes(service.to)}
+                        onChange={(e) => setForm({
+                          ...form,
+                          services: e.target.checked
+                            ? [...form.services, service.to]
+                            : form.services.filter((path) => path !== service.to),
+                        })}
+                      />
+                      <span>{service.title}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* ── SEO ── */}
+                <h4 className="admin-form-section">SEO (isteğe bağlı)</h4>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="pf-seo-title">Arama başlığı</label>
+                    <input id="pf-seo-title" type="text" value={form.seo.title}
+                      onChange={(e) => setForm({ ...form, seo: { ...form.seo, title: e.target.value } })}
+                      placeholder="Boşsa proje adı kullanılır" />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="pf-seo-desc">Meta açıklama</label>
+                    <input id="pf-seo-desc" type="text" value={form.seo.description}
+                      onChange={(e) => setForm({ ...form, seo: { ...form.seo, description: e.target.value } })}
+                      placeholder="Boşsa kısa açıklama kullanılır" />
+                  </div>
+                </div>
+
                 <div className="admin-form-actions">
-                  <button className="btn btn-outline" onClick={resetForm}>İptal</button>
-                  <button className="btn btn-primary" onClick={handleSave}><HiOutlineSave size={16} /> {editing ? 'Güncelle' : 'Ekle'}</button>
+                  <button type="button" className="btn btn-outline" onClick={resetForm} disabled={saving}>Vazgeç</button>
+                  <button type="button" className="btn btn-primary" onClick={handleSave} disabled={saving}>
+                    <HiOutlineSave size={16} /> {saving ? 'Kaydediliyor…' : 'Kaydet'}
+                  </button>
                 </div>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Portfolio List */}
-      <div className="admin-table-wrapper">
-        <div className="admin-table-header"><h3>Tüm Projeler ({items.length})</h3></div>
-        {loading ? (
-          <div className="admin-empty-state"><p>Yükleniyor...</p></div>
-        ) : items.length === 0 ? (
-          <div className="admin-empty-state">
-            <div className="empty-icon">📸</div>
-            <h3>Henüz portfolyo öğesi yok</h3>
-            <p>Yeni bir proje ekleyerek başlayın</p>
-          </div>
-        ) : (
-          <table className="admin-table">
-            <thead><tr><th>İkon</th><th>Başlık</th><th>Kategori</th><th>Partner</th><th>Metrik</th><th>İşlem</th></tr></thead>
-            <tbody>
-              {items.map(item => (
-                <tr key={item.id}>
-                  <td><span style={{ fontSize: '1.5rem' }}>{item.emoji}</span></td>
-                  <td><strong>{item.titleTr}</strong></td>
-                  <td><span className="status-badge" style={{ background: `${item.color}20`, color: item.color }}>{item.category}</span></td>
-                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{item.partner}</td>
-                  <td><span style={{ fontWeight: 700, color: item.color }}>{item.metricVal}</span> <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{item.metricKey}</span></td>
-                  <td>
-                    <div className="table-actions">
-                      <button className="table-action-btn" onClick={() => handleEdit(item)}><HiOutlinePencil size={14} /> Düzenle</button>
-                      <button className="table-action-btn danger" onClick={() => handleDelete(item.id)}><HiOutlineTrash size={14} /> Sil</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
     </div>
   )
 }
 
-// ========== ACTIVITY LOG ==========
-// ========== COUPONS SECTION ==========
-// Yalnızca kupon TANIMLARINI yönetir (admin CRUD). Kuponun gerçek ödeme
-// akışına (Shopier checkout) uygulanması bu turda YAPILMADI — bkz.
-// server/api/coupons.js başındaki not ve docs/BLOCKERS_TR.md.
+function emptyProjectForm() {
+  return {
+    slug: '', title: '', client: '', year: '', category: PROJECT_CATEGORIES[0],
+    excerpt: '', published: true, order: 0, cover: '', coverAlt: '', emoji: '',
+    summary: { problem: '', goal: '', approach: '', role: '' },
+    process: [], media: [], results: [], services: [],
+    seo: { title: '', description: '', ogImage: '' },
+  }
+}
+
+/**
+ * Tekrarlanabilir alan listesi (süreç adımı, medya, sonuç).
+ * Ekle/sil/sırala mantığı tek yerde tutulur; her bölüm için ayrı kod yazılmaz.
+ */
+function RepeatableList({ legend, hint, items, onChange, createItem, addLabel, renderFields }) {
+  const update = (index, next) => onChange(items.map((item, i) => (i === index ? next : item)))
+  const remove = (index) => onChange(items.filter((_, i) => i !== index))
+
+  return (
+    <fieldset className="admin-repeat">
+      <legend className="admin-form-section">{legend}</legend>
+      {hint && <p className="form-hint">{hint}</p>}
+
+      {items.map((item, index) => (
+        <div className="admin-repeat__item" key={index}>
+          <div className="admin-repeat__head">
+            <span>{index + 1}</span>
+            <button
+              type="button"
+              className="table-action-btn danger"
+              onClick={() => remove(index)}
+              aria-label={`${legend} ${index + 1}. kaydı kaldır`}
+            >
+              <HiOutlineTrash size={14} /> Kaldır
+            </button>
+          </div>
+          {renderFields(item, (next) => update(index, next), index)}
+        </div>
+      ))}
+
+      <button type="button" className="btn btn-outline" onClick={() => onChange([...items, createItem()])}>
+        <HiOutlinePlus size={16} /> {addLabel}
+      </button>
+    </fieldset>
+  )
+}
+
 function CouponsSection({ showToast }) {
   const [coupons, setCoupons] = useState([])
   const [loading, setLoading] = useState(true)

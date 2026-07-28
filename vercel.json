@@ -52,6 +52,10 @@
       "destination": "/app.html"
     },
     {
+      "source": "/portfolio/:slug",
+      "destination": "/app.html"
+    },
+    {
       "source": "/s/:slug",
       "destination": "/app.html"
     },

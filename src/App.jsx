@@ -34,6 +34,7 @@ const Partners = lazy(() => import('./pages/Partners'))
 const PartnerDetail = lazy(() => import('./pages/PartnerDetail'))
 const Careers = lazy(() => import('./pages/Careers'))
 const Portfolio = lazy(() => import('./pages/Portfolio'))
+const ProjectDetail = lazy(() => import('./pages/ProjectDetail'))
 const Team = lazy(() => import('./pages/Team'))
 const KVKK = lazy(() => import('./pages/KVKK'))
 const Gizlilik = lazy(() => import('./pages/Gizlilik'))
@@ -252,6 +253,7 @@ function App() {
           <Route path="/partnerler/:id" element={<LazyRoute><PartnerDetail /></LazyRoute>} />
           <Route path="/kariyer" element={<LazyRoute><Careers /></LazyRoute>} />
           <Route path="/portfolio" element={<LazyRoute><Portfolio /></LazyRoute>} />
+          <Route path="/portfolio/:slug" element={<LazyRoute><ProjectDetail /></LazyRoute>} />
           <Route path="/ekip" element={<LazyRoute><Team /></LazyRoute>} />
           <Route path="/basari-hikayeleri" element={<LazyRoute><CaseStudies /></LazyRoute>} />
           <Route path="/kvkk" element={<LazyRoute><KVKK /></LazyRoute>} />

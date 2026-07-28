@@ -90,6 +90,7 @@ const server = createServer(async (req, res) => {
   const SPA_REWRITES = [
     /^\/blog\/[^/]+$/,
     /^\/partnerler\/[^/]+$/,
+    /^\/portfolio\/[^/]+$/,
     /^\/s\/[^/]+$/,
     /^\/@[^/]+$/,
     /^\/401$/,

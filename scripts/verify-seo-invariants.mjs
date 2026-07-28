@@ -159,7 +159,7 @@ const dynamicSources = (vercel.rewrites || [])
   .filter((r) => r.destination === '/app.html')
   .map((r) => r.source)
   .sort()
-const expectedDynamic = ['/401', '/403', '/429', '/@:handle', '/bakim', '/blog/:slug', '/partnerler/:id', '/s/:slug'].sort()
+const expectedDynamic = ['/401', '/403', '/429', '/@:handle', '/bakim', '/blog/:slug', '/partnerler/:id', '/portfolio/:slug', '/s/:slug'].sort()
 if (JSON.stringify(dynamicSources) !== JSON.stringify(expectedDynamic)) {
   fail(`app.html rewrite listesi değişmiş:\n      var: ${dynamicSources.join(', ')}\n      bekl: ${expectedDynamic.join(', ')}`)
 } else {
