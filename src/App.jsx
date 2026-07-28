@@ -34,7 +34,6 @@ const Partners = lazy(() => import('./pages/Partners'))
 const PartnerDetail = lazy(() => import('./pages/PartnerDetail'))
 const Careers = lazy(() => import('./pages/Careers'))
 const Portfolio = lazy(() => import('./pages/Portfolio'))
-const ProjectDetail = lazy(() => import('./pages/ProjectDetail'))
 const Team = lazy(() => import('./pages/Team'))
 const KVKK = lazy(() => import('./pages/KVKK'))
 const Gizlilik = lazy(() => import('./pages/Gizlilik'))
@@ -174,19 +173,7 @@ function App() {
   const isHome = location.pathname === '/'
   const isLoginArea = location.pathname.startsWith('/giris')
   const isLinkProfile = location.pathname.startsWith('/@') || location.pathname === '/kadirdemir'
-
-  // İKİ AYRI KARAR — tek bayrak yeterli değil:
-  //
-  // hideChrome : Navbar + Footer. Yalnız kendi tam ekran arayüzü olan
-  //              alanlarda gizlenir (admin, giriş, link profili).
-  //              Ana sayfa BURADA DEĞİL — navigasyonu olmalı.
-  //
-  // hideDecor  : Aurora, grain ve 3B hero canvas. Bunlar `position: fixed`
-  //              tam ekran katmanlar; ana sayfanın kendi editoryal zemini
-  //              (home-hero__grid) ve büyük tipografisi var. İkisi üst üste
-  //              binince hero okunamaz hâle geliyordu.
-  const hideChrome = isAdmin || isLoginArea || isLinkProfile
-  const hideDecor = hideChrome || isHome
+  const hideShell = isAdmin || isHome || isLoginArea || isLinkProfile
   const isAppUI = isAdmin
     || isLinkProfile
     || location.pathname.startsWith('/organizasyon-kiti')
@@ -246,10 +233,10 @@ function App() {
       <OrganizationSchema />
       <a href="#main-content" className="skip-to-content">İçeriğe geç</a>
       <ScrollToTop />
-      {!hideDecor && <AuroraBackground />}
-      {!hideDecor && <GrainOverlay />}
-      {!hideDecor && <PageHeroCanvas type={canvasTheme} />}
-      {!hideChrome && <Navbar />}
+      {!hideShell && <AuroraBackground />}
+      {!hideShell && <GrainOverlay />}
+      {!hideShell && <PageHeroCanvas type={canvasTheme} />}
+      {!hideShell && <Navbar />}
       <main id="main-content">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
@@ -265,7 +252,6 @@ function App() {
           <Route path="/partnerler/:id" element={<LazyRoute><PartnerDetail /></LazyRoute>} />
           <Route path="/kariyer" element={<LazyRoute><Careers /></LazyRoute>} />
           <Route path="/portfolio" element={<LazyRoute><Portfolio /></LazyRoute>} />
-          <Route path="/portfolio/:slug" element={<LazyRoute><ProjectDetail /></LazyRoute>} />
           <Route path="/ekip" element={<LazyRoute><Team /></LazyRoute>} />
           <Route path="/basari-hikayeleri" element={<LazyRoute><CaseStudies /></LazyRoute>} />
           <Route path="/kvkk" element={<LazyRoute><KVKK /></LazyRoute>} />
@@ -303,7 +289,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      {!hideChrome && <Footer />}
+      {!hideShell && <Footer />}
       {!isAdmin && <CookieBanner />}
       {!isAdmin && <NotificationPrompt />}
     </CustomerProvider>

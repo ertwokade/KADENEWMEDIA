@@ -1,43 +1,28 @@
+import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import {
+  HiOutlineGlobe,
+  HiOutlineLightningBolt,
+  HiOutlineChartBar,
+  HiOutlineCamera,
+  HiOutlineFilm,
+  HiOutlineChatAlt2,
+  HiOutlinePencilAlt,
+  HiOutlineSpeakerphone,
+  HiOutlineCode,
+} from 'react-icons/hi'
+import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
+import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { useSiteContent } from '../hooks/useSiteContent'
-import { SERVICE_DETAILS, SERVICE_SLUGS } from '../data/serviceDetails'
-import { mergeDefined } from '../utils/mergeDefined'
 import PageTransition from '../components/PageTransition'
-import {
-  Container,
-  Section,
-  PageHero,
-  Reveal,
-  SectionHeading,
-  Button,
-  LinkArrow,
-  Marquee,
-  ContactCTA,
-} from '../components/system'
+import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import PageBgAnimation from '../components/PageBgAnimation'
 import './Services.css'
 
-/**
- * HİZMETLER LİSTELEME — /hizmetler
- *
- * Metin tek kaynaktan gelir: src/data/serviceDetails.js. Aynı dosyayı
- * ön-render script'i de okur, böylece sayfadaki metinle Google'ın gördüğü
- * HTML ayrışmaz.
- *
- * Admin > İçerik Yönetimi > Hizmetler bölümündeki kayıt, DOLU alanların
- * üzerine yazar (mergeDefined). Slug listesi bilerek kodda sabittir:
- * admin'den yeni slug eklenmesi karşılığı olmayan bir rota üretirdi.
- */
-const PROCESS = [
-  ['01', 'Keşif & brief', 'Hedef, kitle ve ton netleşir; başarının nasıl ölçüleceği yazılır.'],
-  ['02', 'Strateji & plan', 'Kapsam, takvim ve göstergeler yazılı hâle gelir.'],
-  ['03', 'Üretim & uygulama', 'İş marka diline sadık ve ölçeklenebilir biçimde üretilir.'],
-  ['04', 'Raporlama', 'Sonuç şeffaf ve karşılaştırılabilir biçimde paylaşılır.'],
-]
-
 export default function Services() {
+  const { t, lang } = useLanguage()
   const { content } = useSiteContent('services', { items: [] })
-
   useSEO({
     title: 'New Media ve Dijital Medya Hizmetleri | Kade New Media',
     description: 'Kade New Media’nın sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetleri.',
@@ -45,99 +30,185 @@ export default function Services() {
     path: '/hizmetler',
   })
 
-  // Admin kaydı slug üzerinden eşleşir; eşleşmeyen kayıt yok sayılır.
-  const overrides = Object.fromEntries(
-    (content.items || [])
-      .filter((item) => item?.slug && SERVICE_DETAILS[item.slug])
-      .map((item) => [item.slug, item]),
-  )
-
-  const services = SERVICE_SLUGS.map((slug) => {
-    const base = SERVICE_DETAILS[slug]
-    const merged = mergeDefined(
-      { title: base.titleTr, description: base.descTr, features: base.featuresTr },
-      overrides[slug] || {},
-    )
-    return { slug, ...merged }
+  const baseServices = [
+    {
+      icon: HiOutlineGlobe,
+      slug: 'sosyal-medya-yonetimi',
+      title: t('services.smm'),
+      desc: t('services.smmDesc'),
+      features: [t('services.smmFeat1'), t('services.smmFeat2'), t('services.smmFeat3'), t('services.smmFeat4')],
+      platforms: [FaInstagram, FaFacebookF, FaTiktok],
+    },
+    {
+      icon: HiOutlinePencilAlt,
+      slug: 'icerik-uretimi',
+      title: t('services.contentTitle'),
+      desc: t('services.contentDesc'),
+      features: [t('services.contentFeat1'), t('services.contentFeat2'), t('services.contentFeat3'), t('services.contentFeat4')],
+      platforms: [FaInstagram, FaTiktok, FaYoutube],
+    },
+    {
+      icon: HiOutlineChartBar,
+      slug: 'reklam-yonetimi',
+      title: t('services.adsTitle'),
+      desc: t('services.adsDesc'),
+      features: [t('services.adsFeat1'), t('services.adsFeat2'), t('services.adsFeat3'), t('services.adsFeat4')],
+      platforms: [FaFacebookF, FaInstagram, FaTiktok],
+    },
+    {
+      icon: HiOutlineFilm,
+      slug: 'video-produksiyon',
+      title: t('services.videoTitle'),
+      desc: t('services.videoDesc'),
+      features: [t('services.videoFeat1'), t('services.videoFeat2'), t('services.videoFeat3'), t('services.videoFeat4')],
+      platforms: [FaInstagram, FaTiktok, FaYoutube],
+    },
+    {
+      icon: HiOutlineChatAlt2,
+      slug: 'strateji-danismanlik',
+      title: t('services.strategyTitle'),
+      desc: t('services.strategyDesc'),
+      features: [t('services.strategyFeat1'), t('services.strategyFeat2'), t('services.strategyFeat3'), t('services.strategyFeat4')],
+      platforms: [FaLinkedinIn, FaInstagram, FaFacebookF],
+    },
+    {
+      icon: HiOutlineCode,
+      slug: 'web-sitesi-tasarimi',
+      title: t('services.webTitle'),
+      desc: t('services.webDesc'),
+      features: [t('services.webFeat1'), t('services.webFeat2'), t('services.webFeat3'), t('services.webFeat4')],
+      platforms: [FaInstagram, FaLinkedinIn],
+    },
+  ]
+  const overrides = Array.isArray(content.items) ? content.items : []
+  const services = baseServices.map((service, index) => {
+    const custom = overrides.find((item) => item?.slug === service.slug) || overrides[index] || {}
+    const featureValue = lang === 'en' ? custom.featuresEn : custom.featuresTr
+    const customFeatures = Array.isArray(featureValue)
+      ? featureValue.filter(Boolean)
+      : String(featureValue || '').split(',').map((item) => item.trim()).filter(Boolean)
+    return {
+      ...service,
+      title: (lang === 'en' ? custom.titleEn : custom.titleTr) || service.title,
+      desc: (lang === 'en' ? custom.descEn : custom.descTr) || service.desc,
+      features: customFeatures.length ? customFeatures : service.features,
+    }
   })
+
+  const process = [
+    { step: '01', title: t('services.processStep1'), desc: t('services.processStep1Desc') },
+    { step: '02', title: t('services.processStep2'), desc: t('services.processStep2Desc') },
+    { step: '03', title: t('services.processStep3'), desc: t('services.processStep3Desc') },
+    { step: '04', title: t('services.processStep4'), desc: t('services.processStep4Desc') },
+  ]
 
   return (
     <PageTransition>
-      <PageHero
-        eyebrow="Hizmetler"
-        title="Dijitalde ne yapıyoruz"
-        lead="Strateji, içerik, reklam ve prodüksiyonu tek ekiple yürütüyoruz. Her hizmetin kapsamı, süreci ve teslim edilenleri yazılı."
-        meta={[['Alan', String(services.length)], ['Merkez', 'İstanbul']]}
-        actions={<Button to="/teklif-al" variant="primary">Teklif al</Button>}
-      />
+      {/* Hero */}
+      <section className="services-hero">
+        <PageBgAnimation type="services" />
+        <div className="grid-bg" />
+        <div className="glow-effect" style={{ top: '-150px', right: '-150px' }} />
+        <div className="container">
+          <FadeIn>
+            <div className="section-badge">
+              <HiOutlineLightningBolt size={14} />
+              {t('services.badge')}
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.1}>
+            <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
+              {t('services.title')} <span>{t('services.titleHighlight')}</span> {t('services.titleEnd')}
+            </h1>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <p className="section-subtitle">
+              {t('services.subtitle')}
+            </p>
+          </FadeIn>
+        </div>
+      </section>
 
-      {/* ── HİZMET LİSTESİ — editoryal satırlar ──────────────────── */}
-      <Section>
-        <Container>
-          <SectionHeading
-            eyebrow="Kapsam"
-            title="Hizmet alanları"
-            index={`01 — ${String(services.length).padStart(2, '0')}`}
-          />
-          <ul className="sv-list">
-            {services.map((service, index) => (
-              <Reveal
-                as="li"
-                key={service.slug}
-                className="sv-row"
-                delay={Math.min(index, 5) * 70}
-              >
-                <Link to={`/hizmetler/${service.slug}`} className="sv-row__link">
-                  <span className="sv-row__index">{String(index + 1).padStart(2, '0')}</span>
-                  <span className="sv-row__body">
-                    <span className="sv-row__title">{service.title}</span>
-                    <span className="sv-row__desc">{service.description}</span>
-                    {Array.isArray(service.features) && service.features.length > 0 && (
-                      <span className="sv-row__tags">
-                        {service.features.slice(0, 4).map((feature) => (
-                          <span className="sv-row__tag" key={feature}>{feature}</span>
-                        ))}
-                      </span>
-                    )}
-                  </span>
-                  <span className="sv-row__arrow" aria-hidden="true">→</span>
-                </Link>
-              </Reveal>
+      {/* Services Grid */}
+      <section className="section">
+        <div className="container">
+          <StaggerContainer className="services-detail-grid" staggerDelay={0.1}>
+            {services.map((service) => (
+              <StaggerItem key={service.title}>
+                <motion.div whileHover={{ scale: 1.01 }} style={{ height: '100%' }}>
+                  <Link
+                    to={`/hizmetler/${service.slug}`}
+                    className="service-detail-card glass-card"
+                    aria-label={`${service.title} hizmet detayları`}
+                  >
+                    <div className="service-detail-header">
+                      <div className="service-detail-icon">
+                        <service.icon size={28} />
+                      </div>
+                      <h3>{service.title}</h3>
+                    </div>
+                    <p className="service-detail-desc">{service.desc}</p>
+                    <div className="service-features">
+                      {service.features.map((feature) => (
+                        <span key={feature} className="feature-tag">
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="service-platforms">
+                      {service.platforms.map((Platform, i) => (
+                        <span key={i} className="platform-tag">
+                          <Platform size={14} />
+                        </span>
+                      ))}
+                    </div>
+                    <span className="service-detail-more" aria-hidden="true">Detayları gör →</span>
+                  </Link>
+                </motion.div>
+              </StaggerItem>
             ))}
-          </ul>
-        </Container>
-      </Section>
+          </StaggerContainer>
+        </div>
+      </section>
 
-      <Marquee
-        items={['STRATEJİ', 'İÇERİK', 'REKLAM', 'PRODÜKSİYON', 'WEB', 'RAPORLAMA']}
-        ariaLabel="Çalışma alanlarımız"
-      />
+      {/* Process */}
+      <section className="section process-section">
+        <div className="container">
+          <div className="section-header">
+            <FadeIn>
+              <div className="section-badge">
+                <HiOutlineCamera size={14} />
+                {t('services.processBadge')}
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <h2 className="section-title">
+                {t('services.processTitle')} <span>{t('services.processHighlight')}</span>?
+              </h2>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <p className="section-subtitle">
+                {t('services.processSubtitle')}
+              </p>
+            </FadeIn>
+          </div>
 
-      {/* ── SÜREÇ ────────────────────────────────────────────────── */}
-      <Section>
-        <Container>
-          <SectionHeading eyebrow="Süreç" title="Nasıl çalışıyoruz" index="04 ADIM" />
-          <ol className="sv-process">
-            {PROCESS.map(([step, title, text], index) => (
-              <Reveal as="li" key={step} className="sv-process__row" delay={Math.min(index, 4) * 70}>
-                <span className="sv-process__step">{step}</span>
-                <div>
-                  <h3 className="sv-process__title">{title}</h3>
-                  <p className="sv-process__text">{text}</p>
+          <StaggerContainer className="process-grid" staggerDelay={0.15}>
+            {process.map((item, index) => (
+              <StaggerItem key={item.step}>
+                <div className="process-card glass-card">
+                  <div className="process-step">{item.step}</div>
+                  <h3>{item.title}</h3>
+                  <p>{item.desc}</p>
+                  {index < process.length - 1 && (
+                    <div className="process-connector" />
+                  )}
                 </div>
-              </Reveal>
+              </StaggerItem>
             ))}
-          </ol>
-          <Reveal className="sv-more">
-            <LinkArrow to="/paketler">Çalışma modelimiz ve kapsamlar</LinkArrow>
-          </Reveal>
-        </Container>
-      </Section>
-
-      <ContactCTA
-        title="Hangi hizmete ihtiyacınız var?"
-        text="Kısa bir brief paylaşın; kapsamı ve süreci netleştirip yazılı teklif hazırlayalım."
-      />
+          </StaggerContainer>
+        </div>
+      </section>
     </PageTransition>
   )
 }

@@ -44,15 +44,15 @@
       "destination": "https://kadeai.vercel.app/kadeai/:path*"
     },
     {
+      "source": "/",
+      "destination": "/site.html"
+    },
+    {
       "source": "/blog/:slug",
       "destination": "/app.html"
     },
     {
       "source": "/partnerler/:id",
-      "destination": "/app.html"
-    },
-    {
-      "source": "/portfolio/:slug",
       "destination": "/app.html"
     },
     {

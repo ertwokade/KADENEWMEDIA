@@ -14,10 +14,6 @@ const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
 const template = await readFile(join(DIST, 'app.html'), 'utf8')
 
 const routes = [
-  // Ana sayfa artık React uygulamasından ön-render ediliyor. Daha önce `/`
-  // adresi başka bir projenin statik snapshot'ına (public/site.html) rewrite
-  // ediliyordu; snapshot emekliye ayrıldı.
-  ['/', 'Kade New Media | İstanbul Sosyal Medya & Dijital Pazarlama Ajansı', 'İstanbul merkezli sosyal medya ve dijital pazarlama ajansı Kade New Media. Instagram, TikTok, YouTube yönetimi, içerik üretimi, reklam ve prodüksiyonla markanızı dijitalde büyütüyoruz.', false],
   ['/hakkimizda', 'Kade Media Hakkında | New Media Ajansı İstanbul', 'Kade Media; Kade New Media, Kademedia ve Kadenewmedia adlarıyla da aranan İstanbul merkezli new media ve dijital pazarlama ajansıdır.', false],
   ['/hizmetler', 'New Media ve Dijital Medya Hizmetleri | Kade Media', 'Kade Media’nın sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetleri.', false],
   ['/new-media-ajansi', 'New Media Ajansı İstanbul | Kade Media', 'İstanbul merkezli Kade Media ile new media stratejisi, sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon ve web tasarımı.', false],
@@ -81,25 +77,6 @@ function bulletList(items) {
 }
 
 function extraContent(route) {
-  // Ana sayfa: Google'ın ilk taramada gördüğü metin. React hidrasyonundan
-  // önce de gerçek başlık hiyerarşisi ve iç bağlantılar bulunmalı.
-  if (route === '/') {
-    return `
-      <h2>Ne yapıyoruz?</h2>
-      ${NMA_SERVICES.map((s) => `<h3><a href="${s.to}">${escapeHtml(s.title)}</a></h3>\n      <p>${escapeHtml(s.description)}</p>`).join('\n      ')}
-      <h2>Nasıl çalışıyoruz?</h2>
-      ${NMA_PROCESS.map(([n, t, d]) => `<h3>${escapeHtml(n)}. ${escapeHtml(t)}</h3>\n      <p>${escapeHtml(d)}</p>`).join('\n      ')}
-      <h2>Kade New Media hakkında</h2>
-      <p>Kade New Media; İstanbul merkezli new media ve dijital pazarlama ajansıdır. Strateji, içerik üretimi, dijital reklam ve video prodüksiyonu tek ekiple yürütür, sonuçları şeffaf raporlarla paylaşır.</p>
-      <ul>
-        <li><a href="/hakkimizda">Hakkımızda</a></li>
-        <li><a href="/hizmetler">Hizmetler</a></li>
-        <li><a href="/paketler">Hizmet kapsamları</a></li>
-        <li><a href="/portfolio">Portfolyo</a></li>
-        <li><a href="/iletisim">İletişim</a></li>
-      </ul>`
-  }
-
   if (route === '/sss') return faqSection(FAQ_ITEMS)
 
   // Hizmet detayları ticari olarak en önemli sayfalar; ön-render çıktısında
@@ -176,9 +153,6 @@ function staticFallback(route, title, description) {
 
 function structuredData(route, title, description, noindex) {
   if (noindex) return ''
-  // Ana sayfanın WebSite/Organization düğümleri index.html'de tanımlı;
-  // kendisine breadcrumb üretmek yinelenen ve anlamsız bir düğüm olur.
-  if (route === '/') return ''
 
   const pageName = title.split(' | ')[0]
   const isServiceDetail = route.startsWith('/hizmetler/')
@@ -273,8 +247,7 @@ function render(route, title, description, noindex) {
 }
 
 for (const [route, title, description, noindex] of routes) {
-  // `/` → dist/index.html, diğerleri → dist/<rota>/index.html
-  const directory = route === '/' ? DIST : join(DIST, route.slice(1))
+  const directory = join(DIST, route.slice(1))
   await mkdir(directory, { recursive: true })
   await writeFile(join(directory, 'index.html'), render(route, title, description, noindex))
 }

@@ -17,12 +17,9 @@ const PUBLIC_ROUTES = [
   { slug: 'home', route: '/' },
   { slug: 'hakkimizda', route: '/hakkimizda' },
   { slug: 'hizmetler', route: '/hizmetler' },
-  { slug: 'hizmet-detay', route: '/hizmetler/icerik-uretimi' },
-  { slug: 'portfolio', route: '/portfolio' },
   { slug: 'paketler', route: '/paketler' },
   { slug: 'sss', route: '/sss' },
   { slug: 'iletisim', route: '/iletisim' },
-  { slug: 'teklif-al', route: '/teklif-al' },
   { slug: 'kariyer', route: '/kariyer' },
 ]
 

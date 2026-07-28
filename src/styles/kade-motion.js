@@ -1,12 +1,5 @@
 /* =====================================================================
-   KADE MOTION — OTOMATİK hareket katmanı (2026-07-16)
-
-   NOT: Bu dosya, henüz ortak bileşen sistemine geçmemiş sayfalar için
-   seçici tabanlı otomatik reveal uygular ve `.kade-automotion` sınıfını
-   kullanır. Yeni sayfalar `components/system/Reveal.jsx` bileşenini
-   kullanmalıdır (açık, test edilebilir, route değişiminde temizlenir).
-   İki sistem aynı sınıf adını paylaştığında içerik kalıcı olarak
-   opacity:0'da kalıyordu; adlar bu yüzden ayrıldı.
+   KADE MOTION — anasayfa editoryal diline hafif hareket (2026-07-16)
    · scroll-reveal: kart/grid öğeleri görünüme girince kademeli belirir
    · kart spotlight: imleç takipli yumuşak gold ışık + hover kalkma
    Global çalışır; JS yoksa/reduced-motion'da hiçbir şey gizlenmez.
@@ -46,7 +39,7 @@
     document.querySelectorAll(REVEAL).forEach((el) => {
       if (el.dataset.kmr || excluded(el)) return;
       el.dataset.kmr = '1';
-      el.classList.add('kade-automotion');
+      el.classList.add('kade-reveal');
       const sibs = el.parentElement
         ? Array.from(el.parentElement.children).filter((c) => c === el || !c.dataset.kmr)
         : [el];

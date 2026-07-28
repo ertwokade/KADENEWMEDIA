@@ -17,23 +17,6 @@ export const SERVICE_DETAILS = {
     problemEn: 'Irregular posting and an inconsistent brand voice reduce visibility and trust. We fix this with a planned, consistent publishing flow.',
     deliverablesTr: ['Aylık içerik takvimi', 'Yayın ve topluluk yönetimi', 'Aylık performans raporu'],
     deliverablesEn: ['Monthly content calendar', 'Publishing and community management', 'Monthly performance report'],
-    audienceTr: [
-      'Düzenli paylaşım yapmaya vakti olmayan işletmeler',
-      'Marka sesi henüz oturmamış yeni markalar',
-      'Birden fazla platformu tek elden yönetmek isteyen ekipler',
-    ],
-    processTr: [
-      { title: 'Hesap ve rakip incelemesi', text: 'Mevcut hesapların durumu, rakiplerin yayın ritmi ve kitle beklentisi çıkarılır.' },
-      { title: 'İçerik ekseni ve takvim', text: 'Aylık temalar, format dağılımı ve yayın günleri yazılı takvime dönüşür.' },
-      { title: 'Üretim ve yayın', text: 'Görsel ve metinler üretilir, onay akışından geçer, planlanan saatlerde yayınlanır.' },
-      { title: 'Topluluk yönetimi', text: 'Yorum ve mesajlar marka diline uygun biçimde yanıtlanır.' },
-      { title: 'Raporlama', text: 'Erişim, etkileşim ve takipçi hareketi aylık raporda karşılaştırmalı sunulur.' },
-    ],
-    faqTr: [
-      { soru: 'Kaç platform yönetiyorsunuz?', cevap: 'Kapsam projeye göre belirlenir. Genelde iki ile dört platform üzerinde yoğunlaşmak, hepsine yayılmaktan daha iyi sonuç verir.' },
-      { soru: 'İçerikleri kim onaylıyor?', cevap: 'Yayın öncesi aylık takvim paylaşılır; onayınız alınmadan paylaşım yapılmaz.' },
-      { soru: 'Reklam bütçesi dahil mi?', cevap: 'Hayır. Reklam yönetimi ayrı bir hizmettir ve reklam harcaması platformlara doğrudan ödenir.' },
-    ],
   },
   'icerik-uretimi': {
     titleTr: 'İçerik Üretimi',
@@ -46,23 +29,6 @@ export const SERVICE_DETAILS = {
     problemEn: 'Most brands struggle to decide what to post. We fill that gap by building an on-brand, scalable content pipeline.',
     deliverablesTr: ['İçerik konsepti ve şablonlar', 'Görsel, video ve metin üretimi', 'Marka kimliği tutarlılığı'],
     deliverablesEn: ['Content concept and templates', 'Visual, video and copy production', 'Brand identity consistency'],
-    audienceTr: [
-      'Ne paylaşacağını bulmakta zorlanan markalar',
-      'Görsel dili dağınık görünen hesaplar',
-      'Düzenli video/görsel üretimi gereken ekipler',
-    ],
-    processTr: [
-      { title: 'Marka dili çıkarımı', text: 'Mevcut görseller, ton ve hedef kitle incelenerek içerik yönü belirlenir.' },
-      { title: 'Konsept ve şablon', text: 'Tekrar kullanılabilir şablonlar ve içerik formatları hazırlanır.' },
-      { title: 'Üretim', text: 'Görsel, kısa video ve metinler üretim takvimine göre hazırlanır.' },
-      { title: 'Revizyon', text: 'Geri bildirimler tek turda toplanır ve uygulanır.' },
-      { title: 'Teslim', text: 'İçerikler yayına hazır formatlarda ve kaynak dosyalarıyla teslim edilir.' },
-    ],
-    faqTr: [
-      { soru: 'Çekim dahil mi?', cevap: 'Fotoğraf ve kısa video çekimi kapsama eklenebilir; lokasyon ve süre projeye göre planlanır.' },
-      { soru: 'Kaç revizyon hakkım var?', cevap: 'Her içerik seti için bir revizyon turu standarttır; kapsam genişletilebilir.' },
-      { soru: 'Kaynak dosyaları alabilir miyim?', cevap: 'Evet, teslim paketinde düzenlenebilir kaynak dosyalar yer alır.' },
-    ],
   },
   'reklam-yonetimi': {
     titleTr: 'Reklam Yönetimi',
@@ -75,23 +41,6 @@ export const SERVICE_DETAILS = {
     problemEn: 'Poor targeting and unmeasured campaigns burn budget. We target with data, test, and spend efficiently.',
     deliverablesTr: ['Kampanya kurulumu ve hedefleme', 'A/B testleri ve optimizasyon', 'Şeffaf performans raporu'],
     deliverablesEn: ['Campaign setup and targeting', 'A/B tests and optimization', 'Transparent performance report'],
-    audienceTr: [
-      'Reklam veriyor ama sonucu ölçemeyen işletmeler',
-      'Yeni ürün veya kampanya duyuracak markalar',
-      'Bütçesini verimli kullanmak isteyen ekipler',
-    ],
-    processTr: [
-      { title: 'Hesap ve piksel kontrolü', text: 'Reklam hesapları, dönüşüm takibi ve veri akışı doğrulanır.' },
-      { title: 'Hedefleme planı', text: 'Kitle segmentleri, mesaj ve kreatif varyantları planlanır.' },
-      { title: 'Kampanya kurulumu', text: 'Kampanya yapısı, bütçe dağılımı ve test kurgusu hazırlanır.' },
-      { title: 'Test ve optimizasyon', text: 'Kreatif ve hedefleme varyantları karşılaştırılır, bütçe kazanan tarafa kaydırılır.' },
-      { title: 'Raporlama', text: 'Harcama, sonuç ve maliyet metrikleri şeffaf biçimde paylaşılır.' },
-    ],
-    faqTr: [
-      { soru: 'Minimum reklam bütçesi var mı?', cevap: 'Platform ve hedefe göre değişir; anlamlı test yapılabilecek bir alt sınır birlikte belirlenir.' },
-      { soru: 'Reklam harcaması faturaya dahil mi?', cevap: 'Hayır. Reklam harcaması platformlara doğrudan ödenir, yönetim hizmeti ayrı faturalanır.' },
-      { soru: 'Sonuçları nasıl görürüm?', cevap: 'Kampanya panosuna erişiminiz olur ve dönemsel rapor paylaşılır.' },
-    ],
   },
   'video-produksiyon': {
     titleTr: 'Video Prodüksiyon',
@@ -104,23 +53,6 @@ export const SERVICE_DETAILS = {
     problemEn: 'Attention spans are short; generic video does not work. We produce platform-native video designed for performance.',
     deliverablesTr: ['Senaryo ve çekim planı', 'Çekim, kurgu ve motion', 'Platforma özel formatlar'],
     deliverablesEn: ['Script and shoot plan', 'Filming, editing and motion', 'Platform-specific formats'],
-    audienceTr: [
-      'Reels/TikTok için düzenli video gereken markalar',
-      'Tanıtım veya reklam filmi hazırlatacak işletmeler',
-      'Ürün ve mekân çekimi ihtiyacı olanlar',
-    ],
-    processTr: [
-      { title: 'Brief ve senaryo', text: 'Anlatılacak mesaj, format ve süre netleştirilir; senaryo yazılır.' },
-      { title: 'Ön hazırlık', text: 'Lokasyon, ekipman, oyuncu ve çekim planı hazırlanır.' },
-      { title: 'Çekim', text: 'Planlanan setlerde görüntü ve ses kaydı alınır.' },
-      { title: 'Kurgu', text: 'Kaba kurgu onayından sonra renk, ses ve motion grafik uygulanır.' },
-      { title: 'Teslim', text: 'Platform bazlı en-boy oranları ve altyazılı sürümlerle teslim edilir.' },
-    ],
-    faqTr: [
-      { soru: 'Çekim kaç gün sürer?', cevap: 'Kapsam ve lokasyon sayısına bağlıdır; brief sonrası net gün sayısı paylaşılır.' },
-      { soru: 'Dikey ve yatay sürüm alabilir miyim?', cevap: 'Evet, teslim paketi platforma göre farklı en-boy oranlarını içerir.' },
-      { soru: 'Müzik lisansı dahil mi?', cevap: 'Kullanılan müzikler lisanslı kütüphanelerden seçilir; kapsam teklifte belirtilir.' },
-    ],
   },
   'strateji-danismanlik': {
     titleTr: 'Strateji & Danışmanlık',
@@ -133,23 +65,6 @@ export const SERVICE_DETAILS = {
     problemEn: 'Without clear goals and a roadmap, channels work in silos. We create a measurable plan that sets the direction.',
     deliverablesTr: ['Marka ve rakip analizi', 'Kanal planı ve KPI seti', 'Dijital yol haritası'],
     deliverablesEn: ['Brand and competitor analysis', 'Channel plan and KPI set', 'Digital roadmap'],
-    audienceTr: [
-      'Dijitalde nereden başlayacağını bilemeyen markalar',
-      'İç ekibini yönlendirecek bir yol haritası arayanlar',
-      'Mevcut çalışmasını gözden geçirmek isteyenler',
-    ],
-    processTr: [
-      { title: 'Mevcut durum analizi', text: 'Kanallar, içerik, reklam ve rakip konumlanması incelenir.' },
-      { title: 'Hedef ve KPI', text: 'İş hedefleriyle uyumlu, ölçülebilir göstergeler tanımlanır.' },
-      { title: 'Yol haritası', text: 'Kanal önceliği, içerik ekseni ve takvim yazılı plana dönüşür.' },
-      { title: 'Uygulama desteği', text: 'İç ekip için süreç, şablon ve kontrol listeleri hazırlanır.' },
-      { title: 'Gözden geçirme', text: 'Belirlenen dönemlerde plan verilerle karşılaştırılır ve güncellenir.' },
-    ],
-    faqTr: [
-      { soru: 'Danışmanlık ne kadar sürer?', cevap: 'Kapsama göre değişir; genelde bir başlangıç analizi ve ardından dönemsel gözden geçirme şeklinde ilerler.' },
-      { soru: 'Uygulamayı da siz mi yapıyorsunuz?', cevap: 'Talebe göre yalnız yol haritası veya uygulama dahil çalışabiliriz.' },
-      { soru: 'Ekibimize eğitim veriyor musunuz?', cevap: 'Evet, süreç ve şablonların iç ekibe aktarımı kapsama eklenebilir.' },
-    ],
   },
   'web-sitesi-tasarimi': {
     titleTr: 'Web Sitesi Tasarımı',
@@ -162,23 +77,6 @@ export const SERVICE_DETAILS = {
     problemEn: 'Slow, non-mobile or low-converting sites lose customers. We design fast, mobile-first and conversion-focused.',
     deliverablesTr: ['UI/UX tasarım', 'Mobil-öncelikli geliştirme', 'SEO ve hız optimizasyonu'],
     deliverablesEn: ['UI/UX design', 'Mobile-first development', 'SEO and speed optimization'],
-    audienceTr: [
-      'Sitesi mobilde iyi çalışmayan işletmeler',
-      'Yeni marka veya ürün için site kuracaklar',
-      'İçeriğini kendi güncellemek isteyen ekipler',
-    ],
-    processTr: [
-      { title: 'Kapsam ve içerik haritası', text: 'Sayfa yapısı, içerik ihtiyacı ve dönüşüm hedefleri belirlenir.' },
-      { title: 'Tasarım', text: 'Marka diline uygun arayüz, masaüstü ve mobil için tasarlanır.' },
-      { title: 'Geliştirme', text: 'Hız, erişilebilirlik ve arama motoru uyumu gözetilerek kodlanır.' },
-      { title: 'İçerik girişi', text: 'Metin ve görseller yerleştirilir, yönetim paneli devreye alınır.' },
-      { title: 'Yayın ve devir', text: 'Alan adı, analitik ve form entegrasyonları kurulur; kullanım aktarımı yapılır.' },
-    ],
-    faqTr: [
-      { soru: 'İçeriği kendim güncelleyebilir miyim?', cevap: 'Evet, yönetim paneli üzerinden metin ve görselleri kod bilgisi olmadan güncelleyebilirsiniz.' },
-      { soru: 'E-ticaret kurulumu yapıyor musunuz?', cevap: 'Evet, ürün, sepet ve ödeme entegrasyonları kapsama eklenebilir.' },
-      { soru: 'Site hızını nasıl sağlıyorsunuz?', cevap: 'Görsel optimizasyonu, minimum betik ve ölçülebilir performans hedefleriyle çalışırız.' },
-    ],
   },
 }
 
