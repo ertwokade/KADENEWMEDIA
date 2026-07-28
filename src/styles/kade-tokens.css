@@ -14,10 +14,26 @@
 
 /* ---------------------------------------------------------------------------
    1) POPPINS — self-host, latin + latin-ext (Türkçe ı İ ğ Ğ ş Ş için gerekli)
-   Yalnızca kullanılan 4 ağırlık yüklenir: 400 / 500 / 600 / 700.
-   Toplam ~53 KB (8 dosya). Google Fonts'a runtime bağımlılık yoktur, bu yüzden
+   Yalnızca kullanılan 5 ağırlık yüklenir: 300 / 400 / 500 / 600 / 700.
+   Toplam ~66 KB (10 dosya). Google Fonts'a runtime bağımlılık yoktur, bu yüzden
    CSP'nin font-src/style-src kuralları için harici izin gerekmez.
 --------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-300-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/poppins/poppins-300-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
@@ -161,6 +177,7 @@
   --fs-4xl: clamp(2.25rem, 1.5rem + 3.4vw, 3.75rem);
   --fs-5xl: clamp(2.75rem, 1.6rem + 5.2vw, 5rem);
 
+  --fw-light: 300;
   --fw-regular: 400;
   --fw-medium: 500;
   --fw-semibold: 600;
@@ -214,10 +231,44 @@
   --shadow-xl: 0 24px 60px rgba(23, 19, 10, 0.14);
   --shadow-focus: 0 0 0 3px rgba(224, 168, 31, 0.35);
 
+  /* Hareket dili — süreler amaca göre gruplanır, bileşenler bu tokenları
+     kullanır ki tüm sitede zamanlama tutarlı olsun.
+       micro : hover, focus, buton geri bildirimi
+       ui    : kart, menü, açılır panel
+       page  : sayfa girişi ve bölüm reveal'ı
+     İçerik hiçbir zaman animasyon yüzünden uzun süre görünmez kalmamalı;
+     en uzun süre --dur-page'dir. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-fast: 0.15s;
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-emphasis: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --dur-micro: 0.18s;
+  --dur-ui: 0.36s;
+  --dur-page: 0.7s;
+
+  /* geriye dönük adlar */
+  --dur-fast: var(--dur-micro);
   --dur-normal: 0.25s;
-  --dur-slow: 0.4s;
+  --dur-slow: var(--dur-ui);
+
+  /* reveal kademesi — stagger adımı ve üst sınırı */
+  --stagger-step: 70ms;
+  --stagger-max: 6;
+
+  /* -------------------------------------------------------------------------
+     Z-INDEX KATMANLARI — tek listede tutulur; yeni katman eklerken buraya
+     yazın ki stacking context çakışmaları tahmin edilebilir kalsın.
+  ------------------------------------------------------------------------- */
+  --z-base: 0;
+  --z-decor: 1;      /* grid overlay, grain, dekoratif zeminler */
+  --z-content: 2;
+  --z-sticky: 30;    /* yapışkan bölüm başlıkları */
+  --z-header: 40;
+  --z-overlay: 50;   /* mobil menü arka planı */
+  --z-modal: 60;
+  --z-toast: 70;
+  --z-cursor: 90;
+  --z-skiplink: 100;
 
   /* dokunma hedefi alt sınırı (WCAG 2.1 AA — 24px, hedefimiz 44px) */
   --tap-min: 44px;
