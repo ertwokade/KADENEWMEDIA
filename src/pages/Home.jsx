@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useSEO } from '../hooks/useSEO'
-import { useSiteContent } from '../hooks/useSiteContent'
 import { getPortfolioApi } from '../api'
 import { SERVICES } from '../data/newMediaAgency'
-import { BRAND } from '../config/brand'
 import { normalizeProjects } from '../data/projects'
 import {
   Container,
@@ -69,7 +66,6 @@ function useClock() {
 export default function Home() {
   const clock = useClock()
   const [projects, setProjects] = useState(null) // null = yükleniyor
-  const { content: footerContent } = useSiteContent('footer', BRAND)
 
   useSEO({
     title: 'Kade New Media | İstanbul Sosyal Medya & Dijital Pazarlama Ajansı',
@@ -90,8 +86,6 @@ export default function Home() {
       .catch(() => { if (!cancelled) setProjects([]) })
     return () => { cancelled = true }
   }, [])
-
-  const email = footerContent.email || BRAND.email
 
   return (
     <div className="home">
@@ -236,14 +230,6 @@ export default function Home() {
         secondary={{ to: '/iletisim', label: 'İletişime geç' }}
       />
 
-      <Section tight className="home-contactline">
-        <Container>
-          <div className="home-contactline__row">
-            <a className="kade-link" href={`mailto:${email}`}>{email}</a>
-            <Link className="kade-link" to="/iletisim">İletişim formu</Link>
-          </div>
-        </Container>
-      </Section>
     </div>
   )
 }

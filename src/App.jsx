@@ -171,10 +171,13 @@ function getCanvasTheme(pathname) {
 function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
-  const isHome = location.pathname === '/'
+  // NOT: `/` daha önce statik snapshot'a rewrite ediliyordu ve snapshot kendi
+  // header'ını taşıdığı için ana sayfada React kabuğu gizleniyordu. Ana sayfa
+  // React'e taşındıktan sonra bu kural navigasyonun tamamen kaybolmasına yol
+  // açtı; artık ana sayfa da ortak Navbar/Footer kullanır.
   const isLoginArea = location.pathname.startsWith('/giris')
   const isLinkProfile = location.pathname.startsWith('/@') || location.pathname === '/kadirdemir'
-  const hideShell = isAdmin || isHome || isLoginArea || isLinkProfile
+  const hideShell = isAdmin || isLoginArea || isLinkProfile
   const isAppUI = isAdmin
     || isLinkProfile
     || location.pathname.startsWith('/organizasyon-kiti')
