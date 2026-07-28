@@ -90,15 +90,15 @@ export default function Home() {
   return (
     <div className="home">
       {/* ── HERO ───────────────────────────────────────────────────── */}
-      <header className="home-hero">
-        <div className="home-hero__grid" aria-hidden="true" />
-        <Container className="home-hero__inner">
-          <div className="home-hero__top">
+      <header className="home-intro">
+        <div className="home-intro__grid" aria-hidden="true" />
+        <Container className="home-intro__inner">
+          <div className="home-intro__top">
             <Reveal>
-              <p className="home-hero__kicker">Sosyal medya &amp; pazarlama</p>
+              <p className="home-intro__kicker">Sosyal medya &amp; pazarlama</p>
             </Reveal>
             <Reveal delay={80}>
-              <p className="home-hero__intro">
+              <p className="home-intro__intro">
                 Kade New Media; strateji, içerik, reklam ve prodüksiyonu tek çatı
                 altında birleştirerek markanızı dijitalde büyütür.
               </p>
@@ -106,7 +106,7 @@ export default function Home() {
           </div>
 
           <Reveal delay={140} variant="clip">
-            <h1 className="home-hero__title">
+            <h1 className="home-intro__title">
               <span>BİZ</span>
               <span>MARKANI</span>
               <span>BÜYÜTÜYORUZ</span>
@@ -114,14 +114,14 @@ export default function Home() {
           </Reveal>
 
           <Reveal delay={220}>
-            <div className="home-hero__actions">
+            <div className="home-intro__actions">
               <Button to="/teklif-al" variant="primary">Teklif al</Button>
               <Button to="/hizmetler" variant="outline">Hizmetleri gör</Button>
             </div>
           </Reveal>
         </Container>
 
-        <p className="home-hero__status" aria-hidden="true">
+        <p className="home-intro__status" aria-hidden="true">
           <span>İSTANBUL</span>
           <span>41.01° N · 28.98° E</span>
           <span>{clock}</span>

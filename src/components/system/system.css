@@ -144,20 +144,20 @@
 /* ---------------------------------------------------------------------------
    4) SAYFA HERO — bütün iç sayfaların ortak girişi
 --------------------------------------------------------------------------- */
-.kade-page-hero {
+.kade-pagetop {
   position: relative;
   padding-block: clamp(96px, 14vw, 168px) var(--section-y);
   border-bottom: 1px solid var(--kade-line);
   overflow: hidden;
 }
 
-.kade-page-hero__inner {
+.kade-pagetop__inner {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
 }
 
-.kade-page-hero__title {
+.kade-pagetop__title {
   font-size: var(--fs-5xl);
   font-weight: var(--fw-bold);
   line-height: var(--lh-tight);
@@ -167,7 +167,7 @@
   text-wrap: balance;
 }
 
-.kade-page-hero__meta {
+.kade-pagetop__meta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3) var(--space-6);
@@ -177,12 +177,12 @@
   text-transform: uppercase;
   color: var(--kade-ink-3);
 }
-.kade-page-hero__meta dt { font-weight: var(--fw-semibold); }
-.kade-page-hero__meta dd { margin: 0; color: var(--kade-ink-2); }
-.kade-page-hero__meta > div { display: flex; gap: var(--space-2); }
+.kade-pagetop__meta dt { font-weight: var(--fw-semibold); }
+.kade-pagetop__meta dd { margin: 0; color: var(--kade-ink-2); }
+.kade-pagetop__meta > div { display: flex; gap: var(--space-2); }
 
 /* Dekoratif dikey çizgi ızgarası — ana sayfayla ortak zemin dili. */
-.kade-page-hero__grid {
+.kade-pagetop__grid {
   position: absolute;
   inset: 0;
   z-index: var(--z-decor);
@@ -191,7 +191,7 @@
   background-size: 33.333% 100%;
   opacity: 0.45;
 }
-.kade-page-hero > .kade-container { position: relative; z-index: var(--z-content); }
+.kade-pagetop > .kade-container { position: relative; z-index: var(--z-content); }
 
 /* ---------------------------------------------------------------------------
    5) BUTON ve BAĞLANTI
@@ -505,6 +505,23 @@
   .kade-service-grid { grid-template-columns: minmax(0, 1fr); }
   .kade-card--featured .kade-card__media { aspect-ratio: 4 / 3; }
   .kade-section-head { align-items: flex-start; flex-direction: column; }
-  .kade-page-hero__grid { background-size: 50% 100%; }
+  .kade-pagetop__grid { background-size: 50% 100%; }
   .kade-cta__actions .kade-btn { width: 100%; }
+}
+
+/* ---------------------------------------------------------------------------
+   11) LOGO
+   Marka dosyaları yüklenene kadar metin wordmark gösterilir (bkz.
+   components/system/Logo.jsx). Dosyalar eklenince <img>'e geçer.
+--------------------------------------------------------------------------- */
+.kade-logo--text {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  line-height: 1;
+  color: currentColor;
+  white-space: nowrap;
 }

@@ -74,18 +74,18 @@ export function SectionHeading({ eyebrow, title, index, as = 'h2', description, 
  */
 export function PageHero({ eyebrow, title, lead, meta = [], actions, children, className = '' }) {
   return (
-    <header className={`kade-page-hero${className ? ` ${className}` : ''}`}>
-      <div className="kade-page-hero__grid" aria-hidden="true" />
+    <header className={`kade-pagetop${className ? ` ${className}` : ''}`}>
+      <div className="kade-pagetop__grid" aria-hidden="true" />
       <Container>
-        <div className="kade-page-hero__inner">
+        <div className="kade-pagetop__inner">
           {eyebrow && <Reveal><Eyebrow>{eyebrow}</Eyebrow></Reveal>}
           <Reveal delay={60} variant="clip">
-            <h1 className="kade-page-hero__title">{title}</h1>
+            <h1 className="kade-pagetop__title">{title}</h1>
           </Reveal>
           {lead && <Reveal delay={120}><p className="kade-lead">{lead}</p></Reveal>}
           {meta.length > 0 && (
             <Reveal delay={180}>
-              <dl className="kade-page-hero__meta">
+              <dl className="kade-pagetop__meta">
                 {meta.map(([label, value]) => (
                   <div key={label}>
                     <dt>{label}</dt>

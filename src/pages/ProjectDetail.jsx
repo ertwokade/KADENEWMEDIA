@@ -97,8 +97,8 @@ export default function ProjectDetail() {
       />
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <header className="pd-hero">
-        <div className="kade-page-hero__grid" aria-hidden="true" />
+      <header className="pd-top">
+        <div className="kade-pagetop__grid" aria-hidden="true" />
         <Container>
           <Reveal>
             <Link className="pd-back kade-link" to="/portfolio">

@@ -12,12 +12,12 @@
 /* ---------------------------------------------------------------------------
    HERO
 --------------------------------------------------------------------------- */
-.pd-hero {
+.pd-top {
   position: relative;
   padding-block: clamp(96px, 14vw, 160px) var(--space-12);
   overflow: hidden;
 }
-.pd-hero > .kade-container { position: relative; z-index: var(--z-content); }
+.pd-top > .kade-container { position: relative; z-index: var(--z-content); }
 
 .pd-back {
   display: inline-flex;

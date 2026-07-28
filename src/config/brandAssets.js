@@ -28,3 +28,11 @@ export const LOGO_SOURCES = hasBrandAssets
       symbol: '/logo-icon.svg',
       favicon: '/favicon.png',
     }
+
+/**
+ * Ana logonun en-boy oranı (genişlik / yükseklik).
+ * Mevcut /logo.svg 514×180 → 2.856. Kendi logonuzu ekledikten sonra bu
+ * değeri de güncelleyin; `<img>` etiketine doğru height verilerek görsel
+ * inmeden yer ayrılır ve layout shift oluşmaz.
+ */
+export const LOGO_RATIO = 514 / 180

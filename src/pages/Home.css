@@ -18,7 +18,7 @@
 /* ---------------------------------------------------------------------------
    HERO — tam ekran editoryal giriş
 --------------------------------------------------------------------------- */
-.home-hero {
+.home-intro {
   position: relative;
   min-height: 100svh;
   display: flex;
@@ -28,7 +28,7 @@
   overflow: hidden;
 }
 
-.home-hero__grid {
+.home-intro__grid {
   position: absolute;
   inset: 0;
   z-index: var(--z-decor);
@@ -38,7 +38,7 @@
   opacity: 0.5;
 }
 
-.home-hero__inner {
+.home-intro__inner {
   position: relative;
   z-index: var(--z-content);
   display: flex;
@@ -46,14 +46,14 @@
   gap: clamp(28px, 5vh, 56px);
 }
 
-.home-hero__top {
+.home-intro__top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
   gap: var(--space-6) var(--space-10);
   align-items: start;
 }
 
-.home-hero__kicker {
+.home-intro__kicker {
   margin: 0;
   font-size: clamp(1.25rem, 2.4vw, 1.9rem);
   font-weight: var(--fw-medium);
@@ -61,7 +61,7 @@
   letter-spacing: var(--tracking-tight);
 }
 
-.home-hero__intro {
+.home-intro__intro {
   margin: 0;
   justify-self: end;
   max-width: 42ch;
@@ -71,7 +71,7 @@
 }
 
 /* Başlık: her satır ayrı span → clip-path reveal satır satır çalışır. */
-.home-hero__title {
+.home-intro__title {
   display: flex;
   flex-direction: column;
   margin: 0;
@@ -82,21 +82,24 @@
   text-transform: uppercase;
 }
 
-.home-hero__actions {
+.home-intro__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
 }
 
 /* Durum şeridi — İSTANBUL · koordinat · saat */
-.home-hero__status {
+.home-intro__status {
   position: absolute;
   left: 0;
   right: 0;
   bottom: var(--space-6);
   z-index: var(--z-content);
   margin: 0;
+  /* Sağdan ek boşluk: sağ alttaki sabit GİRİŞ hapı saat göstergesini
+     kapatıyordu. */
   padding-inline: var(--container-pad);
+  padding-right: clamp(150px, 14vw, 200px);
   display: flex;
   justify-content: space-between;
   gap: var(--space-4);
@@ -221,25 +224,25 @@
 }
 
 @media (max-width: 768px) {
-  .home-hero {
+  .home-intro {
     min-height: auto;
     padding-block: clamp(104px, 20vh, 150px) var(--space-16);
   }
-  .home-hero__top { grid-template-columns: minmax(0, 1fr); }
-  .home-hero__intro { justify-self: start; }
-  .home-hero__grid { background-size: 50% 100%; }
-  .home-hero__status {
+  .home-intro__top { grid-template-columns: minmax(0, 1fr); }
+  .home-intro__intro { justify-self: start; }
+  .home-intro__grid { background-size: 50% 100%; }
+  .home-intro__status {
     position: static;
     margin-top: var(--space-8);
     padding-inline: 0;
     flex-wrap: wrap;
   }
-  .home-hero__actions .kade-btn { flex: 1 1 auto; }
+  .home-intro__actions .kade-btn { flex: 1 1 auto; }
   .home-more { justify-content: flex-start; }
 }
 
 @media (max-width: 430px) {
   .home-process__row { grid-template-columns: minmax(0, 1fr); }
   .home-process__text { grid-column: 1; }
-  .home-hero__status { gap: var(--space-2); }
+  .home-intro__status { gap: var(--space-2); }
 }
