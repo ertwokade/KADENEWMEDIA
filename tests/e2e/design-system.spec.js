@@ -152,3 +152,97 @@ test('tek h1 ve doğru başlık hiyerarşisi', async ({ page }) => {
     expect(h1Count, `${route}: h1 sayısı`).toBe(1)
   }
 })
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Reveal görünürlüğü — "var" değil, "görünüyor"
+//
+// Bu test, ekranda olan ama GÖRÜNMEYEN içeriği yakalamak için var. Daha önce
+// ana sayfadaki <h1> mobilde hiç açılmıyordu: element DOM'daydı, opacity'si
+// 1'di, doğru konumdaydı — ama `Reveal` sarmalayıcısı `opacity: 0` /
+// `clip-path: inset(0 0 100%)` durumunda kalıyordu. h1 sayısı, font ve taşma
+// ölçen testlerin hepsi geçiyordu; kullanıcı boş bir başlık alanı görüyordu.
+//
+// Kök neden: `clip-path: inset(0 0 100%)` kesişim dikdörtgenini 0 px'e
+// indiriyor, bu yüzden intersectionRatio hep 0 kalıyor ve pozitif bir
+// IntersectionObserver threshold'u asla tetiklenmiyordu.
+//
+// Bu yüzden burada KAYDIRMA YAPILMAZ: kaydırmak observer'ı geç de olsa
+// tetikleyip hatayı maskeliyor. İlk boyadaki durum ölçülür.
+for (const vp of [
+  { id: '1440x900', width: 1440, height: 900 },
+  { id: '1024x768', width: 1024, height: 768 },
+  { id: '390x844', width: 390, height: 844 },
+]) {
+  test(`ana başlık ilk boyada görünür (${vp.id})`, async ({ page }) => {
+    await page.setViewportSize({ width: vp.width, height: vp.height })
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
+
+    // Reveal geçişi 0,7 sn sürüyor. Bu yüzden iki ayrı ölçüm yapılır:
+    //   500 ms'de  → açılma BAŞLAMIŞ olmalı (kilitlenme yok)
+    //  1600 ms'de  → tamamen görünür olmalı (yarıda kalma yok)
+    // Tek bir "500 ms'de opacity 1" ölçümü, geçişin kendisini hata sanardı.
+    const measure = () => page.evaluate(() => {
+      // Bir öğenin gerçekten boyanıp boyanmadığını atalarıyla birlikte ölçer:
+      // öğenin kendi stili doğru olsa bile bir ata onu görünmez yapabilir.
+      const chain = (el) => {
+        const layers = []
+        for (let node = el; node && node !== document.body; node = node.parentElement) {
+          const st = getComputedStyle(node)
+          const clipPct = st.clipPath && st.clipPath !== 'none'
+            ? Math.max(0, ...[...st.clipPath.matchAll(/([\d.]+)%/g)].map((m) => parseFloat(m[1])))
+            : 0
+          layers.push({
+            by: String(node.className || node.tagName).trim(),
+            opacity: parseFloat(st.opacity),
+            hiddenVisibility: st.visibility === 'hidden',
+            clipPct,
+          })
+        }
+        return layers
+      }
+      // Zincirdeki en kötü değerleri döndür — asıl görünürlük budur.
+      const worst = (el) => {
+        const layers = chain(el)
+        return {
+          opacity: Math.min(...layers.map((l) => l.opacity)),
+          clipPct: Math.max(...layers.map((l) => l.clipPct)),
+          hiddenVisibility: layers.some((l) => l.hiddenVisibility),
+          blame: layers.find((l) => l.opacity < 0.99 || l.clipPct > 1 || l.hiddenVisibility)?.by ?? null,
+        }
+      }
+
+      const h1 = document.querySelector('h1')
+      if (!h1) return { error: 'h1 yok' }
+      const rect = h1.getBoundingClientRect()
+      const cta = document.querySelector('.home-lede__actions a')
+      if (!cta) return { error: 'CTA yok' }
+
+      return {
+        text: h1.textContent.trim(),
+        height: Math.round(rect.height),
+        inViewport: rect.top < window.innerHeight && rect.bottom > 0,
+        h1: worst(h1),
+        cta: worst(cta),
+      }
+    })
+
+    await page.waitForTimeout(500)
+    const early = await measure()
+
+    expect(early.error, JSON.stringify(early)).toBeUndefined()
+    expect(early.height, `h1 yüksekliği: ${JSON.stringify(early)}`).toBeGreaterThan(20)
+    expect(early.inViewport, `h1 ilk ekranda değil: ${JSON.stringify(early)}`).toBe(true)
+    // Açılma başlamış olmalı. Kilitli reveal burada opacity=0 / clipPct=100 verir.
+    expect(early.h1.opacity, `500 ms: h1 hâlâ tamamen saydam — ${JSON.stringify(early.h1)}`).toBeGreaterThan(0.05)
+    expect(early.h1.clipPct, `500 ms: h1 hâlâ tamamen kırpık — ${JSON.stringify(early.h1)}`).toBeLessThan(95)
+    expect(early.cta.opacity, `500 ms: CTA hâlâ tamamen saydam — ${JSON.stringify(early.cta)}`).toBeGreaterThan(0.05)
+
+    await page.waitForTimeout(1100)
+    const settled = await measure()
+
+    expect(settled.h1.opacity, `1600 ms: h1 tam görünür değil — ${JSON.stringify(settled.h1)}`).toBeGreaterThan(0.99)
+    expect(settled.h1.clipPct, `1600 ms: h1 hâlâ kırpık — ${JSON.stringify(settled.h1)}`).toBeLessThan(1)
+    expect(settled.h1.hiddenVisibility, 'h1 visibility:hidden').toBe(false)
+    expect(settled.cta.opacity, `1600 ms: CTA tam görünür değil — ${JSON.stringify(settled.cta)}`).toBeGreaterThan(0.99)
+  })
+}

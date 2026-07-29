@@ -49,14 +49,26 @@ export default function Reveal({
         }
       },
       // Öğe ekranın alt kenarına yaklaşınca başlasın; kullanıcı boş alan görmesin.
-      { rootMargin: '0px 0px -10% 0px', threshold: 0.05 },
+      //
+      // threshold KESİNLİKLE 0 KALMALI. `clip` varyantı öğeyi
+      // `clip-path: inset(0 0 100%)` ile gizler; bu, kesişim dikdörtgenini
+      // 0 px yüksekliğe indirir ve intersectionRatio hep 0 olur. Sıfırdan
+      // büyük bir eşik (ör. 0.05) o oranı asla yakalayamaz — öğe ekranın tam
+      // ortasında dursa bile `isIntersecting: false` döner ve içerik kalıcı
+      // olarak görünmez kalır. Ölçüldü (390×844, Chromium):
+      //   clip-path'li öğe + threshold 0.05 → isIntersecting=false, ratio=0
+      //   clip-path'li öğe + threshold 0    → isIntersecting=true,  ratio=0
+      // Görünürlük eşiğini `rootMargin` zaten belirliyor; eşiğe gerek yok.
+      { rootMargin: '0px 0px -10% 0px', threshold: 0 },
     )
 
     observer.observe(node)
 
     // Güvenlik ağı: bir nedenle observer tetiklenmezse (ör. lazy medya
-    // yüzünden yanlış ölçüm) içerik gizli kalmasın.
-    const failsafe = setTimeout(() => setVisible(true), 2500)
+    // yüzünden yanlış ölçüm) içerik gizli kalmasın. Süre, "ana başlık ve CTA
+    // en geç ~500 ms'de görünür" kabul kriterine yakın tutulur; observer
+    // normalde ilk karede tetiklendiği için bu yol pratikte kullanılmaz.
+    const failsafe = setTimeout(() => setVisible(true), 900)
 
     return () => {
       observer.disconnect()

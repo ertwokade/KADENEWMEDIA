@@ -94,28 +94,56 @@ test('index.html Google Fonts yerine self-host Poppins preload eder', async () =
   assert.match(html, /rel="preload"[^>]*as="font"[^>]*crossorigin/, 'font preload crossorigin olmalı')
 })
 
-test('ana sayfa React uygulamasından gelir; yabancı snapshot geri dönmemiştir', async () => {
+test('yabancı snapshot ve kökeni belirsiz varlıklar geri dönmemiştir', async () => {
+  // `/` bir dönem başka bir projenin (haoqi.design) klonlanmış derlenmiş
+  // çıktısıyla servis ediliyordu. Kanıt: 3 viewport'ta birebir örtüşen kart
+  // yükseklikleri, kopyalanmış Figma plugin ID'leri ve snapshot kodundaki
+  // "orijinal Haoqi imzası" yorumu. Paket ve ona bağlı varlıklar kaldırıldı;
+  // bu test geri gelmediklerini korur.
+  for (const path of [
+    'public/site.html',
+    'public/_next',
+    'public/model',
+    'public/stickers',
+    'public/sticker_img',
+    'public/img/kade-hello-art.jpg',
+    'src/components/kade',
+    'scripts/apply-poppins-to-site.mjs',
+    'scripts/patch-home-content.mjs',
+    'scripts/sanitize-site-snapshot.mjs',
+  ]) {
+    await assert.rejects(stat(new URL(path, ROOT)), `${path} geri gelmiş`)
+  }
+})
+
+test('ana sayfa React uygulamasından servis edilir', async () => {
   // `/` daha önce başka bir Next.js projesinin minified statik snapshot'ına
   // rewrite ediliyordu. Snapshot ana sayfa ile iç sayfaları iki ayrı tasarım
   // sistemine bölüyor, ortak bileşen paylaşımını imkânsız kılıyor ve
-  // hydration #418 hatası veriyordu. Geri gelmediğini burada koruyoruz.
-  await assert.rejects(stat(new URL('public/site.html', ROOT)), 'site.html snapshot\'ı geri gelmiş')
-  await assert.rejects(stat(new URL('public/_next', ROOT)), 'vendored _next chunk\'ları geri gelmiş')
-
+  // hydration #418 hatası veriyordu.
+  //
+  // Bu test SERVİS yolunu doğrular. Snapshot DOSYALARININ silindiğini
+  // doğrulayan ayrı bir test aşağıdadır; ikisi bilerek ayrı tutulur çünkü
+  // "artık kullanılmıyor" ile "dosya kaldırıldı" farklı adımlardır.
   const vercel = JSON.parse(await readRepo('vercel.json'))
   const rootRewrite = (vercel.rewrites || []).find((rule) => rule.source === '/')
   assert.equal(rootRewrite, undefined, '`/` için rewrite tanımlı — ana sayfa React ön-render\'ı olmalı')
+
+  const vite = await readRepo('vite.config.js')
+  assert.doesNotMatch(vite, /site\.html/, 'dev sunucusu hâlâ site.html\'e yönlendiriyor')
 
   // Ana sayfa ön-render listesinde ve indekslenebilir olmalı.
   const generator = await readRepo('scripts/generate-static-routes.mjs')
   assert.match(generator, /\n\s*\['\/',/, 'ana sayfa ön-render rota listesinde yok')
 
-  // React ana sayfası ortak bileşen sistemini kullanmalı.
+  // React ana sayfası ortak bileşen sistemini kullanmalı ve yönlendirme yapmamalı.
   const home = await readRepo('src/pages/Home.jsx')
   assert.match(home, /from '\.\.\/components\/system'/, 'ana sayfa ortak bileşenleri kullanmalı')
-  assert.doesNotMatch(home, /window\.location\.replace/, 'ana sayfa artık statik sayfaya yönlendirmemeli')
-})
+  assert.doesNotMatch(home, /window\.location\.replace/, 'ana sayfa statik sayfaya yönlendirmemeli')
 
+  // Hazır 3B model bağımlılığı olmamalı — hero CSS ile kurulur.
+  assert.doesNotMatch(home, /\.gltf|\.glb|KadeScene/, 'ana sayfa hazır 3B model kullanmamalı')
+})
 test('hata, offline ve gömülü organizasyon kabukları da Poppins kullanır', async () => {
   for (const path of ['public/404.html', 'public/offline.html', 'src/embedded/kadir-organizasyon-kiti/styles.css']) {
     const source = await readRepo(path)
@@ -155,6 +183,25 @@ test('tek reveal sistemi: otomatik katman ile bileşen aynı sınıfı paylaşma
   const systemCss = await readRepo('src/components/system/system.css')
   assert.match(systemCss, /prefers-reduced-motion: reduce/, 'reveal reduced-motion desteklemeli')
   assert.match(systemCss, /opacity: 1 !important/, 'reduced-motion içeriği görünür yapmalı')
+})
+
+test('reveal observer eşiği sıfır: clip varyantı kendini kilitleyemez', async () => {
+  // `clip` varyantı öğeyi `clip-path: inset(0 0 100%)` ile gizler. Bu,
+  // IntersectionObserver'ın kesişim dikdörtgenini 0 px yüksekliğe indirir ve
+  // intersectionRatio her zaman 0 olur. Sıfırdan büyük bir threshold o oranı
+  // asla yakalayamaz: öğe ekranın tam ortasında dursa bile isIntersecting
+  // false döner ve içerik kalıcı olarak görünmez kalır.
+  //
+  // Bu tam olarak yaşandı: ana sayfadaki <h1> mobilde hiç açılmadı, yalnız
+  // 2,5 sn'lik güvenlik zamanlayıcısı sayesinde geç geldi. Kaydırma sonrası
+  // ölçüm yaptığımız için "takılı öğe yok" raporu üretmişti.
+  const reveal = await readRepo('src/components/system/Reveal.jsx')
+  const threshold = reveal.match(/threshold:\s*([\d.]+)/)
+  assert.ok(threshold, 'Reveal bir threshold tanımlamalı')
+  assert.strictEqual(threshold[1], '0', 'threshold 0 olmalı — clip varyantı hiçbir pozitif eşiği geçemez')
+
+  const systemCss = await readRepo('src/components/system/system.css')
+  assert.match(systemCss, /\.kade-reveal--clip\s*\{[^}]*clip-path/, 'clip varyantı hâlâ clip-path kullanıyor olmalı')
 })
 
 // ── Tasarım tokenları ──────────────────────────────────────────────────────

@@ -22,8 +22,11 @@ await mkdir(OUT, { recursive: true })
 const LABEL = process.env.AUDIT_LABEL || 'once'
 const TARGET = process.env.AUDIT_TARGET || 'live'
 
+// Yerel hedef varsayılan olarak Vite dev sunucusudur; AUDIT_URL ile üretim
+// derlemesi (scripts/serve-dist.mjs, 4173) da ölçülebilir. Kabul kriterleri
+// üretim derlemesinde doğrulanmalıdır — dev sunucusu farklı zamanlama üretir.
 const SITES = TARGET === 'local'
-  ? [{ id: 'kade-local', url: 'http://127.0.0.1:5173', name: 'Kade (yerel)' }]
+  ? [{ id: 'kade-local', url: process.env.AUDIT_URL || 'http://127.0.0.1:5173', name: 'Kade (yerel)' }]
   : [
       { id: 'kade', url: 'https://kadenewmedia.com', name: 'Kade New Media (canlı)' },
       { id: 'haoqi', url: 'https://haoqi.design', name: 'Haoqi (referans)' },
