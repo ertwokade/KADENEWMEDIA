@@ -173,7 +173,14 @@ function App() {
   const isHome = location.pathname === '/'
   const isLoginArea = location.pathname.startsWith('/giris')
   const isLinkProfile = location.pathname.startsWith('/@') || location.pathname === '/kadirdemir'
-  const hideShell = isAdmin || isHome || isLoginArea || isLinkProfile
+  // İKİ AYRI KARAR — tek bayrak yetmez:
+  //   hideChrome : Navbar + Footer. Yalnız kendi tam ekran arayüzü olan
+  //                alanlarda gizlenir. Ana sayfa BURADA DEĞİL; navigasyonu olmalı.
+  //   hideDecor  : Aurora, grain ve 3B hero canvas. Bunlar `position: fixed`
+  //                tam ekran katmanlar; ana sayfanın kendi CSS zemini ve büyük
+  //                tipografisi var, üst üste binince giriş okunamaz hâle geliyor.
+  const hideChrome = isAdmin || isLoginArea || isLinkProfile
+  const hideDecor = hideChrome || isHome
   const isAppUI = isAdmin
     || isLinkProfile
     || location.pathname.startsWith('/organizasyon-kiti')
@@ -233,10 +240,10 @@ function App() {
       <OrganizationSchema />
       <a href="#main-content" className="skip-to-content">İçeriğe geç</a>
       <ScrollToTop />
-      {!hideShell && <AuroraBackground />}
-      {!hideShell && <GrainOverlay />}
-      {!hideShell && <PageHeroCanvas type={canvasTheme} />}
-      {!hideShell && <Navbar />}
+      {!hideDecor && <AuroraBackground />}
+      {!hideDecor && <GrainOverlay />}
+      {!hideDecor && <PageHeroCanvas type={canvasTheme} />}
+      {!hideChrome && <Navbar />}
       <main id="main-content">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Home />} />
@@ -289,7 +296,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      {!hideShell && <Footer />}
+      {!hideChrome && <Footer />}
       {!isAdmin && <CookieBanner />}
       {!isAdmin && <NotificationPrompt />}
     </CustomerProvider>
