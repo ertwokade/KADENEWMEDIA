@@ -103,17 +103,31 @@ test('yabancı snapshot ve kökeni belirsiz varlıklar geri dönmemiştir', asyn
   for (const path of [
     'public/site.html',
     'public/_next',
-    'public/model',
     'public/stickers',
     'public/sticker_img',
     'public/img/kade-hello-art.jpg',
-    'src/components/kade',
+    'public/model/cnt.gltf',
+    'public/model/cnt.bin',
+    'public/model/cursor.glb',
+    'public/model/hello.gltf.orig',
     'scripts/apply-poppins-to-site.mjs',
     'scripts/patch-home-content.mjs',
     'scripts/sanitize-site-snapshot.mjs',
   ]) {
     await assert.rejects(stat(new URL(path, ROOT)), `${path} geri gelmiş`)
   }
+
+  // `public/model/hello.*` ve `src/components/kade/` bilinçli olarak geri
+  // getirildi: ana sayfanın cam "hello" objesi yayındaki tasarımın parçası ve
+  // site sahibi bu görünümün korunmasını istedi. Yalnız BU iki varlık serbest;
+  // yukarıdaki liste (imleç modeli, sticker setleri, ikinci sahne modeli)
+  // hâlâ yasak. Klasörün tamamı serbest bırakılmasın diye içerik denetlenir.
+  const modelDir = await readdir(new URL('public/model/', ROOT))
+  assert.deepEqual(
+    modelDir.filter((f) => !f.startsWith('.')).sort(),
+    ['hello.bin', 'hello.gltf'],
+    'public/model yalnız hello modelini içermeli',
+  )
 })
 
 test('ana sayfa React uygulamasından servis edilir', async () => {
@@ -141,8 +155,11 @@ test('ana sayfa React uygulamasından servis edilir', async () => {
   assert.match(home, /from '\.\.\/components\/system'/, 'ana sayfa ortak bileşenleri kullanmalı')
   assert.doesNotMatch(home, /window\.location\.replace/, 'ana sayfa statik sayfaya yönlendirmemeli')
 
-  // Hazır 3B model bağımlılığı olmamalı — hero CSS ile kurulur.
-  assert.doesNotMatch(home, /\.gltf|\.glb|KadeScene/, 'ana sayfa hazır 3B model kullanmamalı')
+  // 3B sahne ana sayfada kullanılıyor (yayındaki tasarımın parçası), ama
+  // BLOKLAYICI OLMAMALI: lazy yüklenmeli ki Three.js bundle'ı diğer 38 rotayı
+  // ve ilk boyayı yavaşlatmasın, metin sahneyi beklemeden okunabilsin.
+  assert.match(home, /lazy\(\s*\(\)\s*=>\s*import\(.*KadeScene/s, 'KadeScene lazy yüklenmeli')
+  assert.match(home, /Suspense/, 'sahne Suspense ile sarılmalı')
 })
 test('hata, offline ve gömülü organizasyon kabukları da Poppins kullanır', async () => {
   for (const path of ['public/404.html', 'public/offline.html', 'src/embedded/kadir-organizasyon-kiti/styles.css']) {

@@ -7,6 +7,12 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
+  // Ana sayfa bir WebGL sahnesi çalıştırıyor. Varsayılan worker sayısında
+  // (çekirdek/2) dört tarayıcı aynı anda GPU/CPU'yu paylaşınca sahne, ölçtüğümüz
+  // CSS geçişlerini geciktiriyor ve zamanlamaya duyarlı testler yükün kendisini
+  // ölçmeye başlıyordu — tek başına 3 sn süren iş paralelde 10 sn'yi aşıyordu.
+  // İki worker, tek kullanıcının tarayıcı deneyimine daha yakın ve kararlı.
+  workers: 2,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: 'list',

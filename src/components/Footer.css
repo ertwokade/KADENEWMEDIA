@@ -8,7 +8,7 @@
 }
 
 /* Kapanış sloganı — iki satır, sola hizalı.
-   Vurgu, ana sayfadaki `home-lede__accent` ile aynı altın degradeyi
+   Vurgu, ana sayfadaki altın vurguyla aynı degradeyi
    kullanır; footer ile giriş bölümü aynı dili konuşur. */
 .kfoot-display {
   display: flex;

@@ -176,6 +176,13 @@ for (const vp of [
   test(`ana başlık ilk boyada görünür (${vp.id})`, async ({ page }) => {
     await page.setViewportSize({ width: vp.width, height: vp.height })
 
+    // 3B modelin inmesini engelle. Bu test METNİN görünürlüğünü ölçüyor,
+    // sahneyi değil; dört worker aynı anda WebGL sahnesi çalıştırınca CPU
+    // doyuyor ve geçişler 10 sn'yi aşabiliyordu (tek başına 3 sn). Model
+    // gelmeyince sahne Suspense'te asılı kalır — tam da doğrulamak
+    // istediğimiz durum: metin sahneyi BEKLEMEDEN görünür olmalı.
+    await page.route('**/model/hello.*', (route) => route.abort())
+
     await page.goto('/', { waitUntil: 'domcontentloaded' })
 
     const measure = () => page.evaluate(() => {
@@ -211,7 +218,7 @@ for (const vp of [
       const h1 = document.querySelector('h1')
       if (!h1) return { error: 'h1 yok' }
       const rect = h1.getBoundingClientRect()
-      const cta = document.querySelector('.home-lede__actions a')
+      const cta = document.querySelector('.home-top__actions a')
       if (!cta) return { error: 'CTA yok' }
 
       return {
@@ -246,6 +253,10 @@ for (const vp of [
     //     CTA'yı opacity ~0,95'te yakalıyordu.
     //   • opacity ve clip-path aynı süreyi kullansa da birlikte bitmiyor →
     //     yalnız opacity'yi beklemek h1'i clipPct=6'da yakalıyordu.
+    // Eşikler AŞAĞIDAKİ assertion'larla birebir aynı olmalı. Değilse test
+    // kendi beklediğinden farklı bir şeyi doğrular: bir tur `clip < 1`
+    // bekleyip `clip < 25` iddia ediyordu, yani beklemeyi geçemeyip
+    // timeout'a düşerken assertion aslında memnun olacaktı.
     await page.waitForFunction(() => {
       const done = (el) => {
         const wrap = el?.closest('.kade-reveal')
@@ -254,10 +265,10 @@ for (const vp of [
         if (parseFloat(st.opacity) <= 0.99) return false
         const clip = st.clipPath
         if (!clip || clip === 'none') return true
-        return [...clip.matchAll(/([\d.]+)%/g)].every((m) => parseFloat(m[1]) < 1)
+        return [...clip.matchAll(/([\d.]+)%/g)].every((m) => parseFloat(m[1]) < 25)
       }
-      return done(document.querySelector('h1')) && done(document.querySelector('.home-lede__actions a'))
-    }, null, { timeout: 10_000 })
+      return done(document.querySelector('h1')) && done(document.querySelector('.home-top__actions a'))
+    }, null, { timeout: 20_000 })
 
     const settled = await measure()
 

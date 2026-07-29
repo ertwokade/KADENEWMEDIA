@@ -1,15 +1,13 @@
 /* ============================================================================
-   ANA SAYFA — özgün React sürümü
+   ANA SAYFA
    ----------------------------------------------------------------------------
-   Ortak bileşen katmanının (components/system/system.css) üzerine yalnızca
-   ana sayfaya özgü kompozisyonu ekler. Renk, tipografi, boşluk ve hareket
-   değerleri tokenlardan gelir (styles/kade-tokens.css) — buraya sabit değer
-   yazmayın.
+   Kompozisyon yayındaki kadenewmedia.com ana sayfasını izler: üç sütunlu üst
+   şerit, arkada tam ekran cam obje, önde dev uppercase başlık.
 
    SINIF ADI KURALI: `-hero` eki KULLANILMAZ. Eski global CSS'te dokuz adet
    `[class*="-hero"]` kuralı var (min-height 100vh, ::before katmanları,
    çocuk eleman dayatmaları); yeni sınıflar o desene takılırsa yerleşim
-   sessizce bozuluyor. Bu yüzden giriş bölümü `home-lede` adını taşır.
+   sessizce bozuluyor. Bu yüzden giriş bölümü `home-top` adını taşır.
    ========================================================================== */
 
 .home {
@@ -18,128 +16,118 @@
 }
 
 /* ---------------------------------------------------------------------------
-   GİRİŞ (LEDE)
-   Görsel ağırlık hazır bir 3B modelden değil, üç katmandan gelir:
-     1. ince dikey ızgara   → editoryal ritim
-     2. yumuşak altın parıltı → derinlik
-     3. büyük tipografi      → asıl figür
-   Üçü de CSS; ilk boyada hazır, ağ isteği yok, layout shift üretmez.
+   GİRİŞ
 --------------------------------------------------------------------------- */
-.home-lede {
+.home-top {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: clamp(40px, 6vh, 72px);
-  min-height: min(92svh, 900px);
-  padding-block: clamp(112px, 16vh, 180px) clamp(48px, 8vh, 88px);
+  min-height: min(100svh, 1000px);
+  padding-block: clamp(96px, 13vh, 150px) clamp(40px, 7vh, 80px);
   overflow: hidden;
 }
 
-.home-lede__grid {
+/* 3B sahne arka planda. `position: absolute` — bileşenin kendi `fixed`
+   değeri sayfanın tamamına yayılıp alt bölümlerin arkasında kalıyordu. */
+.home-top__scene {
   position: absolute;
   inset: 0;
   z-index: var(--z-decor);
   pointer-events: none;
-  background-image: linear-gradient(90deg, var(--kade-line) 1px, transparent 1px);
-  background-size: 25% 100%;
-  opacity: 0.55;
+}
+.home-top__scene canvas {
+  position: absolute !important;
+  inset: 0 !important;
 }
 
-/* Altın parıltı — markanın vurgu rengiyle, düşük yoğunlukta. */
-.home-lede__glow {
+/* İnce ızgara — kesişimlerde artı işareti. */
+.home-top__grid {
   position: absolute;
-  inset: -20% -10% auto -10%;
-  height: 120%;
-  z-index: var(--z-decor);
+  inset: 0;
+  z-index: calc(var(--z-decor) + 1);
   pointer-events: none;
-  background:
-    radial-gradient(58% 46% at 72% 22%, rgba(224, 168, 31, 0.22), transparent 68%),
-    radial-gradient(44% 38% at 12% 68%, rgba(224, 168, 31, 0.12), transparent 72%);
-  filter: blur(6px);
+  background-image:
+    linear-gradient(90deg, var(--kade-line) 1px, transparent 1px),
+    linear-gradient(0deg, var(--kade-line) 1px, transparent 1px);
+  background-size: 25% 100%, 100% 312px;
+  opacity: 0.6;
 }
 
-.home-lede__inner,
-.home-lede > .kade-container {
+.home-top__inner {
   position: relative;
   z-index: var(--z-content);
-}
-
-.home-lede__inner {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-6);
+  flex: 1;
+  gap: clamp(32px, 6vh, 64px);
+  width: 100%;
+  max-width: var(--container-max, 1440px);
+  margin-inline: auto;
+  padding-inline: var(--container-pad, 56px);
 }
 
-.home-lede__eyebrow {
-  margin: 0;
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--kade-ink-3);
+/* Üç sütunlu bilgi şeridi */
+.home-top__lede {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-8);
+  align-items: start;
 }
 
-/* Başlık: iki ağırlık bir arada — ince gövde + kalın vurgu.
-   `text-wrap: balance` satırları dengeler, `clamp` hiçbir viewport'ta
-   taşmaya izin vermez. */
-.home-lede__title {
+.home-top__kicker {
   margin: 0;
-  max-width: 16ch;
-  font-size: clamp(2.5rem, 7.4vw, 6.75rem);
-  font-weight: var(--fw-light);
-  line-height: 1.02;
+  font-size: clamp(1.5rem, 2.3vw, 2.125rem);
+  font-weight: var(--fw-regular);
+  line-height: 1.18;
   letter-spacing: var(--tracking-tight);
-  text-wrap: balance;
 }
 
-.home-lede__accent {
-  display: block;
-  font-weight: var(--fw-bold);
-  /* Vurgu, düz altın yerine ince bir degrade — marka rengi korunur. */
-  background: linear-gradient(96deg, var(--kade-gold-deep) 8%, #f2c94c 92%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.home-lede__text {
+.home-top__note {
   margin: 0;
-  max-width: 54ch;
-  font-size: var(--fs-lg);
-  line-height: var(--lh-snug);
+  max-width: 46ch;
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
   color: var(--kade-ink-2);
 }
 
-.home-lede__actions {
+/* Dev başlık — sayfanın ağırlık merkezi. Alta yaslanır. */
+.home-top__titlewrap { margin-top: auto; }
+
+.home-top__title {
+  margin: 0;
+  font-size: clamp(2.75rem, 8.2vw, 5.6rem);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  color: var(--kade-ink);
+}
+
+.home-top__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
-  margin-top: var(--space-2);
 }
 
-/* Alt bilgi şeridi */
-.home-lede__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-6) var(--space-12);
-  margin: 0;
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--kade-line);
-}
-.home-lede__meta > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.home-lede__meta dt {
-  font-size: var(--fs-2xs);
-  font-weight: var(--fw-semibold);
-  letter-spacing: var(--tracking-wider);
+/* ---------------------------------------------------------------------------
+   TANITIM
+--------------------------------------------------------------------------- */
+.home-intro__title {
+  margin: 0 0 var(--space-6);
+  max-width: 22ch;
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
   text-transform: uppercase;
-  color: var(--kade-ink-3);
 }
-.home-lede__meta dd {
+
+.home-intro__text {
   margin: 0;
-  font-size: var(--fs-md);
-  color: var(--kade-ink);
+  max-width: 56ch;
+  font-size: var(--fs-lg);
+  line-height: var(--lh-snug);
+  color: var(--kade-ink-2);
 }
 
 /* ---------------------------------------------------------------------------
@@ -158,7 +146,7 @@
 }
 
 /* ---------------------------------------------------------------------------
-   ÇALIŞMA BİÇİMİ — üç kolonlu editoryal satırlar
+   SÜREÇ — üç kolonlu editoryal satırlar
 --------------------------------------------------------------------------- */
 .home-process__list {
   list-style: none;
@@ -215,21 +203,25 @@
    RESPONSIVE
 --------------------------------------------------------------------------- */
 @media (max-width: 1024px) {
+  .home-top__lede { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-top__kicker { grid-column: 1 / -1; }
+  .home-top__grid { background-size: 33.333% 100%, 100% 260px; }
   .home-process__row { grid-template-columns: 56px minmax(0, 1fr); }
   .home-process__text { grid-column: 2; }
-  .home-lede__grid { background-size: 33.333% 100%; }
 }
 
 @media (max-width: 768px) {
-  .home-lede {
+  .home-top {
     min-height: auto;
-    padding-block: clamp(96px, 18vh, 140px) var(--space-16);
+    padding-block: clamp(88px, 16vh, 130px) var(--space-16);
     gap: var(--space-10);
   }
-  .home-lede__grid { background-size: 50% 100%; }
-  .home-lede__actions { width: 100%; }
-  .home-lede__actions .kade-btn { flex: 1 1 auto; }
-  .home-lede__meta { gap: var(--space-5) var(--space-8); }
+  .home-top__inner { padding-inline: var(--container-pad-sm, 20px); }
+  .home-top__lede { grid-template-columns: minmax(0, 1fr); gap: var(--space-5); }
+  .home-top__grid { background-size: 50% 100%, 100% 220px; }
+  .home-top__titlewrap { margin-top: var(--space-6); }
+  .home-top__actions { width: 100%; }
+  .home-top__actions .kade-btn { flex: 1 1 auto; }
   .home-more { justify-content: flex-start; }
 }
 
@@ -238,7 +230,7 @@
   .home-process__text { grid-column: 1; }
 }
 
-/* Hareket azaltma: parıltı sabit kalır, geçiş yok. */
+/* Hareket azaltma: geçiş yok. 3B sahne zaten hiç yüklenmez (Home.jsx). */
 @media (prefers-reduced-motion: reduce) {
   .home-process__row { transition: none; }
 }
