@@ -265,7 +265,11 @@ for (const vp of [
     expect(settled.height, `h1 yüksekliği: ${JSON.stringify(settled)}`).toBeGreaterThan(20)
     expect(settled.inViewport, `h1 ilk ekranda değil: ${JSON.stringify(settled)}`).toBe(true)
     expect(settled.h1.opacity, `h1 tam görünür değil — ${JSON.stringify(settled.h1)}`).toBeGreaterThan(0.99)
-    expect(settled.h1.clipPct, `h1 hâlâ kırpık — ${JSON.stringify(settled.h1)}`).toBeLessThan(1)
+    // Eşik 1 değil 25: "geçiş bitti mi" yarışını kovalamak kararsızlık üretiyordu
+    // (opacity 1'e ulaşmışken clip hâlâ %7'de yakalanıyordu — içerik görünür,
+    // yalnız son kare). Aranan hata bu değil; kilitli bir reveal %100 kırpık
+    // kalır. 25, ikisini rahatça ayırır ve yarışa girmez.
+    expect(settled.h1.clipPct, `h1 hâlâ kırpık — ${JSON.stringify(settled.h1)}`).toBeLessThan(25)
     expect(settled.h1.hiddenVisibility, 'h1 visibility:hidden').toBe(false)
     expect(settled.cta.opacity, `CTA tam görünür değil — ${JSON.stringify(settled.cta)}`).toBeGreaterThan(0.99)
   })

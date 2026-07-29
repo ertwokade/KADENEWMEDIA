@@ -32,7 +32,7 @@ export function OrganizationSchema() {
       name: BRAND.name,
       alternateName: BRAND.alternateNames,
       url: BASE_URL,
-      logo: `${BASE_URL}/logo.png`,
+      logo: `${BASE_URL}/favicon.png`,
       description: 'İstanbul merkezli new media, dijital medya ve pazarlama ajansı.',
       email: BRAND.email,
       telephone: BRAND.phone || undefined,
@@ -120,7 +120,7 @@ export function ArticleSchema({ title, description, image, datePublished, dateMo
       '@type': 'Article',
       headline: title,
       description,
-      image: image || `${BASE_URL}/logo.png`,
+      image: image || `${BASE_URL}/og-image.png`,
       datePublished,
       dateModified: dateModified || datePublished,
       author: {
@@ -130,7 +130,7 @@ export function ArticleSchema({ title, description, image, datePublished, dateMo
       publisher: {
         '@type': 'Organization',
         name: 'Kade New Media',
-        logo: { '@type': 'ImageObject', url: `${BASE_URL}/logo.png` },
+        logo: { '@type': 'ImageObject', url: `${BASE_URL}/favicon.png` },
       },
     })
     return () => removeSchema('schema-article')

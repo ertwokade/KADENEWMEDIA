@@ -17,6 +17,9 @@
 .knav > * { pointer-events: auto; }
 
 .knav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   font-family: var(--font-sans);
   font-variation-settings: "wght" 700, "wdth" 120;
   font-weight: 700;
@@ -26,6 +29,21 @@
   color: var(--ky-ink, #17130a);
   text-decoration: none;
   padding: 8px;
+}
+
+/* Gerçek Kade şimşek sembolü. Yatay wordmark görseli BURADA KULLANILMAZ:
+   harfleri beyaza giden bir degrade taşıyor ve krem zeminde 1,4:1
+   kontrasta düşüp kayboluyor (ölçüm: src/config/brandAssets.js). */
+.knav-brand__mark {
+  width: 26px;
+  height: 26px;
+  display: block;
+  flex: none;
+}
+
+@media (max-width: 380px) {
+  .knav-brand { font-size: 15px; gap: 7px; }
+  .knav-brand__mark { width: 22px; height: 22px; }
 }
 
 .knav-links { display: flex; align-items: center; gap: 0 22px; }

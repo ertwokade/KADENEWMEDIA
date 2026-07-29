@@ -1,30 +1,22 @@
 import { BRAND } from '../../config/brand'
-import { LOGO_SOURCES, LOGO_RATIO, hasBrandAssets } from '../../config/brandAssets'
+import { LOGO_SOURCES, LOGO_RATIO } from '../../config/brandAssets'
 
 /**
  * Marka logosu — TEK yerleştirme noktası.
  *
  * Header, sticky header, mobil menü, footer, loading ekranı ve paylaşım
  * alanları bu bileşeni kullanır. Logo dosyaları güncellendiğinde yalnızca
- * aşağıdaki LOGO_SOURCES haritası değişir; hiçbir sayfaya dokunulmaz.
+ * config/brandAssets.js değişir; hiçbir sayfaya dokunulmaz.
  *
- * Dosya yerleşimi (kullanıcı yükleyince):
- *   /public/brand/logo-primary.svg
- *   /public/brand/logo-light.svg    → koyu zemin
- *   /public/brand/logo-dark.svg     → açık zemin
- *   /public/brand/logo-symbol.svg
- *   /public/brand/favicon.svg
+ * İki farklı kompozisyon var, çünkü tek bir dosya her zemin için çalışmıyor
+ * (gerekçe ve ölçümler: config/brandAssets.js):
  *
- * ŞU AN: kullanıcı logoları henüz yüklenmedi (`hasBrandAssets === false`).
- * Repodaki /logo.svg KULLANILAMAZ DURUMDA: viewBox 514×180 olduğu hâlde
- * gerçek çizim içeriği yalnız 65×100'lük bir köşede; tuvalin %87'si boş,
- * bu yüzden görsel minicik ve kırpılmış görünüyor.
+ *   variant="light"  → koyu zemin. Tam yatay wordmark (`/logo.png`).
+ *   diğer varyantlar → açık zemin. Gerçek şimşek sembolü + metin wordmark.
  *
- * Bu nedenle logo dosyası gelene kadar METİN WORDMARK gösterilir — bozuk
- * bir görsel yerine sitenin önceki davranışı korunur. Sahte veya otomatik
- * üretilmiş bir logo BİLEREK oluşturulmamıştır.
- * Dosyalar eklenince config/brandAssets.js içinde `hasBrandAssets = true`
- * yapmak yeterlidir; burada değişiklik gerekmez.
+ * Açık zeminde wordmark GÖRSELİ kullanılmaz: harfleri beyaza giden degrade
+ * taşıdığı için krem zeminde 1,4:1 kontrasta düşüp kayboluyor. Sembol
+ * markayı taşır, metin okunabilirliği garanti eder.
  */
 
 /**
@@ -40,36 +32,66 @@ export default function Logo({
   decorative = false,
   ...rest
 }) {
-  // Marka varlıkları yüklenene kadar metin wordmark.
-  if (!hasBrandAssets) {
+  const label = BRAND.name.replace(' New', '')
+
+  // Koyu zemin: tam wordmark görseli — bu zeminde tasarlandığı gibi çalışır.
+  if (variant === 'light') {
     return (
-      <span
-        className={`kade-logo kade-logo--text${className ? ` ${className}` : ''}`}
+      <img
+        src={LOGO_SOURCES.light}
+        width={width}
+        height={Math.round(width / LOGO_RATIO)}
+        alt={decorative ? '' : BRAND.name}
         aria-hidden={decorative || undefined}
+        className={`kade-logo${className ? ` ${className}` : ''}`}
+        style={{ width, height: 'auto', display: 'block' }}
+        loading="eager"
+        decoding="async"
+        draggable="false"
         {...rest}
-      >
-        {BRAND.name.replace(' New', '')}
-      </span>
+      />
     )
   }
 
-  const src = LOGO_SOURCES[variant] || LOGO_SOURCES.primary
+  // Yalnız işaret istendiğinde metin eklenmez.
+  if (variant === 'symbol') {
+    const size = Math.round(width / 4)
+    return (
+      <img
+        src={LOGO_SOURCES.symbol}
+        width={size}
+        height={size}
+        alt={decorative ? '' : BRAND.name}
+        aria-hidden={decorative || undefined}
+        className={`kade-logo kade-logo--symbol${className ? ` ${className}` : ''}`}
+        loading="eager"
+        decoding="async"
+        draggable="false"
+        {...rest}
+      />
+    )
+  }
 
+  // Açık zemin: sembol + metin. Tek bir erişilebilir ad taşır; sembol
+  // dekoratiftir, adı yanındaki metin verir.
   return (
-    <img
-      src={src}
-      // Oran korunur; width/height doğru oranla verilir ki görsel inmeden
-      // yer ayrılsın (layout shift olmasın).
-      width={width}
-      height={Math.round(width / LOGO_RATIO)}
-      alt={decorative ? '' : BRAND.name}
+    <span
+      className={`kade-logo kade-logo--lockup${className ? ` ${className}` : ''}`}
       aria-hidden={decorative || undefined}
-      className={`kade-logo${className ? ` ${className}` : ''}`}
-      style={{ width, height: 'auto', display: 'block' }}
-      loading="eager"
-      decoding="async"
-      draggable="false"
       {...rest}
-    />
+    >
+      <img
+        src={LOGO_SOURCES.symbol}
+        width={26}
+        height={26}
+        alt=""
+        aria-hidden="true"
+        className="kade-logo__mark"
+        loading="eager"
+        decoding="async"
+        draggable="false"
+      />
+      <span className="kade-logo__text">{label}</span>
+    </span>
   )
 }

@@ -141,7 +141,7 @@ export default function About() {
                     transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                   >
                     <motion.img
-                      src="/logo-icon.svg"
+                      src="/favicon.png"
                       alt="Kade New Media Logo"
                       className="lightning-svg"
                       animate={{ rotate: [0, 2, -2, 0] }}

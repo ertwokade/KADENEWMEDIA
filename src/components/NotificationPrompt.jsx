@@ -28,7 +28,7 @@ export default function NotificationPrompt() {
       if (permission === 'granted') {
         new Notification('Kade New Media', {
           body: 'Yeni rehberler ve ajans güncellemeleri için bildirimler aktif.',
-          icon: '/logo-icon.svg',
+          icon: '/favicon-192.png',
         })
       }
     } catch {

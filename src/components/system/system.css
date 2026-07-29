@@ -511,9 +511,26 @@
 
 /* ---------------------------------------------------------------------------
    11) LOGO
-   Marka dosyaları yüklenene kadar metin wordmark gösterilir (bkz.
-   components/system/Logo.jsx). Dosyalar eklenince <img>'e geçer.
+   Açık zeminde marka, gerçek şimşek sembolü + metin wordmark bileşimiyle
+   kurulur; koyu zeminde tam wordmark görseli kullanılır. Gerekçe ve
+   kontrast ölçümleri: src/config/brandAssets.js
 --------------------------------------------------------------------------- */
+.kade-logo--lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.kade-logo__mark {
+  width: 26px;
+  height: 26px;
+  display: block;
+  flex: none;
+}
+
+.kade-logo__text,
 .kade-logo--text {
   display: inline-block;
   font-family: var(--font-sans);
@@ -524,6 +541,12 @@
   line-height: 1;
   color: currentColor;
   white-space: nowrap;
+}
+
+/* Dar ekranda sembol markayı taşımaya yeter; metin daralan alanı zorlamaz. */
+@media (max-width: 380px) {
+  .kade-logo__text { font-size: 0.95rem; }
+  .kade-logo__mark { width: 22px; height: 22px; }
 }
 
 /* Kart türü rozeti — müşteri işi olmayan kayıtlar açıkça işaretlenir.
