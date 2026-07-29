@@ -52,7 +52,12 @@ export default function KadeScene({ dark = false }) {
     return () => window.removeEventListener('pointermove', onMove)
   }, [])
   return (
-    <Canvas className="kade-canvas" style={{ position: 'fixed', inset: 0, zIndex: 0 }} camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]} gl={{ antialias: true, alpha: false }}>
+    // `position: absolute` — `fixed` DEĞİL. Fixed olduğunda sahne ekrana
+    // yapışıp sayfa boyunca kaydırmayı takip ediyor, giriş bölümünden sonraki
+    // tüm bölümlerin üstünde kalıyordu: kullanıcı kaydırdığında metin yerine
+    // boş bir alan ve havada duran obje görüyordu. Sahne, kapsayıcısı olan
+    // giriş bölümünün içinde kalmalı.
+    <Canvas className="kade-canvas" style={{ position: 'absolute', inset: 0, zIndex: 0 }} camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]} gl={{ antialias: true, alpha: false }}>
       <color attach="background" args={[dark ? '#100d06' : '#fbfaf4']} />
       <ambientLight intensity={1.1} />
       <directionalLight position={[-2, 3, 4]} intensity={1.2} />

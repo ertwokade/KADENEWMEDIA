@@ -38,7 +38,16 @@ test('CSRF tokens are signed and tamper evident', () => {
   try {
     const token = createCsrfToken()
     assert.equal(verifyCsrfToken(token), true)
-    assert.equal(verifyCsrfToken(`${token.slice(0, -1)}0`), false)
+
+    // Son karakteri SABİT '0' ile değiştirmek kararsızdı: token rastgele
+    // üretildiği için son karakteri zaten '0' olduğunda "bozulmuş" token
+    // orijinalin aynısı oluyor, doğrulama haklı olarak true dönüyor ve test
+    // kırılıyordu. Ne sıklıkta olduğu alfabeye bağlı; 12 koşuda 1 kez görüldü.
+    // Artık gerçekten farklı bir karakter seçilir.
+    const lastChar = token.slice(-1)
+    const tampered = `${token.slice(0, -1)}${lastChar === '0' ? '1' : '0'}`
+    assert.notEqual(tampered, token, 'bozulmuş token orijinalden farklı olmalı')
+    assert.equal(verifyCsrfToken(tampered), false)
   } finally {
     if (previousSecret === undefined) delete process.env.JWT_SECRET
     else process.env.JWT_SECRET = previousSecret
