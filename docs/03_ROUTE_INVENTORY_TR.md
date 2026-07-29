@@ -10,7 +10,7 @@ Tarih: 23 Temmuz 2026. Kaynak: `src/App.jsx` (kök, elle çıkarıldı) ve `apps
 
 | Rota | Tür | Amaç | Erişim | Durum |
 |---|---|---|---|---|
-| `/` | Public | Ana sayfa (React değil — `window.location.replace('/')` ile statik `site.html`'e yönlendiriyor) | Herkes | Çalışıyor |
+| `/` | Public | Ana sayfa (React — `src/pages/Home.jsx`, ön-render edilir) | Herkes | Çalışıyor |
 | `/hakkimizda` | Public | Kurumsal sayfa | Herkes | Çalışıyor |
 | `/hizmetler` | Public | Hizmetler listesi | Herkes | Çalışıyor |
 | `/hizmetler/:slug` | Public, dinamik | Hizmet detayı | Herkes | Çalışıyor |

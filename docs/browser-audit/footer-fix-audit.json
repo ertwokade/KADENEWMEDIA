@@ -1,0 +1,192 @@
+[
+  {
+    "site": "kade-local",
+    "siteName": "Kade (yerel)",
+    "viewport": "1440x900",
+    "url": "http://127.0.0.1:4173",
+    "domContentLoadedMs": 121,
+    "firstTextMs": 201,
+    "heroVisualMs": -1,
+    "structure": {
+      "scrollHeight": 4748,
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "horizontalOverflow": false,
+      "overflowingElements": [
+        "div.home-lede__glow right=1584",
+        "div.kade-marquee__track right=5318",
+        "span.kade-marquee__item right=-460",
+        "span.kade-marquee__dot right=-471",
+        "span.kade-marquee__item right=-33",
+        "span.kade-marquee__dot right=-44"
+      ],
+      "clippedText": [],
+      "canvasCount": 0,
+      "canvasSizes": [],
+      "articleCount": 0,
+      "cardHeights": [],
+      "zeroHeightCards": 0,
+      "workSectionHeight": 617,
+      "headerCount": 1,
+      "h1Count": 1,
+      "imageCount": 0,
+      "brokenImages": 0
+    },
+    "links": {
+      "total": 29,
+      "placeholderHash": 0,
+      "suspicious": [],
+      "externalSample": [
+        "https://wa.me/905067293423"
+      ]
+    },
+    "screenshots": {
+      "hero": "docs/browser-audit/footer-fix-kade-local-1440x900-01-hero.png",
+      "bio": "docs/browser-audit/footer-fix-kade-local-1440x900-02-bio.png",
+      "selected-work": "docs/browser-audit/footer-fix-kade-local-1440x900-03-selected-work.png",
+      "mid-scene": "docs/browser-audit/footer-fix-kade-local-1440x900-04-mid-scene.png",
+      "pre-footer": "docs/browser-audit/footer-fix-kade-local-1440x900-05-pre-footer.png",
+      "footer": "docs/browser-audit/footer-fix-kade-local-1440x900-06-footer.png",
+      "hover": "docs/browser-audit/footer-fix-kade-local-1440x900-07-hover.png",
+      "menu": "docs/browser-audit/footer-fix-kade-local-1440x900-08-menu.png"
+    },
+    "hover": {
+      "worked": true,
+      "changed": false
+    },
+    "menu": {
+      "expanded": "false",
+      "bodyLocked": false,
+      "focusInside": false,
+      "closesOnEscape": true
+    },
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "failedRequests": []
+  },
+  {
+    "site": "kade-local",
+    "siteName": "Kade (yerel)",
+    "viewport": "1024x768",
+    "url": "http://127.0.0.1:4173",
+    "domContentLoadedMs": 26,
+    "firstTextMs": 90,
+    "heroVisualMs": -1,
+    "structure": {
+      "scrollHeight": 4467,
+      "scrollWidth": 1024,
+      "clientWidth": 1024,
+      "horizontalOverflow": false,
+      "overflowingElements": [
+        "div.home-lede__glow right=1126",
+        "div.kade-marquee__track right=4034",
+        "span.kade-marquee__item right=-349",
+        "span.kade-marquee__dot right=-357",
+        "span.kade-marquee__item right=-25",
+        "span.kade-marquee__dot right=-33"
+      ],
+      "clippedText": [],
+      "canvasCount": 0,
+      "canvasSizes": [],
+      "articleCount": 0,
+      "cardHeights": [],
+      "zeroHeightCards": 0,
+      "workSectionHeight": 573,
+      "headerCount": 1,
+      "h1Count": 1,
+      "imageCount": 0,
+      "brokenImages": 0
+    },
+    "links": {
+      "total": 29,
+      "placeholderHash": 0,
+      "suspicious": [],
+      "externalSample": [
+        "https://wa.me/905067293423"
+      ]
+    },
+    "screenshots": {
+      "hero": "docs/browser-audit/footer-fix-kade-local-1024x768-01-hero.png",
+      "bio": "docs/browser-audit/footer-fix-kade-local-1024x768-02-bio.png",
+      "selected-work": "docs/browser-audit/footer-fix-kade-local-1024x768-03-selected-work.png",
+      "mid-scene": "docs/browser-audit/footer-fix-kade-local-1024x768-04-mid-scene.png",
+      "pre-footer": "docs/browser-audit/footer-fix-kade-local-1024x768-05-pre-footer.png",
+      "footer": "docs/browser-audit/footer-fix-kade-local-1024x768-06-footer.png",
+      "hover": "docs/browser-audit/footer-fix-kade-local-1024x768-07-hover.png",
+      "menu": "docs/browser-audit/footer-fix-kade-local-1024x768-08-menu.png"
+    },
+    "hover": {
+      "worked": true,
+      "changed": false
+    },
+    "menu": {
+      "expanded": "true",
+      "bodyLocked": true,
+      "focusInside": true,
+      "closesOnEscape": true
+    },
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "failedRequests": []
+  },
+  {
+    "site": "kade-local",
+    "siteName": "Kade (yerel)",
+    "viewport": "390x844",
+    "url": "http://127.0.0.1:4173",
+    "domContentLoadedMs": 34,
+    "firstTextMs": 60,
+    "heroVisualMs": -1,
+    "structure": {
+      "scrollHeight": 5176,
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "horizontalOverflow": false,
+      "overflowingElements": [
+        "div.home-lede__glow right=429",
+        "div.kade-marquee__track right=2560",
+        "span.kade-marquee__item right=-222",
+        "span.kade-marquee__dot right=-227",
+        "span.kade-marquee__item right=-16",
+        "span.kade-marquee__dot right=-21"
+      ],
+      "clippedText": [],
+      "canvasCount": 0,
+      "canvasSizes": [],
+      "articleCount": 0,
+      "cardHeights": [],
+      "zeroHeightCards": 0,
+      "workSectionHeight": 571,
+      "headerCount": 1,
+      "h1Count": 1,
+      "imageCount": 0,
+      "brokenImages": 0
+    },
+    "links": {
+      "total": 29,
+      "placeholderHash": 0,
+      "suspicious": [],
+      "externalSample": [
+        "https://wa.me/905067293423"
+      ]
+    },
+    "screenshots": {
+      "hero": "docs/browser-audit/footer-fix-kade-local-390x844-01-hero.png",
+      "bio": "docs/browser-audit/footer-fix-kade-local-390x844-02-bio.png",
+      "selected-work": "docs/browser-audit/footer-fix-kade-local-390x844-03-selected-work.png",
+      "mid-scene": "docs/browser-audit/footer-fix-kade-local-390x844-04-mid-scene.png",
+      "pre-footer": "docs/browser-audit/footer-fix-kade-local-390x844-05-pre-footer.png",
+      "footer": "docs/browser-audit/footer-fix-kade-local-390x844-06-footer.png",
+      "menu": "docs/browser-audit/footer-fix-kade-local-390x844-08-menu.png"
+    },
+    "menu": {
+      "expanded": "true",
+      "bodyLocked": true,
+      "focusInside": true,
+      "closesOnEscape": true
+    },
+    "consoleErrors": [],
+    "consoleWarnings": [],
+    "failedRequests": []
+  }
+]

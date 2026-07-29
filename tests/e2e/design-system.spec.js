@@ -175,12 +175,9 @@ for (const vp of [
 ]) {
   test(`ana başlık ilk boyada görünür (${vp.id})`, async ({ page }) => {
     await page.setViewportSize({ width: vp.width, height: vp.height })
+
     await page.goto('/', { waitUntil: 'domcontentloaded' })
 
-    // Reveal geçişi 0,7 sn sürüyor. Bu yüzden iki ayrı ölçüm yapılır:
-    //   500 ms'de  → açılma BAŞLAMIŞ olmalı (kilitlenme yok)
-    //  1600 ms'de  → tamamen görünür olmalı (yarıda kalma yok)
-    // Tek bir "500 ms'de opacity 1" ölçümü, geçişin kendisini hata sanardı.
     const measure = () => page.evaluate(() => {
       // Bir öğenin gerçekten boyanıp boyanmadığını atalarıyla birlikte ölçer:
       // öğenin kendi stili doğru olsa bile bir ata onu görünmez yapabilir.
@@ -226,23 +223,76 @@ for (const vp of [
       }
     })
 
-    await page.waitForTimeout(500)
-    const early = await measure()
+    // Burada ZAMANLAMA İDDİASI YOK — bilerek.
+    //
+    // Önce "reveal 800 ms'den önce açılmalı" diye ölçüyordum; amaç, içeriğin
+    // observer ile mi yoksa 900 ms'lik güvenlik zamanlayıcısıyla mı geldiğini
+    // ayırmaktı. Ama dört worker paralel koşarken hydration'ın kendisi 800 ms'i
+    // aşabiliyor; eşik makinenin o anki yüküne bağlı hâle geliyor ve test
+    // kararsızlaşıyordu (tam suite'te düzenli, tek başına koşunca hiç değil).
+    // Yük koşullarına bağlı bir eşik, gerçek bir hatayı değil test ortamını
+    // ölçer.
+    //
+    // İş bölümü şöyle:
+    //   • Kilitlenmenin kendisi → tests/unit/design-system.test.js, threshold
+    //     değerini doğrudan sabitler. Deterministik, yükten bağımsız.
+    //   • Kullanıcının gördüğü sonuç → burası: içerik gerçekten boyanıyor mu?
+    //
+    // Geçişler bittiğinde gerçekten tam görünür mü?
+    //
+    // Beklerken AŞAĞIDA DOĞRULANAN HER ÖZELLİK kontrol edilmeli, yoksa test
+    // geçişin ortasını ölçer. İki kez ısırdı:
+    //   • CTA kendi reveal'ında 210 ms gecikmeli başlar → yalnız h1'i beklemek
+    //     CTA'yı opacity ~0,95'te yakalıyordu.
+    //   • opacity ve clip-path aynı süreyi kullansa da birlikte bitmiyor →
+    //     yalnız opacity'yi beklemek h1'i clipPct=6'da yakalıyordu.
+    await page.waitForFunction(() => {
+      const done = (el) => {
+        const wrap = el?.closest('.kade-reveal')
+        if (!wrap) return false
+        const st = getComputedStyle(wrap)
+        if (parseFloat(st.opacity) <= 0.99) return false
+        const clip = st.clipPath
+        if (!clip || clip === 'none') return true
+        return [...clip.matchAll(/([\d.]+)%/g)].every((m) => parseFloat(m[1]) < 1)
+      }
+      return done(document.querySelector('h1')) && done(document.querySelector('.home-lede__actions a'))
+    }, null, { timeout: 10_000 })
 
-    expect(early.error, JSON.stringify(early)).toBeUndefined()
-    expect(early.height, `h1 yüksekliği: ${JSON.stringify(early)}`).toBeGreaterThan(20)
-    expect(early.inViewport, `h1 ilk ekranda değil: ${JSON.stringify(early)}`).toBe(true)
-    // Açılma başlamış olmalı. Kilitli reveal burada opacity=0 / clipPct=100 verir.
-    expect(early.h1.opacity, `500 ms: h1 hâlâ tamamen saydam — ${JSON.stringify(early.h1)}`).toBeGreaterThan(0.05)
-    expect(early.h1.clipPct, `500 ms: h1 hâlâ tamamen kırpık — ${JSON.stringify(early.h1)}`).toBeLessThan(95)
-    expect(early.cta.opacity, `500 ms: CTA hâlâ tamamen saydam — ${JSON.stringify(early.cta)}`).toBeGreaterThan(0.05)
-
-    await page.waitForTimeout(1100)
     const settled = await measure()
 
-    expect(settled.h1.opacity, `1600 ms: h1 tam görünür değil — ${JSON.stringify(settled.h1)}`).toBeGreaterThan(0.99)
-    expect(settled.h1.clipPct, `1600 ms: h1 hâlâ kırpık — ${JSON.stringify(settled.h1)}`).toBeLessThan(1)
+    expect(settled.error, JSON.stringify(settled)).toBeUndefined()
+    expect(settled.height, `h1 yüksekliği: ${JSON.stringify(settled)}`).toBeGreaterThan(20)
+    expect(settled.inViewport, `h1 ilk ekranda değil: ${JSON.stringify(settled)}`).toBe(true)
+    expect(settled.h1.opacity, `h1 tam görünür değil — ${JSON.stringify(settled.h1)}`).toBeGreaterThan(0.99)
+    expect(settled.h1.clipPct, `h1 hâlâ kırpık — ${JSON.stringify(settled.h1)}`).toBeLessThan(1)
     expect(settled.h1.hiddenVisibility, 'h1 visibility:hidden').toBe(false)
-    expect(settled.cta.opacity, `1600 ms: CTA tam görünür değil — ${JSON.stringify(settled.cta)}`).toBeGreaterThan(0.99)
+    expect(settled.cta.opacity, `CTA tam görünür değil — ${JSON.stringify(settled.cta)}`).toBeGreaterThan(0.99)
   })
 }
+
+// Footer kapanış sloganı, kelimeleri `space-between` ve yüzdeli margin'lerle
+// zıt köşelere iten bir düzendeydi; masaüstünde cümle zigzag hâline gelip
+// okunmuyordu ("BİRLİKTE ... HARİKA" / "İŞLER" / "BAŞARALIM"). Satırların
+// aynı sol kenardan başladığını doğrularız — okuma sırası soldan sağa.
+test('footer sloganı tek sütunda hizalı (zigzag değil)', async ({ page }) => {
+  for (const vp of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(vp)
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
+    await page.waitForTimeout(600)
+
+    const lines = await page.evaluate(() =>
+      [...document.querySelectorAll('.kfoot-line')].map((el) => {
+        const r = el.getBoundingClientRect()
+        return { text: el.textContent.trim(), left: Math.round(r.left), width: Math.round(r.width) }
+      }))
+
+    expect(lines.length, `${vp.width}px: slogan satırı sayısı`).toBeGreaterThan(1)
+    const lefts = lines.map((l) => l.left)
+    expect(Math.max(...lefts) - Math.min(...lefts),
+      `${vp.width}px: satırlar aynı sol kenardan başlamalı — ${JSON.stringify(lines)}`).toBeLessThanOrEqual(2)
+    for (const line of lines) {
+      expect(line.width, `${vp.width}px: "${line.text}" genişliği ölçülemedi`).toBeGreaterThan(0)
+    }
+  }
+})

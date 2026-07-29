@@ -15,7 +15,7 @@ deployment sonrasında yeniden ölçüldü.
 
 | İstek türü | Production davranışı | Kaynak |
 |---|---|---|
-| `/` | Statik Next snapshot `site.html` | `vercel.json`, `public/site.html` |
+| `/` | Build'de ön-render edilmiş React sayfası | `src/pages/Home.jsx`, `scripts/generate-static-routes.mjs` |
 | Bilinen public/korumalı rota | Build sırasında üretilmiş `route/index.html` | `scripts/generate-static-routes.mjs` |
 | Blog, partner, kısa link, profil ve hata dinamik rotaları | `app.html` React kabuğu | `vercel.json` rewrite listesi |
 | `/sitemap.xml` | Serverless sitemap handler | `server/api/sitemap.js` |
@@ -42,7 +42,8 @@ bağlantı taramasını korumak için `noindex, follow` kullanır.
 
 `/admin`, müşteri panelleri, giriş ve Organizasyon Kiti rotaları `noindex`
 olmakla birlikte `robots.txt` içindeki `Disallow` kurallarıyla da kapsanır.
-`app.html` ve `site.html` doğrudan taramaya kapalıdır.
+`app.html` doğrudan taramaya kapalıdır. *(Eskiden aynı listede yer alan
+`site.html` snapshot'ı 29 Tem 2026'da kaldırıldı.)*
 
 ## Canlı Playwright denetimi
 

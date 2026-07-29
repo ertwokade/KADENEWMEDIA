@@ -15,14 +15,14 @@ export default function Footer() {
 
   return (
     <footer className="kfoot">
-      <div className="kfoot-display">
-        <div className="kfoot-row">
-          <span className="kfoot-w kfoot-w1">BİRLİKTE</span>
-          <span className="kfoot-w kfoot-w2">HARİKA</span>
-        </div>
-        <div className="kfoot-row"><span className="kfoot-w kfoot-w3">İŞLER</span></div>
-        <div className="kfoot-row"><span className="kfoot-w kfoot-w4">BAŞARALIM</span></div>
-      </div>
+      {/* Kapanış sloganı. Kelimeler tek tek konumlandırılmaz: eski sürümde
+          her kelime ayrı satırda `space-between` ve yüzdeli margin'lerle zıt
+          köşelere itiliyordu, cümle masaüstünde zigzag hâline gelip
+          okunmuyordu. Okuma sırası artık soldan sağa, iki satır. */}
+      <p className="kfoot-display">
+        <span className="kfoot-line">Birlikte harika</span>
+        <span className="kfoot-line kfoot-line--accent">işler başaralım</span>
+      </p>
 
       <div className="kfoot-bar">
         <a href={`mailto:${email}`} className="kfoot-link">{email}</a>

@@ -20,7 +20,7 @@ Hepsi ön-render'lı, tek ve doğru canonical'a sahip, `sitemap.xml` içinde.
 
 | Yol | Açıklama |
 |---|---|
-| `/` | Ana sayfa (React değil — `public/site.html` statik snapshot, `vercel.json` rewrite) |
+| `/` | Ana sayfa (React — `src/pages/Home.jsx`, build'de ön-render edilir) |
 | `/hakkimizda` | Hakkımızda |
 | `/hizmetler` | Hizmetler listesi |
 | `/new-media-ajansi` | New Media ajansı |

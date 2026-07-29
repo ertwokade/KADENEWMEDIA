@@ -90,9 +90,10 @@ bileşeni** (yukarıdaki madde 1).
 ### 5. Tasarım dili farkı — kasıtlı, geri dönülmemeli
 
 Eski sürüm koyu/altın parçacık temalı, "KADE" (şimşek ikonlu) marka kimliğini
-kullanıyor. Güncel anasayfa (`public/site.html`, bu oturumun önceki turlarında
-kapsamlı biçimde çalışıldı) tamamen farklı, daha minimal bir tasarım dili
-kullanıyor. Şartname §6 açıkça **"eski tasarımı körlemesine geri getirme; güncel
+kullanıyor. Güncel anasayfa (`src/pages/Home.jsx`) tamamen farklı, daha minimal
+bir tasarım dili kullanıyor. *(29 Tem 2026: bu paragraf önceden `public/site.html`
+snapshot'ına atıfta bulunuyordu; snapshot kaldırıldı, ana sayfa React kaynağında
+yeniden yazıldı.)* Şartname §6 açıkça **"eski tasarımı körlemesine geri getirme; güncel
 kadenewmedia.com ana sayfa tasarım diliyle yeniden uygula"** diyor — yani bu fark
 **beklenen ve doğru bir mimari karardır**, eksiklik değil.
 

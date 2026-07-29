@@ -1,7 +1,13 @@
 # 04 — Tasarım Sistemi (Faz 2)
 
-Referans: `kadenewmedia.com` ana sayfası (`public/site.html`) ve kök `src/index.css`
-— şartname §6 gereği birincil tasarım kaynağı budur.
+Referans: `src/styles/kade-tokens.css` (tek doğruluk kaynağı) ve
+`src/components/system/` bileşen katmanı — şartname §6 gereği birincil
+tasarım kaynağı budur.
+
+> **29 Tem 2026 notu.** Bu doküman ilk yazıldığında referans olarak
+> `public/site.html` gösteriliyordu. O dosya başka bir projenin derlenmiş
+> çıktısıydı ve kaldırıldı; tasarım kaynağı artık repodaki tokenlar ve
+> bileşenlerdir. Ayrıntı: `docs/homepage-rebuild-plan.md`.
 
 ## 1. Design tokenları (kök — kaynak referans)
 

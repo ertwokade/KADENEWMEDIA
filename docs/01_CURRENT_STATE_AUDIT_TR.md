@@ -11,7 +11,7 @@ esas alınmıştır.
 ## Ek B — Başlangıç karar listesi (şartname §Ek B)
 
 - **Ana uygulama(lar):** Üç ayrı uygulama tek repoda: (1) kök — Vite 8 + React 19 SPA + Express 5 API (`server.js`, `api/[...path].js`), (2) `apps/kadeai` — Next.js 16 App Router, (3) `apps/studio-web`/`apps/studio-worker` — ayrı bir video-editör ürünü ("Kade Studio", bu şartnamenin kapsamı dışında görünüyor, ayrıca değerlendirilmeli).
-- **Public domain:** `kadenewmedia.com` (kök uygulama, statik `site.html`/`app.html` ikili yapı).
+- **Public domain:** `kadenewmedia.com` (kök uygulama). Rotaların tamamı build sırasında `dist/<rota>/index.html` olarak ön-render edilir; dinamik rotalar `app.html`e yönlenir. *(29 Tem 2026 güncellemesi: eskiden `/` ayrı bir `site.html` snapshot'ıyla servis ediliyordu; o ikili yapı kaldırıldı — bkz. `docs/homepage-rebuild-plan.md`.)*
 - **Admin rotası:** `/admin` (kök uygulama, React SPA içinde, ~8300 satırlık `src/pages/Admin.jsx`).
 - **Kullanıcı paneli rotası:** `/musteri-panel` (kök, `CustomerPortal.jsx`) + `apps/kadeai/app/dashboard/**` (ayrı, kapsamlı bir dashboard — 30+ alt sayfa).
 - **Mevcut ödeme sağlayıcısı:** Shopier (hem kök `server/api/shopier.js` hem `apps/kadeai/lib/payments/shopierProvider.ts` — iki bağımsız entegrasyon).
