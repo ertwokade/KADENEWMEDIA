@@ -14,11 +14,10 @@ Disallow: /kade-kit-business/
 Disallow: /organizasyon-kiti
 Disallow: /organizasyon-kiti/
 
-# Ham SPA kabukları: gerçek sayfalar bunların üzerinden değil kendi
-# URL'lerinden servis edilir. Doğrudan taranırlarsa ana sayfanın ve
-# alt sayfaların kopyası olarak görünürler.
+# Ham SPA kabuğu: gerçek sayfalar bunun üzerinden değil kendi
+# URL'lerinden servis edilir. Doğrudan taranırsa alt sayfaların
+# kopyası olarak görünür.
 Disallow: /app.html
-Disallow: /site.html
 
 # Kısa link yönlendiricileri — indekslenecek içerik taşımaz.
 Disallow: /s/

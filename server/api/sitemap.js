@@ -57,6 +57,37 @@ function urlEntry({ loc, lastmod, changefreq, priority }, base = normalizeSiteBa
   return `  <url>\n    <loc>${escapeXml(base + loc)}</loc>${mod}\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
 }
 
+/**
+ * Sitemap'e girecek proje slug'ları.
+ *
+ * Ölçüt: yayında olmalı VE gösterilecek gerçek bir içeriği bulunmalı
+ * (özet, süreç, medya veya sonuç). İçeriksiz bir kayıt detay sayfasında
+ * 404 gösterildiği için sitemap'e alınmaz — aksi hâlde Google'a var
+ * olmayan sayfa bildirilir.
+ */
+export function sitemapProjects(items) {
+  if (!Array.isArray(items)) return [];
+  const seen = new Set();
+  const slugs = [];
+  for (const item of items) {
+    if (!item || typeof item !== 'object') continue;
+    if (item.published === false) continue;
+    const slug = typeof item.slug === 'string' ? item.slug.trim() : '';
+    if (!slug || seen.has(slug)) continue;
+    const summary = item.summary || {};
+    const hasContent = Boolean(
+      summary.problem || summary.goal || summary.approach || summary.role ||
+      (Array.isArray(item.process) && item.process.length) ||
+      (Array.isArray(item.media) && item.media.length) ||
+      (Array.isArray(item.results) && item.results.length),
+    );
+    if (!hasContent) continue;
+    seen.add(slug);
+    slugs.push(slug);
+  }
+  return slugs;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
@@ -69,12 +100,18 @@ export default async function handler(req, res) {
     let dynamicEntries = [];
     try {
       const supabase = getSupabase();
-      const [blogsRes, partnersRes] = await Promise.all([
+      const [blogsRes, partnersRes, portfolioRes] = await Promise.all([
         supabase.from('kade_blogs').select('slug, updated_at, created_at').or('published.is.null,published.eq.true'),
         supabase.from('kade_partners').select('slug, updated_at'),
+        // Portfolyo, içerik tablosunda tek satır olarak tutulur.
+        supabase.from('kade_site_content').select('data, updated_at').eq('section', 'portfolio').maybeSingle(),
       ]);
       const blogs = blogsRes.error ? [] : (blogsRes.data || []);
       const partners = partnersRes.error ? [] : (partnersRes.data || []);
+      // Yalnızca YAYINDAKİ ve gerçekten detay içeriği olan projeler girer;
+      // boş bir detay sayfası indekslenmemeli.
+      const projects = portfolioRes.error ? [] : sitemapProjects(portfolioRes.data?.data?.items);
+      const portfolioLastmod = String(portfolioRes.data?.updated_at || '').slice(0, 10) || undefined;
       dynamicEntries = [
         ...blogs.filter(b => b.slug).map(b => urlEntry({
           loc: `/blog/${b.slug}`,
@@ -87,6 +124,12 @@ export default async function handler(req, res) {
           lastmod: String(p.updated_at || '').slice(0, 10) || undefined,
           changefreq: 'monthly',
           priority: '0.6',
+        }, base)),
+        ...projects.map(slug => urlEntry({
+          loc: `/portfolio/${slug}`,
+          lastmod: portfolioLastmod,
+          changefreq: 'monthly',
+          priority: '0.7',
         }, base)),
       ];
     } catch (dynamicErr) {

@@ -94,15 +94,26 @@ test('index.html Google Fonts yerine self-host Poppins preload eder', async () =
   assert.match(html, /rel="preload"[^>]*as="font"[^>]*crossorigin/, 'font preload crossorigin olmalı')
 })
 
-test('statik ana sayfa snapshot\'ı Poppins kullanır, eski fontları yüklemez', async () => {
-  const html = await readRepo('public/site.html')
-  assert.ok(html.includes('/fonts/poppins/poppins-400-latin.woff2'), 'snapshot Poppins yüklemeli')
-  for (const stale of ['/fonts/TikTokSans.woff2', '/fonts/GeistMono[wght].woff2', '/fonts/DepartureMono-Regular.woff2']) {
-    assert.ok(!html.includes(stale), `snapshot hâlâ ${stale} yüklüyor`)
-  }
-  // Snapshot kendi Tailwind temasını kullanır; tema değişkeni ezilmezse
-  // sayfadaki her şey eski aileye döner.
-  assert.match(html, /--font-sans:Poppins/, 'snapshot tema değişkeni Poppins olmalı')
+test('ana sayfa React uygulamasından gelir; yabancı snapshot geri dönmemiştir', async () => {
+  // `/` daha önce başka bir Next.js projesinin minified statik snapshot'ına
+  // rewrite ediliyordu. Snapshot ana sayfa ile iç sayfaları iki ayrı tasarım
+  // sistemine bölüyor, ortak bileşen paylaşımını imkânsız kılıyor ve
+  // hydration #418 hatası veriyordu. Geri gelmediğini burada koruyoruz.
+  await assert.rejects(stat(new URL('public/site.html', ROOT)), 'site.html snapshot\'ı geri gelmiş')
+  await assert.rejects(stat(new URL('public/_next', ROOT)), 'vendored _next chunk\'ları geri gelmiş')
+
+  const vercel = JSON.parse(await readRepo('vercel.json'))
+  const rootRewrite = (vercel.rewrites || []).find((rule) => rule.source === '/')
+  assert.equal(rootRewrite, undefined, '`/` için rewrite tanımlı — ana sayfa React ön-render\'ı olmalı')
+
+  // Ana sayfa ön-render listesinde ve indekslenebilir olmalı.
+  const generator = await readRepo('scripts/generate-static-routes.mjs')
+  assert.match(generator, /\n\s*\['\/',/, 'ana sayfa ön-render rota listesinde yok')
+
+  // React ana sayfası ortak bileşen sistemini kullanmalı.
+  const home = await readRepo('src/pages/Home.jsx')
+  assert.match(home, /from '\.\.\/components\/system'/, 'ana sayfa ortak bileşenleri kullanmalı')
+  assert.doesNotMatch(home, /window\.location\.replace/, 'ana sayfa artık statik sayfaya yönlendirmemeli')
 })
 
 test('hata, offline ve gömülü organizasyon kabukları da Poppins kullanır', async () => {
@@ -119,9 +130,31 @@ test('takip edilen eski kök font dosyaları kaldırılmıştır', async () => {
   }
 })
 
-test('statik snapshot üçüncü taraf hava durumu anahtarı veya isteği içermez', async () => {
-  const chunk = await readRepo('public/_next/static/chunks/1ed7a178f7acd3df.js')
-  assert.doesNotMatch(chunk, /devapi\.qweather\.com|c6e1eaf8/, 'snapshot ağ sanitizasyonu build öncesi uygulanmalı')
+test('üçüncü taraf hava durumu isteği ve gömülü anahtarı kaldırılmıştır', async () => {
+  // Anahtar, kaldırılan snapshot bundle'ının içindeydi. Repoda hiçbir yerde
+  // yeniden belirmediğini doğruluyoruz.
+  const files = (await walk(new URL('src/', ROOT).pathname))
+    .filter((file) => /\.(js|jsx|css|html)$/.test(file))
+  for (const file of files) {
+    const source = await readFile(file, 'utf8')
+    assert.doesNotMatch(source, /devapi\.qweather\.com|c6e1eaf8/, `${file} üçüncü taraf hava durumu anahtarı içeriyor`)
+  }
+})
+
+test('tek reveal sistemi: otomatik katman ile bileşen aynı sınıfı paylaşmaz', async () => {
+  // İkisi de `.kade-reveal` kullandığında specificity eşit kalıyor, en son
+  // yüklenen CSS kazanıyor ve içerik kalıcı olarak opacity:0'da takılıyordu.
+  const motion = await readRepo('src/styles/kade-motion.js')
+  assert.match(motion, /kade-automotion/, 'otomatik katman kendi sınıfını kullanmalı')
+  assert.doesNotMatch(motion, /classList\.add\('kade-reveal'\)/, 'otomatik katman bileşen sınıfını eklememeli')
+
+  const legacyCss = await readRepo('src/styles/kade-yeni.css')
+  assert.doesNotMatch(legacyCss, /\.kade-motion \.kade-reveal\b/, 'eski CSS bileşen sınıfını ezmemeli')
+
+  // Bileşen tarafı: hareket kapalıyken içerik gizlenmemeli.
+  const systemCss = await readRepo('src/components/system/system.css')
+  assert.match(systemCss, /prefers-reduced-motion: reduce/, 'reveal reduced-motion desteklemeli')
+  assert.match(systemCss, /opacity: 1 !important/, 'reduced-motion içeriği görünür yapmalı')
 })
 
 // ── Tasarım tokenları ──────────────────────────────────────────────────────

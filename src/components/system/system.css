@@ -525,3 +525,17 @@
   color: currentColor;
   white-space: nowrap;
 }
+
+/* Kart türü rozeti — müşteri işi olmayan kayıtlar açıkça işaretlenir.
+   Medya kutusunun akışından sonra, başlığın üstünde durur. */
+.kade-card__kind {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border: 1px solid var(--kade-line-strong);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--kade-ink-3);
+}

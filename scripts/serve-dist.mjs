@@ -33,7 +33,9 @@ function json(res, status, body) {
 }
 
 async function existingFile(pathname) {
-  const relative = pathname === '/' ? 'site.html' : decodeURIComponent(pathname).replace(/^\/+/, '')
+  // `/` artık React uygulamasının ön-render çıktısıdır (dist/index.html).
+  // Önceden başka bir projenin statik snapshot'ı (site.html) servis ediliyordu.
+  const relative = pathname === '/' ? 'index.html' : decodeURIComponent(pathname).replace(/^\/+/, '')
   const safe = normalize(relative).replace(/^(\.\.(\/|\\|$))+/, '')
   const candidates = [join(root, safe), join(root, safe, 'index.html')]
   for (const candidate of candidates) {
@@ -88,6 +90,7 @@ const server = createServer(async (req, res) => {
   const SPA_REWRITES = [
     /^\/blog\/[^/]+$/,
     /^\/partnerler\/[^/]+$/,
+    /^\/portfolio\/[^/]+$/,
     /^\/s\/[^/]+$/,
     /^\/@[^/]+$/,
     /^\/401$/,

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import Reveal from './Reveal'
 import { isImageSource, toBadgeText } from '../../utils/mediaValue'
+import { PROJECT_KINDS } from '../../data/projects'
 import './system.css'
 
 // Yalnız bileşenler re-export edilir. `prefersReducedMotion` ve
@@ -223,9 +224,12 @@ export function Media({
  * olmaz — placeholder link üretilmez.
  */
 export function ProjectCard({ project, index, featured = false }) {
-  const { slug, title, category, year, excerpt, cover, coverAlt, emoji } = project
+  const { slug, title, category, year, excerpt, cover, coverAlt, emoji, kind } = project
   const Wrapper = slug ? Link : 'article'
   const wrapperProps = slug ? { to: `/portfolio/${slug}` } : {}
+  // Müşteri işi olmayan kayıtlar açıkça etiketlenir; hiçbir kart yanlışlıkla
+  // "referans müşteri" izlenimi vermez.
+  const kindLabel = kind && kind !== 'client' ? PROJECT_KINDS[kind] : null
 
   return (
     <Wrapper className={`kade-card${featured ? ' kade-card--featured' : ''}`} {...wrapperProps}>
@@ -235,6 +239,7 @@ export function ProjectCard({ project, index, featured = false }) {
         fallback={emoji}
         loading={index === 0 ? 'eager' : 'lazy'}
       />
+      {kindLabel && <span className="kade-card__kind">{kindLabel}</span>}
       <div className="kade-card__body">
         <div className="kade-card__meta">
           <span>{category}</span>

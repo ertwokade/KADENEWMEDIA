@@ -16,6 +16,8 @@ const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
 const BASE = 'https://kadenewmedia.com'
 
 const INDEXABLE = [
+  // Ana sayfa artık React uygulamasından ön-render edilir (dist/index.html).
+  '/',
   '/hakkimizda', '/hizmetler', '/new-media-ajansi', '/paketler', '/sss', '/ekip',
   '/kariyer', '/iletisim', '/teklif-al', '/kvkk', '/gizlilik', '/cerez-politikasi',
   '/telif-haklari',
@@ -37,7 +39,7 @@ const failures = []
 const ok = (msg) => console.log(`  ✓ ${msg}`)
 const fail = (msg) => { failures.push(msg); console.error(`  ✗ ${msg}`) }
 
-const read = (route) => readFile(join(DIST, route.slice(1), 'index.html'), 'utf8')
+const read = (route) => readFile(route === '/' ? join(DIST, 'index.html') : join(DIST, route.slice(1), 'index.html'), 'utf8')
 const tag = (html, re) => (html.match(re) || [])[1] || null
 
 const robotsOf = (html) => tag(html, /<meta name="robots" content="([^"]*)"/)
@@ -90,10 +92,9 @@ for (const route of PROTECTED) {
 }
 
 console.log('\n── SPA kabukları taranmamalı ──')
-for (const shell of ['/app.html', '/site.html']) {
-  if (robotsTxt.includes(`Disallow: ${shell}`)) ok(`robots.txt Disallow ${shell}`)
-  else fail(`robots.txt ${shell} engellemiyor — ana sayfanın kopyası olarak indekslenir`)
-}
+// site.html snapshot'ı kaldırıldı; yalnız app.html kabuğu kaldı.
+if (robotsTxt.includes('Disallow: /app.html')) ok('robots.txt Disallow /app.html')
+else fail('robots.txt /app.html engellemiyor — alt sayfaların kopyası olarak indekslenir')
 
 console.log('\n── app.html: dinamik rotalara servis edilen kabuk ──')
 const appShell = await readFile(join(DIST, 'app.html'), 'utf8')
@@ -107,9 +108,6 @@ console.log('\n── Sitemap ──')
 const { STATIC_PAGES } = await import('../server/api/sitemap.js')
 const locs = STATIC_PAGES.map((p) => p.loc)
 
-if (locs.includes('/')) ok('ana sayfa sitemap\'te')
-else fail('ana sayfa sitemap\'te yok')
-
 for (const route of INDEXABLE) {
   if (!locs.includes(route)) fail(`sitemap eksik: ${route}`)
 }
@@ -121,8 +119,8 @@ for (const route of [...PUBLIC_NOINDEX, ...PROTECTED]) {
 ok('noindex ve korumalı sayfalar sitemap dışında')
 
 // Sitemap toplamı: 20 statik indekslenebilir sayfa (ana sayfa + 19).
-if (locs.length !== INDEXABLE.length + 1) {
-  fail(`sitemap statik sayfa sayısı ${locs.length}, beklenen ${INDEXABLE.length + 1}`)
+if (locs.length !== INDEXABLE.length) {
+  fail(`sitemap statik sayfa sayısı ${locs.length}, beklenen ${INDEXABLE.length}`)
 } else {
   ok(`sitemap ${locs.length} statik sayfa içeriyor`)
 }
@@ -161,7 +159,7 @@ const dynamicSources = (vercel.rewrites || [])
   .filter((r) => r.destination === '/app.html')
   .map((r) => r.source)
   .sort()
-const expectedDynamic = ['/401', '/403', '/429', '/@:handle', '/bakim', '/blog/:slug', '/partnerler/:id', '/s/:slug'].sort()
+const expectedDynamic = ['/401', '/403', '/429', '/@:handle', '/bakim', '/blog/:slug', '/partnerler/:id', '/portfolio/:slug', '/s/:slug'].sort()
 if (JSON.stringify(dynamicSources) !== JSON.stringify(expectedDynamic)) {
   fail(`app.html rewrite listesi değişmiş:\n      var: ${dynamicSources.join(', ')}\n      bekl: ${expectedDynamic.join(', ')}`)
 } else {

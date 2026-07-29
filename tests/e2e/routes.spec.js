@@ -27,23 +27,11 @@ const PUBLIC_ROUTES = [
   '/telif-haklari',
 ]
 
-// BULGU (bu turda keşfedildi): `/` şu an src/App.jsx'in React uygulaması
-// tarafından değil, public/site.html üzerinden servis ediliyor — bu,
-// kadenewmedia.com'un ayrı bir Next.js derlemesinden alınmış, kendi
-// vendored `_next/static/chunks/*` dosyalarıyla birlikte tamamen
-// self-contained statik bir export (vercel.json'daki `/ → /site.html`
-// rewrite'ı, docs/04'te "tasarım referansı" olarak tanımlanmıştı ama
-// gerçekte CANLI ana sayfa olarak servis ediliyor). Bu export kendi
-// React çalışma zamanını hydrate ederken "Minified React error #418"
-// (hydration metin uyuşmazlığı) veriyor — sayfa görsel olarak çökmüyor
-// (status/body görünürlüğü ayrıca doğrulanıyor) ama konsola hata basıyor.
-// Kaynak bu repoda yok (yalnızca derlenmiş/minified vendored dosyalar) —
-// güvenle yama yapılamaz. Bilinen, izlenen bir bulgu olarak buradan
-// bilinçli olarak muaf tutuluyor; kaldırılırsa (ör. site.html React
-// tabanlı ana sayfayla değiştirilirse) bu satır da kaldırılmalı.
-const KNOWN_CONSOLE_ISSUES = {
-  '/': [/Minified React error #418/],
-}
+// Ana sayfa artık React uygulamasının parçası (src/pages/Home.jsx).
+// Daha önce `/` başka bir projenin statik snapshot'ına rewrite ediliyordu ve
+// hydration "Minified React error #418" üretiyordu; o muafiyet kaldırıldı —
+// hiçbir public rota konsola kritik hata basmamalı.
+const KNOWN_CONSOLE_ISSUES = {}
 
 for (const route of PUBLIC_ROUTES) {
   test(`public route loads without console errors: ${route}`, async ({ page }) => {

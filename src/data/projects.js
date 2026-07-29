@@ -34,6 +34,28 @@ export const PROJECT_CATEGORIES = [
 
 export const MEDIA_LAYOUTS = ['full', 'split', 'portrait', 'landscape']
 
+/**
+ * Kart türü — bir kaydın NE olduğunu açıkça söyler.
+ *
+ * Gerçek müşteri medyası ve yayın izni olmadan hiçbir kayıt "müşteri işi"
+ * gibi gösterilmez. Yönetici, kaydı doğru türle işaretler; public taraf
+ * bu etiketi kartın üstünde görünür biçimde basar.
+ *
+ *   client     → yayın izni alınmış gerçek müşteri projesi
+ *   experiment → Kade'nin kendi denemesi/iç çalışması
+ *   capability → müşteri işi değil; ne yapabildiğimizi anlatan kart
+ */
+export const PROJECT_KINDS = {
+  client: 'Müşteri projesi',
+  experiment: 'Kade Studio Deneyi',
+  capability: 'Hizmet Kabiliyeti',
+}
+
+/** Bilinmeyen/boş tür güvenli tarafa düşer: müşteri işi SAYILMAZ. */
+export function projectKind(value) {
+  return Object.prototype.hasOwnProperty.call(PROJECT_KINDS, value) ? value : 'capability'
+}
+
 /** Türkçe karakterleri URL-güvenli karşılıklarına çevirir. */
 export function slugify(value) {
   const map = { ı: 'i', İ: 'i', ğ: 'g', Ğ: 'g', ü: 'u', Ü: 'u', ş: 's', Ş: 's', ö: 'o', Ö: 'o', ç: 'c', Ç: 'c' }
@@ -59,6 +81,8 @@ export function normalizeProject(raw) {
     client: str(raw.client),
     year: str(raw.year),
     category: str(raw.category) || PROJECT_CATEGORIES[0],
+    // Tür belirtilmemişse "müşteri projesi" VARSAYILMAZ.
+    kind: projectKind(raw.kind),
     excerpt: str(raw.excerpt),
     // Yayın durumu açıkça false değilse yayında sayılır (eski kayıtlarla uyum).
     published: raw.published !== false,

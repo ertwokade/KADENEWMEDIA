@@ -855,28 +855,9 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
    glossy obje + ışık, mix-blend-multiply + radial mask ile krem zemine
    yumuşak oturur. Sadece hero KONTEYNERLERİ (başlık/alt-başlık hariç).
    ===================================================================== */
-[class*="-hero"]:not(h1):not([class*="-title"]):not([class*="-subtitle"]):not([class*="-badge"]):not([class*="-desc"]) {
-  position: relative !important;
-  isolation: isolate;
-  overflow: hidden;
-}
-[class*="-hero"]:not(h1):not([class*="-title"]):not([class*="-subtitle"]):not([class*="-badge"]):not([class*="-desc"])::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  right: -6%;
-  top: 46%;
-  transform: translateY(-50%);
-  width: min(52vw, 680px);
-  height: min(52vw, 680px);
-  background: url('/img/kade-hello-art.jpg') no-repeat center center;
-  background-size: contain;
-  mix-blend-mode: multiply;
-  opacity: 0.5;
-  -webkit-mask-image: radial-gradient(58% 58% at 52% 50%, #000 38%, transparent 72%);
-  mask-image: radial-gradient(58% 58% at 52% 50%, #000 38%, transparent 72%);
-}
+/* Eski dekoratif hero arka planı kaldırıldı: kullandığı
+   /img/kade-hello-art.jpg görselinin kökeni doğrulanamadı (referans sitenin
+   "hello" temasına ait olabilir) ve varlık projeden çıkarıldı. */
 /* mobilde daha küçük + kenarda, metni ezmesin */
 @media (max-width: 768px) {
   [class*="-hero"]:not(h1):not([class*="-title"]):not([class*="-subtitle"]):not([class*="-badge"]):not([class*="-desc"])::after {

@@ -10,6 +10,7 @@ import {
   SectionHeading,
   Button,
   LinkArrow,
+  Marquee,
   ProjectCard,
   ServiceCard,
   ContactCTA,
@@ -36,6 +37,10 @@ import './Home.css'
  *   • İlk boyada HTML başlık ve CTA görünür; hiçbir metin ağır bir
  *     varlığın yüklenmesini beklemez.
  */
+
+// Marquee içeriği hizmet verisinden türetilir — ayrı bir metin listesi
+// tutulmaz, hizmet eklendiğinde burası kendiliğinden güncellenir.
+const MARQUEE = SERVICES.map((service) => service.title.toLocaleUpperCase('tr-TR'))
 
 const PROCESS = [
   ['01', 'Keşif', 'Markanı, sektörünü ve hedeflerini inceleriz; başarının nasıl ölçüleceğini birlikte yazarız.'],
@@ -129,6 +134,8 @@ export default function Home() {
           </Reveal>
         </Container>
       </Section>
+
+      <Marquee items={MARQUEE} ariaLabel="Hizmet alanlarımız" />
 
       {/* ── ÇALIŞMA BİÇİMİ ──────────────────────────────────────────── */}
       <Section className="home-process">

@@ -3,7 +3,6 @@ import { CustomerProvider } from './contexts/CustomerContext'
 import { OrganizationSchema } from './components/StructuredData'
 import { Routes, Route, useLocation, useParams, Navigate } from 'react-router-dom'
 import { trackPageviewApi, heartbeatApi, getSessionApi, resolveShortLinkApi, recordShortLinkClickApi } from './api'
-import PageHeroCanvas from './components/PageHeroCanvas'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
@@ -34,6 +33,7 @@ const Partners = lazy(() => import('./pages/Partners'))
 const PartnerDetail = lazy(() => import('./pages/PartnerDetail'))
 const Careers = lazy(() => import('./pages/Careers'))
 const Portfolio = lazy(() => import('./pages/Portfolio'))
+const ProjectDetail = lazy(() => import('./pages/ProjectDetail'))
 const Team = lazy(() => import('./pages/Team'))
 const KVKK = lazy(() => import('./pages/KVKK'))
 const Gizlilik = lazy(() => import('./pages/Gizlilik'))
@@ -59,6 +59,12 @@ const Unauthorized = lazy(() => import('./pages/Unauthorized'))
 const Forbidden = lazy(() => import('./pages/Forbidden'))
 const TooManyRequests = lazy(() => import('./pages/TooManyRequests'))
 const Maintenance = lazy(() => import('./pages/Maintenance'))
+
+// Dekoratif 3B zemin Three.js/R3F çeker. Ana sayfa ve diğer `hideDecor`
+// rotalarında hiç render edilmiyor; statik import olduğu için yine de
+// bundle'a giriyor ve THREE.Clock deprecation uyarısı basıyordu.
+// Lazy import ile yalnız gerçekten gösterildiği rotalarda yüklenir.
+const PageHeroCanvas = lazy(() => import('./components/PageHeroCanvas'))
 
 function PageLoader() {
   // Lazy chunk inerken tamamen boş ekran yerine hafif, markalı bir spinner
@@ -242,7 +248,11 @@ function App() {
       <ScrollToTop />
       {!hideDecor && <AuroraBackground />}
       {!hideDecor && <GrainOverlay />}
-      {!hideDecor && <PageHeroCanvas type={canvasTheme} />}
+      {!hideDecor && (
+        <Suspense fallback={null}>
+          <PageHeroCanvas type={canvasTheme} />
+        </Suspense>
+      )}
       {!hideChrome && <Navbar />}
       <main id="main-content">
         <Routes location={location} key={location.pathname}>
@@ -259,6 +269,7 @@ function App() {
           <Route path="/partnerler/:id" element={<LazyRoute><PartnerDetail /></LazyRoute>} />
           <Route path="/kariyer" element={<LazyRoute><Careers /></LazyRoute>} />
           <Route path="/portfolio" element={<LazyRoute><Portfolio /></LazyRoute>} />
+          <Route path="/portfolio/:slug" element={<LazyRoute><ProjectDetail /></LazyRoute>} />
           <Route path="/ekip" element={<LazyRoute><Team /></LazyRoute>} />
           <Route path="/basari-hikayeleri" element={<LazyRoute><CaseStudies /></LazyRoute>} />
           <Route path="/kvkk" element={<LazyRoute><KVKK /></LazyRoute>} />
