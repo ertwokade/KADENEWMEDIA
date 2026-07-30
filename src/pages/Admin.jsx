@@ -28,7 +28,13 @@ import CaseStudiesEditor from './admin/editors/CaseStudiesEditor'
 import NewsletterArchiveEditor from './admin/editors/NewsletterArchiveEditor'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
 import { PACKAGE_SCOPES } from '../data/packages'
-import { HOME_HERO_DEFAULTS, HOME_SERVICES_DEFAULTS, NAVIGATION_DEFAULTS } from '../data/pageDefaults'
+import {
+  HOME_FAQ_DEFAULTS,
+  HOME_HERO_DEFAULTS,
+  HOME_SERVICES_DEFAULTS,
+  HOME_STATS_DEFAULTS,
+  NAVIGATION_DEFAULTS,
+} from '../data/pageDefaults'
 import { getPackageEntitlements } from '../config/entitlements'
 import {
   apiFetch,
@@ -1086,29 +1092,11 @@ function ContentSection({ showToast }) {
 
   // Memoize data props to prevent child editors from resetting form state on re-render
   // (isDirty state change triggers re-render; inline fallback objects would create new refs each time)
-  const heroData = useMemo(() => content.hero || {
-    tr: { title1: 'Dijital Dünyada Markanıza', title2: 'Kademe Atlatıyoruz ⚡', subtitle: 'Kade New Media olarak sosyal medya stratejileri, kreatif içerik üretimi ve dijital pazarlama çözümleriyle markanızı zirveye taşıyoruz.' },
-    en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade New Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
-  }, [content.hero])
+  const heroData = useMemo(() => content.hero || HOME_HERO_DEFAULTS, [content.hero])
   const navigationData = useMemo(() => content.navigation || NAVIGATION_DEFAULTS, [content.navigation])
-  const statsData = useMemo(() => content.stats || { clients: '10+', followers: '500+', campaigns: '50+', satisfaction: '98%' }, [content.stats])
+  const statsData = useMemo(() => content.stats || HOME_STATS_DEFAULTS, [content.stats])
   const servicesData = useMemo(() => content.services || { items: [] }, [content.services])
-  const faqData = useMemo(() => content.faq || {
-    tr: [
-      { q: 'Kade New Media ne tür hizmetler sunuyor?', a: 'Sosyal medya yönetimi, içerik üretimi, reklam yönetimi (Meta, Google, TikTok), video prodüksiyon ve dijital strateji danışmanlığı hizmetleri sunuyoruz.' },
-      { q: 'Minimum sözleşme süresi ne kadar?', a: 'Minimum 3 aylık sözleşme yapıyoruz. Dijital pazarlamada sonuçlar zaman alır, bu süre stratejimizin etkisini görmeniz için idealdir.' },
-      { q: 'Reklam bütçesi paket fiyatına dahil mi?', a: 'Hayır, reklam bütçesi paket fiyatlarına dahil değildir. Reklam yönetim hizmeti dahildir ancak reklam harcaması ayrıca faturalandırılır.' },
-      { q: 'Sonuçları ne zaman görmeye başlarım?', a: 'Organik büyüme stratejilerinde 1-3 ay içinde belirgin sonuçlar görülebilir. Reklam kampanyalarında ise ilk hafta içinde sonuçlar alınmaya başlanır.' },
-      { q: 'Hangi sektörlere hizmet veriyorsunuz?', a: 'Yiyecek & içecek, teknoloji, moda, sağlık, fitness, e-ticaret ve daha birçok sektörde deneyimimiz var. Her sektöre özel stratejiler geliştiriyoruz.' },
-    ],
-    en: [
-      { q: 'What kind of services does Kade New Media offer?', a: 'We offer social media management, content production, ad management (Meta, Google, TikTok), video production, and digital strategy consulting services.' },
-      { q: 'What is the minimum contract period?', a: 'We require a minimum 3-month contract. Results in digital marketing take time, and this period is ideal for seeing the impact of our strategy.' },
-      { q: 'Is the ad budget included in the package price?', a: 'No, the ad budget is not included in package prices. Ad management service is included, but ad spend is billed separately.' },
-      { q: 'When will I start seeing results?', a: 'Organic growth strategies can show significant results within 1-3 months. For ad campaigns, results can be seen within the first week.' },
-      { q: 'Which industries do you serve?', a: 'We have experience in food & beverage, technology, fashion, health, fitness, e-commerce, and many more sectors. We develop custom strategies for each industry.' },
-    ],
-  }, [content.faq])
+  const faqData = useMemo(() => content.faq || HOME_FAQ_DEFAULTS, [content.faq])
   const testimonialsData = useMemo(() => content.testimonials || { items: [] }, [content.testimonials])
   // NOT: Bu içerik, canlı /paketler sayfasındaki 3 sabit kapsamla (baslangic/buyume/ozel,
   // bkz. src/data/packages.js) id üzerinden eşleşir. Yalnızca fiyat alanları admin'den
