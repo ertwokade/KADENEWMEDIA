@@ -127,16 +127,25 @@ export default function Navbar() {
               </Link>
             ))}
             <button type="button" className="knav-mlink" onClick={toggleTheme} aria-label={themeLabel}><ThemeIcon size={15} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 7 }} />TEMA</button>
+            {/* Sabit GİRİŞ hapı ≤1024px'te gizlenir (içeriği örtüyordu); erişim
+                menü içinden sürdürülür. Bkz. .knav-giris--float. */}
+            {customer ? (
+              <Link to="/musteri-panel" className="knav-mlink knav-mlink--giris">
+                {(customer.name?.split(' ')[0] || 'PANEL').toUpperCase()} →
+              </Link>
+            ) : (
+              <Link to="/giris" className="knav-mlink knav-mlink--giris">GİRİŞ →</Link>
+            )}
           </div>
         )}
       </nav>
 
       {customer ? (
-        <Link to="/musteri-panel" className="knav-giris">
+        <Link to="/musteri-panel" className="knav-giris knav-giris--float">
           {(customer.name?.split(' ')[0] || 'PANEL').toUpperCase()} →
         </Link>
       ) : (
-        <Link to="/giris" className="knav-giris">GİRİŞ →</Link>
+        <Link to="/giris" className="knav-giris knav-giris--float">GİRİŞ →</Link>
       )}
     </>
   )

@@ -17,7 +17,7 @@ export default function KVKK() {
         <div className="grid-bg" />
         <div className="container">
           <FadeIn>
-            <div className="legal-content glass-card">
+            <div className="legal-content">
               <h1>KVKK Aydınlatma Metni</h1>
               <p className="legal-date">Son güncelleme: Temmuz 2026</p>
 

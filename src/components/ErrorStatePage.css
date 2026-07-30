@@ -1,3 +1,14 @@
+/* ============================================================================
+   HATA / DURUM SAYFALARI — 404, 401, 403, 429, bakım
+   ----------------------------------------------------------------------------
+   Tek iskelet, tek CSS ailesi. Eskiden `src/pages/NotFound.css` bu dosyanın
+   ilk 52 satırının neredeyse birebir kopyasıydı (`notfound-*` önekiyle); iki
+   dosya birlikte güncellenmediği için hata sayfaları zamanla ayrışıyordu.
+   404'e özel arama kutusu ve popüler sayfa bağlantıları da buraya taşındı.
+
+   Renk ve ölçüler merkezi tokenlardan gelir — bu sayfalar da markanın parçası.
+   ========================================================================== */
+
 .error-state-section {
   position: relative;
   min-height: 80vh;
@@ -9,44 +20,156 @@
 
 .error-state-container {
   text-align: center;
-  padding: 120px 20px 80px;
+  padding: calc(var(--space-16) + var(--space-12)) var(--space-5) var(--space-20);
 }
 
+/* Durum kodu — altın gradyan yalnız burada, tek ve anlamlı vurgu olarak. */
 .error-state-code {
-  font-family: var(--font-primary);
+  font-family: var(--font-sans);
   font-size: clamp(4.5rem, 12vw, 9rem);
-  font-weight: 900;
-  line-height: 1;
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
+}
+
+/* 404'te "0" vurgulanır, "4"ler geri çekilir. */
+.error-state-code--muted {
+  background: none;
+  -webkit-text-fill-color: currentcolor;
+  color: var(--kade-ink-4);
+}
+
+.error-state-code--muted span {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .error-state-container h1 {
-  font-size: clamp(1.5rem, 4vw, 2.2rem);
-  color: var(--white);
-  margin-bottom: 12px;
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tracking-tight);
+  color: var(--kade-ink);
+  margin-bottom: var(--space-3);
 }
 
 .error-state-container p {
-  color: var(--text-secondary);
-  font-size: 1rem;
-  max-width: 440px;
-  margin: 0 auto 32px;
-  line-height: 1.6;
+  color: var(--kade-ink-2);
+  font-size: var(--fs-md);
+  max-width: 46ch;
+  margin: 0 auto var(--space-8);
+  line-height: var(--lh-body);
 }
 
 .error-state-actions {
   display: flex;
-  gap: 12px;
+  gap: var(--space-3);
   justify-content: center;
   flex-wrap: wrap;
 }
 
+/* ── 404: site içi arama ─────────────────────────────────────────────────── */
+
+.error-state-search {
+  display: flex;
+  max-width: 480px;
+  margin: 0 auto var(--space-6);
+  border: 1px solid var(--kade-line-strong);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--kade-surface);
+}
+
+/* Focus halkası input'ta değil sarmalayıcıda: yuvarlak kenar bozulmasın. */
+.error-state-search:focus-within {
+  border-color: var(--kade-gold);
+  box-shadow: var(--shadow-focus);
+}
+
+.error-state-search-input {
+  flex: 1;
+  padding: var(--space-3) var(--space-5);
+  background: transparent;
+  border: none;
+  color: var(--kade-ink);
+  font-size: var(--fs-base);
+  outline: none;
+  min-height: var(--tap-min);
+}
+
+.error-state-search-input::placeholder {
+  color: var(--kade-ink-3);
+}
+
+.error-state-search-btn {
+  padding: var(--space-3) var(--space-5);
+  background: var(--kade-gold);
+  border: none;
+  color: var(--kade-ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  /* 44px dokunma hedefi — eski sürüm 38px'ti. */
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  justify-content: center;
+}
+
+.error-state-search-btn:hover {
+  background: var(--kade-gold-deep);
+}
+
+/* ── 404: popüler sayfalar ───────────────────────────────────────────────── */
+
+.error-state-popular {
+  margin-top: var(--space-12);
+}
+
+.error-state-popular-title {
+  font-size: var(--fs-2xs);
+  color: var(--kade-ink-3);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--space-4);
+}
+
+.error-state-popular-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.error-state-popular-link {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--kade-line);
+  background: transparent;
+  color: var(--kade-ink-2);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  min-height: var(--tap-min);
+  transition: border-color var(--dur-micro) var(--ease-out),
+              color var(--dur-micro) var(--ease-out);
+}
+
+.error-state-popular-link:hover,
+.error-state-popular-link:focus-visible {
+  border-color: var(--kade-gold);
+  color: var(--kade-ink);
+}
+
 @media (max-width: 768px) {
   .error-state-container {
-    padding: 100px 16px 60px;
+    padding: calc(var(--space-16) + var(--space-6)) var(--space-4) var(--space-16);
   }
 }

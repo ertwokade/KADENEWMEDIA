@@ -82,11 +82,18 @@
   color: #17130a;
   font-family: var(--font-sans);
   font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
+  /* Dokunma hedefi alt sınırı — WCAG 2.1 AA hedefimiz 44px.
+     Eski değer 39px ölçülüyordu. */
+  min-height: var(--tap-min, 44px);
   padding: 10px 20px; border-radius: 999px;
   text-decoration: none;
   transition: transform .2s ease;
 }
 .knav-giris:hover { transform: translateY(-1px); }
+
+/* Mobil menü içindeki GİRİŞ girişi — diğer menü satırlarıyla aynı dilde,
+   yalnız altın vurgusuyla ayrılır. */
+.knav-mlink--giris { color: #8a5a00; font-weight: 600; }
 
 /* mobil */
 .knav-burger {
@@ -117,5 +124,12 @@
   .knav { padding: 12px 16px; }
   .knav-links { display: none; }
   .knav-burger { display: inline-flex; }
-  .knav-giris { right: 16px; bottom: 16px; }
+
+  /* ÖLÇÜLDÜ (canlı, 500px genişlik, /sss): sabit GİRİŞ hapı [394,599,90,39]
+     `button.sss-soru` SSS akordiyon tetikleyicisinin ÜZERİNE biniyordu.
+     Footer.css'teki eski not yalnız sayfa dibinde ölçüm yaptığı için bunu
+     kaçırmış. Dar ekranda içerik tam genişlik olduğu için hap kaçınılmaz
+     olarak bir kontrolü örtüyor; bu yüzden yüzen sürüm gizlenir ve erişim
+     mobil menüdeki .knav-mlink--giris ile sürdürülür. */
+  .knav-giris--float { display: none; }
 }

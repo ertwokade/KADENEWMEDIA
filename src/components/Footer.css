@@ -81,10 +81,14 @@
 .kfoot-legal-links a { color: inherit; text-decoration: none; }
 .kfoot-legal-links a:hover { color: var(--ky-ink, #17130a); }
 
-/* Sağ altta `position: fixed` bir "GİRİŞ" hapı var (`.knav-giris`,
-   z-index 10001). Sayfa dibindeyken üç viewport'ta da yasal link satırının
-   ALTINDA kalıyor, örtüşme yok — ölçüldü (1440/1024/390, atBottom=0).
-   Bu yüzden burada ek bir sağ boşluk YOK; alttaki padding yeterli. */
+/* Sağ altta `position: fixed` bir "GİRİŞ" hapı var (`.knav-giris--float`,
+   z-index 10001).
+   DÜZELTME (30.07.2026): Buradaki eski not "örtüşme yok" diyordu, ancak o
+   ölçüm yalnızca SAYFA DİBİNDE yapılmıştı. Sayfa ortasında kaydırırken hap
+   içeriğin üzerinde kalıyor: canlıda 500px genişlikte /sss sayfasında
+   `button.sss-soru` akordiyon tetikleyicisini örttüğü ölçüldü.
+   Çözüm Navbar.css'te: ≤1024px'te yüzen sürüm gizlenir, erişim mobil
+   menüye taşınır. Bu yüzden aşağıdaki ekstra alt boşluk artık gereksiz. */
 @media (max-width: 768px) {
-  .kfoot { padding: 60px 20px 110px; } /* GİRİŞ hapına yer */
+  .kfoot { padding: 60px 20px 72px; }
 }

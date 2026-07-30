@@ -5,9 +5,19 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from './PageTransition'
 import './ErrorStatePage.css'
 
-// Paylaşılan 401/403/429/bakım durum sayfası iskeleti — src/pages/NotFound.jsx
-// ile aynı görsel dilde ama kendi (generic isimli) CSS sınıflarını kullanır.
-export default function ErrorStatePage({ code, title, message, retryLabel, retryTo = '/', secondaryLabel, secondaryTo = '/iletisim' }) {
+/**
+ * Paylaşılan hata/durum sayfası iskeleti — 401, 403, 429, bakım VE 404.
+ *
+ * Eskiden `src/pages/NotFound.jsx` bu iskeletin neredeyse birebir kopyasıydı:
+ * aynı düzen, `notfound-*` adıyla ikinci bir CSS ailesi (125 satır) ve ayrı
+ * bir bileşen. İki dosya birlikte güncellenmediği için hata sayfaları zamanla
+ * birbirinden ayrışıyordu. Artık tek iskelet var.
+ *
+ * @param {ReactNode} children  İskeletin altına eklenen sayfaya özel içerik
+ *                              (ör. 404'teki arama kutusu ve popüler sayfalar).
+ * @param {ReactNode} codeDisplay  `code` yerine özel biçimlendirilmiş kod.
+ */
+export default function ErrorStatePage({ code, codeDisplay, title, message, retryLabel, retryTo = '/', secondaryLabel, secondaryTo = '/iletisim', children }) {
   const location = useLocation()
 
   useSEO({
@@ -24,12 +34,12 @@ export default function ErrorStatePage({ code, title, message, retryLabel, retry
         <div className="glow-effect" style={{ top: '-150px', right: '-100px' }} />
         <div className="container error-state-container">
           <motion.div
-            className="error-state-code"
+            className={`error-state-code${codeDisplay ? ' error-state-code--muted' : ''}`}
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
-            {code}
+            {codeDisplay ?? code}
           </motion.div>
           <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
             {title}
@@ -49,6 +59,7 @@ export default function ErrorStatePage({ code, title, message, retryLabel, retry
               </Link>
             )}
           </motion.div>
+          {children}
         </div>
       </section>
     </PageTransition>

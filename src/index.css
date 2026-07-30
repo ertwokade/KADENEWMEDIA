@@ -9,54 +9,29 @@
 @import './styles/kade-tokens.css';
 @import './styles/kade-design.css';
 
+/* ---------------------------------------------------------------------------
+   ESKİ PALET TAKMA ADLARI — yalnız burada TANIMLANMAYANLAR kaldı.
+   ---------------------------------------------------------------------------
+   Burada eskiden 31 değişken vardı. Ölçüldüğünde 28'inin ÖLÜ KOD olduğu
+   ortaya çıktı: aynı dosyanın ilerisindeki `:root, [data-theme="light"]`
+   bloğu (bkz. "KADE MEDIA1 CINEMATIC THEME") aynı isimleri yeniden
+   tanımlıyor ve kaskadda sonra geldiği için her zaman kazanıyordu.
+
+       16 değişken  → birebir aynı değerle tekrar ediliyordu
+       12 değişken  → farklı değerle eziliyordu (buradaki değer hiç uygulanmadı)
+        3 değişken  → yalnız burada tanımlı  ← SADECE BUNLAR KALDI
+
+   Bu yüzden aşağıdaki silme işlemi görsel olarak nötrdür: silinen hiçbir
+   bildirim zaten yürürlükte değildi.
+
+   KURAL: Palet değişkenlerini tek yerde tut. Marka tokenları için
+   `styles/kade-tokens.css` (--kade-*), eski takma adlar için aşağıdaki
+   "CINEMATIC THEME" bloğu. Buraya yeni değişken eklemeyin.
+--------------------------------------------------------------------------- */
 :root {
-  /* kade açık palet — NOT: --white = ön plan(koyu), --black = zemin(krem) olarak repurpose edildi */
-  --primary: #e0a81f;
-  --primary-dark: #c8901a;
-  --primary-light: #fff2cc;
-  --black: #fdf6e3;
-  --black-light: #f7edd6;
-  --black-lighter: #f2e6c9;
-  --dark-gray: #ece0c4;
-  --gray: #e6d9ba;
-  --gray-light: rgba(23, 19, 10, 0.55);
-  --gray-lighter: rgba(23, 19, 10, 0.72);
-  --white: #17130a;
-  --white-dim: #2a2416;
-  --text-secondary: rgba(23, 19, 10, 0.55);
-  --bg-primary: #fdf6e3;
-
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #e8b93a 0%, #e0a81f 100%);
-  --gradient-dark: linear-gradient(180deg, #fdf6e3 0%, #f5ead0 100%);
-  --gradient-card: linear-gradient(145deg, rgba(224,168,31,0.06) 0%, rgba(224,168,31,0) 100%);
-  --gradient-glow: radial-gradient(circle at center, rgba(224,168,31,0.14) 0%, transparent 70%);
-
-  /* Typography — kade-tokens.css'te tanımlıdır (Poppins). Burada yeniden
-     tanımlamayın; import sırası nedeniyle tokenları ezer. */
-
-  /* Spacing */
-  --section-padding: 100px 0;
-  --container-width: 1200px;
-
-  /* Transitions */
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
-
-  /* Borders */
-  --border-color: rgba(23, 19, 10, 0.12);
-  --border-color-hover: rgba(23, 19, 10, 0.28);
-  --border: rgba(23, 19, 10, 0.12);
-
-  /* Semantic tokens used across tool/form pages */
-  --text-primary: #17130a;
-  --bg-secondary: rgba(23, 19, 10, 0.04);
-  --card-bg: rgba(23, 19, 10, 0.03);
-
-  /* Shadows */
-  --shadow-glow: 0 10px 40px rgba(23, 19, 10, 0.08);
-  --shadow-glow-strong: 0 20px 60px rgba(23, 19, 10, 0.12);
 }
 
 /* Skip to content — accessibility */

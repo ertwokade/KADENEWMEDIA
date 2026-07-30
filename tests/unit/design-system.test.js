@@ -347,3 +347,124 @@ test('PartnerDetail emoji/URL ayrımını kullanır', async () => {
   const source = await readRepo('src/pages/PartnerDetail.jsx')
   assert.match(source, /isImageSource\(partner\.logo\)/, 'logo alanı tür kontrolünden geçmeli')
 })
+
+// ── Merkezî tasarım sistemi: kaskad bütünlüğü ──────────────────────────────
+
+/**
+ * Yorumları siler. Aşağıdaki testler "şu şey KULLANILMAMALI" diye iddia
+ * ediyor; açıklama satırlarında o şeyin adının geçmesi normaldir (neden
+ * kaldırıldığını anlatır). Denetim koda uygulanmalı, düzyazıya değil.
+ */
+function stripComments(source) {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, '')   // /* blok */ — hem CSS hem JS
+    .replace(/^\s*\/\/.*$/gm, '')        // // satır
+}
+// Bu blok 30.07.2026 denetiminde bulunan ve düzeltilen sorunları kilitler.
+// Görsel doğrulama (ekran görüntüsü/e2e) bu ortamda yapılamadığı için
+// invariant'lar YAPISAL olarak korunur.
+
+test('index.css tek palet bloğu tanımlar — ölü :root tekrarı geri gelmemeli', async () => {
+  // Dosyada iki `:root` bloğu vardı. İlkinin 31 değişkeninden 28'i, aynı
+  // dosyanın ilerisindeki `:root, [data-theme="light"]` bloğu tarafından
+  // eziliyordu (16'sı birebir aynı değerle). Yani ölü koddu ve hangi değerin
+  // yürürlükte olduğunu okumayı imkânsızlaştırıyordu.
+  const css = await readRepo('src/index.css')
+
+  const firstRoot = css.match(/^:root \{([\s\S]*?)^\}/m)
+  assert.ok(firstRoot, 'index.css bir :root bloğu içermeli')
+
+  const declared = [...firstRoot[1].matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]).sort()
+  assert.deepEqual(
+    declared,
+    ['--transition-fast', '--transition-normal', '--transition-slow'],
+    'ilk :root yalnız benzersiz transition değişkenlerini tutmalı — palet tekrarı geri gelmiş',
+  )
+})
+
+test('yasal sayfalar merkezi tokenları baypas etmez', async () => {
+  const raw = await readRepo('src/pages/Legal.css')
+  const css = stripComments(raw)
+
+  // Eskiden [data-theme="light"] altında sabit hex kullanılıyordu; tema veya
+  // marka tonu değiştiğinde bu dört sayfa eski renkte kalıyordu.
+  assert.doesNotMatch(css, /#1A1715|#4A4540|#7A7570/i, 'Legal.css sabit hex renk içermemeli')
+  assert.doesNotMatch(css, /\[data-theme="light"\]/, 'ayrı light-mode bloğu gerekmiyor — tokenlar tema ile değişir')
+
+  // Kısa yasal metinlerde açıklanamayan boş dikey alan üretiyordu.
+  assert.doesNotMatch(css, /min-height:\s*100vh/, 'min-height:100vh boş alan üretiyor, kaldırılmalı')
+
+  // Renk ve ölçüler merkezi tokenlardan gelmeli.
+  for (const token of ['--kade-ink', '--kade-line', '--space-', '--fs-', '--container-narrow']) {
+    assert.ok(css.includes(token), `Legal.css ${token} kullanmalı`)
+  }
+})
+
+test('yasal sayfalar toplu !important yamasına bağlı .glass-card kullanmaz', async () => {
+  for (const page of ['KVKK', 'Gizlilik', 'CerezPolitikasi', 'TelifHaklari']) {
+    const source = await readRepo(`src/pages/${page}.jsx`)
+    assert.doesNotMatch(
+      source,
+      /className="legal-content glass-card"/,
+      `${page}.jsx yüzeyini .glass-card'tan almamalı — Legal.css tokenlarla tanımlıyor`,
+    )
+  }
+})
+
+test('404 ile diğer hata sayfaları tek iskeleti paylaşır', async () => {
+  // NotFound.jsx, ErrorStatePage'in neredeyse birebir kopyasıydı: ayrı
+  // bileşen + `notfound-*` adıyla 125 satırlık ikinci bir CSS ailesi. İkisi
+  // birlikte güncellenmediği için hata sayfaları zamanla ayrışıyordu.
+  await assert.rejects(
+    stat(new URL('src/pages/NotFound.css', ROOT)),
+    'NotFound.css geri gelmiş — hata sayfası CSS ailesi tekrar ikiye bölünmüş',
+  )
+
+  const notFound = await readRepo('src/pages/NotFound.jsx')
+  assert.match(notFound, /from '\.\.\/components\/ErrorStatePage'/, '404 ortak iskeleti kullanmalı')
+  assert.doesNotMatch(stripComments(notFound), /notfound-/, 'eski CSS ailesi kalmamalı')
+
+  // Ortak iskelet 404'ün ek içeriğini alabilmeli.
+  const skeleton = await readRepo('src/components/ErrorStatePage.jsx')
+  assert.match(skeleton, /children/, 'ErrorStatePage children almalı')
+  assert.match(skeleton, /codeDisplay/, 'ErrorStatePage özel kod gösterimini desteklemeli')
+})
+
+test('hata sayfalarında dekoratif emoji kullanılmaz', async () => {
+  // Marka dili editoryal; popüler sayfa etiketlerindeki 📋 💰 ❓ ✉️ generic
+  // SaaS görünümü veriyordu.
+  const emoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u
+  for (const path of ['src/pages/NotFound.jsx', 'src/components/ErrorStatePage.jsx']) {
+    const source = stripComments(await readRepo(path))
+    assert.doesNotMatch(source, emoji, `${path} dekoratif emoji içermemeli`)
+  }
+})
+
+test('sabit GİRİŞ butonu dar ekranda içeriğin üzerine binmez', async () => {
+  // ÖLÇÜLDÜ (canlı, 500px, /sss): hap [394,599,90,39] `button.sss-soru`
+  // akordiyon tetikleyicisini örtüyordu. Dar ekranda içerik tam genişlik
+  // olduğu için yüzen hap kaçınılmaz olarak bir kontrolü kapatıyor.
+  const css = await readRepo('src/components/Navbar.css')
+  const mobileBlock = css.match(/@media \(max-width: 1024px\) \{([\s\S]*?)\n\}/)
+  assert.ok(mobileBlock, 'Navbar.css ≤1024px bloğu içermeli')
+  assert.match(
+    mobileBlock[1],
+    /\.knav-giris--float\s*\{\s*display:\s*none/,
+    '≤1024px\'te yüzen GİRİŞ gizlenmeli',
+  )
+
+  // Erişim kaybolmamalı: mobil menüde karşılığı olmalı.
+  const jsx = await readRepo('src/components/Navbar.jsx')
+  assert.match(jsx, /knav-mlink--giris/, 'GİRİŞ mobil menüde erişilebilir kalmalı')
+  assert.match(jsx, /knav-giris--float/, 'yüzen sürüm kendi modifier\'ını taşımalı')
+
+  // Dokunma hedefi alt sınırı.
+  assert.match(css, /\.knav-giris \{[\s\S]*?min-height:\s*var\(--tap-min/, 'GİRİŞ 44px dokunma hedefini karşılamalı')
+})
+
+test('istatistikler uydurma veya anlamsız placeholder göstermez', async () => {
+  // /hakkimizda'da admin içeriği boşken üç istatistik kutusu da '—' basıyordu.
+  const source = await readRepo('src/pages/About.jsx')
+  assert.doesNotMatch(source, /\|\|\s*'—'/, "boş istatistik '—' ile doldurulmamalı")
+  assert.match(source, /stats\.length > 0/, 'hiç veri yoksa istatistik şeridi hiç render edilmemeli')
+})

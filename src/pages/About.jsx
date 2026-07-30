@@ -30,11 +30,22 @@ export default function About() {
       initials: isImageSource(media) ? '' : toBadgeText(media, member.name),
     }
   })
-  const stats = {
-    experience: content.experience || '—',
-    teamSize: content.teamSize || '—',
-    clients: content.clients || '—',
-  }
+  /**
+   * İstatistikler yalnızca GERÇEK bir değer girildiğinde gösterilir.
+   *
+   * Önceki sürüm boş değeri `'—'` ile dolduruyordu; admin'de içerik
+   * girilmediğinde /hakkimizda'da üç kutu da anlamsız bir tire basıyordu.
+   * Uydurma sayı üretmek de seçenek değil, bu yüzden değeri olmayan kutu
+   * hiç render edilmez. Hiçbiri yoksa şerit tamamen kalkar ve metin
+   * kendi ritmini korur.
+   */
+  const stats = [
+    [content.experience, t('about.experience')],
+    [content.teamSize, t('about.team')],
+    [content.clients, t('about.happyClients')],
+  ]
+    .map(([value, label]) => [typeof value === 'string' ? value.trim() : value, label])
+    .filter(([value]) => value !== undefined && value !== null && value !== '' && value !== '—')
   const storyP1 = lang === 'en'
     ? (content.storyEn || t('about.storyP1'))
     : (content.storyTr || t('about.storyP1'))
@@ -92,20 +103,16 @@ export default function About() {
               <h2>{t('about.storyTitle')}</h2>
               <p>{storyP1}</p>
               <p>{storyP2}</p>
-              <div className="story-stats">
-                <div className="story-stat">
-                  <span className="story-stat-number">{stats.experience}</span>
-                  <span className="story-stat-label">{t('about.experience')}</span>
+              {stats.length > 0 && (
+                <div className="story-stats">
+                  {stats.map(([value, label]) => (
+                    <div className="story-stat" key={label}>
+                      <span className="story-stat-number">{value}</span>
+                      <span className="story-stat-label">{label}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="story-stat">
-                  <span className="story-stat-number">{stats.teamSize}</span>
-                  <span className="story-stat-label">{t('about.team')}</span>
-                </div>
-                <div className="story-stat">
-                  <span className="story-stat-number">{stats.clients}</span>
-                  <span className="story-stat-label">{t('about.happyClients')}</span>
-                </div>
-              </div>
+              )}
             </FadeIn>
             <FadeIn direction="right" className="story-visual">
               <div className="visual-card glass-card">
