@@ -1,8 +1,23 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// Production'daki "/" -> "/site.html" yönlendirmesini yerel geliştirmede
+// de kullanarak eski ana sayfa tasarımını birebir önizler.
+function serveStaticLandingAtRoot() {
+  return {
+    name: 'serve-static-landing-at-root',
+    configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        const url = (req.url || '').split('?')[0]
+        if (url === '/') req.url = '/site.html'
+        next()
+      })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), serveStaticLandingAtRoot()],
   server: {
     hmr: {
       overlay: false,

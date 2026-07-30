@@ -1362,7 +1362,15 @@ function HeroEditor({ data, onSave }) {
         <input type="text" value={form[langTab]?.eyebrow || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], eyebrow: e.target.value } })} />
       </div>
       <div className="form-group">
-        <label>{langTab === 'tr' ? 'Ana Baslik (1. Satir)' : 'Main Title (Line 1)'}</label>
+        <label>{langTab === 'tr' ? 'Kısa Giriş Cümlesi' : 'Short Intro Line'}</label>
+        <input
+          type="text"
+          value={form[langTab]?.introLine || ''}
+          onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], introLine: e.target.value } })}
+        />
+      </div>
+      <div className="form-group">
+        <label>{langTab === 'tr' ? 'Büyük Başlık (1. Satır)' : 'Large Title (Line 1)'}</label>
         <input
           type="text"
           value={form[langTab]?.title1 || ''}
@@ -1372,40 +1380,37 @@ function HeroEditor({ data, onSave }) {
       </div>
       <div className="form-row">
         <div className="form-group">
-          <label>{langTab === 'tr' ? 'Ana buton metni' : 'Primary button label'}</label>
-          <input value={form[langTab]?.primaryLabel || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], primaryLabel: e.target.value } })} />
+          <label>{langTab === 'tr' ? 'Büyük Başlık (2. Satır)' : 'Large Title (Line 2)'}</label>
+          <input
+            type="text"
+            value={form[langTab]?.title2 || ''}
+            onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], title2: e.target.value } })}
+          />
         </div>
         <div className="form-group">
-          <label>{langTab === 'tr' ? 'Ana buton rotası' : 'Primary button route'}</label>
-          <input value={form[langTab]?.primaryHref || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], primaryHref: e.target.value } })} placeholder="/teklif-al" />
-        </div>
-      </div>
-      <div className="form-row">
-        <div className="form-group">
-          <label>{langTab === 'tr' ? 'İkinci buton metni' : 'Secondary button label'}</label>
-          <input value={form[langTab]?.secondaryLabel || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], secondaryLabel: e.target.value } })} />
-        </div>
-        <div className="form-group">
-          <label>{langTab === 'tr' ? 'İkinci buton rotası' : 'Secondary button route'}</label>
-          <input value={form[langTab]?.secondaryHref || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], secondaryHref: e.target.value } })} placeholder="/hizmetler" />
+          <label>{langTab === 'tr' ? 'Büyük Başlık (3. Satır)' : 'Large Title (Line 3)'}</label>
+          <input
+            type="text"
+            value={form[langTab]?.title3 || ''}
+            onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], title3: e.target.value } })}
+          />
         </div>
       </div>
       <div className="form-group">
-        <label>{langTab === 'tr' ? 'Ana Baslik (2. Satir - Renkli)' : 'Main Title (Line 2 - Highlighted)'}</label>
-        <input
-          type="text"
-          value={form[langTab]?.title2 || ''}
-          onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], title2: e.target.value } })}
-          placeholder={HERO_EDITOR_DEFAULTS[langTab].title2}
-        />
-      </div>
-      <div className="form-group">
-        <label>{langTab === 'tr' ? 'Alt Aciklama' : 'Subtitle'}</label>
+        <label>{langTab === 'tr' ? 'Üst Açıklama' : 'Top Description'}</label>
         <textarea
           rows="3"
           value={form[langTab]?.subtitle || ''}
           onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], subtitle: e.target.value } })}
           placeholder={HERO_EDITOR_DEFAULTS[langTab].subtitle}
+        />
+      </div>
+      <div className="form-group">
+        <label>{langTab === 'tr' ? 'Alt Açıklama' : 'Lower Description'}</label>
+        <textarea
+          rows="3"
+          value={form[langTab]?.bodyText || ''}
+          onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], bodyText: e.target.value } })}
         />
       </div>
       <div className="admin-form-actions">

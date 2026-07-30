@@ -184,9 +184,10 @@ function getCanvasTheme(pathname) {
 function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
+  const isHome = location.pathname === '/'
   const isLoginArea = location.pathname.startsWith('/giris')
   const isLinkProfile = location.pathname.startsWith('/@') || location.pathname === '/kadirdemir'
-  const hideShell = isAdmin || isLoginArea || isLinkProfile
+  const hideShell = isHome || isAdmin || isLoginArea || isLinkProfile
   const isAppUI = isAdmin
     || isLinkProfile
     || location.pathname.startsWith('/organizasyon-kiti')
