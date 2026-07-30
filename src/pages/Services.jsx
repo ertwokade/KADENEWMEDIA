@@ -17,10 +17,13 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import useSiteContent from '../hooks/useSiteContent'
+import { HOME_SERVICES_DEFAULTS } from '../data/pageDefaults'
 import './Services.css'
 
 export default function Services() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
+  const { content: servicesContent } = useSiteContent('services', HOME_SERVICES_DEFAULTS)
   useSEO({
     title: 'New Media ve Dijital Medya Hizmetleri | Kade New Media',
     description: 'Kade New Media’nın sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetleri.',
@@ -28,7 +31,7 @@ export default function Services() {
     path: '/hizmetler',
   })
 
-  const services = [
+  const staticServices = [
     {
       icon: HiOutlineGlobe,
       slug: 'sosyal-medya-yonetimi',
@@ -78,6 +81,23 @@ export default function Services() {
       platforms: [FaInstagram, FaLinkedinIn],
     },
   ]
+
+  const services = (Array.isArray(servicesContent?.items) && servicesContent.items.length
+    ? servicesContent.items
+    : HOME_SERVICES_DEFAULTS.items
+  ).map((item, index) => {
+    const base = staticServices.find((service) => service.slug === item.slug) || staticServices[index] || staticServices[0]
+    const rawFeatures = lang === 'en' ? item.featuresEn : item.featuresTr
+    return {
+      ...base,
+      slug: item.slug || base.slug,
+      title: lang === 'en' ? (item.titleEn || item.titleTr || base.title) : (item.titleTr || item.titleEn || base.title),
+      desc: lang === 'en' ? (item.descEn || item.descTr || base.desc) : (item.descTr || item.descEn || base.desc),
+      features: Array.isArray(rawFeatures)
+        ? rawFeatures
+        : String(rawFeatures || '').split(',').map((feature) => feature.trim()).filter(Boolean),
+    }
+  })
 
   const process = [
     { step: '01', title: t('services.processStep1'), desc: t('services.processStep1Desc') },

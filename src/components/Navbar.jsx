@@ -2,22 +2,11 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { HiMenuAlt3, HiX, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
 import { useTheme } from '../i18n/ThemeContext'
+import { useLanguage } from '../i18n/LanguageContext'
 import { useCustomer } from '../contexts/CustomerContext'
+import useSiteContent from '../hooks/useSiteContent'
+import { NAVIGATION_DEFAULTS } from '../data/pageDefaults'
 import './Navbar.css'
-
-// Anasayfa (site.html "hello") nav'ının birebir React versiyonu:
-// solda kade media wordmark (wdth 120), sağda 13px mono linkler + TEMA,
-// sağ altta sabit GİRİŞ gold hapı. Arama/TR-EN/TEKLİF AL şablonda yok.
-// static:true → sayfa artık statik HTML (vercel.json rewrite); SPA router
-// yakalamasın diye tam yükleme (<a href>) ile gidilir.
-const NAV_LINKS = [
-  { name: 'HİZMETLER', path: '/hizmetler', static: true },
-  { name: 'PAKETLER', path: '/paketler', static: true },
-  { name: 'PORTFOLYO', path: '/portfolio', static: true },
-  { name: 'HAKKIMIZDA', path: '/hakkimizda', static: true },
-  { name: 'BLOG', path: '/blog', static: true },
-  { name: 'İLETİŞİM', path: '/iletisim', static: true },
-]
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -25,10 +14,14 @@ export default function Navbar() {
   const mobileMenuRef = useRef(null)
   const location = useLocation()
   const { theme, toggleTheme } = useTheme()
+  const { lang } = useLanguage()
   const isDark = theme === 'dark'
   const ThemeIcon = isDark ? HiOutlineSun : HiOutlineMoon
   const themeLabel = isDark ? 'Açık temaya geç' : 'Koyu temaya geç'
   const { customer } = useCustomer()
+  const { content: navigation } = useSiteContent('navigation', NAVIGATION_DEFAULTS)
+  const navLinks = Array.isArray(navigation?.links) && navigation.links.length ? navigation.links : NAVIGATION_DEFAULTS.links
+  const safeLinks = navLinks.filter((link) => typeof link.path === 'string' && link.path.startsWith('/') && !link.path.startsWith('//'))
 
   useEffect(() => { setIsOpen(false) }, [location])
 
@@ -78,19 +71,15 @@ export default function Navbar() {
         <a href="/" className="knav-brand">kade media</a>
 
         <div className="knav-links">
-          {NAV_LINKS.map((l) => (
-            l.static ? (
-              <a key={l.path} href={l.path} className={`knav-link ${location.pathname === l.path ? 'active' : ''}`} aria-current={location.pathname === l.path ? 'page' : undefined}>{l.name}</a>
-            ) : (
-              <Link
-                key={l.path}
-                to={l.path}
-                className={`knav-link ${location.pathname === l.path ? 'active' : ''}`}
-                aria-current={location.pathname === l.path ? 'page' : undefined}
-              >
-                {l.name}
-              </Link>
-            )
+          {safeLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`knav-link ${location.pathname === link.path ? 'active' : ''}`}
+              aria-current={location.pathname === link.path ? 'page' : undefined}
+            >
+              {lang === 'en' ? (link.labelEn || link.labelTr) : (link.labelTr || link.labelEn)}
+            </Link>
           ))}
           <button type="button" className="knav-link knav-tema" onClick={toggleTheme} aria-label={themeLabel} title={themeLabel}>
             <ThemeIcon size={13} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />
@@ -111,19 +100,15 @@ export default function Navbar() {
 
         {isOpen && (
           <div id="mobile-navigation" ref={mobileMenuRef} className="knav-mobile" role="navigation" aria-label="Mobil navigasyon">
-            {NAV_LINKS.map((l) => (
-              l.static ? (
-                <a key={l.path} href={l.path} className={`knav-mlink ${location.pathname === l.path ? 'active' : ''}`} aria-current={location.pathname === l.path ? 'page' : undefined}>{l.name}</a>
-              ) : (
-                <Link
-                  key={l.path}
-                  to={l.path}
-                  className={`knav-mlink ${location.pathname === l.path ? 'active' : ''}`}
-                  aria-current={location.pathname === l.path ? 'page' : undefined}
-                >
-                  {l.name}
-                </Link>
-              )
+            {safeLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`knav-mlink ${location.pathname === link.path ? 'active' : ''}`}
+                aria-current={location.pathname === link.path ? 'page' : undefined}
+              >
+                {lang === 'en' ? (link.labelEn || link.labelTr) : (link.labelTr || link.labelEn)}
+              </Link>
             ))}
             <button type="button" className="knav-mlink" onClick={toggleTheme} aria-label={themeLabel}><ThemeIcon size={15} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 7 }} />TEMA</button>
           </div>
@@ -135,7 +120,9 @@ export default function Navbar() {
           {(customer.name?.split(' ')[0] || 'PANEL').toUpperCase()} →
         </Link>
       ) : (
-        <Link to="/giris" className="knav-giris">GİRİŞ →</Link>
+        <Link to="/giris" className="knav-giris">
+          {lang === 'en' ? (navigation.loginLabelEn || NAVIGATION_DEFAULTS.loginLabelEn) : (navigation.loginLabelTr || NAVIGATION_DEFAULTS.loginLabelTr)}
+        </Link>
       )}
     </>
   )

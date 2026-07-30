@@ -14,6 +14,10 @@ export const STATIC_PAGES = [
   { loc: '/sss', changefreq: 'monthly', priority: '0.7' },
   { loc: '/ekip', changefreq: 'monthly', priority: '0.6' },
   { loc: '/portfolio', changefreq: 'monthly', priority: '0.7' },
+  { loc: '/basin', changefreq: 'monthly', priority: '0.5' },
+  { loc: '/neden-biz', changefreq: 'monthly', priority: '0.7' },
+  { loc: '/podcast-webinar', changefreq: 'monthly', priority: '0.6' },
+  { loc: '/bulten-arsivi', changefreq: 'monthly', priority: '0.6' },
   { loc: '/partnerler', changefreq: 'monthly', priority: '0.7' },
   { loc: '/basari-hikayeleri', changefreq: 'monthly', priority: '0.7' },
   { loc: '/referanslar', changefreq: 'monthly', priority: '0.6' },
@@ -68,12 +72,16 @@ export default async function handler(req, res) {
     let dynamicEntries = [];
     try {
       const supabase = getSupabase();
-      const [blogsRes, partnersRes] = await Promise.all([
+      const [blogsRes, partnersRes, portfolioRes] = await Promise.all([
         supabase.from('kade_blogs').select('slug, updated_at, created_at').or('published.is.null,published.eq.true'),
         supabase.from('kade_partners').select('slug, updated_at'),
+        supabase.from('kade_site_content').select('data, updated_at').eq('section', 'portfolio').maybeSingle(),
       ]);
       const blogs = blogsRes.error ? [] : (blogsRes.data || []);
       const partners = partnersRes.error ? [] : (partnersRes.data || []);
+      const portfolioItems = portfolioRes.error || !Array.isArray(portfolioRes.data?.data?.items)
+        ? []
+        : portfolioRes.data.data.items;
       dynamicEntries = [
         ...blogs.filter(b => b.slug).map(b => urlEntry({
           loc: `/blog/${b.slug}`,
@@ -84,6 +92,12 @@ export default async function handler(req, res) {
         ...partners.filter(p => p.slug).map(p => urlEntry({
           loc: `/partnerler/${p.slug}`,
           lastmod: String(p.updated_at || '').slice(0, 10) || undefined,
+          changefreq: 'monthly',
+          priority: '0.6',
+        }, base)),
+        ...portfolioItems.map((item, index) => String(item.slug || item.id || `proje-${index + 1}`)).filter(Boolean).map(slug => urlEntry({
+          loc: `/portfolio/${encodeURIComponent(slug)}`,
+          lastmod: String(portfolioRes.data?.updated_at || '').slice(0, 10) || undefined,
           changefreq: 'monthly',
           priority: '0.6',
         }, base)),

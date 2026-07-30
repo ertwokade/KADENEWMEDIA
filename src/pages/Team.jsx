@@ -6,6 +6,7 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import useSiteContent from '../hooks/useSiteContent'
 import './Team.css'
 
 // Yalnızca doğrulanmış gerçek kişi. Placeholder isimler kaldırıldı; ekip
@@ -23,11 +24,13 @@ const defaultTeam = [
     color: '#eac321',
   },
 ]
+const TEAM_CONTENT_DEFAULTS = { team: defaultTeam }
 
 const socialIcons = { linkedin: FaLinkedinIn, instagram: FaInstagram }
 
 export default function Team() {
   const { lang } = useLanguage()
+  const { content } = useSiteContent('about', TEAM_CONTENT_DEFAULTS)
 
   useSEO({
     title: lang === 'tr' ? 'Kade New Media Ekibi | İstanbul Dijital Pazarlama Ajansı' : 'Our Team | Kade New Media',
@@ -37,7 +40,7 @@ export default function Team() {
     path: '/ekip',
   })
 
-  const team = defaultTeam
+  const team = Array.isArray(content?.team) && content.team.length ? content.team : defaultTeam
 
   return (
     <PageTransition>
@@ -77,8 +80,8 @@ export default function Team() {
                   whileHover={{ y: -6 }}
                 >
                   <div className="team-card-avatar" style={{ background: `${member.color}15`, borderColor: `${member.color}40` }}>
-                    {member.image ? (
-                      <img src={member.image} alt={member.name} />
+                    {(member.image || member.avatar) ? (
+                      <img src={member.image || member.avatar} alt={member.name} />
                     ) : (
                       <span className="team-card-initials" style={{ color: member.color }}>
                         {member.name.split(' ').map(n => n[0]).join('')}

@@ -5,11 +5,15 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import useSiteContent from '../hooks/useSiteContent'
+import { PORTFOLIO_DEFAULTS } from '../data/pageDefaults'
 import './Portfolio.css'
 
 export default function Portfolio() {
   const { lang } = useLanguage()
   const isEN = lang === 'en'
+  const { content: portfolio } = useSiteContent('portfolio', PORTFOLIO_DEFAULTS)
+  const projects = Array.isArray(portfolio?.items) && portfolio.items.length ? portfolio.items : PORTFOLIO_DEFAULTS.items
 
   useSEO({
     title: isEN ? 'Portfolio | Kade New Media' : 'Portfolyo | Kade New Media',
@@ -49,6 +53,30 @@ export default function Portfolio() {
                 : 'Proje adlarını, görselleri ve sonuçları ancak müşteri izni ve doğrulama sonrasında paylaşıyoruz. Aşağıda ne ürettiğimizi, nasıl çalıştığımızı ve bir vakanın neleri içerdiğini görebilirsin.'}
             </p>
           </FadeIn>
+        </div>
+      </section>
+
+      <section className="section pf-block">
+        <div className="container">
+          <div className="pf-head">
+            <div className="section-badge">{isEN ? 'Selected work' : 'Seçili işler'}</div>
+            <span className="pf-idx">{projects.length} {isEN ? 'projects' : 'proje'}</span>
+          </div>
+          <div className="portfolio-project-grid">
+            {projects.map((project, index) => {
+              const slug = String(project.slug || project.id || `proje-${index + 1}`)
+              return (
+                <Link className="portfolio-project-card glass-card" to={`/portfolio/${slug}`} key={slug}>
+                  <span className="portfolio-project-emoji" style={{ background: `${project.color || '#eac321'}22` }}>{project.emoji || '📸'}</span>
+                  <small>{project.category || (isEN ? 'Project' : 'Proje')}</small>
+                  <h2>{isEN ? (project.titleEn || project.titleTr) : (project.titleTr || project.titleEn)}</h2>
+                  <p>{project.partner}</p>
+                  {project.metricVal && <strong style={{ color: project.color || '#eac321' }}>{project.metricVal} <span>{project.metricKey}</span></strong>}
+                  <span className="portfolio-project-link">{isEN ? 'View project' : 'Projeyi incele'} <HiOutlineArrowRight size={16} /></span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </section>
 

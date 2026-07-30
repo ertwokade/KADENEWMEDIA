@@ -28,6 +28,7 @@ import CaseStudiesEditor from './admin/editors/CaseStudiesEditor'
 import NewsletterArchiveEditor from './admin/editors/NewsletterArchiveEditor'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
 import { PACKAGE_SCOPES } from '../data/packages'
+import { HOME_HERO_DEFAULTS, HOME_SERVICES_DEFAULTS, NAVIGATION_DEFAULTS } from '../data/pageDefaults'
 import { getPackageEntitlements } from '../config/entitlements'
 import {
   apiFetch,
@@ -1063,6 +1064,7 @@ function ContentSection({ showToast }) {
   }
 
   const tabs = [
+    { id: 'navigation', label: '🧭 Navigasyon', desc: 'Üst menü ve giriş düğmesi' },
     { id: 'hero', label: '🏠 Hero', desc: 'Anasayfa başlık ve açıklama' },
     { id: 'stats', label: '📊 İstatistikler', desc: 'Sayaç verileri' },
     { id: 'services', label: '⚡ Hizmetler', desc: 'Hizmet kartları' },
@@ -1088,6 +1090,7 @@ function ContentSection({ showToast }) {
     tr: { title1: 'Dijital Dünyada Markanıza', title2: 'Kademe Atlatıyoruz ⚡', subtitle: 'Kade New Media olarak sosyal medya stratejileri, kreatif içerik üretimi ve dijital pazarlama çözümleriyle markanızı zirveye taşıyoruz.' },
     en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade New Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
   }, [content.hero])
+  const navigationData = useMemo(() => content.navigation || NAVIGATION_DEFAULTS, [content.navigation])
   const statsData = useMemo(() => content.stats || { clients: '10+', followers: '500+', campaigns: '50+', satisfaction: '98%' }, [content.stats])
   const servicesData = useMemo(() => content.services || { items: [] }, [content.services])
   const faqData = useMemo(() => content.faq || {
@@ -1159,6 +1162,13 @@ function ContentSection({ showToast }) {
       </div>
 
       <div onInput={() => setIsDirty(true)} onChange={() => setIsDirty(true)}>
+      {activeTab === 'navigation' && (
+        <NavigationEditor
+          data={navigationData}
+          onSave={(data) => handleSave('navigation', data)}
+        />
+      )}
+
       {activeTab === 'hero' && (
         <HeroEditor
           data={heroData}
@@ -1282,16 +1292,60 @@ function ContentSection({ showToast }) {
   )
 }
 
-const HERO_EDITOR_DEFAULTS = {
-  tr: { title1: 'Dijital Dunyada Markaniza', title2: 'Kademe Atlatiyoruz ⚡', subtitle: 'Kade New Media olarak sosyal medya stratejileri, kreatif icerik uretimi ve dijital pazarlama cozumleriyle markanizi zirveye tasiyoruz.' },
-  en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade New Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
+function NavigationEditor({ data, onSave }) {
+  const normalize = (value) => ({
+    ...NAVIGATION_DEFAULTS,
+    ...(value || {}),
+    links: Array.isArray(value?.links) && value.links.length ? value.links : NAVIGATION_DEFAULTS.links,
+  })
+  const [form, setForm] = useState(() => normalize(data))
+  useEffect(() => { setForm(normalize(data)) }, [data])
+
+  const updateLink = (index, field, value) => {
+    const links = [...form.links]
+    links[index] = { ...links[index], [field]: value }
+    setForm({ ...form, links })
+  }
+
+  return (
+    <div className="admin-form">
+      <h3>Üst Menü & Giriş Düğmesi</h3>
+      <p style={{ color: 'var(--text-tertiary)', fontSize: '0.85rem', marginBottom: 16 }}>
+        Menü metinlerini, sırasını ve hedeflerini buradan yönetin. Hedefler site içi “/rota” biçiminde olmalıdır.
+      </p>
+      {form.links.map((link, index) => (
+        <div className="glass-card" style={{ padding: 16, marginBottom: 12 }} key={`${link.path}-${index}`}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+            <strong>Menü öğesi {index + 1}</strong>
+            <button className="btn btn-outline" type="button" onClick={() => setForm({ ...form, links: form.links.filter((_, itemIndex) => itemIndex !== index) })}>
+              <HiOutlineTrash size={14} /> Sil
+            </button>
+          </div>
+          <div className="form-row">
+            <div className="form-group"><label>Türkçe etiket</label><input value={link.labelTr || ''} onChange={(event) => updateLink(index, 'labelTr', event.target.value)} /></div>
+            <div className="form-group"><label>English label</label><input value={link.labelEn || ''} onChange={(event) => updateLink(index, 'labelEn', event.target.value)} /></div>
+          </div>
+          <div className="form-group"><label>Hedef rota</label><input value={link.path || ''} onChange={(event) => updateLink(index, 'path', event.target.value)} placeholder="/hizmetler" /></div>
+        </div>
+      ))}
+      <button className="btn btn-outline" type="button" onClick={() => setForm({ ...form, links: [...form.links, { labelTr: '', labelEn: '', path: '/' }] })}><HiOutlinePlus size={16} /> Menü öğesi ekle</button>
+      <h3 style={{ marginTop: 24 }}>Giriş düğmesi</h3>
+      <div className="form-row">
+        <div className="form-group"><label>Türkçe</label><input value={form.loginLabelTr || ''} onChange={(event) => setForm({ ...form, loginLabelTr: event.target.value })} /></div>
+        <div className="form-group"><label>English</label><input value={form.loginLabelEn || ''} onChange={(event) => setForm({ ...form, loginLabelEn: event.target.value })} /></div>
+      </div>
+      <div className="admin-form-actions"><button className="btn btn-primary" onClick={() => onSave(form)}><HiOutlineSave size={16} /> Kaydet</button></div>
+    </div>
+  )
 }
+
+const HERO_EDITOR_DEFAULTS = HOME_HERO_DEFAULTS
 
 function HeroEditor({ data, onSave }) {
   const ensureDefaults = useCallback((d) => {
     return {
-      tr: { title1: d?.tr?.title1 || HERO_EDITOR_DEFAULTS.tr.title1, title2: d?.tr?.title2 || HERO_EDITOR_DEFAULTS.tr.title2, subtitle: d?.tr?.subtitle || HERO_EDITOR_DEFAULTS.tr.subtitle },
-      en: { title1: d?.en?.title1 || HERO_EDITOR_DEFAULTS.en.title1, title2: d?.en?.title2 || HERO_EDITOR_DEFAULTS.en.title2, subtitle: d?.en?.subtitle || HERO_EDITOR_DEFAULTS.en.subtitle },
+      tr: { ...HERO_EDITOR_DEFAULTS.tr, ...(d?.tr || {}) },
+      en: { ...HERO_EDITOR_DEFAULTS.en, ...(d?.en || {}) },
     }
   }, [])
   const [form, setForm] = useState(() => ensureDefaults(data))
@@ -1316,6 +1370,10 @@ function HeroEditor({ data, onSave }) {
         <button className={`admin-tab ${langTab === 'en' ? 'active' : ''}`} onClick={() => setLangTab('en')}>🇬🇧 English</button>
       </div>
       <div className="form-group">
+        <label>{langTab === 'tr' ? 'Üst Etiket' : 'Eyebrow'}</label>
+        <input type="text" value={form[langTab]?.eyebrow || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], eyebrow: e.target.value } })} />
+      </div>
+      <div className="form-group">
         <label>{langTab === 'tr' ? 'Ana Baslik (1. Satir)' : 'Main Title (Line 1)'}</label>
         <input
           type="text"
@@ -1323,6 +1381,26 @@ function HeroEditor({ data, onSave }) {
           onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], title1: e.target.value } })}
           placeholder={HERO_EDITOR_DEFAULTS[langTab].title1}
         />
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label>{langTab === 'tr' ? 'Ana buton metni' : 'Primary button label'}</label>
+          <input value={form[langTab]?.primaryLabel || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], primaryLabel: e.target.value } })} />
+        </div>
+        <div className="form-group">
+          <label>{langTab === 'tr' ? 'Ana buton rotası' : 'Primary button route'}</label>
+          <input value={form[langTab]?.primaryHref || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], primaryHref: e.target.value } })} placeholder="/teklif-al" />
+        </div>
+      </div>
+      <div className="form-row">
+        <div className="form-group">
+          <label>{langTab === 'tr' ? 'İkinci buton metni' : 'Secondary button label'}</label>
+          <input value={form[langTab]?.secondaryLabel || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], secondaryLabel: e.target.value } })} />
+        </div>
+        <div className="form-group">
+          <label>{langTab === 'tr' ? 'İkinci buton rotası' : 'Secondary button route'}</label>
+          <input value={form[langTab]?.secondaryHref || ''} onChange={(e) => setForm({ ...form, [langTab]: { ...form[langTab], secondaryHref: e.target.value } })} placeholder="/hizmetler" />
+        </div>
       </div>
       <div className="form-group">
         <label>{langTab === 'tr' ? 'Ana Baslik (2. Satir - Renkli)' : 'Main Title (Line 2 - Highlighted)'}</label>
@@ -1475,12 +1553,29 @@ function PriceCalculatorEditor({ data, onSave }) {
 }
 
 function FooterEditor({ data, onSave }) {
-  const [form, setForm] = useState(data)
+  const withDefaults = (value) => ({
+    displayLines: ['BİRLİKTE', 'HARİKA', 'İŞLER', 'BAŞARALIM'],
+    ...(value || {}),
+  })
+  const [form, setForm] = useState(() => withDefaults(data))
 
-  useEffect(() => { setForm(data) }, [data])
+  useEffect(() => { setForm(withDefaults(data)) }, [data])
   return (
     <div className="admin-form">
       <h3>Footer & İletişim Bilgileri</h3>
+      <h3 style={{ marginTop: 16 }}>Büyük footer metni</h3>
+      <div className="form-row">
+        {(form.displayLines || []).map((line, index) => (
+          <div className="form-group" key={index}>
+            <label>Satır {index + 1}</label>
+            <input value={line || ''} onChange={(event) => {
+              const displayLines = [...form.displayLines]
+              displayLines[index] = event.target.value
+              setForm({ ...form, displayLines })
+            }} />
+          </div>
+        ))}
+      </div>
       <div className="form-row">
         <div className="form-group">
           <label>E-posta</label>
@@ -1518,6 +1613,10 @@ function FooterEditor({ data, onSave }) {
       </div>
       <div className="form-row">
         <div className="form-group">
+          <label>X / Twitter</label>
+          <input type="url" value={form.twitter || ''} onChange={(e) => setForm({ ...form, twitter: e.target.value })} />
+        </div>
+        <div className="form-group">
           <label>WhatsApp</label>
           <input type="url" value={form.whatsapp || ''} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
         </div>
@@ -1533,8 +1632,8 @@ function FooterEditor({ data, onSave }) {
 
 // ========== SERVICES EDITOR ==========
 function ServicesEditor({ data, onSave }) {
-  const emptyItem = { titleTr: '', titleEn: '', descTr: '', descEn: '', featuresTr: '', featuresEn: '' }
-  const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
+  const emptyItem = { slug: '', titleTr: '', titleEn: '', descTr: '', descEn: '', featuresTr: '', featuresEn: '' }
+  const [items, setItems] = useState(data.items?.length ? data.items : HOME_SERVICES_DEFAULTS.items)
 
   useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
   const updateItem = (index, field, value) => {
@@ -1559,6 +1658,9 @@ function ServicesEditor({ data, onSave }) {
                 <HiOutlineTrash size={14} /> Sil
               </button>
             )}
+          </div>
+          <div className="form-group"><label>URL kısa adı (slug)</label>
+            <input type="text" value={item.slug || ''} onChange={(e) => updateItem(i, 'slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))} placeholder="sosyal-medya-yonetimi" />
           </div>
           <div className="form-row">
             <div className="form-group"><label>Başlık (TR)</label>

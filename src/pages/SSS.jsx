@@ -7,11 +7,14 @@ import { FAQSchema } from '../components/StructuredData'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import { FAQ_ITEMS as ITEMS } from '../data/faq'
+import useSiteContent from '../hooks/useSiteContent'
+import { HOME_FAQ_DEFAULTS } from '../data/pageDefaults'
 import './SSS.css'
 
 export default function SSS() {
   const { lang } = useLanguage()
   const [open, setOpen] = useState(null)
+  const { content: faqContent } = useSiteContent('faq', HOME_FAQ_DEFAULTS)
 
   useSEO({
     title: lang === 'tr' ? 'Dijital Pazarlama Sık Sorulan Sorular | Kade New Media' : 'FAQ | Kade New Media',
@@ -19,12 +22,17 @@ export default function SSS() {
     path: '/sss',
   })
 
-  const questionKey = lang === 'tr' ? 'soru' : 'soruEn'
-  const answerKey = lang === 'tr' ? 'cevap' : 'cevapEn'
+  const dynamicItems = Array.isArray(faqContent?.[lang]) ? faqContent[lang] : []
+  const displayItems = dynamicItems.length
+    ? dynamicItems.map((item) => ({ soru: item.q, cevap: item.a }))
+    : ITEMS.map((item) => ({
+      soru: lang === 'tr' ? item.soru : item.soruEn,
+      cevap: lang === 'tr' ? item.cevap : item.cevapEn,
+    }))
 
   return (
     <PageTransition>
-      <FAQSchema items={ITEMS} />
+      <FAQSchema items={displayItems} />
       <section className="sss-hero">
         <div className="container">
           <FadeIn>
@@ -37,14 +45,14 @@ export default function SSS() {
       <section className="section">
         <div className="container">
           <div className="sss-liste">
-            {ITEMS.map((item, index) => {
+            {displayItems.map((item, index) => {
               const panelId = `faq-panel-${index}`
               return (
                 <div className={`sss-item glass-card ${open === index ? 'open' : ''}`} key={item.soru}>
                   <button className="sss-soru" onClick={() => setOpen(open === index ? null : index)} aria-expanded={open === index} aria-controls={panelId}>
-                    <span>{item[questionKey]}</span><HiOutlineChevronDown size={20} aria-hidden="true" />
+                    <span>{item.soru}</span><HiOutlineChevronDown size={20} aria-hidden="true" />
                   </button>
-                  {open === index && <div className="sss-cevap" id={panelId}><p>{item[answerKey]}</p></div>}
+                  {open === index && <div className="sss-cevap" id={panelId}><p>{item.cevap}</p></div>}
                 </div>
               )
             })}

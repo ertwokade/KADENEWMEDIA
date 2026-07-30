@@ -13,6 +13,7 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import useSiteContent from '../hooks/useSiteContent'
 import './About.css'
 
 // Placeholder ekip isimleri kaldırıldı (bkz. CONTENT_REQUIRED.md). Yalnızca
@@ -22,13 +23,15 @@ const defaultTeam = [
 ]
 
 const defaultStats = { experience: '—', teamSize: '—', clients: '—' }
+const ABOUT_DEFAULTS = { ...defaultStats, team: defaultTeam }
 
 export default function About() {
   const { t, lang } = useLanguage()
-  const team = defaultTeam
-  const stats = defaultStats
-  const storyP1 = t('about.storyP1')
-  const storyP2 = t('about.storyP2')
+  const { content } = useSiteContent('about', ABOUT_DEFAULTS)
+  const team = Array.isArray(content?.team) && content.team.length ? content.team : defaultTeam
+  const stats = { ...defaultStats, ...content }
+  const storyP1 = (lang === 'en' ? content.storyEn : content.storyTr) || t('about.storyP1')
+  const storyP2 = (lang === 'en' ? content.missionEn : content.missionTr) || t('about.storyP2')
   useSEO({
     title: 'Kade New Media Hakkında | New Media Ajansı İstanbul',
     description: 'Kade New Media, İstanbul merkezli bir new media ve dijital pazarlama ajansı — Kademedia ve Kadenewmedia adlarıyla da aranıyoruz.',

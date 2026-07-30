@@ -40,7 +40,7 @@
     },
     {
       "source": "/",
-      "destination": "/site.html"
+      "destination": "/app.html"
     },
     {
       "source": "/((?!api/).*)",

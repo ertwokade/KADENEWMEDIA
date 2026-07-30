@@ -5,11 +5,17 @@ import { BRAND } from '../config/brand'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import useSiteContent from '../hooks/useSiteContent'
 import './Careers.css'
+import './ContentPages.css'
+
+const CAREERS_DEFAULTS = { tr: [], en: [] }
 
 export default function Careers() {
   const { lang } = useLanguage()
   const isEN = lang !== 'tr'
+  const { content: careers } = useSiteContent('careers', CAREERS_DEFAULTS)
+  const jobs = Array.isArray(careers?.[lang]) ? careers[lang] : []
 
   useSEO({
     title: lang === 'tr' ? 'Kade New Media Kariyer | Genel Başvuru Bilgileri' : 'Careers | Kade New Media',
@@ -62,6 +68,28 @@ export default function Careers() {
           </FadeIn>
         </div>
       </section>
+
+      {jobs.length > 0 && (
+        <section className="section pf-block">
+          <div className="container">
+            <div className="pf-head">
+              <div className="section-badge">{isEN ? 'Open roles' : 'Açık pozisyonlar'}</div>
+              <span className="pf-idx">{jobs.length} {isEN ? 'roles' : 'ilan'}</span>
+            </div>
+            <div className="content-card-grid">
+              {jobs.map((job, index) => (
+                <article className="content-card glass-card" key={`${job.title}-${index}`}>
+                  <small>{job.department} · {job.location} · {job.type}</small>
+                  <h2>{job.title}</h2>
+                  <p>{job.description}</p>
+                  {Array.isArray(job.requirements) && <ul>{job.requirements.map((requirement) => <li key={requirement}>{requirement}</li>)}</ul>}
+                  <a href={`mailto:${BRAND.email}?subject=${encodeURIComponent(`Kade Media — ${job.title}`)}`}>{isEN ? 'Apply by email →' : 'E-posta ile başvur →'}</a>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="section pf-block">
         <div className="container">

@@ -162,3 +162,34 @@
   flex-wrap: wrap;
   justify-content: center;
 }
+.tesekkur-adimlar {
+  width: min(760px, 100%);
+  margin: 2rem auto 0;
+  text-align: left;
+}
+
+.tesekkur-adimlar > h2 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.tesekkur-adimlar article {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+  padding: 1rem 1.2rem;
+}
+
+.tesekkur-adimlar article > span {
+  font-size: 1.4rem;
+}
+
+.tesekkur-adimlar h3,
+.tesekkur-adimlar p {
+  margin: 0;
+}
+
+.tesekkur-adimlar p {
+  margin-top: 0.25rem;
+  color: var(--text-secondary);
+}

@@ -9,7 +9,17 @@ import { useSEO } from '../hooks/useSEO'
 import { CONTACT } from '../utils/constants'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
+import useSiteContent from '../hooks/useSiteContent'
 import './Tesekkur.css'
+
+const THANK_YOU_DEFAULTS = {
+  baslik: 'Talebiniz alındı',
+  altMetin: 'Mesajınızı aldık ve güvenli biçimde kaydettik.',
+  yanitSuresi: '2-4 saat',
+  yanitSuresiNot: 'Hafta içi 09:00–18:00',
+  adimlarBaslik: 'Bundan sonra ne olacak?',
+  adimlar: [],
+}
 
 // Split title at the last word to wrap it in the highlight <span>
 function splitTitle(baslik) {
@@ -23,7 +33,8 @@ function splitTitle(baslik) {
 export default function Tesekkur() {
   const location = useLocation()
   const submitted = location.state?.submitted === true
-  const title = submitted ? 'Talebiniz alındı' : 'Talep durumu doğrulanamadı'
+  const { content } = useSiteContent('tesekkur', THANK_YOU_DEFAULTS)
+  const title = submitted ? content.baslik : 'Talep durumu doğrulanamadı'
 
   useSEO({
     title: 'Talep Durumu | Kade New Media',
@@ -66,7 +77,7 @@ export default function Tesekkur() {
           <FadeIn delay={0.3}>
             <p className="tesekkur-alt">
               {submitted
-                ? 'Mesajınızı aldık, kaydedildi.'
+                ? content.altMetin
                 : 'Bu sayfayı doğrudan açmış ya da yenilemiş görünüyorsunuz. Bu ekrandan daha önce gönderdiğiniz bir talebin durumunu göremiyoruz.'}
             </p>
           </FadeIn>
@@ -74,9 +85,18 @@ export default function Tesekkur() {
           <FadeIn delay={0.35}>
             <div className="tesekkur-bekleme glass-card">
               <HiOutlineMail size={18} />
-              <span>{submitted ? 'Ek bilgi paylaşmak için' : 'Talebinizi doğrulamak veya yeniden iletmek için'} <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></span>
+              <span>{submitted ? `Beklenen yanıt: ${content.yanitSuresi} · ${content.yanitSuresiNot}` : 'Talebinizi doğrulamak veya yeniden iletmek için'} {submitted && <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>}</span>
             </div>
           </FadeIn>
+
+          {submitted && Array.isArray(content.adimlar) && content.adimlar.length > 0 && (
+            <FadeIn delay={0.45}>
+              <div className="tesekkur-adimlar">
+                <h2>{content.adimlarBaslik}</h2>
+                {content.adimlar.map((step, index) => <article className="glass-card" key={`${step.baslik}-${index}`}><span>{step.ikon}</span><div><h3>{step.baslik}</h3><p>{step.aciklama}</p></div></article>)}
+              </div>
+            </FadeIn>
+          )}
 
           <FadeIn delay={0.55}>
             <div className="tesekkur-linkler">

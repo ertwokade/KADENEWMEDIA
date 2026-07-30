@@ -17,6 +17,13 @@ const PUBLIC_ROUTES = [
   '/sss',
   '/ekip',
   '/portfolio',
+  '/portfolio/flavora-sosyal-medya',
+  '/fiyat-hesaplama',
+  '/basin',
+  '/neden-biz',
+  '/referans-programi',
+  '/podcast-webinar',
+  '/bulten-arsivi',
   '/partnerler',
   '/basari-hikayeleri',
   '/referanslar',
@@ -27,23 +34,7 @@ const PUBLIC_ROUTES = [
   '/telif-haklari',
 ]
 
-// BULGU (bu turda keşfedildi): `/` şu an src/App.jsx'in React uygulaması
-// tarafından değil, public/site.html üzerinden servis ediliyor — bu,
-// kadenewmedia.com'un ayrı bir Next.js derlemesinden alınmış, kendi
-// vendored `_next/static/chunks/*` dosyalarıyla birlikte tamamen
-// self-contained statik bir export (vercel.json'daki `/ → /site.html`
-// rewrite'ı, docs/04'te "tasarım referansı" olarak tanımlanmıştı ama
-// gerçekte CANLI ana sayfa olarak servis ediliyor). Bu export kendi
-// React çalışma zamanını hydrate ederken "Minified React error #418"
-// (hydration metin uyuşmazlığı) veriyor — sayfa görsel olarak çökmüyor
-// (status/body görünürlüğü ayrıca doğrulanıyor) ama konsola hata basıyor.
-// Kaynak bu repoda yok (yalnızca derlenmiş/minified vendored dosyalar) —
-// güvenle yama yapılamaz. Bilinen, izlenen bir bulgu olarak buradan
-// bilinçli olarak muaf tutuluyor; kaldırılırsa (ör. site.html React
-// tabanlı ana sayfayla değiştirilirse) bu satır da kaldırılmalı.
-const KNOWN_CONSOLE_ISSUES = {
-  '/': [/Minified React error #418/],
-}
+const KNOWN_CONSOLE_ISSUES = {}
 
 for (const route of PUBLIC_ROUTES) {
   test(`public route loads without console errors: ${route}`, async ({ page }) => {

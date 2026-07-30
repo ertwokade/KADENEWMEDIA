@@ -34,6 +34,7 @@ const Partners = lazy(() => import('./pages/Partners'))
 const PartnerDetail = lazy(() => import('./pages/PartnerDetail'))
 const Careers = lazy(() => import('./pages/Careers'))
 const Portfolio = lazy(() => import('./pages/Portfolio'))
+const PortfolioDetail = lazy(() => import('./pages/PortfolioDetail'))
 const Team = lazy(() => import('./pages/Team'))
 const KVKK = lazy(() => import('./pages/KVKK'))
 const Gizlilik = lazy(() => import('./pages/Gizlilik'))
@@ -59,6 +60,12 @@ const Unauthorized = lazy(() => import('./pages/Unauthorized'))
 const Forbidden = lazy(() => import('./pages/Forbidden'))
 const TooManyRequests = lazy(() => import('./pages/TooManyRequests'))
 const Maintenance = lazy(() => import('./pages/Maintenance'))
+const BasinPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.BasinPage })))
+const NedenBizPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.NedenBizPage })))
+const ReferralProgramPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.ReferralProgramPage })))
+const PodcastWebinarPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.PodcastWebinarPage })))
+const NewsletterArchivePage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.NewsletterArchivePage })))
+const PriceCalculatorPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.PriceCalculatorPage })))
 
 function PageLoader() {
   // Lazy chunk inerken tamamen boş ekran yerine hafif, markalı bir spinner
@@ -143,6 +150,12 @@ const ROUTE_THEMES = {
   '/kariyer': 'careers',
   '/blog': 'blog',
   '/portfolio': 'portfolio',
+  '/basin': 'about',
+  '/neden-biz': 'about',
+  '/referans-programi': 'contact',
+  '/podcast-webinar': 'blog',
+  '/bulten-arsivi': 'blog',
+  '/fiyat-hesaplama': 'packages',
   '/ekip': 'team',
   '/iletisim': 'contact',
   '/sss': 'contact',
@@ -160,6 +173,7 @@ function getCanvasTheme(pathname) {
   if (ROUTE_THEMES[pathname]) return ROUTE_THEMES[pathname]
   if (pathname.startsWith('/hizmetler/')) return 'services'
   if (pathname.startsWith('/partnerler/')) return 'partners'
+  if (pathname.startsWith('/portfolio/')) return 'portfolio'
   if (pathname.startsWith('/blog/')) return 'blog'
   if (pathname.startsWith('/giris')) return 'about'
   if (pathname.startsWith('/organizasyon-kiti')) return 'about'
@@ -170,10 +184,9 @@ function getCanvasTheme(pathname) {
 function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
-  const isHome = location.pathname === '/'
   const isLoginArea = location.pathname.startsWith('/giris')
   const isLinkProfile = location.pathname.startsWith('/@') || location.pathname === '/kadirdemir'
-  const hideShell = isAdmin || isHome || isLoginArea || isLinkProfile
+  const hideShell = isAdmin || isLoginArea || isLinkProfile
   const isAppUI = isAdmin
     || isLinkProfile
     || location.pathname.startsWith('/organizasyon-kiti')
@@ -252,6 +265,7 @@ function App() {
           <Route path="/partnerler/:id" element={<LazyRoute><PartnerDetail /></LazyRoute>} />
           <Route path="/kariyer" element={<LazyRoute><Careers /></LazyRoute>} />
           <Route path="/portfolio" element={<LazyRoute><Portfolio /></LazyRoute>} />
+          <Route path="/portfolio/:slug" element={<LazyRoute><PortfolioDetail /></LazyRoute>} />
           <Route path="/ekip" element={<LazyRoute><Team /></LazyRoute>} />
           <Route path="/basari-hikayeleri" element={<LazyRoute><CaseStudies /></LazyRoute>} />
           <Route path="/kvkk" element={<LazyRoute><KVKK /></LazyRoute>} />
@@ -280,6 +294,12 @@ function App() {
             />
           ))}
           <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
+          <Route path="/fiyat-hesaplama" element={<LazyRoute><PriceCalculatorPage /></LazyRoute>} />
+          <Route path="/basin" element={<LazyRoute><BasinPage /></LazyRoute>} />
+          <Route path="/neden-biz" element={<LazyRoute><NedenBizPage /></LazyRoute>} />
+          <Route path="/referans-programi" element={<LazyRoute><ReferralProgramPage /></LazyRoute>} />
+          <Route path="/podcast-webinar" element={<LazyRoute><PodcastWebinarPage /></LazyRoute>} />
+          <Route path="/bulten-arsivi" element={<LazyRoute><NewsletterArchivePage /></LazyRoute>} />
           <Route path="/kadirdemir" element={<Navigate to="/@kadirdemir" replace />} />
           <Route path="/:handle" element={<LazyRoute><LinkProfile /></LazyRoute>} />
           <Route path="/s/:slug" element={<ShortLinkRedirect />} />
