@@ -2,11 +2,11 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
-export type ThemeMode = 'system' | 'light' | 'dark'
+export type ThemeMode = 'light' | 'dark'
 export type ResolvedTheme = 'light' | 'dark'
 
 export const THEME_STORAGE_KEY = 'kade-theme-mode'
-export const THEME_MODES: ThemeMode[] = ['system', 'light', 'dark']
+export const THEME_MODES: ThemeMode[] = ['light', 'dark']
 
 type ThemeContextValue = {
   mode: ThemeMode
@@ -18,15 +18,7 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 function isThemeMode(value: string | null | undefined): value is ThemeMode {
-  return value === 'system' || value === 'light' || value === 'dark'
-}
-
-function getSystemTheme(): ResolvedTheme {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-}
-
-function resolveTheme(mode: ThemeMode): ResolvedTheme {
-  return mode === 'system' ? getSystemTheme() : mode
+  return value === 'light' || value === 'dark'
 }
 
 function applyTheme(mode: ThemeMode, theme: ResolvedTheme) {
@@ -40,48 +32,33 @@ function applyTheme(mode: ThemeMode, theme: ResolvedTheme) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setModeState] = useState<ThemeMode>('system')
+  const [mode, setModeState] = useState<ThemeMode>('light')
   const [theme, setTheme] = useState<ResolvedTheme>('light')
-  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    let storedMode: ThemeMode = 'system'
+    let storedMode: ThemeMode = 'light'
     try {
       const stored = window.localStorage.getItem(THEME_STORAGE_KEY)
       if (isThemeMode(stored)) storedMode = stored
     } catch {
-      // Storage may be unavailable; system mode still works for this session.
+      // Storage may be unavailable; the light default still works for this session.
     }
 
     const domTheme = document.documentElement.dataset.theme
     const resolved = domTheme === 'dark' || domTheme === 'light'
       ? domTheme
-      : resolveTheme(storedMode)
+      : storedMode
 
     setModeState(storedMode)
     setTheme(resolved)
-    setReady(true)
+    applyTheme(storedMode, resolved)
   }, [])
 
-  useEffect(() => {
-    if (!ready || mode !== 'system') return undefined
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (event: MediaQueryListEvent) => {
-      const nextTheme = event.matches ? 'dark' : 'light'
-      setTheme(nextTheme)
-      applyTheme('system', nextTheme)
-    }
-
-    media.addEventListener('change', handleChange)
-    return () => media.removeEventListener('change', handleChange)
-  }, [mode, ready])
-
   const setMode = useCallback((nextMode: ThemeMode) => {
-    const nextTheme = resolveTheme(nextMode)
     const update = () => {
       setModeState(nextMode)
-      setTheme(nextTheme)
-      applyTheme(nextMode, nextTheme)
+      setTheme(nextMode)
+      applyTheme(nextMode, nextMode)
       try {
         window.localStorage.setItem(THEME_STORAGE_KEY, nextMode)
       } catch {
@@ -97,9 +74,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const cycleTheme = useCallback(() => {
-    const index = THEME_MODES.indexOf(mode)
-    setMode(THEME_MODES[(index + 1) % THEME_MODES.length])
-  }, [mode, setMode])
+    setMode(theme === 'dark' ? 'light' : 'dark')
+  }, [setMode, theme])
 
   const value = useMemo(() => ({ mode, theme, setMode, cycleTheme }), [cycleTheme, mode, setMode, theme])
 

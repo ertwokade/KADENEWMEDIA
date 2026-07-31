@@ -2,57 +2,43 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 const ThemeContext = createContext()
 const THEME_STORAGE_KEY = 'kade-theme-mode'
-const THEME_MODES = ['system', 'light', 'dark']
+const THEME_MODES = ['light', 'dark']
 
 function getStoredMode() {
-  if (typeof window === 'undefined') return 'system'
+  if (typeof window === 'undefined') return 'light'
   try {
     const stored = window.localStorage.getItem(THEME_STORAGE_KEY)
-    return THEME_MODES.includes(stored) ? stored : 'system'
+    return THEME_MODES.includes(stored) ? stored : 'light'
   } catch {
-    return 'system'
+    return 'light'
   }
 }
 
-function getSystemTheme() {
-  if (typeof window === 'undefined') return 'light'
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-}
-
-function applyTheme(mode, resolvedTheme) {
+function applyTheme(theme) {
   const root = document.documentElement
-  root.setAttribute('data-theme', resolvedTheme)
-  root.setAttribute('data-theme-mode', mode)
-  root.style.colorScheme = resolvedTheme
+  root.setAttribute('data-theme', theme)
+  root.setAttribute('data-theme-mode', theme)
+  root.style.colorScheme = theme
 
   const themeColor = document.querySelector('meta[name="theme-color"]')
-  if (themeColor) themeColor.setAttribute('content', resolvedTheme === 'dark' ? '#0b0b0a' : '#fbfaf4')
+  if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#0b0b0a' : '#fbfaf4')
 }
 
 export function ThemeProvider({ children }) {
   const [mode, setModeState] = useState(getStoredMode)
-  const [systemTheme, setSystemTheme] = useState(getSystemTheme)
-  const theme = mode === 'system' ? systemTheme : mode
+  const theme = mode
 
   useEffect(() => {
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
-    const syncSystemTheme = (event) => setSystemTheme(event.matches ? 'dark' : 'light')
-    syncSystemTheme(media)
-    media.addEventListener?.('change', syncSystemTheme)
-    return () => media.removeEventListener?.('change', syncSystemTheme)
-  }, [])
-
-  useEffect(() => {
-    applyTheme(mode, theme)
+    applyTheme(theme)
     try {
-      window.localStorage.setItem(THEME_STORAGE_KEY, mode)
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
     } catch {
       // Private browsing or disabled storage: the theme still works for this visit.
     }
-  }, [mode, theme])
+  }, [theme])
 
   const setMode = useCallback((nextMode) => {
-    const safeMode = THEME_MODES.includes(nextMode) ? nextMode : 'system'
+    const safeMode = THEME_MODES.includes(nextMode) ? nextMode : 'light'
     if (typeof document !== 'undefined' && document.startViewTransition) {
       document.startViewTransition(() => setModeState(safeMode))
     } else {
@@ -61,9 +47,8 @@ export function ThemeProvider({ children }) {
   }, [])
 
   const cycleTheme = useCallback(() => {
-    const index = THEME_MODES.indexOf(mode)
-    setMode(THEME_MODES[(index + 1) % THEME_MODES.length])
-  }, [mode, setMode])
+    setMode(theme === 'dark' ? 'light' : 'dark')
+  }, [setMode, theme])
 
   const value = useMemo(() => ({
     mode,

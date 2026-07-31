@@ -10,9 +10,9 @@
   --kline: rgba(23, 19, 10, 0.12);
   --kade: #e0a81f;
   --kade-deep: #c8901a;
-  --kf-display: 'TikTokSans', sans-serif;
-  --kf-mono: 'GeistMono', monospace;
-  --kf-tech: 'DepartureMono', monospace;
+  --kf-display: 'Poppins', sans-serif;
+  --kf-mono: 'Poppins', sans-serif;
+  --kf-tech: 'Poppins', sans-serif;
   background: var(--kbg);
   color: var(--kfg);
   font-family: var(--kf-mono);

@@ -669,9 +669,9 @@ function showToast(msg,type="success"){
 function removeToast(t){ t.classList.add("toast-out"); t.addEventListener("animationend",()=>t.remove(),{once:true}) }
 
 // ── TEMA ─────────────────────────────────────────────────────────────
-function loadTheme(){ const s=storageGet("kade-theme")||"dark"; document.documentElement.setAttribute("data-theme",s); updateThemeBtn(s) }
+function loadTheme(){ const s=storageGet("kade-theme")==="dark"?"dark":"light"; document.documentElement.setAttribute("data-theme",s); updateThemeBtn(s) }
 function bindThemeToggle(){ document.getElementById("themeToggle").addEventListener("click",()=>{ const c=document.documentElement.getAttribute("data-theme")||"dark",n=c==="dark"?"light":"dark"; document.documentElement.setAttribute("data-theme",n); storageSet("kade-theme",n); updateThemeBtn(n); showToast(n==="dark"?"Karanlik mod":"Aydinlik mod","info") }) }
-function updateThemeBtn(t){ const b=document.getElementById("themeToggle"); if(b)b.textContent=t==="dark"?"🌙":"☀️" }
+function updateThemeBtn(t){ const b=document.getElementById("themeToggle"); if(b){const l=t==="dark"?"Açık temaya geç":"Koyu temaya geç";b.textContent=t==="dark"?"☀️":"🌙";b.setAttribute("aria-label",l);b.title=l} }
 
 // ── MOBİL MENÜ ───────────────────────────────────────────────────────
 function toggleMobileMenu(){ const s=document.getElementById("sidebar"),o=document.getElementById("mobileOverlay"),isOpen=s.classList.contains("mobile-open"); s.classList.toggle("mobile-open",!isOpen); o.classList.toggle("visible",!isOpen) }
@@ -2417,6 +2417,6 @@ async function generateImageSrcs(prompt,count,startSeed){
 function makeThumb(text,seed){
   const palettes=[["#00d4aa","#0a2a25"],["#6c8ef5","#0a1228"],["#ffd166","#2a1a00"],["#ff6b6b","#2a0808"],["#c77dff","#1a0828"],["#06d6a0","#001a12"],["#f72585","#180014"],["#4cc9f0","#001624"]];
   const[fg,bg]=palettes[(seed||1)%palettes.length],words=(text||"gorsel").split(" ").slice(0,2).join(" ");
-  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='320' height='180'><rect width='320' height='180' fill='${bg}'/><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='${fg}' stop-opacity='.4'/><stop offset='100%' stop-color='transparent'/></linearGradient></defs><rect width='320' height='180' fill='url(#g)'/><text x='50%' y='46%' dominant-baseline='middle' text-anchor='middle' font-family='Inter,sans-serif' font-size='20' font-weight='800' fill='${fg}'>${words}</text><text x='50%' y='68%' dominant-baseline='middle' text-anchor='middle' font-family='Inter,sans-serif' font-size='11' fill='${fg}' opacity='.55'>Banana Studio</text></svg>`;
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='320' height='180'><rect width='320' height='180' fill='${bg}'/><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='${fg}' stop-opacity='.4'/><stop offset='100%' stop-color='transparent'/></linearGradient></defs><rect width='320' height='180' fill='url(#g)'/><text x='50%' y='46%' dominant-baseline='middle' text-anchor='middle' font-family='Poppins,sans-serif' font-size='20' font-weight='800' fill='${fg}'>${words}</text><text x='50%' y='68%' dominant-baseline='middle' text-anchor='middle' font-family='Poppins,sans-serif' font-size='11' fill='${fg}' opacity='.55'>Banana Studio</text></svg>`;
   return`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }

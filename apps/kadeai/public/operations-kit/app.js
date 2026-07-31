@@ -828,9 +828,9 @@ function showToast(msg,type="success"){
 function removeToast(t){ t.classList.add("toast-out"); t.addEventListener("animationend",()=>t.remove(),{once:true}) }
 
 // ── TEMA ─────────────────────────────────────────────────────────────
-function loadTheme(){ const s=storageGet("kade-theme")||"dark"; document.documentElement.setAttribute("data-theme",s); updateThemeBtn(s) }
+function loadTheme(){ const s=storageGet("kade-theme")==="dark"?"dark":"light"; document.documentElement.setAttribute("data-theme",s); updateThemeBtn(s) }
 function bindThemeToggle(){ document.getElementById("themeToggle").addEventListener("click",()=>{ const c=document.documentElement.getAttribute("data-theme")||"dark",n=c==="dark"?"light":"dark"; document.documentElement.setAttribute("data-theme",n); storageSet("kade-theme",n); updateThemeBtn(n); showToast(n==="dark"?"Karanlık mod":"Aydınlık mod","info") }) }
-function updateThemeBtn(t){ const b=document.getElementById("themeToggle"); if(b)b.textContent=t==="dark"?"🌙":"☀️" }
+function updateThemeBtn(t){ const b=document.getElementById("themeToggle"); if(b){const l=t==="dark"?"Açık temaya geç":"Koyu temaya geç";b.textContent=t==="dark"?"☀️":"🌙";b.setAttribute("aria-label",l);b.title=l} }
 
 // ── MOBİL MENÜ ───────────────────────────────────────────────────────
 function toggleMobileMenu(){ const s=document.getElementById("sidebar"),o=document.getElementById("mobileOverlay"),isOpen=s.classList.contains("mobile-open"); s.classList.toggle("mobile-open",!isOpen); o.classList.toggle("visible",!isOpen) }

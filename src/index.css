@@ -1,6 +1,6 @@
 /* ==========================================
    KADE MEDIA - GLOBAL STYLES
-   Yeni arayüz (kade) — açık/krem tema, TikTokSans/GeistMono
+   Yeni arayüz (kade) — açık/krem tema, Poppins
    ========================================== */
 @import './styles/kade-design.css';
 
@@ -28,10 +28,10 @@
   --gradient-glow: radial-gradient(circle at center, rgba(224,168,31,0.14) 0%, transparent 70%);
 
   /* Typography — kade */
-  --font-display: 'TikTokSans', 'Outfit', sans-serif;
-  --font-primary: 'TikTokSans', 'Outfit', sans-serif;
-  --font-secondary: 'TikTokSans', 'Inter', sans-serif;
-  --font-mono: 'GeistMono', ui-monospace, monospace;
+  --font-display: 'Poppins', sans-serif;
+  --font-primary: 'Poppins', sans-serif;
+  --font-secondary: 'Poppins', sans-serif;
+  --font-mono: 'Poppins', sans-serif;
 
   /* Spacing */
   --section-padding: 100px 0;

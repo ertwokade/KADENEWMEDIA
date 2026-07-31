@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { HiMenuAlt3, HiX, HiOutlineDesktopComputer, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
+import { HiMenuAlt3, HiX, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
 import { useTheme } from '../i18n/ThemeContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useCustomer } from '../contexts/CustomerContext'
@@ -13,16 +13,10 @@ export default function Navbar() {
   const menuButtonRef = useRef(null)
   const mobileMenuRef = useRef(null)
   const location = useLocation()
-  const { mode, cycleTheme } = useTheme()
+  const { theme, cycleTheme } = useTheme()
   const { lang } = useLanguage()
-  const themeOptions = {
-    system: { icon: HiOutlineDesktopComputer, label: 'Sistem', next: 'Açık' },
-    light: { icon: HiOutlineSun, label: 'Açık', next: 'Koyu' },
-    dark: { icon: HiOutlineMoon, label: 'Koyu', next: 'Sistem' },
-  }
-  const themeOption = themeOptions[mode] || themeOptions.system
-  const ThemeIcon = themeOption.icon
-  const themeLabel = `${themeOption.label} tema etkin. ${themeOption.next} temaya geç`
+  const ThemeIcon = theme === 'dark' ? HiOutlineSun : HiOutlineMoon
+  const themeLabel = theme === 'dark' ? 'Açık temaya geç' : 'Koyu temaya geç'
   const { customer } = useCustomer()
   const { content: navigation } = useSiteContent('navigation', NAVIGATION_DEFAULTS)
   const navLinks = Array.isArray(navigation?.links) && navigation.links.length ? navigation.links : NAVIGATION_DEFAULTS.links
@@ -87,8 +81,7 @@ export default function Navbar() {
             </Link>
           ))}
           <button type="button" className="knav-link knav-tema" onClick={cycleTheme} aria-label={themeLabel} title={themeLabel}>
-            <ThemeIcon size={13} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />
-            {themeOption.label}
+            <ThemeIcon size={17} aria-hidden="true" />
           </button>
         </div>
 
@@ -115,7 +108,9 @@ export default function Navbar() {
                 {lang === 'en' ? (link.labelEn || link.labelTr) : (link.labelTr || link.labelEn)}
               </Link>
             ))}
-            <button type="button" className="knav-mlink" onClick={cycleTheme} aria-label={themeLabel}><ThemeIcon size={15} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 7 }} />TEMA: {themeOption.label}</button>
+            <button type="button" className="knav-mlink knav-mlink--theme" onClick={cycleTheme} aria-label={themeLabel} title={themeLabel}>
+              <ThemeIcon size={18} aria-hidden="true" />
+            </button>
           </div>
         )}
       </nav>

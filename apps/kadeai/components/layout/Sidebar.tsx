@@ -333,7 +333,9 @@ export default function Sidebar() {
 
         {/* Footer */}
         <div className="space-y-2 border-t border-zinc-100 px-4 py-4 flex-shrink-0">
-          <ThemeToggle className="w-full" />
+          <div className="flex justify-center">
+            <ThemeToggle />
+          </div>
           {settingsAccess && (
             <Link
               href="/dashboard/settings"

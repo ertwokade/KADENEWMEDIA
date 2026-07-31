@@ -8,7 +8,7 @@ import {
   HiOutlineEyeOff, HiOutlineX, HiOutlineMenuAlt3, HiOutlineDatabase,
   HiOutlineKey, HiOutlineCheck, HiOutlinePencil,
   HiOutlineCalendar, HiOutlineBell, HiOutlineMoon,
-  HiOutlineSun, HiOutlineDesktopComputer, HiOutlineChartBar, HiOutlineViewBoards,
+  HiOutlineSun, HiOutlineChartBar, HiOutlineViewBoards,
   HiOutlineMenuAlt2, HiOutlinePhone, HiOutlineAnnotation,
   HiOutlineChatAlt2, HiOutlineChevronLeft, HiOutlineChevronDown,
   HiOutlineCurrencyDollar, HiOutlineClipboardList,
@@ -80,9 +80,8 @@ import './Admin.css'
 function isLocalMode() { return false }
 
 const THEME_MODE_META = {
-  system: { label: 'Sistem Modu', icon: HiOutlineDesktopComputer, next: 'Açık moda geç' },
-  light: { label: 'Açık Mod', icon: HiOutlineSun, next: 'Koyu moda geç' },
-  dark: { label: 'Koyu Mod', icon: HiOutlineMoon, next: 'Sistem moduna geç' },
+  light: { icon: HiOutlineMoon, next: 'Koyu temaya geç' },
+  dark: { icon: HiOutlineSun, next: 'Açık temaya geç' },
 }
 
 // Toast component with progress bar
@@ -102,7 +101,7 @@ function Toast({ message, type, onClose }) {
 
 // ========== LOGIN SCREEN ==========
 function LoginScreen({ onLogin }) {
-  const { mode, theme, cycleTheme } = useTheme()
+  const { theme, cycleTheme } = useTheme()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -124,7 +123,7 @@ function LoginScreen({ onLogin }) {
     }
   }
 
-  const themeMeta = THEME_MODE_META[mode] || THEME_MODE_META.system
+  const themeMeta = THEME_MODE_META[theme]
   const ThemeModeIcon = themeMeta.icon
 
   return (
@@ -133,11 +132,10 @@ function LoginScreen({ onLogin }) {
         type="button"
         className="admin-login-theme"
         onClick={cycleTheme}
-        aria-label={`${themeMeta.label} etkin. ${themeMeta.next}`}
+        aria-label={themeMeta.next}
         title={themeMeta.next}
       >
         <ThemeModeIcon size={18} />
-        <span>{themeMeta.label}</span>
       </button>
       <div className="login-bg-pattern" />
       <div className="login-grid-overlay" />
@@ -8152,9 +8150,9 @@ ${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong
 
 // ========== MAIN ADMIN COMPONENT ==========
 export default function Admin({ initialAuth = false, initialUser = null } = {}) {
-  const { mode, theme, cycleTheme } = useTheme()
+  const { theme, cycleTheme } = useTheme()
   const darkMode = theme === 'dark'
-  const themeMeta = THEME_MODE_META[mode] || THEME_MODE_META.system
+  const themeMeta = THEME_MODE_META[theme]
   const ThemeModeIcon = themeMeta.icon
   const [authChecked, setAuthChecked] = useState(Boolean(initialAuth))
   const [isAuth, setIsAuth] = useState(Boolean(initialAuth))
@@ -8499,11 +8497,10 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
           <button
             className="dark-mode-toggle"
             onClick={cycleTheme}
-            aria-label={`${themeMeta.label} etkin. ${themeMeta.next}`}
+            aria-label={themeMeta.next}
             title={themeMeta.next}
           >
             <ThemeModeIcon size={18} />
-            <span>{themeMeta.label}</span>
           </button>
           <a href="/" target="_blank" rel="noopener noreferrer" className="sidebar-site-link">
             ⚡ <span>Siteyi Görüntüle</span>

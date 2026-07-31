@@ -1223,3 +1223,28 @@ html[data-theme="dark"] .btn-outline:hover {
 html[data-theme="dark"] .grid-bg {
   background-image: linear-gradient(90deg, rgba(247, 243, 232, 0.06) 1px, transparent 1px) !important;
 }
+
+/* Tüm site ve yönetim ekranlarında tek tip marka yazı karakteri. */
+:root {
+  --font-display: 'Poppins', sans-serif;
+  --font-primary: 'Poppins', sans-serif;
+  --font-secondary: 'Poppins', sans-serif;
+  --font-mono: 'Poppins', sans-serif;
+  --ky-mono: 'Poppins', sans-serif;
+  --ky-tech: 'Poppins', sans-serif;
+}
+
+html,
+body,
+#root,
+#root *,
+button,
+input,
+textarea,
+select,
+option,
+code,
+pre,
+kbd {
+  font-family: 'Poppins', sans-serif !important;
+}

@@ -1,14 +1,18 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Poppins } from 'next/font/google'
 import MobileInstallPrompt from '@/components/mobile/MobileInstallPrompt'
 import { ThemeProvider } from '@/lib/context/ThemeContext'
 import './globals.css'
 import { PUBLIC_APP_URL, withBasePath } from '@/lib/appConfig'
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
-const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
+const poppins = Poppins({
+  variable: '--font-poppins',
+  subsets: ['latin', 'latin-ext'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+})
 const siteUrl = PUBLIC_APP_URL
-const themeScript = `(function(){try{var k="kade-theme-mode";var s=localStorage.getItem(k);var m=s==="light"||s==="dark"||s==="system"?s:"system";var t=m==="system"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):m;var d=document.documentElement;d.dataset.themeMode=m;d.dataset.theme=t;d.style.colorScheme=t}catch(e){}})()`
+const themeScript = `(function(){try{var k="kade-theme-mode";var s=localStorage.getItem(k);var t=s==="dark"?"dark":"light";var d=document.documentElement;d.dataset.themeMode=t;d.dataset.theme=t;d.style.colorScheme=t}catch(e){}})()`
 
 export const viewport: Viewport = {
   themeColor: '#eac321',
@@ -68,8 +72,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="tr"
       data-theme="light"
-      data-theme-mode="system"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      data-theme-mode="light"
+      className={`${poppins.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
