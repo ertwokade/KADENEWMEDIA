@@ -5,13 +5,26 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState } from 'react'
 import { User, Lock, Mail, Home } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { apiPath, withBasePath } from '@/lib/appConfig'
+import { apiPath, appRoutes, withBasePath } from '@/lib/appConfig'
 import KadeLogo from '@/components/brand/KadeLogo'
 import ThemeToggle from '@/components/theme/ThemeToggle'
 import { captureAnalytics } from '@/lib/analytics/client'
+import { mapGoogleOAuthError } from '@/lib/auth/oauth'
 import { getSignupPasswordError, SIGNUP_PASSWORD_HINT } from '@/lib/auth/passwordPolicy'
+import { createClient as createSupabaseClient } from '@/lib/supabase/client'
 
 type Mode = 'login' | 'signup'
+
+function GoogleMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5">
+      <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.55h3.24c1.9-1.75 2.98-4.33 2.98-7.42Z" />
+      <path fill="#34A853" d="M12 22c2.7 0 4.98-.9 6.63-2.35l-3.24-2.55c-.9.6-2.05.96-3.39.96-2.61 0-4.83-1.77-5.62-4.14H3.03v2.62A10 10 0 0 0 12 22Z" />
+      <path fill="#FBBC05" d="M6.38 13.92A6 6 0 0 1 6.06 12c0-.67.12-1.32.32-1.92V7.46H3.03A10 10 0 0 0 2 12c0 1.63.39 3.17 1.03 4.54l3.35-2.62Z" />
+      <path fill="#EA4335" d="M12 5.94c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.64 9.64 0 0 0 12 2a10 10 0 0 0-8.97 5.46l3.35 2.62C7.17 7.71 9.39 5.94 12 5.94Z" />
+    </svg>
+  )
+}
 
 export default function AuthPage() {
   const [mode, setMode]         = useState<Mode>('login')
@@ -19,6 +32,7 @@ export default function AuthPage() {
   const [nickname, setNickname] = useState('')      // sadece kayıtta
   const [password, setPassword] = useState('')
   const [loading, setLoading]   = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError]       = useState('')
   const [success, setSuccess]   = useState('')
 
@@ -77,6 +91,37 @@ export default function AuthPage() {
     }
   }
 
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true)
+    setError('')
+    setSuccess('')
+
+    if (!isConfigured) {
+      setError('Supabase bağlantısı yok. Vercel env var\'larını kontrol et.')
+      setGoogleLoading(false)
+      return
+    }
+
+    try {
+      const callbackPath = `${appRoutes.authCallback}?next=${encodeURIComponent(appRoutes.dashboard)}`
+      const redirectTo = new URL(withBasePath(callbackPath), window.location.origin).toString()
+      const { error: oauthError } = await createSupabaseClient().auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo },
+      })
+
+      if (oauthError) {
+        captureAnalytics('login_failed', { provider: 'google', status: oauthError.status || 0 })
+        setError(mapGoogleOAuthError(oauthError))
+      }
+    } catch {
+      captureAnalytics('login_failed', { provider: 'google', status: 0 })
+      setError(mapGoogleOAuthError({}))
+    } finally {
+      setGoogleLoading(false)
+    }
+  }
+
   return (
     <div className="kade-auth-page relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 p-4 text-zinc-100">
       <ThemeToggle compact className="fixed right-4 top-4 z-20" />
@@ -99,6 +144,22 @@ export default function AuthPage() {
                 {m === 'login' ? 'Giriş Yap' : 'Kayıt Ol'}
               </button>
             ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={loading || googleLoading}
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-700 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <GoogleMark />
+            {googleLoading ? 'Google’a yönlendiriliyor...' : 'Google ile devam et'}
+          </button>
+
+          <div className="flex items-center gap-3" aria-hidden="true">
+            <span className="h-px flex-1 bg-zinc-800" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-600">veya</span>
+            <span className="h-px flex-1 bg-zinc-800" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -154,7 +215,7 @@ export default function AuthPage() {
             {error   && <p role="alert" aria-live="assertive" className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">{error}</p>}
             {success && <p role="status" aria-live="polite" className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300">{success}</p>}
 
-            <button type="submit" disabled={loading}
+            <button type="submit" disabled={loading || googleLoading}
               className="w-full rounded-xl bg-[#f2c322] py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-[#ffda3f] disabled:opacity-50">
               {loading ? 'Yükleniyor...' : mode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
             </button>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { appRoutes, withBasePath } from '@/lib/appConfig'
+import { mapGoogleOAuthError } from '@/lib/auth/oauth'
 import { supabaseCookieOptions } from '@/lib/supabase/cookieOptions'
 
 function safeNext(value: string | null) {
@@ -19,6 +20,25 @@ export async function GET(request: NextRequest) {
   })()
   const code = searchParams.get('code')
   const next = safeNext(searchParams.get('next'))
+  const providerErrorCode = searchParams.get('error_code') || searchParams.get('error')
+
+  if (providerErrorCode) {
+    const loginUrl = new URL(`${origin}${withBasePath(appRoutes.login)}`)
+    loginUrl.searchParams.set('auth_error', mapGoogleOAuthError({
+      code: providerErrorCode,
+      message: searchParams.get('error_description'),
+    }))
+    return NextResponse.redirect(loginUrl)
+  }
+
+  if (
+    code
+    && (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  ) {
+    const loginUrl = new URL(`${origin}${withBasePath(appRoutes.login)}`)
+    loginUrl.searchParams.set('auth_error', 'Kimlik doğrulama bağlantısı yapılandırılmamış.')
+    return NextResponse.redirect(loginUrl)
+  }
 
   if (code && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     const cookieStore = await cookies()
