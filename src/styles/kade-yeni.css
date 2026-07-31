@@ -1002,3 +1002,219 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   .kade-spot-ring { display: none !important; }
   .kade-magnet { transition: none !important; }
 }
+
+/* =====================================================================
+   SYSTEM / DARK THEME — marketing site and shared customer tools
+   ===================================================================== */
+html[data-theme="dark"] {
+  --bg-primary: #0b0b0a;
+  --black: #0b0b0a;
+  --black-light: #11110f;
+  --black-lighter: #171612;
+  --dark-gray: #1c1b17;
+  --gray: #27251e;
+  --gray-light: rgba(247, 243, 232, 0.58);
+  --gray-lighter: rgba(247, 243, 232, 0.76);
+  --white: #f7f3e8;
+  --white-dim: #ddd7c8;
+  --text-primary: #f7f3e8;
+  --text-secondary: rgba(247, 243, 232, 0.62);
+  --bg-secondary: rgba(255, 255, 255, 0.045);
+  --card-bg: #131310;
+  --border-color: rgba(247, 243, 232, 0.13);
+  --border-color-hover: rgba(224, 168, 31, 0.56);
+  --border: rgba(247, 243, 232, 0.13);
+  --ky-ink: #f7f3e8;
+  --ky-gold: #e8b83b;
+  --ky-gold-deep: #f0c95a;
+  --ky-line: rgba(247, 243, 232, 0.13);
+  color-scheme: dark;
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body,
+html[data-theme="dark"] #root {
+  background:
+    radial-gradient(70vw 60vh at 74% -10%, rgba(224, 168, 31, 0.16), transparent 65%),
+    radial-gradient(50vw 40vh at 6% 104%, rgba(224, 168, 31, 0.08), transparent 70%),
+    linear-gradient(90deg, rgba(247, 243, 232, 0.045) 1px, transparent 1px),
+    #0b0b0a !important;
+  background-size: auto, auto, 33.333% 100%, auto !important;
+  color: #f7f3e8;
+}
+
+html[data-theme="dark"] .knav {
+  background: linear-gradient(#0b0b0a 55%, transparent);
+}
+
+html[data-theme="dark"] .knav-mobile,
+html[data-theme="dark"] .navbar.scrolled {
+  background: rgba(11, 11, 10, 0.96) !important;
+  border-color: rgba(247, 243, 232, 0.12) !important;
+}
+
+html[data-theme="dark"] .knav-brand,
+html[data-theme="dark"] .knav-link,
+html[data-theme="dark"] .knav-burger,
+html[data-theme="dark"] .knav-mlink,
+html[data-theme="dark"] .navbar-link,
+html[data-theme="dark"] .navbar .logo-word,
+html[data-theme="dark"] .navbar .logo-word span {
+  color: #f7f3e8 !important;
+}
+
+html[data-theme="dark"] .knav-link:hover::before,
+html[data-theme="dark"] .knav-link.active::before {
+  border-color: #f7f3e8;
+}
+
+html[data-theme="dark"] .footer,
+html[data-theme="dark"] footer.footer {
+  background: #0b0b0a !important;
+  border-color: rgba(247, 243, 232, 0.12) !important;
+}
+
+html[data-theme="dark"] .footer h4,
+html[data-theme="dark"] .footer h3,
+html[data-theme="dark"] .footer-title,
+html[data-theme="dark"] .footer a,
+html[data-theme="dark"] .footer p,
+html[data-theme="dark"] .footer li,
+html[data-theme="dark"] .footer-bottom {
+  color: rgba(247, 243, 232, 0.66) !important;
+  border-color: rgba(247, 243, 232, 0.1) !important;
+}
+
+html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .section-title span,
+html[data-theme="dark"] [class*="-hero"] .section-title,
+html[data-theme="dark"] [class*="-hero"] .section-title *,
+html[data-theme="dark"] [class*="-hero"] h1,
+html[data-theme="dark"] [class*="-hero"] h1 *,
+html[data-theme="dark"] [class*="hero"] h1,
+html[data-theme="dark"] [class*="hero"] h1 *,
+html[data-theme="dark"] .hero-title,
+html[data-theme="dark"] .hero-title *,
+html[data-theme="dark"] .page-title,
+html[data-theme="dark"] .page-title *,
+html[data-theme="dark"] .kk-title,
+html[data-theme="dark"] .kk-title *,
+html[data-theme="dark"] .demo-title,
+html[data-theme="dark"] .demo-title * {
+  color: #f7f3e8 !important;
+  -webkit-text-fill-color: #f7f3e8 !important;
+}
+
+html[data-theme="dark"] .section-badge,
+html[data-theme="dark"] .hero-badge,
+html[data-theme="dark"] .stat-label,
+html[data-theme="dark"] .story-stat-label,
+html[data-theme="dark"] [class*="-card-category"],
+html[data-theme="dark"] [class*="-metric-label"],
+html[data-theme="dark"] [class*="-summary-label"] {
+  color: rgba(247, 243, 232, 0.6) !important;
+}
+
+html[data-theme="dark"] .glass-card,
+html[data-theme="dark"] .value-card,
+html[data-theme="dark"] .team-card,
+html[data-theme="dark"] .feature-card,
+html[data-theme="dark"] .pricing-card,
+html[data-theme="dark"] .service-card,
+html[data-theme="dark"] .tilt-card,
+html[data-theme="dark"] .bento-item,
+html[data-theme="dark"] .portfolio-card,
+html[data-theme="dark"] .blog-card,
+html[data-theme="dark"] .partner-card,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .kk-card,
+html[data-theme="dark"] .tool-card,
+html[data-theme="dark"] .case-card,
+html[data-theme="dark"] .testimonial-card,
+html[data-theme="dark"] .demo-card,
+html[data-theme="dark"] .press-card,
+html[data-theme="dark"] .newsletter-card,
+html[data-theme="dark"] .referral-card,
+html[data-theme="dark"] .podcast-card,
+html[data-theme="dark"] .referanslar-istatistikler .glass-card,
+html[data-theme="dark"] .referanslar-istatistikler > *,
+html[data-theme="dark"] .ok-access-card {
+  background: #131310 !important;
+  border-color: rgba(247, 243, 232, 0.13) !important;
+  color: #f7f3e8 !important;
+}
+
+html[data-theme="dark"] .kade-spot {
+  background:
+    linear-gradient(#131310, #131310) padding-box,
+    linear-gradient(135deg, rgba(224, 168, 31, 0.65), rgba(247, 243, 232, 0.12)) border-box !important;
+  box-shadow: 0 18px 42px -28px rgba(0, 0, 0, 0.92) !important;
+}
+
+html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select,
+html[data-theme="dark"] .blog-search-wrapper,
+html[data-theme="dark"] .blog-search-input,
+html[data-theme="dark"] .site-search input,
+html[data-theme="dark"] .search-input {
+  background: rgba(255, 255, 255, 0.055) !important;
+  border-color: rgba(247, 243, 232, 0.15) !important;
+  color: #f7f3e8 !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: rgba(247, 243, 232, 0.42) !important;
+}
+
+html[data-theme="dark"] .blog-category-chips button,
+html[data-theme="dark"] .portfolio-filters button,
+html[data-theme="dark"] .category-chips button,
+html[data-theme="dark"] .filter-bar button,
+html[data-theme="dark"] [class*="filter"] button,
+html[data-theme="dark"] [class*="-chips"] button,
+html[data-theme="dark"] .referanslar-filtre-btn,
+html[data-theme="dark"] [class*="filtre"] button,
+html[data-theme="dark"] [class*="filtre-btn"],
+html[data-theme="dark"] [class*="kategori"] button {
+  color: rgba(247, 243, 232, 0.62) !important;
+}
+
+html[data-theme="dark"] .blog-category-chips button:hover,
+html[data-theme="dark"] .blog-category-chips button.active,
+html[data-theme="dark"] .portfolio-filters button:hover,
+html[data-theme="dark"] .portfolio-filters button.active,
+html[data-theme="dark"] [class*="filter"] button:hover,
+html[data-theme="dark"] [class*="filter"] button.active,
+html[data-theme="dark"] [class*="filtre"] button:hover,
+html[data-theme="dark"] [class*="filtre"] button.active {
+  color: #f7f3e8 !important;
+}
+
+html[data-theme="dark"] .portfolio-metric-value,
+html[data-theme="dark"] .ist-rakam,
+html[data-theme="dark"] .kk-price,
+html[data-theme="dark"] .kk-amount {
+  color: #f7f3e8 !important;
+  -webkit-text-fill-color: #f7f3e8 !important;
+}
+
+html[data-theme="dark"] [class*="-hero"]:not(h1):not([class*="-title"]):not([class*="-subtitle"]):not([class*="-badge"]):not([class*="-desc"])::after {
+  mix-blend-mode: screen;
+  opacity: 0.27;
+}
+
+html[data-theme="dark"] .btn-outline {
+  border-color: rgba(247, 243, 232, 0.42) !important;
+  color: #f7f3e8 !important;
+}
+
+html[data-theme="dark"] .btn-outline:hover {
+  background: #f7f3e8 !important;
+  color: #17130a !important;
+}
+
+html[data-theme="dark"] .grid-bg {
+  background-image: linear-gradient(90deg, rgba(247, 243, 232, 0.06) 1px, transparent 1px) !important;
+}

@@ -7,6 +7,7 @@ import { User, Lock, Mail, Home } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { apiPath, withBasePath } from '@/lib/appConfig'
 import KadeLogo from '@/components/brand/KadeLogo'
+import ThemeToggle from '@/components/theme/ThemeToggle'
 import { captureAnalytics } from '@/lib/analytics/client'
 
 type Mode = 'login' | 'signup'
@@ -68,7 +69,8 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 p-4 text-zinc-100">
+    <div className="kade-auth-page relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 p-4 text-zinc-100">
+      <ThemeToggle compact className="fixed right-4 top-4 z-20" />
       <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-amber-400/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 -right-28 h-96 w-96 rounded-full bg-cyan-500/5 blur-3xl" />
       <div className="w-full max-w-sm space-y-6">

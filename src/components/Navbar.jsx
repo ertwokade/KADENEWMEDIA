@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { HiMenuAlt3, HiX, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
+import { HiMenuAlt3, HiX, HiOutlineDesktopComputer, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi'
 import { useTheme } from '../i18n/ThemeContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useCustomer } from '../contexts/CustomerContext'
@@ -13,11 +13,16 @@ export default function Navbar() {
   const menuButtonRef = useRef(null)
   const mobileMenuRef = useRef(null)
   const location = useLocation()
-  const { theme, toggleTheme } = useTheme()
+  const { mode, cycleTheme } = useTheme()
   const { lang } = useLanguage()
-  const isDark = theme === 'dark'
-  const ThemeIcon = isDark ? HiOutlineSun : HiOutlineMoon
-  const themeLabel = isDark ? 'Açık temaya geç' : 'Koyu temaya geç'
+  const themeOptions = {
+    system: { icon: HiOutlineDesktopComputer, label: 'Sistem', next: 'Açık' },
+    light: { icon: HiOutlineSun, label: 'Açık', next: 'Koyu' },
+    dark: { icon: HiOutlineMoon, label: 'Koyu', next: 'Sistem' },
+  }
+  const themeOption = themeOptions[mode] || themeOptions.system
+  const ThemeIcon = themeOption.icon
+  const themeLabel = `${themeOption.label} tema etkin. ${themeOption.next} temaya geç`
   const { customer } = useCustomer()
   const { content: navigation } = useSiteContent('navigation', NAVIGATION_DEFAULTS)
   const navLinks = Array.isArray(navigation?.links) && navigation.links.length ? navigation.links : NAVIGATION_DEFAULTS.links
@@ -81,9 +86,9 @@ export default function Navbar() {
               {lang === 'en' ? (link.labelEn || link.labelTr) : (link.labelTr || link.labelEn)}
             </Link>
           ))}
-          <button type="button" className="knav-link knav-tema" onClick={toggleTheme} aria-label={themeLabel} title={themeLabel}>
+          <button type="button" className="knav-link knav-tema" onClick={cycleTheme} aria-label={themeLabel} title={themeLabel}>
             <ThemeIcon size={13} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 5 }} />
-            TEMA
+            {themeOption.label}
           </button>
         </div>
 
@@ -110,7 +115,7 @@ export default function Navbar() {
                 {lang === 'en' ? (link.labelEn || link.labelTr) : (link.labelTr || link.labelEn)}
               </Link>
             ))}
-            <button type="button" className="knav-mlink" onClick={toggleTheme} aria-label={themeLabel}><ThemeIcon size={15} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 7 }} />TEMA</button>
+            <button type="button" className="knav-mlink" onClick={cycleTheme} aria-label={themeLabel}><ThemeIcon size={15} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 7 }} />TEMA: {themeOption.label}</button>
           </div>
         )}
       </nav>

@@ -1149,3 +1149,277 @@ aside nav a[class][href].font-semibold {
     color: currentColor !important;
   }
 }
+
+/* Shared three-state theme control: System → Light → Dark. */
+.kade-theme-toggle {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.045);
+  padding: 0 12px;
+  color: #aaa79c;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.kade-theme-toggle:hover {
+  border-color: rgba(242, 195, 34, 0.36);
+  background: rgba(242, 195, 34, 0.1);
+  color: #ffe982;
+}
+
+.kade-theme-toggle:active {
+  transform: translateY(1px);
+}
+
+.kade-theme-toggle--compact {
+  width: 42px;
+  min-height: 42px;
+  border-color: var(--kade-line-strong);
+  background: color-mix(in srgb, var(--kade-paper) 70%, transparent);
+  color: var(--kade-ink);
+}
+
+.kade-public-nav {
+  grid-template-columns: 1fr auto auto auto;
+}
+
+/* Light KadeAI dashboard. Dark mode keeps the original calm charcoal workspace. */
+html[data-theme="light"] .kade-panel,
+html[data-theme="light"] .kade-panel main {
+  background: #f7f5ed !important;
+  color: #17130a;
+}
+
+html[data-theme="light"] .kade-panel .bg-zinc-950,
+html[data-theme="light"] .kade-panel .bg-zinc-950\/70,
+html[data-theme="light"] .kade-panel .bg-zinc-950\/60 {
+  background: #f7f5ed !important;
+}
+
+html[data-theme="light"] .kade-panel .bg-zinc-900,
+html[data-theme="light"] .kade-panel .bg-zinc-900\/90,
+html[data-theme="light"] .kade-panel .bg-zinc-900\/80,
+html[data-theme="light"] .kade-panel .bg-zinc-900\/70,
+html[data-theme="light"] .kade-panel .bg-zinc-900\/60,
+html[data-theme="light"] .kade-panel .bg-zinc-900\/55,
+html[data-theme="light"] .kade-panel .bg-zinc-900\/50 {
+  background: #fffdf6 !important;
+}
+
+html[data-theme="light"] .kade-panel .bg-zinc-800,
+html[data-theme="light"] .kade-panel .bg-zinc-800\/50,
+html[data-theme="light"] .kade-panel .bg-zinc-800\/30 {
+  background: #f0ede3 !important;
+}
+
+html[data-theme="light"] .kade-panel .bg-zinc-700 {
+  background: #ded8c9 !important;
+}
+
+html[data-theme="light"] .kade-panel .bg-white,
+html[data-theme="light"] .kade-panel .bg-white\/80 {
+  background: #fffdf6 !important;
+}
+
+html[data-theme="light"] .kade-panel .text-zinc-100 {
+  color: #17130a !important;
+}
+
+html[data-theme="light"] .kade-panel .text-zinc-200 {
+  color: #2d281e !important;
+}
+
+html[data-theme="light"] .kade-panel .text-zinc-300 {
+  color: #443d31 !important;
+}
+
+html[data-theme="light"] .kade-panel .text-zinc-400 {
+  color: #625a4c !important;
+}
+
+html[data-theme="light"] .kade-panel .text-zinc-500 {
+  color: #71685a !important;
+}
+
+html[data-theme="light"] .kade-panel .text-zinc-600 {
+  color: #7a7061 !important;
+}
+
+html[data-theme="light"] .kade-panel .border-zinc-800,
+html[data-theme="light"] .kade-panel .border-zinc-700,
+html[data-theme="light"] .kade-panel .border-zinc-700\/70,
+html[data-theme="light"] .kade-panel .border-zinc-700\/60,
+html[data-theme="light"] .kade-panel .border-zinc-700\/50 {
+  border-color: rgba(23, 19, 10, 0.13) !important;
+}
+
+html[data-theme="light"] .kade-panel .border-zinc-600 {
+  border-color: rgba(23, 19, 10, 0.2) !important;
+}
+
+html[data-theme="light"] .kade-panel input,
+html[data-theme="light"] .kade-panel textarea,
+html[data-theme="light"] .kade-panel select {
+  color-scheme: light;
+}
+
+html[data-theme="light"] .kade-panel main > div:first-child[class*="border-b"] {
+  background:
+    linear-gradient(90deg, rgba(224, 168, 31, 0.09), transparent 48%),
+    rgba(255, 253, 246, 0.94) !important;
+  border-color: rgba(23, 19, 10, 0.12) !important;
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar {
+  background:
+    linear-gradient(180deg, rgba(224, 168, 31, 0.08), transparent 32%),
+    #fffdf6 !important;
+  border-color: rgba(23, 19, 10, 0.11) !important;
+  box-shadow: 18px 0 55px rgba(23, 19, 10, 0.07);
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar [class*="border-zinc"],
+html[data-theme="light"] .kade-panel aside.kade-sidebar .kade-sidebar-footer {
+  border-color: rgba(23, 19, 10, 0.1) !important;
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar input.kade-sidebar-search {
+  background: rgba(23, 19, 10, 0.035) !important;
+  border-color: rgba(23, 19, 10, 0.12) !important;
+  color: #17130a !important;
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar input.kade-sidebar-search::placeholder {
+  color: rgba(23, 19, 10, 0.42) !important;
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar .kade-sidebar-category {
+  color: #756c5d !important;
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar nav a.kade-sidebar-link[data-active][href] {
+  color: #625a4c !important;
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar nav a.kade-sidebar-link[data-active][href]:hover {
+  background: rgba(224, 168, 31, 0.08) !important;
+  border-color: rgba(224, 168, 31, 0.2) !important;
+  color: #17130a !important;
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar nav a.kade-sidebar-link[data-active="true"][href] {
+  background: rgba(224, 168, 31, 0.13) !important;
+  border-color: rgba(224, 168, 31, 0.32) !important;
+  color: #6d5000 !important;
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar .kade-theme-toggle {
+  border-color: rgba(23, 19, 10, 0.12);
+  background: rgba(23, 19, 10, 0.035);
+  color: #625a4c;
+}
+
+html[data-theme="light"] .kade-panel aside.kade-sidebar .kade-theme-toggle:hover {
+  border-color: rgba(224, 168, 31, 0.42);
+  background: rgba(224, 168, 31, 0.1) !important;
+  color: #6d5000 !important;
+}
+
+html[data-theme="light"] .kade-auth-page {
+  background: #f7f5ed !important;
+  color: #17130a !important;
+}
+
+html[data-theme="light"] .kade-auth-page .bg-zinc-950 {
+  background: #f0ede3 !important;
+}
+
+html[data-theme="light"] .kade-auth-page .bg-zinc-900\/90,
+html[data-theme="light"] .kade-auth-page .bg-zinc-900\/70 {
+  background: rgba(255, 253, 246, 0.94) !important;
+}
+
+html[data-theme="light"] .kade-auth-page .border-zinc-800,
+html[data-theme="light"] .kade-auth-page .border-zinc-700 {
+  border-color: rgba(23, 19, 10, 0.13) !important;
+}
+
+html[data-theme="light"] .kade-auth-page .text-zinc-100 {
+  color: #17130a !important;
+}
+
+html[data-theme="light"] .kade-auth-page .text-zinc-200,
+html[data-theme="light"] .kade-auth-page .text-zinc-400 {
+  color: #51493c !important;
+}
+
+html[data-theme="light"] .kade-auth-page .text-zinc-500,
+html[data-theme="light"] .kade-auth-page .text-zinc-600 {
+  color: #71685a !important;
+}
+
+html[data-theme="light"] .kade-auth-page input {
+  color-scheme: light;
+}
+
+/* Dark public KadeAI pages use the same warm-black language as the dashboard. */
+html[data-theme="dark"] {
+  --kade-paper: #08090d;
+  --kade-paper-warm: #0e0e0c;
+  --kade-ink: #f7f3e8;
+  --kade-muted: #aaa396;
+  --kade-line: rgba(247, 243, 232, 0.12);
+  --kade-line-strong: rgba(247, 243, 232, 0.25);
+  --kade-panel-surface: rgba(20, 20, 17, 0.7);
+}
+
+html[data-theme="dark"],
+html[data-theme="dark"] body {
+  background:
+    linear-gradient(90deg, rgba(247, 243, 232, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(247, 243, 232, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 50% 28%, rgba(242, 195, 34, 0.12), transparent 36%),
+    #08090d;
+  color: #f7f3e8;
+}
+
+html[data-theme="dark"] .kade-public {
+  background:
+    linear-gradient(90deg, var(--kade-line) 1px, transparent 1px),
+    linear-gradient(180deg, var(--kade-line) 1px, transparent 1px),
+    radial-gradient(circle at 51% 45%, rgba(242, 195, 34, 0.12), transparent 32%),
+    var(--kade-paper-warm);
+}
+
+html[data-theme="dark"] .kade-feature-card,
+html[data-theme="dark"] .kade-package-card,
+html[data-theme="dark"] .kade-demo-board,
+html[data-theme="dark"] .kade-links-card {
+  background: rgba(17, 17, 15, 0.9);
+}
+
+html[data-theme="dark"] .kade-ghost,
+html[data-theme="dark"] .kade-hero-kicker,
+html[data-theme="dark"] .kade-pill,
+html[data-theme="dark"] .kade-links-list a {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+@media (max-width: 900px) {
+  .kade-public-nav {
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+  }
+
+  .kade-public-login {
+    min-height: 42px;
+    padding: 0 16px;
+  }
+}

@@ -1924,3 +1924,141 @@
 .admin-table tr:hover td {
   background: rgba(255, 212, 0, 0.045) !important;
 }
+
+/* System-aware light skin. The existing dark skin remains the resolved dark mode. */
+.admin-dashboard:not(.dark),
+.admin-login-container:not(.dark) {
+  --bg-primary: #f5f3ed;
+  --bg-secondary: #ece8dd;
+  --bg-tertiary: #dfdacd;
+  --card-bg: rgba(255, 253, 246, 0.94);
+  --card-bg-glass: rgba(255, 253, 246, 0.84);
+  --text-primary: #17130a;
+  --text-secondary: rgba(23, 19, 10, 0.68);
+  --text-tertiary: rgba(23, 19, 10, 0.52);
+  --accent: #c8901a;
+  --accent-light: #e0a81f;
+  --accent-alpha: rgba(224, 168, 31, 0.11);
+  --accent-glow: rgba(224, 168, 31, 0.2);
+  --border: rgba(23, 19, 10, 0.1);
+  --border-strong: rgba(23, 19, 10, 0.17);
+  --shadow-sm: 0 1px 3px rgba(23, 19, 10, 0.04);
+  --shadow-md: 0 12px 34px rgba(23, 19, 10, 0.07);
+  --shadow-lg: 0 24px 60px rgba(23, 19, 10, 0.1);
+  color-scheme: light;
+  background:
+    radial-gradient(70% 58% at 74% 10%, rgba(224, 168, 31, 0.14), transparent 62%),
+    radial-gradient(55% 48% at 10% 82%, rgba(224, 168, 31, 0.08), transparent 68%),
+    #f5f3ed !important;
+}
+
+.admin-dashboard:not(.dark) .admin-grid-bg,
+.admin-login-container:not(.dark) .login-grid-overlay {
+  background-image:
+    linear-gradient(rgba(23, 19, 10, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 19, 10, 0.025) 1px, transparent 1px) !important;
+  opacity: 0.65;
+}
+
+.admin-dashboard:not(.dark) .admin-login-card,
+.admin-dashboard:not(.dark) .admin-sidebar,
+.admin-dashboard:not(.dark) .admin-stat-card,
+.admin-dashboard:not(.dark) .admin-table-wrapper,
+.admin-dashboard:not(.dark) .admin-form,
+.admin-dashboard:not(.dark) .dashboard-quick-action,
+.admin-dashboard:not(.dark) .dashboard-recent,
+.admin-dashboard:not(.dark) .kanban-column,
+.admin-dashboard:not(.dark) .kanban-card,
+.admin-dashboard:not(.dark) .note-item,
+.admin-dashboard:not(.dark) .notification-dropdown,
+.admin-dashboard:not(.dark) .admin-modal,
+.admin-dashboard:not(.dark) .seed-section,
+.admin-login-container:not(.dark) .admin-login-card {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.75), rgba(255, 253, 246, 0.82)),
+    #fffdf6 !important;
+  border-color: rgba(23, 19, 10, 0.1) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.admin-dashboard:not(.dark) .admin-sidebar {
+  border-right-color: rgba(23, 19, 10, 0.11) !important;
+}
+
+.admin-dashboard:not(.dark) .sidebar-header,
+.admin-dashboard:not(.dark) .sidebar-profile,
+.admin-dashboard:not(.dark) .sidebar-footer,
+.admin-dashboard:not(.dark) .admin-table-header,
+.admin-dashboard:not(.dark) .dashboard-recent-header,
+.admin-dashboard:not(.dark) .admin-form h3 {
+  border-color: rgba(23, 19, 10, 0.1) !important;
+}
+
+.admin-dashboard:not(.dark) .admin-form input,
+.admin-dashboard:not(.dark) .admin-form textarea,
+.admin-dashboard:not(.dark) .admin-form select,
+.admin-dashboard:not(.dark) .seed-section input,
+.admin-dashboard:not(.dark) .search-input,
+.admin-login-container:not(.dark) .admin-login-card input {
+  background: rgba(23, 19, 10, 0.035) !important;
+  border-color: rgba(23, 19, 10, 0.13) !important;
+  color: #17130a !important;
+}
+
+.admin-dashboard:not(.dark) .admin-form input::placeholder,
+.admin-dashboard:not(.dark) .admin-form textarea::placeholder,
+.admin-dashboard:not(.dark) .search-input::placeholder,
+.admin-login-container:not(.dark) .admin-login-card input::placeholder {
+  color: rgba(23, 19, 10, 0.42) !important;
+}
+
+.admin-dashboard:not(.dark) .admin-table th {
+  background: rgba(23, 19, 10, 0.035) !important;
+  color: rgba(23, 19, 10, 0.56) !important;
+}
+
+.admin-dashboard:not(.dark) .admin-table td,
+.admin-dashboard:not(.dark) .admin-table th {
+  border-color: rgba(23, 19, 10, 0.08) !important;
+}
+
+.admin-dashboard:not(.dark) .admin-table tr:hover td {
+  background: rgba(224, 168, 31, 0.07) !important;
+}
+
+.admin-login-theme {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card-bg-glass);
+  color: var(--text-secondary);
+  font: 600 0.78rem/1 var(--font);
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  transition: var(--transition);
+}
+
+.admin-login-theme:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 520px) {
+  .admin-login-theme {
+    top: 12px;
+    right: 12px;
+  }
+
+  .admin-login-theme span {
+    display: none;
+  }
+}

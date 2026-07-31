@@ -6,6 +6,21 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#000000" />
+    <script>
+      (function () {
+        try {
+          var key = 'kade-theme-mode'
+          var stored = localStorage.getItem(key)
+          var mode = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system'
+          var resolved = mode === 'system'
+            ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+            : mode
+          document.documentElement.setAttribute('data-theme', resolved)
+          document.documentElement.setAttribute('data-theme-mode', mode)
+          document.documentElement.style.colorScheme = resolved
+        } catch (_) {}
+      })()
+    </script>
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
