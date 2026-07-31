@@ -42,6 +42,6 @@ export async function POST(req: NextRequest) {
     const result = await generateContent({ prompt: buildBulkPrompt(topic, niche || '', platforms || ['instagram','youtube','tiktok'], count || 5), model: model as AIModel, systemPrompt: BULK_SYSTEM_PROMPT, maxTokens: 4000 })
     const selectedPlatforms = Array.isArray(platforms) && platforms.length > 0 ? platforms : ['instagram', 'youtube', 'tiktok']
     const data = normalizeBulkOutput(parseStructuredOutput(result.content), selectedPlatforms)
-    return NextResponse.json({ data, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ data, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (e) { return NextResponse.json({ error: e instanceof Error ? e.message : 'Sunucu hatası' }, { status: 500 }) }
 }

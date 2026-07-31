@@ -133,6 +133,7 @@ export default function SettingsPage() {
   const [configPath, setConfigPath] = useState('')
   const [showKeys, setShowKeys]     = useState<Record<string, boolean>>({})
   const [envLoaded, setEnvLoaded]   = useState(false)
+  const [settingsAccess, setSettingsAccess] = useState(false)
   const [serverEnvStatus, setServerEnvStatus] = useState<Record<string, boolean>>({
     GROQ_API_KEY: false,
     CEREBRAS_API_KEY: false,
@@ -155,13 +156,21 @@ export default function SettingsPage() {
         setEnvLoaded(true)
       })
     } else {
-      fetch(`${apiPath('/api/env-status')}?t=${Date.now()}`, { cache: 'no-store' })
+      fetch(`${apiPath('/api/config')}?t=${Date.now()}`, { cache: 'no-store' })
         .then((res) => res.json())
-        .then((status) => {
+        .then(async (appConfig) => {
+          const canManage = appConfig.settingsAccess === true
+          setSettingsAccess(canManage)
+          if (!canManage) {
+            setEnvLoaded(true)
+            return
+          }
+          const response = await fetch(`${apiPath('/api/env-status')}?t=${Date.now()}`, { cache: 'no-store' })
+          const status = await response.json()
           setServerEnvStatus(status)
           setEnvLoaded(true)
         })
-        .catch(() => {})
+        .catch(() => setEnvLoaded(true))
     }
   }, [])
 
@@ -190,15 +199,17 @@ export default function SettingsPage() {
   const storageReady = isConfigured('NEXT_PUBLIC_SUPABASE_URL') && isConfigured('NEXT_PUBLIC_SUPABASE_ANON_KEY')
   const capabilityCount = [textGenerationReady, imageGenerationReady, storageReady].filter(Boolean).length
   const visibleCapabilityCount = envLoaded || isElectron ? capabilityCount : 0
+  const canManageInfrastructure = isElectron || settingsAccess
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="Ayarlar" description="API anahtarları ve yapılandırma" showModelSelector={false} />
+      <TopBar title="Ayarlar" description="Şirket briefi, AI hafızası ve sağlayıcılar" showModelSelector={false} />
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-2xl mx-auto space-y-5">
 
           <AccountSettingsPanel />
 
+          {canManageInfrastructure && <>
           {/* Status overview */}
           <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-5 flex items-center justify-between">
             <div>
@@ -342,6 +353,7 @@ export default function SettingsPage() {
               </div>
             </>
           )}
+          </>}
         </div>
       </div>
     </div>

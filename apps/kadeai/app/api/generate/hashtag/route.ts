@@ -40,10 +40,9 @@ export async function POST(req: NextRequest) {
 
     if (Object.values(hashtags).every((group) => group.length === 0)) return NextResponse.json({ error: 'Model kullanılabilir hashtag döndürmedi. Yeniden dene.' }, { status: 502 })
 
-    return NextResponse.json({ hashtags, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ hashtags, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sunucu hatası'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

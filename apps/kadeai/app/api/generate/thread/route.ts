@@ -18,9 +18,8 @@ export async function POST(req: NextRequest) {
 
     const thread = parseStructuredOutput(result.content)
 
-    return NextResponse.json({ thread, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ thread, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'Sunucu hatası' }, { status: 500 })
   }
 }
-

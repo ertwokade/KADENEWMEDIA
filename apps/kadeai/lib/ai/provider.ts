@@ -373,21 +373,13 @@ export async function generateContent(req: GenerateRequest): Promise<GenerateRes
   if (enrichedRequest.model !== 'auto') return generateWithResolvedModel(enrichedRequest)
 
   const routed = routeModelForTask({
-    prompt: enrichedRequest.prompt,
-    systemPrompt: enrichedRequest.systemPrompt,
-    maxTokens: enrichedRequest.maxTokens,
+    prompt: boundedRequest.prompt,
+    systemPrompt: boundedRequest.systemPrompt,
+    maxTokens: boundedRequest.maxTokens,
   })
 
   const available = new Set(getAvailableModels())
-  const fallbackOrder: GenerateRequest['model'][] = [
-    routed.model,
-    'groq-gpt-oss-20b',
-    'groq-llama-70b',
-    'gemini-flash',
-    'mistral-small',
-    'cerebras-glm-4-7',
-    'openrouter-free',
-  ]
+  const fallbackOrder: GenerateRequest['model'][] = [routed.model, ...routed.alternatives]
   const candidates = [...new Set(fallbackOrder)].filter(
     (model) => model !== 'auto' && available.has(model)
   )

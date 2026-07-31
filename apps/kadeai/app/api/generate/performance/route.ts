@@ -9,6 +9,6 @@ export async function POST(req: NextRequest) {
     if (!title || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
     const result = await generateContent({ prompt: buildPerformancePrompt(title, thumbnailDesc || '', contentDesc || '', platform || 'youtube', niche || ''), model: model as AIModel, systemPrompt: PERFORMANCE_SYSTEM_PROMPT, maxTokens: 2500 })
     const data = parseStructuredOutput(result.content)
-    return NextResponse.json({ data, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ data, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (e) { return NextResponse.json({ error: e instanceof Error ? e.message : 'Sunucu hatası' }, { status: 500 }) }
 }

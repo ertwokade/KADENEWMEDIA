@@ -67,7 +67,7 @@ export const MODEL_CONFIGS: Record<AIModel, ModelConfig> = {
     id: 'auto',
     label: 'Otomatik model seçimi',
     shortLabel: 'Otomatik',
-    description: 'Görev türü, metin uzunluğu ve kullanılabilir API anahtarlarına göre seçilir',
+    description: 'Konu, amaç, çıktı biçimi, uzunluk ve kullanılabilir sağlayıcılar birlikte puanlanır',
     provider: 'auto',
     free: true,
     speed: 'fast',

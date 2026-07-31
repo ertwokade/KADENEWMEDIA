@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       prompt: question,
     })
 
-    return NextResponse.json({ answer: result.content, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ answer: result.content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sunucu hatası'
     return NextResponse.json({ error: message }, { status: 500 })

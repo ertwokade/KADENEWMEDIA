@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       words: (words ?? []).filter((w) => w.start >= clip.start - 1.5 && w.end <= clip.end + 1.5),
     }))
 
-    return NextResponse.json({ clips: clipsWithWords, model: result.model })
+    return NextResponse.json({ clips: clipsWithWords, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sunucu hatası'
     return NextResponse.json({ error: message }, { status: 500 })

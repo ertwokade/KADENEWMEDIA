@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       translation = { ceviri: result.content, bolumler: [], kulturel_notlar: [], genel_yonerge: '' }
     }
 
-    return NextResponse.json({ translation, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ translation, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Çeviri hatası'
     return NextResponse.json({ error: message }, { status: 500 })

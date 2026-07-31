@@ -158,7 +158,7 @@ export default function ModelSelector({ value, onChange }: ModelSelectorProps) {
               <span className="min-w-0 flex-1">
                 <span className="block text-xs font-semibold">Otomatik seçim</span>
                 <span className="mt-0.5 block text-[10px] text-zinc-500">
-                  Görev türüne ve çalışan sağlayıcılara göre yönlendirir
+                  Konu, amaç, çıktı biçimi, uzunluk ve çalışan sağlayıcıları birlikte puanlar
                 </span>
               </span>
               {value === 'auto' && <Check className="h-4 w-4" />}

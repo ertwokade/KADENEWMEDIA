@@ -63,7 +63,7 @@ function sanitizeAccount(value: unknown): AccountContextValue {
       id: text(source.brand.id, 80) || undefined,
       workspaceId: text(source.brand.workspaceId, 80) || undefined,
       name: text(source.brand.name, 120),
-      description: text(source.brand.description, 2000),
+      description: text(source.brand.description, 12_000),
       niche: text(source.brand.niche, 240),
       audience: text(source.brand.audience, 1000),
       language: text(source.brand.language, 16) || 'tr',
@@ -234,7 +234,7 @@ export async function PUT(request: NextRequest) {
       if (!allowedBrand) return NextResponse.json({ error: 'Bu markaya erişiminiz yok.' }, { status: 403 })
     }
 
-    if (account.brand.name || brandId) {
+    if (account.brand.name || account.brand.description || brandId) {
       const brandPayload = {
         workspace_id: workspaceId,
         created_by: user.id,

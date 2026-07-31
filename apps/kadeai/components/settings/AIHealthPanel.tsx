@@ -51,12 +51,12 @@ const providers = [
 ]
 
 const roles = [
-  ['Yaratıcı Türkçe', 'Llama → Gemini'],
-  ['Uzun plan / metin', 'Gemini → Mistral'],
-  ['Analiz / skor', 'Magistral → GPT-OSS'],
-  ['Yüksek hacim', 'Cerebras → Gemini'],
-  ['Kod / teknik', 'Codestral → Qwen'],
-  ['Araştırma', 'Compound → OpenRouter'],
+  ['Konu ve amaç', 'Görev sinyalleri puanlanır'],
+  ['Çıktı biçimi', 'JSON / tablo / yaratıcı metin'],
+  ['Bağlam uzunluğu', 'Uzun metne uygun pencere'],
+  ['Üretim hacmi', 'Hız ve çıktı miktarı'],
+  ['Sağlayıcı durumu', 'Yalnızca bağlı modeller'],
+  ['Kesinti anı', 'Sıralı otomatik yedek'],
 ]
 
 export default function AIHealthPanel() {
@@ -118,7 +118,7 @@ export default function AIHealthPanel() {
       <div className="rounded-lg border border-zinc-700/50 bg-zinc-900 p-3">
         <div className="mb-2 flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-orange-400" />
-          <p className="text-xs font-semibold text-zinc-200">Otomatik Model Mantığı</p>
+          <p className="text-xs font-semibold text-zinc-200">Konuya Göre Otomatik Model Mantığı</p>
         </div>
         <div className="grid gap-1.5 sm:grid-cols-2">
           {roles.map(([role, model]) => (
