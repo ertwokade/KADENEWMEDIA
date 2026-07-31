@@ -9,6 +9,7 @@ import { apiPath, withBasePath } from '@/lib/appConfig'
 import KadeLogo from '@/components/brand/KadeLogo'
 import ThemeToggle from '@/components/theme/ThemeToggle'
 import { captureAnalytics } from '@/lib/analytics/client'
+import { getSignupPasswordError, SIGNUP_PASSWORD_HINT } from '@/lib/auth/passwordPolicy'
 
 type Mode = 'login' | 'signup'
 
@@ -35,6 +36,14 @@ export default function AuthPage() {
       setError('Supabase bağlantısı yok. Vercel env var\'larını kontrol et.')
       setLoading(false)
       return
+    }
+    if (mode === 'signup') {
+      const passwordError = getSignupPasswordError(password)
+      if (passwordError) {
+        setError(passwordError)
+        setLoading(false)
+        return
+      }
     }
 
     try {
@@ -132,8 +141,14 @@ export default function AuthPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input id="auth-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
                   required placeholder="En az 8 karakter" minLength={8} maxLength={128} autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  aria-describedby={mode === 'signup' ? 'auth-password-hint' : undefined}
                   className="w-full rounded-xl border border-zinc-700 bg-zinc-950 py-2.5 pl-9 pr-3 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-600 focus:border-amber-400" />
               </div>
+              {mode === 'signup' && (
+                <p id="auth-password-hint" className="mt-2 text-[11px] leading-relaxed text-zinc-500">
+                  {SIGNUP_PASSWORD_HINT}
+                </p>
+              )}
             </div>
 
             {error   && <p role="alert" aria-live="assertive" className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">{error}</p>}

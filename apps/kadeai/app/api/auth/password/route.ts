@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { appRoutes, withBasePath } from '@/lib/appConfig'
 import { signInWithAdminCredentials } from '@/lib/auth/adminBridge'
 import { isLoginIdentifier } from '@/lib/auth/adminIdentity'
+import { getSignupPasswordError, mapSignupProviderError } from '@/lib/auth/passwordPolicy'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 
 export const dynamic = 'force-dynamic'
@@ -48,6 +49,12 @@ export async function POST(request: NextRequest) {
   }
   if (password.length < 8 || password.length > 128) {
     return NextResponse.json({ error: 'Parola 8–128 karakter arasında olmalıdır.' }, { status: 400, headers })
+  }
+  if (action === 'signup') {
+    const passwordError = getSignupPasswordError(password)
+    if (passwordError) {
+      return NextResponse.json({ error: passwordError }, { status: 400, headers })
+    }
   }
   if (!configured()) {
     return NextResponse.json({ error: 'Kimlik doğrulama hizmeti kullanılamıyor.' }, { status: 503, headers })
@@ -115,19 +122,21 @@ export async function POST(request: NextRequest) {
         status: error.status,
         message: error.message,
       })
-      const code = (error as { code?: string }).code
-      if (code === 'user_already_exists' || code === 'email_exists' || /already registered|already exists/i.test(error.message)) {
-        return NextResponse.json({
-          error: 'Bu e-posta ile zaten bir Kade AI hesabı var. "Giriş Yap" sekmesinden giriş yapın.',
-        }, { status: 400, headers })
-      }
-      return NextResponse.json({ error: 'Kayıt işlemi tamamlanamadı. Bilgileri kontrol edip tekrar deneyin.' }, { status: 400, headers })
+      const mapped = mapSignupProviderError(error)
+      return NextResponse.json({ error: mapped.message }, { status: mapped.status, headers })
+    }
+    if (!data.user) {
+      return NextResponse.json({
+        error: 'Hesap oluşturma işlemi doğrulanamadı. Lütfen kısa süre sonra tekrar deneyin.',
+      }, { status: 503, headers })
     }
 
     return NextResponse.json({
       ok: true,
       next: data.session ? appRoutes.onboarding : null,
-      message: 'İşlem tamamlandı. Doğrulama gerekiyorsa e-postanızı kontrol edin.',
+      message: data.session
+        ? 'Hesabın oluşturuldu.'
+        : 'Kayıt talebini aldık. Doğrulama bağlantısı için e-postanı kontrol et; mevcut hesabın varsa Giriş Yap sekmesini kullan.',
     }, { status: data.session ? 200 : 202, headers })
   } catch {
     return NextResponse.json({ error: 'Kimlik doğrulama hizmetine ulaşılamıyor.' }, { status: 503, headers })
