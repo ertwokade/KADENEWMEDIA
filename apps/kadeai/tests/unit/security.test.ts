@@ -1,8 +1,15 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
+import { adminAuthEmail, isLoginIdentifier } from '../../lib/auth/adminIdentity'
 import { canAccessOwnedResource } from '../../lib/security/ownership'
-import { isSettingsOwnerEmail, isSettingsOwnerOnlyRoute } from '../../lib/featureAccess'
+import {
+  isAllowedOwnerUser,
+  isKadeAdminUser,
+  isSettingsOwnerEmail,
+  isSettingsOwnerOnlyRoute,
+  isSettingsOwnerUser,
+} from '../../lib/featureAccess'
 import { distributedRateLimit } from '../../lib/rateLimit'
 
 test('user A cannot access a resource owned by user B', () => {
@@ -19,6 +26,45 @@ test('settings are restricted to the single account owner email', () => {
   assert.equal(isSettingsOwnerOnlyRoute('/dashboard/settings'), true)
   assert.equal(isSettingsOwnerOnlyRoute('/api/env-status'), true)
   assert.equal(isSettingsOwnerOnlyRoute('/dashboard/title'), false)
+})
+
+test('service-role-issued admin identities receive KadeAI owner access', () => {
+  const bridgedAdmin = {
+    email: 'admin-account@sso.kadenewmedia.com',
+    app_metadata: {
+      kade_admin_id: '11111111-1111-1111-1111-111111111111',
+      kade_admin_role: 'admin',
+    },
+  }
+  const forgedEditor = {
+    email: 'editor@sso.kadenewmedia.com',
+    app_metadata: {
+      kade_admin_id: '22222222-2222-2222-2222-222222222222',
+      kade_admin_role: 'editor',
+    },
+  }
+
+  assert.equal(isKadeAdminUser(bridgedAdmin), true)
+  assert.equal(isSettingsOwnerUser(bridgedAdmin), true)
+  assert.equal(isAllowedOwnerUser(bridgedAdmin), true)
+  assert.equal(isKadeAdminUser(forgedEditor), false)
+  assert.equal(isSettingsOwnerUser(forgedEditor), false)
+})
+
+test('admin login identifiers and bridged auth emails are normalized safely', () => {
+  assert.equal(isLoginIdentifier('kadir_demir'), true)
+  assert.equal(isLoginIdentifier('admin@example.com'), true)
+  assert.equal(isLoginIdentifier('invalid username'), false)
+  assert.equal(isLoginIdentifier('not-an-email@'), false)
+
+  assert.equal(
+    adminAuthEmail({ id: 'ADMIN-ID', email: ' ADMIN@EXAMPLE.COM ' }),
+    'admin@example.com',
+  )
+  assert.equal(
+    adminAuthEmail({ id: 'ADMIN-ID', email: null }),
+    'admin-admin-id@sso.kadenewmedia.com',
+  )
 })
 
 test('latest RLS migration uses explicit operations and isolates payment ownership', async () => {

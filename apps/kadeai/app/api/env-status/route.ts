@@ -1,5 +1,5 @@
 import { getAuthenticatedUser } from '@/lib/auth/server'
-import { isSettingsOwnerEmail } from '@/lib/featureAccess'
+import { isSettingsOwnerUser } from '@/lib/featureAccess'
 
 const COMMON_ENV_KEYS = [
   'GROQ_API_KEY',
@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   const user = await getAuthenticatedUser()
   if (!user) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
-  if (!isSettingsOwnerEmail(user.email)) {
+  if (!isSettingsOwnerUser(user)) {
     return Response.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
   }
 

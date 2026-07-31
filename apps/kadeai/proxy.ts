@@ -2,10 +2,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import {
   canAccessFeature,
-  isAllowedOwnerEmail,
+  isAllowedOwnerUser,
   isOwnerMode,
   isOwnerOnlyRoute,
-  isSettingsOwnerEmail,
+  isSettingsOwnerUser,
   isSettingsOwnerOnlyRoute,
 } from '@/lib/featureAccess'
 import { stripBasePath } from '@/lib/appConfig'
@@ -157,7 +157,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (isSettingsOwnerRoute && !isSettingsOwnerEmail(user?.email)) {
+  if (isSettingsOwnerRoute && !isSettingsOwnerUser(user)) {
     if (isApi) {
       return NextResponse.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
     }
@@ -167,7 +167,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (isOwnerRoute && isOwnerMode() && !isAllowedOwnerEmail(user?.email)) {
+  if (isOwnerRoute && isOwnerMode() && !isAllowedOwnerUser(user)) {
     if (isApi) {
       return NextResponse.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
     }

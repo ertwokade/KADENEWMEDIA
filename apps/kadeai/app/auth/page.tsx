@@ -13,7 +13,7 @@ type Mode = 'login' | 'signup'
 
 export default function AuthPage() {
   const [mode, setMode]         = useState<Mode>('login')
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [nickname, setNickname] = useState('')      // sadece kayıtta
   const [password, setPassword] = useState('')
   const [loading, setLoading]   = useState(false)
@@ -40,7 +40,13 @@ export default function AuthPage() {
       const response = await fetch(apiPath('/api/auth/password'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: mode, email, password, displayName: nickname }),
+        body: JSON.stringify({
+          action: mode,
+          identifier,
+          email: mode === 'signup' ? identifier : undefined,
+          password,
+          displayName: nickname,
+        }),
       })
       const result = await response.json() as { error?: string; message?: string; next?: string | null }
       if (!response.ok) {
@@ -98,15 +104,23 @@ export default function AuthPage() {
               </div>
             )}
 
-            {/* E-posta */}
+            {/* Admin kullanıcı adı veya KadeAI e-postası */}
             <div>
-              <label htmlFor="auth-email" className="mb-1.5 block text-xs font-semibold text-zinc-400">E-posta</label>
+              <label htmlFor="auth-identifier" className="mb-1.5 block text-xs font-semibold text-zinc-400">
+                {mode === 'login' ? 'Admin kullanıcı adı veya e-posta' : 'E-posta'}
+              </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                <input id="auth-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                  required maxLength={254} placeholder="kadir@email.com" autoComplete="email"
+                <input id="auth-identifier" type={mode === 'login' ? 'text' : 'email'} value={identifier} onChange={(e) => setIdentifier(e.target.value)}
+                  required maxLength={254} placeholder={mode === 'login' ? 'Admin kullanıcı adı veya e-posta' : 'kadir@email.com'}
+                  autoComplete={mode === 'login' ? 'username' : 'email'}
                   className="w-full rounded-xl border border-zinc-700 bg-zinc-950 py-2.5 pl-9 pr-3 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-600 focus:border-amber-400" />
               </div>
+              {mode === 'login' && (
+                <p className="mt-2 text-[11px] leading-relaxed text-zinc-500">
+                  Admin panelinde kullandığın kullanıcı adı ve şifreyle doğrudan giriş yapabilirsin.
+                </p>
+              )}
             </div>
 
             {/* Şifre */}

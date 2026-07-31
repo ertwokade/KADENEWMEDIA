@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAvailableModels } from '@/lib/ai/modelRouter'
-import { isAllowedOwnerEmail, isOwnerMode, isSettingsOwnerEmail } from '@/lib/featureAccess'
+import { isAllowedOwnerUser, isOwnerMode, isSettingsOwnerUser } from '@/lib/featureAccess'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
 
 export const dynamic = 'force-dynamic'
@@ -19,8 +19,8 @@ export async function GET() {
       const supabase = await createClient()
       const { data: { user } } = await supabase.auth.getUser()
       operationsSync = Boolean(user)
-      ownerAccess = isOwnerMode() && isAllowedOwnerEmail(user?.email)
-      settingsAccess = isSettingsOwnerEmail(user?.email)
+      ownerAccess = isOwnerMode() && isAllowedOwnerUser(user)
+      settingsAccess = isSettingsOwnerUser(user)
     } catch {
       operationsSync = false
     }

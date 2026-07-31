@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { appRoutes, withBasePath } from '@/lib/appConfig'
+import { signInWithAdminCredentials } from '@/lib/auth/adminBridge'
+import { isLoginIdentifier } from '@/lib/auth/adminIdentity'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 
 export const dynamic = 'force-dynamic'
@@ -28,17 +30,21 @@ export async function POST(request: NextRequest) {
   }
 
   const action = body.action === 'signup' ? 'signup' : 'login'
-  const email = String(body.email || '').trim().toLocaleLowerCase('en-US')
+  const identifier = String(body.identifier || body.email || '').trim()
+  const email = identifier.toLocaleLowerCase('en-US')
   const password = String(body.password || '')
   const displayName = String(body.displayName || '').trim().slice(0, 120)
-  const limit = rateLimit(getRateLimitKey(request, `auth-${action}`, email), 5, 10 * 60_000)
+  const limit = rateLimit(getRateLimitKey(request, `auth-${action}`, identifier.toLocaleLowerCase('en-US')), 5, 10 * 60_000)
   const headers = { ...rateLimitHeaders(limit), 'Cache-Control': 'no-store' }
 
   if (!limit.allowed) {
     return NextResponse.json({ error: 'Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.' }, { status: 429, headers })
   }
-  if (!EMAIL_PATTERN.test(email) || email.length > 254) {
+  if (action === 'signup' && (!EMAIL_PATTERN.test(email) || email.length > 254)) {
     return NextResponse.json({ error: 'Geçerli bir e-posta adresi girin.' }, { status: 400, headers })
+  }
+  if (action === 'login' && !isLoginIdentifier(identifier)) {
+    return NextResponse.json({ error: 'Geçerli bir admin kullanıcı adı veya e-posta girin.' }, { status: 400, headers })
   }
   if (password.length < 8 || password.length > 128) {
     return NextResponse.json({ error: 'Parola 8–128 karakter arasında olmalıdır.' }, { status: 400, headers })
@@ -50,6 +56,23 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
     if (action === 'login') {
+      const adminResult = await signInWithAdminCredentials(identifier, password)
+      if (adminResult.ok) {
+        return NextResponse.json({
+          ok: true,
+          next: appRoutes.dashboard,
+          accountType: 'admin',
+        }, { headers })
+      }
+
+      if (!EMAIL_PATTERN.test(email)) {
+        return NextResponse.json({
+          error: adminResult.reason === 'not_admin'
+            ? 'Bu yönetim hesabında admin yetkisi yok.'
+            : 'Kullanıcı adı veya parola hatalı.',
+        }, { status: 401, headers })
+      }
+
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) {
         // Gerçek red sebebini sunucu loguna yaz — Vercel loglarından
@@ -71,7 +94,7 @@ export async function POST(request: NextRequest) {
           }, { status: 401, headers })
         }
         return NextResponse.json({
-          error: 'E-posta veya parola hatalı. Kade AI hesabınız yoksa önce "Kayıt Ol" sekmesinden oluşturun (Kade AI girişi, ana sitedeki hesabınızdan ayrıdır).',
+          error: 'Kullanıcı adı/e-posta veya parola hatalı. Admin panelindeki hesabını ya da mevcut KadeAI hesabını kullanabilirsin.',
         }, { status: 401, headers })
       }
       return NextResponse.json({ ok: true, next: appRoutes.dashboard }, { headers })
