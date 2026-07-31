@@ -2050,9 +2050,16 @@
   transform: translateY(-1px);
 }
 
+@media (max-width: 1024px) {
+  .admin-login-theme {
+    top: 76px;
+    right: 16px;
+  }
+}
+
 @media (max-width: 520px) {
   .admin-login-theme {
-    top: 12px;
+    top: 72px;
     right: 12px;
   }
 

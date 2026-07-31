@@ -19,6 +19,7 @@
 
 html,
 body,
+body *,
 button,
 input,
 textarea,
@@ -27,7 +28,7 @@ option,
 code,
 pre,
 kbd {
-  font-family: var(--font-poppins), "Poppins", sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif !important;
 }
 
 /* Dashboard navigation: dark, calm contrast against the paper workspace. */
