@@ -62,8 +62,8 @@ export default function AccountSettingsPanel() {
       setBriefError('Brief dosyası en fazla 100 KB olabilir.')
       return
     }
-    if (!/\.(md|txt|json)$/i.test(file.name)) {
-      setBriefError('MD, TXT veya JSON biçiminde bir brief yükleyin.')
+    if (!/\.(txt|json)$/i.test(file.name)) {
+      setBriefError('TXT veya JSON biçiminde bir brief yükleyin.')
       return
     }
 
@@ -154,7 +154,7 @@ export default function AccountSettingsPanel() {
               <input
                 id="company-brief-file"
                 type="file"
-                accept=".md,.txt,.json,text/markdown,text/plain,application/json"
+                accept=".txt,.json,text/plain,application/json"
                 className="sr-only"
                 onChange={importBrief}
               />

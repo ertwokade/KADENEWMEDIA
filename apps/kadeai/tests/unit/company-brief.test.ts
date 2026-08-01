@@ -53,13 +53,13 @@ test('brief boyutunu güvenli üst sınırda keser', () => {
   assert.equal(result.account.brand.description.length, MAX_COMPANY_BRIEF_LENGTH)
 })
 
-test('örnek brief MD, PDF ve Word biçimlerinde sunulur', () => {
+test('örnek brief kullanıcı dostu Word ve PDF biçimlerinde sunulur', () => {
   assert.deepEqual(
     SAMPLE_COMPANY_BRIEF_DOWNLOADS.map(({ label }) => label),
-    ['MD', 'PDF', 'Word']
+    ['Word', 'PDF']
   )
   assert.deepEqual(
     SAMPLE_COMPANY_BRIEF_DOWNLOADS.map(({ path }) => path.split('.').pop()),
-    ['md', 'pdf', 'docx']
+    ['docx', 'pdf']
   )
 })

@@ -1,11 +1,9 @@
 import { AccountContextValue, normalizeAccountContext } from '@/lib/profile/types'
 
 export const MAX_COMPANY_BRIEF_LENGTH = 12_000
-export const SAMPLE_COMPANY_BRIEF_PATH = '/downloads/kadeai-sirket-briefi-ornek.md'
 export const SAMPLE_COMPANY_BRIEF_DOWNLOADS = [
-  { label: 'MD', path: SAMPLE_COMPANY_BRIEF_PATH },
-  { label: 'PDF', path: '/downloads/kadeai-sirket-briefi-ornek.pdf' },
   { label: 'Word', path: '/downloads/kadeai-sirket-briefi-ornek.docx' },
+  { label: 'PDF', path: '/downloads/kadeai-sirket-briefi-ornek.pdf' },
 ] as const
 
 export interface CompanyBriefImportResult {
