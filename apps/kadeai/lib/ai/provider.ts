@@ -27,7 +27,7 @@ async function generateWithFallbackGroq(
     systemPrompt,
     maxTokens,
     'vercel-qwen-flash',
-    'alibaba/qwen3.7-flash'
+    'alibaba/qwen3.5-flash'
   )
 }
 
@@ -120,7 +120,7 @@ async function generateWithVercelGateway(
   systemPrompt: string,
   maxTokens: number,
   requestedModel: GenerateRequest['model'],
-  gatewayModel = 'alibaba/qwen3.7-flash'
+  gatewayModel = 'alibaba/qwen3.5-flash'
 ): Promise<GenerateResult> {
   const token = await getVercelGatewayToken()
   if (!token) {

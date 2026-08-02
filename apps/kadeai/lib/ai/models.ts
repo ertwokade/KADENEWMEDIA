@@ -83,7 +83,7 @@ export const MODEL_CONFIGS: Record<AIModel, ModelConfig> = {
     shortLabel: 'Qwen Flash',
     description: 'Vercel AI Gateway üzerinden çok düşük maliyetli genel üretim modeli',
     provider: 'vercel',
-    gatewayModel: 'alibaba/qwen3.7-flash',
+    gatewayModel: 'alibaba/qwen3.5-flash',
     free: true,
     speed: 'fastest',
     speedLabel: 'Ekonomik',
