@@ -10,7 +10,7 @@ import {
   isSettingsOwnerOnlyRoute,
   isSettingsOwnerUser,
 } from '../../lib/featureAccess'
-import { distributedRateLimit } from '../../lib/rateLimit'
+import { countedDistributedRateLimit, distributedRateLimit } from '../../lib/rateLimit'
 
 test('user A cannot access a resource owned by user B', () => {
   assert.equal(canAccessOwnedResource('user-a', 'user-a'), true)
@@ -128,4 +128,18 @@ test('distributed quota fails closed in production without a backend', async () 
     if (previousToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN
     else process.env.UPSTASH_REDIS_REST_TOKEN = previousToken
   }
+})
+
+test('Supabase history counts provide conservative distributed quota fallback', () => {
+  const allowed = countedDistributedRateLimit({ identity: 'user-1', minuteLimit: 30, dailyLimit: 500 }, 4, 42)
+  assert.equal(allowed.allowed, true)
+  assert.equal(allowed.remaining, 25)
+
+  const minuteLimited = countedDistributedRateLimit({ identity: 'user-1', minuteLimit: 5, dailyLimit: 500 }, 5, 42)
+  assert.equal(minuteLimited.allowed, false)
+  assert.equal(minuteLimited.reason, 'minute_limit')
+
+  const dailyLimited = countedDistributedRateLimit({ identity: 'user-1', minuteLimit: 30, dailyLimit: 50 }, 1, 50)
+  assert.equal(dailyLimited.allowed, false)
+  assert.equal(dailyLimited.reason, 'daily_limit')
 })

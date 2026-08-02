@@ -9,7 +9,14 @@ import {
   isSettingsOwnerOnlyRoute,
 } from '@/lib/featureAccess'
 import { stripBasePath } from '@/lib/appConfig'
-import { distributedRateLimit, getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
+import {
+  countedDistributedRateLimit,
+  distributedRateLimit,
+  getRateLimitKey,
+  rateLimit,
+  rateLimitHeaders,
+  type DistributedRateLimitResult,
+} from '@/lib/rateLimit'
 import { supabaseCookieOptions } from '@/lib/supabase/cookieOptions'
 
 function allowedMutationOrigins(request: NextRequest) {
@@ -179,13 +186,42 @@ export async function proxy(request: NextRequest) {
 
   if (isAiApi && user) {
     const idempotencyKey = request.headers.get('idempotency-key')?.trim().slice(0, 200) || undefined
-    const limit = await distributedRateLimit('ai-user', {
+    const quotaOptions = {
       identity: user.id,
       minuteLimit: 30,
       dailyLimit: 500,
       cost: pathname === '/api/image' || pathname === '/api/transcribe' ? 5 : 1,
       idempotencyKey,
-    })
+    }
+    let limit = await distributedRateLimit('ai-user', quotaOptions)
+
+    // Upstash bağlı değilse mevcut Supabase geçmişi dağıtık ve kullanıcıya özel
+    // bir sayaç olarak kullanılır. Böylece üretim tamamen kapanmaz; RLS her
+    // kullanıcının yalnızca kendi isteklerini saydırmasına izin verir.
+    if (!limit.allowed && limit.reason === 'backend_unavailable') {
+      const now = Date.now()
+      const minuteSince = new Date(now - 60_000).toISOString()
+      const daySince = new Date(now - 86_400_000).toISOString()
+      let historyLimit: DistributedRateLimitResult | null = null
+
+      for (const table of ['tool_runs', 'content_history'] as const) {
+        const [minuteResult, dailyResult] = await Promise.all([
+          supabase.from(table).select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', minuteSince),
+          supabase.from(table).select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('created_at', daySince),
+        ])
+        if (!minuteResult.error && !dailyResult.error) {
+          historyLimit = countedDistributedRateLimit(
+            quotaOptions,
+            minuteResult.count ?? 0,
+            dailyResult.count ?? 0
+          )
+          break
+        }
+      }
+
+      if (historyLimit) limit = historyLimit
+    }
+
     if (!limit.allowed) {
       const message = limit.reason === 'duplicate'
         ? 'Bu istek daha önce işlendi.'

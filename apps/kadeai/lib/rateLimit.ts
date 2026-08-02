@@ -107,6 +107,33 @@ function localDistributedRateLimit(scope: string, options: DistributedRateLimitO
   }
 }
 
+export function countedDistributedRateLimit(
+  options: DistributedRateLimitOptions,
+  minuteCount: number,
+  dailyCount: number
+): DistributedRateLimitResult {
+  const minuteLimit = boundedInteger(options.minuteLimit, 30, 10_000)
+  const dailyLimit = boundedInteger(options.dailyLimit, 500, 1_000_000)
+  const cost = boundedInteger(options.cost, 1, 100)
+  const safeMinuteCount = Math.max(0, Math.floor(minuteCount || 0))
+  const safeDailyCount = Math.max(0, Math.floor(dailyCount || 0))
+
+  if (safeMinuteCount + cost > minuteLimit) {
+    return { allowed: false, status: 429, reason: 'minute_limit', remaining: 0, resetIn: 60_000 }
+  }
+  if (safeDailyCount + cost > dailyLimit) {
+    return { allowed: false, status: 429, reason: 'daily_limit', remaining: 0, resetIn: 86_400_000 }
+  }
+
+  return {
+    allowed: true,
+    status: 200,
+    reason: 'ok',
+    remaining: Math.max(0, Math.min(minuteLimit - safeMinuteCount - cost, dailyLimit - safeDailyCount - cost)),
+    resetIn: 60_000,
+  }
+}
+
 export async function distributedRateLimit(
   scope: string,
   options: DistributedRateLimitOptions
