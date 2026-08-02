@@ -1,3 +1,5 @@
+import { getVercelOidcToken } from '@vercel/oidc'
+
 export const VERCEL_GATEWAY_STATUS_KEY = 'VERCEL_AI_GATEWAY'
 
 function configured(name: string) {
@@ -16,6 +18,13 @@ export function hasVercelGatewayRuntime(request?: Request) {
 export async function getVercelGatewayToken() {
   const configuredToken = process.env.AI_GATEWAY_API_KEY?.trim() || process.env.VERCEL_OIDC_TOKEN?.trim()
   if (configuredToken) return configuredToken
+
+  try {
+    const runtimeToken = (await getVercelOidcToken())?.trim()
+    if (runtimeToken) return runtimeToken
+  } catch {
+    // Yerel/Vercel dışı çalışmada aşağıdaki istek başlığı yedeğine geç.
+  }
 
   try {
     const { headers } = await import('next/headers')

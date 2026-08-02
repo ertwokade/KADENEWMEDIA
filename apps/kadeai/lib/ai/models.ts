@@ -79,7 +79,7 @@ export const MODEL_CONFIGS: Record<AIModel, ModelConfig> = {
   },
   'vercel-qwen-flash': {
     id: 'vercel-qwen-flash',
-    label: 'Qwen 3.7 Flash (Ekonomik)',
+    label: 'Qwen 3.5 Flash (Ekonomik)',
     shortLabel: 'Qwen Flash',
     description: 'Vercel AI Gateway üzerinden çok düşük maliyetli genel üretim modeli',
     provider: 'vercel',
@@ -87,7 +87,7 @@ export const MODEL_CONFIGS: Record<AIModel, ModelConfig> = {
     free: true,
     speed: 'fastest',
     speedLabel: 'Ekonomik',
-    contextLabel: '991K',
+    contextLabel: '1M',
     badge: 'Varsayılan',
     ...style('lime'),
   },

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import type { AIModel } from '../../types'
+import { getModelConfig } from '../../lib/ai/models'
 import { getAvailableModels, routeModelForTask } from '../../lib/ai/modelRouter'
 
 const available: AIModel[] = [
@@ -62,4 +63,10 @@ test('Vercel ortamında ekonomik AI Gateway modeli otomatik kullanıma açılır
     if (previous === undefined) delete process.env.VERCEL
     else process.env.VERCEL = previous
   }
+})
+
+test('ekonomik Gateway modeli Vercel kataloğundaki geçerli kimliği kullanır', () => {
+  const model = getModelConfig('vercel-qwen-flash')
+  assert.equal(model.gatewayModel, 'alibaba/qwen3.5-flash')
+  assert.match(model.label, /Qwen 3\.5 Flash/)
 })
