@@ -77,6 +77,13 @@ test('latest RLS migration uses explicit operations and isolates payment ownersh
   assert.match(sql, /REVOKE ALL ON public\.payment_events FROM anon, authenticated/)
 })
 
+test('proxy forwards server request headers to route handlers', async () => {
+  const source = await readFile(new URL('../../proxy.ts', import.meta.url), 'utf8')
+  assert.match(source, /new Headers\(request\.headers\)/)
+  assert.match(source, /NextResponse\.next\(\{ request: \{ headers: requestHeaders \} \}\)/)
+  assert.doesNotMatch(source, /NextResponse\.next\(\{ request \}\)/)
+})
+
 test('distributed AI quota enforces cost, daily limit and idempotency locally', async () => {
   const identity = `unit-${Date.now()}-${Math.random()}`
   const now = 1_750_000_000_000

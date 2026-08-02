@@ -19,6 +19,14 @@ import {
 } from '@/lib/rateLimit'
 import { supabaseCookieOptions } from '@/lib/supabase/cookieOptions'
 
+function nextResponseFor(request: NextRequest) {
+  // Vercel'in kısa ömürlü OIDC başlığı dahil olmak üzere gelen sunucu
+  // başlıklarını Route Handler'a açıkça aktar. NextResponse'e doğrudan
+  // NextRequest vermek, özel başlıkların ara katmanda kaybolmasına yol açar.
+  const requestHeaders = new Headers(request.headers)
+  return NextResponse.next({ request: { headers: requestHeaders } })
+}
+
 function allowedMutationOrigins(request: NextRequest) {
   const allowed = new Set<string>([request.nextUrl.origin])
 
@@ -46,7 +54,7 @@ function allowedMutationOrigins(request: NextRequest) {
 }
 
 export async function proxy(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+  let supabaseResponse = nextResponseFor(request)
   const pathname = stripBasePath(request.nextUrl.pathname)
   const isApi = pathname.startsWith('/api/')
   const isAuthPage = pathname.startsWith('/auth') || pathname === '/login'
@@ -136,7 +144,7 @@ export async function proxy(request: NextRequest) {
         getAll: () => request.cookies.getAll(),
         setAll: (toSet) => {
           toSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
+          supabaseResponse = nextResponseFor(request)
           toSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
