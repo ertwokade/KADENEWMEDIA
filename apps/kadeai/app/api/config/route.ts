@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getAvailableModels } from '@/lib/ai/modelRouter'
 import { isAllowedOwnerUser, isOwnerMode, isSettingsOwnerUser } from '@/lib/featureAccess'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
-import { hasVercelGatewayRuntime } from '@/lib/ai/gatewayAuth'
+import { getVercelGatewayToken } from '@/lib/ai/gatewayAuth'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,12 +10,17 @@ function configured(name: string) {
   return Boolean(process.env[name]?.trim())
 }
 
-export async function GET(request: Request) {
+export async function GET() {
   if (!(await hasAuthenticatedUser())) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
   let operationsSync = false
   let ownerAccess = false
   let settingsAccess = false
-  const aiGateway = hasVercelGatewayRuntime(request)
+  const gatewayToken = await getVercelGatewayToken()
+  const aiGateway = Boolean(gatewayToken)
+  const availableModels = getAvailableModels()
+  if (gatewayToken && !availableModels.includes('vercel-qwen-flash')) {
+    availableModels.push('vercel-qwen-flash')
+  }
   if (configured('NEXT_PUBLIC_SUPABASE_URL') && configured('NEXT_PUBLIC_SUPABASE_ANON_KEY')) {
     try {
       const supabase = await createClient()
@@ -55,7 +60,7 @@ export async function GET(request: Request) {
     ownerAccess,
     settingsAccess,
     autoRouting: true,
-    availableModels: getAvailableModels(),
+    availableModels,
   }, {
     headers: {
       'Cache-Control': 'no-store, no-cache, must-revalidate',

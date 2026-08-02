@@ -1,6 +1,6 @@
 import { getAuthenticatedUser } from '@/lib/auth/server'
 import { isSettingsOwnerUser } from '@/lib/featureAccess'
-import { hasVercelGatewayRuntime, VERCEL_GATEWAY_STATUS_KEY } from '@/lib/ai/gatewayAuth'
+import { getVercelGatewayToken, VERCEL_GATEWAY_STATUS_KEY } from '@/lib/ai/gatewayAuth'
 
 const COMMON_ENV_KEYS = [
   'AI_GATEWAY_API_KEY',
@@ -18,7 +18,7 @@ const COMMON_ENV_KEYS = [
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: Request) {
+export async function GET() {
   const user = await getAuthenticatedUser()
   if (!user) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
   if (!isSettingsOwnerUser(user)) {
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   const status = Object.fromEntries(
     COMMON_ENV_KEYS.map((key) => [key, Boolean(process.env[key]?.trim())])
   )
-  status[VERCEL_GATEWAY_STATUS_KEY] = hasVercelGatewayRuntime(request)
+  status[VERCEL_GATEWAY_STATUS_KEY] = Boolean(await getVercelGatewayToken())
 
   return Response.json(status, {
     headers: {

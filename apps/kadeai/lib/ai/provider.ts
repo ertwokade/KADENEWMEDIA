@@ -120,9 +120,10 @@ async function generateWithVercelGateway(
   systemPrompt: string,
   maxTokens: number,
   requestedModel: GenerateRequest['model'],
-  gatewayModel = 'alibaba/qwen3.5-flash'
+  gatewayModel = 'alibaba/qwen3.5-flash',
+  gatewayToken?: string
 ): Promise<GenerateResult> {
-  const token = await getVercelGatewayToken()
+  const token = gatewayToken?.trim() || await getVercelGatewayToken()
   if (!token) {
     throw new Error('Vercel AI Gateway kimliği bulunamadı. Dağıtım OIDC ayarını kontrol et.')
   }
@@ -308,14 +309,14 @@ async function generateWithMistral(
   }
 }
 
-async function generateWithResolvedModel(req: GenerateRequest): Promise<GenerateResult> {
+async function generateWithResolvedModel(req: GenerateRequest, gatewayToken?: string): Promise<GenerateResult> {
   const { prompt, model, systemPrompt, maxTokens = 1500 } = req
   const sysText = systemPrompt || 'Sen uzman bir sosyal medya içerik stratejistisin. Türkçe yanıt ver.'
   const modelConfig = getModelConfig(model)
 
   try {
     if (modelConfig.provider === 'vercel') {
-      return generateWithVercelGateway(prompt, sysText, maxTokens, model, modelConfig.gatewayModel)
+      return generateWithVercelGateway(prompt, sysText, maxTokens, model, modelConfig.gatewayModel, gatewayToken)
     }
 
     if (modelConfig.provider === 'groq') {
@@ -390,6 +391,7 @@ async function generateWithResolvedModel(req: GenerateRequest): Promise<Generate
 
 export async function generateContent(req: GenerateRequest): Promise<GenerateResult> {
   await assertAuthenticatedUser()
+  const gatewayToken = await getVercelGatewayToken()
   const prompt = typeof req.prompt === 'string' ? req.prompt.trim() : ''
   if (!prompt) throw new Error('İstek metni boş olamaz.')
   if (prompt.length > 24_000) throw new Error('İstek metni 24.000 karakter sınırını aşıyor.')
@@ -408,7 +410,7 @@ export async function generateContent(req: GenerateRequest): Promise<GenerateRes
     ? { ...boundedRequest, systemPrompt: `${boundedRequest.systemPrompt || 'Kullanıcıya doğru ve yararlı bir yanıt ver.'}${profileInstruction}` }
     : boundedRequest
 
-  if (enrichedRequest.model !== 'auto') return generateWithResolvedModel(enrichedRequest)
+  if (enrichedRequest.model !== 'auto') return generateWithResolvedModel(enrichedRequest, gatewayToken)
 
   const routed = routeModelForTask({
     prompt: boundedRequest.prompt,
@@ -417,6 +419,7 @@ export async function generateContent(req: GenerateRequest): Promise<GenerateRes
   })
 
   const available = new Set(getAvailableModels())
+  if (gatewayToken) available.add('vercel-qwen-flash')
   const fallbackOrder: GenerateRequest['model'][] = [routed.model, ...routed.alternatives]
   const candidates = [...new Set(fallbackOrder)].filter(
     (model) => model !== 'auto' && available.has(model)
@@ -429,7 +432,7 @@ export async function generateContent(req: GenerateRequest): Promise<GenerateRes
   let lastError: unknown
   for (const [index, model] of candidates.entries()) {
     try {
-      const result = await generateWithResolvedModel({ ...enrichedRequest, model })
+      const result = await generateWithResolvedModel({ ...enrichedRequest, model }, gatewayToken)
       const routingReason = index === 0
         ? routed.reason
         : `${routed.reason}; ilk sağlayıcı yanıt vermediği için ${getModelConfig(model).shortLabel} yedeği kullanıldı`
