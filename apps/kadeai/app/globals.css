@@ -1241,6 +1241,13 @@ html[data-theme="light"] .kade-panel .bg-white\/80 {
   background: #fffdf6 !important;
 }
 
+html[data-theme="light"] .kade-panel .kade-dashboard-hero {
+  background:
+    radial-gradient(circle at 88% 10%, rgba(242, 195, 34, 0.22), transparent 34%),
+    #11110f !important;
+  border-color: rgba(242, 195, 34, 0.22) !important;
+}
+
 html[data-theme="light"] .kade-panel .text-zinc-100 {
   color: #17130a !important;
 }

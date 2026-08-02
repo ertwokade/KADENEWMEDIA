@@ -1,6 +1,6 @@
 import { AIModel } from '@/types'
 
-export type ModelProviderId = 'auto' | 'groq' | 'cerebras' | 'openrouter' | 'anthropic' | 'openai' | 'google' | 'mistral'
+export type ModelProviderId = 'auto' | 'vercel' | 'groq' | 'cerebras' | 'openrouter' | 'anthropic' | 'openai' | 'google' | 'mistral'
 export type ModelSpeed = 'fastest' | 'fast' | 'balanced'
 
 export interface ModelConfig {
@@ -11,6 +11,7 @@ export interface ModelConfig {
   provider: ModelProviderId
   groqModel?: string
   cerebrasModel?: string
+  gatewayModel?: string
   openRouterModel?: string
   geminiModel?: string
   mistralModel?: string
@@ -53,6 +54,7 @@ function style(color: keyof typeof classes) {
 
 export const MODEL_PROVIDER_GROUPS: ModelProviderGroup[] = [
   { id: 'all', label: 'Hepsi', description: 'Yapılandırılmış modeller' },
+  { id: 'vercel', label: 'Ekonomik', description: 'Vercel ücretsiz kredisi ve düşük maliyetli modeller' },
   { id: 'cerebras', label: 'Cerebras', description: 'En hızlı çıkarım' },
   { id: 'groq', label: 'Groq', description: 'Düşük gecikme' },
   { id: 'openrouter', label: 'OpenRouter', description: 'Ücretsiz yönlendirici ve kredi modelleri' },
@@ -74,6 +76,20 @@ export const MODEL_CONFIGS: Record<AIModel, ModelConfig> = {
     speedLabel: 'Göreve göre',
     contextLabel: 'Akıllı yönlendirme',
     ...style('orange'),
+  },
+  'vercel-qwen-flash': {
+    id: 'vercel-qwen-flash',
+    label: 'Qwen 3.7 Flash (Ekonomik)',
+    shortLabel: 'Qwen Flash',
+    description: 'Vercel AI Gateway üzerinden çok düşük maliyetli genel üretim modeli',
+    provider: 'vercel',
+    gatewayModel: 'alibaba/qwen3.7-flash',
+    free: true,
+    speed: 'fastest',
+    speedLabel: 'Ekonomik',
+    contextLabel: '991K',
+    badge: 'Varsayılan',
+    ...style('lime'),
   },
   'cerebras-glm-4-7': {
     id: 'cerebras-glm-4-7',

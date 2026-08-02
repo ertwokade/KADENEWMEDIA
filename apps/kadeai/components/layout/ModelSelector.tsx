@@ -38,6 +38,7 @@ const models = SELECTABLE_MODELS
 const providerIcons: Record<ModelProviderId | 'all', typeof Cpu> = {
   all: Sparkles,
   auto: Sparkles,
+  vercel: Zap,
   cerebras: Zap,
   groq: Gauge,
   openrouter: Route,

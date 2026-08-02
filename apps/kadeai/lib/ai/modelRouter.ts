@@ -1,4 +1,5 @@
 import { AIModel } from '@/types'
+import { hasVercelGatewayRuntime } from '@/lib/ai/gatewayAuth'
 
 export interface ModelRoutingInput {
   prompt: string
@@ -81,7 +82,7 @@ const MODEL_PREFERENCES: Record<ModelTask, AIModel[]> = {
     'openrouter-nemotron-free', 'groq-qwen-32b', 'groq-llama4',
   ],
   bulk: [
-    'cerebras-glm-4-7', 'groq-gpt-oss-20b', 'groq-llama-8b', 'gemini-flash-lite',
+    'vercel-qwen-flash', 'cerebras-glm-4-7', 'groq-gpt-oss-20b', 'groq-llama-8b', 'gemini-flash-lite',
     'gemini-lite-latest', 'gemini-flash', 'mistral-small',
   ],
   'long-context': [
@@ -89,7 +90,7 @@ const MODEL_PREFERENCES: Record<ModelTask, AIModel[]> = {
     'mistral-medium', 'groq-llama4', 'claude', 'gpt4o',
   ],
   structured: [
-    'gpt4o', 'groq-gpt-oss-20b', 'groq-qwen-32b', 'cerebras-glm-4-7',
+    'gpt4o', 'vercel-qwen-flash', 'groq-gpt-oss-20b', 'groq-qwen-32b', 'cerebras-glm-4-7',
     'mistral-small', 'gemini-flash', 'openrouter-glm-free',
   ],
   creative: [
@@ -97,7 +98,7 @@ const MODEL_PREFERENCES: Record<ModelTask, AIModel[]> = {
     'mistral-medium', 'groq-llama4', 'mistral-nemo',
   ],
   general: [
-    'groq-llama-70b', 'gemini-flash', 'mistral-small', 'cerebras-glm-4-7',
+    'vercel-qwen-flash', 'groq-llama-70b', 'gemini-flash', 'mistral-small', 'cerebras-glm-4-7',
     'groq-gpt-oss-20b', 'openrouter-free', 'groq-llama4',
   ],
 }
@@ -108,6 +109,8 @@ function configured(name: string) {
 
 export function getAvailableModels(): AIModel[] {
   const models: AIModel[] = ['auto']
+
+  if (hasVercelGatewayRuntime()) models.push('vercel-qwen-flash')
 
   if (configured('GROQ_API_KEY')) {
     models.push(

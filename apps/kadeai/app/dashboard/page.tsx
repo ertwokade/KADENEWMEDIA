@@ -137,7 +137,7 @@ export default function DashboardPage() {
     <div className="flex-1 overflow-y-auto bg-zinc-950 text-zinc-100">
       <div className="mx-auto w-full max-w-[1520px] space-y-8 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
         <DashboardMobileHeader />
-        <section className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 px-6 py-7 shadow-2xl shadow-black/20 sm:px-8 sm:py-9">
+        <section className="kade-dashboard-hero relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 px-6 py-7 shadow-2xl shadow-black/20 sm:px-8 sm:py-9">
           <div className="pointer-events-none absolute -right-20 -top-28 h-80 w-80 rounded-full bg-[#f2c322]/20 blur-3xl" />
           <div className="pointer-events-none absolute bottom-0 right-[28%] h-28 w-28 rounded-full bg-[#f2c322]/10 blur-2xl" />
 

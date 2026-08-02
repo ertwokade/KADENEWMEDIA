@@ -9,6 +9,14 @@ type EnvStatus = Record<string, boolean>
 
 const providers = [
   {
+    id: 'VERCEL_AI_GATEWAY',
+    label: 'Vercel AI Gateway',
+    status: 'Aylık ücretsiz kredi ve otomatik yedek',
+    models: 'Qwen 3.7 Flash · düşük maliyet',
+    color: 'text-lime-400',
+    bg: 'bg-lime-900/30',
+  },
+  {
     id: 'CEREBRAS_API_KEY',
     label: 'Cerebras',
     status: 'Yüksek hacimli üretim',

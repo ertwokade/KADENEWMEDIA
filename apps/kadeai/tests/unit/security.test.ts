@@ -19,8 +19,9 @@ test('user A cannot access a resource owned by user B', () => {
 })
 
 test('settings are restricted to the single account owner email', () => {
-  assert.equal(isSettingsOwnerEmail('demirk314@gmail.com'), true)
-  assert.equal(isSettingsOwnerEmail(' DEMIRK314@GMAIL.COM '), true)
+  assert.equal(isSettingsOwnerEmail('thekademedia@gmail.com'), true)
+  assert.equal(isSettingsOwnerEmail(' THEKADEMEDIA@GMAIL.COM '), true)
+  assert.equal(isSettingsOwnerEmail('demirk314@gmail.com'), false)
   assert.equal(isSettingsOwnerEmail('another-owner@gmail.com'), false)
   assert.equal(isSettingsOwnerEmail(null), false)
   assert.equal(isSettingsOwnerOnlyRoute('/dashboard/settings'), true)

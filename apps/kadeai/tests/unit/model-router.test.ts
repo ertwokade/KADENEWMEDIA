@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import type { AIModel } from '../../types'
-import { routeModelForTask } from '../../lib/ai/modelRouter'
+import { getAvailableModels, routeModelForTask } from '../../lib/ai/modelRouter'
 
 const available: AIModel[] = [
   'auto',
@@ -51,4 +51,15 @@ test('yalnızca gerçekten kullanılabilir modelleri döndürür', () => {
 
   assert.equal(result.model, 'cerebras-glm-4-7')
   assert.deepEqual(result.alternatives, [])
+})
+
+test('Vercel ortamında ekonomik AI Gateway modeli otomatik kullanıma açılır', () => {
+  const previous = process.env.VERCEL
+  process.env.VERCEL = '1'
+  try {
+    assert.ok(getAvailableModels().includes('vercel-qwen-flash'))
+  } finally {
+    if (previous === undefined) delete process.env.VERCEL
+    else process.env.VERCEL = previous
+  }
 })

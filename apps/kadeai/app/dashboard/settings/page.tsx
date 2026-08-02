@@ -21,6 +21,17 @@ declare global {
 
 const KEY_DEFS = [
   {
+    id: 'AI_GATEWAY_API_KEY',
+    label: 'Vercel AI Gateway',
+    placeholder: 'vck_...',
+    url: 'https://vercel.com/ai-gateway',
+    urlLabel: 'vercel.com/ai-gateway',
+    color: 'text-lime-400',
+    dot: 'bg-lime-400',
+    models: ['Qwen 3.7 Flash', 'Vercel üzerindeki diğer modeller'],
+    optional: true,
+  },
+  {
     id: 'GROQ_API_KEY',
     label: 'Groq (Açık Modeller)',
     placeholder: 'gsk_...',
@@ -115,6 +126,8 @@ const KEY_DEFS = [
 ]
 
 const TEXT_PROVIDER_KEYS = [
+  'VERCEL_AI_GATEWAY',
+  'AI_GATEWAY_API_KEY',
   'GROQ_API_KEY',
   'CEREBRAS_API_KEY',
   'OPENROUTER_API_KEY',
@@ -135,6 +148,8 @@ export default function SettingsPage() {
   const [envLoaded, setEnvLoaded]   = useState(false)
   const [settingsAccess, setSettingsAccess] = useState(false)
   const [serverEnvStatus, setServerEnvStatus] = useState<Record<string, boolean>>({
+    VERCEL_AI_GATEWAY: false,
+    AI_GATEWAY_API_KEY: false,
     GROQ_API_KEY: false,
     CEREBRAS_API_KEY: false,
     OPENROUTER_API_KEY: false,

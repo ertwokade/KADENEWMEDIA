@@ -65,7 +65,7 @@ const SETTINGS_OWNER_ONLY_ROUTES = [
   '/api/env-status',
 ]
 
-const SETTINGS_OWNER_EMAIL = 'demirk314@gmail.com'
+const SETTINGS_OWNER_EMAIL = 'thekademedia@gmail.com'
 
 type AuthUserLike = {
   email?: string | null

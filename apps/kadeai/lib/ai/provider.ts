@@ -1,5 +1,6 @@
 import { GenerateRequest, GenerateResult } from '@/types'
 import { ModelConfig, getModelConfig } from '@/lib/ai/models'
+import { getVercelGatewayToken } from '@/lib/ai/gatewayAuth'
 import { getAvailableModels, routeModelForTask } from '@/lib/ai/modelRouter'
 import { getRequestProfileInstruction } from '@/lib/ai/profileContext'
 import { assertAuthenticatedUser } from '@/lib/auth/server'
@@ -18,7 +19,16 @@ async function generateWithFallbackGroq(
   systemPrompt: string,
   maxTokens: number
 ): Promise<GenerateResult> {
-  return generateWithGroq(prompt, systemPrompt, maxTokens, fallbackModel(), 'llama-3.3-70b-versatile')
+  if (hasEnv('GROQ_API_KEY')) {
+    return generateWithGroq(prompt, systemPrompt, maxTokens, fallbackModel(), 'llama-3.3-70b-versatile')
+  }
+  return generateWithVercelGateway(
+    prompt,
+    systemPrompt,
+    maxTokens,
+    'vercel-qwen-flash',
+    'alibaba/qwen3.7-flash'
+  )
 }
 
 async function parseChatCompletionResponse(
@@ -103,6 +113,30 @@ async function generateWithOpenAICompatibleEndpoint({
     model: requestedModel,
     tokensUsed: data.tokensUsed,
   }
+}
+
+async function generateWithVercelGateway(
+  prompt: string,
+  systemPrompt: string,
+  maxTokens: number,
+  requestedModel: GenerateRequest['model'],
+  gatewayModel = 'alibaba/qwen3.7-flash'
+): Promise<GenerateResult> {
+  const token = await getVercelGatewayToken()
+  if (!token) {
+    throw new Error('Vercel AI Gateway kimliği bulunamadı. Dağıtım OIDC ayarını kontrol et.')
+  }
+
+  return generateWithOpenAICompatibleEndpoint({
+    prompt,
+    systemPrompt,
+    maxTokens,
+    requestedModel,
+    providerName: 'Vercel AI Gateway',
+    apiKey: token,
+    endpoint: 'https://ai-gateway.vercel.sh/v1/chat/completions',
+    model: gatewayModel,
+  })
 }
 
 async function generateWithGroq(
@@ -280,6 +314,10 @@ async function generateWithResolvedModel(req: GenerateRequest): Promise<Generate
   const modelConfig = getModelConfig(model)
 
   try {
+    if (modelConfig.provider === 'vercel') {
+      return generateWithVercelGateway(prompt, sysText, maxTokens, model, modelConfig.gatewayModel)
+    }
+
     if (modelConfig.provider === 'groq') {
       return generateWithGroq(prompt, sysText, maxTokens, model, modelConfig.groqModel)
     }
