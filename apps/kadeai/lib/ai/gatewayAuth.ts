@@ -15,9 +15,12 @@ export function hasVercelGatewayRuntime(request?: Request) {
   )
 }
 
-export async function getVercelGatewayToken() {
+export async function getVercelGatewayToken(request?: Request) {
   const configuredToken = process.env.AI_GATEWAY_API_KEY?.trim() || process.env.VERCEL_OIDC_TOKEN?.trim()
   if (configuredToken) return configuredToken
+
+  const requestToken = request?.headers.get('x-vercel-oidc-token')?.trim()
+  if (requestToken) return requestToken
 
   try {
     const runtimeToken = (await getVercelOidcToken())?.trim()

@@ -18,7 +18,7 @@ const COMMON_ENV_KEYS = [
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await getAuthenticatedUser()
   if (!user) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
   if (!isSettingsOwnerUser(user)) {
@@ -28,7 +28,7 @@ export async function GET() {
   const status = Object.fromEntries(
     COMMON_ENV_KEYS.map((key) => [key, Boolean(process.env[key]?.trim())])
   )
-  status[VERCEL_GATEWAY_STATUS_KEY] = Boolean(await getVercelGatewayToken())
+  status[VERCEL_GATEWAY_STATUS_KEY] = Boolean(await getVercelGatewayToken(request))
 
   return Response.json(status, {
     headers: {

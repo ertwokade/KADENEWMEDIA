@@ -10,12 +10,12 @@ function configured(name: string) {
   return Boolean(process.env[name]?.trim())
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   if (!(await hasAuthenticatedUser())) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
   let operationsSync = false
   let ownerAccess = false
   let settingsAccess = false
-  const gatewayToken = await getVercelGatewayToken()
+  const gatewayToken = await getVercelGatewayToken(request)
   const aiGateway = Boolean(gatewayToken)
   const availableModels = getAvailableModels()
   if (gatewayToken && !availableModels.includes('vercel-qwen-flash')) {

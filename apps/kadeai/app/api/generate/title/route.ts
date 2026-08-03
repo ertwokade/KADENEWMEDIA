@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       model,
       systemPrompt: SYSTEM_PROMPTS.titleGenerator,
       maxTokens: 2000,
-    })
+    }, req)
 
     const parsed = extractJsonArray<unknown[]>(result.content)
     const validated = Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string').map((item) => item.trim()).filter(Boolean).slice(0, 10) : []

@@ -389,9 +389,9 @@ async function generateWithResolvedModel(req: GenerateRequest, gatewayToken?: st
   }
 }
 
-export async function generateContent(req: GenerateRequest): Promise<GenerateResult> {
+export async function generateContent(req: GenerateRequest, request?: Request): Promise<GenerateResult> {
   await assertAuthenticatedUser()
-  const gatewayToken = await getVercelGatewayToken()
+  const gatewayToken = await getVercelGatewayToken(request)
   const prompt = typeof req.prompt === 'string' ? req.prompt.trim() : ''
   if (!prompt) throw new Error('İstek metni boş olamaz.')
   if (prompt.length > 24_000) throw new Error('İstek metni 24.000 karakter sınırını aşıyor.')

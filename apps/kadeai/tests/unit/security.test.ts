@@ -11,6 +11,7 @@ import {
   isSettingsOwnerUser,
 } from '../../lib/featureAccess'
 import { countedDistributedRateLimit, distributedRateLimit } from '../../lib/rateLimit'
+import { getVercelGatewayToken } from '../../lib/ai/gatewayAuth'
 
 test('user A cannot access a resource owned by user B', () => {
   assert.equal(canAccessOwnedResource('user-a', 'user-a'), true)
@@ -82,6 +83,13 @@ test('proxy forwards server request headers to route handlers', async () => {
   assert.match(source, /new Headers\(request\.headers\)/)
   assert.match(source, /NextResponse\.next\(\{ request: \{ headers: requestHeaders \} \}\)/)
   assert.doesNotMatch(source, /NextResponse\.next\(\{ request \}\)/)
+})
+
+test('Gateway identity can be resolved from the active request explicitly', async () => {
+  const request = new Request('https://example.com/api/generate/title', {
+    headers: { 'x-vercel-oidc-token': 'unit-oidc-token' },
+  })
+  assert.equal(await getVercelGatewayToken(request), 'unit-oidc-token')
 })
 
 test('distributed AI quota enforces cost, daily limit and idempotency locally', async () => {
