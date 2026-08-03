@@ -443,6 +443,15 @@ export async function generateContent(req: GenerateRequest, request?: Request): 
       return { ...result, routingReason }
     } catch (error) {
       lastError = error
+      const message = error instanceof Error ? error.message : 'Bilinmeyen sağlayıcı hatası'
+      console.error('[kadeai/ai] sağlayıcı isteği başarısız:', {
+        model,
+        gatewayIdentity: Boolean(gatewayToken),
+        message: message
+          .replace(/Bearer\s+\S+/gi, 'Bearer [redacted]')
+          .replace(/[A-Za-z0-9_-]{80,}/g, '[redacted]')
+          .slice(0, 500),
+      })
     }
   }
 
