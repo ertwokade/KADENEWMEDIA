@@ -412,14 +412,18 @@ export async function generateContent(req: GenerateRequest): Promise<GenerateRes
 
   if (enrichedRequest.model !== 'auto') return generateWithResolvedModel(enrichedRequest, gatewayToken)
 
+  const availableModels = getAvailableModels()
+  if (gatewayToken && !availableModels.includes('vercel-qwen-flash')) {
+    availableModels.push('vercel-qwen-flash')
+  }
+
   const routed = routeModelForTask({
     prompt: boundedRequest.prompt,
     systemPrompt: boundedRequest.systemPrompt,
     maxTokens: boundedRequest.maxTokens,
-  })
+  }, availableModels)
 
-  const available = new Set(getAvailableModels())
-  if (gatewayToken) available.add('vercel-qwen-flash')
+  const available = new Set(availableModels)
   const fallbackOrder: GenerateRequest['model'][] = [routed.model, ...routed.alternatives]
   const candidates = [...new Set(fallbackOrder)].filter(
     (model) => model !== 'auto' && available.has(model)

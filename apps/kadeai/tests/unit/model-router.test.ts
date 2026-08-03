@@ -54,6 +54,16 @@ test('yalnızca gerçekten kullanılabilir modelleri döndürür', () => {
   assert.deepEqual(result.alternatives, [])
 })
 
+test('yalnızca Gateway bağlıyken yaratıcı görev ekonomik modele yönlenir', () => {
+  const result = routeModelForTask({
+    prompt: 'Sosyal medya için yaratıcı bir başlık üret.',
+    maxTokens: 2_000,
+  }, ['auto', 'vercel-qwen-flash'])
+
+  assert.equal(result.model, 'vercel-qwen-flash')
+  assert.deepEqual(result.alternatives, [])
+})
+
 test('Vercel ortamında ekonomik AI Gateway modeli otomatik kullanıma açılır', () => {
   const previous = process.env.VERCEL
   process.env.VERCEL = '1'
