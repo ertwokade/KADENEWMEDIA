@@ -19,6 +19,7 @@ import { useSEO } from '../hooks/useSEO'
 import { ServiceSchema } from '../components/StructuredData'
 import PageTransition from '../components/PageTransition'
 import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
+import { PageHero } from '../components/system'
 import './Services.css'
 import { SERVICE_DETAILS, SERVICE_SLUGS } from '../data/serviceDetails'
 import NotFound from './NotFound'
@@ -98,31 +99,19 @@ export default function ServiceDetail() {
   return (
     <PageTransition>
       <ServiceSchema name={title} description={desc} url={`/hizmetler/${slug}`} />
-      <section className="services-hero">
-        <div className="grid-bg" />
-        <div className="glow-effect" style={{ top: '-150px', right: '-150px' }} />
-        <div className="container">
-          <FadeIn>
-            <Link to="/hizmetler" className="partner-back" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: 16 }}>
-              <HiOutlineArrowLeft size={16} />
-              {lang === 'tr' ? 'Tüm Hizmetler' : 'All Services'}
-            </Link>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, justifyContent: 'center', marginBottom: 16 }}>
-              <div style={{ width: 56, height: 56, borderRadius: 14, background: `${service.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <service.icon size={28} style={{ color: service.color }} />
-              </div>
-            </div>
-            <h1 className="section-title" style={{ fontSize: 'clamp(2rem, 4.5vw, 3rem)' }}>
-              {title}
-            </h1>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="section-subtitle" style={{ maxWidth: 640 }}>{desc}</p>
-          </FadeIn>
-        </div>
-      </section>
+      {/* Hero, /hizmetler ve ana sayfayla aynı PageHero bileşeni. Geri
+          bağlantısı eyebrow yuvasına konuyor: üst kategori etiketinin
+          bulunduğu yer zaten navigasyonun beklendiği yer. */}
+      <PageHero
+        eyebrow={(
+          <Link to="/hizmetler" className="kade-pagetop__back">
+            <HiOutlineArrowLeft size={14} aria-hidden="true" />
+            {lang === 'tr' ? 'Tüm hizmetler' : 'All services'}
+          </Link>
+        )}
+        title={title}
+        lead={desc}
+      />
 
       <section className="section">
         <div className="container">
@@ -141,7 +130,7 @@ export default function ServiceDetail() {
               {lang === 'tr' ? 'Neler Yapıyoruz?' : 'What We Do'}
             </h2>
           </FadeIn>
-          <StaggerContainer className="services-detail-grid" staggerDelay={0.08} style={{ maxWidth: 800, margin: '0 auto' }}>
+          <StaggerContainer className="kade-grid kade-grid--2" staggerDelay={0.08} style={{ maxWidth: 800, margin: '0 auto' }}>
             {features.map((feat) => (
               <StaggerItem key={feat}>
                 <motion.div className="glass-card" style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 12 }} whileHover={{ scale: 1.02 }}>

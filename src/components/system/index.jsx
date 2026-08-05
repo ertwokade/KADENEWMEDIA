@@ -252,8 +252,16 @@ export function ProjectCard({ project, index, featured = false }) {
   )
 }
 
+/**
+ * Hizmet kartı.
+ *
+ * `features` ve `meta` isteğe bağlıdır: ana sayfa hizmetleri yalnız başlık +
+ * açıklamayla listeler, /hizmetler aynı kartı kapsam etiketleri ve platform
+ * ikonlarıyla kullanır. İki yerde iki ayrı kart bileşeni tutmamak için tek
+ * bileşen genişletildi — ölçü, tipografi ve hover davranışı ortak kalır.
+ */
 export function ServiceCard({ service, index }) {
-  const { to, title, description } = service
+  const { to, title, description, features = [], meta } = service
   const Wrapper = to ? Link : 'div'
   const wrapperProps = to ? { to } : {}
   return (
@@ -261,6 +269,12 @@ export function ServiceCard({ service, index }) {
       <span className="kade-service-card__index">{String(index + 1).padStart(2, '0')}</span>
       <h3 className="kade-service-card__title">{title}</h3>
       {description && <p className="kade-service-card__desc">{description}</p>}
+      {features.length > 0 && (
+        <ul className="kade-service-card__tags">
+          {features.map((feature) => <li key={feature}>{feature}</li>)}
+        </ul>
+      )}
+      {meta && <div className="kade-service-card__meta">{meta}</div>}
     </Wrapper>
   )
 }

@@ -2,19 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "epiminds",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "-l", "5500", "."],
-      "port": 5500,
-      "url": "http://localhost:5500/epiminds.html"
-    },
-    {
-      "name": "bolt-designs",
+      "name": "kade-web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3030,
-      "autoPort": false,
-      "cwd": "C:\\Users\\Kadir Demir\\Desktop\\KadeBusiness\\kademedia\\bolt-designs"
+      "runtimeArgs": ["run", "legacy:dev"],
+      "port": 5173
     }
   ]
 }

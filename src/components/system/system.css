@@ -167,6 +167,19 @@
   text-wrap: balance;
 }
 
+/* Eyebrow yuvasına konan geri bağlantısı (alt sayfalar). Eyebrow'un
+   tipografisini miras alır, yalnız tıklanabilirliğini belli eder. */
+.kade-pagetop__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur-ui) var(--ease-out);
+}
+.kade-pagetop__back:hover,
+.kade-pagetop__back:focus-visible { color: var(--kade-gold-deep); }
+
 .kade-pagetop__meta {
   display: flex;
   flex-wrap: wrap;
@@ -415,8 +428,38 @@
   margin: 0;
   max-width: 34ch;
 }
+/* Kapsam etiketleri — /hizmetler'de hizmetin ne içerdiğini gösterir. */
+.kade-service-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.kade-service-card__tags li {
+  padding: 0.3em 0.7em;
+  border: 1px solid var(--kade-line);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-2xs);
+  line-height: 1.4;
+  color: var(--kade-ink-3);
+}
+/* Platform ikonları — dekoratif, metin taşımaz. */
+.kade-service-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--kade-ink-4);
+}
+
 .kade-service-card:hover .kade-service-card__index,
 .kade-service-card:hover .kade-service-card__desc { color: rgba(23, 19, 10, 0.72); }
+.kade-service-card:hover .kade-service-card__tags li {
+  border-color: rgba(23, 19, 10, 0.28);
+  color: rgba(23, 19, 10, 0.72);
+}
+.kade-service-card:hover .kade-service-card__meta { color: rgba(23, 19, 10, 0.55); }
 
 /* ---------------------------------------------------------------------------
    7) MARQUEE

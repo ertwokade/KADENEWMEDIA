@@ -1,16 +1,21 @@
 import { motion } from 'framer-motion'
 
-// NOT: CSS `filter: blur()` animasyonu içerik-yoğun sayfalarda pahalı ve
-// bileşiklemede (compositing) takılabiliyor — canlıda 2-4 sn'lik "asılı
-// blur" bunun sonucuydu. Blur miktarı 10px→3px'e, süre 0.55→0.32'ye
-// düşürüldü; opacity+y geçişi (ucuz, GPU-dostu) korundu. Dekoratif sheen
-// daha kısa ve hafif hale getirildi.
+// `filter: blur()` geçişten TAMAMEN çıkarıldı.
+//
+// Gerekçe, bu dosyanın önceki sürümünde kayıtlı: canlıda 2-4 saniyelik
+// "asılı blur" gözlenmiş ve blur 10px→3px'e düşürülerek hafifletilmeye
+// çalışılmıştı. Kök sebep miktar değil yöntem: blur GPU'da bileşiklenemez,
+// her karede sayfanın TAMAMI yeniden boyanır; içerik yoğunlaştıkça kare
+// süresi büyür. Azaltmak semptomu geciktirir, kaldırmak bitirir.
+//
+// Geriye kalan opacity + y geçişi transform/opacity üzerinden GPU'da
+// bileşikleniyor: boyama maliyeti yok, süresi sayfa içeriğinden bağımsız.
 export default function PageTransition({ children }) {
   return (
     <motion.div
       className="page-wrapper"
-      initial={{ opacity: 0, y: 14, filter: 'blur(3px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
     >

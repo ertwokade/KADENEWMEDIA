@@ -19,10 +19,17 @@
 
 /* fixed 3D canvas */
 .kade-canvas { position: fixed; inset: 0; z-index: 0; }
-/* grid overlay */
-.kade-grid { position: fixed; inset: 0; z-index: 6; pointer-events: none;
-  background-image: linear-gradient(90deg, var(--kline) 1px, transparent 1px);
-  background-size: 33.333% 100%; opacity: 0.5; }
+/* KALDIRILDI — dekoratif `.kade-grid` ızgara kaplaması.
+ *
+ * Bu kural `position: fixed; inset: 0` veriyordu ve HİÇBİR bileşen tarafından
+ * kullanılmıyordu. Buna karşılık components/system/system.css aynı adı sayfa
+ * YERLEŞİM ızgarası olarak tanımlıyor ve dört sayfa onu kullanıyor:
+ * Home, Portfolio, Services, ServiceDetail. Kapsamsız olduğu için bu kural
+ * hepsini ekrana sabitliyor, ızgara sayfanın akışından çıkıp hero'nun üstüne
+ * biniyordu.
+ *
+ * Dekoratif ızgaraya tekrar ihtiyaç olursa system.css'teki yerleşim adıyla
+ * çakışmayan bir ad verin (ör. `.kade-grid-overlay`). */
 
 /* fixed chrome */
 .kade-nav, .kade-status {

@@ -1,14 +1,9 @@
-import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
 import {
   HiOutlineGlobe,
-  HiOutlineLightningBolt,
   HiOutlineChartBar,
-  HiOutlineCamera,
   HiOutlineFilm,
   HiOutlineChatAlt2,
   HiOutlinePencilAlt,
-  HiOutlineSpeakerphone,
   HiOutlineCode,
 } from 'react-icons/hi'
 import { FaInstagram, FaFacebookF, FaTiktok, FaYoutube, FaLinkedinIn } from 'react-icons/fa'
@@ -16,8 +11,14 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { useSEO } from '../hooks/useSEO'
 import { useSiteContent } from '../hooks/useSiteContent'
 import PageTransition from '../components/PageTransition'
-import { FadeIn, StaggerContainer, StaggerItem } from '../components/Animations'
-import PageBgAnimation from '../components/PageBgAnimation'
+import {
+  Container,
+  Section,
+  SectionHeading,
+  PageHero,
+  ServiceCard,
+  Reveal,
+} from '../components/system'
 import './Services.css'
 
 export default function Services() {
@@ -104,111 +105,60 @@ export default function Services() {
 
   return (
     <PageTransition>
-      {/* Hero */}
-      <section className="services-hero">
-        <PageBgAnimation type="services" />
-        <div className="grid-bg" />
-        <div className="glow-effect" style={{ top: '-150px', right: '-150px' }} />
-        <div className="container">
-          <FadeIn>
-            <div className="section-badge">
-              <HiOutlineLightningBolt size={14} />
-              {t('services.badge')}
-            </div>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              {t('services.title')} <span>{t('services.titleHighlight')}</span> {t('services.titleEnd')}
-            </h1>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="section-subtitle">
-              {t('services.subtitle')}
-            </p>
-          </FadeIn>
-        </div>
-      </section>
+      {/* Hero — ana sayfayla aynı PageHero bileşeni: aynı başlık ölçeği,
+          aynı eyebrow, aynı boşluk ritmi, aynı reveal gecikmeleri. */}
+      <PageHero
+        eyebrow={t('services.badge')}
+        title={`${t('services.title')} ${t('services.titleHighlight')} ${t('services.titleEnd')}`.replace(/\s+/g, ' ').trim()}
+        lead={t('services.subtitle')}
+        meta={[['Hizmet', String(services.length)]]}
+      />
 
-      {/* Services Grid */}
-      <section className="section">
-        <div className="container">
-          <StaggerContainer className="services-detail-grid" staggerDelay={0.1}>
-            {services.map((service) => (
-              <StaggerItem key={service.title}>
-                <motion.div whileHover={{ scale: 1.01 }} style={{ height: '100%' }}>
-                  <Link
-                    to={`/hizmetler/${service.slug}`}
-                    className="service-detail-card glass-card"
-                    aria-label={`${service.title} hizmet detayları`}
-                  >
-                    <div className="service-detail-header">
-                      <div className="service-detail-icon">
-                        <service.icon size={28} />
-                      </div>
-                      <h3>{service.title}</h3>
-                    </div>
-                    <p className="service-detail-desc">{service.desc}</p>
-                    <div className="service-features">
-                      {service.features.map((feature) => (
-                        <span key={feature} className="feature-tag">
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="service-platforms">
-                      {service.platforms.map((Platform, i) => (
-                        <span key={i} className="platform-tag">
-                          <Platform size={14} />
-                        </span>
-                      ))}
-                    </div>
-                    <span className="service-detail-more" aria-hidden="true">Detayları gör →</span>
-                  </Link>
-                </motion.div>
-              </StaggerItem>
+      <Section flushTop>
+        <Container>
+          <div className="kade-grid kade-grid--2">
+            {services.map((service, index) => (
+              <Reveal key={service.slug} delay={Math.min(index, 5) * 70}>
+                <ServiceCard
+                  index={index}
+                  service={{
+                    to: `/hizmetler/${service.slug}`,
+                    title: service.title,
+                    description: service.desc,
+                    features: service.features,
+                    meta: service.platforms.map((Platform, i) => (
+                      <Platform key={i} size={15} aria-hidden="true" />
+                    )),
+                  }}
+                />
+              </Reveal>
             ))}
-          </StaggerContainer>
-        </div>
-      </section>
-
-      {/* Process */}
-      <section className="section process-section">
-        <div className="container">
-          <div className="section-header">
-            <FadeIn>
-              <div className="section-badge">
-                <HiOutlineCamera size={14} />
-                {t('services.processBadge')}
-              </div>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h2 className="section-title">
-                {t('services.processTitle')} <span>{t('services.processHighlight')}</span>?
-              </h2>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="section-subtitle">
-                {t('services.processSubtitle')}
-              </p>
-            </FadeIn>
           </div>
+        </Container>
+      </Section>
 
-          <StaggerContainer className="process-grid" staggerDelay={0.15}>
+      <Section className="process-section">
+        <Container>
+          <SectionHeading
+            eyebrow={t('services.processBadge')}
+            title={`${t('services.processTitle')} ${t('services.processHighlight')}?`}
+            description={t('services.processSubtitle')}
+            index={`0${process.length}`}
+          />
+
+          <div className="process-grid">
             {process.map((item, index) => (
-              <StaggerItem key={item.step}>
-                <div className="process-card glass-card">
+              <Reveal key={item.step} delay={index * 90}>
+                <div className="process-card">
                   <div className="process-step">{item.step}</div>
                   <h3>{item.title}</h3>
                   <p>{item.desc}</p>
-                  {index < process.length - 1 && (
-                    <div className="process-connector" />
-                  )}
                 </div>
-              </StaggerItem>
+              </Reveal>
             ))}
-          </StaggerContainer>
-        </div>
-      </section>
+          </div>
+        </Container>
+      </Section>
     </PageTransition>
   )
 }
