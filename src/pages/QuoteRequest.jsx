@@ -186,7 +186,9 @@ export default function QuoteRequest() {
           </div>
 
           <div className="quote-grid">
-            <form className="quote-form glass-card" onSubmit={submit}>
+            {/* method="post": JS kapalı ya da hydration başarısızsa varsayılan GET
+                gönderimi kişisel veriyi adres çubuğuna yazıyordu. Bkz. Contact.jsx. */}
+            <form className="quote-form glass-card" method="post" onSubmit={submit}>
               <AnimatePresence mode="wait">
                 {step === 1 && (
                   <motion.div
@@ -296,7 +298,7 @@ export default function QuoteRequest() {
                     </div>
 
                     <label className="quote-toggle">
-                      <input type="checkbox" checked={form.adManagement} onChange={e => setForm({ ...form, adManagement: e.target.checked })} />
+                      <input id="quote-ad-management" name="adManagement" type="checkbox" checked={form.adManagement} onChange={e => setForm({ ...form, adManagement: e.target.checked })} />
                       <span className="quote-toggle-thumb" />
                       <div>
                         <strong>{T('Reklam yönetimi dahil', 'Include ad management')}</strong>
@@ -342,7 +344,7 @@ export default function QuoteRequest() {
                     </label>
 
                     <label className="quote-consent">
-                      <input type="checkbox" checked={form.consent} onChange={e => setForm({ ...form, consent: e.target.checked })} required />
+                      <input id="quote-consent" name="consent" type="checkbox" checked={form.consent} onChange={e => setForm({ ...form, consent: e.target.checked })} required />
                       <span>
                         {T(
                           'Verilerimin teklif süreci için işlenmesini ve bana iletişim kurulmasını ',

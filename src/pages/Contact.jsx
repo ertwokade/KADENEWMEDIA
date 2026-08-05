@@ -79,7 +79,9 @@ export default function Contact() {
     setSending(true)
     setError('')
     try {
-      await sendContactApi({ ...formData, service: formData.services.join(', '), consent: kvkkAccepted })
+      // Honeypot sunucuya da gönderilir: yukarıdaki istemci kontrolü yalnızca
+      // formu dolduran botları eler, doğrudan API'ye POST atanları elemez.
+      await sendContactApi({ ...formData, service: formData.services.join(', '), consent: kvkkAccepted, website: honeypot })
       analytics.formSubmit(formData.services.join(', '))
       setSubmitted(true)
       setFormData({ name: '', email: '', phone: '', company: '', services: [], message: '' })
@@ -190,7 +192,12 @@ export default function Contact() {
             </FadeIn>
 
             <FadeIn direction="right" className="contact-form-wrapper">
-              <form className="contact-form glass-card" onSubmit={handleSubmit}>
+              {/* method="post" — gönderim JS ile (handleSubmit + fetch) yapılır ama
+                  form varsayılanı GET olduğu için hydration başarısız olur ya da JS
+                  kapalıysa ad, e-posta, telefon ve mesaj adres çubuğuna query string
+                  olarak yazılıyordu; oradan tarayıcı geçmişine, Referer başlığına ve
+                  sunucu erişim loglarına sızıyordu. POST'ta gövdede kalır. */}
+              <form className="contact-form glass-card" method="post" onSubmit={handleSubmit}>
                 {/* Honeypot — hidden from users, filled only by bots */}
                 <div style={{ display: 'none' }} aria-hidden="true">
                   <input
@@ -266,9 +273,13 @@ export default function Contact() {
                     ].map(opt => (
                       <label
                         key={opt.value}
+                        htmlFor={`service-${opt.value}`}
                         className={`service-checkbox-item ${formData.services.includes(opt.value) ? 'checked' : ''}`}
                       >
                         <input
+                          id={`service-${opt.value}`}
+                          name="services"
+                          value={opt.value}
                           type="checkbox"
                           checked={formData.services.includes(opt.value)}
                           onChange={() => handleServiceToggle(opt.value)}
@@ -293,8 +304,10 @@ export default function Contact() {
                 </div>
 
                 <div className="form-group kvkk-consent">
-                  <label className={`service-checkbox-item ${kvkkAccepted ? 'checked' : ''}`}>
+                  <label htmlFor="kvkk-consent" className={`service-checkbox-item ${kvkkAccepted ? 'checked' : ''}`}>
                     <input
+                      id="kvkk-consent"
+                      name="consent"
                       type="checkbox"
                       checked={kvkkAccepted}
                       onChange={(e) => setKvkkAccepted(e.target.checked)}

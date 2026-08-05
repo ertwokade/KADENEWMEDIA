@@ -3,8 +3,12 @@ import { generateContent } from '@/lib/ai/provider'
 import { CONTENT_PLAN_SYSTEM_PROMPT, buildContentPlanPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
+import { requireApiUser } from '@/lib/auth/server'
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { niche, platform, goal, frequency, model } = await req.json()
     if (!niche || !platform || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })

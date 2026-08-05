@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict'
 import { createHmac } from 'node:crypto'
 import { test } from 'node:test'
-import { createCsrfToken, sessionVersionMatches, verifyCsrfToken } from '../../server/api/_lib/auth.js'
+import { IDLE_TIMEOUT_SECONDS, createCsrfToken, createToken, isSessionIdle, sessionVersionMatches, verifyCsrfToken, verifyToken } from '../../server/api/_lib/auth.js'
+import { isValidUserEmail } from '../../server/api/users.js'
 import { validateMediaUpload } from '../../server/api/_lib/uploadValidation.js'
 import { validateRequestBodySize } from '../../server/api/_lib/requestLimits.js'
 import { isValidQueryId } from '../../server/api/_lib/validation.js'
@@ -290,4 +291,85 @@ test('kullanıcıya gösterilen hata mesajları teknik sızıntı içermez', asy
   assert.equal(toUserMessage(null), GENERIC_ERROR_MESSAGE)
   assert.equal(toUserMessage(''), GENERIC_ERROR_MESSAGE)
   assert.equal(toUserMessage(new Error('Doğrulama hatası')), 'Doğrulama hatası')
+})
+
+// ── Yönetici oturumu: hareketsizlik sınırı ────────────────────────────────
+
+test('hareketsizlik sınırı aşılan oturum düşer', () => {
+  const now = 1_800_000_000
+  // Sınır içinde: oturum ayakta.
+  assert.equal(isSessionIdle({ lastSeen: now - IDLE_TIMEOUT_SECONDS + 60 }, now), false)
+  // Tam sınırda hâlâ geçerli, bir saniye sonrası değil.
+  assert.equal(isSessionIdle({ lastSeen: now - IDLE_TIMEOUT_SECONDS }, now), false)
+  assert.equal(isSessionIdle({ lastSeen: now - IDLE_TIMEOUT_SECONDS - 1 }, now), true)
+})
+
+test('lastSeen taşımayan token hareketsiz sayılır', () => {
+  // Fail-closed: alanı olmayan eski token'lar (ve elle üretilmiş olanlar)
+  // sınırsız oturum elde edememeli.
+  const now = 1_800_000_000
+  for (const payload of [{}, { lastSeen: null }, { lastSeen: 'dun' }, { lastSeen: 0 }, { lastSeen: -1 }]) {
+    assert.equal(isSessionIdle(payload, now), true, `hareketsiz sayılmalı: ${JSON.stringify(payload)}`)
+  }
+})
+
+test('createToken lastSeen damgası basar', () => {
+  process.env.JWT_SECRET ||= 'x'.repeat(48)
+  const before = Math.floor(Date.now() / 1000)
+  const decoded = verifyToken(createToken({ id: 'u1', username: 'kade', role: 'admin' }))
+  assert.ok(decoded, 'token doğrulanabilmeli')
+  assert.ok(decoded.lastSeen >= before, 'lastSeen şimdiki zamanı taşımalı')
+  assert.equal(isSessionIdle(decoded), false, 'yeni token hareketsiz sayılmamalı')
+})
+
+// ── Yönetici hesabında e-posta zorunlu ────────────────────────────────────
+
+test('yönetici hesabı e-postasız oluşturulamaz', () => {
+  // Canlıda `kade` (Admin) kullanıcısının e-postası boştu; şifre sıfırlama
+  // ve güvenlik bildirimi akışlarının hiçbiri o hesap için çalışmıyordu.
+  for (const invalid of ['', '   ', 'kade', 'kade@', '@kade.com', 'a b@c.com', null, undefined, 42]) {
+    assert.equal(isValidUserEmail(invalid), false, `geçersiz sayılmalı: ${String(invalid)}`)
+  }
+  assert.equal(isValidUserEmail('thekademedia@gmail.com'), true)
+  assert.equal(isValidUserEmail('  Kade@Example.CO  '), true)
+  assert.equal(isValidUserEmail(`${'a'.repeat(250)}@b.co`), false, '254 karakter sınırı')
+})
+
+// ── Formlar kişisel veriyi adres çubuğuna yazmaz ──────────────────────────
+
+test('kişisel veri toplayan formlar POST ile gönderilir', async () => {
+  // Varsayılan method GET: JS kapalıysa ya da hydration başarısız olursa ad,
+  // e-posta, telefon ve mesaj query string'e yazılır; oradan tarayıcı
+  // geçmişine, Referer başlığına ve sunucu erişim loglarına sızar.
+  const { readFile } = await import('node:fs/promises')
+  for (const page of ['src/pages/Contact.jsx', 'src/pages/QuoteRequest.jsx']) {
+    const source = await readFile(new URL(`../../${page}`, import.meta.url), 'utf8')
+    for (const [, attrs] of source.matchAll(/<form([^>]*)>/g)) {
+      assert.match(attrs, /method="post"/, `${page}: form method="post" olmalı`)
+    }
+  }
+})
+
+test('form onay kutularının name ve id değeri var', async () => {
+  // name olmadan alan hiçbir gönderimde taşınmaz; id olmadan da <label
+  // htmlFor> bağı kurulamaz.
+  const { readFile } = await import('node:fs/promises')
+  for (const page of ['src/pages/Contact.jsx', 'src/pages/QuoteRequest.jsx']) {
+    const source = await readFile(new URL(`../../${page}`, import.meta.url), 'utf8')
+    for (const [tag] of source.matchAll(/<input[^>]*type="checkbox"[^>]*\/?>/gs)) {
+      assert.match(tag, /\sname=/, `${page}: onay kutusunda name yok → ${tag.slice(0, 90)}`)
+      assert.match(tag, /\sid=/, `${page}: onay kutusunda id yok → ${tag.slice(0, 90)}`)
+    }
+  }
+})
+
+test('iletişim formu honeypot değerini sunucuya taşır', async () => {
+  // İstemci kontrolü yalnız formu dolduran botu eler; doğrudan API'ye POST
+  // atan bot için sunucu tarafı kontrol şart.
+  const { readFile } = await import('node:fs/promises')
+  const page = await readFile(new URL('../../src/pages/Contact.jsx', import.meta.url), 'utf8')
+  assert.match(page, /website: honeypot/, 'honeypot API isteğine eklenmeli')
+
+  const api = await readFile(new URL('../../server/api/contact.js', import.meta.url), 'utf8')
+  assert.match(api, /typeof website === 'string' && website\.trim\(\)/, 'sunucu honeypot kontrolü yapmalı')
 })

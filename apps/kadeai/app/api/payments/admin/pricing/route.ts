@@ -3,6 +3,7 @@ import { getPricingSnapshot, updatePricingOverrides } from '@/lib/payments/prici
 import { TIER_LABEL, PERIOD_LABEL } from '@/lib/payments/catalog'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
+import { hasValidAdminSecret } from '@/lib/auth/adminSecret'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,12 +16,6 @@ export const dynamic = 'force-dynamic'
  * paylasilan bir sir (KADEAI_ADMIN_API_SECRET) ile korunur - legacy site
  * (kademedia admin paneli) buraya server-to-server istek atar.
  */
-function isAuthorized(request: NextRequest): boolean {
-  const secret = process.env.KADEAI_ADMIN_API_SECRET
-  if (!secret) return false
-  const provided = request.headers.get('x-kade-admin-secret') || ''
-  return provided.length > 0 && provided === secret
-}
 
 export async function GET(request: NextRequest) {
   const limit = rateLimit(getRateLimitKey(request, 'admin-pricing-get'), 30, 60_000)
@@ -28,7 +23,7 @@ export async function GET(request: NextRequest) {
   if (!limit.allowed) {
     return NextResponse.json({ error: 'Cok fazla istek.' }, { status: 429, headers })
   }
-  if (!isAuthorized(request)) {
+  if (!hasValidAdminSecret(request)) {
     return NextResponse.json({ error: 'Yetkisiz.' }, { status: 401, headers })
   }
 
@@ -53,7 +48,7 @@ export async function PUT(request: NextRequest) {
   if (!limit.allowed) {
     return NextResponse.json({ error: 'Cok fazla istek.' }, { status: 429, headers })
   }
-  if (!isAuthorized(request)) {
+  if (!hasValidAdminSecret(request)) {
     return NextResponse.json({ error: 'Yetkisiz.' }, { status: 401, headers })
   }
 

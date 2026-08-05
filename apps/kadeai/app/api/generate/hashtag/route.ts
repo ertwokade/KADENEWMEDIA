@@ -3,8 +3,12 @@ import { generateContent } from '@/lib/ai/provider'
 import { SYSTEM_PROMPTS, buildHashtagPrompt } from '@/lib/ai/prompts'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { HashtagRequest } from '@/types'
+import { requireApiUser } from '@/lib/auth/server'
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   const { allowed } = rateLimit(getRateLimitKey(req))
   if (!allowed) return NextResponse.json({ error: 'Çok fazla istek. 1 dakika bekle.' }, { status: 429 })
 

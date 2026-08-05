@@ -3,8 +3,12 @@ import { generateContent } from '@/lib/ai/provider'
 import { CAROUSEL_SYSTEM_PROMPT, buildCarouselPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
+import { requireApiUser } from '@/lib/auth/server'
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { topic, platform, slideCount, tone, model } = await req.json()
     if (!topic || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })

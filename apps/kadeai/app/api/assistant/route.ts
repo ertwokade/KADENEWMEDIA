@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateContent } from '@/lib/ai/provider'
 import { SELECTABLE_MODELS } from '@/lib/ai/models'
 import { AIModel } from '@/types'
+import { requireApiUser } from '@/lib/auth/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +19,9 @@ function selectOperationsModel(): AIModel | null {
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const body = await req.json()
     const question = String(body.question || '').slice(0, 4000)

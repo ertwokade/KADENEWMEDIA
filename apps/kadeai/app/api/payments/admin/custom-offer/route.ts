@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createDynamicOffer } from '@/lib/payments/offers'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
+import { hasValidAdminSecret } from '@/lib/auth/adminSecret'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,12 +14,6 @@ export const dynamic = 'force-dynamic'
  * (KADEAI_ADMIN_API_SECRET) ile korunur - legacy site (kademedia admin
  * paneli / Teklif Builder) buraya server-to-server istek atar.
  */
-function isAuthorized(request: NextRequest): boolean {
-  const secret = process.env.KADEAI_ADMIN_API_SECRET
-  if (!secret) return false
-  const provided = request.headers.get('x-kade-admin-secret') || ''
-  return provided.length > 0 && provided === secret
-}
 
 export async function POST(request: NextRequest) {
   const limit = rateLimit(getRateLimitKey(request, 'admin-custom-offer'), 20, 60_000)
@@ -27,7 +22,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Cok fazla istek.' }, { status: 429, headers })
   }
 
-  if (!isAuthorized(request)) {
+  if (!hasValidAdminSecret(request)) {
     return NextResponse.json({ error: 'Yetkisiz.' }, { status: 401, headers })
   }
 

@@ -3,8 +3,12 @@ import { generateContent } from '@/lib/ai/provider'
 import { BIO_LINK_SYSTEM_PROMPT, buildBioLinkPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
+import { requireApiUser } from '@/lib/auth/server'
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { name, niche, platforms, highlights, tone, model } = await req.json()
     if (!name || !niche || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })

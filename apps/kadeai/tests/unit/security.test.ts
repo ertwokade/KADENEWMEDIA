@@ -158,3 +158,85 @@ test('Supabase history counts provide conservative distributed quota fallback', 
   assert.equal(dailyLimited.allowed, false)
   assert.equal(dailyLimited.reason, 'daily_limit')
 })
+
+// ── Route Handler'lar middleware'e tek başına güvenmez ─────────────────────
+
+test('oturum gerektiren her API route handler kendi kontrolünü de yapar', async () => {
+  // proxy.ts (middleware) tek bir `matcher` regex'ine dayanıyor. Bir rota
+  // taşınır, matcher daraltılır ya da bir handler middleware'in kapsamadığı
+  // bir yoldan çağrılırsa korumanın tamamı sessizce düşer. Bu yüzden korunan
+  // her handler ayrıca requireApiUser() çağırır.
+  const { readdir } = await import('node:fs/promises')
+  const { join, relative } = await import('node:path')
+
+  const API_ROOT = new URL('../../app/api/', import.meta.url).pathname
+
+  async function routeFiles(dir: string): Promise<string[]> {
+    const out: string[] = []
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name)
+      if (entry.isDirectory()) out.push(...await routeFiles(full))
+      else if (entry.name === 'route.ts') out.push(full)
+    }
+    return out
+  }
+
+  // Oturum ÖNCESİ çalışması gereken ya da başka bir mekanizmayla korunan uçlar.
+  // Buraya bir yol eklemek bilinçli bir güvenlik kararıdır — gerekçesiz eklemeyin.
+  const EXEMPT = new Map<string, string>([
+    ['health/route.ts', 'ayakta mı kontrolü, veri döndürmez'],
+    ['auth/password/route.ts', 'giriş akışı — oturum henüz yok'],
+    ['auth/recovery/route.ts', 'şifre sıfırlama — oturum henüz yok'],
+    ['auth/recovery-session/route.ts', 'şifre sıfırlama — oturum henüz yok'],
+    ['auth/logout/route.ts', 'çıkış; oturum yoksa da güvenle çalışmalı'],
+    ['payments/webhook/route.ts', 'PSP imzasıyla doğrulanır, oturum taşımaz'],
+    ['payments/admin/pricing/route.ts', 'sunucular-arası sır (hasValidAdminSecret)'],
+    ['payments/admin/custom-offer/route.ts', 'sunucular-arası sır (hasValidAdminSecret)'],
+    ['packages/route.ts', 'genel paket kataloğu — giriş öncesi fiyat sayfasında okunur'],
+  ])
+
+  // Kabul edilen iki biçim:
+  //  1) paylaşılan yardımcılar,
+  //  2) handler içinde supabase.auth.getUser() + `if (!user)` erken dönüşü.
+  // İkincisinde yalnız getUser() çağrısı yetmez; dönen değer kontrol edilmezse
+  // sorgu anonim kimlikle çalışır ve RLS tek savunma hattı olarak kalır.
+  const HELPER_GUARD = /requireApiUser|assertAuthenticatedUser|getAuthenticatedUser|hasValidAdminSecret|hasAuthenticatedUser/
+  const isGuarded = (source: string) =>
+    HELPER_GUARD.test(source)
+    || (/auth\.getUser\(\)/.test(source) && /if \(!user\)/.test(source))
+
+  const unguarded: string[] = []
+  for (const file of await routeFiles(API_ROOT)) {
+    const rel = relative(API_ROOT, file)
+    if (EXEMPT.has(rel)) {
+      // Muaf tutulan uçlar da tamamen korumasız kalmamalı: ya kendi sırrını
+      // doğrular ya da bilinçli olarak herkese açıktır. Yalnızca varlığı
+      // kayıt altına alınır ki liste sessizce büyümesin.
+      continue
+    }
+    if (!isGuarded(await readFile(file, 'utf8'))) unguarded.push(rel)
+  }
+
+  assert.deepEqual(
+    unguarded,
+    [],
+    `Bu route handler'lar yalnızca middleware'e güveniyor: ${unguarded.join(', ')}`,
+  )
+})
+
+test('admin sırrı sabit zamanlı karşılaştırılır', async () => {
+  // `provided === secret` ilk farklı baytta kısa devre yapar; yanıt süresi
+  // üzerinden sır bayt bayt tahmin edilebilir.
+  for (const route of ['pricing', 'custom-offer']) {
+    const source = await readFile(
+      new URL(`../../app/api/payments/admin/${route}/route.ts`, import.meta.url),
+      'utf8',
+    )
+    assert.match(source, /hasValidAdminSecret/, `${route}: paylaşılan doğrulayıcıyı kullanmalı`)
+    assert.doesNotMatch(source, /provided === secret/, `${route}: kısa devre yapan karşılaştırma kalmış`)
+  }
+
+  const helper = await readFile(new URL('../../lib/auth/adminSecret.ts', import.meta.url), 'utf8')
+  assert.match(helper, /timingSafeEqual/, 'sabit zamanlı karşılaştırma kullanılmalı')
+  assert.match(helper, /if \(!secret\) return false/, 'sır tanımsızsa kapalı düşmeli')
+})

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateContent } from '@/lib/ai/provider'
 import { parseStructuredOutput } from '@/lib/ai/structured'
 import { AIModel } from '@/types'
+import { requireApiUser } from '@/lib/auth/server'
 
 const metricLabels: Record<string, string> = {
   followers: 'Takipçi / Abone',
@@ -15,6 +16,9 @@ const metricLabels: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { platform, niche, metrics, model } = await req.json() as {
       platform?: string

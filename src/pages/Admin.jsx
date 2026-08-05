@@ -4263,6 +4263,13 @@ function UsersSection({ showToast }) {
       showToast('Şifre gerekli', 'error')
       return
     }
+    // E-posta zorunlu: adressiz hesap için şifre sıfırlama akışı çalışmıyor.
+    // Sunucu da aynı kuralı uyguluyor; buradaki kontrol yalnızca hatayı
+    // kaydetmeye çalışmadan önce göstermek için.
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((form.email || '').trim())) {
+      showToast('Geçerli bir e-posta adresi gerekli', 'error')
+      return
+    }
     try {
       if (editingUser) {
         const payload = {

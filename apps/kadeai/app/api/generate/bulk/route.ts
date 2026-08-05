@@ -3,6 +3,7 @@ import { generateContent } from '@/lib/ai/provider'
 import { BULK_SYSTEM_PROMPT, buildBulkPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
+import { requireApiUser } from '@/lib/auth/server'
 
 function normalizeBulkOutput(data: Record<string, unknown>, platforms: string[]) {
   if (Array.isArray(data.basliklar) || data.raw) return data
@@ -36,6 +37,9 @@ function normalizeBulkOutput(data: Record<string, unknown>, platforms: string[])
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { topic, niche, platforms, count, model } = await req.json()
     if (!topic || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })

@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateContent } from '@/lib/ai/provider'
 import { DUBBING_SYSTEM_PROMPT, buildTranslatePrompt } from '@/lib/ai/prompts'
 import { TranslateRequest } from '@/types'
+import { requireApiUser } from '@/lib/auth/server'
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const body: TranslateRequest = await req.json()
     const {

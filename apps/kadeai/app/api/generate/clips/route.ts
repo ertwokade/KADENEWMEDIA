@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CLIP_EXTRACTION_SYSTEM_PROMPT, buildClipExtractionPrompt } from '@/lib/ai/prompts'
 import { generateContent } from '@/lib/ai/provider'
+import { requireApiUser } from '@/lib/auth/server'
 
 export const maxDuration = 120
 
@@ -20,6 +21,9 @@ interface GroqWord { word: string; start: number; end: number }
 
 // Transkripsiyon route'undan gelen metin ve zaman damgalarını analiz eder.
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { transcript, words, videoDuration } = await req.json() as {
       transcript: string

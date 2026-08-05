@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getRateLimitKey, rateLimit } from '@/lib/rateLimit'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
+import { requireApiUser } from '@/lib/auth/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +19,9 @@ async function hasSupportedSignature(file: File) {
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   if (!(await hasAuthenticatedUser())) return NextResponse.json({ error: 'Oturum gerekli.' }, { status: 401 })
   const { allowed } = rateLimit(getRateLimitKey(req))
   if (!allowed) return NextResponse.json({ error: 'Çok fazla istek. 1 dakika bekle.' }, { status: 429 })

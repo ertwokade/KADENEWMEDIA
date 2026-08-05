@@ -3,8 +3,12 @@ import { generateContent } from '@/lib/ai/provider'
 import { COLLAB_MAIL_SYSTEM_PROMPT, buildCollabMailPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
+import { requireApiUser } from '@/lib/auth/server'
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { senderName, senderChannel, senderNiche, targetName, dealType, extraNotes, model } = await req.json()
     if (!senderName || !targetName || !dealType || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })

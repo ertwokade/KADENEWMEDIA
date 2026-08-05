@@ -4,6 +4,7 @@ import { SYSTEM_PROMPTS, buildViralScorePrompt } from '@/lib/ai/prompts'
 import { clampScore, extractJsonObject } from '@/lib/ai/json'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { ViralScoreRequest } from '@/types'
+import { requireApiUser } from '@/lib/auth/server'
 
 interface ViralCriterion {
   puan: number
@@ -51,6 +52,9 @@ function normalizeAnalysis(value: Record<string, unknown>, title: string): Viral
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   const { allowed } = rateLimit(getRateLimitKey(req))
   if (!allowed) return NextResponse.json({ error: 'Çok fazla istek. 1 dakika bekle.' }, { status: 429 })
 

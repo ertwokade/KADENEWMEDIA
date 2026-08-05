@@ -6,13 +6,37 @@ export const AUTH_COOKIE_NAME = 'kade_admin_session';
 export const CSRF_COOKIE_NAME = 'kade_csrf';
 const SESSION_MAX_AGE_SECONDS = 8 * 60 * 60;
 
+// Oturumun mutlak ömrü 8 saatti ve hareketsizlik sınırı yoktu: ortak ya da
+// kilitlenmemiş bir makinede açık bırakılan admin paneli tam 8 saat boyunca
+// kullanılabilir kalıyordu. Artık kayan (sliding) bir hareketsizlik sınırı var
+// — mutlak 8 saatlik tavan korunur, üstüne 30 dakika hareketsizlik eklenir.
+export const IDLE_TIMEOUT_SECONDS = 30 * 60;
+// Her istekte yeni çerez basmamak için: son yenilemenin üzerinden bu kadar
+// geçmişse token tazelenir. Aksi hâlde her API çağrısı Set-Cookie üretirdi.
+const SESSION_REFRESH_AFTER_SECONDS = 5 * 60;
+
+const nowSeconds = () => Math.floor(Date.now() / 1000);
+
 function getSecret() {
   if (process.env.JWT_SECRET && process.env.JWT_SECRET.length >= 32) return process.env.JWT_SECRET;
   throw new Error('JWT_SECRET environment variable must be set to a random value of at least 32 characters');
 }
 
 export function createToken(payload) {
-  return jwt.sign(payload, getSecret(), { expiresIn: `${SESSION_MAX_AGE_SECONDS}s` });
+  // `lastSeen` hareketsizlik sınırının dayanağı; çağıran vermezse şimdi kabul
+  // edilir, böylece mevcut çağrı noktalarının hiçbiri değişmek zorunda kalmaz.
+  return jwt.sign(
+    { lastSeen: nowSeconds(), ...payload },
+    getSecret(),
+    { expiresIn: `${SESSION_MAX_AGE_SECONDS}s` },
+  );
+}
+
+/** Hareketsizlik sınırı aşılmış mı? Eski (lastSeen taşımayan) token'lar da aşılmış sayılır. */
+export function isSessionIdle(sessionUser, now = nowSeconds()) {
+  const lastSeen = Number(sessionUser?.lastSeen);
+  if (!Number.isFinite(lastSeen) || lastSeen <= 0) return true;
+  return now - lastSeen > IDLE_TIMEOUT_SECONDS;
 }
 
 export function verifyToken(token) {
@@ -262,6 +286,9 @@ function hasPermission(user, permission, { write = false } = {}) {
 export async function getAuthorizedUser(req) {
   const sessionUser = requireAuth(req);
   if (!sessionUser) return null;
+  // Hareketsizlik sınırı JWT'nin kendi son kullanma tarihinden bağımsız:
+  // token 8 saat geçerli olsa da 30 dakika işlem yapılmamışsa oturum düşer.
+  if (isSessionIdle(sessionUser)) return null;
 
   const supabase = getSupabase();
   let query = supabase
@@ -291,6 +318,28 @@ export async function getAuthorizedUser(req) {
   };
 }
 
+/**
+ * Kayan oturum: yetkili her istekte `lastSeen` ilerletilir, böylece aktif
+ * yönetici 30 dakikalık hareketsizlik sınırına takılmaz. Her istekte yeni
+ * çerez basmamak için yalnızca son tazelemenin üzerinden belli bir süre
+ * geçtiyse token yeniden üretilir.
+ */
+function refreshSessionActivity(req, res, user) {
+  if (!res?.setHeader) return;
+  const now = nowSeconds();
+  const lastSeen = Number(user?.lastSeen) || 0;
+  if (now - lastSeen < SESSION_REFRESH_AFTER_SECONDS) return;
+
+  const token = createToken({
+    id: user.id,
+    username: user.username,
+    role: user.role,
+    sessionVersion: Number(user.session_version ?? user.sessionVersion ?? 0),
+    lastSeen: now,
+  });
+  appendSetCookie(res, serializeCookie(req, AUTH_COOKIE_NAME, token, { httpOnly: true }));
+}
+
 export async function requirePermission(req, res, permission, options = {}) {
   const user = await getAuthorizedUser(req);
   if (!user) {
@@ -301,6 +350,7 @@ export async function requirePermission(req, res, permission, options = {}) {
     res.status(403).json({ error: 'Bu işlem için yetkiniz yok' });
     return null;
   }
+  refreshSessionActivity(req, res, user);
   return user;
 }
 
@@ -314,5 +364,6 @@ export async function requireAdmin(req, res) {
     res.status(403).json({ error: 'Bu işlem için admin yetkisi gerekli' });
     return null;
   }
+  refreshSessionActivity(req, res, user);
   return user;
 }

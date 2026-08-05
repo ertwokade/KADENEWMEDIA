@@ -3,8 +3,12 @@ import { generateContent } from '@/lib/ai/provider'
 import { COMPETITOR_SYSTEM_PROMPT, buildCompetitorPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
+import { requireApiUser } from '@/lib/auth/server'
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { competitorInfo, myNiche, myPlatform, model } = await req.json()
     if (!competitorInfo || !myNiche || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })

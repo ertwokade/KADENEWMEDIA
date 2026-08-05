@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { TTSRequest } from '@/types'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
+import { requireApiUser } from '@/lib/auth/server'
 
 export const maxDuration = 120
 
@@ -27,6 +28,9 @@ function splitIntoChunks(text: string, maxLen = 4000): string[] {
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   if (!(await hasAuthenticatedUser())) return NextResponse.json({ error: 'Oturum gerekli.' }, { status: 401 })
   const limit = rateLimit(getRateLimitKey(req, 'tts'), 5, 60_000)
   if (!limit.allowed) return NextResponse.json({ error: 'Çok fazla istek.' }, { status: 429, headers: rateLimitHeaders(limit) })

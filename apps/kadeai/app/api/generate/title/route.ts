@@ -4,8 +4,12 @@ import { SYSTEM_PROMPTS, buildTitlePrompt } from '@/lib/ai/prompts'
 import { extractJsonArray } from '@/lib/ai/json'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { TitleGenerateRequest } from '@/types'
+import { requireApiUser } from '@/lib/auth/server'
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   const { allowed, remaining } = rateLimit(getRateLimitKey(req))
   if (!allowed) return NextResponse.json({ error: 'Çok fazla istek. 1 dakika bekle.' }, { status: 429 })
 

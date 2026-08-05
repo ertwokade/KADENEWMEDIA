@@ -3,8 +3,12 @@ import { generateContent } from '@/lib/ai/provider'
 import { COMMENT_ANALYSIS_SYSTEM_PROMPT, buildCommentAnalysisPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
+import { requireApiUser } from '@/lib/auth/server'
 
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { comments, contentTitle, model } = await req.json()
     if (!comments || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })

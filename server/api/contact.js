@@ -221,8 +221,16 @@ export default async function handler(req, res) {
   }
 
   const {
-    name, email, phone, company, service, message, consent,
+    name, email, phone, company, service, message, consent, website,
   } = body || {};
+
+  // Honeypot. `website` alanı formda gizli ve boş; yalnız otomatik doldurucular
+  // yazar. İstemci tarafında da kontrol ediliyor ama oradaki kontrol doğrudan
+  // API'ye POST atan botu elemiyor. Bot'a başarısız olduğu söylenmez —
+  // aksi hâlde alanı boş bırakmayı öğrenir; istek sessizce yutulur.
+  if (typeof website === 'string' && website.trim()) {
+    return res.status(200).json({ message: 'Mesajınız başarıyla gönderildi!' });
+  }
 
   if (!name?.trim() || !email?.trim() || !message?.trim()) {
     return res.status(400).json({ error: 'Ad, e-posta ve mesaj alanları zorunludur.' });

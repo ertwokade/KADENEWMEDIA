@@ -3,7 +3,11 @@ import { generateContent } from '@/lib/ai/provider'
 import { QUOTE_SYSTEM_PROMPT, buildQuotePrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
+import { requireApiUser } from '@/lib/auth/server'
 export async function POST(req: NextRequest) {
+  const guard = await requireApiUser()
+  if (guard) return guard
+
   try {
     const { content, authorName, model } = await req.json()
     if (!content || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })

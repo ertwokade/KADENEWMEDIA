@@ -4,6 +4,15 @@ import { getDefaultPermissions, requireAdmin } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
 
+const USER_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Yönetici hesabı e-postası — boş bırakılamaz, şifre sıfırlamanın tek kanalı. */
+export function isValidUserEmail(value) {
+  if (typeof value !== 'string') return false;
+  const email = value.trim();
+  return email.length > 0 && email.length <= 254 && USER_EMAIL_RE.test(email);
+}
+
 function mapUser(u) {
   if (!u) return u;
   return {
@@ -45,6 +54,11 @@ export default async function handler(req, res) {
       if (!username || !password) {
         return res.status(400).json({ error: 'Kullanıcı adı ve şifre gerekli' });
       }
+      // E-posta zorunlu: adressiz bir yönetici hesabı için şifre sıfırlama ve
+      // güvenlik bildirimi akışlarının hiçbiri çalışmıyor.
+      if (!isValidUserEmail(req.body.email)) {
+        return res.status(400).json({ error: 'Geçerli bir e-posta adresi gerekli' });
+      }
       if (typeof username !== 'string' || !/^[a-zA-Z0-9_]{1,30}$/.test(username)) {
         return res.status(400).json({ error: 'Geçersiz kullanıcı adı formatı' });
       }
@@ -61,7 +75,7 @@ export default async function handler(req, res) {
       const newUser = {
         username,
         password_hash: hashedPassword,
-        email: req.body.email || '',
+        email: String(req.body.email).trim().toLowerCase(),
         role: role || 'viewer',
         permissions: permissions || getDefaultPermissions(role || 'viewer'),
         session_version: 0,
@@ -103,7 +117,13 @@ export default async function handler(req, res) {
       }
       if (permissions) updateData.permissions = permissions;
       if (password) updateData.password_hash = await bcrypt.hash(password, 12);
-      if (emailUpdate !== undefined) updateData.email = emailUpdate;
+      // Güncellemede e-posta boşaltılamaz; verildiyse geçerli olmak zorunda.
+      if (emailUpdate !== undefined) {
+        if (!isValidUserEmail(emailUpdate)) {
+          return res.status(400).json({ error: 'Geçerli bir e-posta adresi gerekli' });
+        }
+        updateData.email = String(emailUpdate).trim().toLowerCase();
+      }
 
       const shouldRevokeSessions = Boolean(password || role || permissions);
       if (shouldRevokeSessions) {
