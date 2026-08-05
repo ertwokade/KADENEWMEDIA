@@ -1,34 +1,66 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 const ThemeContext = createContext()
+const THEME_STORAGE_KEY = 'kade-theme-mode'
+const THEME_MODES = ['light', 'dark']
+
+function getStoredMode() {
+  if (typeof window === 'undefined') return 'light'
+  try {
+    const stored = window.localStorage.getItem(THEME_STORAGE_KEY)
+    return THEME_MODES.includes(stored) ? stored : 'light'
+  } catch {
+    return 'light'
+  }
+}
+
+function applyTheme(theme) {
+  const root = document.documentElement
+  root.setAttribute('data-theme', theme)
+  root.setAttribute('data-theme-mode', theme)
+  root.style.colorScheme = theme
+
+  const themeColor = document.querySelector('meta[name="theme-color"]')
+  if (themeColor) themeColor.setAttribute('content', theme === 'dark' ? '#0b0b0a' : '#fbfaf4')
+}
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    // Yeni kade arayüzü açık tema — eski 'dark' tercihini bir kez sıfırla
-    const saved = localStorage.getItem('theme')
-    if (localStorage.getItem('kade_theme_v2') !== '1') {
-      localStorage.setItem('kade_theme_v2', '1')
-      return 'light'
-    }
-    return saved || 'light'
-  })
+  const [mode, setModeState] = useState(getStoredMode)
+  const theme = mode
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
+    applyTheme(theme)
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+    } catch {
+      // Private browsing or disabled storage: the theme still works for this visit.
+    }
   }, [theme])
 
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark'
+  const setMode = useCallback((nextMode) => {
+    const safeMode = THEME_MODES.includes(nextMode) ? nextMode : 'light'
     if (typeof document !== 'undefined' && document.startViewTransition) {
-      document.startViewTransition(() => setTheme(next))
+      document.startViewTransition(() => setModeState(safeMode))
     } else {
-      setTheme(next)
+      setModeState(safeMode)
     }
-  }
+  }, [])
+
+  const cycleTheme = useCallback(() => {
+    setMode(theme === 'dark' ? 'light' : 'dark')
+  }, [setMode, theme])
+
+  const value = useMemo(() => ({
+    mode,
+    theme,
+    setMode,
+    setTheme: setMode,
+    cycleTheme,
+    toggleTheme: cycleTheme,
+  }), [cycleTheme, mode, setMode, theme])
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   )

@@ -1,5 +1,7 @@
 export type AIModel =
   | 'auto'                    // Göreve ve mevcut sağlayıcılara göre otomatik seçim
+  // Vercel AI Gateway
+  | 'vercel-qwen-flash'       // En düşük maliyetli varsayılan gateway modeli
   // Groq
   | 'groq-llama-70b'          // Llama 3.3 70B  ~500 t/s
   | 'groq-llama4'             // Llama 4 Scout 17B

@@ -35,10 +35,9 @@ export async function POST(req: NextRequest) {
     const hooks = validated.length ? validated : (result.content.trim() ? [{ hook: result.content.trim(), tip: 'genel', neden: 'Modelin düz metin yanıtı' }] : [])
     if (hooks.length === 0) return NextResponse.json({ error: 'Model kullanılabilir hook döndürmedi. Yeniden dene.' }, { status: 502 })
 
-    return NextResponse.json({ hooks, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ hooks, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sunucu hatası'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

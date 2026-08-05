@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     const data = parsed ? normalizeClickbait(parsed, title) : null
     if (!data) return NextResponse.json({ error: 'Model geçerli bir clickbait analiz şeması döndürmedi. Yeniden dene.' }, { status: 502 })
 
-    return NextResponse.json({ ...data, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ ...data, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'Sunucu hatası' }, { status: 500 })
   }

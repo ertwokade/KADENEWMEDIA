@@ -5,7 +5,7 @@ import { STATIC_PAGES, escapeXml, normalizeSiteBaseUrl } from '../../server/api/
 
 test('critical public and protected route declarations remain present', async () => {
   const source = await readFile(new URL('../../src/App.jsx', import.meta.url), 'utf8')
-  for (const route of ['/', '/hizmetler', '/iletisim', '/giris', '/giris/danismanlik', '/admin', '/musteri-panel', '/organizasyon-kiti']) {
+  for (const route of ['/', '/hizmetler', '/iletisim', '/giris', '/giris/danismanlik', '/admin', '/musteri-panel', '/organizasyon-kiti', '/portfolio/:slug', '/fiyat-hesaplama', '/basin', '/neden-biz', '/referans-programi', '/podcast-webinar', '/bulten-arsivi']) {
     assert.match(source, new RegExp(`path=["']${route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`), route)
   }
 })

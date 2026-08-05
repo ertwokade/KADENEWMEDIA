@@ -5,11 +5,15 @@ import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
+import { useSiteContent } from '../hooks/useSiteContent'
+import { HOME_TESTIMONIALS_DEFAULTS } from '../data/pageDefaults'
 import './Referanslar.css'
 
 export default function Referanslar() {
   const { lang } = useLanguage()
   const isEN = lang === 'en'
+  const { content } = useSiteContent('testimonials', HOME_TESTIMONIALS_DEFAULTS)
+  const testimonials = Array.isArray(content?.items) ? content.items : []
   useSEO({
     title: isEN ? 'Client References | Kade New Media' : 'Müşteri Referansları | Kade New Media',
     description: isEN ? 'Verified Kade New Media client references.' : 'Doğrulanmış Kade New Media müşteri referansları.',
@@ -41,6 +45,22 @@ export default function Referanslar() {
           <FadeIn delay={0.2}><p className="section-subtitle">{isEN ? 'Names, companies, ratings, and statements are published only with explicit permission. Below is how we measure success and how a reference gets published.' : 'İsim, şirket, puan ve beyanları yalnızca açık izinle yayınlıyoruz. Aşağıda başarıyı nasıl ölçtüğümüzü ve bir referansın nasıl yayınlandığını görebilirsin.'}</p></FadeIn>
         </div>
       </section>
+
+      {testimonials.length > 0 && (
+        <section className="section">
+          <div className="container reference-grid">
+            {testimonials.map((item, index) => (
+              <blockquote className="reference-card glass-card" key={`${item.nameTr || item.nameEn}-${index}`}>
+                <p>“{isEN ? (item.textEn || item.textTr) : (item.textTr || item.textEn)}”</p>
+                <footer>
+                  <strong>{isEN ? (item.nameEn || item.nameTr) : (item.nameTr || item.nameEn)}</strong>
+                  <span>{isEN ? (item.roleEn || item.roleTr) : (item.roleTr || item.roleEn)}</span>
+                </footer>
+              </blockquote>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="section pf-block">
         <div className="container">

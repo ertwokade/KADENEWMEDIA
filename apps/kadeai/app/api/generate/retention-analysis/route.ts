@@ -40,7 +40,7 @@ Bu içeriği analiz et.
     })
 
     return NextResponse.json(
-      { content: result.content, model: result.model, tokensUsed: result.tokensUsed },
+      { content: result.content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed },
       { headers: { 'X-RateLimit-Remaining': String(remaining) } }
     )
   } catch (error) {

@@ -1,9 +1,17 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
+import { adminAuthEmail, isLoginIdentifier } from '../../lib/auth/adminIdentity'
 import { canAccessOwnedResource } from '../../lib/security/ownership'
-import { isSettingsOwnerEmail, isSettingsOwnerOnlyRoute } from '../../lib/featureAccess'
-import { distributedRateLimit } from '../../lib/rateLimit'
+import {
+  isAllowedOwnerUser,
+  isKadeAdminUser,
+  isSettingsOwnerEmail,
+  isSettingsOwnerOnlyRoute,
+  isSettingsOwnerUser,
+} from '../../lib/featureAccess'
+import { countedDistributedRateLimit, distributedRateLimit } from '../../lib/rateLimit'
+import { getVercelGatewayToken } from '../../lib/ai/gatewayAuth'
 
 test('user A cannot access a resource owned by user B', () => {
   assert.equal(canAccessOwnedResource('user-a', 'user-a'), true)
@@ -12,13 +20,53 @@ test('user A cannot access a resource owned by user B', () => {
 })
 
 test('settings are restricted to the single account owner email', () => {
-  assert.equal(isSettingsOwnerEmail('demirk314@gmail.com'), true)
-  assert.equal(isSettingsOwnerEmail(' DEMIRK314@GMAIL.COM '), true)
+  assert.equal(isSettingsOwnerEmail('thekademedia@gmail.com'), true)
+  assert.equal(isSettingsOwnerEmail(' THEKADEMEDIA@GMAIL.COM '), true)
+  assert.equal(isSettingsOwnerEmail('demirk314@gmail.com'), false)
   assert.equal(isSettingsOwnerEmail('another-owner@gmail.com'), false)
   assert.equal(isSettingsOwnerEmail(null), false)
   assert.equal(isSettingsOwnerOnlyRoute('/dashboard/settings'), true)
   assert.equal(isSettingsOwnerOnlyRoute('/api/env-status'), true)
   assert.equal(isSettingsOwnerOnlyRoute('/dashboard/title'), false)
+})
+
+test('service-role-issued admin identities receive KadeAI owner access', () => {
+  const bridgedAdmin = {
+    email: 'admin-account@sso.kadenewmedia.com',
+    app_metadata: {
+      kade_admin_id: '11111111-1111-1111-1111-111111111111',
+      kade_admin_role: 'admin',
+    },
+  }
+  const forgedEditor = {
+    email: 'editor@sso.kadenewmedia.com',
+    app_metadata: {
+      kade_admin_id: '22222222-2222-2222-2222-222222222222',
+      kade_admin_role: 'editor',
+    },
+  }
+
+  assert.equal(isKadeAdminUser(bridgedAdmin), true)
+  assert.equal(isSettingsOwnerUser(bridgedAdmin), true)
+  assert.equal(isAllowedOwnerUser(bridgedAdmin), true)
+  assert.equal(isKadeAdminUser(forgedEditor), false)
+  assert.equal(isSettingsOwnerUser(forgedEditor), false)
+})
+
+test('admin login identifiers and bridged auth emails are normalized safely', () => {
+  assert.equal(isLoginIdentifier('kadir_demir'), true)
+  assert.equal(isLoginIdentifier('admin@example.com'), true)
+  assert.equal(isLoginIdentifier('invalid username'), false)
+  assert.equal(isLoginIdentifier('not-an-email@'), false)
+
+  assert.equal(
+    adminAuthEmail({ id: 'ADMIN-ID', email: ' ADMIN@EXAMPLE.COM ' }),
+    'admin@example.com',
+  )
+  assert.equal(
+    adminAuthEmail({ id: 'ADMIN-ID', email: null }),
+    'admin-admin-id@sso.kadenewmedia.com',
+  )
 })
 
 test('latest RLS migration uses explicit operations and isolates payment ownership', async () => {
@@ -28,6 +76,20 @@ test('latest RLS migration uses explicit operations and isolates payment ownersh
   assert.doesNotMatch(sql, /CREATE POLICY payment_orders_own_insert/)
   assert.match(sql, /REVOKE INSERT, UPDATE, DELETE ON public\.payment_orders FROM anon, authenticated/)
   assert.match(sql, /REVOKE ALL ON public\.payment_events FROM anon, authenticated/)
+})
+
+test('proxy forwards server request headers to route handlers', async () => {
+  const source = await readFile(new URL('../../proxy.ts', import.meta.url), 'utf8')
+  assert.match(source, /new Headers\(request\.headers\)/)
+  assert.match(source, /NextResponse\.next\(\{ request: \{ headers: requestHeaders \} \}\)/)
+  assert.doesNotMatch(source, /NextResponse\.next\(\{ request \}\)/)
+})
+
+test('Gateway identity can be resolved from the active request explicitly', async () => {
+  const request = new Request('https://example.com/api/generate/title', {
+    headers: { 'x-vercel-oidc-token': 'unit-oidc-token' },
+  })
+  assert.equal(await getVercelGatewayToken(request), 'unit-oidc-token')
 })
 
 test('distributed AI quota enforces cost, daily limit and idempotency locally', async () => {
@@ -81,4 +143,18 @@ test('distributed quota fails closed in production without a backend', async () 
     if (previousToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN
     else process.env.UPSTASH_REDIS_REST_TOKEN = previousToken
   }
+})
+
+test('Supabase history counts provide conservative distributed quota fallback', () => {
+  const allowed = countedDistributedRateLimit({ identity: 'user-1', minuteLimit: 30, dailyLimit: 500 }, 4, 42)
+  assert.equal(allowed.allowed, true)
+  assert.equal(allowed.remaining, 25)
+
+  const minuteLimited = countedDistributedRateLimit({ identity: 'user-1', minuteLimit: 5, dailyLimit: 500 }, 5, 42)
+  assert.equal(minuteLimited.allowed, false)
+  assert.equal(minuteLimited.reason, 'minute_limit')
+
+  const dailyLimited = countedDistributedRateLimit({ identity: 'user-1', minuteLimit: 30, dailyLimit: 50 }, 1, 50)
+  assert.equal(dailyLimited.allowed, false)
+  assert.equal(dailyLimited.reason, 'daily_limit')
 })

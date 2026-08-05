@@ -368,3 +368,67 @@
 [data-theme="light"] .case-testimonial {
   background: rgba(0, 0, 0, 0.03);
 }
+.case-stats-grid,
+.case-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.case-stat,
+.case-study {
+  padding: clamp(1.3rem, 3vw, 2rem);
+}
+
+.case-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.case-stat > strong {
+  font-size: 2rem;
+}
+
+.case-list {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.case-study {
+  border-top: 3px solid var(--accent);
+}
+
+.case-study header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.case-logo {
+  font-size: 2.4rem;
+}
+
+.case-study p,
+.case-study blockquote {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.case-metrics {
+  margin-top: 1.2rem;
+}
+
+.case-metrics > div {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+
+.case-metrics strong {
+  margin-top: 0.35rem;
+  font-size: 1.5rem;
+}

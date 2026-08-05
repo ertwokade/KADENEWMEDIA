@@ -1,15 +1,12 @@
 import { redirect } from 'next/navigation'
-import { getAuthenticatedUser } from '@/lib/auth/server'
-import { isSettingsOwnerEmail } from '@/lib/featureAccess'
+import { hasAuthenticatedUser } from '@/lib/auth/server'
 import { appRoutes, withBasePath } from '@/lib/appConfig'
 
 export const dynamic = 'force-dynamic'
 
 export default async function SettingsLayout({ children }: { children: React.ReactNode }) {
-  const user = await getAuthenticatedUser()
-
-  if (!isSettingsOwnerEmail(user?.email)) {
-    redirect(withBasePath(appRoutes.dashboard))
+  if (!(await hasAuthenticatedUser())) {
+    redirect(withBasePath(appRoutes.login))
   }
 
   return children

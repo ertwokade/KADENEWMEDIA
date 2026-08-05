@@ -75,10 +75,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Model geçerli bir viral skor şeması döndürmedi. Lütfen yeniden dene.' }, { status: 502 })
     }
 
-    return NextResponse.json({ analysis, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ analysis, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sunucu hatası'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

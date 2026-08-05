@@ -1,0 +1,82 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import type { AIModel } from '../../types'
+import { getModelConfig } from '../../lib/ai/models'
+import { getAvailableModels, routeModelForTask } from '../../lib/ai/modelRouter'
+
+const available: AIModel[] = [
+  'auto',
+  'groq-llama-70b',
+  'groq-qwen-32b',
+  'groq-gpt-oss-120b',
+  'groq-gpt-oss-20b',
+  'groq-compound-mini',
+  'cerebras-glm-4-7',
+  'gemini-flash',
+  'mistral-codestral',
+]
+
+test('kod görevi için teknik modeli seçer ve yedekleri sıralar', () => {
+  const result = routeModelForTask({
+    prompt: 'Bu React TypeScript kodunu incele, hatayı ayıkla ve düzelt.',
+  }, available)
+
+  assert.equal(result.task, 'coding')
+  assert.equal(result.model, 'mistral-codestral')
+  assert.ok(result.alternatives.includes('groq-qwen-32b'))
+  assert.match(result.reason, /kod ve teknik üretim/i)
+})
+
+test('çoklu sinyallerde baskın analiz amacını korur', () => {
+  const result = routeModelForTask({
+    prompt: 'Rakip performansını analiz et, riskleri karşılaştır ve sonucu JSON formatında ver.',
+  }, available)
+
+  assert.equal(result.task, 'analysis')
+  assert.equal(result.model, 'groq-gpt-oss-120b')
+})
+
+test('uzun bağlamı metin uzunluğundan algılar', () => {
+  const result = routeModelForTask({
+    prompt: `Bu dokümanı özetle:\n${'uzun bağlam '.repeat(700)}`,
+  }, available)
+
+  assert.equal(result.task, 'long-context')
+  assert.equal(result.model, 'gemini-flash')
+})
+
+test('yalnızca gerçekten kullanılabilir modelleri döndürür', () => {
+  const result = routeModelForTask({
+    prompt: 'Yaratıcı bir Instagram açıklaması yaz.',
+  }, ['auto', 'cerebras-glm-4-7'])
+
+  assert.equal(result.model, 'cerebras-glm-4-7')
+  assert.deepEqual(result.alternatives, [])
+})
+
+test('yalnızca Gateway bağlıyken yaratıcı görev ekonomik modele yönlenir', () => {
+  const result = routeModelForTask({
+    prompt: 'Sosyal medya için yaratıcı bir başlık üret.',
+    maxTokens: 2_000,
+  }, ['auto', 'vercel-qwen-flash'])
+
+  assert.equal(result.model, 'vercel-qwen-flash')
+  assert.deepEqual(result.alternatives, [])
+})
+
+test('Vercel ortamında ekonomik AI Gateway modeli otomatik kullanıma açılır', () => {
+  const previous = process.env.VERCEL
+  process.env.VERCEL = '1'
+  try {
+    assert.ok(getAvailableModels().includes('vercel-qwen-flash'))
+  } finally {
+    if (previous === undefined) delete process.env.VERCEL
+    else process.env.VERCEL = previous
+  }
+})
+
+test('ekonomik Gateway modeli Vercel kataloğundaki geçerli kimliği kullanır', () => {
+  const model = getModelConfig('vercel-qwen-flash')
+  assert.equal(model.gatewayModel, 'alibaba/qwen3.5-flash')
+  assert.match(model.label, /Qwen 3\.5 Flash/)
+})

@@ -19,6 +19,7 @@ import { useSidebar } from '@/lib/context/SidebarContext'
 import { TOOL_CATEGORIES, TOOL_REGISTRY } from '@/lib/tools/registry'
 import { apiPath, stripBasePath, withBasePath } from '@/lib/appConfig'
 import KadeLogo from '@/components/brand/KadeLogo'
+import ThemeToggle from '@/components/theme/ThemeToggle'
 
 const iconMap = {
   'layout-dashboard': LayoutDashboard,
@@ -332,6 +333,9 @@ export default function Sidebar() {
 
         {/* Footer */}
         <div className="space-y-2 border-t border-zinc-100 px-4 py-4 flex-shrink-0">
+          <div className="flex justify-center">
+            <ThemeToggle />
+          </div>
           {settingsAccess && (
             <Link
               href="/dashboard/settings"

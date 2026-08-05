@@ -1,0 +1,237 @@
+.content-page-hero {
+  padding: clamp(9rem, 14vw, 12rem) 0 clamp(4rem, 8vw, 7rem);
+}
+
+.content-page-grid,
+.calculator-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.content-panel,
+.content-card,
+.calculator-form,
+.calculator-result,
+.content-empty,
+.content-cta {
+  padding: clamp(1.4rem, 3vw, 2rem);
+}
+
+.content-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.content-panel small {
+  color: var(--text-tertiary);
+}
+
+.content-kicker {
+  margin: 0;
+  color: var(--accent);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.content-definition-list {
+  width: 100%;
+  margin: 0;
+}
+
+.content-definition-list > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.65fr) 1fr;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.content-definition-list dt {
+  color: var(--text-secondary);
+}
+
+.content-definition-list dd {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.content-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.1rem;
+}
+
+.content-card {
+  display: flex;
+  min-height: 230px;
+  flex-direction: column;
+  align-items: flex-start;
+  border-top: 3px solid var(--accent);
+}
+
+.content-card p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.content-card a {
+  margin-top: auto;
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.content-card small {
+  color: var(--text-tertiary);
+}
+
+.content-emoji {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  font-size: 1.65rem;
+}
+
+.content-step-number {
+  align-self: flex-end;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+}
+
+.content-big-number {
+  color: var(--text-primary);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+}
+
+.content-muted-section {
+  background: color-mix(in srgb, var(--bg-secondary) 58%, transparent);
+}
+
+.comparison-table {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--bg-card);
+}
+
+.comparison-row {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr 1.2fr;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.comparison-row:last-child {
+  border-bottom: 0;
+}
+
+.comparison-row > span {
+  display: flex;
+  gap: 0.45rem;
+  color: var(--text-secondary);
+}
+
+.comparison-head {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.content-cta {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.content-cta .btn {
+  margin-top: 0.75rem;
+}
+
+.content-empty {
+  text-align: center;
+}
+
+.content-empty svg {
+  color: var(--accent);
+}
+
+.calculator-form {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.calculator-form label {
+  display: grid;
+  gap: 0.55rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.calculator-form label > strong {
+  color: var(--accent);
+}
+
+.calculator-form input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.calculator-form select {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 0 0.85rem;
+}
+
+.calculator-form .calculator-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.calculator-form .calculator-check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+}
+
+.calculator-result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.calculator-result > strong {
+  margin: 0.8rem 0;
+  color: var(--text-primary);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+}
+
+.calculator-result > p:not(.content-kicker) {
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+@media (max-width: 760px) {
+  .content-page-grid,
+  .calculator-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-row {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-head {
+    display: none;
+  }
+}

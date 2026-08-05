@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "expectedCount": 169,
+  "expectedCount": 170,
   "generatedFrom": "Kade Media full-site audit inventory",
   "routes": [
     {
@@ -137,6 +137,21 @@
       "implemented": true,
       "expectedStatus": 200,
       "testPath": "/portfolio"
+    },
+    {
+      "route": "/portfolio/:slug",
+      "type": "page",
+      "app": "root",
+      "methods": [
+        "GET"
+      ],
+      "access": "public",
+      "roles": [
+        "anonymous"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/portfolio/flavora-sosyal-medya"
     },
     {
       "route": "/ekip",
@@ -344,8 +359,8 @@
       "roles": [
         "anonymous"
       ],
-      "implemented": false,
-      "expectedStatus": 404,
+      "implemented": true,
+      "expectedStatus": 200,
       "testPath": "/fiyat-hesaplama"
     },
     {
@@ -359,8 +374,8 @@
       "roles": [
         "anonymous"
       ],
-      "implemented": false,
-      "expectedStatus": 404,
+      "implemented": true,
+      "expectedStatus": 200,
       "testPath": "/basin"
     },
     {
@@ -374,8 +389,8 @@
       "roles": [
         "anonymous"
       ],
-      "implemented": false,
-      "expectedStatus": 404,
+      "implemented": true,
+      "expectedStatus": 200,
       "testPath": "/neden-biz"
     },
     {
@@ -389,8 +404,8 @@
       "roles": [
         "anonymous"
       ],
-      "implemented": false,
-      "expectedStatus": 404,
+      "implemented": true,
+      "expectedStatus": 200,
       "testPath": "/referans-programi"
     },
     {
@@ -404,8 +419,8 @@
       "roles": [
         "anonymous"
       ],
-      "implemented": false,
-      "expectedStatus": 404,
+      "implemented": true,
+      "expectedStatus": 200,
       "testPath": "/podcast-webinar"
     },
     {
@@ -419,8 +434,8 @@
       "roles": [
         "anonymous"
       ],
-      "implemented": false,
-      "expectedStatus": 404,
+      "implemented": true,
+      "expectedStatus": 200,
       "testPath": "/bulten-arsivi"
     },
     {

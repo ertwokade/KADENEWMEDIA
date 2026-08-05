@@ -9,12 +9,6 @@ const blogDetailSource = await readFile(new URL('../src/pages/BlogDetail.jsx', i
 const partnerDetailSource = await readFile(new URL('../src/pages/PartnerDetail.jsx', import.meta.url), 'utf8')
 
 const expectedMissing = new Set([
-  '/fiyat-hesaplama',
-  '/basin',
-  '/neden-biz',
-  '/referans-programi',
-  '/podcast-webinar',
-  '/bulten-arsivi',
   '/blog/:slug',
   '/partnerler/:id',
 ])
@@ -41,6 +35,7 @@ function rootPageExists(route) {
   if (route === '/partnerler/:id') return !/<NotFound\s*\/>/.test(partnerDetailSource)
   if (route === '/links' || route === '/kadelinks') return appSource.includes(`path="${route}"`)
   if (route.startsWith('/hizmetler/')) return appSource.includes('path="/hizmetler/:slug"')
+  if (route === '/portfolio/:slug') return appSource.includes('path="/portfolio/:slug"')
   if (route.startsWith('/organizasyon-kiti/') && !route.includes('/plan/')) {
     return appSource.includes('path={`/organizasyon-kiti/${section}`}')
   }
@@ -69,7 +64,7 @@ function rootApiExists(route) {
 
 assert(manifest.schemaVersion === 1, 'Unsupported route manifest schema')
 assert(manifest.routes.length === manifest.expectedCount, `Expected ${manifest.expectedCount} routes, found ${manifest.routes.length}`)
-assert(manifest.expectedCount === 169, `Inventory contract changed: ${manifest.expectedCount}`)
+assert(manifest.expectedCount === 170, `Inventory contract changed: ${manifest.expectedCount}`)
 
 const seen = new Set()
 for (const entry of manifest.routes) {

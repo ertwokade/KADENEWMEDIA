@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
     const bio = parseStructuredOutput(result.content)
 
-    return NextResponse.json({ bio, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ bio, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : 'Sunucu hatası' }, { status: 500 })
   }

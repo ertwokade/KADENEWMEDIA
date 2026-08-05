@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import type { ReactNode } from 'react'
+import ThemeToggle from '@/components/theme/ThemeToggle'
 
 type KadeSiteShellProps = {
   children: ReactNode
@@ -25,6 +26,7 @@ export default function KadeSiteShell({ children, compact = false }: KadeSiteShe
             </Link>
           ))}
         </nav>
+        <ThemeToggle compact />
         <Link href="/dashboard" className="kade-public-login">
           Giriş
           <ArrowRight className="h-4 w-4" />

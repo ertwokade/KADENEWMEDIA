@@ -69,7 +69,15 @@
 .knav-link:hover::before, .knav-link.active::before {
   border-color: var(--ky-ink, #17130a);
 }
-.knav-tema { opacity: 0.55; }
+.knav-tema {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+  opacity: 0.68;
+}
 .knav-tema:hover { opacity: 1; }
 
 /* GİRİŞ — sağ altta sabit gold hap (statik şablonla birebir) */
@@ -119,6 +127,16 @@
   border-bottom: 1px solid rgba(23, 19, 10, 0.07);
 }
 .knav-mlink.active { color: #c8901a; }
+.knav-mlink--theme {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  align-self: flex-start;
+  padding: 0;
+  border: 1px solid rgba(23, 19, 10, 0.12);
+  border-radius: 50%;
+}
 
 @media (max-width: 1024px) {
   .knav { padding: 12px 16px; }

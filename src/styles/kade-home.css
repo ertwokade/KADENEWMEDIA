@@ -22,7 +22,7 @@
 /* work */
 .kade-work { padding: 8vh 32px 10vh; }
 .kade-workgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px 32px; }
-.kade-block { display: flex; flex-direction: column; gap: 14px; pointer-events: auto; cursor: none; text-decoration: none; color: inherit; }
+.kade-block { display: flex; flex-direction: column; gap: 14px; pointer-events: auto; cursor: pointer; text-decoration: none; color: inherit; }
 .kade-block.featured { grid-column: 1 / -1; }
 .kade-visual { position: relative; width: 100%; aspect-ratio: 16 / 11; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 24px 60px rgba(20,40,90,.16); }
 .kade-block.featured .kade-visual { aspect-ratio: 16 / 7.6; }

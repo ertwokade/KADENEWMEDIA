@@ -65,7 +65,12 @@ const SETTINGS_OWNER_ONLY_ROUTES = [
   '/api/env-status',
 ]
 
-const SETTINGS_OWNER_EMAIL = 'demirk314@gmail.com'
+const SETTINGS_OWNER_EMAIL = 'thekademedia@gmail.com'
+
+type AuthUserLike = {
+  email?: string | null
+  app_metadata?: Record<string, unknown> | null
+}
 
 function matchesRoute(pathname: string, route: string) {
   return pathname === route || pathname.startsWith(`${route}/`)
@@ -83,6 +88,17 @@ export function isSettingsOwnerEmail(email?: string | null) {
   return email?.trim().toLowerCase() === SETTINGS_OWNER_EMAIL
 }
 
+export function isKadeAdminUser(user?: AuthUserLike | null) {
+  return Boolean(
+    user?.app_metadata?.kade_admin_id
+    && user.app_metadata.kade_admin_role === 'admin'
+  )
+}
+
+export function isSettingsOwnerUser(user?: AuthUserLike | null) {
+  return isSettingsOwnerEmail(user?.email) || isKadeAdminUser(user)
+}
+
 export function isAllowedOwnerEmail(email?: string | null) {
   if (!email) return false
   const configured = [process.env.KADE_OWNER_EMAIL, process.env.KADE_OWNER_EMAILS]
@@ -93,6 +109,10 @@ export function isAllowedOwnerEmail(email?: string | null) {
     .filter(Boolean)
 
   return configured.includes(email.trim().toLocaleLowerCase('tr-TR'))
+}
+
+export function isAllowedOwnerUser(user?: AuthUserLike | null) {
+  return isAllowedOwnerEmail(user?.email) || isKadeAdminUser(user)
 }
 
 export function isOwnerMode() {

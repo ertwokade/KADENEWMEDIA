@@ -59,6 +59,12 @@ const Unauthorized = lazy(() => import('./pages/Unauthorized'))
 const Forbidden = lazy(() => import('./pages/Forbidden'))
 const TooManyRequests = lazy(() => import('./pages/TooManyRequests'))
 const Maintenance = lazy(() => import('./pages/Maintenance'))
+const BasinPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.BasinPage })))
+const NedenBizPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.NedenBizPage })))
+const ReferralProgramPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.ReferralProgramPage })))
+const PodcastWebinarPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.PodcastWebinarPage })))
+const NewsletterArchivePage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.NewsletterArchivePage })))
+const PriceCalculatorPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.PriceCalculatorPage })))
 
 // Dekoratif 3B zemin Three.js/R3F çeker. Ana sayfa ve diğer `hideDecor`
 // rotalarında hiç render edilmiyor; statik import olduğu için yine de
@@ -149,6 +155,12 @@ const ROUTE_THEMES = {
   '/kariyer': 'careers',
   '/blog': 'blog',
   '/portfolio': 'portfolio',
+  '/basin': 'about',
+  '/neden-biz': 'about',
+  '/referans-programi': 'contact',
+  '/podcast-webinar': 'blog',
+  '/bulten-arsivi': 'blog',
+  '/fiyat-hesaplama': 'packages',
   '/ekip': 'team',
   '/iletisim': 'contact',
   '/sss': 'contact',
@@ -166,6 +178,7 @@ function getCanvasTheme(pathname) {
   if (ROUTE_THEMES[pathname]) return ROUTE_THEMES[pathname]
   if (pathname.startsWith('/hizmetler/')) return 'services'
   if (pathname.startsWith('/partnerler/')) return 'partners'
+  if (pathname.startsWith('/portfolio/')) return 'portfolio'
   if (pathname.startsWith('/blog/')) return 'blog'
   if (pathname.startsWith('/giris')) return 'about'
   if (pathname.startsWith('/organizasyon-kiti')) return 'about'
@@ -298,6 +311,12 @@ function App() {
             />
           ))}
           <Route path="/kade-kit-business" element={<LazyRoute><KadeKitBusinessGuard><KadeKitBusinessStudio /></KadeKitBusinessGuard></LazyRoute>} />
+          <Route path="/fiyat-hesaplama" element={<LazyRoute><PriceCalculatorPage /></LazyRoute>} />
+          <Route path="/basin" element={<LazyRoute><BasinPage /></LazyRoute>} />
+          <Route path="/neden-biz" element={<LazyRoute><NedenBizPage /></LazyRoute>} />
+          <Route path="/referans-programi" element={<LazyRoute><ReferralProgramPage /></LazyRoute>} />
+          <Route path="/podcast-webinar" element={<LazyRoute><PodcastWebinarPage /></LazyRoute>} />
+          <Route path="/bulten-arsivi" element={<LazyRoute><NewsletterArchivePage /></LazyRoute>} />
           <Route path="/kadirdemir" element={<Navigate to="/@kadirdemir" replace />} />
           <Route path="/:handle" element={<LazyRoute><LinkProfile /></LazyRoute>} />
           <Route path="/s/:slug" element={<ShortLinkRedirect />} />

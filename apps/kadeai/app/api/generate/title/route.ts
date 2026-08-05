@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       model,
       systemPrompt: SYSTEM_PROMPTS.titleGenerator,
       maxTokens: 2000,
-    })
+    }, req)
 
     const parsed = extractJsonArray<unknown[]>(result.content)
     const validated = Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string').map((item) => item.trim()).filter(Boolean).slice(0, 10) : []
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     if (titles.length === 0) return NextResponse.json({ error: 'Model kullanılabilir başlık döndürmedi. Yeniden dene.' }, { status: 502 })
 
-    return NextResponse.json({ titles, model: result.model, tokensUsed: result.tokensUsed }, {
+    return NextResponse.json({ titles, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed }, {
       headers: { 'X-RateLimit-Remaining': String(remaining) },
     })
   } catch (error) {
@@ -40,4 +40,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-

@@ -52,10 +52,9 @@ export async function POST(req: NextRequest) {
     }
 
     if (ideas.length === 0) return NextResponse.json({ error: 'Model geçerli fikir kartları döndürmedi. Yeniden dene.' }, { status: 502 })
-    return NextResponse.json({ ideas, model: result.model, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ ideas, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sunucu hatası'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
-
