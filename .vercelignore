@@ -1,3 +1,8 @@
+# Ortam değişkenleri asla deploy paketine girmesin
+.env
+.env.*
+!.env.example
+
 admin-data-backups/
 _recovered_public_build/
 current-domain-deploy.json

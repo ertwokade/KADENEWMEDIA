@@ -468,3 +468,39 @@ test('istatistikler uydurma veya anlamsız placeholder göstermez', async () => 
   assert.doesNotMatch(source, /\|\|\s*'—'/, "boş istatistik '—' ile doldurulmamalı")
   assert.match(source, /stats\.length > 0/, 'hiç veri yoksa istatistik şeridi hiç render edilmemeli')
 })
+
+// ── Klonlanmış Next.js snapshot'ı geri gelmesin ────────────────────────────
+
+test('repoda klonlanmış Next.js snapshot kalıntısı yok', async () => {
+  // Anasayfa bir dönem başka bir projenin derlenmiş Next.js çıktısıyla
+  // (public/site.html + public/_next/**) servis ediliyordu; kaynak koddaki
+  // React anasayfası hiç yayına çıkmıyordu. Snapshot kaldırıldı.
+  for (const path of ['public/site.html', 'public/_next']) {
+    const found = await stat(new URL(path, ROOT)).then(() => true, () => false)
+    assert.equal(found, false, `${path} geri gelmiş — klon snapshot'ı yeniden eklenmiş`)
+  }
+
+  // Snapshot'ı üretime hazırlayan yardımcı scriptler de geri gelmemeli.
+  for (const path of ['scripts/apply-poppins-to-site.mjs', 'scripts/sanitize-site-snapshot.mjs']) {
+    const found = await stat(new URL(path, ROOT)).then(() => true, () => false)
+    assert.equal(found, false, `${path} geri gelmiş — snapshot hazırlama adımı yeniden eklenmiş`)
+  }
+})
+
+test('build zinciri snapshot ve token bütünlüğünü doğruluyor', async () => {
+  // dist/ üzerinde koşan gerçek kontrol scripts/verify-build-integrity.mjs;
+  // build komutundan düşerse regresyon sessizce yayına çıkar.
+  const pkg = JSON.parse(await readRepo('package.json'))
+  assert.match(
+    pkg.scripts['legacy:build'],
+    /verify-build-integrity\.mjs/,
+    'legacy:build sonunda build bütünlüğü doğrulayıcısı koşmalı',
+  )
+
+  // vercel.json anasayfayı hiçbir snapshot'a yönlendirmemeli.
+  const vercel = JSON.parse(await readRepo('vercel.json'))
+  for (const rule of [...(vercel.rewrites ?? []), ...(vercel.redirects ?? [])]) {
+    assert.doesNotMatch(rule.destination, /site\.html|_next/, `vercel.json kuralı snapshot'a yönlendiriyor: ${rule.source}`)
+    if (rule.source === '/') assert.fail("vercel.json'da anasayfa için rewrite/redirect olmamalı")
+  }
+})
