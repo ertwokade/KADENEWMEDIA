@@ -373,3 +373,41 @@ test('iletişim formu honeypot değerini sunucuya taşır', async () => {
   const api = await readFile(new URL('../../server/api/contact.js', import.meta.url), 'utf8')
   assert.match(api, /typeof website === 'string' && website\.trim\(\)/, 'sunucu honeypot kontrolü yapmalı')
 })
+
+// ── Sistem Sağlığı paneli gerçeği raporlar ───────────────────────────────
+
+test('isteğe bağlı ortam değişkenleri eksik gibi gösterilmez', async () => {
+  // Panel eskiden tek bir kırmızı ✕ kullanıyordu: SITE_URL tanımsızken
+  // "eksik" görünüyordu, oysa kullanıldığı üç yerin hepsinde çalışan bir
+  // varsayılanı var. Zorunlu bir değişkenin gerçekten eksik olmasıyla aynı
+  // görünmek uyarıyı değersizleştiriyordu.
+  const { ENV_CHECKS, CLIENT_CHECKS } = await import('../../server/api/system-health.js')
+
+  const siteUrl = ENV_CHECKS.find((check) => check.key === 'SITE_URL')
+  assert.ok(siteUrl, 'SITE_URL kontrolü listede olmalı')
+  assert.equal(siteUrl.optional, true, 'SITE_URL isteğe bağlı işaretlenmeli')
+
+  // İsteğe bağlı her değişken, eksikken ne olduğunu söylemeli.
+  for (const check of [...ENV_CHECKS, ...CLIENT_CHECKS].filter((c) => c.optional)) {
+    assert.ok(check.note && check.note.length > 20, `${check.key}: eksikken ne olduğu yazılmalı`)
+  }
+
+  // Zorunlu sayılanlar gerçekten zorunlu olmalı: bunlar yoksa uygulama çalışmaz.
+  const required = ENV_CHECKS.filter((c) => !c.optional).map((c) => c.key)
+  assert.deepEqual(required, ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'JWT_SECRET'])
+})
+
+test('istemci build değişkenleri sunucu listesinde yer almaz', async () => {
+  // VITE_ önekli değişkenler istemci bundle'ına gömülür; sunucu çalışma
+  // zamanında process.env'den okunmaları güvenilir değil. Sunucu listesine
+  // eklenirlerse panel doğru yapılandırmada bile "eksik" gösterir.
+  const { ENV_CHECKS, CLIENT_CHECKS } = await import('../../server/api/system-health.js')
+
+  for (const check of ENV_CHECKS) {
+    assert.doesNotMatch(check.key, /^VITE_/, `${check.key} sunucudan okunamaz, CLIENT_CHECKS'e taşınmalı`)
+  }
+  assert.ok(
+    CLIENT_CHECKS.some((check) => check.key === 'VITE_GA_ID'),
+    'VITE_GA_ID istemci listesinde raporlanmalı',
+  )
+})

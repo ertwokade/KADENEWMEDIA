@@ -5959,13 +5959,35 @@ function SystemHealthSection() {
 
           <div className="admin-form">
             <h3 style={{ marginBottom: 12 }}>Ortam Değişkenleri (yalnızca var/yok — değer gösterilmez)</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
-              {Object.entries(health.envVars).map(([key, { label, present }]) => (
-                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.85rem' }}>
-                  <span style={{ color: present ? '#2ECC71' : '#E91E63' }}>{present ? '✓' : '✕'}</span>
-                  {label}
-                </div>
-              ))}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
+              {/* Üç durum ayrı gösterilir. Eskiden tek bir kırmızı ✕ vardı ve
+                  varsayılanı olan isteğe bağlı bir değişken, gerçekten eksik
+                  olan zorunlu bir değişkenle aynı görünüyordu. */}
+              {Object.entries(health.envVars).map(([key, { label, present, optional, note }]) => {
+                const state = present === null ? 'unknown' : present ? 'ok' : optional ? 'default' : 'missing'
+                const mark = { ok: '✓', default: '○', unknown: '–', missing: '✕' }[state]
+                const color = {
+                  ok: 'var(--kade-success)',
+                  default: 'var(--kade-ink-3)',
+                  unknown: 'var(--kade-ink-3)',
+                  missing: 'var(--kade-danger)',
+                }[state]
+                return (
+                  <div key={key} style={{ display: 'flex', gap: 8, fontSize: '0.85rem', alignItems: 'flex-start' }}>
+                    <span style={{ color, lineHeight: 1.5 }} aria-hidden="true">{mark}</span>
+                    <span>
+                      {label}
+                      {state === 'default' && <span style={{ color: 'var(--kade-ink-3)' }}> — varsayılan kullanılıyor</span>}
+                      {state === 'unknown' && <span style={{ color: 'var(--kade-ink-3)' }}> — sunucudan doğrulanamaz</span>}
+                      {note && state !== 'ok' && (
+                        <span style={{ display: 'block', marginTop: 2, fontSize: '0.78rem', color: 'var(--kade-ink-3)', lineHeight: 1.5 }}>
+                          {note}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
