@@ -107,19 +107,12 @@
      dokunulmadan Poppins'e döner. Yeni kodda `--font-sans` kullanın.
   ------------------------------------------------------------------------- */
   --font-sans: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-
-  /* Arayüz monospace'i — SADECE küçük, büyük harfli etiketler için:
-     navigasyon, eyebrow, kart meta satırı, buton ve rozet metni.
-     Gövde metni, başlık ve form içeriği her zaman Poppins kalır.
-
-     Neden ayrı bir aile: sitenin görsel dili teknik/editoryal bir etiket
-     katmanı üzerine kurulu; bu katman Poppins'le yazıldığında başlıklardan
-     ayrışmıyor ve "etiket" okunmuyordu. Seçilen yığın Türkçe için tam
-     kapsamlıdır (İ ı Ş ş Ğ ğ Ç ç Ö ö Ü ü) — SF Mono, Menlo ve Consolas
-     üçü de Latin Extended-A taşır, bu yüzden hiçbir harf başka aileye
-     düşmez. scripts/verify-poppins.mjs bu aileyi bilerek tanır. */
-  --font-mono-ui: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  /* Kullanıcının marka kararı: pazarlama sayfaları, ürün arayüzleri, küçük
+     etiketler, form elemanları ve teknik görünümlü metinler dahil sitenin
+     tamamı aynı Poppins ailesini kullanır. Bu iki takma ad, eski bileşenleri
+     tek tek değiştirmeden aynı aileye taşımak için korunur. */
+  --font-mono: var(--font-sans);
+  --font-mono-ui: var(--font-sans);
 
   /* geriye dönük takma adlar → hepsi Poppins */
   --font-primary: var(--font-sans);
@@ -455,7 +448,7 @@ option,
   font-family: inherit;
 }
 
-/* Gerçek kod/teknik çıktı — okunabilirlik için monospace kalır. */
+/* Kod/teknik çıktı da marka kararı gereği Poppins kullanır. */
 code,
 kbd,
 samp,

@@ -1243,16 +1243,11 @@ kbd {
 }
 
 /* ---------------------------------------------------------------------
-   ETİKET KATMANI — yukarıdaki blanket kuralın TEK istisnası.
+   ETİKET KATMANI — eski sınıf adları geriye dönük olarak korunur.
 
-   Sitenin görsel dili küçük, büyük harfli, geniş harf aralıklı bir
-   "teknik etiket" katmanı üzerine kurulu: navigasyon, eyebrow, kart meta
-   satırı, rozetler. Bunlar Poppins'le yazıldığında başlık tipografisinden
-   ayrışmıyor ve etiket gibi okunmuyorlar.
-
-   Kapsam bilerek dar: yalnız `.kade-mono` taşıyan öğeler ve çocukları.
-   GÖVDE METNİ, BAŞLIK VE FORM İÇERİĞİ HER ZAMAN POPPINS KALIR — bu sınıfı
-   paragraf veya başlığa vermeyin.
+   Navigasyon, eyebrow, kart meta satırı ve rozetler de artık
+   `--font-mono-ui` üzerinden Poppins kullanır. Ayrışma yalnız harf aralığı,
+   ağırlık ve büyük harf kullanımıyla sağlanır; ikinci bir font ailesi yoktur.
 --------------------------------------------------------------------- */
 .kade-mono,
 .kade-mono *,
