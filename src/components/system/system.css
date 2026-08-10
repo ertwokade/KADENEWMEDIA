@@ -80,6 +80,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  font-family: var(--font-mono-ui);
   font-size: var(--fs-2xs);
   font-weight: var(--fw-semibold);
   letter-spacing: var(--tracking-wider);
@@ -134,6 +135,7 @@
 }
 .kade-section-head__text { display: flex; flex-direction: column; gap: var(--space-3); }
 .kade-section-head__index {
+  font-family: var(--font-mono-ui);
   font-size: var(--fs-2xs);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
@@ -185,6 +187,7 @@
   flex-wrap: wrap;
   gap: var(--space-3) var(--space-6);
   margin-top: var(--space-2);
+  font-family: var(--font-mono-ui);
   font-size: var(--fs-xs);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
@@ -218,7 +221,7 @@
   padding: 13px 26px;
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
-  font-family: var(--font-sans);
+  font-family: var(--font-mono-ui);
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
   letter-spacing: var(--tracking-wide);
@@ -239,7 +242,7 @@
 
 .kade-btn--primary {
   background: linear-gradient(135deg, #f5d84a, var(--kade-gold));
-  color: var(--kade-ink);
+  color: var(--kade-on-brand);
 }
 .kade-btn--primary:hover { background: linear-gradient(135deg, var(--kade-gold), var(--kade-gold-deep)); }
 
@@ -355,7 +358,7 @@
   padding: 3px 9px;
   border-radius: var(--radius-xs);
   background: var(--kade-gold);
-  color: var(--kade-ink);
+  color: var(--kade-on-brand);
   font-size: var(--fs-2xs);
   font-weight: var(--fw-semibold);
   letter-spacing: var(--tracking-wide);
@@ -374,6 +377,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   gap: var(--space-2) var(--space-4);
+  font-family: var(--font-mono-ui);
   font-size: var(--fs-xs);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
@@ -410,6 +414,7 @@
 .kade-service-card:hover,
 .kade-service-card:focus-visible { background: var(--kade-gold); }
 .kade-service-card__index {
+  font-family: var(--font-mono-ui);
   font-size: var(--fs-2xs);
   letter-spacing: var(--tracking-wider);
   color: var(--kade-ink-3);
@@ -453,13 +458,17 @@
   color: var(--kade-ink-4);
 }
 
+/* Hover'da kartın zemini ALTIN olur. Altın her iki temada da açık bir renk,
+   bu yüzden üstündeki metin temaya göre değişmez — koyu kalır. Burada
+   --kade-ink kullanmak koyu temada beyaz-üstü-altın (1.6:1) üretiyordu. */
 .kade-service-card:hover .kade-service-card__index,
-.kade-service-card:hover .kade-service-card__desc { color: rgba(23, 19, 10, 0.72); }
+.kade-service-card:hover .kade-service-card__desc { color: color-mix(in srgb, var(--kade-on-brand) 76%, transparent); }
+.kade-service-card:hover .kade-service-card__title { color: var(--kade-on-brand); }
 .kade-service-card:hover .kade-service-card__tags li {
-  border-color: rgba(23, 19, 10, 0.28);
-  color: rgba(23, 19, 10, 0.72);
+  border-color: color-mix(in srgb, var(--kade-on-brand) 30%, transparent);
+  color: color-mix(in srgb, var(--kade-on-brand) 76%, transparent);
 }
-.kade-service-card:hover .kade-service-card__meta { color: rgba(23, 19, 10, 0.55); }
+.kade-service-card:hover .kade-service-card__meta { color: color-mix(in srgb, var(--kade-on-brand) 58%, transparent); }
 
 /* ---------------------------------------------------------------------------
    7) MARQUEE
@@ -595,6 +604,7 @@
 /* Kart türü rozeti — müşteri işi olmayan kayıtlar açıkça işaretlenir.
    Medya kutusunun akışından sonra, başlığın üstünde durur. */
 .kade-card__kind {
+  font-family: var(--font-mono-ui);
   align-self: flex-start;
   padding: 3px 10px;
   border: 1px solid var(--kade-line-strong);

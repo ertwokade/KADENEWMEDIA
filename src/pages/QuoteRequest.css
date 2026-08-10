@@ -91,8 +91,11 @@
   color: var(--text-primary);
 }
 
+/* --primary (#e0a81f) DOLGU tonu; 14,7px metin olarak krem zeminde 2,1:1
+   kalıyordu. Aktif adım etiketinin okunur olması şart — bu, formda nerede
+   olduğunu söyleyen tek gösterge. */
 .quote-step.active .quote-step-title {
-  color: var(--primary);
+  color: var(--kade-gold-text);
 }
 
 .quote-step-bar {

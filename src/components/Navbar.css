@@ -10,8 +10,16 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 56px;
-  font-family: var(--font-sans);
-  background: linear-gradient(var(--bg-primary, #fbfaf4) 55%, transparent);
+  font-family: var(--font-mono-ui);
+  /* Yumuşak perde — düz zemin DEĞİL. Giriş bölümünün lacivert sahnesi ve
+     ışın patlaması nav'ın altından geçiyor; opak bir şerit ikisini de
+     kesiyordu. Yalnız üst kenarda hafif bir koyulaşma bırakılır, bu da
+     nav metnini her zeminde okunur tutmaya yetiyor. */
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--bg-primary) 72%, transparent),
+    transparent
+  );
   pointer-events: none;
 }
 .knav > * { pointer-events: auto; }
@@ -20,13 +28,12 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  font-family: var(--font-sans);
-  font-variation-settings: "wght" 700, "wdth" 120;
+  font-family: var(--font-mono-ui);
   font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.02em;
+  font-size: 15px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ky-ink, #17130a);
+  color: var(--ky-ink, var(--kade-ink));
   text-decoration: none;
   padding: 8px;
 }
@@ -46,14 +53,14 @@
   .knav-brand__mark { width: 22px; height: 22px; }
 }
 
-.knav-links { display: flex; align-items: center; gap: 0 22px; }
+.knav-links { display: flex; align-items: center; gap: 0 26px; }
 .knav-link {
   position: relative;
   font-family: inherit;
-  font-size: 13px;
-  letter-spacing: 0.02em;
+  font-size: 12px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ky-ink, #17130a);
+  color: var(--ky-ink, var(--kade-ink));
   text-decoration: none;
   background: none; border: none; cursor: pointer;
   padding: 8px 4px;
@@ -67,7 +74,7 @@
   pointer-events: none;
 }
 .knav-link:hover::before, .knav-link.active::before {
-  border-color: var(--ky-ink, #17130a);
+  border-color: var(--ky-ink, var(--kade-line-strong));
 }
 .knav-tema {
   display: inline-grid;
@@ -87,9 +94,9 @@
   z-index: 10001;
   display: inline-flex; align-items: center; gap: 8px;
   background: linear-gradient(135deg, #f5d84a, #e0a81f);
-  color: #17130a;
-  font-family: var(--font-sans);
-  font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
+  color: var(--kade-on-brand);
+  font-family: var(--font-mono-ui);
+  font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500;
   /* Dokunma hedefi alt sınırı — WCAG 2.1 AA hedefimiz 44px.
      Eski değer 39px ölçülüyordu. */
   min-height: var(--tap-min, 44px);
@@ -101,13 +108,13 @@
 
 /* Mobil menü içindeki GİRİŞ girişi — diğer menü satırlarıyla aynı dilde,
    yalnız altın vurgusuyla ayrılır. */
-.knav-mlink--giris { color: #8a5a00; font-weight: 600; }
+.knav-mlink--giris { color: var(--kade-gold-text); font-weight: 600; }
 
 /* mobil */
 .knav-burger {
   display: none;
   background: none; border: none; cursor: pointer;
-  color: var(--ky-ink, #17130a);
+  color: var(--ky-ink, var(--kade-ink));
   padding: 8px;
 }
 .knav-mobile {
@@ -115,18 +122,18 @@
   top: 100%; left: 0; right: 0;
   display: flex; flex-direction: column;
   background: var(--bg-primary, #fbfaf4);
-  border-bottom: 1px solid rgba(23, 19, 10, 0.11);
+  border-bottom: 1px solid var(--kade-line);
   padding: 8px 20px 18px;
 }
 .knav-mlink {
-  font-family: var(--font-sans);
-  font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase;
-  color: var(--ky-ink, #17130a); text-decoration: none;
+  font-family: var(--font-mono-ui);
+  font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ky-ink, var(--kade-ink)); text-decoration: none;
   background: none; border: none; text-align: left; cursor: pointer;
   padding: 13px 0;
-  border-bottom: 1px solid rgba(23, 19, 10, 0.07);
+  border-bottom: 1px solid var(--kade-line);
 }
-.knav-mlink.active { color: #c8901a; }
+.knav-mlink.active { color: var(--kade-gold-text); }
 .knav-mlink--theme {
   display: grid;
   width: 42px;
@@ -134,7 +141,7 @@
   place-items: center;
   align-self: flex-start;
   padding: 0;
-  border: 1px solid rgba(23, 19, 10, 0.12);
+  border: 1px solid var(--kade-line);
   border-radius: 50%;
 }
 

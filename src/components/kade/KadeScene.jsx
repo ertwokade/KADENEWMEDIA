@@ -20,7 +20,7 @@ function useHelloGeometry() {
   }, [gltf])
 }
 
-function Glass({ pointer }) {
+function Glass({ pointer, dark }) {
   const ref = useRef()
   const { viewport } = useThree()
   const geometry = useHelloGeometry()
@@ -34,11 +34,19 @@ function Glass({ pointer }) {
   })
   return (
     <mesh ref={ref} geometry={geometry} scale={scale}>
+      {/* Cam malzeme ARKASINDAKİNİ geçirir. Koyu lacivert zeminde tam
+          geçirgenlik objeyi zeminin rengine boyuyor, yani siyah bir leke
+          bırakıyordu. Koyu temada geçirgenlik biraz kısılır ve malzemeye
+          kendi sıcak rengi verilir: obje zeminden ayrılır, referans
+          tasarımdaki amber "hello" geri gelir. */}
       <MeshTransmissionMaterial
-        transmission={1} thickness={3.2} roughness={0.03} ior={1.34} chromaticAberration={0.4}
+        transmission={dark ? 0.82 : 1} thickness={dark ? 2.1 : 3.2}
+        roughness={0.03} ior={1.34} chromaticAberration={0.4}
         anisotropicBlur={0.04} distortion={0.2} distortionScale={0.35} temporalDistortion={0.1}
         backside backsideThickness={1.0} samples={6} resolution={896}
-        color="#ffffff" attenuationColor="#f79a1e" attenuationDistance={0.55}
+        color={dark ? '#f6a94b' : '#ffffff'}
+        attenuationColor="#f79a1e"
+        attenuationDistance={dark ? 0.9 : 0.55}
       />
     </mesh>
   )
@@ -58,15 +66,17 @@ export default function KadeScene({ dark = false }) {
     // boş bir alan ve havada duran obje görüyordu. Sahne, kapsayıcısı olan
     // giriş bölümünün içinde kalmalı.
     <Canvas className="kade-canvas" style={{ position: 'absolute', inset: 0, zIndex: 0 }} camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]} gl={{ antialias: true, alpha: false }}>
-      <color attach="background" args={[dark ? '#100d06' : '#fbfaf4']} />
-      <ambientLight intensity={1.1} />
-      <directionalLight position={[-2, 3, 4]} intensity={1.2} />
+      <color attach="background" args={[dark ? '#0a1030' : '#fbfaf4']} />
+      {/* Koyu sahnede aynı ışık şiddeti objeyi görünmez bırakıyor: zemin
+          parlaklığı düştüğü için yansıyacak ışık da kalmıyor. */}
+      <ambientLight intensity={dark ? 1.9 : 1.1} />
+      <directionalLight position={[-2, 3, 4]} intensity={dark ? 2.4 : 1.2} />
       <Background dark={dark} />
       <Environment resolution={256}>
-        <Lightformer intensity={2} position={[0, 3, 4]} scale={[10, 5, 1]} color="#fff6da" />
-        <Lightformer intensity={1.3} position={[-4, 1, 2]} scale={[6, 6, 1]} color="#ffd766" />
+        <Lightformer intensity={dark ? 4.2 : 2} position={[0, 3, 4]} scale={[10, 5, 1]} color="#fff6da" />
+        <Lightformer intensity={dark ? 3 : 1.3} position={[-4, 1, 2]} scale={[6, 6, 1]} color="#ffd766" />
       </Environment>
-      <Suspense fallback={null}><Glass pointer={pointer} /></Suspense>
+      <Suspense fallback={null}><Glass pointer={pointer} dark={dark} /></Suspense>
     </Canvas>
   )
 }

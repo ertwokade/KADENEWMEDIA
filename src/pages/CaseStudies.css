@@ -78,7 +78,7 @@
 .case-platform-tag {
   padding: 3px 10px;
   border-radius: 100px;
-  background: rgba(23, 19, 10, 0.06);
+  background: var(--kade-surface-3);
   border: 1px solid var(--border-color);
   font-size: 0.75rem;
   color: var(--text-secondary);
@@ -162,7 +162,7 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(23, 19, 10,0.08);
+  background: var(--kade-surface-3);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   color: var(--text-secondary);
@@ -178,7 +178,7 @@
 }
 
 .case-modal-close:hover {
-  background: rgba(23, 19, 10,0.15);
+  background: var(--kade-surface-3);
   color: var(--white);
 }
 
@@ -224,7 +224,7 @@
 }
 
 .case-metric-card {
-  background: rgba(23, 19, 10, 0.03);
+  background: var(--kade-surface-2);
   border-radius: 12px;
   padding: 16px;
 }
@@ -267,7 +267,7 @@
 
 /* Testimonial */
 .case-testimonial {
-  background: rgba(23, 19, 10, 0.03);
+  background: var(--kade-surface-2);
   border-radius: 12px;
   padding: 20px !important;
   margin-top: 8px;

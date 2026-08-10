@@ -98,7 +98,7 @@ a.contact-card-value:hover {
   width: 42px;
   height: 42px;
   border-radius: 10px;
-  background: rgba(23, 19, 10, 0.05);
+  background: var(--kade-surface-2);
   border: 1px solid var(--border-color);
   color: var(--gray-lighter);
   transition: all 0.3s ease;
@@ -144,7 +144,7 @@ a.contact-card-value:hover {
 .form-group textarea {
   width: 100%;
   padding: 14px 16px;
-  background: rgba(23, 19, 10, 0.04);
+  background: var(--kade-surface-2);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   color: var(--white);
@@ -209,7 +209,7 @@ a.contact-card-value:hover {
   content: '';
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(23, 19, 10, 0.3);
+  border: 2px solid var(--kade-line-strong);
   border-top-color: var(--white);
   border-radius: 50%;
   animation: spinLoader 0.6s linear infinite;
@@ -310,8 +310,8 @@ a.contact-card-value:hover {
   gap: 10px;
   padding: 12px 16px;
   border-radius: 10px;
-  border: 1px solid rgba(23, 19, 10, 0.08);
-  background: rgba(23, 19, 10, 0.02);
+  border: 1px solid var(--kade-line);
+  background: var(--kade-surface-2);
   cursor: pointer;
   transition: all 0.2s;
   font-size: 0.9rem;
@@ -337,7 +337,7 @@ a.contact-card-value:hover {
   width: 20px;
   height: 20px;
   border-radius: 6px;
-  border: 2px solid rgba(23, 19, 10, 0.15);
+  border: 2px solid var(--kade-line);
   display: flex;
   align-items: center;
   justify-content: center;

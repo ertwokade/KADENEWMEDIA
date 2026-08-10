@@ -1,15 +1,24 @@
 /* =====================================================================
-   KADE YENİ — anasayfanın (site.html / "hello") GERÇEK dilini React
-   app'in tamamına taşır: /admin, /giris, /paketler, kit panelleri…
-   Onaylı v2 statik şablonla aynı token'lar:
-     bg #fbfaf4 · elevated #efede7 · ink #17130a · gold #e0a81f
+   KADE YENİ — anasayfanın GERÇEK dilini React app'in tamamına taşır:
+   /admin, /giris, /paketler, kit panelleri…
+
+   VARSAYILAN YÜZEY KOYU'dur:
+     koyu   bg #0f1111 · elevated #191b1b · ink #ffffff · gold #e0a81f
+     açık   bg #fbfaf4 · elevated #efede7 · ink #17130a · gold #e0a81f
+   Açık palet kaybolmadı; `[data-theme="light"]` altında ve ürün
+   arayüzlerinde (`body.kade-app-ui`) aynen yürürlükte.
+
      tek aile: Poppins (400/500/600/700) — bkz. styles/kade-tokens.css
-     etiket: "— LABEL" mono, .2em tracking · kart: düz border, r6-8
+     etiket: mono, .2em tracking (.kade-mono) · kart: düz border, r6-8
    En son import edilir (main.jsx) — paylaşılan sınıfları override eder.
    ===================================================================== */
 
 
-:root, [data-theme="light"] {
+/* `:root` BİLEREK yok: koyu tema artık varsayılan ve aşağıdaki
+   `html[data-theme="dark"]` bloğundan gelir. Bu blok yalnız açık temayı ve
+   açık palete sabitlenmiş ürün arayüzlerini besler. */
+[data-theme="light"],
+body.kade-app-ui {
   --bg-primary: #fbfaf4;
   --black: #fbfaf4;
   --black-light: #f4f2e9;
@@ -22,7 +31,14 @@
   --ky-gold-deep: #c8901a;
   --ky-line: rgba(23, 19, 10, 0.11);
 }
-html, body, #root { background: #fbfaf4 !important; }
+
+html[data-theme="light"],
+html[data-theme="light"] body,
+html[data-theme="light"] #root,
+body.kade-app-ui,
+body.kade-app-ui #root {
+  background: #fbfaf4 !important;
+}
 
 /* ---------- 1) BAŞLIKLAR: anasayfa display dili ---------- */
 .section-title,
@@ -53,7 +69,7 @@ html, body, #root { background: #fbfaf4 !important; }
   font-size: 12px !important;
   font-weight: 400 !important;
   letter-spacing: 0.2em !important;
-  color: rgba(23, 19, 10, 0.55) !important;
+  color: var(--kade-ink-3) !important;
   text-transform: uppercase !important;
   gap: 10px !important;
 }
@@ -70,7 +86,7 @@ html, body, #root { background: #fbfaf4 !important; }
 /* ---------- 3) KARTLAR: düz bordered (glass/glow yok) ---------- */
 .glass-card, .value-card, .team-card, .feature-card, .pricing-card,
 .service-card, .tilt-card, .bento-item {
-  background: #fffdf6 !important;
+  background: var(--card-bg) !important;
   border: 1px solid var(--ky-line) !important;
   border-radius: 8px !important;
   backdrop-filter: none !important;
@@ -105,15 +121,15 @@ html, body, #root { background: #fbfaf4 !important; }
 }
 .btn-primary {
   background: linear-gradient(135deg, #f5d84a, #e0a81f) !important;
-  color: #17130a !important;
+  color: var(--kade-on-brand) !important;
   border: none !important;
   box-shadow: none !important;
 }
 .btn-outline {
-  border: 1px solid rgba(23, 19, 10, 0.35) !important;
+  border: 1px solid var(--kade-line-strong) !important;
   color: var(--ky-ink) !important;
 }
-.btn-outline:hover { background: var(--ky-ink) !important; color: #fbfaf4 !important; }
+.btn-outline:hover { background: var(--ky-ink) !important; color: var(--bg-primary) !important; }
 
 /* ---------- 6) NAVBAR: statik şablonla birebir ---------- */
 .navbar { font-family: var(--ky-mono); }
@@ -136,13 +152,13 @@ html, body, #root { background: #fbfaf4 !important; }
   font-family: var(--ky-tech) !important;
   font-size: 12px !important;
   background: linear-gradient(135deg, #f5d84a, #e0a81f) !important;
-  color: #17130a !important;
+  color: var(--kade-on-brand) !important;
 }
-.navbar.scrolled { background: rgba(251, 250, 244, 0.88); }
+.navbar.scrolled { background: color-mix(in srgb, var(--bg-primary) 88%, transparent); }
 
 /* ---------- 7) FOOTER: cream + mono uppercase ---------- */
 .footer, footer.footer {
-  background: #fbfaf4 !important;
+  background: var(--bg-primary) !important;
   border-top: 1px solid var(--ky-line) !important;
 }
 .footer h4, .footer h3, .footer-title {
@@ -150,7 +166,7 @@ html, body, #root { background: #fbfaf4 !important; }
   font-size: 12px !important;
   letter-spacing: 0.2em !important;
   text-transform: uppercase !important;
-  color: rgba(23, 19, 10, 0.55) !important;
+  color: var(--kade-ink-3) !important;
 }
 .footer a { font-family: var(--ky-mono); font-size: 13px; }
 
@@ -316,7 +332,7 @@ html, body, #root { background: #fbfaf4 !important; }
    ===================================================================== */
 .cookie-banner {
   background: #fffdf6 !important;
-  border: 1px solid rgba(23, 19, 10, 0.11) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 8px !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
@@ -332,10 +348,10 @@ html, body, #root { background: #fbfaf4 !important; }
   border-radius: 999px !important;
 }
 .whatsapp-float {
-  background: #17130a !important;
+  background: var(--kade-ink) !important;
   color: #fbfaf4 !important;
   box-shadow: none !important;
-  border: 1px solid rgba(23, 19, 10, 0.2) !important;
+  border: 1px solid var(--kade-line-strong) !important;
 }
 .whatsapp-float:hover { background: #2a251a !important; }
 
@@ -343,10 +359,9 @@ html, body, #root { background: #fbfaf4 !important; }
    ANASAYFA ARKA PLANI — gold ışık + thirds grid, app'in tamamında
    ===================================================================== */
 html, body, #root {
-  background:
-    radial-gradient(70vw 60vh at 74% -10%, rgba(235, 198, 105, 0.26), transparent 65%),
+  background: radial-gradient(70vw 60vh at 74% -10%, rgba(235, 198, 105, 0.26), transparent 65%),
     radial-gradient(50vw 40vh at 6% 104%, rgba(235, 198, 105, 0.10), transparent 70%),
-    linear-gradient(90deg, rgba(23, 19, 10, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, var(--kade-surface-2) 1px, transparent 1px),
     #fbfaf4 !important;
   background-size: auto, auto, 33.333% 100%, auto !important;
   background-attachment: fixed !important;
@@ -359,7 +374,7 @@ html, body, #root {
 .login-bg-glow { display: none !important; }
 .login-card {
   background: #fffdf6 !important;
-  border: 1px solid rgba(23, 19, 10, 0.11) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 10px !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
@@ -377,13 +392,13 @@ html, body, #root {
   font-weight: 800 !important;
   text-transform: uppercase !important;
   font-size: 22px !important;
-  color: #17130a !important;
+  color: var(--kade-ink) !important;
 }
 .login-input {
-  background: rgba(23, 19, 10, 0.035) !important;
-  border: 1px solid rgba(23, 19, 10, 0.12) !important;
+  background: var(--kade-surface-2) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 6px !important;
-  color: #17130a !important;
+  color: var(--kade-ink) !important;
 }
 .login-input:focus {
   border-color: rgba(224, 168, 31, 0.72) !important;
@@ -435,7 +450,7 @@ html, body, #root {
 .login-tabs, .auth-tabs {
   background: none !important;
   border: none !important;
-  border-bottom: 1px solid rgba(23, 19, 10, 0.12) !important;
+  border-bottom: 1px solid var(--kade-line) !important;
   border-radius: 0 !important;
   padding: 0 !important;
   gap: 18px !important;
@@ -449,12 +464,12 @@ html, body, #root {
   font-size: 12px !important;
   letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
-  color: rgba(23, 19, 10, 0.5) !important;
+  color: var(--kade-ink-3) !important;
   padding: 10px 2px !important;
 }
 .login-tabs button.active, .auth-tabs button.active,
 .login-tabs button[aria-selected="true"], .auth-tabs button[aria-selected="true"] {
-  color: #17130a !important;
+  color: var(--kade-ink) !important;
   border-bottom: 2px solid #e0a81f !important;
 }
 /* input: ikonlar gizli, köşeli, mono placeholder */
@@ -475,7 +490,7 @@ html, body, #root {
   box-shadow: none !important;
 }
 .login-card a { color: #c8901a !important; }
-.login-logo, .login-logo::after { color: #17130a !important; }
+.login-logo, .login-logo::after { color: var(--kade-ink) !important; }
 }
 
 /* İşletim sisteminin doğal imleçlerini kullan. */
@@ -526,8 +541,8 @@ textarea,
   display: block !important; /* flex başlığı parçalayıp savuruyordu */
   text-align: left !important;
   word-spacing: normal !important;
-  color: #17130a !important;
-  -webkit-text-fill-color: #17130a !important;
+  color: var(--kade-ink) !important;
+  -webkit-text-fill-color: var(--kade-ink) !important;
   background: none !important;
   -webkit-background-clip: initial !important;
   background-clip: initial !important;
@@ -557,21 +572,21 @@ textarea,
   font-size: 12px !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
-  color: rgba(23,19,10,0.55) !important;
+  color: var(--kade-ink-3) !important;
   padding: 6px 8px !important;
   transition: color .2s, border-color .2s !important;
 }
 .blog-category-chips button:hover, .portfolio-filters button:hover,
 .category-chips button:hover, .filter-bar button:hover,
 [class*="filter"] button:hover, [class*="-chips"] button:hover {
-  color: #17130a !important;
-  border-color: rgba(23,19,10,0.35) !important;
+  color: var(--kade-ink) !important;
+  border-color: var(--kade-line-strong) !important;
   border-style: dotted !important;
 }
 .blog-category-chips button.active, .portfolio-filters button.active,
 .category-chips button.active, .filter-bar button.active,
 [class*="filter"] button.active, [class*="-chips"] button.active {
-  color: #17130a !important;
+  color: var(--kade-ink) !important;
   border: none !important;
   border-bottom: 2px solid #e0a81f !important;
   border-radius: 0 !important;
@@ -579,8 +594,8 @@ textarea,
 
 /* --- 2) ARAMA KUTUSU → düz köşeli mono --- */
 .blog-search-wrapper, .blog-search-input, .site-search input, .search-input {
-  background: rgba(23,19,10,0.035) !important;
-  border: 1px solid rgba(23,19,10,0.12) !important;
+  background: var(--kade-surface-2) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 4px !important;
   box-shadow: none !important;
   font-family: var(--font-sans);
@@ -593,14 +608,14 @@ input[type="range"] {
 }
 input[type="range"]::-webkit-slider-thumb { background: #e0a81f !important; }
 input[type="range"]::-moz-range-thumb { background: #e0a81f !important; border: none !important; }
-input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0.10) !important; }
+input[type="range"]::-webkit-slider-runnable-track { background: var(--kade-surface-3) !important; }
 
 /* --- 4) KART GRUBU → düz bordered (glow/blur/radius sıfır) --- */
 .portfolio-card, .blog-card, .partner-card, .stat-card, .kk-card,
 .tool-card, .case-card, .testimonial-card, .demo-card, .press-card,
 .newsletter-card, .referral-card, .podcast-card, .service-card {
   background: #fffdf6 !important;
-  border: 1px solid rgba(23,19,10,0.11) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 6px !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
@@ -628,7 +643,7 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 }
 .case-duration-tag, .case-platform-tag, .case-metric-label, .case-mini-label,
 .case-summary-label, .portfolio-metric-label {
-  color: rgba(23,19,10,0.55) !important;
+  color: var(--kade-ink-3) !important;
   font-family: var(--font-sans);
   text-transform: uppercase !important;
   letter-spacing: 0.08em !important;
@@ -637,8 +652,8 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 
 /* --- 6) KADE KIT → editoryal --- */
 .kk-title span, [class*="-hero"] h1 span, .hero-title span, .page-title span {
-  color: #17130a !important;
-  -webkit-text-fill-color: #17130a !important;
+  color: var(--kade-ink) !important;
+  -webkit-text-fill-color: var(--kade-ink) !important;
   font-family: inherit !important;
   font-style: normal !important;
   background: none !important;
@@ -653,7 +668,7 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 .kk-toggle {
   background: none !important;
   border: none !important;
-  border-bottom: 1px solid rgba(23,19,10,0.12) !important;
+  border-bottom: 1px solid var(--kade-line) !important;
   border-radius: 0 !important;
   padding: 0 !important;
   gap: 18px !important;
@@ -686,37 +701,37 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 .kk-badge::before { content: '★ '; }
 .kk-price, .kk-amount {
   font-family: var(--font-sans);
-  color: #17130a !important;
-  -webkit-text-fill-color: #17130a !important;
+  color: var(--kade-ink) !important;
+  -webkit-text-fill-color: var(--kade-ink) !important;
   background: none !important;
   font-weight: 600 !important;
 }
 .kk-chk { color: #c8901a !important; }
 
 /* --- 7) hero'daki büyük başlık span'leri düz kalsın (tekrar teyit) --- */
-[class*="-hero"] .section-title span { color:#17130a !important; -webkit-text-fill-color:#17130a !important; background:none !important; font-style:normal !important; }
+[class*="-hero"] .section-title span { color: var(--kade-ink) !important; -webkit-text-fill-color: var(--kade-ink) !important; background:none !important; font-style:normal !important; }
 
 /* --- portfolio metrik sayıları: inline renk -> ink mono --- */
 .portfolio-metric-value {
-  color: #17130a !important;
+  color: var(--kade-ink) !important;
   font-family: var(--font-sans);
   font-weight: 600 !important;
 }
-.portfolio-card-header { border-bottom: 1px solid rgba(23,19,10,0.11) !important; }
+.portfolio-card-header { border-bottom: 1px solid var(--kade-line) !important; }
 
 /* --- Referanslar üst istatistikleri: emoji gizle, düz mono kart --- */
 .referanslar-istatistikler .glass-card,
 .referanslar-istatistikler > * {
   background: #fffdf6 !important;
-  border: 1px solid rgba(23,19,10,0.11) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 6px !important;
   box-shadow: none !important;
 }
 .ist-ikon { display: none !important; }
 .ist-rakam {
   font-family: var(--font-sans);
-  color: #17130a !important;
-  -webkit-text-fill-color: #17130a !important;
+  color: var(--kade-ink) !important;
+  -webkit-text-fill-color: var(--kade-ink) !important;
   background: none !important;
   font-weight: 600 !important;
 }
@@ -734,18 +749,18 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
   font-size: 12px !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
-  color: rgba(23,19,10,0.55) !important;
+  color: var(--kade-ink-3) !important;
   padding: 6px 8px !important;
 }
 .referanslar-filtre-btn:hover, [class*="filtre"] button:hover {
-  color: #17130a !important; border-color: rgba(23,19,10,0.35) !important; border-style: dotted !important;
+  color: var(--kade-ink) !important; border-color: var(--kade-line-strong) !important; border-style: dotted !important;
 }
 .referanslar-filtre-btn.active, [class*="filtre"] button.active {
-  color: #17130a !important; border: none !important;
+  color: var(--kade-ink) !important; border: none !important;
   border-bottom: 2px solid #e0a81f !important; border-radius: 0 !important;
 }
 .sayfalama-btn {
-  background: none !important; border: 1px solid rgba(23,19,10,0.2) !important;
+  background: none !important; border: 1px solid var(--kade-line-strong) !important;
   border-radius: 4px !important; box-shadow: none !important;
   font-family: var(--font-sans); text-transform: uppercase !important;
 }
@@ -769,8 +784,8 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 [class*="-hero"] .section-title span, [class*="-hero"] h1 span,
 [class*="hero"] h1 span, .demo-title span, .kk-title span, .hero-title span,
 .page-title span {
-  color: #17130a !important;
-  -webkit-text-fill-color: #17130a !important;
+  color: var(--kade-ink) !important;
+  -webkit-text-fill-color: var(--kade-ink) !important;
   background: none !important;
   font-style: normal !important;
   font-family: inherit !important;
@@ -790,8 +805,8 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
   text-transform: uppercase !important;
 }
 .partner-logo-large {
-  background: rgba(23,19,10,0.04) !important;
-  border: 1px solid rgba(23,19,10,0.11) !important;
+  background: var(--kade-surface-2) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 6px !important;
 }
 .partner-logo-large span { display: none !important; }   /* emoji logo */
@@ -817,8 +832,8 @@ input[type="range"]::-webkit-slider-runnable-track { background: rgba(23,19,10,0
 /* --- kesin: hero başlığı tek renk ink (gradient-clip + transform offset yok) --- */
 [class*="-hero"] .section-title, [class*="-hero"] .section-title *,
 [class*="hero"] h1, [class*="hero"] h1 * {
-  color: #17130a !important;
-  -webkit-text-fill-color: #17130a !important;
+  color: var(--kade-ink) !important;
+  -webkit-text-fill-color: var(--kade-ink) !important;
   background: none !important;
   -webkit-background-clip: border-box !important;
   background-clip: border-box !important;
@@ -910,9 +925,8 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   transform-style: preserve-3d;
   border: 1px solid transparent !important;
   border-radius: 16px !important;
-  background:
-    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
-    linear-gradient(135deg, rgba(224, 168, 31, 0.50), rgba(23, 19, 10, 0.12)) border-box !important;
+  background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    linear-gradient(135deg, rgba(224, 168, 31, 0.50), var(--kade-surface-3)) border-box !important;
   box-shadow: 0 10px 30px -22px rgba(23, 19, 10, 0.50) !important;
   transition: transform 0.24s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.34s ease;
 }
@@ -988,27 +1002,27 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
    SYSTEM / DARK THEME — marketing site and shared customer tools
    ===================================================================== */
 html[data-theme="dark"] {
-  --bg-primary: #0b0b0a;
-  --black: #0b0b0a;
-  --black-light: #11110f;
-  --black-lighter: #171612;
-  --dark-gray: #1c1b17;
-  --gray: #27251e;
-  --gray-light: rgba(247, 243, 232, 0.58);
-  --gray-lighter: rgba(247, 243, 232, 0.76);
-  --white: #f7f3e8;
-  --white-dim: #ddd7c8;
-  --text-primary: #f7f3e8;
-  --text-secondary: rgba(247, 243, 232, 0.62);
+  --bg-primary: #0f1111;
+  --black: #0f1111;
+  --black-light: #151717;
+  --black-lighter: #191b1b;
+  --dark-gray: #232626;
+  --gray: #2d3030;
+  --gray-light: rgba(230, 232, 232, 0.58);
+  --gray-lighter: rgba(230, 232, 232, 0.76);
+  --white: #ffffff;
+  --white-dim: rgba(230, 232, 232, 0.86);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(230, 232, 232, 0.62);
   --bg-secondary: rgba(255, 255, 255, 0.045);
-  --card-bg: #131310;
-  --border-color: rgba(247, 243, 232, 0.13);
+  --card-bg: #17191a;
+  --border-color: rgba(230, 232, 232, 0.13);
   --border-color-hover: rgba(224, 168, 31, 0.56);
-  --border: rgba(247, 243, 232, 0.13);
-  --ky-ink: #f7f3e8;
+  --border: rgba(230, 232, 232, 0.13);
+  --ky-ink: #ffffff;
   --ky-gold: #e8b83b;
   --ky-gold-deep: #f0c95a;
-  --ky-line: rgba(247, 243, 232, 0.13);
+  --ky-line: rgba(230, 232, 232, 0.13);
   color-scheme: dark;
 }
 
@@ -1018,20 +1032,20 @@ html[data-theme="dark"] #root {
   background:
     radial-gradient(70vw 60vh at 74% -10%, rgba(224, 168, 31, 0.16), transparent 65%),
     radial-gradient(50vw 40vh at 6% 104%, rgba(224, 168, 31, 0.08), transparent 70%),
-    linear-gradient(90deg, rgba(247, 243, 232, 0.045) 1px, transparent 1px),
-    #0b0b0a !important;
+    linear-gradient(90deg, rgba(230, 232, 232, 0.045) 1px, transparent 1px),
+    #0f1111 !important;
   background-size: auto, auto, 33.333% 100%, auto !important;
-  color: #f7f3e8;
+  color: #ffffff;
 }
 
 html[data-theme="dark"] .knav {
-  background: linear-gradient(#0b0b0a 55%, transparent);
+  background: linear-gradient(#0f1111 55%, transparent);
 }
 
 html[data-theme="dark"] .knav-mobile,
 html[data-theme="dark"] .navbar.scrolled {
   background: rgba(11, 11, 10, 0.96) !important;
-  border-color: rgba(247, 243, 232, 0.12) !important;
+  border-color: rgba(230, 232, 232, 0.12) !important;
 }
 
 html[data-theme="dark"] .knav-brand,
@@ -1041,18 +1055,18 @@ html[data-theme="dark"] .knav-mlink,
 html[data-theme="dark"] .navbar-link,
 html[data-theme="dark"] .navbar .logo-word,
 html[data-theme="dark"] .navbar .logo-word span {
-  color: #f7f3e8 !important;
+  color: #ffffff !important;
 }
 
 html[data-theme="dark"] .knav-link:hover::before,
 html[data-theme="dark"] .knav-link.active::before {
-  border-color: #f7f3e8;
+  border-color: #ffffff;
 }
 
 html[data-theme="dark"] .footer,
 html[data-theme="dark"] footer.footer {
-  background: #0b0b0a !important;
-  border-color: rgba(247, 243, 232, 0.12) !important;
+  background: #0f1111 !important;
+  border-color: rgba(230, 232, 232, 0.12) !important;
 }
 
 html[data-theme="dark"] .footer h4,
@@ -1062,8 +1076,8 @@ html[data-theme="dark"] .footer a,
 html[data-theme="dark"] .footer p,
 html[data-theme="dark"] .footer li,
 html[data-theme="dark"] .footer-bottom {
-  color: rgba(247, 243, 232, 0.66) !important;
-  border-color: rgba(247, 243, 232, 0.1) !important;
+  color: rgba(230, 232, 232, 0.66) !important;
+  border-color: rgba(230, 232, 232, 0.1) !important;
 }
 
 html[data-theme="dark"] .section-title,
@@ -1082,8 +1096,8 @@ html[data-theme="dark"] .kk-title,
 html[data-theme="dark"] .kk-title *,
 html[data-theme="dark"] .demo-title,
 html[data-theme="dark"] .demo-title * {
-  color: #f7f3e8 !important;
-  -webkit-text-fill-color: #f7f3e8 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 html[data-theme="dark"] .section-badge,
@@ -1093,7 +1107,7 @@ html[data-theme="dark"] .story-stat-label,
 html[data-theme="dark"] [class*="-card-category"],
 html[data-theme="dark"] [class*="-metric-label"],
 html[data-theme="dark"] [class*="-summary-label"] {
-  color: rgba(247, 243, 232, 0.6) !important;
+  color: rgba(230, 232, 232, 0.6) !important;
 }
 
 html[data-theme="dark"] .glass-card,
@@ -1120,15 +1134,15 @@ html[data-theme="dark"] .podcast-card,
 html[data-theme="dark"] .referanslar-istatistikler .glass-card,
 html[data-theme="dark"] .referanslar-istatistikler > *,
 html[data-theme="dark"] .ok-access-card {
-  background: #131310 !important;
-  border-color: rgba(247, 243, 232, 0.13) !important;
-  color: #f7f3e8 !important;
+  background: #17191a !important;
+  border-color: rgba(230, 232, 232, 0.13) !important;
+  color: #ffffff !important;
 }
 
 html[data-theme="dark"] .kade-spot {
   background:
-    linear-gradient(#131310, #131310) padding-box,
-    linear-gradient(135deg, rgba(224, 168, 31, 0.65), rgba(247, 243, 232, 0.12)) border-box !important;
+    linear-gradient(#17191a, #17191a) padding-box,
+    linear-gradient(135deg, rgba(224, 168, 31, 0.65), rgba(230, 232, 232, 0.12)) border-box !important;
   box-shadow: 0 18px 42px -28px rgba(0, 0, 0, 0.92) !important;
 }
 
@@ -1140,13 +1154,13 @@ html[data-theme="dark"] .blog-search-input,
 html[data-theme="dark"] .site-search input,
 html[data-theme="dark"] .search-input {
   background: rgba(255, 255, 255, 0.055) !important;
-  border-color: rgba(247, 243, 232, 0.15) !important;
-  color: #f7f3e8 !important;
+  border-color: rgba(230, 232, 232, 0.15) !important;
+  color: #ffffff !important;
 }
 
 html[data-theme="dark"] input::placeholder,
 html[data-theme="dark"] textarea::placeholder {
-  color: rgba(247, 243, 232, 0.42) !important;
+  color: rgba(230, 232, 232, 0.42) !important;
 }
 
 html[data-theme="dark"] .blog-category-chips button,
@@ -1159,7 +1173,7 @@ html[data-theme="dark"] .referanslar-filtre-btn,
 html[data-theme="dark"] [class*="filtre"] button,
 html[data-theme="dark"] [class*="filtre-btn"],
 html[data-theme="dark"] [class*="kategori"] button {
-  color: rgba(247, 243, 232, 0.62) !important;
+  color: rgba(230, 232, 232, 0.62) !important;
 }
 
 html[data-theme="dark"] .blog-category-chips button:hover,
@@ -1170,34 +1184,37 @@ html[data-theme="dark"] [class*="filter"] button:hover,
 html[data-theme="dark"] [class*="filter"] button.active,
 html[data-theme="dark"] [class*="filtre"] button:hover,
 html[data-theme="dark"] [class*="filtre"] button.active {
-  color: #f7f3e8 !important;
+  color: #ffffff !important;
 }
 
 html[data-theme="dark"] .portfolio-metric-value,
 html[data-theme="dark"] .ist-rakam,
 html[data-theme="dark"] .kk-price,
 html[data-theme="dark"] .kk-amount {
-  color: #f7f3e8 !important;
-  -webkit-text-fill-color: #f7f3e8 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
+/* `mix-blend-mode: screen` KALDIRILDI. Bu perde artık --bg-primary'den
+   renk alıyor ve normal bir kararma yapıyor (bkz. index.css hero::after);
+   screen ile karıştırıldığında koyu temada hero'nun tepesine beyaza yakın
+   bir yıkama biniyor ve başlık okunmuyordu. */
 html[data-theme="dark"] [class*="-hero"]:not(h1):not([class*="-title"]):not([class*="-subtitle"]):not([class*="-badge"]):not([class*="-desc"])::after {
-  mix-blend-mode: screen;
-  opacity: 0.27;
+  opacity: 0.85;
 }
 
 html[data-theme="dark"] .btn-outline {
-  border-color: rgba(247, 243, 232, 0.42) !important;
-  color: #f7f3e8 !important;
+  border-color: rgba(230, 232, 232, 0.42) !important;
+  color: #ffffff !important;
 }
 
 html[data-theme="dark"] .btn-outline:hover {
-  background: #f7f3e8 !important;
-  color: #17130a !important;
+  background: #ffffff !important;
+  color: var(--kade-ink) !important;
 }
 
 html[data-theme="dark"] .grid-bg {
-  background-image: linear-gradient(90deg, rgba(247, 243, 232, 0.06) 1px, transparent 1px) !important;
+  background-image: linear-gradient(90deg, rgba(230, 232, 232, 0.06) 1px, transparent 1px) !important;
 }
 
 /* Tüm site ve yönetim ekranlarında tek tip marka yazı karakteri. */
@@ -1223,4 +1240,38 @@ code,
 pre,
 kbd {
   font-family: 'Poppins', sans-serif !important;
+}
+
+/* ---------------------------------------------------------------------
+   ETİKET KATMANI — yukarıdaki blanket kuralın TEK istisnası.
+
+   Sitenin görsel dili küçük, büyük harfli, geniş harf aralıklı bir
+   "teknik etiket" katmanı üzerine kurulu: navigasyon, eyebrow, kart meta
+   satırı, rozetler. Bunlar Poppins'le yazıldığında başlık tipografisinden
+   ayrışmıyor ve etiket gibi okunmuyorlar.
+
+   Kapsam bilerek dar: yalnız `.kade-mono` taşıyan öğeler ve çocukları.
+   GÖVDE METNİ, BAŞLIK VE FORM İÇERİĞİ HER ZAMAN POPPINS KALIR — bu sınıfı
+   paragraf veya başlığa vermeyin.
+--------------------------------------------------------------------- */
+.kade-mono,
+.kade-mono *,
+.kade-eyebrow,
+.kade-section-head__index,
+.kade-card__meta,
+.kade-card__kind,
+.kade-service-card__index,
+.kade-pagetop__meta,
+.kade-btn,
+.knav-link,
+.knav-mlink,
+.knav-giris,
+.section-badge,
+.hero-badge,
+.stat-label,
+.story-stat-label,
+.footer h3,
+.footer h4,
+.footer-title {
+  font-family: var(--font-mono-ui) !important;
 }

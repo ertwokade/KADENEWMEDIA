@@ -265,7 +265,7 @@ input, textarea {
   right: -30%;
   width: 45%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(23, 19, 10, 0.55), transparent);
+  background: linear-gradient(90deg, transparent, var(--kade-surface-3), transparent);
   transform: skewX(-18deg);
   opacity: 0;
   transition: right 0.6s ease, opacity 0.2s ease;
@@ -299,7 +299,7 @@ input, textarea {
 
 /* Cards */
 .glass-card {
-  background: rgba(23, 19, 10, 0.03);
+  background: var(--kade-surface-2);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
@@ -312,7 +312,7 @@ input, textarea {
 
 .glass-card:hover {
   border-color: var(--border-color-hover);
-  background: rgba(23, 19, 10, 0.06);
+  background: var(--kade-surface-3);
   transform: translateY(-4px) translateZ(0);
   box-shadow: var(--shadow-glow);
 }
@@ -376,28 +376,15 @@ input, textarea {
 
 /* ==========================================
    LIGHT THEME
+   ------------------------------------------
+   Buradaki değişken bloğu KALDIRILDI. Aşağıdaki "CINEMATIC THEME" bölümü
+   aynı isimleri `[data-theme="light"]` için yeniden tanımlıyor ve kaskadda
+   sonra geldiği için her zaman kazanıyordu — yani bu 15 bildirimden hiçbiri
+   yürürlükte değildi. Palet tek yerde: bkz. CINEMATIC THEME.
    ========================================== */
-[data-theme="light"] {
-  --black: #E8E2DC;
-  --black-light: #E0DAD4;
-  --black-lighter: #D8D2CC;
-  --dark-gray: #C8C2BC;
-  --gray: #9E9994;
-  --gray-light: #5C5753;
-  --gray-lighter: #3A3531;
-  --white: #1A1715;
-  --white-dim: #2C2825;
-  --text-secondary: #5C5753;
-  --bg-primary: #E8E2DC;
-  --border-color: rgba(0, 0, 0, 0.07);
-  --border-color-hover: rgba(234, 195, 33, 0.30);
-  --shadow-glow: 0 4px 24px rgba(234, 195, 33, 0.08);
-  --shadow-glow-strong: 0 4px 32px rgba(234, 195, 33, 0.14);
-}
-
 [data-theme="light"] body {
   background-color: transparent;
-  color: #1A1715;
+  color: var(--text-primary);
 }
 
 [data-theme="light"] .navbar.scrolled {
@@ -850,11 +837,49 @@ input, textarea {
    KADE MEDIA1 CINEMATIC THEME
    ========================================== */
 
-:root,
-[data-theme="light"] {
+/* Eski takma adlar (--black / --white / --gray …) sayfa CSS'lerinde ~40 yerde
+   geçiyor ve isimleri anlamlarını yansıtmıyor: `--black` SAYFA ZEMİNİ,
+   `--white` GÖVDE METNİ demek. Bu yüzden koyu temada `--black` koyu,
+   `--white` açık olur; krem temada tam tersi. Tek tek yeniden adlandırmak
+   yerine ikisi de burada, tek yerde temaya bağlanır.
+
+   Gerçek renk kararları kade-tokens.css'teki --kade-* tokenlarıdır; bu blok
+   yalnız onları eski isimlere köprüler. */
+:root {
   --primary: #e0a81f;
   --primary-dark: #c8901a;
   --primary-light: #fff2cc;
+  --black: #0f1111;
+  --black-light: #151717;
+  --black-lighter: #191b1b;
+  --dark-gray: #232626;
+  --gray: #2d3030;
+  --gray-light: rgba(230, 232, 232, 0.6);
+  --gray-lighter: rgba(230, 232, 232, 0.78);
+  --white: #ffffff;
+  --white-dim: rgba(230, 232, 232, 0.86);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(230, 232, 232, 0.64);
+  --text-tertiary: rgba(230, 232, 232, 0.4);
+  --bg-primary: #0f1111;
+  --bg-secondary: rgba(230, 232, 232, 0.05);
+  --card-bg: rgba(230, 232, 232, 0.035);
+  --border-color: rgba(230, 232, 232, 0.1);
+  --border-color-hover: rgba(224, 168, 31, 0.55);
+  --border: rgba(230, 232, 232, 0.1);
+  --gradient-primary: linear-gradient(135deg, #e8b93a 0%, #e0a81f 42%, #cf9414 100%);
+  --gradient-dark: linear-gradient(180deg, #0f1111 0%, #171a1a 100%);
+  --gradient-card: linear-gradient(145deg, rgba(230, 232, 232, 0.06), rgba(230, 232, 232, 0.02) 58%, rgba(224, 168, 31, 0.06));
+  --gradient-glow: radial-gradient(circle at center, rgba(224, 168, 31, 0.16), transparent 70%);
+  --shadow-glow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  --shadow-glow-strong: 0 20px 60px rgba(0, 0, 0, 0.55);
+  /* Font aileleri kade-tokens.css'ten miras alınır (Poppins). */
+  --section-padding: clamp(82px, 12vh, 150px) 0;
+  --container-width: 1280px;
+}
+
+[data-theme="light"],
+body.kade-app-ui {
   --black: #fdf6e3;
   --black-light: #f7edd6;
   --black-lighter: #f2e6c9;
@@ -871,26 +896,22 @@ input, textarea {
   --bg-secondary: rgba(23, 19, 10, 0.035);
   --card-bg: rgba(23, 19, 10, 0.026);
   --border-color: rgba(23, 19, 10, 0.10);
-  --border-color-hover: rgba(224, 168, 31, 0.55);
   --border: rgba(23, 19, 10, 0.10);
-  --gradient-primary: linear-gradient(135deg, #e8b93a 0%, #e0a81f 42%, #cf9414 100%);
   --gradient-dark: linear-gradient(180deg, #fdf6e3 0%, #f5ead0 100%);
   --gradient-card: linear-gradient(145deg, rgba(23, 19, 10, 0.045), rgba(23, 19, 10, 0.016) 58%, rgba(224, 168, 31, 0.05));
   --gradient-glow: radial-gradient(circle at center, rgba(224, 168, 31, 0.14), transparent 70%);
   --shadow-glow: 0 10px 40px rgba(23, 19, 10, 0.08);
   --shadow-glow-strong: 0 20px 60px rgba(23, 19, 10, 0.12);
-  /* Font aileleri kade-tokens.css'ten miras alınır (Poppins). */
-  --section-padding: clamp(82px, 12vh, 150px) 0;
-  --container-width: 1280px;
-  color-scheme: light;
 }
 
+/* Zemin artık sabit değil, tokendan gelir — TEMA düğmesi bu satır yüzünden
+   uzun süre hiçbir şeyi değiştirmiyordu (`!important` seçimi eziyordu). */
 html,
 body,
 #root {
   min-height: 100%;
-  background: #fdf6e3 !important;
-  color: var(--white) !important;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 body {
@@ -898,6 +919,7 @@ body {
   letter-spacing: 0 !important;
 }
 
+/* Zemin ışıması — iki temada da altın, yalnız taban rengi değişir. */
 body::before {
   content: '';
   position: fixed;
@@ -905,9 +927,9 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(90% 70% at 62% 12%, rgba(224, 168, 31, 0.06), transparent 62%),
+    radial-gradient(90% 70% at 62% 12%, rgba(224, 168, 31, 0.07), transparent 62%),
     radial-gradient(70% 60% at 18% 78%, rgba(224, 168, 31, 0.05), transparent 70%),
-    linear-gradient(180deg, rgba(253, 246, 227, 0.4), #fdf6e3 78%);
+    var(--gradient-dark);
 }
 
 body::after {
@@ -1025,7 +1047,7 @@ h6 {
   right: clamp(20px, 5vw, 72px);
   top: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(23, 19, 10, 0.07), transparent);
+  background: linear-gradient(90deg, transparent, var(--kade-surface-3), transparent);
   pointer-events: none;
 }
 
@@ -1045,7 +1067,7 @@ h6 {
   background: transparent !important;
   border: 0 !important;
   border-radius: 0 !important;
-  color: rgba(23, 19, 10, 0.56) !important;
+  color: var(--kade-ink-3) !important;
   font-size: 0.74rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.22em !important;
@@ -1095,7 +1117,7 @@ h6 {
 .section-subtitle {
   max-width: 580px !important;
   margin: 0 !important;
-  color: rgba(23, 19, 10, 0.58) !important;
+  color: var(--kade-ink-3) !important;
   font-size: clamp(0.98rem, 1.2vw, 1.08rem) !important;
   line-height: 1.68 !important;
 }
@@ -1131,9 +1153,9 @@ a.btn {
 
 .btn-outline,
 .mobile-login-cta {
-  background: rgba(23, 19, 10, 0.035) !important;
-  color: rgba(23, 19, 10, 0.78) !important;
-  border: 1px solid rgba(23, 19, 10, 0.11) !important;
+  background: var(--kade-surface-2) !important;
+  color: var(--kade-ink-2) !important;
+  border: 1px solid var(--kade-line) !important;
 }
 
 .btn-outline:hover,
@@ -1177,8 +1199,8 @@ a.btn {
 .referral-form,
 .referral-step,
 .referral-reward {
-  background: var(--gradient-card), rgba(253, 246, 227, 0.88) !important;
-  border: 1px solid rgba(23, 19, 10, 0.075) !important;
+  background: var(--gradient-card), var(--card-bg) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 16px !important;
   box-shadow: none !important;
   backdrop-filter: blur(14px) !important;
@@ -1201,7 +1223,7 @@ a.btn {
 .perk-card:hover,
 .value-card:hover {
   border-color: rgba(255, 212, 0, 0.42) !important;
-  background: linear-gradient(145deg, rgba(255, 212, 0, 0.06), rgba(23, 19, 10, 0.024) 52%, rgba(23, 19, 10, 0.045)), rgba(253, 246, 227, 0.92) !important;
+  background: linear-gradient(145deg, rgba(255, 212, 0, 0.06), var(--kade-surface-2) 52%, var(--kade-surface-2)), var(--card-bg) !important;
   box-shadow: 0 0 34px rgba(255, 212, 0, 0.09) !important;
 }
 
@@ -1235,7 +1257,7 @@ a.btn {
 .footer-desc,
 .footer-links-group li,
 .footer-links-group a {
-  color: rgba(23, 19, 10, 0.56) !important;
+  color: var(--kade-ink-3) !important;
 }
 
 .service-card h3,
@@ -1252,8 +1274,8 @@ a.btn {
 .contact-card-icon,
 .platform-icon,
 .social-link {
-  background: rgba(23, 19, 10, 0.035) !important;
-  border: 1px solid rgba(23, 19, 10, 0.09) !important;
+  background: var(--kade-surface-2) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 999px !important;
 }
 
@@ -1266,8 +1288,8 @@ select,
 .audit-input,
 .footer-newsletter-input,
 .search-input {
-  background: rgba(23, 19, 10, 0.035) !important;
-  border: 1px solid rgba(23, 19, 10, 0.095) !important;
+  background: var(--kade-surface-2) !important;
+  border: 1px solid var(--kade-line) !important;
   color: var(--white) !important;
   border-radius: 14px !important;
 }
@@ -1287,7 +1309,7 @@ select:focus,
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(23, 19, 10, 0.34) !important;
+  color: var(--kade-ink-4) !important;
 }
 
 select option {
@@ -1314,6 +1336,13 @@ select option {
   isolation: isolate;
 }
 
+/* Hero kararması — dekoratif zeminin (parçacık canvas'ı) alt kenara doğru
+   sayfa zeminine karışmasını sağlar.
+
+   Renk SAYFA ZEMİNİNDEN gelir (--bg-primary). Eskiden krem sabitti; koyu
+   temada bu, hero'nun üstüne beyaza yakın bir perde çekiyor ve başlığı
+   yıkıyordu. `--bg-primary` iki temada da doğru rengi verdiği için tek
+   kural iki temaya birden yetiyor. */
 .hero::before,
 [class*="-hero"]::before {
   content: '';
@@ -1323,7 +1352,12 @@ select option {
   pointer-events: none;
   background:
     radial-gradient(62% 58% at 60% 48%, rgba(255, 200, 0, 0.1), rgba(255, 200, 0, 0) 70%),
-    linear-gradient(180deg, rgba(253, 246, 227, 0.18) 0%, rgba(253, 246, 227, 0) 48%, rgba(253, 246, 227, 0.88) 100%);
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg-primary) 18%, transparent) 0%,
+      transparent 48%,
+      color-mix(in srgb, var(--bg-primary) 88%, transparent) 100%
+    );
 }
 
 .hero::after,
@@ -1333,7 +1367,11 @@ select option {
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: radial-gradient(120% 100% at 50% 0%, rgba(253, 246, 227, 0) 55%, rgba(253, 246, 227, 0.88) 100%);
+  background: radial-gradient(
+    120% 100% at 50% 0%,
+    transparent 55%,
+    color-mix(in srgb, var(--bg-primary) 88%, transparent) 100%
+  );
 }
 
 .hero-3d {
@@ -1362,7 +1400,7 @@ select option {
   margin-bottom: 22px;
   background: radial-gradient(circle at 3.5px 50%, #FFD400 0 3.5px, transparent 4px);
   filter: drop-shadow(0 0 10px rgba(255, 212, 0, 0.45));
-  color: rgba(23, 19, 10, 0.62);
+  color: var(--kade-ink-3);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.22em;
@@ -1395,7 +1433,7 @@ select option {
 .hero-subtitle {
   max-width: 340px !important;
   margin: 0 !important;
-  color: rgba(23, 19, 10, 0.58) !important;
+  color: var(--kade-ink-3) !important;
   font-size: 0.95rem !important;
   line-height: 1.5 !important;
 }
@@ -1408,7 +1446,7 @@ select option {
 }
 
 .hero-actions .btn-outline {
-  border-color: rgba(23, 19, 10, 0.1) !important;
+  border-color: var(--kade-line) !important;
 }
 
 .hero-platforms {
@@ -1417,7 +1455,7 @@ select option {
 }
 
 .platforms-label {
-  color: rgba(23, 19, 10, 0.42) !important;
+  color: var(--kade-ink-4) !important;
   font-size: 0.7rem !important;
   letter-spacing: 0.2em !important;
 }
@@ -1425,7 +1463,7 @@ select option {
 .platform-icon {
   width: 42px !important;
   height: 42px !important;
-  color: rgba(23, 19, 10, 0.68) !important;
+  color: var(--kade-ink-2) !important;
 }
 
 .platform-icon:hover,
@@ -1442,8 +1480,8 @@ select option {
 .trust-bar {
   margin-top: 0 !important;
   padding: 14px 0 !important;
-  border-color: rgba(23, 19, 10, 0.07) !important;
-  background: rgba(23, 19, 10, 0.018) !important;
+  border-color: var(--kade-line) !important;
+  background: var(--kade-surface-2) !important;
 }
 
 .stats-section {
@@ -1494,7 +1532,7 @@ select option {
 
 .cta-section,
 .footer {
-  border-top: 1px solid rgba(23, 19, 10, 0.07) !important;
+  border-top: 1px solid var(--kade-line) !important;
 }
 
 .cta-content {
@@ -1607,7 +1645,7 @@ iframe {
 .blog-card, .contact-card, .value-card, .partner-card, .team-card, .feature-card,
 .stat-card, .case-card, .info-card, .price-card, .plan-card, .review-card {
   background: #fffdf7 !important;
-  border: 1px solid rgba(23, 19, 10, 0.12) !important;
+  border: 1px solid var(--kade-line) !important;
   border-radius: 6px !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;

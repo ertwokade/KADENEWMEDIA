@@ -171,7 +171,11 @@ function staticFallback(route, title, description) {
   const protectedCopy = protectedRoutes.has(route)
     ? 'Bu alan yalnız yetkili kullanıcıların güvenli oturumuyla açılır.'
     : description
-  return `<main data-static-route-fallback="${escapeHtml(route)}" style="max-width:880px;margin:0 auto;padding:48px 24px;font-family:Poppins,system-ui,-apple-system,'Segoe UI',sans-serif;color:#17130a;background:#fbfaf4;line-height:1.6">
+  // Renk sabitlenmez, gövdeden miras alınır: bu blok hidrasyona kadar
+  // görünür ve site artık iki temada birden servis ediliyor. Sabit krem
+  // zemin, koyu temada bir kare boyunca beyaz bir dikdörtgen olarak
+  // parlıyordu.
+  return `<main data-static-route-fallback="${escapeHtml(route)}" style="max-width:880px;margin:0 auto;padding:48px 24px;font-family:Poppins,system-ui,-apple-system,'Segoe UI',sans-serif;color:inherit;background:transparent;line-height:1.6">
       <nav aria-label="Temel navigasyon"><a href="/">Ana sayfa</a> · <a href="/hizmetler">Hizmetler</a> · <a href="/paketler">Paketler</a> · <a href="/iletisim">İletişim</a></nav>
       <h1>${escapeHtml(pageName)}</h1>
       <p>${escapeHtml(protectedCopy)}</p>

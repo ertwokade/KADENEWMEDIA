@@ -104,16 +104,29 @@ for (const route of ROUTES) {
       }
     })
 
-    // 1) Her ölçülen elemanın ailesi Poppins olmalı.
+    // 1) Her ölçülen elemanın ailesi Poppins olmalı — İKİ İSTİSNA dışında.
+    //
+    // Sitenin etiket katmanı (navigasyon, eyebrow, kart meta satırı, buton ve
+    // rozet metni) bilerek monospace: bkz. --font-mono-ui, kade-tokens.css.
+    // `button` ve `link` örnekleri çoğu sayfada bu katmandan geliyor, bu
+    // yüzden onlarda mono da kabul edilir.
+    //
+    // GÖVDE, BAŞLIK, FORM ALANI VE LABEL İÇİN İSTİSNA YOK: metin okunacaksa
+    // Poppins olmalı. Bu ayrım kasıtlı — istisnayı genişletmeden önce
+    // tasarım kararını doğrulayın.
+    const MONO_FAMILY = /^(ui-monospace|SFMono-Regular|SF Mono|Menlo|Consolas|monospace)$/i
+    const MONO_ALLOWED = new Set(['button', 'link'])
     const wrong = Object.entries(result.applied)
-      .filter(([, fam]) => fam && fam !== 'Poppins')
+      .filter(([key, fam]) => {
+        if (!fam || fam === 'Poppins') return false
+        return !(MONO_ALLOWED.has(key) && MONO_FAMILY.test(fam))
+      })
     if (wrong.length) {
       failures.push(`${route}: Poppins DEĞİL -> ${wrong.map(([k, v]) => `${k}=${v}`).join(', ')}`)
     }
 
     // 2) Sayfada Poppins dışı bir metin ailesi kalmamalı (monospace hariç).
-    const MONO_OK = /^(ui-monospace|SFMono-Regular|Menlo|Consolas|monospace)$/i
-    const strays = result.families.filter((f) => f !== 'Poppins' && !MONO_OK.test(f))
+    const strays = result.families.filter((f) => f !== 'Poppins' && !MONO_FAMILY.test(f))
     if (strays.length) {
       failures.push(`${route}: sayfada kalan yabancı font ailesi -> ${strays.join(', ')}`)
     }

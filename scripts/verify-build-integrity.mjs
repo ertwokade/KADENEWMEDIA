@@ -4,10 +4,17 @@
  *
  * İki regresyonu kalıcı olarak kilitler:
  *
- *  1) Klonlanmış Next.js snapshot'ı geri gelmesin. Anasayfa bir dönem başka
- *     bir projenin derlenmiş Next.js çıktısıyla (public/site.html + _next/**)
- *     servis ediliyordu; kaynak koddaki React anasayfası ise hiç yayına
- *     çıkmıyordu. Snapshot kaldırıldı — bu kontrol geri sızmasını engeller.
+ *  1) Anasayfa snapshot'ı eksiksiz çıksın. Anasayfa (yalnız "/") derlenmiş bir
+ *     statik snapshot ile servis ediliyor: public/site.html + public/_next/**,
+ *     vercel.json'daki "/" → "/site.html" rewrite'ı üzerinden. Snapshot bir
+ *     dönem kaldırılmış, yerine React anasayfası konmuştu; site sahibinin
+ *     talebiyle geri alındı. Bu kontrol artık TERSİ yönde koruyor: snapshot
+ *     ya da referans verdiği chunk'lardan biri dist'e girmezse anasayfa
+ *     sessizce boş/bozuk yayına çıkar — build burada durur.
+ *
+ *     Snapshot yabancı kaynaklıdır ve kaynak kodu bu repoda yoktur; içeriği
+ *     elle düzenlenebilir değildir. Diğer 38 rota kaynak koddaki React
+ *     uygulamasından gelmeye devam eder (bkz. aşağıdaki bundle kontrolü).
  *
  *  2) Tasarım token katmanı bundle'a girsin. src/styles/kade-tokens.css tek
  *     doğruluk kaynağı; bir import zinciri kopar da token'lar üretilen CSS'e
@@ -43,28 +50,57 @@ const rel = (path) => path.slice(DIST.length)
 const htmlFiles = files.filter((f) => f.endsWith('.html'))
 const cssFiles = files.filter((f) => f.endsWith('.css'))
 
-// ── 1. Klonlanmış snapshot kalıntısı ───────────────────────────────────────
+// ── 1. Anasayfa snapshot'ı ─────────────────────────────────────────────────
 
-console.log('\nSnapshot kalıntısı kontrolü')
+console.log('\nAnasayfa snapshot kontrolü')
 
-for (const artifact of ['site.html', '_next']) {
-  if (await exists(join(DIST, artifact))) fail(`dist/${artifact} üretilmiş — snapshot geri gelmiş`)
-  else ok(`dist/${artifact} yok`)
+const SNAPSHOT = join(DIST, 'site.html')
+const snapshotHtml = (await exists(SNAPSHOT)) ? await readFile(SNAPSHOT, 'utf8') : null
+
+if (!snapshotHtml) {
+  fail('dist/site.html yok — anasayfa snapshot\'ı build çıktısına girmemiş')
+} else {
+  ok('dist/site.html üretilmiş')
+
+  // site.html'in referans verdiği HER chunk dist'te bulunmalı. Eksik tek bir
+  // dosya bile anasayfayı boş ekrana düşürür ve bu ancak canlıda fark edilir.
+  const referenced = [...new Set(
+    [...snapshotHtml.matchAll(/(?:src|href)="(\/_next\/static\/chunks\/[^"]+)"/g)].map((m) => m[1]),
+  )]
+  const missing = []
+  for (const path of referenced) {
+    if (!await exists(join(DIST, path.slice(1)))) missing.push(path)
+  }
+  if (!referenced.length) fail('dist/site.html hiçbir /_next/ chunk\'ına referans vermiyor — snapshot bozuk')
+  else if (missing.length) fail(`snapshot chunk'ları eksik (${missing.length}): ${missing.join(', ')}`)
+  else ok(`snapshot'ın ${referenced.length} chunk referansının tamamı dist'te`)
+
+  // Snapshot yabancı kaynaklı; orijinal imza SVG'sini Kade sürümüne çeviren
+  // yama site.html içinde satır içi duruyor. Yama düşerse anasayfada başka
+  // bir markanın imzası görünür.
+  if (!/svg-sign/.test(snapshotHtml)) fail('dist/site.html: Kade imza yaması kaybolmuş')
+  else ok('Kade imza yaması yerinde')
 }
 
-// HTML çıktısında yabancı bundle referansı olmamalı. Minified JS içindeki
-// rastgele değişken adları yanlış pozitif ürettiği için yalnızca HTML'e ve
-// gerçek script/link referanslarına bakılır.
+// Snapshot DIŞINDAKİ hiçbir HTML yabancı bundle'a referans vermemeli; verirse
+// snapshot iç sayfalara da sızmış demektir. Minified JS içindeki rastgele
+// değişken adları yanlış pozitif ürettiği için yalnızca HTML'e ve gerçek
+// script/link referanslarına bakılır.
 for (const file of htmlFiles) {
+  if (file === SNAPSHOT) continue
   const html = await readFile(file, 'utf8')
   const nextRefs = html.match(/(?:src|href)="\/?_next\//g) || []
-  if (nextRefs.length) fail(`${rel(file)}: ${nextRefs.length} adet /_next/ referansı var`)
-  if (/haoqi/i.test(html)) fail(`${rel(file)}: 'haoqi' dizesi geçiyor`)
+  if (nextRefs.length) fail(`${rel(file)}: ${nextRefs.length} adet /_next/ referansı var — snapshot iç sayfaya sızmış`)
 }
-if (!failures.length) ok(`${htmlFiles.length} HTML dosyasında _next/haoqi referansı yok`)
+if (!failures.some((f) => f.includes('sızmış'))) ok(`${htmlFiles.length - 1} iç sayfa HTML'inde /_next/ referansı yok`)
 
 // Anasayfa ile bir iç sayfa aynı uygulama bundle'ını yüklemeli; farklıysa
 // tekrar iki ayrı uygulama servis ediliyor demektir.
+//
+// NOT: buradaki "anasayfa" dist/index.html'dir — "/" adresini snapshot
+// devraldığı için index.html artık yalnız SEO/fallback çıktısıdır. Kontrol
+// yine de değerli: iç sayfaların hepsinin tek bir React bundle'ından
+// beslendiğini doğrular.
 const bundleOf = (html) => (html.match(/\/assets\/(index-[A-Za-z0-9_-]+\.js)/) || [])[1] || null
 const homeBundle = bundleOf(await readFile(join(DIST, 'index.html'), 'utf8'))
 const innerPath = join(DIST, 'hakkimizda', 'index.html')

@@ -25,6 +25,16 @@ const fragment = /* glsl */ `
     gl_FragColor = vec4(col,1.0);
   }
 `
+/* Koyu tema paleti LACİVERT, kahve değil.
+   Amber "hello" objesi sıcak bir renk; onu kahverengi bir zemine koyduğumuzda
+   obje zeminden ayrışmıyor ve sahne çamurlanıyordu. Soğuk lacivert zemin
+   sıcak camla tamamlayıcı kontrast kuruyor — giriş bölümünün bütün etkisi
+   bu karşıtlıktan geliyor. */
+const PALETTE = {
+  dark: { a: '#16224d', b: '#0a1030', streak: '#3a5bb8' },
+  light: { a: '#fdf2d2', b: '#fbfaf4', streak: '#ffffff' },
+}
+
 export default function Background({ dark = false }) {
   const { viewport } = useThree()
   const uniforms = useMemo(() => ({
@@ -36,8 +46,10 @@ export default function Background({ dark = false }) {
   useFrame((s) => {
     /* eslint-disable react-hooks/immutability */
     uniforms.uTime.value = s.clock.elapsedTime
-    if (dark) { uniforms.uColorA.value.set('#241a06'); uniforms.uColorB.value.set('#12100a'); uniforms.uStreak.value.set('#8a6a1e') }
-    else { uniforms.uColorA.value.set('#fdf2d2'); uniforms.uColorB.value.set('#fbfaf4'); uniforms.uStreak.value.set('#ffffff') }
+    const p = dark ? PALETTE.dark : PALETTE.light
+    uniforms.uColorA.value.set(p.a)
+    uniforms.uColorB.value.set(p.b)
+    uniforms.uStreak.value.set(p.streak)
     /* eslint-enable react-hooks/immutability */
   })
   return (

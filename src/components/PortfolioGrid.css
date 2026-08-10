@@ -10,7 +10,7 @@
   border-radius: 18px;
   overflow: hidden;
   cursor: pointer;
-  background: rgba(23, 19, 10, 0.04);
+  background: var(--kade-surface-2);
   border: 1px solid var(--border-color);
 }
 

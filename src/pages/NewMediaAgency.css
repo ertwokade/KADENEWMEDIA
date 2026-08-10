@@ -115,7 +115,7 @@
 }
 
 .new-media-process {
-  background: rgba(23, 19, 10, 0.025);
+  background: var(--kade-surface-2);
 }
 
 .new-media-process-grid {

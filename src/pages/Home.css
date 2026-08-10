@@ -131,6 +131,166 @@
 }
 
 /* ---------------------------------------------------------------------------
+   MARKA IZGARASI
+   Hücreler `gap: 1px` + kapsayıcı zemin ile ayrılır: ayrı ayrı border
+   vermek komşu hücrelerde çift kalınlıkta çizgi üretiyordu.
+--------------------------------------------------------------------------- */
+/* Bu bölüm HER İKİ TEMADA DA koyudur ve tema tokenlarını yerel olarak ezer.
+
+   Sebep teknik: hücrelerdeki yatay KADE wordmark'ı harflerinde beyaza giden
+   bir degrade taşıyor. Krem zeminde 1,4:1 kontrasta düşüp kayboluyor
+   (ölçüm: src/config/brandAssets.js) — açık temada ızgara boş görünüyordu.
+   Sembol+metin kilidine düşmek yerine zemini koyu tutuyoruz: hem wordmark
+   tasarlandığı zeminde kalıyor hem de referans tasarımdaki "marka duvarı"
+   etkisi iki temada da aynı oluyor. */
+.home-marks {
+  --kade-ink: #ffffff;
+  --kade-ink-2: rgba(230, 232, 232, 0.78);
+  --kade-ink-3: rgba(230, 232, 232, 0.64);
+  --kade-canvas: #121414;
+  --kade-surface-2: rgba(230, 232, 232, 0.06);
+  --kade-line: rgba(230, 232, 232, 0.12);
+  background: #121414;
+  color: #fff;
+}
+
+.kmark-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--kade-line);
+  border: 1px solid var(--kade-line);
+}
+
+.kmark-cell { display: flex; min-width: 0; }
+
+.kmark-link {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+  min-height: clamp(220px, 26vw, 320px);
+  padding: var(--space-6);
+  background: var(--kade-canvas);
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  transition: background var(--dur-ui) var(--ease-out);
+}
+.kmark-link:hover,
+.kmark-link:focus-visible { background: var(--kade-surface-2); }
+
+.kmark-art {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-width: 0;
+}
+
+/* Wordmark hücreyi taşacak kadar büyük durur ve hover'da bir tık büyür —
+   ızgaranın hareketi tamamen bu ölçek oyunundan geliyor. */
+.kmark-logo {
+  width: min(100%, 260px) !important;
+  transition: transform var(--dur-page) var(--ease-out);
+}
+.kmark-link:hover .kmark-logo { transform: scale(1.06); }
+
+.kmark-label {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--kade-ink-2);
+}
+
+.kmark-badge {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  padding: 3px 8px;
+  background: var(--kade-accent);
+  color: var(--kade-on-brand);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------------
+   IŞIN PATLAMASI — tam genişlikte dekoratif bölüm
+--------------------------------------------------------------------------- */
+.home-burst {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(520px, 78vh, 820px);
+  padding: var(--section-y) var(--container-pad);
+  overflow: hidden;
+  background: #000;
+  isolation: isolate;
+}
+
+.home-burst__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* Merkezde koyu bir yumuşama: ışınlar başlığın altından geçerken metni
+   okunmaz hâle getiriyordu. */
+.home-burst__inner::before {
+  content: '';
+  position: absolute;
+  inset: -12% -8%;
+  z-index: -1;
+  background: radial-gradient(60% 60% at 50% 50%, rgba(0, 0, 0, 0.86), transparent 72%);
+  pointer-events: none;
+}
+
+.home-burst__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+  max-width: 900px;
+}
+
+.home-burst__title {
+  margin: 0;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: var(--fw-bold);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  /* Bu bölümün zemini temadan bağımsız siyah; metin de öyle. */
+  color: #fff;
+}
+
+.home-burst__text {
+  margin: 0;
+  max-width: 46ch;
+  font-size: var(--fs-lg);
+  line-height: var(--lh-snug);
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.home-burst__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; }
+/* Bölüm siyah zeminli olduğu için outline buton tema tokenlarını değil bu
+   zemini referans alır. */
+.home-burst__actions .kade-btn--outline { color: #fff; border-color: rgba(255, 255, 255, 0.42); }
+.home-burst__actions .kade-btn--outline:hover { background: #fff; color: #111; border-color: #fff; }
+
+/* ---------------------------------------------------------------------------
    BÖLÜM ORTAKLARI
 --------------------------------------------------------------------------- */
 .home-more {
@@ -208,9 +368,14 @@
   .home-top__grid { background-size: 33.333% 100%, 100% 260px; }
   .home-process__row { grid-template-columns: 56px minmax(0, 1fr); }
   .home-process__text { grid-column: 2; }
+  .kmark-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 768px) {
+  .kmark-grid { grid-template-columns: minmax(0, 1fr); }
+  .kmark-link { min-height: 200px; }
+  .home-burst { min-height: 70vh; }
+  .home-burst__actions .kade-btn { width: 100%; }
   .home-top {
     min-height: auto;
     padding-block: clamp(88px, 16vh, 130px) var(--space-16);

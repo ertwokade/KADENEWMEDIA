@@ -94,22 +94,29 @@ test('index.html Google Fonts yerine self-host Poppins preload eder', async () =
   assert.match(html, /rel="preload"[^>]*as="font"[^>]*crossorigin/, 'font preload crossorigin olmalı')
 })
 
-test('yabancı snapshot ve kökeni belirsiz varlıklar geri dönmemiştir', async () => {
-  // `/` bir dönem başka bir projenin (haoqi.design) klonlanmış derlenmiş
-  // çıktısıyla servis ediliyordu. Kanıt: 3 viewport'ta birebir örtüşen kart
-  // yükseklikleri, kopyalanmış Figma plugin ID'leri ve snapshot kodundaki
-  // "orijinal Haoqi imzası" yorumu. Paket ve ona bağlı varlıklar kaldırıldı;
-  // bu test geri gelmediklerini korur.
+test('snapshot varlıkları eksiksiz, hazırlama scriptleri yok', async () => {
+  // `/` başka bir projenin (haoqi.design) klonlanmış derlenmiş çıktısıyla
+  // servis ediliyor. Paket bir dönem kaldırılmıştı; site sahibinin talebiyle
+  // geri getirildi. Snapshot'ın kaynağı bu repoda YOK, dolayısıyla parçaları
+  // elle tamamlanamaz — biri düşerse anasayfa boş/bozuk yayına çıkar.
   for (const path of [
     'public/site.html',
     'public/_next',
-    'public/stickers',
     'public/sticker_img',
     'public/img/kade-hello-art.jpg',
     'public/model/cnt.gltf',
     'public/model/cnt.bin',
     'public/model/cursor.glb',
-    'public/model/hello.gltf.orig',
+    'public/model/hello.gltf',
+    'public/model/hello.bin',
+  ]) {
+    const found = await stat(new URL(path, ROOT)).then(() => true, () => false)
+    assert.equal(found, true, `${path} eksik — snapshot bozuk`)
+  }
+
+  // Snapshot'ı üreten/yamalayan yardımcı scriptler geri gelmemeli: snapshot
+  // artık olduğu gibi servis edilir, build sırasında yeniden yazılmaz.
+  for (const path of [
     'scripts/apply-poppins-to-site.mjs',
     'scripts/patch-home-content.mjs',
     'scripts/sanitize-site-snapshot.mjs',
@@ -117,36 +124,30 @@ test('yabancı snapshot ve kökeni belirsiz varlıklar geri dönmemiştir', asyn
     await assert.rejects(stat(new URL(path, ROOT)), `${path} geri gelmiş`)
   }
 
-  // `public/model/hello.*` ve `src/components/kade/` bilinçli olarak geri
-  // getirildi: ana sayfanın cam "hello" objesi yayındaki tasarımın parçası ve
-  // site sahibi bu görünümün korunmasını istedi. Yalnız BU iki varlık serbest;
-  // yukarıdaki liste (imleç modeli, sticker setleri, ikinci sahne modeli)
-  // hâlâ yasak. Klasörün tamamı serbest bırakılmasın diye içerik denetlenir.
-  const modelDir = await readdir(new URL('public/model/', ROOT))
-  assert.deepEqual(
-    modelDir.filter((f) => !f.startsWith('.')).sort(),
-    ['hello.bin', 'hello.gltf'],
-    'public/model yalnız hello modelini içermeli',
-  )
+  // Referans verilmeyen varlık taşınmasın: `public/stickers` (3,1 MB PNG seti)
+  // snapshot'ın hiçbir yerinden çağrılmıyor, `sticker_img` webp'leri kullanılıyor.
+  const strays = await stat(new URL('public/stickers', ROOT)).then(() => true, () => false)
+  assert.equal(strays, false, 'public/stickers geri gelmiş — snapshot bu seti kullanmıyor')
 })
 
-test('ana sayfa React uygulamasından servis edilir', async () => {
-  // `/` daha önce başka bir Next.js projesinin minified statik snapshot'ına
-  // rewrite ediliyordu. Snapshot ana sayfa ile iç sayfaları iki ayrı tasarım
-  // sistemine bölüyor, ortak bileşen paylaşımını imkânsız kılıyor ve
-  // hydration #418 hatası veriyordu.
-  //
-  // Bu test SERVİS yolunu doğrular. Snapshot DOSYALARININ silindiğini
-  // doğrulayan ayrı bir test aşağıdadır; ikisi bilerek ayrı tutulur çünkü
-  // "artık kullanılmıyor" ile "dosya kaldırıldı" farklı adımlardır.
+test('ana sayfa snapshot\'tan, iç sayfalar React\'ten servis edilir', async () => {
+  // `/` derlenmiş statik snapshot'a rewrite edilir (site sahibinin kararı);
+  // diğer bütün rotalar React uygulamasından gelir. Bu test SERVİS yolunu
+  // doğrular — snapshot dosyalarının varlığını doğrulayan ayrı bir test
+  // aşağıdadır; ikisi bilerek ayrı tutulur çünkü "yönlendirme doğru" ile
+  // "dosya yerinde" farklı arıza biçimleridir.
   const vercel = JSON.parse(await readRepo('vercel.json'))
   const rootRewrite = (vercel.rewrites || []).find((rule) => rule.source === '/')
-  assert.equal(rootRewrite, undefined, '`/` için rewrite tanımlı — ana sayfa React ön-render\'ı olmalı')
+  assert.equal(rootRewrite?.destination, '/site.html', '`/` snapshot\'a rewrite edilmeli')
 
-  const vite = await readRepo('vite.config.js')
-  assert.doesNotMatch(vite, /site\.html/, 'dev sunucusu hâlâ site.html\'e yönlendiriyor')
+  // Snapshot yalnız "/" içindir; başka hiçbir rota ona gitmemeli.
+  for (const rule of vercel.rewrites || []) {
+    if (rule.source === '/') continue
+    assert.doesNotMatch(rule.destination, /site\.html/, `${rule.source} snapshot'a yönlendiriyor`)
+  }
 
-  // Ana sayfa ön-render listesinde ve indekslenebilir olmalı.
+  // Ana sayfa ön-render listesinde ve indekslenebilir olmalı: dist/index.html
+  // snapshot düşerse devreye giren yedek ve JS'siz istemcilerin gördüğü çıktı.
   const generator = await readRepo('scripts/generate-static-routes.mjs')
   assert.match(generator, /\n\s*\['\/',/, 'ana sayfa ön-render rota listesinde yok')
 
@@ -469,22 +470,24 @@ test('istatistikler uydurma veya anlamsız placeholder göstermez', async () => 
   assert.match(source, /stats\.length > 0/, 'hiç veri yoksa istatistik şeridi hiç render edilmemeli')
 })
 
-// ── Klonlanmış Next.js snapshot'ı geri gelmesin ────────────────────────────
+// ── Anasayfa snapshot'ı eksiksiz olsun ─────────────────────────────────────
 
-test('repoda klonlanmış Next.js snapshot kalıntısı yok', async () => {
-  // Anasayfa bir dönem başka bir projenin derlenmiş Next.js çıktısıyla
-  // (public/site.html + public/_next/**) servis ediliyordu; kaynak koddaki
-  // React anasayfası hiç yayına çıkmıyordu. Snapshot kaldırıldı.
+test('anasayfa snapshot dosyaları yerinde', async () => {
+  // Anasayfa ("/") derlenmiş bir statik snapshot ile servis ediliyor:
+  // public/site.html + public/_next/**. Snapshot bir dönem kaldırılmış,
+  // yerine React anasayfası konmuştu; site sahibinin talebiyle geri alındı.
+  // Kontrol artık ters yönde: parçalardan biri düşerse anasayfa boş yayına
+  // çıkar, o yüzden varlıkları burada doğrulanır.
   for (const path of ['public/site.html', 'public/_next']) {
     const found = await stat(new URL(path, ROOT)).then(() => true, () => false)
-    assert.equal(found, false, `${path} geri gelmiş — klon snapshot'ı yeniden eklenmiş`)
+    assert.equal(found, true, `${path} yok — anasayfa snapshot'ı eksik`)
   }
 
-  // Snapshot'ı üretime hazırlayan yardımcı scriptler de geri gelmemeli.
-  for (const path of ['scripts/apply-poppins-to-site.mjs', 'scripts/sanitize-site-snapshot.mjs']) {
-    const found = await stat(new URL(path, ROOT)).then(() => true, () => false)
-    assert.equal(found, false, `${path} geri gelmiş — snapshot hazırlama adımı yeniden eklenmiş`)
-  }
+  // Snapshot yabancı kaynaklı; orijinal imza SVG'sini Kade sürümüne çeviren
+  // yama site.html içinde satır içi duruyor. Düşerse anasayfada başka bir
+  // markanın imzası görünür.
+  const snapshot = await readRepo('public/site.html')
+  assert.match(snapshot, /svg-sign/, 'Kade imza yaması site.html içinde kalmalı')
 })
 
 test('build zinciri snapshot ve token bütünlüğünü doğruluyor', async () => {
@@ -497,10 +500,11 @@ test('build zinciri snapshot ve token bütünlüğünü doğruluyor', async () =
     'legacy:build sonunda build bütünlüğü doğrulayıcısı koşmalı',
   )
 
-  // vercel.json anasayfayı hiçbir snapshot'a yönlendirmemeli.
+  // Anasayfayı snapshot'a taşıyan rewrite yerinde olmalı: düşerse "/" sessizce
+  // React fallback'ine (dist/index.html) döner ve ziyaretçi bambaşka bir
+  // anasayfa görür.
   const vercel = JSON.parse(await readRepo('vercel.json'))
-  for (const rule of [...(vercel.rewrites ?? []), ...(vercel.redirects ?? [])]) {
-    assert.doesNotMatch(rule.destination, /site\.html|_next/, `vercel.json kuralı snapshot'a yönlendiriyor: ${rule.source}`)
-    if (rule.source === '/') assert.fail("vercel.json'da anasayfa için rewrite/redirect olmamalı")
-  }
+  const homeRule = (vercel.rewrites ?? []).find((rule) => rule.source === '/')
+  assert.ok(homeRule, "vercel.json'da anasayfa için rewrite bulunmalı")
+  assert.equal(homeRule.destination, '/site.html', 'anasayfa rewrite\'ı snapshot\'a gitmeli')
 })

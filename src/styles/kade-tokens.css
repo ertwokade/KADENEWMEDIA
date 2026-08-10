@@ -109,6 +109,18 @@
   --font-sans: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
+  /* Arayüz monospace'i — SADECE küçük, büyük harfli etiketler için:
+     navigasyon, eyebrow, kart meta satırı, buton ve rozet metni.
+     Gövde metni, başlık ve form içeriği her zaman Poppins kalır.
+
+     Neden ayrı bir aile: sitenin görsel dili teknik/editoryal bir etiket
+     katmanı üzerine kurulu; bu katman Poppins'le yazıldığında başlıklardan
+     ayrışmıyor ve "etiket" okunmuyordu. Seçilen yığın Türkçe için tam
+     kapsamlıdır (İ ı Ş ş Ğ ğ Ç ç Ö ö Ü ü) — SF Mono, Menlo ve Consolas
+     üçü de Latin Extended-A taşır, bu yüzden hiçbir harf başka aileye
+     düşmez. scripts/verify-poppins.mjs bu aileyi bilerek tanır. */
+  --font-mono-ui: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
   /* geriye dönük takma adlar → hepsi Poppins */
   --font-primary: var(--font-sans);
   --font-secondary: var(--font-sans);
@@ -122,42 +134,84 @@
   --kf-tech: var(--font-sans);
 
   /* -------------------------------------------------------------------------
-     3) MARKA RENKLERİ — mevcut kurumsal kimlik korunur (altın + krem + mürekkep)
+     3) MARKA RENKLERİ — altın kimlik iki temada da korunur
+
+     TEMA MİMARİSİ
+     Sitenin varsayılan yüzeyi KOYU'dur (#0f1111). Açık tema (krem #fbfaf4)
+     kaybolmadı; TEMA düğmesiyle erişilir ve `[data-theme="light"]` altında
+     aşağıdaki blokta birebir eski değerleriyle durur.
+
+     Buradaki `:root` bloğu KOYU temayı tanımlar. Aşağıdaki iki blok onu
+     ezer:
+       [data-theme="light"]  → ziyaretçinin seçtiği açık tema
+       body.kade-app-ui      → admin, müşteri paneli, Organizasyon Kiti,
+                               Kade Kit Business, proje takip ve /@profil.
+                               Bu yüzeyler ürün arayüzüdür, pazarlama
+                               sayfası değil; kendi doğrulanmış açık
+                               paletlerinde bırakıldılar ki panel CSS'i
+                               ve oradaki kontrast ölçümleri bozulmasın.
+
+     KURAL: yeni renk yazarken üç bloğa da değer verin, yoksa bir tema
+     eksik kalır.
   ------------------------------------------------------------------------- */
+  color-scheme: dark;
+
   --kade-gold: #e0a81f;
   --kade-gold-deep: #c8901a;
   --kade-gold-soft: #fff2cc;
-  /* Mürekkep tonları — krem zemin (#fbfaf4 / #fdf6e3) üzerinde ölçülmüştür.
+
+  /* ZEMİN ÜZERİNE yazılan altın metin. --kade-gold dolgu rengidir ve koyu
+     zeminde metin olarak 4.5:1'i geçmez; bu token onun okunabilir karşılığı.
+     (koyu #ebc669 üzerine #0f1111 → 9.8:1 · açık #8a5a00 üzerine #fbfaf4 → 5.4:1) */
+  --kade-gold-text: #ebc669;
+
+  /* Vurgu — asidik yeşil. Yalnız küçük etiket/rozet zeminlerinde kullanılır
+     (üzerine her zaman koyu mürekkep yazılır), metin rengi olarak değil. */
+  --kade-accent: #c0fe04;
+
+  /* Mürekkep tonları — koyu zemin (#0f1111) üzerinde ölçülmüştür.
      WCAG 2.1 AA küçük metin için 4.5:1, büyük metin (≥18.66px bold veya
      ≥24px) için 3:1 ister.
-       --kade-ink    : 16.9:1  her boyutta güvenli
-       --kade-ink-2  :  8.4:1  her boyutta güvenli
-       --kade-ink-3  :  5.2:1  küçük metin dahil AA (ikincil metin için)
-       --kade-ink-4  :  2.4:1  AA'yı GEÇMEZ — yalnız devre dışı kontrol,
+       --kade-ink    : 18.9:1  her boyutta güvenli
+       --kade-ink-2  :  9.3:1  her boyutta güvenli
+       --kade-ink-3  :  6.5:1  küçük metin dahil AA (ikincil metin için)
+       --kade-ink-4  :  2.6:1  AA'yı GEÇMEZ — yalnız devre dışı kontrol,
                                ayraç ve dekoratif öğelerde kullanın; asla
                                okunması gereken metinde değil. */
-  --kade-ink: #17130a;
-  --kade-ink-2: rgba(23, 19, 10, 0.72);
-  --kade-ink-3: rgba(23, 19, 10, 0.62);
-  --kade-ink-4: rgba(23, 19, 10, 0.38);
-  --kade-canvas: #fdf6e3;
-  --kade-surface: #fbfaf4;
-  --kade-surface-2: rgba(23, 19, 10, 0.035);
-  --kade-surface-3: rgba(23, 19, 10, 0.07);
+  --kade-ink: #ffffff;
+  --kade-ink-2: rgba(230, 232, 232, 0.78);
+  --kade-ink-3: rgba(230, 232, 232, 0.64);
+  --kade-ink-4: rgba(230, 232, 232, 0.34);
+  /* Hayalet — dev arka plan rakamları, filigran benzeri dekor. Metin
+     DEĞİL: okunması gereken hiçbir şey bu tonda yazılmaz. */
+  --kade-ink-ghost: rgba(230, 232, 232, 0.12);
 
-  /* durum renkleri — WCAG AA kontrastı krem zemin üzerinde doğrulandı */
-  --kade-success: #1c7a4a;
-  --kade-success-bg: rgba(28, 122, 74, 0.1);
-  --kade-danger: #b3261e;
-  --kade-danger-bg: rgba(179, 38, 30, 0.1);
-  --kade-warning: #8a5a00;
-  --kade-warning-bg: rgba(224, 168, 31, 0.16);
-  --kade-info: #1b5e9c;
-  --kade-info-bg: rgba(27, 94, 156, 0.1);
+  /* Marka dolgusu ÜZERİNDEKİ mürekkep. Altın/asidik yeşil zeminler her iki
+     temada da açık olduğu için bu değer temaya göre DEĞİŞMEZ; koyu kalır.
+     Buraya --kade-ink koymak, koyu temada altın butonun üstüne beyaz yazı
+     bindirir (kontrast 1.6:1). */
+  --kade-on-brand: #17130a;
+  --kade-canvas: #0f1111;
+  --kade-surface: #0f1111;
+  --kade-surface-2: rgba(230, 232, 232, 0.05);
+  --kade-surface-3: rgba(230, 232, 232, 0.09);
+  /* Yüzeyden bir kademe yukarısı — modal, açılır panel, yapışkan başlık. */
+  --kade-elevated: #191b1b;
 
-  /* çizgi ve kenarlıklar */
-  --kade-line: rgba(23, 19, 10, 0.12);
-  --kade-line-strong: rgba(23, 19, 10, 0.28);
+  /* durum renkleri — WCAG AA kontrastı koyu zemin üzerinde doğrulandı
+     (success 10.6:1, danger 6.8:1, warning 10.0:1, info 7.8:1) */
+  --kade-success: #3ddc84;
+  --kade-success-bg: rgba(61, 220, 132, 0.14);
+  --kade-danger: #ff6b6b;
+  --kade-danger-bg: rgba(255, 107, 107, 0.14);
+  --kade-warning: #f0b429;
+  --kade-warning-bg: rgba(240, 180, 41, 0.16);
+  --kade-info: #6aa9ff;
+  --kade-info-bg: rgba(106, 169, 255, 0.14);
+
+  /* çizgi ve kenarlıklar — ızgara hatlarının tamamı buradan gelir */
+  --kade-line: rgba(230, 232, 232, 0.1);
+  --kade-line-strong: rgba(230, 232, 232, 0.26);
 
   /* -------------------------------------------------------------------------
      4) TİPOGRAFİ ÖLÇEĞİ — mobilde min 15px gövde, akıcı büyüme
@@ -225,11 +279,12 @@
   --radius-xl: 24px;
   --radius-pill: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(23, 19, 10, 0.06), 0 1px 3px rgba(23, 19, 10, 0.05);
-  --shadow-md: 0 4px 12px rgba(23, 19, 10, 0.08);
-  --shadow-lg: 0 12px 32px rgba(23, 19, 10, 0.1);
-  --shadow-xl: 0 24px 60px rgba(23, 19, 10, 0.14);
-  --shadow-focus: 0 0 0 3px rgba(224, 168, 31, 0.35);
+  /* Koyu zeminde krem tabanlı gölge görünmez; siyah ve daha yüksek alfa. */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.58);
+  --shadow-focus: 0 0 0 3px rgba(224, 168, 31, 0.45);
 
   /* Hareket dili — süreler amaca göre gruplanır, bileşenler bu tokenları
      kullanır ki tüm sitede zamanlama tutarlı olsun.
@@ -272,6 +327,91 @@
 
   /* dokunma hedefi alt sınırı (WCAG 2.1 AA — 24px, hedefimiz 44px) */
   --tap-min: 44px;
+}
+
+/* ---------------------------------------------------------------------------
+   3b) AÇIK TEMA — TEMA düğmesiyle seçilir.
+   Değerler eskiden `:root`ta duran, krem zemin üzerinde WCAG AA ölçülmüş
+   paletin aynısıdır; koyu tema varsayılan olurken hiçbiri değişmedi.
+--------------------------------------------------------------------------- */
+[data-theme='light'] {
+  color-scheme: light;
+
+  --kade-ink: #17130a;
+  --kade-ink-2: rgba(23, 19, 10, 0.72);
+  --kade-ink-3: rgba(23, 19, 10, 0.62);
+  --kade-ink-4: rgba(23, 19, 10, 0.38);
+  --kade-ink-ghost: rgba(23, 19, 10, 0.1);
+  --kade-on-brand: #17130a;
+  --kade-gold-text: #8a5a00;
+  --kade-canvas: #fdf6e3;
+  --kade-surface: #fbfaf4;
+  --kade-surface-2: rgba(23, 19, 10, 0.035);
+  --kade-surface-3: rgba(23, 19, 10, 0.07);
+  --kade-elevated: #f3ecd9;
+
+  --kade-success: #1c7a4a;
+  --kade-success-bg: rgba(28, 122, 74, 0.1);
+  --kade-danger: #b3261e;
+  --kade-danger-bg: rgba(179, 38, 30, 0.1);
+  --kade-warning: #8a5a00;
+  --kade-warning-bg: rgba(224, 168, 31, 0.16);
+  --kade-info: #1b5e9c;
+  --kade-info-bg: rgba(27, 94, 156, 0.1);
+
+  --kade-line: rgba(23, 19, 10, 0.12);
+  --kade-line-strong: rgba(23, 19, 10, 0.28);
+
+  --shadow-sm: 0 1px 2px rgba(23, 19, 10, 0.06), 0 1px 3px rgba(23, 19, 10, 0.05);
+  --shadow-md: 0 4px 12px rgba(23, 19, 10, 0.08);
+  --shadow-lg: 0 12px 32px rgba(23, 19, 10, 0.1);
+  --shadow-xl: 0 24px 60px rgba(23, 19, 10, 0.14);
+  --shadow-focus: 0 0 0 3px rgba(224, 168, 31, 0.35);
+}
+
+/* ---------------------------------------------------------------------------
+   3c) ÜRÜN ARAYÜZLERİ — admin, müşteri paneli, Organizasyon Kiti, Kade Kit
+   Business, proje takip, /@profil. `body.kade-app-ui` sınıfını App.jsx bu
+   rotalarda basar.
+
+   Bunlar pazarlama sayfası değil; kendi CSS'leri krem zemine göre yazıldı ve
+   kontrastları o zemine göre ölçüldü. Yeni koyu yüzeyin arkasında sessizce
+   bozulmamaları için açık palete sabitlenirler — ziyaretçinin tema seçimi
+   burada uygulanmaz.
+--------------------------------------------------------------------------- */
+body.kade-app-ui {
+  color-scheme: light;
+
+  --kade-ink: #17130a;
+  --kade-ink-2: rgba(23, 19, 10, 0.72);
+  --kade-ink-3: rgba(23, 19, 10, 0.62);
+  --kade-ink-4: rgba(23, 19, 10, 0.38);
+  --kade-ink-ghost: rgba(23, 19, 10, 0.1);
+  --kade-on-brand: #17130a;
+  --kade-gold-text: #8a5a00;
+  --kade-canvas: #fdf6e3;
+  --kade-surface: #fbfaf4;
+  --kade-surface-2: rgba(23, 19, 10, 0.035);
+  --kade-surface-3: rgba(23, 19, 10, 0.07);
+  --kade-elevated: #f3ecd9;
+
+  --kade-success: #1c7a4a;
+  --kade-success-bg: rgba(28, 122, 74, 0.1);
+  --kade-danger: #b3261e;
+  --kade-danger-bg: rgba(179, 38, 30, 0.1);
+  --kade-warning: #8a5a00;
+  --kade-warning-bg: rgba(224, 168, 31, 0.16);
+  --kade-info: #1b5e9c;
+  --kade-info-bg: rgba(27, 94, 156, 0.1);
+
+  --kade-line: rgba(23, 19, 10, 0.12);
+  --kade-line-strong: rgba(23, 19, 10, 0.28);
+
+  --shadow-sm: 0 1px 2px rgba(23, 19, 10, 0.06), 0 1px 3px rgba(23, 19, 10, 0.05);
+  --shadow-md: 0 4px 12px rgba(23, 19, 10, 0.08);
+  --shadow-lg: 0 12px 32px rgba(23, 19, 10, 0.1);
+  --shadow-xl: 0 24px 60px rgba(23, 19, 10, 0.14);
+  --shadow-focus: 0 0 0 3px rgba(224, 168, 31, 0.35);
 }
 
 /* ---------------------------------------------------------------------------

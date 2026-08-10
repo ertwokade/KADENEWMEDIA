@@ -165,7 +165,7 @@
   left: 24px;
   right: 24px;
   bottom: 18px;
-  border: 1px solid rgba(23, 19, 10, 0.075);
+  border: 1px solid var(--kade-line);
   border-radius: 18px;
   background: rgba(253, 246, 227, 0.82);
   box-shadow: 0 22px 70px rgba(0, 0, 0, 0.38);
@@ -173,7 +173,7 @@
 }
 
 .cookie-content p {
-  color: rgba(23, 19, 10, 0.68);
+  color: var(--kade-ink-2);
 }
 
 .cookie-btn {
@@ -188,9 +188,9 @@
 }
 
 .cookie-decline {
-  background: rgba(23, 19, 10, 0.035);
-  color: rgba(23, 19, 10, 0.62);
-  border-color: rgba(23, 19, 10, 0.09);
+  background: var(--kade-surface-2);
+  color: var(--kade-ink-3);
+  border-color: var(--kade-line);
 }
 
 .cookie-details {

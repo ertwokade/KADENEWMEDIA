@@ -111,7 +111,7 @@
   padding: var(--space-3) var(--space-5);
   background: var(--kade-gold);
   border: none;
-  color: var(--kade-ink);
+  color: var(--kade-on-brand);
   cursor: pointer;
   display: flex;
   align-items: center;

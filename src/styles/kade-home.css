@@ -29,7 +29,7 @@
 .kade-emoji { font-size: clamp(56px, 8vw, 110px); line-height: 1; transition: transform .6s cubic-bezier(.16,1,.3,1); filter: drop-shadow(0 10px 24px rgba(0,0,0,.22)); }
 .kade-block:hover .kade-emoji { transform: scale(1.12) rotate(-6deg); }
 .kade-num { position: absolute; top: 16px; left: 20px; color: rgba(255,255,255,.85); font-size: 13px; }
-.kade-tag { position: absolute; top: 14px; right: 14px; background: var(--kade); color: #17130a; font-size: var(--fs-2xs); padding: 3px 8px; letter-spacing: .04em; }
+.kade-tag { position: absolute; top: 14px; right: 14px; background: var(--kade); color: var(--kade-ink); font-size: var(--fs-2xs); padding: 3px 8px; letter-spacing: .04em; }
 .kade-meta { display: flex; justify-content: space-between; align-items: baseline; font-size: clamp(13px, 1.4vw, 16px); }
 .kade-block:hover .kade-meta span:first-child { opacity: .55; }
 
@@ -37,11 +37,11 @@
 .kade-services { padding: 8vh 32px; }
 .kade-servgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--kline); border: 1px solid var(--kline); }
 .kade-servcard { background: var(--kbg); padding: 40px 34px 48px; display: flex; flex-direction: column; gap: 14px; min-height: 34vh; justify-content: flex-end; transition: background .3s ease; }
-.kade-servcard:hover { background: var(--kade); color: #17130a; }
+.kade-servcard:hover { background: var(--kade); color: var(--kade-on-brand); }
 .kade-servcard span { font-size: 12px; color: var(--kmuted); }
 .kade-servcard h3 { font-size: clamp(24px, 3vw, 40px); font-weight: 800; }
 .kade-servcard p { font-size: 12.5px; line-height: 1.55; color: var(--kmuted); max-width: 32ch; }
-.kade-servcard:hover span, .kade-servcard:hover p { color: rgba(23,19,10,.7); }
+.kade-servcard:hover span, .kade-servcard:hover p { color: color-mix(in srgb, var(--kade-on-brand) 74%, transparent); }
 
 /* process */
 .kade-process { padding: 8vh 32px; }
@@ -59,7 +59,7 @@
 /* contact */
 .kade-contact { justify-content: center; align-items: flex-start; overflow: hidden; }
 .kade-cta { font-size: clamp(40px, 9.5vw, 150px); line-height: .9; font-weight: 800; letter-spacing: -0.03em; position: relative; z-index: 3; }
-.kade-wa { display: inline-block; margin-top: 30px; background: var(--kade); color: #17130a; padding: 14px 26px; border-radius: 40px; font-size: 13px; letter-spacing: .04em; z-index: 3; position: relative; pointer-events: auto; text-decoration: none; transition: transform .25s ease, background .25s ease; }
+.kade-wa { display: inline-block; margin-top: 30px; background: var(--kade); color: var(--kade-ink); padding: 14px 26px; border-radius: 40px; font-size: 13px; letter-spacing: .04em; z-index: 3; position: relative; pointer-events: auto; text-decoration: none; transition: transform .25s ease, background .25s ease; }
 .kade-wa:hover { transform: translateY(-2px) scale(1.03); background: var(--kade-deep); }
 .kade-footer { position: absolute; bottom: 64px; left: 32px; right: 32px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; z-index: 3; }
 .kade-footer a { text-decoration: none; color: inherit; }

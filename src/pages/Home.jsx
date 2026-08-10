@@ -1,6 +1,9 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import SceneBoundary from '../components/kade/SceneBoundary.jsx'
+import BurstCanvas from '../components/kade/BurstCanvas.jsx'
+import MarkGrid from '../components/kade/MarkGrid.jsx'
 import { useSEO } from '../hooks/useSEO'
+import { useTheme } from '../i18n/ThemeContext'
 import { getPortfolioApi } from '../api'
 import { SERVICES } from '../data/newMediaAgency'
 import { homeProjects } from '../data/projects'
@@ -92,6 +95,7 @@ function useWantsScene() {
 export default function Home() {
   const [projects, setProjects] = useState(null) // null = yükleniyor
   const wantsScene = useWantsScene()
+  const { theme } = useTheme()
 
   useSEO({
     title: 'Kade New Media | İstanbul Sosyal Medya & Dijital Pazarlama Ajansı',
@@ -121,8 +125,12 @@ export default function Home() {
           <div className="home-top__scene" aria-hidden="true">
             {/* Sahne dekoratif. Model inmezse ya da WebGL yoksa sessizce
                 atlanır — sayfanın geri kalanı etkilenmez. */}
+            {/* Sahne temayı BİLMEK ZORUNDA: kendi zeminini WebGL içinde
+                boyuyor ve CSS'i miras almıyor. Bayrak geçilmediğinde koyu
+                temada giriş bölümü krem bir dikdörtgen olarak kalıyor,
+                üstündeki beyaz başlık okunmuyordu. */}
             <SceneBoundary>
-              <Suspense fallback={null}><KadeScene /></Suspense>
+              <Suspense fallback={null}><KadeScene dark={theme === 'dark'} /></Suspense>
             </SceneBoundary>
           </div>
         )}
@@ -179,6 +187,46 @@ export default function Home() {
           </Reveal>
         </Container>
       </Section>
+
+      {/* ── MARKA IZGARASI ──────────────────────────────────────────────
+          Kade'nin kendi ürünleri ve hizmet alanları, wordmark'ın tekrarıyla
+          kurulan bir ızgarada. Her hücre gerçek bir sayfaya gider. */}
+      <Section className="home-marks" aria-labelledby="home-marks-title">
+        <Container size="wide">
+          <SectionHeading
+            eyebrow="Kade evreni"
+            title="Ne yapıyoruz, nereye bağlanıyor?"
+            as="h2"
+            id="home-marks-title"
+          />
+          <MarkGrid />
+        </Container>
+      </Section>
+
+      {/* ── IŞIN PATLAMASI ─────────────────────────────────────────────
+          Tam genişlikte dekoratif bölüm. Metin canvas'ın ÜSTÜNDE normal
+          HTML; canvas hiç çizilmese bile başlık okunur. */}
+      <section className="home-burst" aria-labelledby="home-burst-title">
+        <BurstCanvas className="home-burst__canvas" />
+        <div className="home-burst__inner">
+          <Reveal variant="clip">
+            <h2 className="home-burst__title" id="home-burst-title">
+              Marka ile<br />dijital büyüme
+            </h2>
+          </Reveal>
+          <Reveal delay={90}>
+            <p className="home-burst__text">
+              Net strateji, güçlü içerik, düzenli üretim ve kalıcı büyüme.
+            </p>
+          </Reveal>
+          <Reveal delay={160}>
+            <div className="home-burst__actions">
+              <Button to="/teklif-al" variant="primary">Teklif al</Button>
+              <Button to="/portfolio" variant="outline">Çalışmaları gör</Button>
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
       {/* ── HİZMETLER ───────────────────────────────────────────────── */}
       <Section id="hizmetler" className="home-services">
