@@ -80,6 +80,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  font-family: var(--font-mono);
   font-size: var(--fs-2xs);
   font-weight: var(--fw-semibold);
   letter-spacing: var(--tracking-wider);
@@ -134,6 +135,7 @@
 }
 .kade-section-head__text { display: flex; flex-direction: column; gap: var(--space-3); }
 .kade-section-head__index {
+  font-family: var(--font-mono);
   font-size: var(--fs-2xs);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
@@ -261,7 +263,12 @@
   text-decoration: none;
   font-weight: var(--fw-medium);
   position: relative;
+  outline: 1px dotted transparent;
+  outline-offset: 8px;
+  transition: outline-color var(--dur-ui) var(--ease-out);
 }
+.kade-link:hover,
+.kade-link:focus-visible { outline-color: var(--kade-line-strong); }
 .kade-link::after {
   content: '';
   position: absolute;
