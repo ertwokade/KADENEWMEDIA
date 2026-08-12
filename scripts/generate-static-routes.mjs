@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 import { FAQ_ITEMS } from '../src/data/faq.js'
@@ -14,9 +14,9 @@ const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
 const template = await readFile(join(DIST, 'app.html'), 'utf8')
 
 const routes = [
-  // Ana sayfa artık React uygulamasından ön-render ediliyor. Daha önce `/`
-  // adresi başka bir projenin statik snapshot'ına (public/site.html) rewrite
-  // ediliyordu; snapshot emekliye ayrıldı.
+  // Bu React çıktısı build sırasında geçici bir SEO/fallback sayfası üretir.
+  // Döngünün sonunda `/` için fiziksel dist/index.html, Haoqi snapshot'ıyla
+  // değiştirilir. Böylece Vercel'in statik dosya önceliğine bağımlı kalınmaz.
   ['/', 'Kade New Media | İstanbul Sosyal Medya & Dijital Pazarlama Ajansı', 'İstanbul merkezli sosyal medya ve dijital pazarlama ajansı Kade New Media. Instagram, TikTok, YouTube yönetimi, içerik üretimi, reklam ve prodüksiyonla markanızı dijitalde büyütüyoruz.', false],
   ['/hakkimizda', 'Kade Media Hakkında | New Media Ajansı İstanbul', 'Kade Media; Kade New Media, Kademedia ve Kadenewmedia adlarıyla da aranan İstanbul merkezli new media ve dijital pazarlama ajansıdır.', false],
   ['/hizmetler', 'New Media ve Dijital Medya Hizmetleri | Kade Media', 'Kade Media’nın sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetleri.', false],
@@ -289,4 +289,11 @@ for (const [route, title, description, noindex] of routes) {
   await writeFile(join(directory, 'index.html'), render(route, title, description, noindex))
 }
 
+// Vercel fiziksel dist/index.html dosyasını rewrite kurallarından önce servis
+// edebiliyor. Anasayfayı yalnız `"/" -> "/site.html"` rewrite'ına bırakmak bu
+// nedenle React fallback'ini canlıya çıkarıyordu. Snapshot'ı doğrudan kök
+// dosyaya kopyalayarak iki ortamda da aynı Haoqi arayüzünü garanti ediyoruz.
+await copyFile(join(DIST, 'site.html'), join(DIST, 'index.html'))
+
 console.log(`Generated ${routes.length} route entry files.`)
+console.log('Installed Haoqi snapshot as dist/index.html.')

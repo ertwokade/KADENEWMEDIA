@@ -5,8 +5,9 @@
  * İki regresyonu kalıcı olarak kilitler:
  *
  *  1) Anasayfa snapshot'ı eksiksiz çıksın. Anasayfa (yalnız "/") derlenmiş bir
- *     statik snapshot ile servis ediliyor: public/site.html + public/_next/**,
- *     vercel.json'daki "/" → "/site.html" rewrite'ı üzerinden. Snapshot bir
+ *     statik snapshot ile servis ediliyor: public/site.html + public/_next/**.
+ *     Build sonunda snapshot hem dist/site.html hem de fiziksel
+ *     dist/index.html olarak bulunur; Vercel rewrite önceliğine güvenilmez. Bir
  *     dönem kaldırılmış, yerine React anasayfası konmuştu; site sahibinin
  *     talebiyle geri alındı. Bu kontrol artık TERSİ yönde koruyor: snapshot
  *     ya da referans verdiği chunk'lardan biri dist'e girmezse anasayfa
@@ -55,7 +56,9 @@ const cssFiles = files.filter((f) => f.endsWith('.css'))
 console.log('\nAnasayfa snapshot kontrolü')
 
 const SNAPSHOT = join(DIST, 'site.html')
+const INDEX = join(DIST, 'index.html')
 const snapshotHtml = (await exists(SNAPSHOT)) ? await readFile(SNAPSHOT, 'utf8') : null
+const indexHtml = (await exists(INDEX)) ? await readFile(INDEX, 'utf8') : null
 
 if (!snapshotHtml) {
   fail('dist/site.html yok — anasayfa snapshot\'ı build çıktısına girmemiş')
@@ -80,6 +83,9 @@ if (!snapshotHtml) {
   // bir markanın imzası görünür.
   if (!/svg-sign/.test(snapshotHtml)) fail('dist/site.html: Kade imza yaması kaybolmuş')
   else ok('Kade imza yaması yerinde')
+
+  if (indexHtml !== snapshotHtml) fail('dist/index.html Haoqi snapshot\'ıyla aynı değil — Vercel kökte React fallback servis edebilir')
+  else ok('dist/index.html doğrudan Haoqi snapshot\'ını içeriyor')
 }
 
 // Snapshot DIŞINDAKİ hiçbir HTML yabancı bundle'a referans vermemeli; verirse
@@ -87,29 +93,24 @@ if (!snapshotHtml) {
 // değişken adları yanlış pozitif ürettiği için yalnızca HTML'e ve gerçek
 // script/link referanslarına bakılır.
 for (const file of htmlFiles) {
-  if (file === SNAPSHOT) continue
+  if (file === SNAPSHOT || file === INDEX) continue
   const html = await readFile(file, 'utf8')
   const nextRefs = html.match(/(?:src|href)="\/?_next\//g) || []
   if (nextRefs.length) fail(`${rel(file)}: ${nextRefs.length} adet /_next/ referansı var — snapshot iç sayfaya sızmış`)
 }
-if (!failures.some((f) => f.includes('sızmış'))) ok(`${htmlFiles.length - 1} iç sayfa HTML'inde /_next/ referansı yok`)
+if (!failures.some((f) => f.includes('sızmış'))) ok(`${htmlFiles.length - 2} iç sayfa HTML'inde /_next/ referansı yok`)
 
-// Anasayfa ile bir iç sayfa aynı uygulama bundle'ını yüklemeli; farklıysa
-// tekrar iki ayrı uygulama servis ediliyor demektir.
-//
-// NOT: buradaki "anasayfa" dist/index.html'dir — "/" adresini snapshot
-// devraldığı için index.html artık yalnız SEO/fallback çıktısıdır. Kontrol
-// yine de değerli: iç sayfaların hepsinin tek bir React bundle'ından
-// beslendiğini doğrular.
+// React iç sayfaları ve app.html aynı uygulama bundle'ını yüklemeli. Anasayfa
+// özellikle Haoqi snapshot'ıdır ve bu karşılaştırmaya dahil edilmez.
 const bundleOf = (html) => (html.match(/\/assets\/(index-[A-Za-z0-9_-]+\.js)/) || [])[1] || null
-const homeBundle = bundleOf(await readFile(join(DIST, 'index.html'), 'utf8'))
+const appBundle = bundleOf(await readFile(join(DIST, 'app.html'), 'utf8'))
 const innerPath = join(DIST, 'hakkimizda', 'index.html')
-if (!homeBundle) {
-  fail('dist/index.html bir /assets/index-*.js bundle\'ı yüklemiyor')
+if (!appBundle) {
+  fail('dist/app.html bir /assets/index-*.js bundle\'ı yüklemiyor')
 } else if (await exists(innerPath)) {
   const innerBundle = bundleOf(await readFile(innerPath, 'utf8'))
-  if (homeBundle !== innerBundle) fail(`anasayfa (${homeBundle}) ve /hakkimizda (${innerBundle}) farklı bundle yüklüyor`)
-  else ok(`anasayfa ve iç sayfalar aynı bundle'ı yüklüyor (${homeBundle})`)
+  if (appBundle !== innerBundle) fail(`app.html (${appBundle}) ve /hakkimizda (${innerBundle}) farklı bundle yüklüyor`)
+  else ok(`React iç sayfaları aynı bundle'ı yüklüyor (${appBundle})`)
 }
 
 // ── 2. Tasarım token katmanı ───────────────────────────────────────────────
