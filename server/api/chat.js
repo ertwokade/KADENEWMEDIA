@@ -91,7 +91,10 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: promptText }] }],
-          generationConfig: { maxOutputTokens: isAdmin ? 800 : 300, temperature: 0.7 },
+          generationConfig: {
+            maxOutputTokens: isAdmin ? 1200 : 500,
+            thinkingConfig: { thinkingLevel: 'minimal' },
+          },
         }),
       }
     );
@@ -107,7 +110,7 @@ export default async function handler(req, res) {
 
     const data = await apiRes.json();
     const text = data?.candidates?.[0]?.content?.parts
-      ?.filter(part => typeof part?.text === 'string')
+      ?.filter(part => typeof part?.text === 'string' && part.thought !== true)
       .at(-1)?.text;
 
     if (text) {
