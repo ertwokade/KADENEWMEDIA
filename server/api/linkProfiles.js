@@ -15,7 +15,9 @@ function sanitizeLinks(value) {
       const clean = Object.fromEntries(Object.entries(item).filter(([key]) => LINK_FIELDS.has(key)));
       if (typeof clean.label !== 'string' || typeof clean.url !== 'string') return null;
       clean.label = clean.label.trim().slice(0, 60);
-      clean.url = clean.url.trim().slice(0, 500);
+      let url = clean.url.trim();
+      if (url && !/^https?:\/\//i.test(url)) url = `https://${url}`;
+      clean.url = url.slice(0, 500);
       clean.icon = typeof clean.icon === 'string' ? clean.icon.trim().slice(0, 30) : 'custom';
       if (!clean.label || !/^https?:\/\//i.test(clean.url)) return null;
       return clean;

@@ -9,6 +9,11 @@
 @import './styles/kade-tokens.css';
 @import './styles/kade-design.css';
 
+::selection {
+  background: var(--kade-gold);
+  color: var(--kade-ink);
+}
+
 /* ---------------------------------------------------------------------------
    ESKİ PALET TAKMA ADLARI — yalnız burada TANIMLANMAYANLAR kaldı.
    ---------------------------------------------------------------------------

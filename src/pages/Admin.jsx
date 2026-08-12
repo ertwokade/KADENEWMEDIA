@@ -2425,7 +2425,9 @@ function LinkProfilesSection({ showToast }) {
       slug: profile.slug || '', name: profile.name || '', handle: profile.handle || '',
       tagline: profile.tagline || '', photo: profile.photo || '', active: profile.active !== false,
       accentColor: profile.accentColor || '#d4943f',
-      links: profile.links?.length ? profile.links.map((l) => ({ ...l })) : [{ label: '', url: '', icon: 'instagram' }],
+      links: profile.links?.length
+        ? profile.links.map((l) => ({ label: l?.label || '', url: l?.url || '', icon: l?.icon || 'instagram' }))
+        : [{ label: '', url: '', icon: 'instagram' }],
     })
     setEditingProfile(profile)
     setShowForm(true)
@@ -2444,6 +2446,16 @@ function LinkProfilesSection({ showToast }) {
   const handleSave = async () => {
     if (isLocalMode()) { showToast('Sunucu bağlantısı yok — yazma işlemi yapılamaz.', 'error'); return }
     if (!form.slug.trim() || !form.name.trim()) { showToast('Slug ve isim gerekli', 'error'); return }
+
+    const filledLinks = form.links.filter((l) => l.label.trim() || l.url.trim())
+    const normalizedLinks = []
+    for (const l of filledLinks) {
+      if (!l.label.trim() || !l.url.trim()) { showToast('Her link için hem etiket hem adres girilmeli', 'error'); return }
+      const url = /^https?:\/\//i.test(l.url.trim()) ? l.url.trim() : `https://${l.url.trim()}`
+      try { new URL(url) } catch { showToast(`Geçersiz link adresi: ${l.url}`, 'error'); return }
+      normalizedLinks.push({ ...l, label: l.label.trim(), url })
+    }
+
     const payload = {
       slug: form.slug.trim().toLowerCase(),
       name: form.name.trim(),
@@ -2452,7 +2464,7 @@ function LinkProfilesSection({ showToast }) {
       photo: form.photo,
       active: form.active,
       accentColor: form.accentColor || '#d4943f',
-      links: form.links.filter((l) => l.label.trim() && l.url.trim()),
+      links: normalizedLinks,
     }
     try {
       if (editingProfile?._id) {
@@ -2593,6 +2605,9 @@ function LinkProfilesSection({ showToast }) {
 
                 <div className="form-group">
                   <label>Linkler</label>
+                  <small style={{ display: 'block', color: 'var(--text-secondary)', marginBottom: 8 }}>
+                    Her satıra bir etiket (örn. Instagram) ve o hesabın/sayfanın adresini yazın. Adresi "https://" olmadan da yazabilirsiniz (örn. instagram.com/hesap-adi) — otomatik tamamlanır. Boş bıraktığınız satırlar kaydedilmez.
+                  </small>
                   {form.links.map((link, i) => (
                     <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
                       <select value={link.icon} onChange={(e) => updateLink(i, 'icon', e.target.value)} style={{ padding: '8px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
