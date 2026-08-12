@@ -84,6 +84,10 @@ if (!snapshotHtml) {
   if (!/svg-sign/.test(snapshotHtml)) fail('dist/site.html: Kade imza yaması kaybolmuş')
   else ok('Kade imza yaması yerinde')
 
+  if (!/src="\/homepage-admin\.js"/.test(snapshotHtml)) fail('dist/site.html: admin ana sayfa runtime bağlantısı yok')
+  else if (!await exists(join(DIST, 'homepage-admin.js'))) fail('dist/homepage-admin.js yok — admin içerikleri ana sayfaya uygulanamaz')
+  else ok('admin ana sayfa runtime bağlantısı yerinde')
+
   if (indexHtml !== snapshotHtml) fail('dist/index.html Haoqi snapshot\'ıyla aynı değil — Vercel kökte React fallback servis edebilir')
   else ok('dist/index.html doğrudan Haoqi snapshot\'ını içeriyor')
 }

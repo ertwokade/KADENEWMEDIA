@@ -9,14 +9,14 @@ import jwt from 'jsonwebtoken';
 // public GET /api/content çağrısının takvim gibi iç verileri sızdırmasını
 // engeller.
 export const CONTENT_SECTIONS = new Set([
-  'hero', 'stats', 'services', 'faq', 'testimonials', 'packages',
+  'homepage', 'hero', 'stats', 'services', 'faq', 'testimonials', 'packages',
   'priceCalculator', 'about', 'footer', 'careers', 'basin', 'nedenBiz',
   'tesekkur', 'referralProgram', 'podcastWebinar', 'caseStudies',
   'newsletterArchive', 'calendar', 'portfolio',
 ]);
 
 export const PUBLIC_CONTENT_SECTIONS = new Set([
-  'hero', 'stats', 'services', 'faq', 'testimonials', 'packages',
+  'homepage', 'hero', 'stats', 'services', 'faq', 'testimonials', 'packages',
   'about', 'footer', 'careers', 'tesekkur', 'caseStudies', 'portfolio',
 ]);
 

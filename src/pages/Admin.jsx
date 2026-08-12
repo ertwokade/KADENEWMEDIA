@@ -26,10 +26,12 @@ import ReferralEditor from './admin/editors/ReferralEditor'
 import PodcastWebinarEditor from './admin/editors/PodcastWebinarEditor'
 import CaseStudiesEditor from './admin/editors/CaseStudiesEditor'
 import NewsletterArchiveEditor from './admin/editors/NewsletterArchiveEditor'
+import HomepageEditor from './admin/editors/HomepageEditor'
 import { blogPosts as staticBlogPosts, partnersData as staticPartnersData } from '../data/content'
 import { PACKAGE_SCOPES } from '../data/packages'
 import { SERVICE_DETAILS } from '../data/serviceDetails'
 import { ABOUT_CONTENT_FALLBACK } from '../data/about'
+import { HOMEPAGE_DEFAULTS } from '../data/homepage'
 import { getPackageEntitlements } from '../config/entitlements'
 import { PROJECT_CATEGORIES, PROJECT_KINDS, normalizeProjects, hasDetailContent, slugify } from '../data/projects'
 import { SERVICES as NMA_SERVICES } from '../data/newMediaAgency'
@@ -1032,7 +1034,7 @@ function BlogSection({ showToast }) {
 
 // ========== CONTENT MANAGEMENT ==========
 function ContentSection({ showToast }) {
-  const [activeTab, setActiveTab] = useState('hero')
+  const [activeTab, setActiveTab] = useState('homepage')
   const [content, setContent] = useState({})
   const [loading, setLoading] = useState(true)
   const [isDirty, setIsDirty] = useState(false)
@@ -1081,6 +1083,7 @@ function ContentSection({ showToast }) {
   // Bu alan olmadan yönetici, hiçbir yere yansımayan ekranlarda içerik girip
   // "kaydedildi" bildirimi alıyordu.
   const tabs = [
+    { id: 'homepage', label: '✨ Ana Sayfa', desc: 'Haoqi ana sayfasındaki tüm görünen içerikler', route: '/', status: 'live' },
     { id: 'hero', label: '🏠 Hero', desc: 'Anasayfa başlık ve açıklama', route: '/', status: 'static' },
     { id: 'stats', label: '📊 İstatistikler', desc: 'Sayaç verileri', route: '/', status: 'static' },
     { id: 'services', label: '⚡ Hizmetler', desc: 'Hizmet kartları', route: '/hizmetler', status: 'live' },
@@ -1103,6 +1106,17 @@ function ContentSection({ showToast }) {
 
   // Memoize data props to prevent child editors from resetting form state on re-render
   // (isDirty state change triggers re-render; inline fallback objects would create new refs each time)
+  const homepageData = useMemo(() => ({
+    ...HOMEPAGE_DEFAULTS,
+    ...(content.homepage || {}),
+    hero: { ...HOMEPAGE_DEFAULTS.hero, ...(content.homepage?.hero || {}) },
+    intro: { ...HOMEPAGE_DEFAULTS.intro, ...(content.homepage?.intro || {}) },
+    navItems: Array.isArray(content.homepage?.navItems) ? content.homepage.navItems : HOMEPAGE_DEFAULTS.navItems,
+    workItems: Array.isArray(content.homepage?.workItems) ? content.homepage.workItems : HOMEPAGE_DEFAULTS.workItems,
+    statementLines: Array.isArray(content.homepage?.statementLines) ? content.homepage.statementLines : HOMEPAGE_DEFAULTS.statementLines,
+    contactLines: Array.isArray(content.homepage?.contactLines) ? content.homepage.contactLines : HOMEPAGE_DEFAULTS.contactLines,
+    socialLinks: Array.isArray(content.homepage?.socialLinks) ? content.homepage.socialLinks : HOMEPAGE_DEFAULTS.socialLinks,
+  }), [content.homepage])
   const heroData = useMemo(() => content.hero || {
     tr: { title1: 'Dijital Dünyada Markanıza', title2: 'Kademe Atlatıyoruz ⚡', subtitle: 'Kade New Media olarak sosyal medya stratejileri, kreatif içerik üretimi ve dijital pazarlama çözümleriyle markanızı zirveye taşıyoruz.' },
     en: { title1: 'Level Up Your Brand', title2: 'In The Digital World ⚡', subtitle: 'At Kade New Media, we take your brand to the top with social media strategies, creative content production, and digital marketing solutions.' },
@@ -1233,6 +1247,13 @@ function ContentSection({ showToast }) {
       )}
 
       <div onInput={() => setIsDirty(true)} onChange={() => setIsDirty(true)}>
+      {activeTab === 'homepage' && (
+        <HomepageEditor
+          data={homepageData}
+          onSave={(data) => handleSave('homepage', data)}
+        />
+      )}
+
       {activeTab === 'hero' && (
         <HeroEditor
           data={heroData}
