@@ -106,7 +106,9 @@ export default async function handler(req, res) {
     }
 
     const data = await apiRes.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data?.candidates?.[0]?.content?.parts
+      ?.filter(part => typeof part?.text === 'string')
+      .at(-1)?.text;
 
     if (text) {
       logAiUsage(isAdmin ? 'admin' : 'public', 'gemini-3.6-flash', data?.usageMetadata);
