@@ -84,7 +84,7 @@ export default async function handler(req, res) {
     }
 
     const apiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_KEY}`,
       {
         method: 'POST',
         signal: AbortSignal.timeout(25000),
@@ -109,7 +109,7 @@ export default async function handler(req, res) {
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (text) {
-      logAiUsage(isAdmin ? 'admin' : 'public', 'gemini-2.5-flash', data?.usageMetadata);
+      logAiUsage(isAdmin ? 'admin' : 'public', 'gemini-3.6-flash', data?.usageMetadata);
       return res.status(200).json({ reply: text.trim() });
     }
     if (isAdmin) {
