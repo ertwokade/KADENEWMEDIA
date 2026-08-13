@@ -189,7 +189,6 @@ function getCanvasTheme(pathname) {
 function App() {
   const location = useLocation()
   const isAdmin = location.pathname === '/admin'
-  const isHome = location.pathname === '/'
   const isLoginArea = location.pathname.startsWith('/giris')
   const isLinkProfile = location.pathname.startsWith('/@') || location.pathname === '/kadirdemir'
   // İKİ AYRI KARAR — tek bayrak yetmez:
@@ -199,13 +198,14 @@ function App() {
   //                tam ekran katmanlar; ana sayfanın kendi CSS zemini ve büyük
   //                tipografisi var, üst üste binince giriş okunamaz hâle geliyor.
   const hideChrome = isAdmin || isLoginArea || isLinkProfile
-  const hideDecor = hideChrome || isHome
   const isAppUI = isAdmin
     || isLinkProfile
     || location.pathname.startsWith('/organizasyon-kiti')
     || location.pathname === '/kade-kit-business'
     || location.pathname === '/musteri-panel'
     || location.pathname === '/proje-takip'
+  const isMarketingSite = !isAppUI && !isLoginArea && !isLinkProfile
+  const hideDecor = hideChrome || isMarketingSite
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 
@@ -213,8 +213,12 @@ function App() {
   // araç/panel sayfalarında (Kade AI panelleri dahil) normal imleç kullanılır.
   useEffect(() => {
     document.body.classList.toggle('kade-app-ui', isAppUI)
-    return () => document.body.classList.remove('kade-app-ui')
-  }, [isAppUI])
+    document.body.classList.toggle('kade-marketing', isMarketingSite)
+    return () => {
+      document.body.classList.remove('kade-app-ui')
+      document.body.classList.remove('kade-marketing')
+    }
+  }, [isAppUI, isMarketingSite])
 
   useEffect(() => {
     // Don't track admin visits, avoid duplicate on first render

@@ -1,0 +1,792 @@
+/* ============================================================================
+   KADE — PUBLIC ROUTE UNIFICATION
+   ----------------------------------------------------------------------------
+   Home.jsx is the visual source of truth. This layer carries its editorial
+   grid, large uppercase type, ruled cards and gold/acid accents across every
+   public route while leaving admin, customer and product UIs untouched.
+   ========================================================================== */
+
+body.kade-marketing {
+  background: var(--kade-canvas);
+  color: var(--kade-ink);
+}
+
+body.kade-marketing main {
+  position: relative;
+  isolation: isolate;
+  min-height: 70vh;
+  background: var(--kade-canvas);
+}
+
+/* Legacy route decorations are replaced by the same quiet ruled grid used on
+   the homepage. Content remains regular HTML and never depends on animation. */
+body.kade-marketing :is(.page-bg-anim, .grid-bg, .glow-effect) {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   ROUTE HEROES
+--------------------------------------------------------------------------- */
+body.kade-marketing :is(
+  .about-hero,
+  .blog-hero,
+  .contact-hero,
+  .packages-hero,
+  .partners-hero,
+  .careers-hero,
+  .team-hero,
+  .referanslar-hero,
+  .case-hero,
+  .sss-hero,
+  .quote-hero,
+  .new-media-hero,
+  .content-page-hero,
+  .partner-detail-hero
+) {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(540px, 74svh, 780px);
+  padding: clamp(150px, 19vh, 210px) 0 clamp(64px, 9vh, 104px);
+  overflow: hidden;
+  border: 0;
+  border-bottom: 1px solid var(--kade-line);
+  background-color: var(--kade-canvas);
+  background-image:
+    linear-gradient(90deg, var(--kade-line) 1px, transparent 1px),
+    linear-gradient(0deg, var(--kade-line) 1px, transparent 1px);
+  background-size: 25% 100%, 100% 260px;
+  color: var(--kade-ink);
+  text-align: left;
+}
+
+body.kade-marketing :is(
+  .about-hero,
+  .blog-hero,
+  .contact-hero,
+  .packages-hero,
+  .partners-hero,
+  .careers-hero,
+  .team-hero,
+  .referanslar-hero,
+  .case-hero,
+  .sss-hero,
+  .quote-hero,
+  .new-media-hero,
+  .content-page-hero,
+  .partner-detail-hero
+)::after {
+  content: 'KADE / NEW MEDIA';
+  position: absolute;
+  right: var(--container-pad);
+  bottom: clamp(28px, 4vw, 56px);
+  color: var(--kade-ink-3);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-widest);
+  writing-mode: vertical-rl;
+}
+
+body.kade-marketing :is(
+  .about-hero,
+  .blog-hero,
+  .contact-hero,
+  .packages-hero,
+  .partners-hero,
+  .careers-hero,
+  .team-hero,
+  .referanslar-hero,
+  .case-hero,
+  .sss-hero,
+  .quote-hero,
+  .new-media-hero,
+  .content-page-hero,
+  .partner-detail-hero
+) > .container {
+  position: relative;
+  z-index: 1;
+}
+
+body.kade-marketing .section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-6);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--kade-ink-3);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  line-height: 1.4;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+body.kade-marketing .section-badge::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+}
+
+body.kade-marketing .section-title {
+  max-width: 18ch;
+  margin: 0;
+  color: var(--kade-ink);
+  font-size: clamp(2.7rem, 7.1vw, 6.8rem) !important;
+  font-weight: var(--fw-bold);
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  text-align: left;
+  text-wrap: balance;
+  text-transform: uppercase;
+}
+
+body.kade-marketing .section-title span {
+  color: inherit;
+  -webkit-text-fill-color: currentColor;
+  background: none;
+}
+
+body.kade-marketing .section-subtitle {
+  max-width: 58ch;
+  margin: var(--space-7) 0 0;
+  color: var(--kade-ink-2);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-snug);
+  text-align: left;
+}
+
+/* New-system heroes use their own semantic markup; make them the same scale. */
+body.kade-marketing .kade-pagetop {
+  min-height: clamp(540px, 74svh, 780px);
+  border-bottom: 1px solid var(--kade-line);
+}
+
+body.kade-marketing .kade-pagetop__title {
+  max-width: 18ch;
+  font-size: clamp(2.7rem, 7.1vw, 6.8rem);
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   SECTION RHYTHM + EDITORIAL PANELS
+--------------------------------------------------------------------------- */
+body.kade-marketing .container {
+  max-width: var(--container-max);
+  padding-inline: var(--container-pad);
+}
+
+body.kade-marketing .section {
+  position: relative;
+  z-index: 1;
+  padding-block: var(--section-y);
+  background: var(--kade-canvas);
+  color: var(--kade-ink);
+}
+
+body.kade-marketing .section + .section {
+  border-top: 1px solid var(--kade-line);
+}
+
+body.kade-marketing .section-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.45fr);
+  gap: var(--space-8);
+  align-items: end;
+  margin: 0 0 clamp(44px, 7vw, 84px);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--kade-line);
+  text-align: left;
+}
+
+body.kade-marketing .section-header .section-title {
+  font-size: clamp(2rem, 4.3vw, 4.2rem) !important;
+}
+
+body.kade-marketing :is(.glass-card, .content-panel, .content-card) {
+  border: 1px solid var(--kade-line);
+  border-radius: 0 !important;
+  background: var(--kade-canvas);
+  color: var(--kade-ink);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body.kade-marketing :is(.glass-card, .content-panel, .content-card):hover {
+  border-color: var(--kade-ink-3);
+  box-shadow: none;
+}
+
+body.kade-marketing :is(
+  .value-card,
+  .team-card,
+  .package-card,
+  .faq-card,
+  .blog-card,
+  .blog-featured,
+  .careers-job-card,
+  .content-card,
+  .content-panel,
+  .contact-card,
+  .case-study,
+  .reference-card,
+  .sss-item
+) {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(24px, 3.2vw, 42px);
+  transition:
+    color var(--dur-ui) var(--ease-out),
+    background var(--dur-ui) var(--ease-out),
+    border-color var(--dur-ui) var(--ease-out),
+    transform var(--dur-ui) var(--ease-out);
+}
+
+body.kade-marketing :is(
+  .value-card,
+  .team-card,
+  .package-card,
+  .faq-card,
+  .blog-card,
+  .careers-job-card,
+  .content-card,
+  .contact-card
+):hover {
+  transform: translateY(-4px);
+  background: var(--kade-surface-2);
+}
+
+body.kade-marketing :is(
+  .value-card,
+  .team-card,
+  .package-card,
+  .faq-card,
+  .blog-card,
+  .blog-featured,
+  .careers-job-card,
+  .content-card,
+  .content-panel,
+  .contact-card,
+  .case-study,
+  .sss-item
+) :is(h2, h3, h4) {
+  color: var(--kade-ink);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+body.kade-marketing :is(
+  .value-card,
+  .team-card,
+  .package-card,
+  .faq-card,
+  .blog-card,
+  .blog-featured,
+  .careers-job-card,
+  .content-card,
+  .content-panel,
+  .contact-card,
+  .case-study,
+  .sss-item
+) p {
+  color: var(--kade-ink-2);
+  line-height: var(--lh-body);
+}
+
+body.kade-marketing :is(
+  .values-grid,
+  .team-grid,
+  .packages-grid,
+  .faq-grid,
+  .blog-grid,
+  .careers-job-grid,
+  .content-card-grid,
+  .contact-cards,
+  .case-stats-grid,
+  .referanslar-grid
+) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--kade-line);
+  background: var(--kade-line);
+}
+
+body.kade-marketing :is(
+  .values-grid,
+  .team-grid,
+  .packages-grid,
+  .faq-grid,
+  .blog-grid,
+  .careers-job-grid,
+  .content-card-grid,
+  .contact-cards,
+  .case-stats-grid,
+  .referanslar-grid
+) > * {
+  min-width: 0;
+  border: 0;
+  background: var(--kade-canvas);
+}
+
+/* --------------------------------------------------------------------------
+   PAGE-SPECIFIC STRUCTURES, ONE VISUAL LANGUAGE
+--------------------------------------------------------------------------- */
+body.kade-marketing :is(.story-grid, .contact-grid, .content-page-grid, .calculator-layout) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(32px, 6vw, 88px);
+  align-items: start;
+}
+
+body.kade-marketing .story-content > h2,
+body.kade-marketing .contact-info > h2,
+body.kade-marketing .blog-newsletter > h2,
+body.kade-marketing .content-cta > h2,
+body.kade-marketing .portfolio-cta > h2,
+body.kade-marketing .sss-cta > h2 {
+  margin: 0 0 var(--space-5);
+  color: var(--kade-ink);
+  font-size: clamp(2rem, 4.5vw, 4.4rem);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+body.kade-marketing .story-content > p,
+body.kade-marketing .contact-info-desc {
+  max-width: 58ch;
+  margin-bottom: var(--space-5);
+  color: var(--kade-ink-2);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+}
+
+body.kade-marketing .story-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: var(--space-8);
+  border: 1px solid var(--kade-line);
+  background: var(--kade-line);
+}
+
+body.kade-marketing .story-stat {
+  display: flex;
+  min-height: 150px;
+  padding: var(--space-5);
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--kade-canvas);
+}
+
+body.kade-marketing .story-stat-number {
+  color: var(--kade-ink);
+  font-size: clamp(2rem, 5vw, 4.6rem);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+}
+
+body.kade-marketing .visual-card {
+  display: grid;
+  min-height: 440px;
+  place-items: center;
+  background: #121414;
+}
+
+body.kade-marketing .blog-featured {
+  display: grid;
+  grid-template-columns: 1.08fr 1fr;
+  gap: 0;
+  margin-bottom: clamp(40px, 7vw, 80px);
+  padding: 0;
+}
+
+body.kade-marketing :is(.blog-featured-image, .blog-card-image) {
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  overflow: hidden;
+  background: #121414;
+  color: #fff;
+  font-size: 4rem;
+}
+
+body.kade-marketing :is(.blog-featured-image, .blog-card-image) img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+body.kade-marketing .blog-featured-content,
+body.kade-marketing .blog-card-content {
+  display: flex;
+  padding: clamp(26px, 4vw, 52px);
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+body.kade-marketing .blog-meta,
+body.kade-marketing :is(.careers-job-meta, .pkg-tag, .content-kicker) {
+  color: var(--kade-ink-3);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+body.kade-marketing :is(.blog-newsletter, .content-cta, .portfolio-cta, .sss-cta, .case-cta) {
+  padding: clamp(40px, 7vw, 88px);
+  border: 1px solid var(--kade-line);
+  border-radius: 0;
+  background: #121414;
+  color: #fff;
+  text-align: left;
+}
+
+body.kade-marketing :is(.blog-newsletter, .content-cta, .portfolio-cta, .sss-cta, .case-cta) p {
+  max-width: 58ch;
+  margin: 0 0 var(--space-6);
+  color: rgba(230, 232, 232, 0.78);
+}
+
+body.kade-marketing .pf-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--kade-line);
+}
+
+body.kade-marketing .pf-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--kade-line);
+  background: var(--kade-line);
+}
+
+body.kade-marketing .pf-tile {
+  min-height: 260px;
+  padding: var(--space-6);
+  background: var(--kade-canvas);
+}
+
+body.kade-marketing .pf-proc {
+  border-top: 1px solid var(--kade-line);
+}
+
+body.kade-marketing .pf-proc-row {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr) auto;
+  gap: var(--space-7);
+  align-items: center;
+  padding: clamp(26px, 4vw, 48px) 0;
+  border-bottom: 1px solid var(--kade-line);
+}
+
+body.kade-marketing .pf-proc-main h3 {
+  color: var(--kade-ink);
+  font-size: clamp(1.7rem, 3.8vw, 3.8rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+body.kade-marketing .pf-proc-main p,
+body.kade-marketing :is(.pf-idx, .pf-c, .pf-proc-n) {
+  color: var(--kade-ink-3);
+}
+
+body.kade-marketing .pf-proc-tag {
+  padding: 5px 10px;
+  background: var(--kade-accent);
+  color: var(--kade-on-brand);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+/* Forms: square, quiet, high contrast — like the homepage buttons/cards. */
+body.kade-marketing :is(.contact-form, .quote-form, .calculator-form) {
+  padding: clamp(28px, 4vw, 52px);
+  border: 1px solid var(--kade-line);
+  border-radius: 0 !important;
+  background: var(--kade-surface-2);
+  box-shadow: none;
+}
+
+body.kade-marketing :is(.contact-form, .quote-form, .calculator-form) h3 {
+  color: var(--kade-ink);
+  font-size: clamp(1.5rem, 3vw, 2.7rem);
+  text-transform: uppercase;
+}
+
+body.kade-marketing :is(input, textarea, select) {
+  border: 1px solid var(--kade-line);
+  border-radius: 0 !important;
+  background: var(--kade-canvas);
+  color: var(--kade-ink);
+  box-shadow: none;
+}
+
+body.kade-marketing :is(input, textarea, select):focus {
+  border-color: var(--kade-gold-text);
+  box-shadow: 0 0 0 1px var(--kade-gold-text);
+}
+
+body.kade-marketing :is(label, .form-label, .form-hint) {
+  color: var(--kade-ink-2);
+}
+
+body.kade-marketing :is(.btn, .kade-btn) {
+  min-height: 48px;
+  border-radius: 0;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+body.kade-marketing :is(.btn-primary, .kade-btn--primary) {
+  border: 1px solid var(--kade-gold);
+  background: var(--kade-gold);
+  color: var(--kade-on-brand);
+}
+
+body.kade-marketing :is(.btn-outline, .btn-secondary, .kade-btn--outline) {
+  border: 1px solid var(--kade-line);
+  background: transparent;
+  color: var(--kade-ink);
+}
+
+body.kade-marketing :is(.btn-outline, .btn-secondary, .kade-btn--outline):hover {
+  border-color: var(--kade-ink);
+  background: var(--kade-ink);
+  color: var(--kade-canvas);
+}
+
+/* FAQ rows and comparison tables use the homepage process-row rhythm. */
+body.kade-marketing :is(.sss-liste, .comparison-table, .case-list) {
+  border-top: 1px solid var(--kade-line);
+}
+
+body.kade-marketing .sss-item {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--kade-line);
+  background: transparent;
+}
+
+body.kade-marketing .sss-soru {
+  width: 100%;
+  padding: clamp(24px, 4vw, 42px) 0;
+  background: transparent;
+  color: var(--kade-ink);
+  font-size: clamp(1.25rem, 2.7vw, 2.3rem);
+  font-weight: var(--fw-semibold);
+  text-align: left;
+}
+
+body.kade-marketing .sss-cevap {
+  max-width: 72ch;
+  padding: 0 0 var(--space-7);
+  color: var(--kade-ink-2);
+}
+
+body.kade-marketing .comparison-row {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1fr;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  border: 0;
+  border-bottom: 1px solid var(--kade-line);
+  background: transparent;
+  color: var(--kade-ink-2);
+}
+
+body.kade-marketing .comparison-head {
+  color: var(--kade-ink-3);
+  font-size: var(--fs-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+/* Legal, detail and status routes keep their content but gain the same canvas. */
+body.kade-marketing .legal-page {
+  min-height: 100vh;
+  padding: clamp(150px, 18vh, 210px) 0 var(--section-y);
+  background-color: var(--kade-canvas);
+  background-image:
+    linear-gradient(90deg, var(--kade-line) 1px, transparent 1px),
+    linear-gradient(0deg, var(--kade-line) 1px, transparent 1px);
+  background-size: 25% 100%, 100% 260px;
+  color: var(--kade-ink);
+}
+
+body.kade-marketing .legal-content {
+  max-width: var(--container-narrow);
+  margin-inline: auto;
+  padding: clamp(28px, 5vw, 64px);
+  border: 1px solid var(--kade-line);
+  border-radius: 0 !important;
+  background: var(--kade-canvas);
+  color: var(--kade-ink-2);
+  box-shadow: none;
+}
+
+body.kade-marketing .legal-content h1 {
+  color: var(--kade-ink);
+  font-size: clamp(2.4rem, 6vw, 5.8rem);
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+body.kade-marketing .legal-content :is(h2, h3) {
+  margin-top: var(--space-8);
+  color: var(--kade-ink);
+}
+
+body.kade-marketing .tesekkur-section {
+  min-height: 88svh;
+  padding-block: clamp(150px, 18vh, 210px) var(--section-y);
+  background: var(--kade-canvas);
+  color: var(--kade-ink);
+}
+
+body.kade-marketing .tesekkur-baslik {
+  color: var(--kade-ink);
+  font-size: clamp(2.7rem, 7vw, 6.8rem);
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+body.kade-marketing .tesekkur-baslik span {
+  color: inherit;
+  -webkit-text-fill-color: currentColor;
+  background: none;
+}
+
+body.kade-marketing main :is(
+  .quote-steps,
+  .quote-pick-card,
+  .quote-chip,
+  .service-checkbox-item,
+  .blog-category-chip,
+  .contact-card-icon,
+  .value-icon,
+  .team-card-avatar
+) {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  body.kade-marketing :is(
+    .about-hero,
+    .blog-hero,
+    .contact-hero,
+    .packages-hero,
+    .partners-hero,
+    .careers-hero,
+    .team-hero,
+    .referanslar-hero,
+    .case-hero,
+    .sss-hero,
+    .quote-hero,
+    .new-media-hero,
+    .content-page-hero,
+    .partner-detail-hero
+  ) {
+    min-height: 610px;
+    background-size: 50% 100%, 100% 220px;
+  }
+
+  body.kade-marketing :is(
+    .values-grid,
+    .team-grid,
+    .packages-grid,
+    .faq-grid,
+    .blog-grid,
+    .careers-job-grid,
+    .content-card-grid,
+    .case-stats-grid,
+    .referanslar-grid,
+    .pf-tiles
+  ),
+  body.kade-marketing :is(.story-grid, .contact-grid, .content-page-grid, .calculator-layout),
+  body.kade-marketing .blog-featured,
+  body.kade-marketing .section-header {
+    grid-template-columns: 1fr;
+  }
+
+  body.kade-marketing .pf-proc-row {
+    grid-template-columns: 56px minmax(0, 1fr);
+  }
+
+  body.kade-marketing .pf-proc-tag {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 640px) {
+  body.kade-marketing :is(
+    .about-hero,
+    .blog-hero,
+    .contact-hero,
+    .packages-hero,
+    .partners-hero,
+    .careers-hero,
+    .team-hero,
+    .referanslar-hero,
+    .case-hero,
+    .sss-hero,
+    .quote-hero,
+    .new-media-hero,
+    .content-page-hero,
+    .partner-detail-hero
+  )::after {
+    display: none;
+  }
+
+  body.kade-marketing .story-stats,
+  body.kade-marketing .comparison-row {
+    grid-template-columns: 1fr;
+  }
+
+  body.kade-marketing .story-stat {
+    min-height: 120px;
+  }
+
+  body.kade-marketing :is(.blog-newsletter, .content-cta, .portfolio-cta, .sss-cta, .case-cta) {
+    padding: 28px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.kade-marketing :is(
+    .value-card,
+    .team-card,
+    .package-card,
+    .faq-card,
+    .blog-card,
+    .careers-job-card,
+    .content-card,
+    .contact-card
+  ) {
+    transition: none;
+  }
+}
