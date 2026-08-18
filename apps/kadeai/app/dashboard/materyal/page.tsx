@@ -36,6 +36,13 @@ const KINDS: Array<{ key: string; label: string }> = [
   { key: 'photo', label: 'Fotoğraf' },
 ]
 
+const SOURCES: Array<{ key: string; label: string }> = [
+  { key: '', label: 'Tüm kaynaklar' },
+  { key: 'arsivhub', label: 'arsivhub' },
+  { key: 'youtube', label: 'YouTube' },
+  { key: 'tiktok', label: 'TikTok' },
+]
+
 const SORTS: Array<{ key: string; label: string }> = [
   { key: 'yeni', label: 'En yeni' },
   { key: 'izlenme', label: 'En çok izlenen' },
@@ -62,6 +69,8 @@ export default function MateryalPage() {
   const [sonKosu, setSonKosu] = useState<RunRow | null>(null)
   const [arama, setArama] = useState('')
   const [tur, setTur] = useState('')
+  const [kaynak, setKaynak] = useState('')
+  const [toplamaOzeti, setToplamaOzeti] = useState<string | null>(null)
   const [sirala, setSirala] = useState('yeni')
   const [yukleniyor, setYukleniyor] = useState(true)
   const [toplaniyor, setToplaniyor] = useState(false)
@@ -74,6 +83,7 @@ export default function MateryalPage() {
       const params = new URLSearchParams({ sort: sirala, limit: '60' })
       if (arama.trim()) params.set('q', arama.trim())
       if (tur) params.set('kind', tur)
+      if (kaynak) params.set('source', kaynak)
       const cevap = await apiFetch(apiPath(`/api/materials?${params}`))
       const veri = await cevap.json()
       if (!cevap.ok) throw new Error(veri?.error || 'Materyaller getirilemedi.')
@@ -85,7 +95,7 @@ export default function MateryalPage() {
     } finally {
       setYukleniyor(false)
     }
-  }, [arama, sirala, tur])
+  }, [arama, kaynak, sirala, tur])
 
   useEffect(() => {
     const zamanlayici = setTimeout(getir, arama ? 350 : 0)
@@ -96,16 +106,23 @@ export default function MateryalPage() {
     setToplaniyor(true)
     setHata(null)
     try {
-      const cevap = await apiFetch(apiPath('/api/materials/sync'), { method: 'POST' })
+      const hedef = kaynak ? `/api/materials/sync?source=${kaynak}` : '/api/materials/sync'
+      const cevap = await apiFetch(apiPath(hedef), { method: 'POST' })
       const veri = await cevap.json()
       if (!cevap.ok) throw new Error(veri?.error || 'Toplama başarısız.')
+      /* Her kaynak kendi sonucunu döndürüyor: atlananın nedenini de gösteriyoruz. */
+      const satirlar: string[] = (veri.sonuclar ?? []).map(
+        (s: { source: string; found: number; inserted: number; error?: string }) =>
+          s.error ? `${s.source}: ${s.error}` : `${s.source}: ${s.found} kayıt, ${s.inserted} yeni`
+      )
+      setToplamaOzeti(satirlar.join(' · ') || null)
       await getir()
     } catch (e) {
       setHata(e instanceof Error ? e.message : 'Toplama başarısız.')
     } finally {
       setToplaniyor(false)
     }
-  }, [getir])
+  }, [getir, kaynak])
 
   const ozet = useMemo(() => {
     if (!sonKosu?.finished_at) return 'Henüz toplama yapılmadı'
@@ -146,6 +163,16 @@ export default function MateryalPage() {
           </div>
 
           <select
+            value={kaynak}
+            onChange={(e) => setKaynak(e.target.value)}
+            className="px-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-sm outline-none"
+          >
+            {SOURCES.map((s) => (
+              <option key={s.key || 'tum'} value={s.key}>{s.label}</option>
+            ))}
+          </select>
+
+          <select
             value={sirala}
             onChange={(e) => setSirala(e.target.value)}
             className="px-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-sm outline-none"
@@ -169,6 +196,10 @@ export default function MateryalPage() {
         <p className="text-xs text-[var(--muted)]">
           Havuzda {toplam.toLocaleString('tr-TR')} materyal · {ozet}
         </p>
+
+        {toplamaOzeti && (
+          <p className="text-xs text-[var(--muted)] border-l-2 border-[var(--accent)] pl-3">{toplamaOzeti}</p>
+        )}
 
         {hata && (
           <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400">{hata}</div>
