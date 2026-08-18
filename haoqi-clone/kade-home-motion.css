@@ -1,4 +1,4 @@
-/* Kade metinleri özgün Haoqi hareket motorunun üzerinde çalışır. */
+/* Kade metinleri, klonlanan hareket motorunun üzerinde çalışır. */
 html{view-transition-name:kade-page}
 ::view-transition-old(root){animation:kade-out .2s ease both}
 ::view-transition-new(root){animation:kade-in .45s cubic-bezier(.22,1,.36,1) both}

@@ -3,7 +3,7 @@
 import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import { dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { transformHtml } from '../kade-html-transform.mjs'
+import { transformHtml, transformScript } from '../kade-html-transform.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const out = join(root, 'dist')
@@ -28,6 +28,9 @@ async function walk(dir) {
     if (extname(entry.name).toLowerCase() === '.html') {
       await writeFile(target, transformHtml(await readFile(source, 'utf8')))
       pages += 1
+    } else if (rel.startsWith('_next/') && entry.name.endsWith('.js')) {
+      await writeFile(target, transformScript(await readFile(source, 'utf8')))
+      assets += 1
     } else {
       await cp(source, target)
       assets += 1

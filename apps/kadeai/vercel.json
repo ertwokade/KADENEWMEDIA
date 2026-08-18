@@ -6,7 +6,22 @@
   "headers": [
     {
       "source": "/kadeai/manifest.json",
-      "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        }
+      ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/materials/sync",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/kade-search/collect",
+      "schedule": "0 5 * * *"
     }
   ]
 }

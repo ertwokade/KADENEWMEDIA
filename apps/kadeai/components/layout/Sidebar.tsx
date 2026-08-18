@@ -10,7 +10,7 @@ import {
   GitBranch, LayoutGrid, BookOpen, Link2,
   CalendarDays, ImagePlus, BarChart2, Search, Users,
   MessageSquare, Mail, Radio, AlertCircle,
-  Copy, BookMarked, Activity, Library,
+  Copy, BookMarked, Activity, Library, Radar, Captions,
   ChevronRight, Clapperboard, LayoutDashboard,
   CircleDollarSign, LogOut,
 } from 'lucide-react'
@@ -28,6 +28,8 @@ const iconMap = {
   'image-plus': ImagePlus,
   'file-code': FileCode,
   radio: Radio,
+  radar: Radar,
+  captions: Captions,
   'book-open': BookOpen,
   settings: Settings,
   wand: Wand2,

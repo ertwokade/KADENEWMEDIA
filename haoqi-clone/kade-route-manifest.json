@@ -1,7 +1,7 @@
 {
   "generatedAt": "2026-08-13T22:10:53.604Z",
   "source": "https://kadenewmedia.com",
-  "designReference": "https://haoqi.design",
+  "designReference": "",
   "routes": [
     "/401",
     "/403",
@@ -73,8 +73,8 @@
     "/wasm_design_utils"
   ],
   "notes": [
-    "Ana sayfa public/site.html Kade/Haoqi sürümünden alınır.",
-    "İç sayfalar Haoqi makale topolojisi ve Kade canlı içerikleriyle üretilir.",
+    "Ana sayfa derlenmiş snapshot olarak servis edilir.",
+    "İç sayfalar Kade tasarım sistemiyle ve Kade canlı içerikleriyle üretilir.",
     "Operasyonel giriş rotaları yerelde güvenli geçiş sayfasıdır; canlı kimlik doğrulama alanına bağlanır.",
     "Sitemapte görünen ancak doğrulanmış veri dönmeyen partner rotalarında içerik uydurulmaz."
   ]

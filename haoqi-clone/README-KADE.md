@@ -1,25 +1,36 @@
-# Kade New Media · Haoqi tasarım uygulaması
+# Kade New Media — public site
 
-Bu klasör, Haoqi tasarım sisteminin görsel diliyle Kade New Media'nın canlı içerik ve rotalarını birleştirir.
+Bu klasör kadenewmedia.com'un public yüzünü üretir: ana sayfa snapshot'ı ve
+statik pazarlama rotaları. Uygulama tarafı (api/*, admin, müşteri paneli,
+giriş) kök dizindeki React projesinde kalır.
 
 ## Çalıştırma
 
 ```bash
-cd /Users/kadirdemir/Desktop/KADENEWMEDIA/haoqi-clone
-npm run dev
+node server.mjs            # varsayılan 4180, PORT ile değiştirilir
 ```
 
-Varsayılan adres: `http://127.0.0.1:4180/`
+`server.mjs` her HTML/JS isteğinde `kade-html-transform.mjs` içindeki tek
+dönüşümü uygular: marka metinleri, bağlantı eşlemeleri ve stil/script
+enjeksiyonları. Aynı dönüşüm `scripts/build-static.mjs` tarafından da
+kullanıldığı için yerelde görülen çıktı yayınlanan çıktıyla birebir aynıdır.
 
-## Kapsam
+## Üretim
 
-- Ana sayfa: özgün Haoqi WebGL, kaydırma, imleç, tema ve ses motoru üzerinde Kade içeriği
-- İç sayfalar: kaydırma girişleri, imleç ışığı, kart hover hareketleri ve sayfa geçişleri
-- İç sayfalar: Haoqi makale topolojisi, TikTok Sans + Geist Mono + Departure Mono
-- Formlar: `/iletisim` ve `/teklif-al` canlı Kade API uçlarına bağlı
-- Rota listesi: `kade-route-manifest.json`
-- SEO: canonical, açıklamalar, `sitemap.xml` ve `robots.txt`
-- Doğrulanmayan partner kayıtlarında isim/sonuç uydurulmadı
-- Oturum gerektiren rotalar, canlı güvenli alana geçiş verir
+```bash
+node scripts/build-static.mjs   # dist/ üretir (sunucu gerektirmeyen statik)
+```
 
-Temiz özgün klon yedeği: `../haoqi-clone-backup-2026-08-13`
+Kök projedeki `npm run legacy:build` bu adımı çağırır ve `scripts/merge-clone.mjs`
+ile çıktıyı uygulama derlemesinin üzerine bindirir.
+
+## Katmanlar
+
+| Dosya | İş |
+|---|---|
+| `kade-html-transform.mjs` | Tek doğruluk kaynağı: metin/bağlantı değişimleri + enjeksiyonlar |
+| `kade-brand.css/js` | Marka dili, hizmetler paneli, dil ve tema kontrolleri |
+| `kade-routes.css/js` | Statik rotaların ortak tasarımı, breadcrumb ve site indeksi |
+| `kade-access.js` | KadeAI / danışmanlık giriş-kayıt menüsü |
+| `kade-footer.js` | Ana sayfa site haritası footer'ı |
+| `kade-entry-watchdog.js` | Giriş yükleyicisi takılırsa sayfayı açar |

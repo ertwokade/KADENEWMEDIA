@@ -1083,7 +1083,7 @@ function ContentSection({ showToast }) {
   // Bu alan olmadan yönetici, hiçbir yere yansımayan ekranlarda içerik girip
   // "kaydedildi" bildirimi alıyordu.
   const tabs = [
-    { id: 'homepage', label: '✨ Ana Sayfa', desc: 'Haoqi ana sayfasındaki tüm görünen içerikler', route: '/', status: 'live' },
+    { id: 'homepage', label: '✨ Ana Sayfa', desc: 'Ana sayfadaki tüm görünen içerikler', route: '/', status: 'live' },
     { id: 'hero', label: '🏠 Hero', desc: 'Anasayfa başlık ve açıklama', route: '/', status: 'static' },
     { id: 'stats', label: '📊 İstatistikler', desc: 'Sayaç verileri', route: '/', status: 'static' },
     { id: 'services', label: '⚡ Hizmetler', desc: 'Hizmet kartları', route: '/hizmetler', status: 'live' },

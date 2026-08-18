@@ -4,7 +4,7 @@ import { readFile, stat } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { transformHtml } from './kade-html-transform.mjs'
+import { transformHtml, transformScript } from './kade-html-transform.mjs'
 
 const root = fileURLToPath(new URL('.', import.meta.url))
 const port = Number(process.env.PORT || 4180)
@@ -24,6 +24,10 @@ createServer(async (req,res) => {
     res.setHeader('cache-control', 'no-store')
     if (extension === '.html') {
       res.end(transformHtml(await readFile(target, 'utf8')))
+      return
+    }
+    if (extension === '.js' && safe.startsWith('/_next/')) {
+      res.end(transformScript(await readFile(target, 'utf8')))
       return
     }
     createReadStream(target).pipe(res)

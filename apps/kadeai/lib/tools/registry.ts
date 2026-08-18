@@ -74,7 +74,8 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('video-factory', 'Video Fabrikası', 'media', '/dashboard/video-factory', 'clapperboard', 'Konu veya senaryodan otomatik video üretir.', ['brand.name']),
   tool('ai-thumbnail', 'AI Thumbnail', 'media', '/dashboard/ai-thumbnail', 'image-plus', 'Görsel arka plan ve thumbnail kompozisyonu üretir.', ['brand.name']),
   tool('clip-generator', 'Klip Üretici', 'media', '/dashboard/clip-generator', 'scissors', 'Video veya transkriptten klip önerileri çıkarır.', [], false),
-  tool('dubbing', 'Dublaj & Çeviri', 'media', '/dashboard/dubbing', 'mic', 'Dublaj ve çeviri iş akışı.', [], false, 'coming-soon'),
+  tool('subtitles', 'Altyazı Stüdyosu', 'media', '/dashboard/subtitles', 'captions', 'Videodan altyazı üretir, çevirir ve YouTube’a yükler.', [], false),
+  tool('dubbing', 'Dublaj Stüdyosu', 'media', '/dashboard/dubbing', 'mic', 'Videoyu otomatik olarak başka dillerde seslendirir.', [], false),
 
   tool('viral-score', 'Viral Skor', 'analysis', '/dashboard/viral-score', 'trending-up', 'Girilen içerik sinyallerinden tahmini viral potansiyel analizi.', ['brand.niche', 'brand.audience']),
   tool('ab-test', 'A/B Başlık Testi', 'analysis', '/dashboard/ab-test', 'flask', 'İki başlığı aynı ölçütlerle karşılaştırır.', ['brand.niche']),
@@ -82,6 +83,8 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('youtube-seo', 'YouTube SEO', 'analysis', '/dashboard/youtube-seo', 'search', 'Girilen video verilerini SEO açısından inceler.', ['brand.niche']),
   tool('retention-analysis', 'İzlenme Analizi', 'analysis', '/dashboard/retention-analysis', 'bar-chart', 'Girilen akış ve metriklerden izleyici tutma analizi.', ['brand.audience']),
   tool('social-audit', 'Sosyal Medya Analizi', 'analysis', '/dashboard/social-audit', 'users', 'Girilen profil ve metrikleri denetler.', brandBasics),
+  tool('trend-radar', 'Trend Radar', 'analysis', '/dashboard/trend-radar', 'radar', 'TikTok, Reels, Shorts, YouTube ve Google’da ölçülmüş canlı trend verisi.', [], false),
+  tool('materyal', 'Materyal Kütüphanesi', 'analysis', '/dashboard/materyal', 'image-plus', 'arsivhub arşivinden toplanan video ve fotoğraf materyalleri.', [], false),
   tool('trends', 'Trend Bulucu', 'analysis', '/dashboard/trends', 'bar-chart', 'Niş ve bölge bağlamında araştırma önerileri üretir.', ['brand.niche', 'preferences.platforms']),
   tool('competitor', 'Rakip Analizi', 'analysis', '/dashboard/competitor', 'users', 'Kullanıcının sağladığı rakip bilgilerini analiz eder.', ['brand.niche']),
   tool('comment-analysis', 'Yorum Analizi', 'analysis', '/dashboard/comment-analysis', 'message-square', 'Yapıştırılan gerçek yorumları analiz eder.', [], false),

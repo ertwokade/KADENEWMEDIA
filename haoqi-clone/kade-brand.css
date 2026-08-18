@@ -414,3 +414,173 @@ footer a[href^="mailto:"]{text-transform:none!important}
   .kade-services-panel__arrow{grid-column:3;grid-row:1/3;align-self:center}
   .kade-services-panel__footer{flex-direction:column;align-items:flex-start;gap:0;padding-top:14px}
 }
+
+/* ── Giriş / kayıt girişi ─────────────────────────────────────────────
+   Başlıktaki diğer kontrollerle aynı çip dili: kutu yok, hover'da noktalı
+   çerçeve. İkon tek başına belirsiz kaldığı için masaüstünde kısa etiketle,
+   mobil kontrol şeridinde yalnız ikonla duruyor. */
+.kade-access-trigger{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:8px!important;
+  border:0!important;
+  background:transparent!important;
+  color:inherit!important;
+  font-size:13px!important;
+  font-weight:500!important;
+  letter-spacing:.02em!important;
+  text-transform:uppercase;
+  line-height:1!important;
+  cursor:pointer;
+  pointer-events:auto;
+}
+.kade-access-trigger::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border:2px dotted transparent;
+  pointer-events:none;
+  transition:border-color .2s ease;
+}
+.kade-access-trigger:hover::before,.kade-access-trigger[aria-expanded="true"]::before{border-color:currentColor}
+.kade-access-trigger i{
+  display:block;
+  width:15px;
+  height:15px;
+  background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='square'%3E%3Cpath d='M14 3h6v18h-6'/%3E%3Cpath d='M3 12h11'/%3E%3Cpath d='M10 8l4 4-4 4'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='square'%3E%3Cpath d='M14 3h6v18h-6'/%3E%3Cpath d='M3 12h11'/%3E%3Cpath d='M10 8l4 4-4 4'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.kade-access-trigger--icon span{display:none}
+
+.kade-access-panel{
+  position:fixed;
+  z-index:55;
+  top:clamp(58px,6vw,84px);
+  right:clamp(14px,3.4vw,52px);
+  width:min(330px,calc(100vw - 28px));
+  padding:16px 18px 18px;
+  border:1px solid var(--line);
+  background:var(--bg);
+  color:var(--text);
+  box-shadow:0 26px 70px rgba(0,0,0,.13);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translateY(-6px);
+  transition:opacity .2s ease,transform .24s cubic-bezier(.2,.9,.2,1),visibility 0s linear .24s;
+}
+.kade-access-panel.is-open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);transition-delay:0s}
+.kade-access-panel__label{
+  margin:0 0 14px!important;
+  color:var(--muted);
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.18em!important;
+}
+.kade-access-panel__area{padding:14px 0;border-top:1px solid var(--line)}
+.kade-access-panel__area strong{display:block;font-size:15px!important;font-weight:700!important;letter-spacing:-.02em!important}
+.kade-access-panel__area small{display:block;margin-top:3px;color:var(--muted);font-size:11px!important;line-height:1.4!important}
+.kade-access-panel__actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.kade-access-panel__actions a{
+  position:relative;
+  padding:9px 11px;
+  color:inherit!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.1em!important;
+  text-transform:uppercase;
+  text-decoration:none!important;
+  transition:background-color .2s ease,color .2s ease;
+}
+.kade-access-panel__actions a::before{content:'';position:absolute;inset:0;border:2px dotted transparent;transition:border-color .2s ease}
+.kade-access-panel__actions a:hover::before{border-color:currentColor}
+.kade-access-panel__actions a[data-kade-primary]{background:var(--accent);color:#101210!important}
+.kade-access-panel__actions a[data-kade-primary]:hover{background:var(--text);color:var(--bg)!important}
+
+@media(max-width:900px){
+  /* Klon başlığında mobil kontrol şeridi zaten ikonu taşıyor. */
+  header.z-50 .kade-access-trigger{display:none}
+  .kade-access-panel{top:64px;right:14px}
+}
+@media(max-width:760px){
+  /* Statik başlıkta marka adıyla çakışmasın diye etiket düşer, ikon kalır. */
+  .hud nav .kade-access-trigger span{display:none}
+  .hud nav .kade-access-trigger{padding:8px 6px!important}
+}
+
+/* ── Ana sayfa site footer'ı ──────────────────────────────────────────
+   Statik rotalardaki site indeksiyle aynı dil: hairline ızgara, mono
+   başlıklar, altı çizilerek açılan bağlantılar. */
+.kade-sitefooter{
+  position:relative;
+  /* Sahne tuvali (z-30) HUD metnini footer'ın üstüne boyuyordu; başlığın (z-50)
+     altında kalacak şekilde onun üzerine alındı. */
+  z-index:45;
+  /* Alt boşluk, sahnenin sabit HUD satırının üstüne binmemesi için. */
+  padding:clamp(30px,4vw,56px) clamp(20px,4vw,56px) clamp(64px,6vw,88px);
+  border-top:1px solid var(--line);
+  background:var(--bg);
+  color:var(--text);
+}
+.kade-sitefooter__grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
+}
+.kade-sitefooter__col{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  padding:0 clamp(12px,1.6vw,28px) clamp(20px,2vw,28px) 0;
+}
+.kade-sitefooter__col strong{
+  margin-bottom:8px;
+  color:var(--muted);
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.16em!important;
+  text-transform:uppercase;
+}
+.kade-sitefooter__col a{
+  position:relative;
+  width:fit-content;
+  color:inherit!important;
+  font-size:13px!important;
+  font-weight:500!important;
+  text-decoration:none!important;
+}
+.kade-sitefooter__col a::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:100%;
+  bottom:-3px;
+  height:1px;
+  background:currentColor;
+  transition:right .25s cubic-bezier(.2,.9,.2,1);
+}
+.kade-sitefooter__col a:hover::after{right:0}
+.kade-sitefooter__base{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px 24px;
+  padding-top:clamp(16px,2vw,24px);
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:11px!important;
+  font-weight:500!important;
+}
+.kade-sitefooter__base a{color:inherit!important;text-decoration:none!important}
+.kade-sitefooter__base a:hover{color:var(--text)!important}
+@media(max-width:900px){
+  .kade-sitefooter__grid{grid-template-columns:1fr 1fr}
+  .kade-sitefooter__base{flex-direction:column;align-items:flex-start;gap:6px}
+}
+/* Site footer'ı ekrandayken sabit HUD telif satırını gizle (tekrar oluyor). */
+html.kade-footer-visible .fixed .tabular-nums,
+html.kade-footer-visible footer ~ div .tabular-nums{opacity:0;transition:opacity .25s ease}

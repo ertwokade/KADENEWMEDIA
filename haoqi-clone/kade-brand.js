@@ -83,7 +83,7 @@
     function registerLocaleNodes(){
       var elements=Array.prototype.slice.call(document.body.querySelectorAll('h1,h2,h3,h4,p,a,button,span,div'));
       elements.forEach(function(element){
-        if(element.closest('#kade-services-panel,.kade-language-toggle'))return;
+        if(element.closest('#kade-services-panel,#kade-access-panel,.kade-sitefooter,.kade-language-toggle'))return;
         var value=cleanText(element.textContent),index=-1;
         var folded=value.toLocaleLowerCase('tr');
         localeEntries.some(function(entry,i){if(folded===cleanText(entry.tr).toLocaleLowerCase('tr')||folded===cleanText(entry.en).toLocaleLowerCase('tr')){index=i;return true}return false});
@@ -108,7 +108,7 @@
         {tr:'ve web tasarımı alanlarında çalışıyor.',en:'and works across web design.'}
       ];
       var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(node){
-        if(node.parentElement&&node.parentElement.closest('#kade-services-panel,.kade-language-toggle,[data-kade-i18n]'))return NodeFilter.FILTER_REJECT;
+        if(node.parentElement&&node.parentElement.closest('#kade-services-panel,#kade-access-panel,.kade-sitefooter,.kade-language-toggle,[data-kade-i18n]'))return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }}),textNodes=[],textNode;
       while((textNode=walker.nextNode()))textNodes.push(textNode);

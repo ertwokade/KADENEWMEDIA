@@ -78,7 +78,7 @@ export default function HomepageEditor({ data, onSave }) {
 
   return (
     <div className="admin-form">
-      <h3>Haoqi Ana Sayfa</h3>
+      <h3>Ana Sayfa</h3>
       <p style={{ color: 'var(--text-secondary)', marginTop: -8, marginBottom: 18 }}>
         Buradaki kayıtlar canlı ana sayfaya anında uygulanır. Menü, çalışma kartı ve sosyal bağlantı listelerine yeni öğe ekleyebilirsiniz.
       </p>
