@@ -1,0 +1,283 @@
+/* ── Kade route system ────────────────────────────────────────────────
+   One layout for all 68 static routes, built from the homepage's own
+   vocabulary: the 390px hairline column rhythm (drawn by the canvas
+   field), mono micro-labels, oversized display headings, dotted hover
+   outlines and the lime accent used only as a small marker.
+   Loaded after kade-site.css / kade-brand.css, so it wins. */
+
+/* The canvas field already paints the site grid; a second CSS grid on top
+   of it only muddied the background. */
+.article-shell::before{display:none!important}
+.article-shell{background:transparent!important}
+.article-shell>article{
+  max-width:none!important;
+  width:min(1320px,100%);
+  margin:0 auto;
+  padding:clamp(88px,11vh,132px) clamp(20px,4vw,64px) 0!important;
+}
+
+/* ── Page head ─────────────────────────────────────────────────────── */
+.page-head{padding-top:0!important;padding-bottom:clamp(26px,3vw,44px);border-bottom:1px solid var(--line)}
+.eyebrow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 clamp(18px,2.4vw,30px)!important;
+  color:var(--muted);
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.18em!important;
+}
+.eyebrow::before{content:'';flex:none;width:6px;height:6px;background:var(--accent)}
+.page-head h1{
+  max-width:17ch;
+  font-size:clamp(36px,5.4vw,74px)!important;
+  line-height:.98!important;
+  letter-spacing:-.05em!important;
+}
+.lead{max-width:58ch;margin-top:clamp(16px,1.8vw,24px)!important;font-size:clamp(14px,1.1vw,17px)!important;line-height:1.55!important}
+.rule{display:none!important}
+
+/* Route meta strip injected by kade-routes.js — breadcrumb + last update. */
+.kade-meta{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px 22px;
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+  color:var(--muted);
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.16em!important;
+  text-transform:uppercase;
+}
+.kade-meta a{color:inherit;text-decoration:none}
+.kade-meta a:hover{color:var(--text)}
+.kade-meta span[aria-current]{color:var(--text)}
+
+/* ── Sections: mono label rail on the left, content on the right ───── */
+.article-shell section{
+  display:grid;
+  grid-template-columns:minmax(0,20%) minmax(0,1fr);
+  gap:clamp(16px,3vw,56px);
+  margin:0!important;
+  padding:clamp(34px,4.2vw,66px) 0;
+  border-bottom:1px solid var(--line);
+}
+.article-shell section>h2{
+  position:sticky;
+  top:0;
+  grid-column:1;
+  align-self:start;
+  margin:0!important;
+  font-size:clamp(14px,1.05vw,18px)!important;
+  line-height:1.25!important;
+  letter-spacing:-.02em!important;
+}
+.article-shell section>*:not(h2){grid-column:2}
+.article-shell section>p,.article-shell section>ul{max-width:70ch}
+.article-shell p{font-size:clamp(14px,1.05vw,16px)!important}
+.prose{max-width:76ch}
+.prose>h2{margin-top:clamp(38px,4vw,64px)!important}
+
+/* ── Feature lists: hairline index instead of bullets ──────────────── */
+.feature-list{
+  columns:auto!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0!important;
+  margin:0!important;
+  padding:0!important;
+  list-style:none!important;
+  border-top:1px solid var(--line);
+}
+.feature-list li{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin:0!important;
+  padding:14px 18px 14px 0;
+  border-bottom:1px solid var(--line);
+  font-size:clamp(12px,.92vw,14px)!important;
+}
+.feature-list li::marker{content:''}
+.feature-list li::before{content:'';flex:none;width:5px;height:5px;background:var(--accent)}
+
+/* ── Cards: flat hairline grid, dotted hover like the header controls ─ */
+.cards{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  border:0!important;
+  border-top:1px solid var(--line)!important;
+}
+.card{
+  position:relative;
+  min-height:0!important;
+  padding:clamp(18px,1.7vw,28px) clamp(16px,1.4vw,24px)!important;
+  border:0!important;
+  border-bottom:1px solid var(--line)!important;
+  border-right:1px solid var(--line)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  transition:none!important;
+}
+.card:nth-child(3n){border-right:0!important}
+.card::after{display:none!important}
+.card::before{content:'';position:absolute;inset:0;border:2px dotted transparent;pointer-events:none;transition:border-color .2s ease}
+.card:hover{transform:none!important;background:transparent!important}
+.card:hover::before{border-color:var(--text)}
+.card .index{
+  position:relative;
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.14em!important;
+  color:var(--muted)!important;
+}
+.card .index::after{
+  content:'';
+  position:absolute;
+  top:50%;
+  right:-12px;
+  width:5px;
+  height:5px;
+  margin-top:-2px;
+  background:var(--accent);
+  transform:scale(0);
+  transition:transform .25s cubic-bezier(.2,.9,.2,1);
+}
+.card:hover .index::after{transform:scale(1)}
+.card h3{margin:clamp(22px,2.4vw,34px) 0 8px!important;font-size:clamp(16px,1.3vw,21px)!important;letter-spacing:-.035em!important}
+.card p{font-size:clamp(12px,.9vw,14px)!important;line-height:1.5!important}
+
+/* ── Calls to action, gateways, empty states: flat bands ───────────── */
+.cta,.gateway,.empty-state,.error-state,.price-box{
+  margin:0!important;
+  padding:clamp(34px,4.2vw,66px) 0!important;
+  border-radius:0!important;
+  border-bottom:1px solid var(--line);
+  background:transparent!important;
+  text-align:left!important;
+  transition:none!important;
+}
+.cta:hover,.gateway:hover,.empty-state:hover,.price-box:hover{transform:none!important;box-shadow:none!important}
+.cta h2,.gateway h2,.empty-state h2{max-width:18ch;font-size:clamp(24px,3.2vw,50px)!important;line-height:1!important;letter-spacing:-.05em!important;margin-bottom:14px!important}
+.gateway>span,.empty-state>span{display:block;margin-bottom:18px;font-size:32px!important}
+.cta a,.gateway a,.empty-state a,.error-state a,.button-link,.kade-form button{
+  position:relative;
+  display:inline-block;
+  margin-top:22px!important;
+  padding:14px 18px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:var(--accent)!important;
+  color:#101210!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.14em!important;
+  text-transform:uppercase;
+  text-decoration:none!important;
+  transition:background-color .2s ease,color .2s ease;
+}
+.cta a:hover,.gateway a:hover,.empty-state a:hover,.button-link:hover,.kade-form button:hover{background:var(--text)!important;color:var(--bg)!important}
+.error-state strong{color:var(--text)!important}
+
+/* ── Forms ─────────────────────────────────────────────────────────── */
+.contact-grid{gap:clamp(24px,4vw,72px)!important}
+.kade-form label,.kade-form legend{font-size:10px!important;font-weight:700!important;letter-spacing:.16em!important;color:var(--muted)}
+.kade-form input:not([type=checkbox]):not([type=range]),.kade-form textarea,.kade-form select{padding:14px 0!important;border:0!important;border-bottom:1px solid var(--line)!important}
+.kade-form input:focus,.kade-form textarea:focus,.kade-form select:focus{border-bottom-color:var(--accent)!important}
+.kade-form fieldset,.choice{border-color:var(--line)!important;border-radius:0!important}
+
+/* ── Site index: every route reachable from every page ─────────────── */
+.kade-routes{padding:clamp(34px,4vw,60px) 0 0;border-bottom:1px solid var(--line)}
+.kade-routes__grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:0;
+  border-top:1px solid var(--line);
+}
+.kade-routes__col{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  padding:22px clamp(14px,1.4vw,24px) 30px 0;
+  border-right:1px solid var(--line);
+}
+.kade-routes__col:last-child{border-right:0}
+.kade-routes__col strong{
+  margin-bottom:6px;
+  color:var(--muted);
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.16em!important;
+  text-transform:uppercase;
+}
+.kade-routes__col a{
+  position:relative;
+  width:fit-content;
+  color:inherit;
+  font-size:13px!important;
+  font-weight:500!important;
+  text-decoration:none!important;
+  transition:opacity .2s ease;
+}
+.kade-routes__col a::after{content:'';position:absolute;left:0;right:100%;bottom:-3px;height:1px;background:var(--text);transition:right .25s cubic-bezier(.2,.9,.2,1)}
+.kade-routes__col a:hover::after{right:0}
+.kade-routes__col a[aria-current]{color:var(--muted)}
+.kade-routes__col a[aria-current]::before{content:'';position:absolute;left:-12px;top:50%;width:5px;height:5px;margin-top:-2px;background:var(--accent)}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+.article-footer{
+  margin-top:0!important;
+  padding:clamp(30px,3.4vw,52px) 0 clamp(46px,6vw,90px)!important;
+  border-radius:0!important;
+  background:transparent!important;
+}
+.article-footer h2{margin-bottom:clamp(18px,2vw,26px)!important;font-size:10px!important;font-weight:700!important;letter-spacing:.16em!important;text-transform:uppercase;color:var(--muted)}
+.metadata-grid dt{font-size:12px!important}
+.footer-rule{border-top-style:solid!important}
+.footer-links a{position:relative;padding:2px 0}
+.footer-links a:hover{outline:0!important;color:var(--text)!important}
+
+@media(max-width:900px){
+  .article-shell>article{width:100%;padding:76px 18px 0!important}
+  .page-head h1{font-size:clamp(30px,8.4vw,44px)!important;max-width:none}
+  .article-shell section{grid-template-columns:1fr;gap:14px;padding:30px 0}
+  .article-shell section>h2{position:static;font-size:15px!important}
+  .article-shell section>*:not(h2){grid-column:1}
+  .feature-list{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr!important}
+  .card{border-right:0!important}
+  .kade-routes__grid{grid-template-columns:1fr 1fr}
+  .kade-routes__col{border-right:0;border-bottom:1px solid var(--line);padding-bottom:22px}
+  .kade-routes__col:nth-child(odd){border-right:1px solid var(--line);padding-right:16px}
+  .kade-meta{font-size:9px!important;gap:6px 14px}
+}
+
+/* Card internals follow the same marker + mono link language as the rest. */
+.card ul{margin:14px 0 20px!important;padding:0!important;list-style:none!important}
+.card li{display:flex;align-items:baseline;gap:9px;margin:0 0 7px!important;font-size:clamp(11px,.85vw,13px)!important}
+.card li::marker{content:''}
+.card li::before{content:'';flex:none;width:4px;height:4px;background:var(--accent)}
+.arrow-link{
+  position:relative;
+  align-self:flex-start;
+  margin-top:auto!important;
+  padding-bottom:3px;
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.14em!important;
+  text-decoration:none!important;
+}
+.arrow-link::after{content:'';position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--text);transition:right .25s cubic-bezier(.2,.9,.2,1)}
+.card:hover .arrow-link::after{right:0}
+
+/* Dark mode kept the old card/panel fills; the flat hairline system needs none. */
+html.dark .card,html.dark .cta,html.dark .gateway,html.dark .empty-state,
+html.dark .error-state,html.dark .price-box,html.dark .article-footer,
+html[data-theme="dark"] .card,html[data-theme="dark"] .cta,html[data-theme="dark"] .gateway,
+html[data-theme="dark"] .empty-state,html[data-theme="dark"] .error-state,
+html[data-theme="dark"] .price-box,html[data-theme="dark"] .article-footer{
+  background-color:transparent!important;
+}

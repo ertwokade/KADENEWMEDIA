@@ -1,0 +1,13 @@
+{
+  "name": "haoqi-design-clone",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
+  },
+  "devDependencies": {
+    "opentype.js": "^2.0.0",
+    "three": "^0.185.1"
+  }
+}

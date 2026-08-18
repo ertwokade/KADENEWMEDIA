@@ -1,0 +1,6 @@
+node_modules/
+dist/
+hydration-fix-backup-2026-08-17/
+# Kullanılmayan üretilmiş model (scripts/generate-merhaba-model.mjs ile yeniden üretilir)
+model/merhaba.bin
+model/merhaba.gltf

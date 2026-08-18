@@ -23,7 +23,7 @@
     "demo:fixture": "corepack pnpm --filter @kade/studio-worker fixture",
     "demo:seed": "corepack pnpm --filter @kade/studio-worker seed",
     "legacy:dev": "vite",
-    "legacy:build": "vite build && node -e \"require('fs').renameSync('dist/index.html','dist/app.html')\" && node scripts/generate-static-routes.mjs && node scripts/verify-build-integrity.mjs",
+    "legacy:build": "vite build && node -e \"require('fs').renameSync('dist/index.html','dist/app.html')\" && node scripts/generate-static-routes.mjs && node scripts/verify-build-integrity.mjs && node haoqi-clone/scripts/build-static.mjs && node scripts/merge-clone.mjs",
     "legacy:verify:build": "node scripts/verify-build-integrity.mjs",
     "legacy:lint": "eslint .",
     "legacy:test:unit": "node --test tests/unit/*.test.js",

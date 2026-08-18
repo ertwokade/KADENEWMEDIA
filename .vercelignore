@@ -21,3 +21,8 @@ kade-site-snapshot-2
 /sticker_img
 /bgm.mp3
 GLASS_SHADER_SPEC.md
+
+# Klon çalışma dosyaları: kaynak yüklenir, çıktı Vercel'de üretilir
+haoqi-clone-backup-2026-08-13/
+haoqi-clone/dist/
+haoqi-clone/hydration-fix-backup-2026-08-17/

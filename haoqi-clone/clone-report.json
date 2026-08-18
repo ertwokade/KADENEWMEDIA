@@ -1,0 +1,44 @@
+{
+  "origin": "https://haoqi.design",
+  "routes": [
+    "/",
+    "/reunimos",
+    "/inspire_mono",
+    "/wasm_design_utils",
+    "/adrive",
+    "/shore_icon",
+    "/teambition"
+  ],
+  "downloadedAssets": 54,
+  "failures": [
+    {
+      "url": "https://haoqi.design/_next/static/chu",
+      "error": "Error: 404 "
+    },
+    {
+      "url": "https://haoqi.design/_next/static/chunks/$%7Be%7D",
+      "error": "Error: 404 "
+    },
+    {
+      "url": "https://haoqi.design/_next/static/chunks/$%7Bt%7D",
+      "error": "Error: 404 "
+    },
+    {
+      "url": "https://haoqi.design/_next/sta",
+      "error": "Error: 404 "
+    },
+    {
+      "url": "https://haoqi.design/stories/figma_and_me#vectors",
+      "error": "Error: 404 "
+    },
+    {
+      "url": "https://haoqi.design/_next/static/chunks/vec2%20screenUv",
+      "error": "Error: 404 "
+    },
+    {
+      "url": "https://haoqi.design/_next/static/chunks/vUv",
+      "error": "Error: 404 "
+    }
+  ],
+  "generatedAt": "2026-08-13T10:09:00.607Z"
+}

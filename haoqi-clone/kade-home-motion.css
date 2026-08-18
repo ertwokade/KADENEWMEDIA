@@ -1,0 +1,7 @@
+/* Kade metinleri özgün Haoqi hareket motorunun üzerinde çalışır. */
+html{view-transition-name:kade-page}
+::view-transition-old(root){animation:kade-out .2s ease both}
+::view-transition-new(root){animation:kade-in .45s cubic-bezier(.22,1,.36,1) both}
+@keyframes kade-out{to{opacity:0;transform:scale(.99)}}
+@keyframes kade-in{from{opacity:0;transform:translateY(12px) scale(.99)}}
+@media(prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}

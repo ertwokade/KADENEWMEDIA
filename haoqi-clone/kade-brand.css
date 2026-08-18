@@ -1,0 +1,416 @@
+@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-400.ttf') format('truetype');font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-500.ttf') format('truetype');font-weight:500;font-style:normal;font-display:block}
+@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-600.ttf') format('truetype');font-weight:600;font-style:normal;font-display:block}
+@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-700.ttf') format('truetype');font-weight:700;font-style:normal;font-display:block}
+html body,html body *{font-family:"Montserrat Kade",Arial,sans-serif!important}
+html body [class*="font-bold"][class*="uppercase"],html body [class*="font-bold"][class*="uppercase"] *{font-weight:700!important;letter-spacing:-.04em!important}
+span[aria-label^="Sound"],span[aria-label^="Ses"],header span[class*="lg:hidden p-2 uppercase"],header span[class*="hidden lg:inline p-2 uppercase"],header span[class*="lg:bottom-7 lg:left-1/2"],header div[class*="hidden lg:block p-2 shrink-0"]{display:none!important}
+/* Fixed palette measured from the live kadenewmedia.com homepage in Chrome. */
+:root,html[data-theme="light"]{
+  --bg:#fbfaf4;
+  --text:#000;
+  --muted:rgba(54,54,48,.6);
+  --line:rgba(54,54,48,.1);
+  --accent:#c0fe04;
+  --panel:rgba(54,54,48,.035);
+  --background-deep:251,250,244;
+  --background-1:rgb(251,250,244);
+  --background-elevated:#efede7;
+  --label:0,0,0;
+  --label-d:54,54,48;
+  --label-1:rgba(0,0,0,1);
+  --label-2:rgba(54,54,48,.6);
+  --label-3:rgba(54,54,48,.32);
+  --label-4:rgba(54,54,48,.18);
+  --selection-bg:#c0fe04;
+  color-scheme:light
+}
+html.dark,html[data-theme="dark"]{
+  --bg:#000;
+  --text:#fbfaf4;
+  --muted:rgba(251,250,244,.62);
+  --line:rgba(251,250,244,.14);
+  --accent:#c0fe04;
+  --panel:rgba(239,237,231,.08);
+  --background-deep:0,0,0;
+  --background-1:#000;
+  --background-elevated:#24231f;
+  --label:251,250,244;
+  --label-d:239,237,231;
+  --label-1:rgba(251,250,244,1);
+  --label-2:rgba(251,250,244,.62);
+  --label-3:rgba(251,250,244,.34);
+  --label-4:rgba(251,250,244,.18);
+  --selection-bg:#c0fe04;
+  color-scheme:dark
+}
+html{background:var(--bg)!important;color:var(--text)!important;transition:background-color .3s ease,color .3s ease}
+html body,html .kade-home-static{background-color:var(--bg)!important;color:var(--text)!important}
+/* The scroll shell must stay transparent, otherwise it paints over the accent
+   glow and the hairline grid that sit behind it on body. */
+html .article-shell{background-color:transparent!important;color:var(--text)!important}
+html body{transition:background-color .3s ease,color .3s ease}
+html body canvas{filter:sepia(.55) saturate(1.5) hue-rotate(-8deg) brightness(1.04)!important;transition:filter .35s ease}
+html.dark body canvas{filter:sepia(.55) saturate(1.5) hue-rotate(-8deg) brightness(1.04)!important}
+html.dark input,html.dark textarea,html.dark select,html.dark option{
+  background-color:#080808!important;
+  color:#fbfaf4!important;
+  border-color:var(--line)!important;
+}
+html.dark .card,html.dark .cta,html.dark .gateway,html.dark .empty-state,
+html.dark .error-state,html.dark .price-box,html.dark .article-footer{
+  background-color:rgba(239,237,231,.08)!important;
+  color:var(--text)!important;
+}
+html.dark .client-card{
+  background:color-mix(in srgb,var(--client-color) 10%,#080808)!important;
+  color:var(--text)!important;
+}
+html.dark .client-card::before{opacity:.28}
+[data-theme-toggle],[aria-label^="Theme:"]{
+  display:inline-grid!important;
+  place-items:center;
+  width:40px;
+  height:40px;
+  padding:0!important;
+  line-height:1;
+  color:inherit;
+  transition:opacity .2s ease,color .3s ease!important;
+}
+html:not([data-kade-loaded]) header.z-50{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+html:not([data-kade-loaded]) body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:35;
+  background:var(--bg);
+  pointer-events:none;
+}
+html:not([data-kade-loaded]) body::before{
+  content:'';
+  position:fixed;
+  z-index:36;
+  top:50%;
+  left:50%;
+  width:96px;
+  height:3px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--text) 0 38%,color-mix(in srgb,var(--text) 18%,transparent) 38% 100%);
+  transform:translate(-50%,-50%);
+  animation:kade-loading-pulse .9s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+html[data-kade-loaded] header.z-50{opacity:1!important;visibility:visible!important}
+html[data-kade-loaded] header.z-50 [aria-label^="Theme:"]{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+@keyframes kade-loading-pulse{from{opacity:.42;transform:translate(-50%,-50%) scaleX(.82)}to{opacity:1;transform:translate(-50%,-50%) scaleX(1)}}
+[data-theme-toggle]::before,[aria-label^="Theme:"]::before{
+  content:'';
+  display:block;
+  position:static!important;
+  inset:auto!important;
+  width:20px;
+  height:20px;
+  background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+}
+html.dark [data-theme-toggle]::before,html.dark [aria-label^="Theme:"]::before{
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z'/%3E%3C/svg%3E");
+}
+[data-theme-toggle]>span,[aria-label^="Theme:"]>span{display:none!important}
+[data-theme-toggle]:focus,[aria-label^="Theme:"]:focus,[data-theme-toggle]:focus-visible,[aria-label^="Theme:"]:focus-visible{outline:none!important}
+.kade-language-toggle{
+  position:relative;
+  display:inline-grid!important;
+  place-items:center;
+  width:40px!important;
+  height:40px!important;
+  padding:0!important;
+  flex:0 0 40px;
+  color:inherit;
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  cursor:pointer;
+}
+.kade-language-toggle::before{
+  content:'';
+  width:21px;
+  height:21px;
+  background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='1.8'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18M12 3c2.3 2.5 3.5 5.5 3.5 9S14.3 18.5 12 21c-2.3-2.5-3.5-5.5-3.5-9S9.7 5.5 12 3Z'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='1.8'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18M12 3c2.3 2.5 3.5 5.5 3.5 9S14.3 18.5 12 21c-2.3-2.5-3.5-5.5-3.5-9S9.7 5.5 12 3Z'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+}
+.kade-language-toggle span{
+  position:absolute;
+  right:-3px;
+  bottom:1px;
+  min-width:18px;
+  padding:1px 3px;
+  background:var(--bg);
+  color:var(--text);
+  font-size:8px!important;
+  font-weight:700!important;
+  line-height:11px!important;
+  letter-spacing:.02em!important;
+  text-align:center;
+}
+.kade-language-toggle:hover,[data-theme-toggle]:hover,[aria-label^="Theme:"]:hover{opacity:.55!important}
+
+html.kade-services-open{overflow:hidden!important}
+.kade-mobile-controls{display:none}
+/* The original header reserved one third of the viewport for four controls.
+   After removing sound and the theme label, keep the remaining controls content-sized. */
+header.z-50>div:first-child>div:has(>:is([data-theme-toggle],[aria-label^="Theme:"])){
+  flex-basis:auto!important;
+  width:auto!important;
+  flex-wrap:nowrap!important;
+  justify-content:flex-end!important;
+  gap:clamp(10px,1.25vw,22px)!important;
+}
+header.z-50>div:first-child>div:has(>:is([data-theme-toggle],[aria-label^="Theme:"]))>button,
+header.z-50>div:first-child>div:has(>:is([data-theme-toggle],[aria-label^="Theme:"]))>[role="button"]{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto;
+  height:40px!important;
+  line-height:24px!important;
+}
+header.z-50>div:first-child>div:has(>:is([data-theme-toggle],[aria-label^="Theme:"]))>[aria-label^="Sound"]{display:none!important}
+html body div[class*="top-24"][class*="flex-row-reverse"][class*="pointer-events-none"]{display:none!important}
+header.z-50>div:first-child>a::before,
+header.z-50>div:first-child>div:has(>:is([data-theme-toggle],[aria-label^="Theme:"]))>button::before,
+header.z-50>div:first-child>div:has(>:is([data-theme-toggle],[aria-label^="Theme:"]))>[role="button"]::before{
+  border:none!important;
+  outline:none!important;
+}
+header.z-50>div:first-child>div:has(>:is([data-theme-toggle],[aria-label^="Theme:"]))>button:nth-child(1){width:112px;padding-left:0!important;padding-right:0!important}
+header.z-50>div:first-child>div:has(>:is([data-theme-toggle],[aria-label^="Theme:"]))>button:nth-child(2){width:88px;padding-left:0!important;padding-right:0!important}
+.svg-sign[data-kade-signature] .svg-sign__path{stroke-linecap:round!important;stroke-linejoin:round!important}
+.hud nav a,.hud nav button,.hud nav a:hover,.hud nav button:hover,.hud nav a:focus,.hud nav button:focus{
+  border-color:transparent!important;
+  outline:none!important;
+}
+header.z-50 a[href="/"]>span{display:none!important}
+header.z-50 a[href="/"]::after{content:'Kade New Media'}
+footer a[href^="mailto:"]{text-transform:none!important}
+::selection{background:#c0fe04;color:#000}
+
+@media(max-width:900px){
+  .kade-mobile-controls{
+    position:fixed;
+    z-index:60;
+    top:14px;
+    right:14px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+    height:42px;
+    color:var(--text);
+  }
+  .kade-mobile-controls>button{display:inline-grid!important;place-items:center;width:36px!important;height:36px!important;padding:0!important;border:0!important;background:transparent!important;color:inherit!important}
+  .kade-mobile-services::before{
+    content:'';
+    width:20px;
+    height:20px;
+    background:currentColor;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='black'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='black'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+  }
+  .kade-language-toggle{width:36px!important;height:36px!important;flex-basis:36px}
+}
+
+/* ── Hizmetler sayfası (services sheet) ───────────────────────────────
+   Built from the homepage's own vocabulary: full-bleed hairline column
+   grid, mono micro-labels, oversized uppercase display type and the
+   dotted outline the header controls already use on hover. */
+#kade-services-panel{
+  position:fixed;
+  inset:0;
+  z-index:45;
+  display:flex;
+  flex-direction:column;
+  /* Clears the site header, which stays on top and doubles as the toggle. */
+  padding:clamp(96px,8vw,128px) clamp(20px,3.4vw,56px) clamp(20px,2.4vw,32px);
+  background-color:var(--bg);
+  background-image:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 25%);
+  color:var(--text);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .3s ease,visibility 0s linear .3s;
+}
+#kade-services-panel.is-open{opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+
+.kade-services-panel__bar{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:clamp(20px,4vw,64px);
+  padding:0 clamp(6px,1vw,14px) clamp(18px,2.4vw,30px);
+}
+.kade-services-panel__intro>span{
+  display:block;
+  color:var(--muted);
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.18em!important;
+}
+.kade-services-panel__intro h2{
+  margin:clamp(14px,1.6vw,22px) 0 0;
+  max-width:16ch;
+  font-size:clamp(26px,3.1vw,50px)!important;
+  font-weight:700!important;
+  line-height:1!important;
+  letter-spacing:-.05em!important;
+}
+.kade-services-panel__intro p{
+  margin:clamp(10px,1.2vw,16px) 0 0;
+  max-width:44ch;
+  color:var(--muted);
+  font-size:clamp(11px,.85vw,13px)!important;
+  font-weight:400!important;
+  line-height:1.5!important;
+  letter-spacing:0!important;
+}
+
+/* Same chip shape as the header controls: no box until you hover it. */
+.kade-services-panel__close,
+.kade-services-panel__footer a{
+  position:relative;
+  flex:none;
+  padding:10px 12px;
+  border:0!important;
+  background:transparent!important;
+  color:inherit!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.14em!important;
+  line-height:1!important;
+  text-decoration:none!important;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.kade-services-panel__close::before,
+.kade-services-panel__footer a::before,
+.kade-services-panel__grid>a::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border:2px dotted transparent;
+  pointer-events:none;
+  transition:border-color .2s ease;
+}
+.kade-services-panel__close:hover::before,
+.kade-services-panel__footer a:hover::before,
+.kade-services-panel__grid>a:hover::before{border-color:var(--text)}
+.kade-services-panel__close i{margin-left:8px;color:var(--muted);font-style:normal}
+
+.kade-services-panel__grid{
+  display:flex;
+  flex-direction:column;
+  flex:1;
+  min-height:0;
+  border-top:1px solid var(--line);
+}
+.kade-services-panel__grid>a{
+  position:relative;
+  display:grid;
+  grid-template-columns:clamp(40px,4.4vw,72px) minmax(0,1.4fr) minmax(0,1fr) 30px;
+  align-items:center;
+  gap:clamp(12px,2vw,28px);
+  flex:1 1 0;
+  min-height:64px;
+  padding:clamp(10px,1.4vw,18px) clamp(6px,1vw,14px);
+  border-bottom:1px solid var(--line);
+  color:inherit!important;
+  text-decoration:none!important;
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity .4s ease,transform .5s cubic-bezier(.2,.9,.2,1);
+}
+#kade-services-panel.is-open .kade-services-panel__grid>a{opacity:1;transform:translateY(0)}
+#kade-services-panel.is-open .kade-services-panel__grid>a:nth-child(2){transition-delay:.05s}
+#kade-services-panel.is-open .kade-services-panel__grid>a:nth-child(3){transition-delay:.1s}
+#kade-services-panel.is-open .kade-services-panel__grid>a:nth-child(4){transition-delay:.15s}
+#kade-services-panel.is-open .kade-services-panel__grid>a:nth-child(5){transition-delay:.2s}
+#kade-services-panel.is-open .kade-services-panel__grid>a:nth-child(6){transition-delay:.25s}
+.kade-services-panel__index{
+  position:relative;
+  color:var(--muted);
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.14em!important;
+}
+/* The accent only ever appears as a small marker, like the homepage does. */
+.kade-services-panel__index::after{
+  content:'';
+  position:absolute;
+  top:50%;
+  right:-14px;
+  width:6px;
+  height:6px;
+  margin-top:-3px;
+  background:var(--accent);
+  transform:scale(0);
+  transition:transform .25s cubic-bezier(.2,.9,.2,1);
+}
+.kade-services-panel__grid>a:hover .kade-services-panel__index::after{transform:scale(1)}
+.kade-services-panel__grid strong{
+  display:block;
+  font-size:clamp(18px,2.1vw,36px)!important;
+  font-weight:700!important;
+  line-height:1!important;
+  letter-spacing:-.045em!important;
+  transition:transform .3s cubic-bezier(.2,.9,.2,1);
+}
+.kade-services-panel__grid>a:hover strong{transform:translateX(10px)}
+.kade-services-panel__grid small{
+  color:var(--muted);
+  font-size:clamp(10px,.8vw,13px)!important;
+  line-height:1.45!important;
+}
+.kade-services-panel__arrow{
+  justify-self:end;
+  font-size:16px!important;
+  transition:transform .3s cubic-bezier(.2,.9,.2,1);
+}
+.kade-services-panel__grid>a:hover .kade-services-panel__arrow{transform:translate(4px,-4px)}
+
+.kade-services-panel__footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:clamp(12px,2vw,28px);
+  padding-top:clamp(12px,1.6vw,20px);
+}
+
+@media(max-width:900px){
+  #kade-services-panel{
+    padding:72px 16px 20px;
+    overflow:auto;
+    background-image:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 50%);
+  }
+  .kade-services-panel__bar{gap:12px;padding-bottom:20px}
+  .kade-services-panel__intro h2{font-size:clamp(24px,7.4vw,36px)!important;max-width:12ch}
+  .kade-services-panel__intro p{font-size:12px!important}
+  .kade-services-panel__close{padding:8px 10px;font-size:10px!important}
+  .kade-services-panel__close i{display:none}
+  .kade-services-panel__grid{flex:none}
+  .kade-services-panel__grid>a{
+    grid-template-columns:34px minmax(0,1fr) 22px;
+    grid-template-rows:auto auto;
+    gap:4px 12px;
+    min-height:88px;
+    padding:16px 6px;
+  }
+  .kade-services-panel__index{grid-column:1;grid-row:1/3;align-self:center}
+  .kade-services-panel__index::after{right:auto;left:0;top:auto;bottom:-10px;margin:0}
+  .kade-services-panel__grid strong{grid-column:2;grid-row:1;font-size:clamp(17px,5.2vw,23px)!important}
+  .kade-services-panel__grid>a:hover strong{transform:none}
+  .kade-services-panel__grid small{grid-column:2;grid-row:2;font-size:11px!important}
+  .kade-services-panel__arrow{grid-column:3;grid-row:1/3;align-self:center}
+  .kade-services-panel__footer{flex-direction:column;align-items:flex-start;gap:0;padding-top:14px}
+}

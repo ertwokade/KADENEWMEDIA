@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /giris
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /organizasyon-kiti
+Sitemap: https://kadenewmedia.com/sitemap.xml

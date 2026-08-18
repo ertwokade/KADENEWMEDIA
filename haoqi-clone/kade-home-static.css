@@ -1,0 +1,4 @@
+.kade-home-static{margin:0;background:var(--bg,#fbfaf4);color:var(--text,#171918)}
+.kade-home-static #kade-about{display:none!important}
+.kade-home-static [data-codex-agent-overlay-root]{display:none!important}
+html.dark .kade-home-static{background:#000;color:#fbfaf4}
