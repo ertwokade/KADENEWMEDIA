@@ -281,3 +281,13 @@ html[data-theme="dark"] .empty-state,html[data-theme="dark"] .error-state,
 html[data-theme="dark"] .price-box,html[data-theme="dark"] .article-footer{
   background-color:transparent!important;
 }
+
+/* ── Açılış animasyonu ───────────────────────────────────────────────
+   Orijinal efekt 38px kayma + 7px bulanıklıkla geliyordu; hızlı kaydıran
+   kullanıcıda "yüklenmedi" hissi veriyordu. Daha kısa mesafe, bulanıklık yok. */
+.page-head h1,.reveal{
+  transform:translateY(14px)!important;
+  filter:none!important;
+  transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .45s cubic-bezier(.22,1,.36,1)!important;
+}
+.page-head h1.is-visible,.reveal.is-visible{transform:none!important}

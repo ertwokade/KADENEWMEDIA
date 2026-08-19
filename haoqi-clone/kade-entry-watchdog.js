@@ -10,8 +10,11 @@
 (function () {
   'use strict';
   var LOADER_SELECTOR = 'div[class*="left-1/2"][class*="top-1/2"][class*="z-40"]';
-  var STALL_MS = 6000;
-  var GRACE_MS = 2500;
+  /* Site doğrudan açılsın: giriş yükleyicisi beklenmiyor, sahne arkada
+     yüklenirken içerik hemen görünür. Uygulama kendi girişini tamamlarsa
+     override kaldırılıyor ve normal davranış geri geliyor. */
+  var STALL_MS = 400;
+  var GRACE_MS = 0;
   var TICK_MS = 250;
   var ATTRIBUTE = 'data-kade-entry-stalled';
   var root = document.documentElement;

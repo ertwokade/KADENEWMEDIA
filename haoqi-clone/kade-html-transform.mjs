@@ -22,12 +22,12 @@ const COPY = [
      uyuşmazlığı (React #418) çıkıyor — ikisi de aynı listeden besleniyor. */
   ['mailto:curiosity.wen@gmail.com', 'mailto:thekademedia@gmail.com'],
   ['<span>curiosity.wen@gmail.com</span>', '<span>thekademedia@gmail.com</span>'],
-  ['href="https://twitter.com/wenhaoqi"', 'href="https://instagram.com/kadenewmedia"'],
-  ['<span>Twitter/X</span>', '<span>Instagram</span>'],
-  ['href="https://www.figma.com/@wenhaoqi"', 'href="https://x.com/kadenewmedia"'],
-  ['<span>Figma</span>', '<span>X</span>'],
-  ['href="https://github.com/wenhaoqiasd"', 'href="https://www.youtube.com/@kadenewmedia"'],
-  ['<span>GitHub</span>', '<span>YouTube</span>'],
+  /* Sahnedeki footer üç bağlantıyla geliyordu; beş hesabın tamamı burada
+     gösterilsin diye iki bağlantı daha ekleniyor. Sunucu HTML'i ile bundle
+     aynı listeden üretiliyor, aksi halde hidrasyon uyuşmuyor. */
+  ['<a class="block before:absolute relative before:inset-0 p-2 lg:hover:before:border-l1 before:border-2 before:border-transparent active:before:border-l1 before:border-dotted uppercase before:content-[&#x27;&#x27;] before:transition-colors before:duration-200 cursor-pointer pointer-events-auto before:pointer-events-none" target="_blank" rel="noopener noreferrer" href="https://twitter.com/wenhaoqi"><span style="opacity:0"><span>Twitter/X</span></span></a>', '<a class="block before:absolute relative before:inset-0 p-2 lg:hover:before:border-l1 before:border-2 before:border-transparent active:before:border-l1 before:border-dotted uppercase before:content-[&#x27;&#x27;] before:transition-colors before:duration-200 cursor-pointer pointer-events-auto before:pointer-events-none" target="_blank" rel="noopener noreferrer" href="https://instagram.com/kadenewmedia"><span style="opacity:0"><span>Instagram</span></span></a>'],
+  ['<a class="block before:absolute relative before:inset-0 p-2 lg:hover:before:border-l1 before:border-2 before:border-transparent active:before:border-l1 before:border-dotted uppercase before:content-[&#x27;&#x27;] before:transition-colors before:duration-200 cursor-pointer pointer-events-auto before:pointer-events-none" target="_blank" rel="noopener noreferrer" href="https://www.figma.com/@wenhaoqi"><span style="opacity:0"><span>Figma</span></span></a>', '<a class="block before:absolute relative before:inset-0 p-2 lg:hover:before:border-l1 before:border-2 before:border-transparent active:before:border-l1 before:border-dotted uppercase before:content-[&#x27;&#x27;] before:transition-colors before:duration-200 cursor-pointer pointer-events-auto before:pointer-events-none" target="_blank" rel="noopener noreferrer" href="https://tiktok.com/@kadenewmedia"><span style="opacity:0"><span>TikTok</span></span></a>'],
+  ['<a class="block before:absolute relative before:inset-0 p-2 lg:hover:before:border-l1 before:border-2 before:border-transparent active:before:border-l1 before:border-dotted uppercase before:content-[&#x27;&#x27;] before:transition-colors before:duration-200 cursor-pointer pointer-events-auto before:pointer-events-none" target="_blank" rel="noopener noreferrer" href="https://github.com/wenhaoqiasd"><span style="opacity:0"><span>GitHub</span></span></a>', '<a class="block before:absolute relative before:inset-0 p-2 lg:hover:before:border-l1 before:border-2 before:border-transparent active:before:border-l1 before:border-dotted uppercase before:content-[&#x27;&#x27;] before:transition-colors before:duration-200 cursor-pointer pointer-events-auto before:pointer-events-none" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/@kadenewmedia"><span style="opacity:0"><span>YouTube</span></span></a><a class="block before:absolute relative before:inset-0 p-2 lg:hover:before:border-l1 before:border-2 before:border-transparent active:before:border-l1 before:border-dotted uppercase before:content-[&#x27;&#x27;] before:transition-colors before:duration-200 cursor-pointer pointer-events-auto before:pointer-events-none" target="_blank" rel="noopener noreferrer" href="https://x.com/kadenewmedia"><span style="opacity:0"><span>X</span></span></a><a class="block before:absolute relative before:inset-0 p-2 lg:hover:before:border-l1 before:border-2 before:border-transparent active:before:border-l1 before:border-dotted uppercase before:content-[&#x27;&#x27;] before:transition-colors before:duration-200 cursor-pointer pointer-events-auto before:pointer-events-none" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/company/kadenewmedia"><span style="opacity:0"><span>LinkedIn</span></span></a>'],
   ['Haoqi (c) 2026', 'Kade New Media (c) 2026'],
   /* Footer başlığı ve kart etiketleri geç mount olduğu için DOM düzeltmesine
      yetişmiyordu; kaynağında çevriliyor. */
@@ -69,8 +69,8 @@ export const SCRIPT_COPY = [
   ['`Haoqi (c) ${', '`Kade New Media (c) ${'],
   ['curiosity.wen@gmail.com', 'thekademedia@gmail.com'],
   ['{href:"https://twitter.com/wenhaoqi",label:"Twitter/X"}', '{href:"https://instagram.com/kadenewmedia",label:"Instagram"}'],
-  ['{href:"https://www.figma.com/@wenhaoqi",label:"Figma"}', '{href:"https://x.com/kadenewmedia",label:"X"}'],
-  ['{href:"https://github.com/wenhaoqiasd",label:"GitHub"}', '{href:"https://www.youtube.com/@kadenewmedia",label:"YouTube"}'],
+  ['{href:"https://www.figma.com/@wenhaoqi",label:"Figma"}', '{href:"https://tiktok.com/@kadenewmedia",label:"TikTok"}'],
+  ['{href:"https://github.com/wenhaoqiasd",label:"GitHub"}', '{href:"https://www.youtube.com/@kadenewmedia",label:"YouTube"},{href:"https://x.com/kadenewmedia",label:"X"},{href:"https://www.linkedin.com/company/kadenewmedia",label:"LinkedIn"}'],
   ['"/reunimos"', '"/referanslar"'],
   ['"/inspire_mono"', '"/hizmetler/sosyal-medya-yonetimi"'],
   ['"/wasm_design_utils"', '"/hizmetler/strateji-danismanlik"'],

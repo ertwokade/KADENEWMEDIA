@@ -37,16 +37,6 @@
     ]]
   ];
 
-  /* Tek elden yönetilen sosyal hesaplar: sahnedeki footer yalnızca üçünü
-     gösterebiliyor, tam liste burada duruyor. */
-  var SOCIAL = [
-    ['Instagram', 'https://instagram.com/kadenewmedia'],
-    ['TikTok', 'https://tiktok.com/@kadenewmedia'],
-    ['YouTube', 'https://www.youtube.com/@kadenewmedia'],
-    ['X', 'https://x.com/kadenewmedia'],
-    ['LinkedIn', 'https://www.linkedin.com/company/kadenewmedia']
-  ];
-
   var CONTACT = {
     mail: 'thekademedia@gmail.com',
     tel: '+90 506 729 34 23',
@@ -79,14 +69,9 @@
           '<a class="kade-sitefooter__cta" href="/iletisim">' + (tr ? 'İletişim sayfası ↗' : 'Contact page ↗') + '</a>' +
         '</div>' +
       '</div>' +
-      /* Telifi tekrar yazmıyoruz: sahnenin sabit HUD'u zaten "Kade New Media
-         (c) <yıl>" gösteriyor; burada yalnızca sosyal hesaplar duruyor. */
-      '<div class="kade-sitefooter__base">' +
-        '<span class="kade-sitefooter__baslik">' + (tr ? 'SOSYAL' : 'SOCIAL') + '</span>' +
-        '<div class="kade-sitefooter__social">' + SOCIAL.map(function (item) {
-          return '<a href="' + item[1] + '" target="_blank" rel="noopener noreferrer">' + item[0] + ' ↗</a>';
-        }).join('') + '</div>' +
-      '</div>';
+      /* Sosyal hesaplar sahnenin kendi footer satırında; telif de sabit HUD'da.
+         Burada tekrar etmiyoruz, alt bölüm sade kalsın. */
+      '';
     return wrap;
   }
 

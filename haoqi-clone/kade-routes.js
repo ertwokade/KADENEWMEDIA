@@ -120,3 +120,31 @@
   buildMeta();
   buildIndex();
 })();
+
+/* İlk ekrandaki içerik beklemesin: gözlemciye bırakılan öğeler sayfa açılır
+   açılmaz görünür olsun, gözlemci hiç tetiklenmezse de hiçbir şey gizli
+   kalmasın. Aşağıdaki bölümler yine kaydırdıkça açılıyor. */
+(function () {
+  'use strict';
+  var shell = document.querySelector('.article-shell');
+  if (!shell) return;
+
+  function ac(el) { el.classList.add('is-visible') }
+
+  function ilkEkran() {
+    var sinir = window.innerHeight * 1.5;
+    document.querySelectorAll('.reveal, .page-head h1').forEach(function (el) {
+      if (el.getBoundingClientRect().top < sinir) ac(el);
+    });
+  }
+
+  function hepsi() {
+    document.querySelectorAll('.reveal, .page-head h1').forEach(ac);
+  }
+
+  ilkEkran();
+  requestAnimationFrame(ilkEkran);
+  setTimeout(ilkEkran, 400);
+  /* Emniyet ağı: gözlemci bir sebeple çalışmazsa içerik görünmeden kalmasın. */
+  setTimeout(hepsi, 2500);
+})();
