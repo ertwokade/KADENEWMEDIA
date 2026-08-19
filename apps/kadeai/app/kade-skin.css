@@ -142,3 +142,52 @@ button[class*='border'][class*='rounded']:hover {
   border-left: 2px solid var(--k-accent) !important;
   border-radius: 0 !important;
 }
+
+/* ── Yüksek özgüllüklü globals kuralları ─────────────────────────────
+   globals.css bazı bölümleri "html[data-theme] .kade-panel .x" gibi güçlü
+   seçicilerle koyu renge sabitliyor; sonuçta krem zeminde koyu-üstüne-koyu
+   metin çıkıyordu. Aynı özgüllükle geri alınıyor. */
+html .kade-panel .kade-dashboard-hero,
+html[data-theme='light'] .kade-panel .kade-dashboard-hero,
+html[data-theme='dark'] .kade-panel .kade-dashboard-hero {
+  background: var(--k-paper) !important;
+  background-image: none !important;
+  border: 1px solid var(--k-line) !important;
+  border-radius: 2px !important;
+}
+
+html .kade-panel .kade-dashboard-hero h1,
+html .kade-panel .kade-dashboard-hero p,
+html .kade-panel .kade-dashboard-hero span,
+html .kade-panel .kade-dashboard-hero div {
+  color: var(--k-ink) !important;
+}
+
+html .kade-panel .kade-dashboard-hero [class*='text-[#aaa79c]'],
+html .kade-panel .kade-dashboard-hero [class*='text-zinc-4'] {
+  color: var(--k-muted) !important;
+}
+
+html .kade-panel .kade-sidebar,
+html[data-theme='light'] .kade-panel .kade-sidebar,
+html[data-theme='dark'] .kade-panel .kade-sidebar {
+  background: var(--k-paper) !important;
+  border-color: var(--k-line) !important;
+  box-shadow: none !important;
+}
+
+html .kade-panel .kade-sidebar svg,
+html .kade-panel .kade-sidebar-footer,
+html .kade-panel .kade-sidebar a,
+html .kade-panel .kade-sidebar button { color: var(--k-ink) !important }
+
+html .kade-panel .kade-sidebar a.kade-sidebar-link[data-active='true'][href] {
+  background: transparent !important;
+  border-left: 2px solid var(--k-accent) !important;
+  border-radius: 0 !important;
+  color: var(--k-ink) !important;
+}
+
+/* Aksan düğmedeki metin koyu kalmalı (sarı zemin üstünde). */
+html [class*='bg-[#f2c322]'],
+html [class*='bg-[#f2c322]'] * { color: #11110f !important }
