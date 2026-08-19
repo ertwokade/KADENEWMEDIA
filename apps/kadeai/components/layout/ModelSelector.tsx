@@ -108,28 +108,25 @@ export default function ModelSelector({ value, onChange }: ModelSelectorProps) {
   }, [isOpen])
 
   return (
-    <div ref={rootRef} className="relative w-full min-w-[180px] max-w-[480px]">
+    <div ref={rootRef} className="relative w-auto min-w-0 max-w-[220px]">
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
+        title={isAutoSelected && autoReason ? autoReason : undefined}
         className={cn(
           'flex h-12 w-full items-center justify-between gap-3 rounded-lg border bg-zinc-900 px-3 text-left shadow-sm transition-colors',
           isOpen ? 'border-orange-400' : 'border-zinc-700 hover:border-orange-400'
         )}
         aria-expanded={isOpen}
       >
-        <span className="flex min-w-0 items-center gap-2.5">
-          <span className={cn('grid h-8 w-8 place-items-center rounded-lg bg-zinc-950', selected.colorClass)}>
-            <SelectedIcon className="h-4 w-4" />
+        <span className="flex min-w-0 items-center gap-2">
+          <span className={cn('grid h-6 w-6 place-items-center rounded-lg bg-zinc-950', selected.colorClass)}>
+            <SelectedIcon className="h-3.5 w-3.5" />
           </span>
           <span className="min-w-0">
             <span className="flex min-w-0 items-center gap-1.5">
               <span className="truncate text-xs font-semibold text-zinc-100">{selected.shortLabel}</span>
               {isAutoSelected && <Sparkles className="h-3 w-3 shrink-0 text-orange-500" />}
-            </span>
-            <span className="block truncate text-[10px] text-zinc-500">
-              {selected.speedLabel || speedLabels[selected.speed || 'balanced']}
-              {selected.contextLabel ? ` / ${selected.contextLabel}` : ''}
             </span>
           </span>
         </span>
@@ -241,12 +238,8 @@ export default function ModelSelector({ value, onChange }: ModelSelectorProps) {
         </div>
       )}
 
-      {isAutoSelected && autoReason && (
-        <p className="mt-1 flex items-center gap-1 px-1 text-[10px] text-zinc-500">
-          <Sparkles className="h-2.5 w-2.5 shrink-0 text-orange-500" />
-          <span className="truncate">{autoReason}</span>
-        </p>
-      )}
+      {/* Otomatik seçim açıklaması üst barda ikinci bir satır açıyordu; artık
+          yalnızca düğmenin başlığında (title) duruyor. */}
     </div>
   )
 }

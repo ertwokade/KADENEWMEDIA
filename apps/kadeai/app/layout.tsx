@@ -3,6 +3,7 @@ import { Poppins } from 'next/font/google'
 import MobileInstallPrompt from '@/components/mobile/MobileInstallPrompt'
 import { ThemeProvider } from '@/lib/context/ThemeContext'
 import './globals.css'
+import './kade-skin.css'
 import { PUBLIC_APP_URL, withBasePath } from '@/lib/appConfig'
 
 const poppins = Poppins({

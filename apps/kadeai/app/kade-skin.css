@@ -1,0 +1,99 @@
+/* ── Kade site kalıbı ─────────────────────────────────────────────────
+   Panel, ana sitenin görsel dilini kullanır: krem yüzey, saç teli çizgiler,
+   mono küçük etiketler, noktalı hover çerçevesi ve düz (gölgesiz) yüzeyler.
+   Bileşenlerdeki sabit koyu renkler burada tek yerden çevrilir; böylece 40+
+   araç sayfası tek tek elden geçirilmeden aynı dile gelir.
+   Marka sarısı korunuyor: logo ve aksan onun üzerine kurulu. */
+
+:root {
+  --k-paper: #fbfaf4;
+  --k-ink: #050505;
+  --k-muted: #615f55;
+  --k-line: rgba(5, 5, 5, 0.14);
+  --k-accent: #f2c322;
+}
+
+html[data-theme-mode='dark'] {
+  --k-paper: #08090d;
+  --k-ink: #f7f3e8;
+  --k-muted: #aaa396;
+  --k-line: rgba(247, 243, 232, 0.14);
+}
+
+/* Yüzeyler: koyu zinc tonları ve yarı saydam beyaz katmanlar tek renge iner. */
+[class*='bg-zinc-950'],
+[class*='bg-zinc-900'],
+[class*='bg-zinc-800'],
+[class*='bg-[#0'],
+[class*='bg-[#1'] {
+  background-color: var(--k-paper) !important;
+}
+
+[class*='bg-white/'] {
+  background-color: transparent !important;
+}
+
+/* Çizgiler: kalın koyu kenarlıklar saç teline iner. */
+[class*='border-zinc-'],
+[class*='border-white/'],
+[class*='border-black/'] {
+  border-color: var(--k-line) !important;
+}
+
+/* Metin: sabit açık gri tonları mürekkep ve muted olarak ikiye ayrılır. */
+[class*='text-zinc-100'],
+[class*='text-zinc-50'],
+[class*='text-white'],
+[class*='text-[#fffdf5]'],
+[class*='text-[#f7f3e8]'] {
+  color: var(--k-ink) !important;
+}
+
+[class*='text-zinc-400'],
+[class*='text-zinc-500'],
+[class*='text-[#aaa79c]'],
+[class*='text-[#d9d7ce]'] {
+  color: var(--k-muted) !important;
+}
+
+/* Düz yüzey: sahte derinlik (gölge, blur hale, gradyan) kaldırılıyor. */
+[class*='shadow-'] { box-shadow: none !important }
+[class*='blur-3xl'],
+[class*='blur-2xl'] { display: none !important }
+.kade-dashboard-hero { background-image: none !important }
+
+/* Köşeler: sitenin dili keskin; yalnızca rozet/pill yuvarlak kalıyor. */
+[class*='rounded-2xl'],
+[class*='rounded-xl'],
+[class*='rounded-lg'],
+[class*='rounded-md'] { border-radius: 2px !important }
+[class*='rounded-full'] { border-radius: 999px !important }
+
+/* Kart ve bağlantılarda sitenin imzası: hover'da noktalı çerçeve. */
+.kade-skin-card,
+a[class*='rounded'][class*='border'],
+button[class*='rounded'][class*='border'] {
+  position: relative;
+  transition: border-color .2s ease;
+}
+a[class*='border'][class*='rounded']:hover,
+button[class*='border'][class*='rounded']:hover {
+  border-color: var(--k-ink) !important;
+  border-style: dotted !important;
+  border-width: 2px !important;
+}
+
+/* Aksan düğmeler: keskin köşe, düz zemin, yükselme yok. */
+[class*='bg-[#f2c322]'] {
+  background-color: var(--k-accent) !important;
+  color: #11110f !important;
+  border-radius: 0 !important;
+}
+[class*='hover:-translate-y-0.5']:hover { transform: none !important }
+
+/* Bölüm başlıkları mono ve seyrek harfli — statik rotalardaki dille aynı. */
+.kade-eyebrow,
+[class*='uppercase'][class*='tracking-'] {
+  letter-spacing: .16em !important;
+  font-weight: 700 !important;
+}

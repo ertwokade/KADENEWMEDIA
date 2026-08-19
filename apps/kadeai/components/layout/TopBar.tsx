@@ -69,7 +69,10 @@ export default function TopBar({ title, description, showModelSelector = true }:
       </div>
 
       {showModelSelector && (
-        <div className="order-3 w-full flex-shrink-0 sm:order-none sm:ml-4 sm:w-[300px] lg:w-[360px]">
+        /* Model seçici üst barın yarısını kaplayan bir panel gibi duruyordu;
+           artık sağ uçta küçük bir düğme. Açılır liste aynı, yalnızca tetikleyici
+           küçüldü. */
+        <div className="order-3 ml-auto w-auto flex-shrink-0 sm:order-none sm:ml-4">
           <ModelSelector value={selectedModel} onChange={setSelectedModel} />
         </div>
       )}

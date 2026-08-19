@@ -727,6 +727,10 @@ function buildAssistantContext(){
 
 // ── BOOTSTRAP ────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded",async()=>{
+  // Hazır sinyali her durumda gitmeli: başlatmanın herhangi bir adımı hata
+  // verirse üst çerçeve 12 saniye bekleyip "Operasyon alanı yüklenemedi"
+  // gösteriyordu. Hata artık konsola yazılır, arayüz yine de açılır.
+  try{
   // Bulut senkronizasyonu olan hesaplarda ortak tarayıcı state'ini göstermeden
   // önce kullanıcıya ait kayıt yüklenir. API yoksa loadApiFeatures yerel moda düşer.
   state=buildCleanInitial();
@@ -756,11 +760,13 @@ document.addEventListener("DOMContentLoaded",async()=>{
   syncUndoBtn();
   const initialView = new URLSearchParams(location.search).get("view") || location.hash.replace(/^#/,"");
   if(initialView && viewOrder.includes(initialView)) navigateTo(initialView,false);
-  if(document.documentElement.classList.contains("embedded")&&window.parent!==window){
+  }catch(error){
+    console.error("Operasyon merkezi başlatılırken hata:", error);
+  }finally{
     document.body.dataset.operationsReady="true";
-    window.parent.postMessage({type:"kade:operations-ready"},location.origin);
-  }else{
-    document.body.dataset.operationsReady="true";
+    if(document.documentElement.classList.contains("embedded")&&window.parent!==window){
+      window.parent.postMessage({type:"kade:operations-ready"},location.origin);
+    }
   }
 });
 

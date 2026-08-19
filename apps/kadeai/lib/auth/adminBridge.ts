@@ -27,9 +27,12 @@ async function findAdminAccount(identifier: string): Promise<AdminAccount | null
     .from('kade_users')
     .select('id, username, email, password_hash, role')
 
+  /* Kullanıcı adı büyük/küçük harfe duyarlı aranıyordu: kayıt "Ertwo" iken
+     "ertwo" yazan kullanıcı hesabı bulamıyordu. Parola doğrulaması bcrypt ile
+     yapıldığı için aramanın harf duyarsız olması güvenliği etkilemiyor. */
   query = normalized.includes('@')
     ? query.ilike('email', normalized)
-    : query.eq('username', normalized)
+    : query.ilike('username', normalized)
 
   const { data, error } = await query.limit(1).maybeSingle()
   if (error) throw error
