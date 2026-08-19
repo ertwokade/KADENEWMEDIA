@@ -97,3 +97,48 @@ button[class*='border'][class*='rounded']:hover {
   letter-spacing: .16em !important;
   font-weight: 700 !important;
 }
+
+/* ── Kenar çubuğu ────────────────────────────────────────────────────
+   globals.css kenar çubuğunu sabit koyu renge çiviliyor (.kade-panel
+   .kade-sidebar). Ana sitede gezinme de sayfayla aynı yüzeyde durduğu için
+   burada da kâğıt zemin + saç teli ayrım kullanılıyor. */
+.kade-panel .kade-sidebar {
+  background: var(--k-paper) !important;
+  border-color: var(--k-line) !important;
+  box-shadow: none !important;
+}
+
+.kade-panel .kade-sidebar [class*='border-zinc'],
+.kade-panel .kade-sidebar-search {
+  border-color: var(--k-line) !important;
+}
+
+.kade-panel .kade-sidebar-search {
+  background: transparent !important;
+  color: var(--k-ink) !important;
+  border-radius: 0 !important;
+}
+
+.kade-panel .kade-sidebar-search::placeholder { color: var(--k-muted) !important }
+
+.kade-panel .kade-sidebar-category,
+.kade-panel .kade-sidebar a,
+.kade-panel .kade-sidebar button {
+  color: var(--k-ink) !important;
+}
+
+/* Kategori başlıkları mono-küçük etiket olarak. */
+.kade-panel .kade-sidebar-category {
+  color: var(--k-muted) !important;
+  letter-spacing: .16em !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+}
+
+/* Aktif satır: dolgu yerine sol kenarda aksan çizgisi — site diliyle aynı. */
+.kade-panel .kade-sidebar [aria-current='page'],
+.kade-panel .kade-sidebar .active {
+  background: transparent !important;
+  border-left: 2px solid var(--k-accent) !important;
+  border-radius: 0 !important;
+}
