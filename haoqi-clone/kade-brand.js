@@ -236,13 +236,18 @@
       document.title=locale==='tr'?'Kade New Media | Dijital Pazarlama Ajansı':'Kade New Media | Digital Marketing Agency';
       updateLanguageControl();
       renderServicesPanel();
-      applyLocaleToPage(locale,!!animate);
+      /* Sayfa zaten Türkçe yayınlanıyor (metinler bundle ve sunucu HTML'inde
+         çevrili). İlk yüklemede React'in metin düğümlerini textContent ile
+         ezmek, o bölüm yeniden render edildiğinde removeChild hatasına ve
+         sayfanın boşalmasına yol açıyordu; bu yüzden yalnızca kullanıcı dili
+         değiştirdiğinde ya da İngilizceye geçildiğinde uygulanıyor. */
+      if(animate||locale!=='tr')applyLocaleToPage(locale,!!animate);
       window.dispatchEvent(new CustomEvent('kade:localechange',{detail:{locale:locale}}));
       /* The cloned page finishes its own staggered text reveal after hydration.
          A few leaf spans can therefore be written back to Haoqi's original
          language after our first pass. Reconcile only while that native reveal
          settles; user-triggered switches keep their scramble animation. */
-      if(!animate)[450,1250,2600].forEach(function(delay){
+      if(!animate&&locale!=='tr')[450,1250,2600].forEach(function(delay){
         setTimeout(function(){
           if(syncGeneration!==localeSyncGeneration)return;
           applyLocaleToPage(locale,false);
@@ -332,17 +337,10 @@
       document.querySelectorAll('a[href="https://reunimos.cc"]').forEach(function(a){setAnchor(a,'/hizmetler/sosyal-medya-yonetimi','Sosyal medya yönetimi')});
       document.querySelectorAll('a[href="https://www.alipan.com/"]').forEach(function(a){setAnchor(a,'/hizmetler/icerik-uretimi','İçerik üretimi')});
       document.querySelectorAll('a[href="https://www.teambition.com/"]').forEach(function(a){setAnchor(a,'/hizmetler/web-sitesi-tasarimi','Web sitesi tasarımı')});
-      var footer=document.querySelector('footer');
-      if(footer){
-        var email=footer.querySelector('a[href^="mailto:"]');
-        if(email)email.setAttribute('href','mailto:thekademedia@gmail.com');
-        var socialBox=email&&email.parentElement&&email.parentElement.querySelector('div');
-        if(socialBox){
-          var specs=[['Instagram','https://instagram.com/kadenewmedia'],['X','https://x.com/kadenewmedia'],['YouTube','https://www.youtube.com/@kadenewmedia'],['TikTok','https://tiktok.com/@kadenewmedia'],['LinkedIn','https://www.linkedin.com/company/kadenewmedia']];
-          var links=Array.prototype.slice.call(socialBox.querySelectorAll(':scope > a'));
-          links.slice(0,specs.length).forEach(function(a,index){a.setAttribute('data-kade-social','');a.href=specs[index][1];a.target='_blank';a.rel='noopener noreferrer';var leaf=Array.prototype.find.call(a.querySelectorAll('span'),function(s){return !s.querySelector('span')});var textNode=leaf&&leaf.firstChild&&leaf.firstChild.nodeType===Node.TEXT_NODE?leaf.firstChild:a.firstChild&&a.firstChild.nodeType===Node.TEXT_NODE?a.firstChild:null;if(textNode&&textNode.nodeValue!==specs[index][0])textNode.nodeValue=specs[index][0]});
-        }
-      }
+      /* Footer'daki e-posta ve sosyal bağlantılar artık kaynağında (bundle +
+         sunucu HTML'i) düzeltiliyor. Burada DOM'a dokunmak React'in o bölümü
+         yeniden render ettiği anda removeChild hatasına ve sayfanın boşalmasına
+         yol açıyordu; bu yüzden kaldırıldı. */
       installExperience();
     }
     function revealControlsWhenReady(done){

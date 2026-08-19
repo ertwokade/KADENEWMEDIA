@@ -35,14 +35,11 @@ const COPY = [
   ['text:"Create"', 'text:"birlikte"'],
   ['text:"Something"', 'text:"iş"'],
   ['text:"Extraordinary"', 'text:"üretelim"'],
-  ['>Let&#x27;s<', '>Hadi<'],
-  ['>Create<', '>birlikte<'],
-  ['>Something<', '>iş<'],
-  ['>Extraordinary<', '>üretelim<'],
+  ['<span>Let&#x27;s</span>', '<span>Hadi</span>'],
+  ['<span>Create</span>', '<span>birlikte</span>'],
+  ['<span>Something</span>', '<span>iş</span>'],
+  ['<span>Extraordinary</span>', '<span>üretelim</span>'],
   ['"TOOLS"', '"ARAÇ"'],
-  ['>TOOLS<', '>ARAÇ<'],
-  ['type:"tools"', 'type:"araç"'],
-  ['type:"event"', 'type:"etkinlik"'],
   /* Haoqi'nin kendi proje rotaları kaldırıldı; ana sayfadaki iş kartları
      kade-brand.js tarafından zaten Kade hizmetleri olarak etiketleniyor, bu
      yüzden bağlantılar da gerçek Kade sayfalarına gidiyor. */
@@ -57,9 +54,7 @@ const COPY = [
   ['text:"Create"', 'text:"birlikte"'],
   ['text:"Something"', 'text:"iş"'],
   ['text:"Extraordinary"', 'text:"üretelim"'],
-  ['"TOOLS"', '"ARAÇ"'],
-  ['type:"tools"', 'type:"araç"'],
-  ['type:"event"', 'type:"etkinlik"']
+  ['"TOOLS"', '"ARAÇ"']
 ]
 
 /* Bundle içi metinler: footer geç mount olduğu için kade-brand.js'in DOM
@@ -83,9 +78,7 @@ export const SCRIPT_COPY = [
   ['text:"Create"', 'text:"birlikte"'],
   ['text:"Something"', 'text:"iş"'],
   ['text:"Extraordinary"', 'text:"üretelim"'],
-  ['"TOOLS"', '"ARAÇ"'],
-  ['type:"tools"', 'type:"araç"'],
-  ['type:"event"', 'type:"etkinlik"']
+  ['"TOOLS"', '"ARAÇ"']
 ]
 
 export function transformScript(code) {
