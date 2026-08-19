@@ -191,3 +191,50 @@ html .kade-panel .kade-sidebar a.kade-sidebar-link[data-active='true'][href] {
 /* Aksan düğmedeki metin koyu kalmalı (sarı zemin üstünde). */
 html [class*='bg-[#f2c322]'],
 html [class*='bg-[#f2c322]'] * { color: #11110f !important }
+
+/* Kenar çubuğu, globals.css'te "html[data-theme] .kade-panel aside.kade-sidebar"
+   gibi daha özgül seçicilerle koyu gradyana sabitlenmiş; aynı seviyede geri
+   alınıyor. */
+html[data-theme='light'] .kade-panel aside.kade-sidebar,
+html[data-theme='dark'] .kade-panel aside.kade-sidebar,
+html .kade-panel aside.kade-sidebar {
+  background: var(--k-paper) !important;
+  background-image: none !important;
+  border-color: var(--k-line) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme='light'] .kade-panel aside.kade-sidebar .kade-sidebar-footer,
+html[data-theme='dark'] .kade-panel aside.kade-sidebar .kade-sidebar-footer,
+html .kade-panel aside.kade-sidebar .kade-sidebar-footer {
+  background: transparent !important;
+  border-color: var(--k-line) !important;
+}
+
+html[data-theme='light'] .kade-panel aside.kade-sidebar .kade-sidebar-category,
+html[data-theme='dark'] .kade-panel aside.kade-sidebar .kade-sidebar-category,
+html .kade-panel aside.kade-sidebar .kade-sidebar-category {
+  background: transparent !important;
+  color: var(--k-muted) !important;
+}
+
+html[data-theme='light'] .kade-panel aside.kade-sidebar input.kade-sidebar-search,
+html[data-theme='dark'] .kade-panel aside.kade-sidebar input.kade-sidebar-search,
+html .kade-panel aside.kade-sidebar input.kade-sidebar-search {
+  background: transparent !important;
+  border-color: var(--k-line) !important;
+  color: var(--k-ink) !important;
+}
+
+html[data-theme='light'] .kade-panel aside.kade-sidebar [class*='border-zinc'],
+html .kade-panel aside.kade-sidebar [class*='border-zinc'] {
+  border-color: var(--k-line) !important;
+}
+
+html .kade-panel aside.kade-sidebar,
+html .kade-panel aside.kade-sidebar a,
+html .kade-panel aside.kade-sidebar button,
+html .kade-panel aside.kade-sidebar span,
+html .kade-panel aside.kade-sidebar svg {
+  color: var(--k-ink) !important;
+}
