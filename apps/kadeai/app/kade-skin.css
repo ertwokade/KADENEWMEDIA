@@ -99,54 +99,13 @@ button[class*='border'][class*='rounded']:hover {
 }
 
 /* ── Kenar çubuğu ────────────────────────────────────────────────────
-   globals.css kenar çubuğunu sabit koyu renge çiviliyor (.kade-panel
-   .kade-sidebar). Ana sitede gezinme de sayfayla aynı yüzeyde durduğu için
-   burada da kâğıt zemin + saç teli ayrım kullanılıyor. */
-.kade-panel .kade-sidebar {
-  background: var(--k-paper) !important;
-  border-color: var(--k-line) !important;
-  box-shadow: none !important;
-}
+   Gezinme koyu kalıyor: globals.css onu birden fazla yüksek özgüllüklü
+   kuralla koyu zemine sabitliyor ve CSS üzerinden çevirmeye çalışmak
+   metni okunmaz hale getiriyordu. İçerik alanı site diline geçti; çubuğun
+   dönüşümü bileşen düzeyinde yapılmalı (Sidebar.tsx'teki sabit renkler).
+   Bu yüzden burada rengine dokunulmuyor. */
 
-.kade-panel .kade-sidebar [class*='border-zinc'],
-.kade-panel .kade-sidebar-search {
-  border-color: var(--k-line) !important;
-}
-
-.kade-panel .kade-sidebar-search {
-  background: transparent !important;
-  color: var(--k-ink) !important;
-  border-radius: 0 !important;
-}
-
-.kade-panel .kade-sidebar-search::placeholder { color: var(--k-muted) !important }
-
-.kade-panel .kade-sidebar-category,
-.kade-panel .kade-sidebar a,
-.kade-panel .kade-sidebar button {
-  color: var(--k-ink) !important;
-}
-
-/* Kategori başlıkları mono-küçük etiket olarak. */
-.kade-panel .kade-sidebar-category {
-  color: var(--k-muted) !important;
-  letter-spacing: .16em !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-}
-
-/* Aktif satır: dolgu yerine sol kenarda aksan çizgisi — site diliyle aynı. */
-.kade-panel .kade-sidebar [aria-current='page'],
-.kade-panel .kade-sidebar .active {
-  background: transparent !important;
-  border-left: 2px solid var(--k-accent) !important;
-  border-radius: 0 !important;
-}
-
-/* ── Yüksek özgüllüklü globals kuralları ─────────────────────────────
-   globals.css bazı bölümleri "html[data-theme] .kade-panel .x" gibi güçlü
-   seçicilerle koyu renge sabitliyor; sonuçta krem zeminde koyu-üstüne-koyu
-   metin çıkıyordu. Aynı özgüllükle geri alınıyor. */
+/* Hero: koyu gradyan yerine kâğıt zemin ve saç teli çerçeve. */
 html .kade-panel .kade-dashboard-hero,
 html[data-theme='light'] .kade-panel .kade-dashboard-hero,
 html[data-theme='dark'] .kade-panel .kade-dashboard-hero {
@@ -168,80 +127,21 @@ html .kade-panel .kade-dashboard-hero [class*='text-zinc-4'] {
   color: var(--k-muted) !important;
 }
 
-html .kade-panel .kade-sidebar,
-html[data-theme='light'] .kade-panel .kade-sidebar,
-html[data-theme='dark'] .kade-panel .kade-sidebar {
-  background: var(--k-paper) !important;
-  border-color: var(--k-line) !important;
-  box-shadow: none !important;
-}
-
-html .kade-panel .kade-sidebar svg,
-html .kade-panel .kade-sidebar-footer,
-html .kade-panel .kade-sidebar a,
-html .kade-panel .kade-sidebar button { color: var(--k-ink) !important }
-
-html .kade-panel .kade-sidebar a.kade-sidebar-link[data-active='true'][href] {
-  background: transparent !important;
-  border-left: 2px solid var(--k-accent) !important;
-  border-radius: 0 !important;
-  color: var(--k-ink) !important;
-}
-
-/* Aksan düğmedeki metin koyu kalmalı (sarı zemin üstünde). */
+/* Aksan düğmedeki metin sarı zemin üstünde koyu kalmalı. */
 html [class*='bg-[#f2c322]'],
 html [class*='bg-[#f2c322]'] * { color: #11110f !important }
 
-/* Kenar çubuğu, globals.css'te "html[data-theme] .kade-panel aside.kade-sidebar"
-   gibi daha özgül seçicilerle koyu gradyana sabitlenmiş; aynı seviyede geri
-   alınıyor. */
-html[data-theme='light'] .kade-panel aside.kade-sidebar,
-html[data-theme='dark'] .kade-panel aside.kade-sidebar,
-html .kade-panel aside.kade-sidebar {
-  background: var(--k-paper) !important;
-  background-image: none !important;
-  border-color: var(--k-line) !important;
-  box-shadow: none !important;
-}
-
-html[data-theme='light'] .kade-panel aside.kade-sidebar .kade-sidebar-footer,
-html[data-theme='dark'] .kade-panel aside.kade-sidebar .kade-sidebar-footer,
-html .kade-panel aside.kade-sidebar .kade-sidebar-footer {
-  background: transparent !important;
-  border-color: var(--k-line) !important;
-}
-
-html[data-theme='light'] .kade-panel aside.kade-sidebar .kade-sidebar-category,
-html[data-theme='dark'] .kade-panel aside.kade-sidebar .kade-sidebar-category,
-html .kade-panel aside.kade-sidebar .kade-sidebar-category {
-  background: transparent !important;
-  color: var(--k-muted) !important;
-}
-
-html[data-theme='light'] .kade-panel aside.kade-sidebar input.kade-sidebar-search,
-html[data-theme='dark'] .kade-panel aside.kade-sidebar input.kade-sidebar-search,
-html .kade-panel aside.kade-sidebar input.kade-sidebar-search {
-  background: transparent !important;
-  border-color: var(--k-line) !important;
-  color: var(--k-ink) !important;
-}
-
-html[data-theme='light'] .kade-panel aside.kade-sidebar [class*='border-zinc'],
-html .kade-panel aside.kade-sidebar [class*='border-zinc'] {
-  border-color: var(--k-line) !important;
-}
-
-html .kade-panel aside.kade-sidebar,
-html .kade-panel aside.kade-sidebar a,
-html .kade-panel aside.kade-sidebar button,
-html .kade-panel aside.kade-sidebar span,
-html .kade-panel aside.kade-sidebar svg {
-  color: var(--k-ink) !important;
-}
-
-/* Son çare: globals.css'teki koyu zemin kuralı beklenenden güçlü davranıyor;
-   sınıf tekrarıyla özgüllük yükseltilip renk açıkça yazılıyor. */
-html body div.kade-panel aside.kade-sidebar.kade-sidebar {
-  background-color: var(--k-paper) !important;
-  background-image: none !important;
-}
+/* Genel dönüşüm kenar çubuğuna uygulanmasın: orada koyu zemin duruyor. */
+.kade-sidebar [class*='text-zinc-100'],
+.kade-sidebar [class*='text-white'],
+.kade-sidebar [class*='text-[#fffdf5]'] { color: #fffdf5 !important }
+.kade-sidebar [class*='text-zinc-400'],
+.kade-sidebar [class*='text-[#aaa79c]'] { color: #aaa79c !important }
+.kade-sidebar [class*='bg-zinc-9'],
+.kade-sidebar [class*='bg-zinc-8'] { background-color: rgba(255,255,255,.05) !important }
+.kade-sidebar,
+.kade-sidebar a,
+.kade-sidebar button,
+.kade-sidebar span,
+.kade-sidebar svg { color: #fffdf5 !important }
+.kade-sidebar .kade-sidebar-category { color: #8b877c !important }
