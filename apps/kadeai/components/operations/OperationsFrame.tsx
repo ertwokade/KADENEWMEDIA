@@ -50,6 +50,26 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
     return () => window.clearTimeout(timeout)
   }, [hydrated, loaded, retryCount])
 
+  /* Hazır mesajı, dinleyici bağlanmadan önce gidebiliyor: kit aynı origin'de
+     olduğu için gövdedeki işareti de yokluyoruz. Böylece yarış durumunda
+     çerçeve boş kalmıyor. */
+  useEffect(() => {
+    if (!hydrated || loaded) return
+    const poll = window.setInterval(() => {
+      try {
+        if (iframeRef.current?.contentDocument?.body?.dataset.operationsReady === 'true') {
+          window.clearInterval(poll)
+          setLoaded(true)
+          setTimedOut(false)
+        }
+      } catch {
+        /* Farklı origin'e düşerse yoklama yapılamaz; mesaj yolu devrede kalır. */
+      }
+    }, 250)
+    readinessPollRef.current = poll
+    return () => window.clearInterval(poll)
+  }, [hydrated, loaded, retryCount])
+
   useEffect(() => {
     if (!loaded) return
     iframeRef.current?.contentWindow?.postMessage(
