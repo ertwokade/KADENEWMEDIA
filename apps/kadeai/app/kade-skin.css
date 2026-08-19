@@ -238,3 +238,10 @@ html .kade-panel aside.kade-sidebar span,
 html .kade-panel aside.kade-sidebar svg {
   color: var(--k-ink) !important;
 }
+
+/* Son çare: globals.css'teki koyu zemin kuralı beklenenden güçlü davranıyor;
+   sınıf tekrarıyla özgüllük yükseltilip renk açıkça yazılıyor. */
+html body div.kade-panel aside.kade-sidebar.kade-sidebar {
+  background-color: var(--k-paper) !important;
+  background-image: none !important;
+}
