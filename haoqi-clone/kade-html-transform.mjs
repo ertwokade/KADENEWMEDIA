@@ -39,6 +39,9 @@ const COPY = [
   ['<span>Create</span>', '<span>birlikte</span>'],
   ['<span>Something</span>', '<span>iş</span>'],
   ['<span>Extraordinary</span>', '<span>üretelim</span>'],
+  /* Giriş kapısı bundle'da kapatıldı; sunucu HTML'indeki çubuk da kalkmalı,
+     yoksa React hidrasyonda uyuşmazlık görüyor. */
+  ['<div class="left-1/2 top-1/2 z-40 fixed flex h-4 w-[140px] -translate-x-1/2 -translate-y-1/2 items-center justify-center pointer-events-none opacity-100" style="transition:opacity 250ms cubic-bezier(0.25, 1, 0.5, 1)" aria-hidden="true"><div class="relative h-1.5 w-full overflow-hidden rounded-full bg-l3"><div class="absolute inset-y-0 left-0 rounded-full bg-l1" style="width:0%;transition:width 520ms cubic-bezier(0.22, 1, 0.36, 1);will-change:width"></div></div></div>', ''],
   ['<span>tools</span>', '<span>araç</span>'],
   ['<span>event</span>', '<span>etkinlik</span>'],
   ['"TOOLS"', '"ARAÇ"'],
@@ -58,7 +61,12 @@ const COPY = [
   ['text:"Extraordinary"', 'text:"üretelim"'],
   ['"TOOLS"', '"ARAÇ"'],
   ['type:"tools"', 'type:"araç"'],
-  ['type:"event"', 'type:"etkinlik"']
+  ['type:"event"', 'type:"etkinlik"'],
+  /* Ana sayfa giriş kapısı: sahne üç modelin beş kare çizmesini bekliyor ve o
+     sırada dolan bir çubuk gösteriyordu. Kapı kapatıldı — sayfa diğer rotalar
+     gibi doğrudan açılıyor, sahne arkada yükleniyor. Rota geçiş animasyonu
+     olduğu gibi duruyor. */
+  ['x={"/":{entryLoading:{enabled:!0},routeLoading:{enabled:!0}}}', 'x={"/":{entryLoading:{enabled:!1},routeLoading:{enabled:!0}}}']
 ]
 
 /* Bundle içi metinler: footer geç mount olduğu için kade-brand.js'in DOM
@@ -84,7 +92,12 @@ export const SCRIPT_COPY = [
   ['text:"Extraordinary"', 'text:"üretelim"'],
   ['"TOOLS"', '"ARAÇ"'],
   ['type:"tools"', 'type:"araç"'],
-  ['type:"event"', 'type:"etkinlik"']
+  ['type:"event"', 'type:"etkinlik"'],
+  /* Ana sayfa giriş kapısı: sahne üç modelin beş kare çizmesini bekliyor ve o
+     sırada dolan bir çubuk gösteriyordu. Kapı kapatıldı — sayfa diğer rotalar
+     gibi doğrudan açılıyor, sahne arkada yükleniyor. Rota geçiş animasyonu
+     olduğu gibi duruyor. */
+  ['x={"/":{entryLoading:{enabled:!0},routeLoading:{enabled:!0}}}', 'x={"/":{entryLoading:{enabled:!1},routeLoading:{enabled:!0}}}']
 ]
 
 export function transformScript(code) {
