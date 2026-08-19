@@ -84,7 +84,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('retention-analysis', 'İzlenme Analizi', 'analysis', '/dashboard/retention-analysis', 'bar-chart', 'Girilen akış ve metriklerden izleyici tutma analizi.', ['brand.audience']),
   tool('social-audit', 'Sosyal Medya Analizi', 'analysis', '/dashboard/social-audit', 'users', 'Girilen profil ve metrikleri denetler.', brandBasics),
   tool('trend-radar', 'Trend Radar', 'analysis', '/dashboard/trend-radar', 'radar', 'TikTok, Reels, Shorts, YouTube ve Google’da ölçülmüş canlı trend verisi.', [], false),
-  tool('materyal', 'Materyal Kütüphanesi', 'analysis', '/dashboard/materyal', 'image-plus', 'arsivhub arşivinden toplanan video ve fotoğraf materyalleri.', [], false),
+  tool('materyal', 'Materyal Kütüphanesi', 'analysis', '/dashboard/materyal', 'image-plus', 'Video ve fotoğraf materyallerini ara, izle ve indir.', [], false),
   tool('trends', 'Trend Bulucu', 'analysis', '/dashboard/trends', 'bar-chart', 'Niş ve bölge bağlamında araştırma önerileri üretir.', ['brand.niche', 'preferences.platforms']),
   tool('competitor', 'Rakip Analizi', 'analysis', '/dashboard/competitor', 'users', 'Kullanıcının sağladığı rakip bilgilerini analiz eder.', ['brand.niche']),
   tool('comment-analysis', 'Yorum Analizi', 'analysis', '/dashboard/comment-analysis', 'message-square', 'Yapıştırılan gerçek yorumları analiz eder.', [], false),

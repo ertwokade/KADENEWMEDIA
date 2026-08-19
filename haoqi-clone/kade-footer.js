@@ -36,6 +36,23 @@
       ['/telif-haklari', 'Telif Hakları', 'Copyright']
     ]]
   ];
+
+  /* Tek elden yönetilen sosyal hesaplar: sahnedeki footer yalnızca üçünü
+     gösterebiliyor, tam liste burada duruyor. */
+  var SOCIAL = [
+    ['Instagram', 'https://instagram.com/kadenewmedia'],
+    ['TikTok', 'https://tiktok.com/@kadenewmedia'],
+    ['YouTube', 'https://www.youtube.com/@kadenewmedia'],
+    ['X', 'https://x.com/kadenewmedia'],
+    ['LinkedIn', 'https://www.linkedin.com/company/kadenewmedia']
+  ];
+
+  var CONTACT = {
+    mail: 'thekademedia@gmail.com',
+    tel: '+90 506 729 34 23',
+    telHref: '+905067293423',
+    adres: 'Biruni Teknopark, Zeytinburnu / İstanbul'
+  };
   var mounted = null;
 
   function locale() {
@@ -53,12 +70,22 @@
           group[2].map(function (item) {
             return '<a href="' + item[0] + '">' + (tr ? item[1] : item[2]) + '</a>';
           }).join('') + '</div>';
-      }).join('') + '</div>' +
-      /* Telifi tekrar yazmıyoruz: sahnenin sol-alt sabit HUD'u zaten
-         "Kade New Media (c) <yıl>" gösteriyor ve ekranın dibinde duruyor. */
+      }).join('') +
+        '<div class="kade-sitefooter__col kade-sitefooter__col--contact">' +
+          '<strong>' + (tr ? 'İletişim' : 'Contact') + '</strong>' +
+          '<a href="mailto:' + CONTACT.mail + '">' + CONTACT.mail + '</a>' +
+          '<a href="tel:' + CONTACT.telHref + '">' + CONTACT.tel + '</a>' +
+          '<span class="kade-sitefooter__adres">' + CONTACT.adres + '</span>' +
+          '<a class="kade-sitefooter__cta" href="/iletisim">' + (tr ? 'İletişim sayfası ↗' : 'Contact page ↗') + '</a>' +
+        '</div>' +
+      '</div>' +
+      /* Telifi tekrar yazmıyoruz: sahnenin sabit HUD'u zaten "Kade New Media
+         (c) <yıl>" gösteriyor; burada yalnızca sosyal hesaplar duruyor. */
       '<div class="kade-sitefooter__base">' +
-        '<span>' + (tr ? 'İstanbul · Sosyal medya, içerik, reklam ve prodüksiyon' : 'İstanbul · Social media, content, advertising and production') + '</span>' +
-        '<a href="mailto:thekademedia@gmail.com">thekademedia@gmail.com</a>' +
+        '<span class="kade-sitefooter__baslik">' + (tr ? 'SOSYAL' : 'SOCIAL') + '</span>' +
+        '<div class="kade-sitefooter__social">' + SOCIAL.map(function (item) {
+          return '<a href="' + item[1] + '" target="_blank" rel="noopener noreferrer">' + item[0] + ' ↗</a>';
+        }).join('') + '</div>' +
       '</div>';
     return wrap;
   }

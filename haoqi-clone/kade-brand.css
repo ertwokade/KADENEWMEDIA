@@ -520,14 +520,16 @@ footer a[href^="mailto:"]{text-transform:none!important}
      altında kalacak şekilde onun üzerine alındı. */
   z-index:45;
   /* Alt boşluk, sahnenin sabit HUD satırının üstüne binmemesi için. */
-  padding:clamp(30px,4vw,56px) clamp(20px,4vw,56px) clamp(64px,6vw,88px);
+  /* Alt boşluk, sahnenin ekran dibine sabitlenmiş telif satırının üstüne
+     binmemesi için bilerek geniş. */
+  padding:clamp(30px,4vw,56px) clamp(20px,4vw,56px) clamp(96px,9vw,132px);
   border-top:1px solid var(--line);
   background:var(--bg);
   color:var(--text);
 }
 .kade-sitefooter__grid{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:0;
 }
 .kade-sitefooter__col{
@@ -567,18 +569,42 @@ footer a[href^="mailto:"]{text-transform:none!important}
   display:flex;
   flex-wrap:wrap;
   align-items:center;
-  justify-content:space-between;
-  gap:10px 24px;
+  gap:12px clamp(18px,2.4vw,34px);
   padding-top:clamp(16px,2vw,24px);
   border-top:1px solid var(--line);
-  color:var(--muted);
-  font-size:11px!important;
-  font-weight:500!important;
 }
-.kade-sitefooter__base a{color:inherit!important;text-decoration:none!important}
-.kade-sitefooter__base a:hover{color:var(--text)!important}
+.kade-sitefooter__baslik{
+  color:var(--muted);
+  font-size:10px!important;
+  font-weight:700!important;
+  letter-spacing:.16em!important;
+}
+.kade-sitefooter__social{display:flex;flex-wrap:wrap;gap:10px clamp(14px,2vw,28px)}
+.kade-sitefooter__social a{
+  position:relative;
+  color:inherit!important;
+  font-size:12px!important;
+  font-weight:600!important;
+  letter-spacing:.02em!important;
+  text-decoration:none!important;
+}
+.kade-sitefooter__social a::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:100%;
+  bottom:-3px;
+  height:1px;
+  background:currentColor;
+  transition:right .25s cubic-bezier(.2,.9,.2,1);
+}
+.kade-sitefooter__social a:hover::after{right:0}
+.kade-sitefooter__col--contact a{font-size:12px!important}
+.kade-sitefooter__adres{color:var(--muted);font-size:12px!important;line-height:1.45;max-width:22ch}
+.kade-sitefooter__cta{margin-top:4px;font-weight:700!important}
 @media(max-width:900px){
   .kade-sitefooter__grid{grid-template-columns:1fr 1fr}
+  .kade-sitefooter__col--contact{grid-column:1/-1}
   .kade-sitefooter__base{flex-direction:column;align-items:flex-start;gap:6px}
 }
 /* Site footer'ı ekrandayken sabit HUD telif satırını gizle (tekrar oluyor). */

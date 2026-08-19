@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Clock3, Eye, Image as ImageIcon, Loader2, RefreshCw, Search, Video } from 'lucide-react'
+import { Clock3, Download, Eye, Image as ImageIcon, Loader2, Play, RefreshCw, Search, Video, X } from 'lucide-react'
 import { apiFetch } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
 import TopBar from '@/components/layout/TopBar'
@@ -36,13 +36,6 @@ const KINDS: Array<{ key: string; label: string }> = [
   { key: 'photo', label: 'Fotoğraf' },
 ]
 
-const SOURCES: Array<{ key: string; label: string }> = [
-  { key: '', label: 'Tüm kaynaklar' },
-  { key: 'arsivhub', label: 'arsivhub' },
-  { key: 'youtube', label: 'YouTube' },
-  { key: 'tiktok', label: 'TikTok' },
-]
-
 const SORTS: Array<{ key: string; label: string }> = [
   { key: 'yeni', label: 'En yeni' },
   { key: 'izlenme', label: 'En çok izlenen' },
@@ -69,12 +62,12 @@ export default function MateryalPage() {
   const [sonKosu, setSonKosu] = useState<RunRow | null>(null)
   const [arama, setArama] = useState('')
   const [tur, setTur] = useState('')
-  const [kaynak, setKaynak] = useState('')
   const [toplamaOzeti, setToplamaOzeti] = useState<string | null>(null)
   const [sirala, setSirala] = useState('yeni')
   const [yukleniyor, setYukleniyor] = useState(true)
   const [toplaniyor, setToplaniyor] = useState(false)
   const [hata, setHata] = useState<string | null>(null)
+  const [acik, setAcik] = useState<MaterialRow | null>(null)
 
   const getir = useCallback(async () => {
     setYukleniyor(true)
@@ -83,7 +76,6 @@ export default function MateryalPage() {
       const params = new URLSearchParams({ sort: sirala, limit: '60' })
       if (arama.trim()) params.set('q', arama.trim())
       if (tur) params.set('kind', tur)
-      if (kaynak) params.set('source', kaynak)
       const cevap = await apiFetch(apiPath(`/api/materials?${params}`))
       const veri = await cevap.json()
       if (!cevap.ok) throw new Error(veri?.error || 'Materyaller getirilemedi.')
@@ -95,7 +87,7 @@ export default function MateryalPage() {
     } finally {
       setYukleniyor(false)
     }
-  }, [arama, kaynak, sirala, tur])
+  }, [arama, sirala, tur])
 
   useEffect(() => {
     const zamanlayici = setTimeout(getir, arama ? 350 : 0)
@@ -106,23 +98,19 @@ export default function MateryalPage() {
     setToplaniyor(true)
     setHata(null)
     try {
-      const hedef = kaynak ? `/api/materials/sync?source=${kaynak}` : '/api/materials/sync'
-      const cevap = await apiFetch(apiPath(hedef), { method: 'POST' })
+      const cevap = await apiFetch(apiPath('/api/materials/sync'), { method: 'POST' })
       const veri = await cevap.json()
       if (!cevap.ok) throw new Error(veri?.error || 'Toplama başarısız.')
-      /* Her kaynak kendi sonucunu döndürüyor: atlananın nedenini de gösteriyoruz. */
-      const satirlar: string[] = (veri.sonuclar ?? []).map(
-        (s: { source: string; found: number; inserted: number; error?: string }) =>
-          s.error ? `${s.source}: ${s.error}` : `${s.source}: ${s.found} kayıt, ${s.inserted} yeni`
-      )
-      setToplamaOzeti(satirlar.join(' · ') || null)
+      /* Kaynak adları kullanıcıya gösterilmiyor; yalnızca toplam sonuç. */
+      const toplam = veri.toplam ?? { found: 0, inserted: 0 }
+      setToplamaOzeti(`${toplam.found} kayıt tarandı · ${toplam.inserted} yeni eklendi`)
       await getir()
     } catch (e) {
       setHata(e instanceof Error ? e.message : 'Toplama başarısız.')
     } finally {
       setToplaniyor(false)
     }
-  }, [getir, kaynak])
+  }, [getir])
 
   const ozet = useMemo(() => {
     if (!sonKosu?.finished_at) return 'Henüz toplama yapılmadı'
@@ -132,7 +120,7 @@ export default function MateryalPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="Materyal Kütüphanesi" description="arsivhub arşivinden toplanan video ve fotoğraflar" />
+      <TopBar title="Materyal Kütüphanesi" description="Video ve fotoğraf materyalleri" />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
         <div className="flex flex-wrap items-center gap-3">
@@ -163,16 +151,6 @@ export default function MateryalPage() {
           </div>
 
           <select
-            value={kaynak}
-            onChange={(e) => setKaynak(e.target.value)}
-            className="px-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-sm outline-none"
-          >
-            {SOURCES.map((s) => (
-              <option key={s.key || 'tum'} value={s.key}>{s.label}</option>
-            ))}
-          </select>
-
-          <select
             value={sirala}
             onChange={(e) => setSirala(e.target.value)}
             className="px-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-sm outline-none"
@@ -189,7 +167,7 @@ export default function MateryalPage() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent)] text-black text-sm font-semibold disabled:opacity-60"
           >
             {toplaniyor ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            Kaynağı tara
+            Kütüphaneyi tazele
           </button>
         </div>
 
@@ -218,14 +196,16 @@ export default function MateryalPage() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
             {materyaller.map((m) => (
-              <a
+              <div
                 key={m.id}
-                href={m.page_url}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="group rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--surface)] transition-colors hover:border-[var(--accent)]"
               >
-                <div className="relative aspect-video bg-black/30 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setAcik(m)}
+                  className="relative block w-full aspect-video bg-black/30 overflow-hidden cursor-zoom-in"
+                  aria-label={`${m.title} önizle`}
+                >
                   {m.thumbnail ? (
                     // Kaynak CDN'i Next image loader'inda tanimli olmadigi icin dogrudan img.
                     // eslint-disable-next-line @next/next/no-img-element
@@ -245,7 +225,10 @@ export default function MateryalPage() {
                       {sureMetni(m.duration_sec)}
                     </span>
                   )}
-                </div>
+                  <span className="absolute inset-0 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+                    <Play className="w-9 h-9 text-white" />
+                  </span>
+                </button>
                 <div className="p-3 space-y-1.5">
                   <p className="text-sm font-medium line-clamp-2">{m.title}</p>
                   <div className="flex items-center gap-3 text-[11px] text-[var(--muted)]">
@@ -266,12 +249,60 @@ export default function MateryalPage() {
                       </span>
                     )}
                   </div>
+                  {m.media_url && (
+                    <a
+                      href={m.media_url}
+                      download
+                      className="inline-flex items-center gap-1.5 mt-1 text-[11px] font-semibold text-[var(--muted)] hover:text-[var(--fg)]"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      İndir
+                    </a>
+                  )}
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         )}
       </div>
+
+      {acik && (
+        /* Önizleme: video ise yerinde oynatılır, fotoğraf ise büyütülür. */
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/80 p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setAcik(null)}
+        >
+          <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setAcik(null)}
+              className="absolute -top-10 right-0 inline-flex items-center gap-1 text-sm text-white/80 hover:text-white"
+            >
+              <X className="w-4 h-4" /> Kapat
+            </button>
+            {acik.kind === 'video' && acik.media_url ? (
+              <video src={acik.media_url} poster={acik.thumbnail ?? undefined} controls autoPlay className="w-full rounded-xl bg-black" />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={acik.media_url ?? acik.thumbnail ?? ''} alt={acik.title} className="w-full rounded-xl" />
+            )}
+            <div className="flex items-center justify-between gap-4 mt-3">
+              <p className="text-sm text-white/90">{acik.title}</p>
+              {acik.media_url && (
+                <a
+                  href={acik.media_url}
+                  download
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent)] text-black text-xs font-semibold"
+                >
+                  <Download className="w-3.5 h-3.5" /> İndir
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -29,6 +29,20 @@ const COPY = [
   ['href="https://github.com/wenhaoqiasd"', 'href="https://www.youtube.com/@kadenewmedia"'],
   ['<span>GitHub</span>', '<span>YouTube</span>'],
   ['Haoqi (c) 2026', 'Kade New Media (c) 2026'],
+  /* Footer başlığı ve kart etiketleri geç mount olduğu için DOM düzeltmesine
+     yetişmiyordu; kaynağında çevriliyor. */
+  ['text:"Let\'s"', 'text:"Hadi"'],
+  ['text:"Create"', 'text:"birlikte"'],
+  ['text:"Something"', 'text:"iş"'],
+  ['text:"Extraordinary"', 'text:"üretelim"'],
+  ['>Let&#x27;s<', '>Hadi<'],
+  ['>Create<', '>birlikte<'],
+  ['>Something<', '>iş<'],
+  ['>Extraordinary<', '>üretelim<'],
+  ['"TOOLS"', '"ARAÇ"'],
+  ['>TOOLS<', '>ARAÇ<'],
+  ['type:"tools"', 'type:"araç"'],
+  ['type:"event"', 'type:"etkinlik"'],
   /* Haoqi'nin kendi proje rotaları kaldırıldı; ana sayfadaki iş kartları
      kade-brand.js tarafından zaten Kade hizmetleri olarak etiketleniyor, bu
      yüzden bağlantılar da gerçek Kade sayfalarına gidiyor. */
@@ -38,7 +52,14 @@ const COPY = [
   ['"/adrive"', '"/hizmetler/reklam-yonetimi"'],
   ['"/shore_icon"', '"/portfolio"'],
   ['"/teambition"', '"/kade-kit-business"'],
-  ['haoqi-field', 'kade-field']
+  ['haoqi-field', 'kade-field'],
+  ['text:"Let\'s"', 'text:"Hadi"'],
+  ['text:"Create"', 'text:"birlikte"'],
+  ['text:"Something"', 'text:"iş"'],
+  ['text:"Extraordinary"', 'text:"üretelim"'],
+  ['"TOOLS"', '"ARAÇ"'],
+  ['type:"tools"', 'type:"araç"'],
+  ['type:"event"', 'type:"etkinlik"']
 ]
 
 /* Bundle içi metinler: footer geç mount olduğu için kade-brand.js'in DOM
@@ -57,7 +78,14 @@ export const SCRIPT_COPY = [
   ['"/adrive"', '"/hizmetler/reklam-yonetimi"'],
   ['"/shore_icon"', '"/portfolio"'],
   ['"/teambition"', '"/kade-kit-business"'],
-  ['haoqi-field', 'kade-field']
+  ['haoqi-field', 'kade-field'],
+  ['text:"Let\'s"', 'text:"Hadi"'],
+  ['text:"Create"', 'text:"birlikte"'],
+  ['text:"Something"', 'text:"iş"'],
+  ['text:"Extraordinary"', 'text:"üretelim"'],
+  ['"TOOLS"', '"ARAÇ"'],
+  ['type:"tools"', 'type:"araç"'],
+  ['type:"event"', 'type:"etkinlik"']
 ]
 
 export function transformScript(code) {
