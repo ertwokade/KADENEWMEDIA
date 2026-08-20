@@ -105,7 +105,7 @@ export function transformScript(code) {
   return code
 }
 
-const BOOTSTRAP = `<script data-kade-bootstrap>(function(){try{var migration='kade-light-default-2026-08-17';if(localStorage.getItem(migration)!=='1'){localStorage.setItem('theme','light');localStorage.setItem(migration,'1')}localStorage.setItem('sound','off');var nativePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this instanceof HTMLAudioElement){this.pause();return Promise.resolve()}return nativePlay.apply(this,arguments)}}catch(error){}})();</script>`
+const BOOTSTRAP = `<script data-kade-bootstrap>(function(){try{var migration='kade-light-default-2026-08-17';if(localStorage.getItem(migration)!=='1'){localStorage.setItem('theme','light');localStorage.setItem(migration,'1')}var locale=localStorage.getItem('kade-locale')==='en'?'en':'tr';document.documentElement.setAttribute('data-locale',locale);document.documentElement.lang=locale;localStorage.setItem('sound','off');var nativePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this instanceof HTMLAudioElement){this.pause();return Promise.resolve()}return nativePlay.apply(this,arguments)}}catch(error){}})();</script>`
 
 const HEAD_ASSETS = [
   ['/kade-brand.css', '<link rel="preload" href="/fonts/kade/montserrat-400.ttf" as="font" type="font/ttf" crossorigin><link rel="preload" href="/fonts/kade/montserrat-700.ttf" as="font" type="font/ttf" crossorigin><link rel="stylesheet" href="/kade-brand.css">'],
