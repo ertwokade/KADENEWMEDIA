@@ -1,10 +1,8 @@
 (function(){
   'use strict';
   var isNextApp=!!document.querySelector('script[src*="/_next/"]');
-  /* kade-brand.css covers the page with an opaque sheet + loading bar until
-     [data-kade-loaded] is set. Only the cloned Next app needs that wait — the
-     static routes are server-rendered HTML, so mark them loaded right away
-     instead of leaving them blank behind the cover. */
+  /* Only the cloned Next app needs to wait for its native reveal. Static
+     routes are server-rendered HTML, so mark them loaded immediately. */
   if(!isNextApp)document.documentElement.setAttribute('data-kade-loaded','');
   if(isNextApp){
     document.title='Kade New Media | Dijital Pazarlama Ajansı';

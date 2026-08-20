@@ -78,31 +78,11 @@ html.dark .client-card::before{opacity:.28}
   transition:opacity .2s ease,color .3s ease!important;
 }
 html:not([data-kade-loaded]) header.z-50{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-html:not([data-kade-loaded]) body::after{
-  content:'';
-  position:fixed;
-  inset:0;
-  z-index:35;
-  background:var(--bg);
-  pointer-events:none;
-}
-html:not([data-kade-loaded]) body::before{
-  content:'';
-  position:fixed;
-  z-index:36;
-  top:50%;
-  left:50%;
-  width:96px;
-  height:3px;
-  border-radius:999px;
-  background:linear-gradient(90deg,var(--text) 0 38%,color-mix(in srgb,var(--text) 18%,transparent) 38% 100%);
-  transform:translate(-50%,-50%);
-  animation:kade-loading-pulse .9s ease-in-out infinite alternate;
-  pointer-events:none;
-}
+/* Keep the cloned app's loading state functional, but do not cover the page
+   with a blank sheet or show a progress bar. */
+div[class*="left-1/2"][class*="top-1/2"][class*="z-40"][aria-hidden="true"]{visibility:hidden!important}
 html[data-kade-loaded] header.z-50{opacity:1!important;visibility:visible!important}
 html[data-kade-loaded] header.z-50 [aria-label^="Theme:"]{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
-@keyframes kade-loading-pulse{from{opacity:.42;transform:translate(-50%,-50%) scaleX(.82)}to{opacity:1;transform:translate(-50%,-50%) scaleX(1)}}
 [data-theme-toggle]::before,[aria-label^="Theme:"]::before{
   content:'';
   display:block;
