@@ -81,6 +81,12 @@ html:not([data-kade-loaded]) header.z-50{opacity:0!important;visibility:hidden!i
 /* Keep the cloned app's loading state functional, but do not cover the page
    with a blank sheet or show a progress bar. */
 div[class*="left-1/2"][class*="top-1/2"][class*="z-40"][aria-hidden="true"]{visibility:hidden!important}
+/* The clone renders the full homepage immediately but keeps its scroll shell
+   invisible until WebGL finishes. Show that server-rendered first frame so a
+   refresh never flashes as an empty page. The native reveal takes over as soon
+   as data-kade-loaded is set. */
+html:not([data-kade-loaded]) body>div.invisible.pointer-events-none.select-none{visibility:visible!important}
+html:not([data-kade-loaded]) body span{opacity:1!important}
 html[data-kade-loaded] header.z-50{opacity:1!important;visibility:visible!important}
 html[data-kade-loaded] header.z-50 [aria-label^="Theme:"]{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
 [data-theme-toggle]::before,[aria-label^="Theme:"]::before{
