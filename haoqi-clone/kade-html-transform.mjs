@@ -105,7 +105,13 @@ export function transformScript(code) {
   return code
 }
 
-const BOOTSTRAP = `<script data-kade-bootstrap>(function(){try{var migration='kade-light-default-2026-08-17';if(localStorage.getItem(migration)!=='1'){localStorage.setItem('theme','light');localStorage.setItem(migration,'1')}var locale=localStorage.getItem('kade-locale')==='en'?'en':'tr';document.documentElement.setAttribute('data-locale',locale);document.documentElement.lang=locale;localStorage.setItem('sound','off');var nativePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this instanceof HTMLAudioElement){this.pause();return Promise.resolve()}return nativePlay.apply(this,arguments)}}catch(error){}})();</script>`
+const BOOTSTRAP = `<script data-kade-bootstrap>(function(){try{var root=document.documentElement;root.setAttribute('data-kade-prepaint','');var migration='kade-light-default-2026-08-17';if(localStorage.getItem(migration)!=='1'){localStorage.setItem('theme','light');localStorage.setItem(migration,'1')}var locale=localStorage.getItem('kade-locale')==='en'?'en':'tr';root.setAttribute('data-locale',locale);root.lang=locale;addEventListener('DOMContentLoaded',function(){setTimeout(function(){root.removeAttribute('data-kade-prepaint')},2500)},{once:true});localStorage.setItem('sound','off');var nativePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this instanceof HTMLAudioElement){this.pause();return Promise.resolve()}return nativePlay.apply(this,arguments)}}catch(error){}})();</script>`
+
+/* This is intentionally inline. The homepage HTML already contains the final
+   copy, but the cloned app hides it until WebGL and its scramble effect start.
+   Revealing those existing nodes prevents a network-dependent white first
+   frame without adding a second loading screen. */
+const CRITICAL_FIRST_PAINT = `<style data-kade-critical-first-paint>html[data-kade-prepaint] body>div.invisible.pointer-events-none.select-none,html[data-kade-prepaint] body>div[aria-hidden="false"]:has(>header.z-50){visibility:visible!important}html[data-kade-prepaint] body>div.invisible.pointer-events-none.select-none span[style*="opacity:0"],html[data-kade-prepaint] body>div[aria-hidden="false"]:has(>header.z-50) span[style*="opacity:0"]{opacity:1!important}</style>`
 
 const HEAD_ASSETS = [
   ['/kade-brand.css', '<link rel="preload" href="/fonts/kade/montserrat-400.ttf" as="font" type="font/ttf" crossorigin><link rel="preload" href="/fonts/kade/montserrat-700.ttf" as="font" type="font/ttf" crossorigin><link rel="stylesheet" href="/kade-brand.css">'],
@@ -116,7 +122,7 @@ const BODY_ASSETS = ['/kade-routes.js', '/kade-access.js', '/kade-footer.js', '/
 
 export function transformHtml(html) {
   for (const [from, to] of COPY) html = html.split(from).join(to)
-  if (!html.includes('data-kade-bootstrap')) html = html.replace('<head>', '<head>' + BOOTSTRAP)
+  if (!html.includes('data-kade-bootstrap')) html = html.replace('<head>', '<head>' + BOOTSTRAP + CRITICAL_FIRST_PAINT)
   for (const [marker, tag] of HEAD_ASSETS) {
     if (!html.includes(marker)) html = html.replace('</head>', tag + '</head>')
   }

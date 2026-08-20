@@ -83,7 +83,8 @@ html:not([data-kade-loaded]) header.z-50{opacity:0!important;visibility:hidden!i
 div[class*="left-1/2"][class*="top-1/2"][class*="z-40"][aria-hidden="true"]{visibility:hidden!important}
 /* The real page is already server-rendered. Let its own letter and WebGL
    animations start immediately instead of inserting a separate loading view. */
-html:not([data-kade-loaded]) body>div.invisible.pointer-events-none.select-none{
+html:not([data-kade-loaded]) body>div.invisible.pointer-events-none.select-none,
+html:not([data-kade-loaded]) body>div[aria-hidden="false"]:has(>header.z-50){
   visibility:visible!important;
 }
 html[data-kade-loaded] header.z-50{opacity:1!important;visibility:visible!important}
