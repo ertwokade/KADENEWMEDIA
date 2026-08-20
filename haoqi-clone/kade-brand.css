@@ -1,7 +1,7 @@
-@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-400.ttf') format('truetype');font-weight:400;font-style:normal;font-display:block}
-@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-500.ttf') format('truetype');font-weight:500;font-style:normal;font-display:block}
-@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-600.ttf') format('truetype');font-weight:600;font-style:normal;font-display:block}
-@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-700.ttf') format('truetype');font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-400.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-500.ttf') format('truetype');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-600.ttf') format('truetype');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:"Montserrat Kade";src:url('/fonts/kade/montserrat-700.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap}
 html body,html body *{font-family:"Montserrat Kade",Arial,sans-serif!important}
 html body [class*="font-bold"][class*="uppercase"],html body [class*="font-bold"][class*="uppercase"] *{font-weight:700!important;letter-spacing:-.04em!important}
 span[aria-label^="Sound"],span[aria-label^="Ses"],header span[class*="lg:hidden p-2 uppercase"],header span[class*="hidden lg:inline p-2 uppercase"],header span[class*="lg:bottom-7 lg:left-1/2"],header div[class*="hidden lg:block p-2 shrink-0"]{display:none!important}
@@ -81,31 +81,10 @@ html:not([data-kade-loaded]) header.z-50{opacity:0!important;visibility:hidden!i
 /* Keep the cloned app's loading state functional, but do not cover the page
    with a blank sheet or show a progress bar. */
 div[class*="left-1/2"][class*="top-1/2"][class*="z-40"][aria-hidden="true"]{visibility:hidden!important}
-/* Keep the native scramble hidden until it is ready. During that short window
-   paint a stable, page-like first frame instead of a blank sheet or a loader.
-   The real scene replaces it as soon as the app marks itself ready. */
-html:not([data-kade-loaded]) body::after{
-  content:"SOSYAL MEDYA &\A DİJİTAL PAZARLAMA\A\A Markaları dijitalde büyütüyoruz.";
-  position:fixed;
-  inset:0;
-  z-index:34;
-  box-sizing:border-box;
-  padding:clamp(110px,14vh,180px) clamp(28px,4.5vw,72px);
-  overflow:hidden;
-  white-space:pre-line;
-  background-color:var(--bg);
-  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-  background-size:calc((100vw - 112px)/3) calc(100vh/3);
-  background-position:56px 0;
-  color:var(--text);
-  font-size:clamp(32px,4.4vw,72px);
-  font-weight:600;
-  line-height:1.08;
-  letter-spacing:-.045em;
-  pointer-events:none;
-}
-html[data-locale="en"]:not([data-kade-loaded]) body::after{
-  content:"SOCIAL MEDIA &\A DIGITAL MARKETING\A\A We grow brands digitally.";
+/* The real page is already server-rendered. Let its own letter and WebGL
+   animations start immediately instead of inserting a separate loading view. */
+html:not([data-kade-loaded]) body>div.invisible.pointer-events-none.select-none{
+  visibility:visible!important;
 }
 html[data-kade-loaded] header.z-50{opacity:1!important;visibility:visible!important}
 html[data-kade-loaded] header.z-50 [aria-label^="Theme:"]{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
