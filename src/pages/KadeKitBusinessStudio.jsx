@@ -16,6 +16,17 @@ import { useCustomer } from '../contexts/CustomerContext'
 import OrganizationKitNav from '../components/OrganizationKitNav'
 import PageTransition from '../components/PageTransition'
 import './OrganizationKit.css'
+import '../styles/kade-gate.css'
+import '../styles/kade-surface.css'
+
+/* Klon rotalarına DIŞ bağlantı: `<Link>` değil `<a href>`.
+
+   Üretimde bu adresler statik klondan servis ediliyor (bkz. scripts/
+   merge-clone.mjs). `<Link>` kullanıldığında React Router sayfayı istemci
+   tarafında kendi kopyasıyla çiziyordu; sonuç, aynı URL'nin nereden
+   gelindiğine göre iki farklı tasarımda açılmasıydı — Google'dan gelen klonu,
+   panelden tıklayan React sürümünü görüyordu. Tam sayfa yüklemesi doğru
+   katmanı getirir. */
 
 const businessModules = [
   {
@@ -87,7 +98,7 @@ export default function KadeKitBusinessStudio() {
 
   return (
     <PageTransition>
-      <div className="ok-page kk-page">
+      <div className="kade-surface ok-page kk-page">
         <div className="container ok-layout kk-layout">
           <OrganizationKitNav />
 
@@ -99,10 +110,10 @@ export default function KadeKitBusinessStudio() {
                 <p>Yorum analizi, prodüksiyon CRM, kreatif üretim ve AI kaynak radarını KadeMedia temasında tek çalışma alanında kullanın.</p>
               </div>
               {entitlements?.hasOrganizationKitAccess ? (
-                <Link to="/organizasyon-kiti" className="kk-secure-badge">
+                <a href="/organizasyon-kiti" className="kk-secure-badge">
                   Danışmanlık paneli
                   <HiOutlineArrowRight size={16} />
-                </Link>
+                </a>
               ) : (
                 <span className="kk-secure-badge">Güvenli erişim aktif</span>
               )}

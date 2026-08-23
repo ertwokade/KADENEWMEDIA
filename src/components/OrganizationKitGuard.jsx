@@ -3,11 +3,22 @@ import { HiOutlineLockClosed, HiOutlineSparkles } from 'react-icons/hi'
 import { useCustomer } from '../contexts/CustomerContext'
 import PageTransition from './PageTransition'
 import '../pages/OrganizationKit.css'
+import '../styles/kade-gate.css'
+import '../styles/kade-surface.css'
+
+/* Klon rotalarına DIŞ bağlantı: `<Link>` değil `<a href>`.
+
+   Üretimde bu adresler statik klondan servis ediliyor (bkz. scripts/
+   merge-clone.mjs). `<Link>` kullanıldığında React Router sayfayı istemci
+   tarafında kendi kopyasıyla çiziyordu; sonuç, aynı URL'nin nereden
+   gelindiğine göre iki farklı tasarımda açılmasıydı — Google'dan gelen klonu,
+   panelden tıklayan React sürümünü görüyordu. Tam sayfa yüklemesi doğru
+   katmanı getirir. */
 
 function OrganizationKitAccessScreen() {
   return (
     <PageTransition>
-      <section className="ok-access-page">
+      <section className="kade-surface ok-access-page">
         <div className="ok-access-card">
           <div className="ok-access-icon">
             <HiOutlineLockClosed size={26} />
@@ -17,10 +28,10 @@ function OrganizationKitAccessScreen() {
           <p>
             Markanızın medya, ekip ve büyüme operasyonunu stratejik bir sistemle yönetmek için danışmanlık planınızı aktifleştirin.
           </p>
-          <Link to="/paketler" className="btn btn-primary ok-access-cta">
+          <a href="/paketler" className="btn btn-primary ok-access-cta">
             <HiOutlineSparkles size={18} />
             Danışmanlık Planlarını İncele
-          </Link>
+          </a>
         </div>
       </section>
     </PageTransition>

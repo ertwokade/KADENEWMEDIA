@@ -89,7 +89,7 @@ export default function Contact() {
       setTimeout(() => navigate('/tesekkur', { state: { submitted: true } }), 600)
     } catch (err) {
       const errorMsg = err.message || ''
-      if (errorMsg === 'API unavailable' || errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
+      if (errorMsg.includes('API servisine ulaşılamıyor') || errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
         // API unreachable — open mailto fallback
         const subject = encodeURIComponent(`Teklif Talebi — ${formData.name}`)
         const body = encodeURIComponent(

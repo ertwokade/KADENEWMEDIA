@@ -41,7 +41,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           <AutoModelApplier toolId={toolId} />
           <div className="kade-panel flex h-dvh bg-zinc-950">
             <Sidebar />
-            <main className="flex-1 lg:ml-[272px] flex flex-col overflow-hidden min-w-0">
+            <main className="kade-main flex-1 lg:ml-[272px] flex flex-col overflow-hidden min-w-0">
               {children}
             </main>
           </div>

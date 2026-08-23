@@ -57,11 +57,17 @@ async function fetch(input, init = {}) {
     }
   }
 
-  return globalThis.fetch(input, {
-    ...init,
-    credentials: init.credentials || 'include',
-    headers,
-  });
+  try {
+    return await globalThis.fetch(input, {
+      ...init,
+      credentials: init.credentials || 'include',
+      headers,
+    });
+  } catch (error) {
+    const unavailable = new Error('API servisine ulaşılamıyor. Yerel sunucunun çalıştığını kontrol edip tekrar deneyin.');
+    unavailable.cause = error;
+    throw unavailable;
+  }
 }
 
 export { fetch as apiFetch };
@@ -81,10 +87,10 @@ async function handleResponse(res, { reloadOnUnauthorized = true } = {}) {
       data = await res.json();
     } else {
       const text = await res.text();
-      try { data = JSON.parse(text); } catch { throw new Error('API unavailable'); }
+      try { data = JSON.parse(text); } catch { throw new Error('API servisi beklenmeyen bir yanıt verdi. Lütfen tekrar deneyin.'); }
     }
   } catch (e) {
-    throw new Error(e.message || 'API unavailable');
+    throw new Error(e.message || 'API servisine şu anda ulaşılamıyor. Lütfen tekrar deneyin.');
   }
   if (res.status === 401) {
     try { sessionStorage.removeItem('kade_admin_user'); } catch { /* ignore */ }

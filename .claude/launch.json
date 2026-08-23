@@ -4,8 +4,39 @@
     {
       "name": "kade-web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "legacy:dev"],
+      "runtimeArgs": [
+        "run",
+        "legacy:web"
+      ],
       "port": 5173
+    },
+    {
+      "name": "kade-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:api"
+      ],
+      "port": 3001
+    },
+    {
+      "name": "kadeai",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "apps/kadeai"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "kade-clone",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "haoqi-clone/server.mjs"
+      ],
+      "port": 4180
     }
   ]
 }

@@ -5,6 +5,8 @@ import OrganizationKitNav from '../components/OrganizationKitNav'
 import PageTransition from '../components/PageTransition'
 import { fractionalDirectorPlan } from '../data/organizationKit'
 import './OrganizationKit.css'
+import '../styles/kade-gate.css'
+import '../styles/kade-surface.css'
 
 export default function OrganizationKitPlan() {
   useSEO({
@@ -16,7 +18,7 @@ export default function OrganizationKitPlan() {
 
   return (
     <PageTransition>
-      <div className="ok-page">
+      <div className="kade-surface ok-page">
         <div className="container ok-layout">
           <OrganizationKitNav />
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { queryTrends } from '@/lib/kade-search/store'
-import { failure, requireReaderAccess } from '../_guard'
+import { failure, isKadeSearchConfigured, requireReaderAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +12,9 @@ export const dynamic = 'force-dynamic'
 export async function GET(req: NextRequest) {
   const guard = await requireReaderAccess()
   if (guard) return guard
+  if (!isKadeSearchConfigured()) {
+    return NextResponse.json({ adet: 0, trendler: [], localFallback: true })
+  }
   try {
     const params = req.nextUrl.searchParams
     const limit = Math.min(Number(params.get('limit') ?? 25), 100)

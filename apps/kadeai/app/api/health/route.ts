@@ -14,7 +14,8 @@ export async function GET(request: Request) {
     process.env.GEMINI_API_KEY,
   ]
   const aiGateway = Boolean(await getVercelGatewayToken(request))
-  const authConfigured = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  const localAuthBypass = process.env.NODE_ENV !== 'production' && process.env.KADE_DISABLE_AUTH === '1'
+  const authConfigured = localAuthBypass || Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
   const aiConfigured = aiGateway || providers.some((value) => Boolean(value?.trim()))
   const healthy = authConfigured && aiConfigured
   return NextResponse.json({

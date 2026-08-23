@@ -18,7 +18,6 @@ import { cn } from '@/lib/utils'
 import { useSidebar } from '@/lib/context/SidebarContext'
 import { TOOL_CATEGORIES, TOOL_REGISTRY } from '@/lib/tools/registry'
 import { apiPath, stripBasePath, withBasePath } from '@/lib/appConfig'
-import KadeLogo from '@/components/brand/KadeLogo'
 import ThemeToggle from '@/components/theme/ThemeToggle'
 
 const iconMap = {
@@ -235,11 +234,15 @@ export default function Sidebar() {
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       )}>
 
-        {/* Logo */}
-        <div className="relative flex items-center justify-between px-5 py-5 border-b border-zinc-100 flex-shrink-0">
-          <div className="relative flex min-w-0 flex-1 items-center">
-            <KadeLogo className="w-[176px] max-w-full rounded-md" priority />
-          </div>
+        {/* Brand */}
+        <div className="kade-sidebar-head relative flex items-center justify-between px-4 py-4 border-b border-zinc-100 flex-shrink-0">
+          <Link href="/dashboard" className="kade-brand group flex min-w-0 flex-1 items-center gap-3" onClick={() => close()}>
+            <span className="kade-brand-symbol grid h-10 w-10 shrink-0 place-items-center" aria-hidden="true">K/</span>
+            <span className="min-w-0 leading-none">
+              <strong className="kade-brand-title block truncate">KADE AI</strong>
+              <span className="kade-brand-subtitle mt-1.5 block truncate">NEW MEDIA SYSTEM</span>
+            </span>
+          </Link>
           <button onClick={close} aria-label="Menüyü kapat" className="lg:hidden rounded-lg p-2 text-[#aaa79c] transition-colors hover:bg-white/5 hover:text-[#fffdf5]">
             <X className="w-4 h-4" />
           </button>
@@ -247,6 +250,7 @@ export default function Sidebar() {
 
         {/* Search */}
         <div className="px-4 pt-4 pb-3 flex-shrink-0">
+          <p className="kade-sidebar-kicker mb-2 px-1">Çalışma alanı</p>
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
             <input
@@ -334,8 +338,9 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="space-y-2 border-t border-zinc-100 px-4 py-4 flex-shrink-0">
-          <div className="flex justify-center">
+        <div className="kade-sidebar-bottom space-y-2 border-t border-zinc-100 px-4 py-4 flex-shrink-0">
+          <div className="kade-sidebar-theme-row flex items-center justify-between rounded-xl px-3 py-2">
+            <span className="text-[11px] font-semibold">Görünüm</span>
             <ThemeToggle />
           </div>
           {settingsAccess && (

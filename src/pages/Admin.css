@@ -5,54 +5,67 @@
 /* ===== THEME TOKENS ===== */
 .admin-dashboard,
 .admin-login-container {
-  --bg-primary: #F5F3F0;
-  --bg-secondary: #ECEAE6;
-  --bg-tertiary: #E2E0DC;
-  --card-bg: #FFFFFF;
-  --card-bg-glass: rgba(255, 255, 255, 0.72);
-  --text-primary: #1A1715;
-  --text-secondary: #5C5753;
-  --text-tertiary: #9E9994;
-  --accent: #D4A017;
-  --accent-light: #EAC321;
-  --accent-alpha: rgba(212, 160, 23, 0.08);
-  --accent-glow: rgba(212, 160, 23, 0.25);
-  --border: rgba(0, 0, 0, 0.07);
-  --border-strong: rgba(0, 0, 0, 0.12);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.08);
-  --shadow-glow: 0 0 20px rgba(212, 160, 23, 0.15);
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  /* Rol eşlemesi — admin'in kendi değişken adları, sitenin tokenlarına bağlı.
+     Mürekkep ve yüzey rollerini karıştırmamaya dikkat: text değişkenleri
+     okunacak metni, bg ve card değişkenleri altındaki zemini taşır. */
+  --bg-primary: var(--gate-bg);
+  --bg-secondary: var(--kade-surface-2);
+  --bg-tertiary: var(--kade-surface-3);
+  --card-bg: var(--kade-surface);
+  --card-bg-glass: var(--gate-panel);
+  --text-primary: var(--gate-ink);
+  --text-secondary: var(--gate-muted);
+  --text-tertiary: var(--gate-faint);
+  --accent: var(--gate-accent);
+  --accent-light: var(--gate-accent);
+  --accent-alpha: color-mix(in srgb, var(--gate-accent) 8%, transparent);
+  --accent-glow: color-mix(in srgb, var(--gate-accent) 25%, transparent);
+  --border: var(--gate-line);
+  --border-strong: var(--gate-line-strong);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-glow: 0 0 20px color-mix(in srgb, var(--gate-accent) 15%, transparent);
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
   --sidebar-width: 270px;
   --sidebar-collapsed: 72px;
   --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   color-scheme: light;
 }
 
-/* Dark Mode */
+/* Dark Mode
+   ---------------------------------------------------------------------------
+   Admin'in KENDİ karanlık modu var (sağ üstteki düğme, `kade_admin_dark`) ve
+   ziyaretçinin site temasından bağımsız çalışır. Bu yüzden buradaki değerler
+   tokenlardan TÜRETİLMEZ, sitenin koyu paletinin değerleri doğrudan yazılır:
+   admin açık temaya sabitlenmiş bir yüzey (bkz. App.jsx `isAppUI`), dolayısıyla
+   `--kade-*` burada her zaman krem değerleri taşır ve tokendan okumak karanlık
+   modu sessizce aydınlatırdı.
+
+   Sayılar `styles/kade-tokens.css` koyu bloğunun aynısıdır; orası değişirse
+   burası da güncellenmeli. */
 .admin-dashboard.dark,
 .admin-login-container.dark {
-  --bg-primary: #0F0F12;
-  --bg-secondary: #18181D;
-  --bg-tertiary: #222228;
-  --card-bg: #1C1C22;
-  --card-bg-glass: rgba(28, 28, 34, 0.78);
-  --text-primary: #F0EDE8;
-  --text-secondary: #A8A49E;
-  --text-tertiary: #6B6760;
-  --accent: #EAC321;
-  --accent-light: #F5D84A;
-  --accent-alpha: rgba(234, 195, 33, 0.10);
-  --accent-glow: rgba(234, 195, 33, 0.20);
-  --border: rgba(255, 255, 255, 0.06);
-  --border-strong: rgba(255, 255, 255, 0.10);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+  --bg-primary: #0f1111;
+  --bg-secondary: rgba(230, 232, 232, 0.05);
+  --bg-tertiary: rgba(230, 232, 232, 0.09);
+  --card-bg: #191b1b;
+  --card-bg-glass: rgba(230, 232, 232, 0.05);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(230, 232, 232, 0.78);
+  --text-tertiary: rgba(230, 232, 232, 0.64);
+  --accent: #e0a81f;
+  --accent-light: #ebc669;
+  --accent-alpha: rgba(224, 168, 31, 0.1);
+  --accent-glow: rgba(224, 168, 31, 0.2);
+  --border: rgba(230, 232, 232, 0.1);
+  --border-strong: rgba(230, 232, 232, 0.26);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
   color-scheme: dark;
 }
 
@@ -85,9 +98,9 @@
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(circle at 20% 50%, rgba(212,160,23,0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(108,99,255,0.05) 0%, transparent 50%),
-    radial-gradient(circle at 60% 80%, rgba(234,195,33,0.06) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--gate-accent) 8%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, var(--gate-panel) 0%, transparent 50%),
+    radial-gradient(circle at 60% 80%, color-mix(in srgb, var(--gate-accent) 6%, transparent) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -95,16 +108,16 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+    linear-gradient(var(--gate-panel) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gate-panel) 1px, transparent 1px);
   background-size: 60px 60px;
   pointer-events: none;
 }
 
 .dark .login-grid-overlay {
   background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    linear-gradient(var(--gate-panel) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gate-panel) 1px, transparent 1px);
 }
 
 .admin-login-card {
@@ -114,8 +127,8 @@
   text-align: center;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  border-radius: 0;
+  box-shadow: none;
   position: relative;
   z-index: 1;
 }
@@ -124,11 +137,11 @@
   content: '';
   position: absolute;
   inset: -1px;
-  border-radius: var(--radius-xl);
+  border-radius: 0;
   padding: 1px;
   background: linear-gradient(135deg, var(--accent-alpha), transparent 40%, transparent 60%, var(--accent-alpha));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(var(--gate-ink) 0 0) content-box, linear-gradient(var(--gate-ink) 0 0);
+  mask: linear-gradient(var(--gate-ink) 0 0) content-box, linear-gradient(var(--gate-ink) 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
@@ -169,7 +182,7 @@
 .admin-login-card input {
   width: 100%;
   padding: 12px 16px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   border: 1px solid var(--border);
   background: var(--bg-secondary);
   color: var(--text-primary);
@@ -181,11 +194,11 @@
 .admin-login-card input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-alpha);
+  box-shadow: none;
 }
 
 .admin-login-card input.error {
-  border-color: #EF4444;
+  border-color: var(--gate-danger);
 }
 
 .password-input-wrap {
@@ -207,7 +220,7 @@
   justify-content: center;
   transform: translateY(-50%);
   border: 0;
-  border-radius: 8px;
+  border-radius: 0;
   background: transparent;
   color: var(--text-tertiary);
   cursor: pointer;
@@ -222,7 +235,7 @@
 }
 
 .error-text {
-  color: #EF4444;
+  color: var(--gate-danger);
   font-size: 0.78rem;
   margin-top: 6px;
   display: block;
@@ -244,7 +257,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 18px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   font-size: 0.88rem;
   font-weight: 600;
   font-family: var(--font);
@@ -257,14 +270,14 @@
 .admin-dashboard .btn-primary,
 .admin-login-container .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--gate-ink);
   border-color: var(--accent);
 }
 
 .admin-dashboard .btn-primary:hover,
 .admin-login-container .btn-primary:hover {
-  background: #b89a18;
-  box-shadow: var(--shadow-glow);
+  background: var(--gate-accent);
+  box-shadow: none;
   transform: translateY(-1px);
 }
 
@@ -293,7 +306,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-secondary);
@@ -310,9 +323,9 @@
 }
 
 .btn-icon.danger:hover {
-  border-color: #EF4444;
-  color: #EF4444;
-  background: rgba(239,68,68,0.08);
+  border-color: var(--gate-danger);
+  color: var(--gate-danger);
+  background: color-mix(in srgb, var(--gate-danger) 8%, transparent);
 }
 
 /* ===== LAYOUT ===== */
@@ -328,8 +341,8 @@
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.015) 1px, transparent 1px);
+    linear-gradient(var(--gate-panel) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gate-panel) 1px, transparent 1px);
   background-size: 48px 48px;
   pointer-events: none;
   z-index: 0;
@@ -337,8 +350,8 @@
 
 .dark .admin-grid-bg {
   background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    linear-gradient(var(--gate-panel) 1px, transparent 1px),
+    linear-gradient(90deg, var(--gate-panel) 1px, transparent 1px);
 }
 
 /* ===== SIDEBAR ===== */
@@ -389,7 +402,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-tertiary);
@@ -426,14 +439,14 @@
 .sidebar-avatar {
   width: 38px;
   height: 38px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #D4A017);
+  border-radius: 0;
+  background: linear-gradient(135deg, var(--accent), var(--gate-accent));
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--gate-ink);
   flex-shrink: 0;
   text-transform: uppercase;
 }
@@ -483,7 +496,7 @@
   overflow: hidden;
   background: transparent;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   cursor: pointer;
   transition: var(--transition);
   font-family: inherit;
@@ -515,7 +528,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   color: var(--text-secondary);
   font-size: 0.88rem;
   font-weight: 500;
@@ -549,18 +562,18 @@
   transform: translateY(-50%);
   width: 3px;
   height: 60%;
-  border-radius: 0 3px 3px 0;
+  border-radius: 0;
   background: var(--accent);
 }
 
 .nav-badge {
   margin-left: auto;
   background: var(--accent);
-  color: #fff;
+  color: var(--gate-ink);
   font-size: var(--fs-2xs);
   font-weight: 700;
   padding: 2px 7px;
-  border-radius: 10px;
+  border-radius: 0;
   min-width: 18px;
   text-align: center;
 }
@@ -582,7 +595,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   border: none;
   background: none;
   color: var(--text-secondary);
@@ -604,7 +617,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   color: var(--text-tertiary);
   font-size: 0.85rem;
   text-decoration: none;
@@ -626,10 +639,10 @@
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   border: none;
   background: none;
-  color: #EF4444;
+  color: var(--gate-danger);
   font-size: 0.85rem;
   cursor: pointer;
   width: 100%;
@@ -639,7 +652,7 @@
   overflow: hidden;
 }
 
-.sidebar-logout:hover { background: rgba(239,68,68,0.08); }
+.sidebar-logout:hover { background: color-mix(in srgb, var(--gate-danger) 8%, transparent); }
 .collapsed .sidebar-logout span { display: none; }
 .collapsed .sidebar-logout { justify-content: center; }
 
@@ -743,10 +756,10 @@
 
 .admin-stat-card {
   padding: 22px;
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   transition: var(--transition);
   position: relative;
   overflow: hidden;
@@ -759,20 +772,20 @@
   right: 0;
   width: 80px;
   height: 80px;
-  border-radius: 50%;
+  border-radius: 0;
   opacity: 0.06;
   transform: translate(20px, -20px);
 }
 
 .admin-stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
 }
 
 .admin-stat-card .stat-icon {
   width: 44px;
   height: 44px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -790,7 +803,7 @@
 .admin-stat-card .stat-label {
   /* Önceki: --text-tertiary (0.38 alpha) => küçük etiketlerde okunamıyordu.
      --text-secondary (0.62 alpha) net kontrast sağlar (Öncelik 4).
-     !important şart: src/index.css satır ~1250 ".stat-label{color:rgba(23,19,10,.56)!important}"
+     !important şart: src/index.css satır ~1250 ".stat-label{color:var(--gate-muted)!important}"
      genel (public) sayfalar için tanımlı ama sınıf adı admin panelde de çakışıyor;
      !important olmadan bu global kural kazanıyor ve etiket admin'in siyah
      arka planında neredeyse görünmez hale geliyordu (canlı doğrulamada tespit edildi). */
@@ -804,9 +817,9 @@
 .admin-table-wrapper {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
 .admin-table-header {
@@ -864,7 +877,7 @@
 
 .table-action-btn {
   padding: 5px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   border: 1px solid var(--border);
   background: none;
   color: var(--text-secondary);
@@ -885,9 +898,9 @@
 }
 
 .table-action-btn.danger:hover {
-  border-color: #EF4444;
-  color: #EF4444;
-  background: rgba(239,68,68,0.06);
+  border-color: var(--gate-danger);
+  color: var(--gate-danger);
+  background: color-mix(in srgb, var(--gate-danger) 6%, transparent);
 }
 
 .table-action-btn.primary {
@@ -900,7 +913,7 @@
 .admin-form {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   padding: 24px;
 }
 
@@ -935,7 +948,7 @@
 .admin-form select {
   width: 100%;
   padding: 10px 14px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   border: 1px solid var(--border);
   background: var(--bg-secondary);
   color: var(--text-primary);
@@ -964,7 +977,7 @@
 .admin-form select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-alpha);
+  box-shadow: none;
 }
 
 .admin-form textarea {
@@ -1008,7 +1021,7 @@
 .admin-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--gate-line-strong);
   backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
@@ -1020,13 +1033,13 @@
 .admin-modal {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: 0;
   width: 100%;
   max-width: 700px;
   max-height: 85vh;
   overflow-y: auto;
   padding: 32px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: none;
 }
 
 .admin-modal-header {
@@ -1045,7 +1058,7 @@
 .admin-modal-close {
   background: none;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   padding: 6px;
   color: var(--text-tertiary);
   cursor: pointer;
@@ -1056,8 +1069,8 @@
 }
 
 .admin-modal-close:hover {
-  border-color: #EF4444;
-  color: #EF4444;
+  border-color: var(--gate-danger);
+  color: var(--gate-danger);
 }
 
 /* ===== TABS ===== */
@@ -1067,14 +1080,14 @@
   gap: 3px;
   margin-bottom: 20px;
   background: var(--bg-secondary);
-  border-radius: var(--radius-md);
+  border-radius: 0;
   padding: 3px;
   border: 1px solid var(--border);
 }
 
 .admin-tab {
   padding: 9px 16px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   border: none;
   background: none;
   color: var(--text-secondary);
@@ -1088,9 +1101,9 @@
 
 .admin-tab.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--gate-ink);
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(212,160,23,0.2);
+  box-shadow: none;
 }
 
 /* Sekme durumu — public sitedeki gerçek karşılığı (bkz. Admin.jsx `tabs`). */
@@ -1099,21 +1112,21 @@
   font-size: 0.72em;
   opacity: 0.75;
 }
-.admin-tab--no-page .admin-tab-flag { color: var(--kade-danger, #b3261e); opacity: 1; }
+.admin-tab--no-page .admin-tab-flag { color: var(--kade-danger, var(--gate-danger)); opacity: 1; }
 .admin-tab.active .admin-tab-flag { color: inherit; }
 .admin-tab-dirty {
   margin-left: 5px;
   font-size: var(--fs-2xs);
-  color: #e91e63;
+  color: var(--gate-danger);
 }
-.admin-tab.active .admin-tab-dirty { color: #fff; }
+.admin-tab.active .admin-tab-dirty { color: var(--gate-ink); }
 
 /* Sekme altındaki durum açıklaması. */
 .admin-content-notice {
   margin: 0 0 18px;
   padding: 12px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--kade-line, rgba(23, 19, 10, 0.12));
+  border-radius: 0;
+  border: 1px solid var(--kade-line, var(--gate-line));
   border-left-width: 4px;
   font-size: 0.85rem;
   line-height: 1.55;
@@ -1121,8 +1134,8 @@
 }
 .admin-content-notice code {
   padding: 1px 5px;
-  border-radius: 4px;
-  background: rgba(23, 19, 10, 0.07);
+  border-radius: 0;
+  background: var(--gate-panel);
   font-size: 0.92em;
 }
 .admin-content-notice a {
@@ -1131,12 +1144,12 @@
   text-underline-offset: 0.15em;
 }
 .admin-content-notice--no-page {
-  border-left-color: var(--kade-danger, #b3261e);
-  background: var(--kade-danger-bg, rgba(179, 38, 30, 0.08));
+  border-left-color: var(--kade-danger, var(--gate-danger));
+  background: var(--kade-danger-bg, color-mix(in srgb, var(--gate-danger) 8%, transparent));
 }
 .admin-content-notice--static {
-  border-left-color: var(--kade-warning, #8a5a00);
-  background: var(--kade-warning-bg, rgba(224, 168, 31, 0.14));
+  border-left-color: var(--kade-warning, var(--gate-accent-text));
+  background: var(--kade-warning-bg, color-mix(in srgb, var(--gate-accent) 14%, transparent));
 }
 
 .admin-tab:hover:not(.active) {
@@ -1150,7 +1163,7 @@
   align-items: center;
   gap: 4px;
   padding: 3px 10px;
-  border-radius: 20px;
+  border-radius: 0;
   font-size: 0.72rem;
   font-weight: 600;
   white-space: nowrap;
@@ -1193,7 +1206,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px 16px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   border: 1px solid var(--border);
   background: var(--card-bg);
   color: var(--text-secondary);
@@ -1216,7 +1229,7 @@
 .dashboard-recent {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   overflow: hidden;
   margin-bottom: 24px;
 }
@@ -1251,7 +1264,7 @@
 .dashboard-recent-avatar {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 0;
   background: linear-gradient(135deg, var(--accent-alpha), var(--accent-glow));
   display: flex;
   align-items: center;
@@ -1302,7 +1315,7 @@
   min-width: 260px;
   flex: 1;
   background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -1329,7 +1342,7 @@
 .kanban-column-count {
   font-size: 0.72rem;
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: 0;
   font-weight: 600;
 }
 
@@ -1345,14 +1358,14 @@
 .kanban-card {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: 0;
   padding: 14px;
   cursor: pointer;
   transition: var(--transition);
 }
 
 .kanban-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
   transform: translateY(-2px);
   border-color: var(--accent);
 }
@@ -1380,7 +1393,7 @@
 
 .kanban-card-service {
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--accent-alpha);
   color: var(--accent);
   font-weight: 600;
@@ -1408,7 +1421,7 @@
   margin-bottom: 16px;
   padding: 12px 16px;
   background: var(--bg-secondary);
-  border-radius: var(--radius-md);
+  border-radius: 0;
   border: 1px solid var(--border);
 }
 
@@ -1419,7 +1432,7 @@
   top: 16px;
   width: 10px;
   height: 10px;
-  border-radius: 50%;
+  border-radius: 0;
   border: 2px solid var(--accent);
   background: var(--card-bg);
 }
@@ -1434,7 +1447,7 @@
 .note-type-badge {
   font-size: 0.7rem;
   padding: 2px 8px;
-  border-radius: 10px;
+  border-radius: 0;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -1472,8 +1485,8 @@
   right: -2px;
   width: 8px;
   height: 8px;
-  border-radius: 50%;
-  background: #EF4444;
+  border-radius: 0;
+  background: var(--gate-danger);
   border: 2px solid var(--card-bg);
 }
 
@@ -1485,8 +1498,8 @@
   max-height: 420px;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  border-radius: 0;
+  box-shadow: none;
   overflow: hidden;
   z-index: 500;
 }
@@ -1524,7 +1537,7 @@
 .notification-icon-wrap {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1559,26 +1572,26 @@
   bottom: 24px;
   right: 24px;
   padding: 14px 24px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   font-size: 0.88rem;
   font-weight: 500;
   z-index: 10000;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: none;
   animation: toastSlideIn 0.3s ease;
   max-width: 400px;
 }
 
 .admin-toast.success {
-  background: #059669;
-  color: #fff;
+  background: var(--kade-success);
+  color: var(--gate-ink);
 }
 
 .admin-toast.error {
-  background: #DC2626;
-  color: #fff;
+  background: var(--gate-danger);
+  color: var(--gate-ink);
 }
 
 .admin-toast .toast-progress {
@@ -1586,8 +1599,8 @@
   bottom: 0;
   left: 0;
   height: 3px;
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  background: rgba(255,255,255,0.3);
+  border-radius: 0;
+  background: var(--gate-line-strong);
   animation: toastProgress 3s linear;
 }
 
@@ -1606,13 +1619,13 @@
   background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
 }
 
 .skeleton-text { height: 14px; width: 100%; margin-bottom: 8px; }
 .skeleton-title { height: 20px; width: 60%; margin-bottom: 12px; }
-.skeleton-card { height: 100px; width: 100%; border-radius: var(--radius-lg); }
-.skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+.skeleton-card { height: 100px; width: 100%; border-radius: 0; }
+.skeleton-avatar { width: 40px; height: 40px; border-radius: 0; }
 
 @keyframes shimmer {
   0% { background-position: -200% 0; }
@@ -1623,7 +1636,7 @@
 .color-dot {
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: 0;
   display: inline-block;
   vertical-align: middle;
 }
@@ -1635,7 +1648,7 @@
   display: inline-block;
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 0;
   background: var(--accent);
   margin-right: 8px;
 }
@@ -1652,7 +1665,7 @@
   height: 38px;
   font-size: 1.1rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   background: var(--bg-secondary);
   cursor: pointer;
   display: flex;
@@ -1669,7 +1682,7 @@
 .seed-section {
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   padding: 24px;
   margin-bottom: 24px;
 }
@@ -1680,7 +1693,7 @@
 .seed-section input {
   width: 100%;
   padding: 10px 14px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   border: 1px solid var(--border);
   background: var(--bg-secondary);
   color: var(--text-primary);
@@ -1689,32 +1702,32 @@
   transition: var(--transition);
 }
 
-.seed-section input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-alpha); }
+.seed-section input:focus { outline: none; border-color: var(--accent); box-shadow: none; }
 
 .password-section { max-width: 500px; }
 
 .local-mode-banner {
-  background: rgba(234,179,8,0.1);
-  color: #B45309;
+  background: color-mix(in srgb, var(--gate-accent) 10%, transparent);
+  color: var(--kade-warning);
   padding: 12px 20px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 24px;
-  border: 1px solid rgba(234,179,8,0.2);
+  border: 1px solid color-mix(in srgb, var(--gate-accent) 20%, transparent);
 }
 
 .dark .local-mode-banner {
-  background: rgba(234,179,8,0.08);
-  color: #FBBF24;
-  border-color: rgba(234,179,8,0.15);
+  background: color-mix(in srgb, var(--gate-accent) 8%, transparent);
+  color: var(--gate-accent);
+  border-color: color-mix(in srgb, var(--gate-accent) 15%, transparent);
 }
 
 /* View Toggle */
 .view-toggle {
   display: flex;
   background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   border: 1px solid var(--border);
   overflow: hidden;
 }
@@ -1736,13 +1749,13 @@
 
 .view-toggle button.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--gate-ink);
 }
 
 /* Search Input */
 .search-input {
   padding: 8px 14px;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   border: 1px solid var(--border);
   background: var(--bg-secondary);
   color: var(--text-primary);
@@ -1755,7 +1768,7 @@
 .search-input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-alpha);
+  box-shadow: none;
 }
 
 .search-input::placeholder { color: var(--text-tertiary); }
@@ -1764,7 +1777,7 @@
 .mobile-menu-btn {
   display: none;
   padding: 8px;
-  border-radius: var(--radius-sm);
+  border-radius: 0;
   border: 1px solid var(--border);
   background: var(--card-bg);
   color: var(--text-primary);
@@ -1775,7 +1788,7 @@
   top: 12px;
   left: 12px;
   z-index: 300;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -1842,29 +1855,29 @@
 .admin-login-container,
 .admin-dashboard.dark,
 .admin-login-container.dark {
-  --bg-primary: #060606;
-  --bg-secondary: rgba(255, 255, 255, 0.035);
-  --bg-tertiary: rgba(255, 255, 255, 0.06);
-  --card-bg: rgba(8, 8, 8, 0.9);
-  --card-bg-glass: rgba(8, 8, 8, 0.78);
-  --text-primary: #FFFFFF;
-  --text-secondary: rgba(255, 255, 255, 0.68);
+  --bg-primary: var(--gate-bg);
+  --bg-secondary: var(--gate-panel);
+  --bg-tertiary: var(--gate-line);
+  --card-bg: var(--gate-bg);
+  --card-bg-glass: var(--gate-bg);
+  --text-primary: var(--gate-ink);
+  --text-secondary: var(--gate-line-strong);
   /* 0.38 => küçük ikincil metinlerde (etiket/altbaşlık) okunamıyordu; 0.55'e
      yükseltildi (Öncelik 4). */
-  --text-tertiary: rgba(255, 255, 255, 0.55);
-  --accent: #FFD400;
-  --accent-light: #FFE75A;
-  --accent-alpha: rgba(255, 212, 0, 0.08);
-  --accent-glow: rgba(255, 212, 0, 0.32);
-  --border: rgba(255, 255, 255, 0.075);
-  --border-strong: rgba(255, 255, 255, 0.13);
+  --text-tertiary: var(--gate-line-strong);
+  --accent: var(--gate-accent);
+  --accent-light: var(--gate-accent);
+  --accent-alpha: color-mix(in srgb, var(--gate-accent) 8%, transparent);
+  --accent-glow: color-mix(in srgb, var(--gate-accent) 32%, transparent);
+  --border: var(--gate-line);
+  --border-strong: var(--gate-line);
   --shadow-sm: none;
-  --shadow-md: 0 16px 40px rgba(0, 0, 0, 0.28);
-  --shadow-lg: 0 24px 70px rgba(0, 0, 0, 0.44);
-  --shadow-glow: 0 0 34px rgba(255, 212, 0, 0.18);
+  --shadow-md: 0 16px 40px var(--gate-line-strong);
+  --shadow-lg: 0 24px 70px var(--gate-line-strong);
+  --shadow-glow: 0 0 34px color-mix(in srgb, var(--gate-accent) 18%, transparent);
   --radius-sm: 10px;
   --radius-md: 14px;
-  --radius-lg: 16px;
+  --radius-lg: 0;
   --radius-xl: 18px;
   color-scheme: dark;
 }
@@ -1872,14 +1885,14 @@
 .admin-dashboard,
 .admin-login-container {
   background:
-    radial-gradient(70% 58% at 74% 10%, rgba(255, 212, 0, 0.08), transparent 62%),
-    radial-gradient(55% 48% at 10% 82%, rgba(255, 212, 0, 0.055), transparent 68%),
-    #060606 !important;
+    radial-gradient(70% 58% at 74% 10%, color-mix(in srgb, var(--gate-accent) 8%, transparent), transparent 62%),
+    radial-gradient(55% 48% at 10% 82%, color-mix(in srgb, var(--gate-accent) 5.5%, transparent), transparent 68%),
+    var(--gate-bg) !important;
 }
 
 .login-bg-pattern {
   background:
-    radial-gradient(60% 55% at 60% 48%, rgba(255, 212, 0, 0.09), transparent 70%) !important;
+    radial-gradient(60% 55% at 60% 48%, color-mix(in srgb, var(--gate-accent) 9%, transparent), transparent 70%) !important;
 }
 
 .login-grid-overlay,
@@ -1887,8 +1900,8 @@
 .dark .login-grid-overlay,
 .dark .admin-grid-bg {
   background-image:
-    linear-gradient(rgba(255, 212, 0, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 212, 0, 0.022) 1px, transparent 1px) !important;
+    linear-gradient(color-mix(in srgb, var(--gate-accent) 2.2%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--gate-accent) 2.2%, transparent) 1px, transparent 1px) !important;
   background-size: 86px 86px !important;
   opacity: 0.36;
 }
@@ -1906,15 +1919,15 @@
 .notification-dropdown,
 .admin-modal,
 .seed-section {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.016) 58%, rgba(255, 212, 0, 0.035)), rgba(8, 8, 8, 0.9) !important;
-  border-color: rgba(255, 255, 255, 0.075) !important;
-  box-shadow: none !important;
+  background: linear-gradient(145deg, var(--gate-panel), var(--gate-panel) 58%, color-mix(in srgb, var(--gate-accent) 3.5%, transparent)), var(--gate-bg) !important;
+  border-color: var(--gate-line) !important;
+  box-shadow: none;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
 
 .admin-login-card {
-  border-radius: 18px;
+  border-radius: 0;
 }
 
 .admin-logo span,
@@ -1926,7 +1939,7 @@
 .kanban-card-service,
 .table-action-btn.primary,
 .admin-tab:hover:not(.active) {
-  color: #FFD400 !important;
+  color: var(--gate-accent) !important;
 }
 
 .admin-dashboard .btn-primary,
@@ -1934,21 +1947,21 @@
 .admin-tab.active,
 .view-toggle button.active,
 .nav-badge {
-  background: #FFD400 !important;
-  border-color: #FFD400 !important;
-  color: #060606 !important;
-  box-shadow: 0 0 28px rgba(255, 212, 0, 0.26) !important;
+  background: var(--gate-accent) !important;
+  border-color: var(--gate-accent) !important;
+  color: var(--gate-bg) !important;
+  box-shadow: none;
 }
 
 .sidebar-avatar,
 .admin-stat-card .stat-icon {
-  background: rgba(255, 212, 0, 0.09) !important;
-  color: #FFD400 !important;
-  border: 1px solid rgba(255, 212, 0, 0.24);
+  background: color-mix(in srgb, var(--gate-accent) 9%, transparent) !important;
+  color: var(--gate-accent) !important;
+  border: 1px solid color-mix(in srgb, var(--gate-accent) 24%, transparent);
 }
 
 .admin-sidebar {
-  border-right-color: rgba(255, 255, 255, 0.075) !important;
+  border-right-color: var(--gate-line) !important;
 }
 
 .sidebar-header,
@@ -1957,7 +1970,7 @@
 .admin-table-header,
 .dashboard-recent-header,
 .admin-form h3 {
-  border-color: rgba(255, 255, 255, 0.075) !important;
+  border-color: var(--gate-line) !important;
 }
 
 .sidebar-nav-item,
@@ -1967,7 +1980,7 @@
 .dark-mode-toggle,
 .sidebar-site-link,
 .sidebar-logout {
-  border-radius: 999px !important;
+  border-radius: 0;
 }
 
 .sidebar-nav-item:hover,
@@ -1976,8 +1989,8 @@
 .kanban-card:hover,
 .table-action-btn:hover,
 .btn-icon:hover {
-  background: rgba(255, 212, 0, 0.07) !important;
-  border-color: rgba(255, 212, 0, 0.42) !important;
+  background: color-mix(in srgb, var(--gate-accent) 7%, transparent) !important;
+  border-color: color-mix(in srgb, var(--gate-accent) 42%, transparent) !important;
 }
 
 .admin-form input,
@@ -1989,10 +2002,10 @@
 .admin-login-card input,
 .seed-section input,
 .search-input {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: #fff !important;
-  border-radius: 14px !important;
+  background: var(--gate-panel) !important;
+  border-color: var(--gate-line) !important;
+  color: var(--gate-ink) !important;
+  border-radius: 0;
 }
 
 .admin-form input:focus,
@@ -2001,22 +2014,22 @@
 .admin-login-card input:focus,
 .seed-section input:focus,
 .search-input:focus {
-  border-color: rgba(255, 212, 0, 0.72) !important;
-  box-shadow: 0 0 0 4px rgba(255, 212, 0, 0.12) !important;
+  border-color: color-mix(in srgb, var(--gate-accent) 72%, transparent) !important;
+  box-shadow: none;
 }
 
 .admin-table th {
-  background: rgba(255, 255, 255, 0.035) !important;
-  color: rgba(255, 255, 255, 0.42) !important;
+  background: var(--gate-panel) !important;
+  color: var(--gate-line-strong) !important;
 }
 
 .admin-table td,
 .admin-table th {
-  border-color: rgba(255, 255, 255, 0.065) !important;
+  border-color: var(--gate-line) !important;
 }
 
 .admin-table tr:hover td {
-  background: rgba(255, 212, 0, 0.045) !important;
+  background: color-mix(in srgb, var(--gate-accent) 4.5%, transparent) !important;
 }
 
 /* ============================================================================
@@ -2053,7 +2066,7 @@
   margin-bottom: var(--space-4);
   padding: var(--space-4);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: 0;
   background: var(--bg-secondary);
 }
 .admin-repeat__head {
@@ -2096,22 +2109,22 @@
 .admin-cell-warn {
   margin-top: 4px;
   font-size: 0.72rem;
-  color: var(--kade-warning, #8a5a00);
+  color: var(--kade-warning, var(--gate-accent-text));
 }
 
 .admin-status-pill {
   min-height: 26px;
   padding: 3px 10px;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: 0;
   font-size: 0.74rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
 }
 .admin-status-pill.is-live {
-  background: var(--kade-success-bg, rgba(28, 122, 74, 0.1));
-  color: var(--kade-success, #1c7a4a);
+  background: var(--kade-success-bg, color-mix(in srgb, var(--kade-success) 10%, transparent));
+  color: var(--kade-success, var(--kade-success));
   border-color: currentColor;
 }
 .admin-status-pill.is-draft {

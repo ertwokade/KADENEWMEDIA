@@ -1,0 +1,316 @@
+/* ============================================================================
+   KADE SURFACE — uygulama içi sayfa dili
+   ----------------------------------------------------------------------------
+   Müşteri paneli, proje takip, Organizasyon Kiti, link profili, admin ve
+   hata/durum sayfaları bu dosyadan beslenir.
+
+   İLİŞKİ: renk ve tipografi ROLLERİ `kade-gate.css`te tanımlıdır ve `.kade-gate`
+   ile `.kade-surface` kapsayıcılarının ikisinde de geçerlidir. Bu dosya renk
+   TANIMLAMAZ; yalnız o rolleri kullanan bileşenleri kurar. Yeni bir renk
+   gerekiyorsa `styles/kade-tokens.css` → `kade-gate.css` sırasını izleyin.
+
+   Bu dosyayı kullanan sayfa `kade-gate.css`i de import etmelidir.
+
+   DİL — giriş ekranlarıyla aynı:
+     · ince hairline ızgara; kutular arasında çift çizgi olmaz (dış çerçeve
+       üstten+soldan, hücreler sağdan+alttan çizer)
+     · keskin köşe; yalnız geniş paneller 12px yumuşatılır
+     · büyük harf, aralıklı mikro etiketler; sıkı harf aralıklı büyük başlıklar
+     · vurgu DOLGU olarak kullanılır, metin olarak değil
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Sayfa başlığı — eyebrow · başlık · açıklama · ayraç
+--------------------------------------------------------------------------- */
+.surface-shell {
+  width: min(100%, var(--surface-max, 1160px));
+  margin: 0 auto;
+  padding: clamp(24px, 5vh, 60px) clamp(18px, 4vw, 42px) clamp(32px, 6vh, 72px);
+}
+
+.surface-head h1 {
+  max-width: 18ch;
+  margin: 0;
+  color: var(--gate-ink);
+  font-size: clamp(2rem, 4.6vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.surface-head .gate-rule {
+  margin: clamp(24px, 4vh, 40px) 0 0;
+}
+
+.surface-headrow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* ---------------------------------------------------------------------------
+   Hairline ızgara ve kart
+--------------------------------------------------------------------------- */
+.surface-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--surface-cols, 3), minmax(0, 1fr));
+  border-top: 1px solid var(--gate-line);
+  border-left: 1px solid var(--gate-line);
+}
+
+.surface-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border-right: 1px solid var(--gate-line);
+  border-bottom: 1px solid var(--gate-line);
+  padding: clamp(18px, 2.2vw, 26px);
+  background: var(--gate-panel);
+  color: var(--gate-ink);
+}
+
+/* Sitenin noktalı hover çerçevesi — bağlantı olan kartlarda. */
+a.surface-card::before,
+.surface-card--link::before {
+  position: absolute;
+  inset: 0;
+  border: 2px dotted transparent;
+  pointer-events: none;
+  content: '';
+  transition: border-color 0.18s ease;
+}
+
+a.surface-card:hover::before,
+.surface-card--link:hover::before {
+  border-color: var(--gate-ink);
+}
+
+a.surface-card {
+  text-decoration: none;
+}
+
+.surface-card-index {
+  color: var(--gate-decor);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.surface-card h2,
+.surface-card h3 {
+  margin: 0;
+  color: var(--gate-ink);
+  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.surface-card p {
+  margin: 8px 0 0;
+  color: var(--gate-muted);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+/* Geniş, tek parça panel — form ve tablo taşıyıcısı. */
+.surface-panel {
+  border: 1px solid var(--gate-line);
+  border-radius: 12px;
+  padding: clamp(18px, 2.4vw, 28px);
+  background: var(--gate-panel);
+  color: var(--gate-ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Rozet ve durum
+--------------------------------------------------------------------------- */
+.surface-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--gate-line-strong);
+  padding: 5px 10px;
+  color: var(--gate-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.surface-badge--accent {
+  border-color: transparent;
+  background: var(--gate-accent);
+  color: var(--gate-on-accent);
+}
+
+.surface-badge--ok {
+  border-color: var(--kade-success);
+  color: var(--kade-success);
+}
+
+.surface-badge--warn {
+  border-color: var(--kade-warning);
+  color: var(--kade-warning);
+}
+
+.surface-badge--danger {
+  border-color: var(--gate-danger);
+  color: var(--gate-danger);
+}
+
+/* ---------------------------------------------------------------------------
+   Tablo — panel içinde, hairline
+--------------------------------------------------------------------------- */
+.surface-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.surface-table th {
+  border-bottom: 1px solid var(--gate-line-strong);
+  padding: 10px 12px;
+  color: var(--gate-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.surface-table td {
+  border-bottom: 1px solid var(--gate-line);
+  padding: 12px;
+  color: var(--gate-ink);
+}
+
+.surface-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Dar ekranda tablo kendi kutusunda kayar; sayfa yatay kaymaz. */
+.surface-table-wrap {
+  overflow-x: auto;
+}
+
+/* ---------------------------------------------------------------------------
+   Boş durum
+--------------------------------------------------------------------------- */
+.surface-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border: 1px dashed var(--gate-line-strong);
+  padding: clamp(32px, 6vh, 60px) 24px;
+  color: var(--gate-muted);
+  text-align: center;
+}
+
+.surface-empty strong {
+  color: var(--gate-ink);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.surface-empty p {
+  max-width: 46ch;
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 1080px) {
+  .surface-grid {
+    --surface-cols: 2;
+  }
+}
+
+@media (max-width: 700px) {
+  .surface-grid {
+    --surface-cols: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Bildirim şeridi
+   ---------------------------------------------------------------------------
+   Organizasyon Kiti ve Kade Kit Business sayfaları demo-veri uyarısını global
+   `.glass-card` sınıfıyla basıyor. O sınıf pazarlama sayfaları için yazılmış
+   (bulanık cam + yuvarlak köşe); ürün yüzeyinde kutusuz kalıyordu. Burada
+   yüzeyin kendi diline çevrilir — sınıf adına dokunmadan.
+--------------------------------------------------------------------------- */
+.kade-surface .glass-card[role='status'] {
+  display: block;
+  border: 1px solid var(--gate-line) !important;
+  border-left: 3px solid var(--gate-accent) !important;
+  border-radius: 0 !important;
+  background: var(--gate-panel) !important;
+  color: var(--gate-muted) !important;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Form alanları ve butonlar
+   ---------------------------------------------------------------------------
+   index.css'te `input, textarea, select { border-radius: 14px !important; ... }`
+   ve `.btn` için hap biçimi tanımlı. O kurallar pazarlama sayfaları için doğru;
+   ürün yüzeyleri sitenin keskin köşeli form dilini kullandığı için burada aynı
+   ağırlıkta geri alınır. Kapsam `.kade-surface` ile sınırlıdır.
+--------------------------------------------------------------------------- */
+.kade-surface input:not([type='checkbox']):not([type='radio']):not([type='range']),
+.kade-surface textarea,
+.kade-surface select {
+  border: 1px solid var(--gate-line-strong) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--gate-ink) !important;
+  box-shadow: none !important;
+}
+
+.kade-surface input::placeholder,
+.kade-surface textarea::placeholder {
+  color: var(--gate-faint) !important;
+}
+
+.kade-surface input:focus,
+.kade-surface textarea:focus,
+.kade-surface select:focus {
+  border-color: var(--gate-ink) !important;
+  box-shadow: 4px 4px 0 var(--gate-accent) !important;
+}
+
+.kade-surface input[type='checkbox'],
+.kade-surface input[type='radio'] {
+  accent-color: var(--gate-accent);
+}
+
+.kade-surface .btn {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.kade-surface .btn-primary {
+  border: 1px solid var(--gate-ink) !important;
+  background: var(--gate-accent) !important;
+  color: var(--gate-on-accent) !important;
+}
+
+.kade-surface .btn-primary:hover {
+  background: var(--gate-ink) !important;
+  color: var(--gate-bg) !important;
+}
+
+.kade-surface .btn-outline {
+  border: 1px solid var(--gate-ink) !important;
+  background: transparent !important;
+  color: var(--gate-ink) !important;
+}

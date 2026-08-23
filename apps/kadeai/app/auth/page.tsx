@@ -3,10 +3,9 @@
 export const dynamic = 'force-dynamic'
 
 import { useEffect, useState } from 'react'
-import { User, Lock, Mail, Home } from 'lucide-react'
+import { User, Lock, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { apiPath, appRoutes, withBasePath } from '@/lib/appConfig'
-import KadeLogo from '@/components/brand/KadeLogo'
 import ThemeToggle from '@/components/theme/ThemeToggle'
 import { captureAnalytics } from '@/lib/analytics/client'
 import { mapGoogleOAuthError } from '@/lib/auth/oauth'
@@ -122,26 +121,45 @@ export default function AuthPage() {
     }
   }
 
-  return (
-    <div className="kade-auth-page relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 p-4 text-zinc-100">
-      <ThemeToggle compact className="fixed right-4 top-4 z-20" />
-      <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-amber-400/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 -right-28 h-96 w-96 rounded-full bg-cyan-500/5 blur-3xl" />
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
-          <div className="mb-3 flex justify-center">
-            <KadeLogo className="w-[220px] max-w-[72vw] drop-shadow-[0_12px_30px_rgba(242,195,34,0.12)]" priority />
-          </div>
-          <p className="text-sm text-zinc-500">İçerik ve operasyon çalışma alanı</p>
-        </div>
+  const isLogin = mode === 'login'
 
-        <div className="space-y-5 rounded-2xl border border-zinc-800 bg-zinc-900/90 p-6 shadow-2xl shadow-black/40 backdrop-blur">
-          <div className="flex rounded-xl border border-zinc-800 bg-zinc-950 p-1">
+  /* Sunum katmanı bilinçli olarak Tailwind yerine anlamlı sınıflara dayanır:
+     giriş ekranının görünümü app/kade-skin.css içinde, sitenin /giris
+     ekranlarıyla aynı tasarım dilinde tanımlıdır. Kimlik doğrulama akışı
+     (state, fetch, OAuth) bu düzenlemeden etkilenmez. */
+  return (
+    <div className="kade-auth-page">
+      <div className="kade-auth-grid" aria-hidden="true" />
+
+      <header className="kade-auth-hud">
+        <a className="kade-auth-brand" href="https://kadenewmedia.com">
+          <span>Kade</span><span>New Media</span>
+        </a>
+        <nav className="kade-auth-nav">
+          <a href="https://kadenewmedia.com/giris">← <span>Çalışma alanı</span></a>
+          <ThemeToggle compact />
+        </nav>
+      </header>
+
+      <main className="kade-auth-main">
+        <div className="kade-auth-card">
+          <div className="kade-auth-heading">
+            <p className="kade-auth-eyebrow">Content AI çalışma alanı</p>
+            <h1>{isLogin ? 'Tekrar hoş geldiniz.' : 'Çalışma alanınızı açın.'}</h1>
+            <p>İçerik üretimi, trend radarı ve operasyon araçları tek panelde.</p>
+          </div>
+
+          <div className="kade-auth-tabs" role="tablist" aria-label="Hesap işlemi">
             {(['login', 'signup'] as Mode[]).map((m) => (
-              <button key={m} onClick={() => { setMode(m); setError(''); setSuccess('') }}
-                className={cn('flex-1 py-1.5 rounded-lg text-sm font-semibold transition-colors',
-                  mode === m ? 'bg-[#f2c322] text-zinc-950 shadow-sm' : 'text-zinc-500 hover:text-zinc-200')}>
-                {m === 'login' ? 'Giriş Yap' : 'Kayıt Ol'}
+              <button
+                key={m}
+                type="button"
+                role="tab"
+                aria-selected={mode === m}
+                onClick={() => { setMode(m); setError(''); setSuccess('') }}
+                className={cn('kade-auth-tab', mode === m && 'is-active')}
+              >
+                {m === 'login' ? 'Giriş yap' : 'Kayıt ol'}
               </button>
             ))}
           </div>
@@ -150,91 +168,103 @@ export default function AuthPage() {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading || googleLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-700 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60"
+            className="kade-auth-google"
           >
             <GoogleMark />
             {googleLoading ? 'Google’a yönlendiriliyor...' : 'Google ile devam et'}
           </button>
 
-          <div className="flex items-center gap-3" aria-hidden="true">
-            <span className="h-px flex-1 bg-zinc-800" />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-600">veya</span>
-            <span className="h-px flex-1 bg-zinc-800" />
-          </div>
+          <div className="kade-auth-divider" aria-hidden="true"><span>veya</span></div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Kayıtta görünen ad */}
-            {mode === 'signup' && (
-              <div>
-                <label htmlFor="auth-display-name" className="mb-1.5 block text-xs font-medium text-zinc-400">Görünen Ad</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                  <input id="auth-display-name" value={nickname} onChange={(e) => setNickname(e.target.value)}
-                    placeholder="Kade, Studio Kade..." autoComplete="name"
-                    className="w-full rounded-xl border border-zinc-700 bg-zinc-950 py-2.5 pl-9 pr-3 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-600 focus:border-amber-400" />
+          <form onSubmit={handleSubmit} className="kade-auth-form">
+            {!isLogin && (
+              <label className="kade-auth-field" htmlFor="auth-display-name">
+                <span>Görünen ad</span>
+                <div>
+                  <User className="kade-auth-field-icon" aria-hidden="true" />
+                  <input
+                    id="auth-display-name"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    placeholder="Kade, Studio Kade..."
+                    autoComplete="name"
+                    className="kade-auth-input"
+                  />
                 </div>
-              </div>
+              </label>
             )}
 
-            {/* Admin kullanıcı adı veya KadeAI e-postası */}
-            <div>
-              <label htmlFor="auth-identifier" className="mb-1.5 block text-xs font-semibold text-zinc-400">
-                {mode === 'login' ? 'Admin kullanıcı adı veya e-posta' : 'E-posta'}
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                <input id="auth-identifier" type={mode === 'login' ? 'text' : 'email'} value={identifier} onChange={(e) => setIdentifier(e.target.value)}
-                  required maxLength={254} placeholder={mode === 'login' ? 'Admin kullanıcı adı veya e-posta' : 'kadir@email.com'}
-                  autoComplete={mode === 'login' ? 'username' : 'email'}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 py-2.5 pl-9 pr-3 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-600 focus:border-amber-400" />
+            <label className="kade-auth-field" htmlFor="auth-identifier">
+              <span>{isLogin ? 'Admin kullanıcı adı veya e-posta' : 'E-posta'}</span>
+              <div>
+                <Mail className="kade-auth-field-icon" aria-hidden="true" />
+                <input
+                  id="auth-identifier"
+                  type={isLogin ? 'text' : 'email'}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  required
+                  maxLength={254}
+                  placeholder={isLogin ? 'Admin kullanıcı adı veya e-posta' : 'kadir@email.com'}
+                  autoComplete={isLogin ? 'username' : 'email'}
+                  className="kade-auth-input"
+                />
               </div>
-              {mode === 'login' && (
-                <p className="mt-2 text-[11px] leading-relaxed text-zinc-500">
+              {isLogin && (
+                <small className="kade-auth-hint">
                   Admin panelinde kullandığın kullanıcı adı ve şifreyle doğrudan giriş yapabilirsin.
-                </p>
+                </small>
               )}
-            </div>
+            </label>
 
-            {/* Şifre */}
-            <div>
-              <label htmlFor="auth-password" className="mb-1.5 block text-xs font-semibold text-zinc-400">Şifre</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                <input id="auth-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                  required placeholder="En az 8 karakter" minLength={8} maxLength={128} autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  aria-describedby={mode === 'signup' ? 'auth-password-hint' : undefined}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 py-2.5 pl-9 pr-3 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-600 focus:border-amber-400" />
+            <label className="kade-auth-field" htmlFor="auth-password">
+              <span>Şifre</span>
+              <div>
+                <Lock className="kade-auth-field-icon" aria-hidden="true" />
+                <input
+                  id="auth-password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="En az 8 karakter"
+                  minLength={8}
+                  maxLength={128}
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
+                  aria-describedby={isLogin ? undefined : 'auth-password-hint'}
+                  className="kade-auth-input"
+                />
               </div>
-              {mode === 'signup' && (
-                <p id="auth-password-hint" className="mt-2 text-[11px] leading-relaxed text-zinc-500">
-                  {SIGNUP_PASSWORD_HINT}
-                </p>
+              {!isLogin && (
+                <small id="auth-password-hint" className="kade-auth-hint">{SIGNUP_PASSWORD_HINT}</small>
               )}
-            </div>
+            </label>
 
-            {error   && <p role="alert" aria-live="assertive" className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">{error}</p>}
-            {success && <p role="status" aria-live="polite" className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300">{success}</p>}
+            {error && <p role="alert" aria-live="assertive" className="kade-auth-error">{error}</p>}
+            {success && <p role="status" aria-live="polite" className="kade-auth-success">{success}</p>}
 
-            <button type="submit" disabled={loading || googleLoading}
-              className="w-full rounded-xl bg-[#f2c322] py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-[#ffda3f] disabled:opacity-50">
-              {loading ? 'Yükleniyor...' : mode === 'login' ? 'Giriş Yap' : 'Hesap Oluştur'}
+            <button type="submit" disabled={loading || googleLoading} className="kade-auth-submit">
+              <span>{loading ? 'Yükleniyor...' : isLogin ? 'Çalışma alanına gir' : 'Hesap oluştur'}</span>
+              {!loading && <em aria-hidden="true">↗</em>}
             </button>
-            {mode === 'login' && (
-              <a href={withBasePath('/reset-password')} className="block text-center text-xs font-medium text-amber-400 hover:text-amber-300">
-                Şifremi unuttum
-              </a>
+
+            {isLogin && (
+              <a href={withBasePath('/reset-password')} className="kade-auth-forgot">Şifremi unuttum</a>
             )}
           </form>
 
+          {/* Danışmanlık ayrı bir hesap; yanlış kapıya gelen doğru kapıyı görsün. */}
+          <a className="kade-auth-crosslink" href="https://kadenewmedia.com/giris/danismanlik">
+            <span>Danışmanlık paneli aramıştınız?</span>
+            <strong>Müşteri girişine git <em aria-hidden="true">↗</em></strong>
+          </a>
         </div>
-        <a
-          href="https://kadenewmedia.com"
-          className="mx-auto flex min-h-11 w-fit items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/70 px-5 text-sm font-semibold text-zinc-400 transition-colors hover:border-amber-400/40 hover:text-amber-300"
-        >
-          <Home className="h-4 w-4" aria-hidden="true" />
-          Anasayfaya Dön
-        </a>
-      </div>
+
+        <footer className="kade-auth-meta">
+          <span>İstanbul</span>
+          <a href="https://kadenewmedia.com">kadenewmedia.com</a>
+        </footer>
+      </main>
     </div>
   )
 }

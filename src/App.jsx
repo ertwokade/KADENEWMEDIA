@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { CustomerProvider } from './contexts/CustomerContext'
 import { OrganizationSchema } from './components/StructuredData'
 import { Routes, Route, useLocation, useParams, Navigate } from 'react-router-dom'
@@ -11,6 +11,7 @@ import ErrorTracker from './components/ErrorTracker'
 import GrainOverlay from './components/GrainOverlay'
 import AuroraBackground from './components/AuroraBackground'
 import ErrorBoundary from './components/ErrorBoundary'
+import { lazyWithRetry } from './utils/lazyWithRetry'
 import NotificationPrompt from './components/NotificationPrompt'
 import OrganizationKitGuard from './components/OrganizationKitGuard'
 import KadeKitBusinessGuard from './components/KadeKitBusinessGuard'
@@ -28,49 +29,49 @@ import BlogDetail from './pages/BlogDetail'
 import NotFound from './pages/NotFound'
 
 // Secondary pages — lazy loaded to reduce initial bundle
-const Packages = lazy(() => import('./pages/Packages'))
-const Partners = lazy(() => import('./pages/Partners'))
-const PartnerDetail = lazy(() => import('./pages/PartnerDetail'))
-const Careers = lazy(() => import('./pages/Careers'))
-const Portfolio = lazy(() => import('./pages/Portfolio'))
-const ProjectDetail = lazy(() => import('./pages/ProjectDetail'))
-const Team = lazy(() => import('./pages/Team'))
-const KVKK = lazy(() => import('./pages/KVKK'))
-const Gizlilik = lazy(() => import('./pages/Gizlilik'))
-const CerezPolitikasi = lazy(() => import('./pages/CerezPolitikasi'))
-const TelifHaklari = lazy(() => import('./pages/TelifHaklari'))
-const CaseStudies = lazy(() => import('./pages/CaseStudies'))
-const Admin = lazy(() => import('./pages/Admin'))
+const Packages = lazyWithRetry(() => import('./pages/Packages'))
+const Partners = lazyWithRetry(() => import('./pages/Partners'))
+const PartnerDetail = lazyWithRetry(() => import('./pages/PartnerDetail'))
+const Careers = lazyWithRetry(() => import('./pages/Careers'))
+const Portfolio = lazyWithRetry(() => import('./pages/Portfolio'))
+const ProjectDetail = lazyWithRetry(() => import('./pages/ProjectDetail'))
+const Team = lazyWithRetry(() => import('./pages/Team'))
+const KVKK = lazyWithRetry(() => import('./pages/KVKK'))
+const Gizlilik = lazyWithRetry(() => import('./pages/Gizlilik'))
+const CerezPolitikasi = lazyWithRetry(() => import('./pages/CerezPolitikasi'))
+const TelifHaklari = lazyWithRetry(() => import('./pages/TelifHaklari'))
+const CaseStudies = lazyWithRetry(() => import('./pages/CaseStudies'))
+const Admin = lazyWithRetry(() => import('./pages/Admin'))
 // New pages
-const SSS = lazy(() => import('./pages/SSS'))
-const Referanslar = lazy(() => import('./pages/Referanslar'))
-const Tesekkur = lazy(() => import('./pages/Tesekkur'))
-const QuoteRequest = lazy(() => import('./pages/QuoteRequest'))
-const CustomerPortal = lazy(() => import('./pages/CustomerPortal'))
-const LoginHub = lazy(() => import('./pages/LoginHub'))
-const Login = lazy(() => import('./pages/Login'))
-const ProjectTracking = lazy(() => import('./pages/ProjectTracking'))
-const OrganizationKitDashboard = lazy(() => import('./pages/OrganizationKitDashboard'))
-const OrganizationKitPlan = lazy(() => import('./pages/OrganizationKitPlan'))
-const OrganizationKitSection = lazy(() => import('./pages/OrganizationKitSection'))
-const KadeKitBusinessStudio = lazy(() => import('./pages/KadeKitBusinessStudio'))
-const LinkProfile = lazy(() => import('./pages/LinkProfile'))
-const Unauthorized = lazy(() => import('./pages/Unauthorized'))
-const Forbidden = lazy(() => import('./pages/Forbidden'))
-const TooManyRequests = lazy(() => import('./pages/TooManyRequests'))
-const Maintenance = lazy(() => import('./pages/Maintenance'))
-const BasinPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.BasinPage })))
-const NedenBizPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.NedenBizPage })))
-const ReferralProgramPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.ReferralProgramPage })))
-const PodcastWebinarPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.PodcastWebinarPage })))
-const NewsletterArchivePage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.NewsletterArchivePage })))
-const PriceCalculatorPage = lazy(() => import('./pages/ContentPages').then((module) => ({ default: module.PriceCalculatorPage })))
+const SSS = lazyWithRetry(() => import('./pages/SSS'))
+const Referanslar = lazyWithRetry(() => import('./pages/Referanslar'))
+const Tesekkur = lazyWithRetry(() => import('./pages/Tesekkur'))
+const QuoteRequest = lazyWithRetry(() => import('./pages/QuoteRequest'))
+const CustomerPortal = lazyWithRetry(() => import('./pages/CustomerPortal'))
+const LoginHub = lazyWithRetry(() => import('./pages/LoginHub'))
+const Login = lazyWithRetry(() => import('./pages/Login'))
+const ProjectTracking = lazyWithRetry(() => import('./pages/ProjectTracking'))
+const OrganizationKitDashboard = lazyWithRetry(() => import('./pages/OrganizationKitDashboard'))
+const OrganizationKitPlan = lazyWithRetry(() => import('./pages/OrganizationKitPlan'))
+const OrganizationKitSection = lazyWithRetry(() => import('./pages/OrganizationKitSection'))
+const KadeKitBusinessStudio = lazyWithRetry(() => import('./pages/KadeKitBusinessStudio'))
+const LinkProfile = lazyWithRetry(() => import('./pages/LinkProfile'))
+const Unauthorized = lazyWithRetry(() => import('./pages/Unauthorized'))
+const Forbidden = lazyWithRetry(() => import('./pages/Forbidden'))
+const TooManyRequests = lazyWithRetry(() => import('./pages/TooManyRequests'))
+const Maintenance = lazyWithRetry(() => import('./pages/Maintenance'))
+const BasinPage = lazyWithRetry(() => import('./pages/ContentPages').then((module) => ({ default: module.BasinPage })))
+const NedenBizPage = lazyWithRetry(() => import('./pages/ContentPages').then((module) => ({ default: module.NedenBizPage })))
+const ReferralProgramPage = lazyWithRetry(() => import('./pages/ContentPages').then((module) => ({ default: module.ReferralProgramPage })))
+const PodcastWebinarPage = lazyWithRetry(() => import('./pages/ContentPages').then((module) => ({ default: module.PodcastWebinarPage })))
+const NewsletterArchivePage = lazyWithRetry(() => import('./pages/ContentPages').then((module) => ({ default: module.NewsletterArchivePage })))
+const PriceCalculatorPage = lazyWithRetry(() => import('./pages/ContentPages').then((module) => ({ default: module.PriceCalculatorPage })))
 
 // Dekoratif 3B zemin Three.js/R3F çeker. Ana sayfa ve diğer `hideDecor`
 // rotalarında hiç render edilmiyor; statik import olduğu için yine de
 // bundle'a giriyor ve THREE.Clock deprecation uyarısı basıyordu.
 // Lazy import ile yalnız gerçekten gösterildiği rotalarda yüklenir.
-const PageHeroCanvas = lazy(() => import('./components/PageHeroCanvas'))
+const PageHeroCanvas = lazyWithRetry(() => import('./components/PageHeroCanvas'))
 
 function PageLoader() {
   // Lazy chunk inerken tamamen boş ekran yerine hafif, markalı bir spinner
@@ -200,12 +201,18 @@ function App() {
   //                tipografisi var, üst üste binince giriş okunamaz hâle geliyor.
   const hideChrome = isAdmin || isLoginArea || isLinkProfile
   const hideDecor = hideChrome || isHome
+  // `kade-app-ui`, CSS'i krem zemine göre yazılmış ürün arayüzlerini açık
+  // palete SABİTLER; o sayfalarda tema düğmesi çalışmaz. Bu bir geçiş
+  // önlemidir: bir yüzey `styles/kade-gate.css` rollerine taşındığında kendi
+  // zeminini boyadığı için sabitlemeye ihtiyacı kalmaz ve listeden çıkar.
+  // Taşınanlar listeden çıktı: /musteri-panel, /proje-takip, /organizasyon-kiti,
+  // /kade-kit-business ve /@profil artık kendi zeminini rol tokenlarından
+  // boyuyor ve tema düğmesini izliyor.
+  //
+  // /admin BİLEREK kalıyor: kendi karanlık mod düğmesi var (`kade_admin_dark`)
+  // ve site temasından bağımsız çalışması isteniyor; açık palete sabitlenmesi
+  // o düğmenin tek yetkili olmasını sağlıyor.
   const isAppUI = isAdmin
-    || isLinkProfile
-    || location.pathname.startsWith('/organizasyon-kiti')
-    || location.pathname === '/kade-kit-business'
-    || location.pathname === '/musteri-panel'
-    || location.pathname === '/proje-takip'
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 

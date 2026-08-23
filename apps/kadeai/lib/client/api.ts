@@ -162,7 +162,11 @@ export async function apiFetch(input: string, init?: RequestInit, timeoutMs = 60
     if (controller.signal.aborted && !externalSignal?.aborted) {
       throw new Error('İstek zaman aşımına uğradı. Bağlantını kontrol edip yeniden dene.')
     }
-    throw error
+    throw new Error(
+      error instanceof Error && error.message
+        ? `KadeAI servisine ulaşılamadı: ${error.message}`
+        : 'KadeAI servisine ulaşılamadı. Bağlantını kontrol edip yeniden dene.'
+    )
   } finally {
     window.clearTimeout(timeout)
     externalSignal?.removeEventListener('abort', abortFromExternal)

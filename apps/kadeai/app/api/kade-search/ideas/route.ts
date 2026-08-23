@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateIdeas } from '@/lib/kade-search/ideas'
-import { failure, requireReaderAccess } from '../_guard'
+import { failure, isKadeSearchConfigured, requireReaderAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   const guard = await requireReaderAccess()
   if (guard) return guard
+  if (!isKadeSearchConfigured()) {
+    return NextResponse.json({ adet: 0, fikirler: [], localFallback: true })
+  }
   try {
     const p = req.nextUrl.searchParams
     const ideas = await generateIdeas({

@@ -10,6 +10,16 @@ import PageTransition from '../components/PageTransition'
 import { PersonSchema } from '../components/StructuredData'
 import NotFound from './NotFound'
 import './LinkProfile.css'
+import '../styles/kade-gate.css'
+
+/* Klon rotalarına DIŞ bağlantı: `<Link>` değil `<a href>`.
+
+   Üretimde bu adresler statik klondan servis ediliyor (bkz. scripts/
+   merge-clone.mjs). `<Link>` kullanıldığında React Router sayfayı istemci
+   tarafında kendi kopyasıyla çiziyordu; sonuç, aynı URL'nin nereden
+   gelindiğine göre iki farklı tasarımda açılmasıydı — Google'dan gelen klonu,
+   panelden tıklayan React sürümünü görüyordu. Tam sayfa yüklemesi doğru
+   katmanı getirir. */
 
 function hexToRgbTriplet(hex) {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '')
@@ -122,7 +132,7 @@ export default function LinkProfile() {
 
   if (status === 'loading') {
     return (
-      <div className="kd-page">
+      <div className="kade-surface kd-page">
         <main className="kd-main">
           <div className="kd-shell">
             <div className="kd-loading-card" aria-hidden="true" />
@@ -220,11 +230,11 @@ export default function LinkProfile() {
 
                 <footer className="kd-footer">
                   <nav className="kd-footer-nav" aria-label="Yasal bağlantılar">
-                    <Link to="/gizlilik" className="kd-footer-sublink">{lang === 'en' ? 'Privacy' : 'Gizlilik'}</Link>
+                    <a href="/gizlilik" className="kd-footer-sublink">{lang === 'en' ? 'Privacy' : 'Gizlilik'}</a>
                     <span className="kd-footer-dot" aria-hidden="true">·</span>
-                    <Link to="/kvkk" className="kd-footer-sublink">KVKK</Link>
+                    <a href="/kvkk" className="kd-footer-sublink">KVKK</a>
                     <span className="kd-footer-dot" aria-hidden="true">·</span>
-                    <Link to="/hakkimizda" className="kd-footer-sublink">{lang === 'en' ? 'About' : 'Hakkımızda'}</Link>
+                    <a href="/hakkimizda" className="kd-footer-sublink">{lang === 'en' ? 'About' : 'Hakkımızda'}</a>
                   </nav>
                   <Link to="/" className="kd-footer-link">Kade New Media</Link>
                 </footer>

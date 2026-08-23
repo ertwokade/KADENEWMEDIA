@@ -10,7 +10,7 @@ type ThemeToggleProps = {
 }
 
 export default function ThemeToggle({ compact = false, className }: ThemeToggleProps) {
-  const { theme, cycleTheme } = useTheme()
+  const { theme, setMode } = useTheme()
   const isDark = theme === 'dark'
   const Icon = isDark ? Sun : Moon
   const label = isDark ? 'Açık temaya geç' : 'Koyu temaya geç'
@@ -19,7 +19,7 @@ export default function ThemeToggle({ compact = false, className }: ThemeToggleP
     <button
       type="button"
       className={cn('kade-theme-toggle', compact && 'kade-theme-toggle--compact', className)}
-      onClick={cycleTheme}
+      onClick={() => setMode(isDark ? 'light' : 'dark')}
       aria-label={label}
       title={label}
     >

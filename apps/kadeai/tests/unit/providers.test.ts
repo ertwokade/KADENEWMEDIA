@@ -16,6 +16,30 @@ test('AI mock is deterministic and never reports provider tokens', () => {
   assert.match(result.routingReason || '', /harici AI çağrısı yapılmadı/)
 })
 
+test('AI mock returns valid structured payloads for schema-driven tools', () => {
+  const clickbait = JSON.parse(generateMockContent({
+    prompt: 'JSON: {"clickbait_skoru":0-100,"alternatifler":[]}',
+    systemPrompt: 'Yanıtını sadece JSON ver.',
+    model: 'auto',
+  }).content)
+  assert.equal(clickbait.clickbait_skoru, 42)
+  assert.ok(clickbait.alternatifler.length > 0)
+
+  const hashtags = JSON.parse(generateMockContent({
+    prompt: 'Konu: dijital pazarlama',
+    systemPrompt: 'Sen sosyal medya hashtag stratejistisisin.',
+    model: 'auto',
+  }).content)
+  assert.ok(hashtags.niche.includes('#kadeai'))
+
+  const carousel = JSON.parse(generateMockContent({
+    prompt: 'JSON: {"baslik":"","slayts":[],"caption":"","hashtags":[]}',
+    systemPrompt: 'Carousel uzmanısın.',
+    model: 'auto',
+  }).content)
+  assert.equal(carousel.slayts.length, 5)
+})
+
 test('email templates escape user-controlled HTML and mock captures without sending', async () => {
   const message = renderEmail('user@example.test', { kind: 'welcome', displayName: '<script>alert(1)</script>' })
   assert.doesNotMatch(message.html, /<script>/)

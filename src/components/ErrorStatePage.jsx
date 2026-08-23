@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import { HiOutlineHome, HiOutlineArrowRight } from 'react-icons/hi'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from './PageTransition'
+import '../styles/kade-gate.css'
+import '../styles/kade-surface.css'
 import './ErrorStatePage.css'
 
 /**
@@ -29,10 +31,9 @@ export default function ErrorStatePage({ code, codeDisplay, title, message, retr
 
   return (
     <PageTransition>
-      <section className="error-state-section">
-        <div className="grid-bg" />
-        <div className="glow-effect" style={{ top: '-150px', right: '-100px' }} />
-        <div className="container error-state-container">
+      <section className="kade-surface error-state-section">
+        <div className="gate-grid" aria-hidden="true" />
+        <div className="surface-shell error-state-container">
           <motion.div
             className={`error-state-code${codeDisplay ? ' error-state-code--muted' : ''}`}
             initial={{ scale: 0.5, opacity: 0 }}
@@ -48,12 +49,12 @@ export default function ErrorStatePage({ code, codeDisplay, title, message, retr
             {message}
           </motion.p>
           <motion.div className="error-state-actions" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-            <Link to={retryTo} className="btn btn-primary">
+            <Link to={retryTo} className="gate-btn">
               <HiOutlineHome size={18} />
               {retryLabel}
             </Link>
             {secondaryLabel && (
-              <Link to={secondaryTo} className="btn btn-outline">
+              <Link to={secondaryTo} className="gate-btn gate-btn--ghost">
                 {secondaryLabel}
                 <HiOutlineArrowRight size={16} />
               </Link>

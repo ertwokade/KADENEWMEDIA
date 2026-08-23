@@ -14,7 +14,18 @@ import { useSEO } from '../hooks/useSEO'
 import { useCustomer } from '../contexts/CustomerContext'
 import { customerPortalApi } from '../api'
 import PageTransition from '../components/PageTransition'
+import '../styles/kade-gate.css'
+import '../styles/kade-surface.css'
 import './CustomerPortal.css'
+
+/* Klon rotalarına DIŞ bağlantı: `<Link>` değil `<a href>`.
+
+   Üretimde bu adresler statik klondan servis ediliyor (bkz. scripts/
+   merge-clone.mjs). `<Link>` kullanıldığında React Router sayfayı istemci
+   tarafında kendi kopyasıyla çiziyordu; sonuç, aynı URL'nin nereden
+   gelindiğine göre iki farklı tasarımda açılmasıydı — Google'dan gelen klonu,
+   panelden tıklayan React sürümünü görüyordu. Tam sayfa yüklemesi doğru
+   katmanı getirir. */
 
 const CONSULTING_LABELS = {
   'social-media': 'Sosyal Medya Yönetimi',
@@ -79,7 +90,7 @@ export default function CustomerPortal() {
   if (loading) {
     return (
       <PageTransition>
-        <div className="cp-loading">
+        <div className="kade-surface cp-loading">
           <div className="cp-spinner" />
           <p>Yükleniyor...</p>
         </div>
@@ -90,11 +101,11 @@ export default function CustomerPortal() {
   if (error) {
     return (
       <PageTransition>
-        <div className="cp-error-page">
+        <div className="kade-surface cp-error-page">
           <HiOutlineExclamationCircle size={48} />
           <h2>Bir hata oluştu</h2>
           <p>{error}</p>
-          <button className="btn btn-primary" onClick={() => window.location.reload()}>Tekrar Dene</button>
+          <button className="gate-btn" onClick={() => window.location.reload()}>Tekrar Dene</button>
         </div>
       </PageTransition>
     )
@@ -145,7 +156,8 @@ export default function CustomerPortal() {
 
   return (
     <PageTransition>
-      <div className="cp-page">
+      <div className="kade-surface cp-page">
+        <div className="gate-grid" aria-hidden="true" />
         {/* Header */}
         <div className="cp-header">
           <div className="container cp-header-inner">
@@ -230,7 +242,7 @@ export default function CustomerPortal() {
                 </div>
                 <h2>Henüz paket satın almadınız</h2>
                 <p>Hizmetlerimize erişmek için bir paket satın alın.</p>
-                <Link to="/paketler" className="btn btn-primary">Paketleri İncele</Link>
+                <a href="/paketler" className="gate-btn">Paketleri İncele</a>
               </motion.div>
             )}
 
@@ -256,7 +268,7 @@ export default function CustomerPortal() {
               {consultingAreas.length === 0 ? (
                 <div className="cp-card-empty">
                   <p>Aktif danışmanlık hizmeti bulunmuyor.</p>
-                  <Link to="/paketler" className="cp-link">Paketleri inceleyin →</Link>
+                  <a href="/paketler" className="cp-link">Paketleri inceleyin →</a>
                 </div>
               ) : (
                 <ul className="cp-list">
@@ -335,7 +347,7 @@ export default function CustomerPortal() {
               {packages.length === 0 ? (
                 <div className="cp-card-empty">
                   <p>Henüz satın alınmış paket yok.</p>
-                  <Link to="/paketler" className="cp-link">Paketleri inceleyin →</Link>
+                  <a href="/paketler" className="cp-link">Paketleri inceleyin →</a>
                 </div>
               ) : (
                 <div className="cp-packages-table">
@@ -390,7 +402,7 @@ export default function CustomerPortal() {
 
             <div className="cp-support-banner">
               <HiOutlineUser size={18} />
-              <span>Bir sorun mu var? <Link to="/iletisim" className="cp-link">Destek ekibimizle iletişime geçin</Link></span>
+              <span>Bir sorun mu var? <a href="/iletisim" className="cp-link">Destek ekibimizle iletişime geçin</a></span>
             </div>
           </div>
         </div>

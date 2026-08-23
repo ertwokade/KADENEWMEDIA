@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { queryTrends } from '@/lib/kade-search/store'
-import { failure, requireReaderAccess } from '../_guard'
+import { failure, isKadeSearchConfigured, requireReaderAccess } from '../_guard'
 import type { TrendFilters } from '@/lib/kade-search/types'
 
 export const dynamic = 'force-dynamic'
@@ -26,6 +26,10 @@ export function filtersFromSearchParams(params: URLSearchParams): TrendFilters {
 export async function GET(req: NextRequest) {
   const guard = await requireReaderAccess()
   if (guard) return guard
+  if (!isKadeSearchConfigured()) {
+    const filters = filtersFromSearchParams(req.nextUrl.searchParams)
+    return NextResponse.json({ adet: 0, filtreler: filters, trendler: [], localFallback: true })
+  }
   try {
     const filters = filtersFromSearchParams(req.nextUrl.searchParams)
     const trends = await queryTrends(filters)

@@ -1,188 +1,205 @@
-.access-hub {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 132px 24px 80px;
-  position: relative;
-  color: #fff;
-  background:
-    radial-gradient(70% 58% at 74% 10%, rgba(255, 212, 0, 0.08), transparent 62%),
-    radial-gradient(55% 48% at 10% 82%, rgba(255, 212, 0, 0.055), transparent 68%),
-    #060606;
+/* /giris — çalışma alanı seçimi.
+   Renk, tipografi ve HUD davranışı ../styles/kade-gate.css'ten gelir; burada
+   yalnız bu ekrana özgü düzen var. Kart ızgarası sitenin iç sayfalarındaki
+   `.cards` deseninin karşılığıdır: dış çerçeve üstten ve soldan, her hücre
+   sağdan ve alttan çizer — böylece hücreler arasında çift çizgi oluşmaz. */
+
+.gate-hub {
+  display: flex;
+  flex-direction: column;
 }
 
-.access-hub-panel {
-  width: min(100%, 920px);
-  position: relative;
-  z-index: 1;
+.gate-shell {
+  width: min(100%, 1080px);
+  margin: 0 auto;
+  padding: clamp(28px, 6vh, 68px) clamp(18px, 4vw, 42px) clamp(32px, 5vh, 56px);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-.access-hub-brand {
-  width: fit-content;
-  display: inline-block;
-  text-decoration: none;
-}
-
-.access-hub-brand img {
-  display: block;
-  width: clamp(160px, 18vw, 190px);
-  height: auto;
-  object-fit: contain;
-}
-
-.access-hub-heading {
-  max-width: 680px;
-  margin: 46px 0 36px;
-}
-
-.access-hub-eyebrow {
-  display: block;
-  margin-bottom: 14px;
-  color: #FFD400;
-  font-family: var(--font-sans);
-  font-size: var(--fs-2xs);
-  font-weight: 700;
-  letter-spacing: 0.16em;
-}
-
-.access-hub-heading h1 {
+.gate-head h1 {
+  max-width: 17ch;
   margin: 0;
-  color: #fff;
-  font-family: var(--font-sans);
-  font-size: clamp(2.25rem, 5vw, 4.75rem);
-  font-weight: 750;
-  letter-spacing: -0.055em;
-  line-height: 0.98;
+  color: var(--gate-ink);
+  font-size: clamp(2.25rem, 5.4vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.96;
 }
 
-.access-hub-grid {
+.gate-head .gate-rule {
+  margin: clamp(28px, 4vh, 44px) 0 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Çalışma alanı kartları
+--------------------------------------------------------------------------- */
+.gate-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--gate-line);
+  border-left: 1px solid var(--gate-line);
+}
+
+.gate-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 336px;
+  flex-direction: column;
+  border-right: 1px solid var(--gate-line);
+  border-bottom: 1px solid var(--gate-line);
+  padding: clamp(20px, 2.4vw, 28px);
+  background: var(--gate-panel);
+  color: var(--gate-ink) !important;
+  text-decoration: none;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease, border-color 0.3s ease;
+}
+
+.gate-card:hover,
+.gate-card:focus-visible {
+  z-index: 2;
+  transform: translateY(-6px);
+  border-color: var(--gate-accent);
+  background: color-mix(in srgb, var(--gate-accent) 9%, var(--gate-panel));
+}
+
+/* Siteyle aynı jest: kartın üstüne gelindiğinde sağ üstte ok belirir. */
+.gate-card::after {
+  position: absolute;
+  right: 18px;
+  top: 15px;
+  opacity: 0;
+  color: var(--gate-ink);
+  font-size: 20px;
+  transform: translate(-8px, 8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  content: '↗';
+}
+
+.gate-card:hover::after,
+.gate-card:focus-visible::after {
+  opacity: 1;
+  transform: none;
+}
+
+.gate-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 16px;
 }
 
-.access-hub-grid > div {
-  min-width: 0;
+.gate-card-index {
+  color: var(--gate-decor);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
 }
 
-.access-hub-card {
-  min-height: 320px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 28px;
-  color: #fff;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.016) 58%, rgba(255, 212, 0, 0.035)), rgba(8, 8, 8, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.075);
-  border-radius: 18px;
-  text-decoration: none;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.44);
-  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+.gate-card-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--gate-ink);
+  background: var(--gate-accent);
+  color: var(--gate-on-accent);
 }
 
-.access-hub-card:hover {
-  color: #fff;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.022) 58%, rgba(255, 212, 0, 0.055)), rgba(8, 8, 8, 0.94);
-  border-color: rgba(255, 212, 0, 0.5);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5), 0 0 34px rgba(255, 212, 0, 0.1);
+.gate-card-title {
+  margin-top: clamp(30px, 4vw, 44px);
+  color: var(--gate-ink);
+  font-size: clamp(1.5rem, 2.6vw, 2.125rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
 }
 
-.access-hub-card:focus-visible {
-  outline: 3px solid rgba(255, 212, 0, 0.5);
-  outline-offset: 4px;
+.gate-card-desc {
+  max-width: 36ch;
+  margin-top: 10px;
+  color: var(--gate-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
-.access-hub-card-top,
-.access-hub-cta {
+.gate-card-features {
+  margin: 18px 0 0;
+  padding-left: 18px;
+  color: var(--gate-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.gate-card-features li {
+  margin-bottom: 6px;
+}
+
+.gate-card-features li::marker {
+  color: var(--gate-accent);
+}
+
+.gate-card-link {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-}
-
-.access-hub-icon {
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  color: #060606;
-  background: #FFD400;
-  border-radius: 5px;
-}
-
-.access-hub-number {
-  align-self: flex-start;
-  color: rgba(255, 255, 255, 0.34);
-  font-family: var(--font-sans);
-  font-size: var(--fs-2xs);
-  letter-spacing: 0.1em;
-}
-
-.access-hub-card-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: auto 0 32px;
-}
-
-.access-hub-card-copy strong {
-  font-family: var(--font-sans);
-  font-size: clamp(1.65rem, 3vw, 2.3rem);
-  font-weight: 750;
-  letter-spacing: -0.035em;
-}
-
-.access-hub-card-copy > span {
-  max-width: 330px;
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 14px;
-  line-height: 1.65;
-}
-
-.access-hub-cta {
-  justify-content: flex-start;
-  gap: 10px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  color: #FFD400;
-  font-family: var(--font-sans);
-  font-size: var(--fs-2xs);
-  font-weight: 700;
+  gap: 9px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--gate-line);
+  color: var(--gate-ink);
+  font-size: 0.78125rem;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.access-hub-card:hover .access-hub-cta svg {
-  transform: translateX(4px);
+.gate-card-link em {
+  font-style: normal;
+  transition: transform 0.18s ease;
 }
 
-.access-hub-cta svg {
-  transition: transform 180ms ease;
+.gate-card:hover .gate-card-link em {
+  transform: translate(3px, -3px);
 }
 
-@media (max-width: 720px) {
-  .access-hub {
-    padding: 112px 18px 56px;
-    place-items: start center;
-  }
+.gate-card-link .gate-kbd {
+  margin-left: auto;
+}
 
-  .access-hub-heading {
-    margin: 36px 0 28px;
-  }
+.gate-hint {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 18px 0 clamp(36px, 6vh, 60px);
+  color: var(--gate-faint);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
 
-  .access-hub-grid {
+/* Dokunmatik cihazda klavye ipucu yanıltıcı olur. */
+@media (hover: none), (pointer: coarse) {
+  .gate-hint,
+  .gate-card-link .gate-kbd {
+    display: none;
+  }
+}
+
+.gate-hub .gate-footer {
+  margin-top: auto;
+}
+
+@media (max-width: 760px) {
+  .gate-cards {
     grid-template-columns: 1fr;
   }
 
-  .access-hub-card {
-    min-height: 260px;
-    padding: 24px;
+  .gate-card {
+    min-height: 0;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .access-hub-card,
-  .access-hub-cta svg {
-    transition: none;
+  .gate-card-title {
+    margin-top: 28px;
   }
 }

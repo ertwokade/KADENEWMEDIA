@@ -254,7 +254,7 @@ body.kade-app-ui #root {
   text-transform: uppercase !important;
 }
 
-/* neon #FFD400 -> gold */
+/* neon var(--kade-gold) -> gold */
 .sidebar-nav-item.active, .sidebar-site-link:hover, .dark-mode-toggle:hover,
 .kanban-card-service, .table-action-btn.primary, .admin-tab:hover:not(.active) {
   color: #c8901a !important;

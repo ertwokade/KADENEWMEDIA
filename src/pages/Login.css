@@ -1,241 +1,427 @@
-.login-page {
-  --primary: #FFD400;
-  --primary-dark: #D4A017;
-  --white: #FFFFFF;
-  --gray: rgba(255, 255, 255, 0.38);
-  --gray-light: rgba(255, 255, 255, 0.62);
-  --border-color: rgba(255, 255, 255, 0.1);
-  min-height: 100vh;
+/* /giris/danismanlik — danışmanlık ve müşteri girişi.
+   Palet, tipografi, HUD ve buton dili ../styles/kade-gate.css'ten gelir;
+   burada yalnız bu ekranın form bileşenleri var.
+
+   Düzen: tam genişlik HUD + ortalanmış tek sütun + künye satırı. Aynı iskelet
+   KadeAI girişinde de (apps/kadeai/app/kade-skin.css) kullanılır; iki kapı
+   arka arkaya görüldüğü için birebir aynı yapıda duruyorlar. */
+
+.gate-auth {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+}
+
+.gate-auth-main {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   justify-content: center;
-  padding: 100px 20px 60px;
-  position: relative;
-  color: var(--white);
-  background:
-    radial-gradient(60% 48% at 50% 0%, rgba(255, 212, 0, 0.08), transparent 72%),
-    #060606;
+  gap: 20px;
+  padding: clamp(16px, 4vh, 40px) clamp(18px, 4vw, 42px) clamp(24px, 4vh, 44px);
 }
 
-.login-bg-glow {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 400px;
-  background: radial-gradient(ellipse at center, rgba(234, 195, 33, 0.06) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
+.gate-auth-meta {
+  display: flex;
+  width: min(100%, 500px);
+  margin: 0 auto;
+  justify-content: space-between;
+  gap: 20px;
+  color: var(--gate-faint);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.login-card {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 420px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 40px 36px 32px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+.gate-auth-meta a {
+  color: inherit !important;
+  text-decoration: none;
 }
 
-.login-logo {
-  display: block;
-  text-align: center;
-  margin-bottom: 28px;
+.gate-auth-meta a:hover {
+  color: var(--gate-ink) !important;
 }
 
-.login-logo img {
-  display: block;
-  width: min(190px, 100%);
-  height: auto;
+/* --------------------------------------------------------------------------
+   Form
+-------------------------------------------------------------------------- */
+.gate-form-card {
+  width: min(100%, 500px);
   margin: 0 auto;
 }
 
-.login-tabs {
-  display: flex;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 28px;
-  gap: 4px;
+.gate-form-heading h2 {
+  margin: 12px 0 0;
+  color: var(--gate-ink);
+  font-size: clamp(1.875rem, 3vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1.04;
 }
 
-.login-tab {
-  flex: 1;
-  padding: 10px;
-  border: none;
+.gate-form-heading p {
+  max-width: 44ch;
+  margin: 12px 0 0;
+  color: var(--gate-muted);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+.gate-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 22px 0;
+  border: 1px solid var(--gate-line-strong);
+}
+
+.gate-tab {
+  min-height: 46px;
+  border: 0;
+  border-right: 1px solid var(--gate-line-strong);
   background: transparent;
-  color: var(--gray-light);
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: 9px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  color: var(--gate-muted);
   font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
 }
 
-.login-tab.active {
-  background: var(--primary);
-  color: #0a0a0a;
+.gate-tab:last-child {
+  border-right: 0;
 }
 
-.login-tab:not(.active):hover {
-  color: var(--white);
+.gate-tab:hover {
+  color: var(--gate-ink);
 }
 
-.login-form {
+.gate-tab.active {
+  background: var(--gate-accent);
+  color: var(--gate-on-accent);
+}
+
+.gate-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
-.login-field {
+.gate-field {
+  display: block;
+  color: var(--gate-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.gate-field > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.gate-field > span small {
+  color: var(--gate-faint);
+  font-weight: 500;
+  text-transform: none;
+}
+
+.gate-field > div {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.login-field-icon {
+.gate-field-icon {
   position: absolute;
-  left: 14px;
-  color: var(--gray);
+  left: 15px;
+  z-index: 1;
+  color: var(--gate-muted);
   pointer-events: none;
-  flex-shrink: 0;
 }
 
-.login-input {
+/* index.css içindeki `input, textarea, select { ... !important }` bloğu tüm
+   alanlara 14px köşe, krem zemin ve sarı odak halkası dayatıyor. O kural
+   sitenin geri kalanında yerinde; giriş formu sitenin keskin köşeli form
+   dilini kullandığı için burada aynı ağırlıkta geri alınır. */
+.kade-gate .gate-input {
   width: 100%;
-  padding: 13px 44px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  color: var(--white);
-  font-size: 0.9rem;
+  min-height: 54px;
+  border: 1px solid var(--gate-line-strong) !important;
+  border-radius: 0 !important;
+  outline: 0;
+  padding: 0 48px;
+  background: transparent !important;
+  color: var(--gate-ink) !important;
   font-family: inherit;
-  transition: border-color 0.2s ease, background 0.2s ease;
-  outline: none;
+  font-size: 13px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.login-input:focus {
-  border-color: var(--primary);
-  background: rgba(234, 195, 33, 0.04);
+.kade-gate .gate-input::placeholder {
+  color: var(--gate-faint) !important;
 }
 
-.login-input::placeholder {
-  color: var(--gray);
+/* Odak: sert kenar + kaydırılmış vurgu bloğu. Aynı jest KadeAI panelindeki
+   form alanlarında da var; iki ürün yüzeyi tek dil konuşsun. */
+.kade-gate .gate-input:focus {
+  border-color: var(--gate-ink) !important;
+  box-shadow: 4px 4px 0 var(--gate-accent) !important;
 }
 
-.login-field-eye {
+.gate-field-eye {
   position: absolute;
-  right: 14px;
-  background: none;
-  border: none;
-  color: var(--gray);
+  right: 8px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--gate-muted);
   cursor: pointer;
-  padding: 4px;
+}
+
+.gate-field-eye:hover {
+  color: var(--gate-ink);
+}
+
+.gate-field-note {
   display: flex;
   align-items: center;
-  transition: color 0.2s;
-}
-
-.login-field-eye:hover {
-  color: var(--primary);
-}
-
-.login-error {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 0.85rem;
-  color: #f87171;
-  overflow: hidden;
-}
-
-.login-submit {
-  width: 100%;
-  padding: 14px;
-  font-size: 0.95rem;
-  margin-top: 4px;
-  justify-content: center;
-}
-
-.login-submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.login-switch {
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--gray-light);
-  margin-top: 4px;
-}
-
-.login-switch-btn {
-  background: none;
-  border: none;
-  color: var(--primary);
-  font-size: inherit;
-  font-family: inherit;
-  cursor: pointer;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--gate-danger);
+  font-size: 11px;
   font-weight: 600;
-  padding: 0;
+  text-transform: none;
 }
 
-.login-switch-btn:hover {
-  text-decoration: underline;
+/* Şifre gücü — dört kademe, dolan kısım vurgu rengi. */
+.gate-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.login-legal {
-  margin-top: 20px;
+.gate-strength-bar {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.gate-strength-bar i {
+  height: 3px;
+  background: var(--gate-line-strong);
+  transition: background 0.18s ease;
+}
+
+.gate-strength-bar i[data-on='true'] {
+  background: var(--gate-accent);
+}
+
+.gate-strength[data-level='0'] .gate-strength-bar i[data-on='true'],
+.gate-strength[data-level='1'] .gate-strength-bar i[data-on='true'] {
+  background: var(--gate-danger);
+}
+
+.gate-strength small {
+  min-width: 8ch;
+  color: var(--gate-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: right;
+  text-transform: none;
+}
+
+.gate-consent {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+  align-items: start;
+  color: var(--gate-muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.kade-gate .gate-consent input {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border: 1px solid var(--gate-line-strong) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  accent-color: var(--gate-accent);
+}
+
+.gate-consent a {
+  color: var(--gate-ink) !important;
+  font-weight: 700;
+}
+
+.gate-error {
+  overflow: hidden;
+  border: 1px solid var(--gate-danger);
+  padding: 11px 13px;
+  background: var(--gate-danger-bg);
+  color: var(--gate-danger);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.gate-submit {
+  width: 100%;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding: 0 10px 0 20px;
+}
+
+.gate-submit em {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid currentColor;
+  font-size: 15px;
+  font-style: normal;
+}
+
+.gate-switch {
+  margin: 0;
+  color: var(--gate-muted);
   text-align: center;
-  font-size: 0.78rem;
-  color: var(--gray);
+  font-size: 11px;
+}
+
+.gate-switch-btn {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--gate-ink);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Yanlış kapı köprüsü — Content AI ayrı bir hesap. */
+.gate-crosslink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 22px;
+  border: 1px solid var(--gate-line);
+  padding: 14px 16px;
+  background: var(--gate-panel);
+  color: var(--gate-ink) !important;
+  font-size: 11px;
+  text-decoration: none;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.gate-crosslink:hover {
+  border-color: var(--gate-accent);
+  background: color-mix(in srgb, var(--gate-accent) 9%, var(--gate-panel));
+}
+
+.gate-crosslink > span {
+  color: var(--gate-muted);
+}
+
+.gate-crosslink strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.gate-crosslink em {
+  font-style: normal;
+  transition: transform 0.18s ease;
+}
+
+.gate-crosslink:hover em {
+  transform: translate(3px, -3px);
+}
+
+.gate-legal {
+  max-width: 420px;
+  margin: 18px auto 0;
+  color: var(--gate-muted);
+  text-align: center;
+  font-size: 11px;
   line-height: 1.6;
 }
 
-.login-legal a {
-  color: var(--gray-light);
+.gate-legal a {
+  color: var(--gate-muted) !important;
   text-decoration: underline;
 }
 
-.login-legal a:hover {
-  color: var(--primary);
-}
-
-.login-home-link {
-  min-height: 44px;
-  display: flex;
+/* --------------------------------------------------------------------------
+   Oturum kontrolü — panele yönlendirme kararı verilene kadarki ara kare
+-------------------------------------------------------------------------- */
+.gate-auth-main--checking {
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 18px;
-  padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--gray-light);
-  font-size: 0.85rem;
+  gap: 16px;
+  min-height: 45vh;
+}
+
+.gate-auth-main--checking p {
+  margin: 0;
+  color: var(--gate-muted);
+  font-size: 11px;
   font-weight: 600;
-  text-decoration: none;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.login-home-link:hover {
-  background: rgba(255, 212, 0, 0.07);
-  border-color: rgba(255, 212, 0, 0.56);
-  color: var(--primary);
+/* İnce altın yay. Önceki sürümdeki zıplayan "K" bloğu, hemen ardından gelen
+   formun sakin girişiyle aynı ekranda iki farklı hareket dili yaratıyordu. */
+.gate-checking-mark {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--gate-line-strong);
+  border-top-color: var(--gate-accent);
+  border-radius: 50%;
+  animation: gate-spin 0.85s linear infinite;
 }
 
-@media (max-width: 480px) {
-  .login-card {
-    padding: 32px 20px 24px;
-    border-radius: 16px;
+@keyframes gate-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* kade-gate.css'teki genel hareket azaltma kuralı süreyi 0.01ms'ye çekiyor;
+   sonsuz dönen bir yayda bu titremeye dönüşür. Burada tamamen durdurulur:
+   yay sabit kalır, altın ucu yine "bekleniyor" bilgisini taşır. */
+@media (prefers-reduced-motion: reduce) {
+  .gate-checking-mark {
+    animation: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Uyarlama
+-------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  .gate-crosslink {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }

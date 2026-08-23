@@ -114,7 +114,7 @@ export default function ModelSelector({ value, onChange }: ModelSelectorProps) {
         onClick={() => setIsOpen((open) => !open)}
         title={isAutoSelected && autoReason ? autoReason : undefined}
         className={cn(
-          'flex h-12 w-full items-center justify-between gap-3 rounded-lg border bg-zinc-900 px-3 text-left shadow-sm transition-colors',
+          'kade-model-trigger flex w-full items-center justify-between gap-3 rounded-xl border bg-zinc-900 px-3 text-left transition-colors',
           isOpen ? 'border-orange-400' : 'border-zinc-700 hover:border-orange-400'
         )}
         aria-expanded={isOpen}
@@ -134,7 +134,7 @@ export default function ModelSelector({ value, onChange }: ModelSelectorProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-[min(92vw,520px)] overflow-hidden rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl shadow-black/40">
+        <div className="kade-model-menu absolute right-0 z-50 mt-2 overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-900 shadow-xl shadow-black/40">
           <div className="border-b border-zinc-800 p-2">
             <button
               type="button"
@@ -162,37 +162,44 @@ export default function ModelSelector({ value, onChange }: ModelSelectorProps) {
               {value === 'auto' && <Check className="h-4 w-4" />}
             </button>
           </div>
-          <div className="border-b border-zinc-800 p-2">
-            <p className="mb-2 px-1 text-[10px] font-medium uppercase tracking-wider text-zinc-600">Manuel seçim</p>
-            <div className="grid grid-cols-3 gap-1 sm:grid-cols-6">
-              {visibleProviders.map((provider) => {
-                const ProviderIcon = providerIcons[provider.id]
-                const active = activeProvider === provider.id
-                return (
-                  <button
-                    key={provider.id}
-                    type="button"
-                    title={provider.description}
-                    onClick={() => setActiveProvider(provider.id)}
-                    className={cn(
-                      'flex h-8 items-center justify-center gap-1 rounded-lg border px-2 text-[10px] font-semibold transition-colors',
-                      active
-                        ? 'border-orange-500/50 bg-orange-900/30 text-orange-300'
-                        : 'border-transparent text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200'
-                    )}
-                  >
-                    <ProviderIcon className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{provider.label}</span>
-                  </button>
-                )
-              })}
+          {directlyAvailableModels.length > 0 && (
+            <div className="border-b border-zinc-800 p-2">
+              <p className="mb-2 px-1 text-[10px] font-medium uppercase tracking-wider text-zinc-600">Manuel seçim</p>
+              <div className="grid grid-cols-3 gap-1 sm:grid-cols-6">
+                {visibleProviders.map((provider) => {
+                  const ProviderIcon = providerIcons[provider.id]
+                  const active = activeProvider === provider.id
+                  return (
+                    <button
+                      key={provider.id}
+                      type="button"
+                      title={provider.description}
+                      onClick={() => setActiveProvider(provider.id)}
+                      className={cn(
+                        'flex h-8 items-center justify-center gap-1 rounded-lg border px-2 text-[10px] font-semibold transition-colors',
+                        active
+                          ? 'border-orange-500/50 bg-orange-900/30 text-orange-300'
+                          : 'border-transparent text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200'
+                      )}
+                    >
+                      <ProviderIcon className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{provider.label}</span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="max-h-[420px] overflow-y-auto p-2">
             <div className="grid gap-1">
               {!availabilityLoaded && (
                 <p className="px-3 py-6 text-center text-xs text-zinc-500">Çalışan modeller kontrol ediliyor…</p>
+              )}
+              {availabilityLoaded && directlyAvailableModels.length === 0 && (
+                <p className="px-3 py-4 text-center text-xs leading-relaxed text-zinc-500">
+                  Bu ortamda otomatik model yönlendirmesi kullanılıyor.
+                </p>
               )}
               {visibleModels.map((model) => {
                 const ProviderIcon = providerIcons[model.provider]

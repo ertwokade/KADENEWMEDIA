@@ -6,6 +6,8 @@ import kitHtml from '../embedded/kadir-organizasyon-kiti/index.html?raw'
 import kitCss from '../embedded/kadir-organizasyon-kiti/styles.css?raw'
 import kitJs from '../embedded/kadir-organizasyon-kiti/app.js?raw'
 import './OrganizationKit.css'
+import '../styles/kade-gate.css'
+import '../styles/kade-surface.css'
 
 const lucideFallback = `<script>
   window.lucide = window.lucide || {
@@ -149,7 +151,7 @@ export default function OrganizationKitDashboard() {
 
   return (
     <PageTransition>
-      <div className="ok-page ok-studio-page">
+      <div className="kade-surface ok-page ok-studio-page">
         <div className="container ok-studio-container">
           <section className="ok-studio-header">
             <div>

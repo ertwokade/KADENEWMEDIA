@@ -862,6 +862,14 @@ function bindParentBridge(){
     if(event.data?.type==="kade:set-operations-view"){
       const view=event.data.view;
       if(typeof view==="string"&&viewOrder.includes(view))navigateTo(view,false);
+      return;
+    }
+    if(event.data?.type==="kade:set-operations-theme"){
+      const nextTheme=event.data.theme;
+      if(nextTheme==="light"||nextTheme==="dark"){
+        document.documentElement.setAttribute("data-theme",nextTheme);
+        updateThemeBtn(nextTheme);
+      }
     }
   });
 }

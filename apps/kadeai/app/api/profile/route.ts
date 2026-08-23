@@ -9,6 +9,10 @@ import {
 
 export const dynamic = 'force-dynamic'
 
+const hasSupabaseConfig = () => Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
+
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>
 
 function text(value: unknown, max = 500) {
@@ -187,6 +191,9 @@ async function loadAccount(supabase: SupabaseClient, user: { id: string; email?:
 }
 
 export async function GET() {
+  if (!hasSupabaseConfig()) {
+    return NextResponse.json({ error: 'Yerel profil kullanılıyor.', cloud: false }, { status: 401 })
+  }
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -202,6 +209,11 @@ export async function PUT(request: NextRequest) {
   try {
     const size = Number(request.headers.get('content-length') || 0)
     if (size > 100_000) return NextResponse.json({ error: 'Profil verisi çok büyük.' }, { status: 413 })
+    if (!hasSupabaseConfig()) {
+      const body = await request.json()
+      const account = sanitizeAccount(body.account)
+      return NextResponse.json({ account, completion: getProfileCompletion(account), cloud: false })
+    }
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Oturum gerekli.' }, { status: 401 })

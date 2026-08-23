@@ -1,0 +1,345 @@
+/* ============================================================================
+   KADE GATE — giriş kapısı tasarım katmanı
+   ----------------------------------------------------------------------------
+   Giriş ekranları (/giris, /giris/danismanlik) ve ÜRÜN YÜZEYLERİ (müşteri
+   paneli, proje takip, Organizasyon Kiti, link profili, admin, hata/durum
+   sayfaları) buradan beslenir.
+
+   İKİ KAPSAYICI:
+     .kade-gate     tam ekran giriş kapısı — kendi zemini, ızgarası ve
+                    imleç parıltısı vardır.
+     .kade-surface  uygulama içi sayfa — aynı rolleri devralır ama tam ekran
+                    davranışı ve dekoru yoktur; sayfa akışında yaşar.
+   Rol eşlemesi ikisinde de aynıdır, aşağıda tek yerde tanımlanır.
+
+   PALET — kendi rengini TANIMLAMAZ. Her token `styles/kade-tokens.css`teki
+   merkezi `--kade-*` değişkenlerine bağlanır; giriş ekranları uygulamanın
+   geri kalanıyla (müşteri paneli, admin, Organizasyon Kiti, pazarlama
+   sayfaları) aynı paleti kullanır. Bunun iki sonucu var:
+
+     · Tema düğmesi kendiliğinden çalışır. Açık/koyu değerleri kade-tokens.css
+       içinde zaten tanımlı olduğu için burada ikinci bir `[data-theme]` bloğu
+       tutulmaz — palet tek yerden yönetilir.
+     · Marka rengi bir gün değişirse burası dokunulmadan onunla birlikte döner.
+
+   Buradaki `--gate-*` adları bir kopya değil, ROL eşlemesidir: hangi ham
+   tokenın hangi işi yaptığını tek yerde sabitler, sayfa CSS'leri de rolü
+   çağırır. Yeni renk eklemeyin; eksik bir rol varsa yine kade-tokens.css'ten
+   eşleyin.
+
+   VURGU (altın #e0a81f) bir DOLGU rengidir — buton, işaretçi, hover tint.
+   Metin olarak kullanılmaz: koyu zeminde 4.5:1'i geçmez. Altın zemin ÜZERİNE
+   daima --gate-on-accent yazılır; altın METİN gerektiğinde --gate-accent-text
+   (kade-tokens.css'teki --kade-gold-text) kullanılır.
+   ========================================================================== */
+
+.kade-gate,
+.kade-surface {
+  --gate-bg: var(--kade-canvas);
+  --gate-ink: var(--kade-ink);
+  /* Metin tonları bilinçli olarak bir kademe koyu seçildi: giriş ekranlarının
+     etiketleri 11-13px ve kade-tokens.css --kade-ink-4'ü "AA'yı GEÇMEZ, asla
+     okunması gereken metinde kullanmayın" diye işaretliyor.
+       --gate-muted → ink-2  9.3:1  ikincil metin, etiket, ipucu
+       --gate-faint → ink-3  6.5:1  künye, placeholder, yardımcı satır
+     Gerçekten dekoratif olan tek öğe (kart sıra numarası) doğrudan
+     --kade-ink-4'ü çağırır. */
+  --gate-muted: var(--kade-ink-2);
+  --gate-faint: var(--kade-ink-3);
+  --gate-decor: var(--kade-ink-4);
+  --gate-line: var(--kade-line);
+  --gate-line-strong: var(--kade-line-strong);
+  --gate-panel: var(--kade-surface-2);
+  --gate-elevated: var(--kade-elevated);
+  --gate-accent: var(--kade-gold);
+  --gate-accent-text: var(--kade-gold-text);
+  --gate-on-accent: var(--kade-on-brand);
+  --gate-danger: var(--kade-danger);
+  --gate-danger-bg: var(--kade-danger-bg);
+
+  background: var(--gate-bg);
+  color: var(--gate-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Yalnız giriş kapısı: tam ekran ve kendi dekor katmanları. */
+.kade-gate {
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+}
+
+/* Uygulama içi sayfa: sayfa akışında yaşar, ızgarayı kendi kutusuna çizer. */
+.kade-surface {
+  position: relative;
+  isolation: isolate;
+}
+
+/* index.css `h1..h6` için `--font-display` bildiriyor; miras tek başına
+   yetmiyor. Uygulamanın tek font kuralına (Poppins) uyulur, yalnızca
+   başlıkların kapsayıcıdan miras alması sağlanır. */
+.kade-gate h1, .kade-gate h2, .kade-gate h3,
+.kade-surface h1, .kade-surface h2, .kade-surface h3 {
+  font-family: var(--font-sans);
+}
+
+/* Sitenin gövdesindeki işaretçi takipli vurgu parıltısı + eğik ışık bandı.
+   Klonda body::before olarak duruyor; burada kapsayıcıya bağlanır ki giriş
+   ekranı dışına taşmasın. */
+.kade-gate::before {
+  position: absolute;
+  z-index: -2;
+  inset: -25vmax;
+  pointer-events: none;
+  content: '';
+  background:
+    radial-gradient(circle at var(--pointer-x, 50%) var(--pointer-y, 18%), color-mix(in srgb, var(--gate-accent) 14%, transparent), transparent 25%),
+    linear-gradient(115deg, transparent 20%, color-mix(in srgb, var(--gate-ink) 3%, transparent) 50%, transparent 80%);
+}
+
+/* İnce ızgara — iç sayfalardaki hairline düzenin karşılığı. */
+.gate-grid {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--gate-line) 1px, transparent 1px) 0 0 / 25% 100%,
+    linear-gradient(var(--gate-line) 1px, transparent 1px) 0 0 / 100% 180px;
+}
+
+/* ---------------------------------------------------------------------------
+   HUD — sitenin sabit üst şeridi. Giriş ekranlarının çıkmaz sokak olmaması
+   için burada da var: marka sola, siteye dönüş ve tema sağa.
+--------------------------------------------------------------------------- */
+.gate-hud {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px clamp(18px, 4vw, 42px);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.gate-hud-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.32em;
+  color: var(--gate-ink) !important;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.gate-hud-brand span:last-child {
+  color: var(--gate-muted);
+  font-weight: 500;
+}
+
+.gate-hud-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gate-hud-nav a,
+.gate-hud-nav .theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: auto;
+  height: auto;
+  min-height: 34px;
+  border: 2px dotted transparent;
+  border-radius: 0;
+  padding: 6px 9px;
+  background: transparent;
+  color: var(--gate-muted) !important;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.gate-hud-nav a:hover,
+.gate-hud-nav a:focus-visible,
+.gate-hud-nav .theme-toggle:hover,
+.gate-hud-nav .theme-toggle:focus-visible {
+  border-color: var(--gate-ink);
+  outline: none;
+  background: transparent !important;
+  color: var(--gate-ink) !important;
+}
+
+/* Dar ekranda HUD'a üç bağlantı sığmıyor. Kısaltma yerine ikincil bağlantı
+   tamamen düşer: yarım okunan bir etiket ("←") hiç olmamasından daha kötü. */
+@media (max-width: 620px) {
+  .gate-hud {
+    padding: 16px 18px;
+  }
+
+  .gate-hud-nav .gate-hud-optional {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Ortak tipografi — iç sayfalardaki page-head / eyebrow / rule düzeni.
+--------------------------------------------------------------------------- */
+.gate-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  color: var(--gate-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.gate-eyebrow::before {
+  width: 7px;
+  height: 7px;
+  background: var(--gate-accent);
+  border-radius: 50%;
+  content: '';
+}
+
+.gate-lead {
+  max-width: 62ch;
+  margin: 20px 0 0;
+  color: var(--gate-muted);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.gate-rule {
+  height: 1px;
+  background: var(--gate-line);
+}
+
+/* Butonlar — sitedeki .button-link: keskin köşe, vurgu dolgusu, koyu metin. */
+.gate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  border: 1px solid var(--gate-ink);
+  border-radius: 0;
+  padding: 0 18px;
+  background: var(--gate-accent);
+  color: var(--gate-on-accent) !important;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.gate-btn:hover:not(:disabled) {
+  background: var(--gate-ink);
+  color: var(--gate-bg) !important;
+}
+
+.gate-btn:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.gate-btn--ghost {
+  background: transparent;
+  color: var(--gate-ink) !important;
+}
+
+/* Klavye ipuçları ve küçük künye satırları. */
+.gate-kbd {
+  display: inline-grid;
+  min-width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid var(--gate-line-strong);
+  padding: 0 5px;
+  color: var(--gate-muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.gate-footer {
+  border-radius: 12px;
+  background: var(--gate-panel);
+  padding: 24px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.gate-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0;
+}
+
+.gate-footer-grid div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gate-footer-grid dt {
+  color: var(--gate-ink);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.gate-footer-grid dd {
+  margin: 0;
+  color: var(--gate-muted);
+  letter-spacing: 0.02em;
+}
+
+.gate-footer-grid a {
+  color: inherit !important;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gate-line-strong);
+}
+
+.gate-footer-grid a:hover {
+  color: var(--gate-ink) !important;
+}
+
+@media (max-width: 620px) {
+  .gate-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+:where(.kade-gate, .kade-surface) :focus-visible {
+  outline: 2px solid var(--gate-ink);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kade-gate *, .kade-gate *::before, .kade-gate *::after,
+  .kade-surface *, .kade-surface *::before, .kade-surface *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

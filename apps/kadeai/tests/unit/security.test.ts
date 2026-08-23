@@ -200,7 +200,7 @@ test('oturum gerektiren her API route handler kendi kontrolünü de yapar', asyn
   //  2) handler içinde supabase.auth.getUser() + `if (!user)` erken dönüşü.
   // İkincisinde yalnız getUser() çağrısı yetmez; dönen değer kontrol edilmezse
   // sorgu anonim kimlikle çalışır ve RLS tek savunma hattı olarak kalır.
-  const HELPER_GUARD = /requireApiUser|assertAuthenticatedUser|getAuthenticatedUser|hasValidAdminSecret|hasAuthenticatedUser/
+  const HELPER_GUARD = /requireApiUser|requireReaderAccess|requireCollectorAccess|assertAuthenticatedUser|getAuthenticatedUser|hasValidAdminSecret|hasAuthenticatedUser/
   const isGuarded = (source: string) =>
     HELPER_GUARD.test(source)
     || (/auth\.getUser\(\)/.test(source) && /if \(!user\)/.test(source))

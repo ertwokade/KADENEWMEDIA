@@ -54,7 +54,7 @@ kbd {
 
 .kade-panel .kade-sidebar-search:focus {
   background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(242, 195, 34, 0.55) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 55%, transparent) !important;
 }
 
 .kade-panel .kade-sidebar-category {
@@ -62,7 +62,7 @@ kbd {
 }
 
 .kade-panel .kade-sidebar-category[data-active="true"] {
-  color: #f2c322 !important;
+  color: var(--kade-accent) !important;
 }
 
 .kade-panel .kade-sidebar a.kade-sidebar-link[data-active][href] {
@@ -77,9 +77,9 @@ kbd {
 }
 
 .kade-panel .kade-sidebar a.kade-sidebar-link[data-active="true"][href] {
-  background: rgba(242, 195, 34, 0.13) !important;
-  border-color: rgba(242, 195, 34, 0.28) !important;
-  color: #ffe982 !important;
+  background: color-mix(in srgb, var(--kade-accent) 13%, transparent) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 28%, transparent) !important;
+  color: var(--kade-accent-text) !important;
 }
 
 .kade-panel .kade-sidebar svg {
@@ -97,13 +97,13 @@ kbd {
 
 :root {
   --kade-paper: #fbfaf4;
-  --kade-paper-warm: #fff8cc;
+  --kade-paper-warm: #f4f2ea;
   --kade-ink: #050505;
   --kade-muted: #615f55;
   --kade-line: rgba(5, 5, 5, 0.14);
   --kade-line-strong: rgba(5, 5, 5, 0.28);
-  --kade-yellow: #f2c322;
-  --kade-yellow-soft: rgba(242, 195, 34, 0.22);
+  --kade-yellow: var(--kade-accent);
+  --kade-yellow-soft: color-mix(in srgb, var(--kade-accent) 22%, transparent);
   --kade-panel-surface: rgba(255, 255, 255, 0.58);
 }
 
@@ -115,7 +115,7 @@ body {
   background:
     linear-gradient(90deg, var(--kade-line) 1px, transparent 1px),
     linear-gradient(180deg, var(--kade-line) 1px, transparent 1px),
-    radial-gradient(circle at 50% 28%, rgba(242, 195, 34, 0.18), transparent 36%),
+    radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--kade-accent) 18%, transparent), transparent 36%),
     var(--kade-paper);
   background-size: 33.333vw 100%, 100% 33.333vh, auto, auto;
   color: var(--kade-ink);
@@ -149,15 +149,15 @@ body {
 
 aside {
   background:
-    linear-gradient(180deg, rgba(234, 195, 33, 0.05), transparent 32%),
+    linear-gradient(180deg, color-mix(in srgb, var(--kade-accent) 5%, transparent), transparent 32%),
     rgba(8, 9, 13, 0.96) !important;
-  border-color: rgba(234, 195, 33, 0.16) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 16%, transparent) !important;
   box-shadow: 18px 0 70px rgba(0, 0, 0, 0.24);
 }
 
 aside input {
   background: rgba(0, 0, 0, 0.28) !important;
-  border-color: rgba(234, 195, 33, 0.18) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 18%, transparent) !important;
   color: #f4f4f5 !important;
 }
 
@@ -172,25 +172,25 @@ aside button {
 
 aside a:hover,
 aside button:hover {
-  background: rgba(234, 195, 33, 0.08) !important;
+  background: color-mix(in srgb, var(--kade-accent) 8%, transparent) !important;
   color: #f4f4f5 !important;
 }
 
 aside a[class*="bg-"][class*="-50"],
 aside a[class*="bg-zinc-100"] {
-  background: rgba(234, 195, 33, 0.11) !important;
-  border-color: rgba(234, 195, 33, 0.32) !important;
-  color: #fde68a !important;
+  background: color-mix(in srgb, var(--kade-accent) 11%, transparent) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 32%, transparent) !important;
+  color: var(--kade-accent-text) !important;
 }
 
 aside a[class*="bg-"][class*="-50"] svg,
 aside a[class*="bg-zinc-100"] svg {
-  color: #eac321 !important;
+  color: var(--kade-accent) !important;
 }
 
 aside [class*="border-zinc-100"],
 aside [class*="border-zinc-200"] {
-  border-color: rgba(234, 195, 33, 0.14) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 14%, transparent) !important;
 }
 
 aside [class*="bg-zinc-50"],
@@ -201,26 +201,26 @@ aside [class*="bg-white"] {
 
 aside [class*="from-orange-50"],
 aside [class*="to-purple-50"] {
-  background: rgba(234, 195, 33, 0.08) !important;
+  background: color-mix(in srgb, var(--kade-accent) 8%, transparent) !important;
 }
 
 aside .bg-gradient-to-br {
-  background: linear-gradient(135deg, #eac321, #f4d95d) !important;
+  background: linear-gradient(135deg, var(--kade-accent), var(--kade-accent)) !important;
   color: #08090d !important;
-  box-shadow: 0 0 22px rgba(234, 195, 33, 0.22) !important;
+  box-shadow: 0 0 22px color-mix(in srgb, var(--kade-accent) 22%, transparent) !important;
 }
 
 main > div:first-child[class*="border-b"] {
   background:
-    linear-gradient(90deg, rgba(234, 195, 33, 0.045), transparent 46%),
+    linear-gradient(90deg, color-mix(in srgb, var(--kade-accent) 4.5%, transparent), transparent 46%),
     rgba(8, 9, 13, 0.92) !important;
-  border-color: rgba(234, 195, 33, 0.16) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 16%, transparent) !important;
 }
 
 main > div:first-child[class*="border-b"] [class*="rounded-full"] {
-  background: rgba(234, 195, 33, 0.1) !important;
-  border-color: rgba(234, 195, 33, 0.26) !important;
-  color: #eac321 !important;
+  background: color-mix(in srgb, var(--kade-accent) 10%, transparent) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 26%, transparent) !important;
+  color: var(--kade-accent) !important;
 }
 
 aside nav a {
@@ -230,19 +230,19 @@ aside nav a {
 }
 
 aside nav a:hover {
-  background: rgba(234, 195, 33, 0.075) !important;
-  border-color: rgba(234, 195, 33, 0.18) !important;
+  background: color-mix(in srgb, var(--kade-accent) 7.5%, transparent) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 18%, transparent) !important;
   color: #f4f4f5 !important;
 }
 
 aside nav a.font-semibold {
-  background: rgba(234, 195, 33, 0.12) !important;
-  border-color: rgba(234, 195, 33, 0.34) !important;
-  color: #fde68a !important;
+  background: color-mix(in srgb, var(--kade-accent) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 34%, transparent) !important;
+  color: var(--kade-accent-text) !important;
 }
 
 aside nav a.font-semibold svg {
-  color: #eac321 !important;
+  color: var(--kade-accent) !important;
 }
 
 aside nav a[class][href] {
@@ -252,15 +252,15 @@ aside nav a[class][href] {
 }
 
 aside nav a[class][href]:hover {
-  background: rgba(234, 195, 33, 0.075) !important;
-  border-color: rgba(234, 195, 33, 0.18) !important;
+  background: color-mix(in srgb, var(--kade-accent) 7.5%, transparent) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 18%, transparent) !important;
   color: #f4f4f5 !important;
 }
 
 aside nav a[class][href].font-semibold {
-  background: rgba(234, 195, 33, 0.12) !important;
-  border-color: rgba(234, 195, 33, 0.34) !important;
-  color: #fde68a !important;
+  background: color-mix(in srgb, var(--kade-accent) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 34%, transparent) !important;
+  color: var(--kade-accent-text) !important;
 }
 
 @keyframes gradient-shift {
@@ -279,7 +279,7 @@ aside nav a[class][href].font-semibold {
   background:
     linear-gradient(90deg, var(--kade-line) 1px, transparent 1px),
     linear-gradient(180deg, var(--kade-line) 1px, transparent 1px),
-    radial-gradient(circle at 51% 45%, rgba(242, 195, 34, 0.2), transparent 32%),
+    radial-gradient(circle at 51% 45%, color-mix(in srgb, var(--kade-accent) 20%, transparent), transparent 32%),
     var(--kade-paper-warm);
   background-size: 33.333vw 100%, 100% 42vh, auto, auto;
   color: var(--kade-ink);
@@ -425,8 +425,8 @@ aside nav a[class][href].font-semibold {
   font-weight: 1000;
   line-height: 0.8;
   letter-spacing: -0.08em;
-  color: rgba(242, 195, 34, 0.42);
-  filter: blur(0.2px) drop-shadow(0 22px 40px rgba(242, 195, 34, 0.32));
+  color: color-mix(in srgb, var(--kade-accent) 42%, transparent);
+  filter: blur(0.2px) drop-shadow(0 22px 40px color-mix(in srgb, var(--kade-accent) 32%, transparent));
   transform: rotate(-6deg);
 }
 
@@ -704,7 +704,7 @@ aside nav a[class][href].font-semibold {
     background:
       linear-gradient(90deg, var(--kade-line) 1px, transparent 1px),
       linear-gradient(180deg, var(--kade-line) 1px, transparent 1px),
-      radial-gradient(circle at 51% 45%, rgba(242, 195, 34, 0.2), transparent 32%),
+      radial-gradient(circle at 51% 45%, color-mix(in srgb, var(--kade-accent) 20%, transparent), transparent 32%),
       var(--kade-paper-warm);
     background-size: 33.333vw 100%, 100% 42vh, auto, auto;
     color: var(--kade-ink);
@@ -850,8 +850,8 @@ aside nav a[class][href].font-semibold {
     font-weight: 1000;
     line-height: 0.8;
     letter-spacing: -0.08em;
-    color: rgba(242, 195, 34, 0.42);
-    filter: blur(0.2px) drop-shadow(0 22px 40px rgba(242, 195, 34, 0.32));
+    color: color-mix(in srgb, var(--kade-accent) 42%, transparent);
+    filter: blur(0.2px) drop-shadow(0 22px 40px color-mix(in srgb, var(--kade-accent) 32%, transparent));
     transform: rotate(-6deg);
   }
 
@@ -1146,13 +1146,13 @@ aside nav a[class][href].font-semibold {
   }
 
   .kade-panel aside.kade-sidebar nav a.kade-sidebar-link[data-active="true"][href] {
-    background: rgba(242, 195, 34, 0.13) !important;
-    border-color: rgba(242, 195, 34, 0.28) !important;
-    color: #ffe982 !important;
+    background: color-mix(in srgb, var(--kade-accent) 13%, transparent) !important;
+    border-color: color-mix(in srgb, var(--kade-accent) 28%, transparent) !important;
+    color: var(--kade-accent-text) !important;
   }
 
   .kade-panel aside.kade-sidebar nav a.kade-sidebar-link[data-active="true"] svg {
-    color: #f2c322 !important;
+    color: var(--kade-accent) !important;
   }
 
   .kade-panel aside.kade-sidebar .bg-gradient-to-br svg {
@@ -1181,9 +1181,9 @@ aside nav a[class][href].font-semibold {
 }
 
 .kade-theme-toggle:hover {
-  border-color: rgba(242, 195, 34, 0.36);
-  background: rgba(242, 195, 34, 0.1);
-  color: #ffe982;
+  border-color: color-mix(in srgb, var(--kade-accent) 36%, transparent);
+  background: color-mix(in srgb, var(--kade-accent) 10%, transparent);
+  color: var(--kade-accent-text);
 }
 
 .kade-theme-toggle:active {
@@ -1243,9 +1243,9 @@ html[data-theme="light"] .kade-panel .bg-white\/80 {
 
 html[data-theme="light"] .kade-panel .kade-dashboard-hero {
   background:
-    radial-gradient(circle at 88% 10%, rgba(242, 195, 34, 0.22), transparent 34%),
+    radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--kade-accent) 22%, transparent), transparent 34%),
     #11110f !important;
-  border-color: rgba(242, 195, 34, 0.22) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 22%, transparent) !important;
 }
 
 html[data-theme="light"] .kade-panel .text-zinc-100 {
@@ -1292,14 +1292,14 @@ html[data-theme="light"] .kade-panel select {
 
 html[data-theme="light"] .kade-panel main > div:first-child[class*="border-b"] {
   background:
-    linear-gradient(90deg, rgba(224, 168, 31, 0.09), transparent 48%),
+    linear-gradient(90deg, color-mix(in srgb, var(--kade-accent) 9%, transparent), transparent 48%),
     rgba(255, 253, 246, 0.94) !important;
   border-color: rgba(23, 19, 10, 0.12) !important;
 }
 
 html[data-theme="light"] .kade-panel aside.kade-sidebar {
   background:
-    linear-gradient(180deg, rgba(224, 168, 31, 0.08), transparent 32%),
+    linear-gradient(180deg, color-mix(in srgb, var(--kade-accent) 8%, transparent), transparent 32%),
     #fffdf6 !important;
   border-color: rgba(23, 19, 10, 0.11) !important;
   box-shadow: 18px 0 55px rgba(23, 19, 10, 0.07);
@@ -1329,15 +1329,15 @@ html[data-theme="light"] .kade-panel aside.kade-sidebar nav a.kade-sidebar-link[
 }
 
 html[data-theme="light"] .kade-panel aside.kade-sidebar nav a.kade-sidebar-link[data-active][href]:hover {
-  background: rgba(224, 168, 31, 0.08) !important;
-  border-color: rgba(224, 168, 31, 0.2) !important;
+  background: color-mix(in srgb, var(--kade-accent) 8%, transparent) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 20%, transparent) !important;
   color: #17130a !important;
 }
 
 html[data-theme="light"] .kade-panel aside.kade-sidebar nav a.kade-sidebar-link[data-active="true"][href] {
-  background: rgba(224, 168, 31, 0.13) !important;
-  border-color: rgba(224, 168, 31, 0.32) !important;
-  color: #6d5000 !important;
+  background: color-mix(in srgb, var(--kade-accent) 13%, transparent) !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 32%, transparent) !important;
+  color: var(--kade-accent-strong) !important;
 }
 
 html[data-theme="light"] .kade-panel aside.kade-sidebar .kade-theme-toggle {
@@ -1347,9 +1347,9 @@ html[data-theme="light"] .kade-panel aside.kade-sidebar .kade-theme-toggle {
 }
 
 html[data-theme="light"] .kade-panel aside.kade-sidebar .kade-theme-toggle:hover {
-  border-color: rgba(224, 168, 31, 0.42);
-  background: rgba(224, 168, 31, 0.1) !important;
-  color: #6d5000 !important;
+  border-color: color-mix(in srgb, var(--kade-accent) 42%, transparent);
+  background: color-mix(in srgb, var(--kade-accent) 10%, transparent) !important;
+  color: var(--kade-accent-strong) !important;
 }
 
 html[data-theme="light"] .kade-auth-page {
@@ -1405,7 +1405,7 @@ html[data-theme="dark"] body {
   background:
     linear-gradient(90deg, rgba(247, 243, 232, 0.045) 1px, transparent 1px),
     linear-gradient(180deg, rgba(247, 243, 232, 0.045) 1px, transparent 1px),
-    radial-gradient(circle at 50% 28%, rgba(242, 195, 34, 0.12), transparent 36%),
+    radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--kade-accent) 12%, transparent), transparent 36%),
     #08090d;
   color: #f7f3e8;
 }
@@ -1414,7 +1414,7 @@ html[data-theme="dark"] .kade-public {
   background:
     linear-gradient(90deg, var(--kade-line) 1px, transparent 1px),
     linear-gradient(180deg, var(--kade-line) 1px, transparent 1px),
-    radial-gradient(circle at 51% 45%, rgba(242, 195, 34, 0.12), transparent 32%),
+    radial-gradient(circle at 51% 45%, color-mix(in srgb, var(--kade-accent) 12%, transparent), transparent 32%),
     var(--kade-paper-warm);
 }
 

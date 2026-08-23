@@ -7,6 +7,8 @@ import PageTransition from '../components/PageTransition'
 import { organizationKitSections } from '../data/organizationKit'
 import './OrganizationKit.css'
 import NotFound from './NotFound'
+import '../styles/kade-gate.css'
+import '../styles/kade-surface.css'
 
 export default function OrganizationKitSection() {
   const { section } = useParams()
@@ -23,7 +25,7 @@ export default function OrganizationKitSection() {
 
   return (
     <PageTransition>
-      <div className="ok-page">
+      <div className="kade-surface ok-page">
         <div className="container ok-layout">
           <OrganizationKitNav />
 

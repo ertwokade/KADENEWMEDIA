@@ -1,11 +1,33 @@
+/* /@handle — link profili (link-in-bio kartı).
+   ---------------------------------------------------------------------------
+   Bu sayfa kapak görselinin üstünde duran tek bir karttır; sitenin hairline
+   ızgara deseni buraya uymuyor, o yüzden düzen korunur. Marka bağı RENKTEN
+   kurulur: aşağıdaki `--kd-*` rolleri `styles/kade-gate.css` tokenlarından
+   türer, böylece profil kartı da giriş ekranlarıyla aynı altın ve aynı
+   mürekkep ailesini kullanır.
+
+   Kart BİLEREK her iki temada da koyu kalır: üstünde tam kanama bir kapak
+   fotoğrafı var ve açık zeminde fotoğrafın kenarları kayboluyor. Koyu kart,
+   fotoğrafı çerçeveleyen kasıtlı bir karardır — tema düğmesinden bağımsızdır.
+--------------------------------------------------------------------------- */
+.kd-page {
+  --kd-bg: #0e0b08;
+  --kd-surface: #1a1208;
+  --kd-surface-2: rgba(17, 15, 13, 0.65);
+  --kd-ink: #f6eee3;
+  --kd-ink-2: rgba(246, 238, 227, 0.75);
+  --kd-ink-3: rgba(246, 238, 227, 0.58);
+  --kd-line: rgba(244, 235, 224, 0.12);
+}
+
 .kd-page {
   min-height: 100vh;
-  background: #0e0b08;
+  background: var(--kd-bg);
 }
 
 .kd-main {
   min-height: 100vh;
-  background: #0e0b08;
+  background: var(--kd-bg);
   padding: 20px 16px;
   display: flex;
   justify-content: center;
@@ -54,7 +76,7 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(70% 65% at 50% 32%, rgba(14, 11, 8, 0.1) 0%, rgba(14, 11, 8, 0.6) 100%),
+    radial-gradient(70% 65% at 50% 32%, rgba(14, 11, 8, 0.1) 0%, color-mix(in srgb, var(--kd-bg) 60%, transparent) 100%),
     rgba(14, 11, 8, 0.42);
   mix-blend-mode: multiply;
 }
@@ -63,8 +85,8 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(14, 11, 8, 0.35) 0%, rgba(14, 11, 8, 0) 22%, rgba(14, 11, 8, 0) 50%, rgba(14, 11, 8, 0.6) 80%, #000 100%),
-    radial-gradient(120% 90% at 50% 100%, rgba(14, 11, 8, 0.55) 0%, rgba(14, 11, 8, 0) 60%);
+    linear-gradient(180deg, rgba(14, 11, 8, 0.35) 0%, color-mix(in srgb, var(--kd-bg) 0%, transparent) 22%, color-mix(in srgb, var(--kd-bg) 0%, transparent) 50%, color-mix(in srgb, var(--kd-bg) 60%, transparent) 80%, #000 100%),
+    radial-gradient(120% 90% at 50% 100%, rgba(14, 11, 8, 0.55) 0%, color-mix(in srgb, var(--kd-bg) 0%, transparent) 60%);
 }
 
 .kd-cover-topbar {
@@ -86,9 +108,9 @@
   width: 41px;
   height: 41px;
   border-radius: 999px;
-  background: rgba(17, 15, 13, 0.65);
-  color: #f6eee3;
-  box-shadow: 0 1px 0 rgba(244, 235, 224, 0.06) inset;
+  background: var(--kd-surface-2);
+  color: var(--kd-ink);
+  box-shadow: 0 1px 0 var(--kd-line) inset;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(var(--kd-accent-rgb, 212, 148, 63), 0.25);
   cursor: pointer;
@@ -105,16 +127,16 @@
   gap: 4px;
   padding: 4px;
   border-radius: 999px;
-  background: rgba(17, 15, 13, 0.65);
+  background: var(--kd-surface-2);
   border: 1px solid rgba(var(--kd-accent-rgb, 212, 148, 63), 0.25);
-  box-shadow: 0 1px 0 rgba(244, 235, 224, 0.06) inset;
+  box-shadow: 0 1px 0 var(--kd-line) inset;
   backdrop-filter: blur(8px);
 }
 
 .kd-lang-btn {
   border: 0;
   background: transparent;
-  color: rgba(246, 238, 227, 0.7);
+  color: var(--kd-ink-2);
   font-family: var(--font-sans);
   font-size: 0.78rem;
   font-weight: 600;
@@ -125,15 +147,15 @@
 }
 
 .kd-lang-btn.is-active {
-  background: linear-gradient(180deg, #e8b468 0%, var(--kd-accent, #d4943f) 100%);
-  color: #1a1208;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--gate-accent) 72%, #fff) 0%, var(--gate-accent) 100%);
+  color: var(--kd-surface);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset;
 }
 
 .kd-cover-bottom {
   padding: 22px 24px 26px;
   text-align: center;
-  color: #f6eee3;
+  color: var(--kd-ink);
 }
 
 .kd-cover-inner {
@@ -154,7 +176,7 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   margin: 0;
-  background: linear-gradient(180deg, #f6eee3 0%, rgba(244, 235, 224, 0.88) 100%);
+  background: linear-gradient(180deg, var(--kd-ink) 0%, var(--kd-ink) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -171,8 +193,8 @@
   width: 24px;
   height: 24px;
   flex-shrink: 0;
-  fill: var(--kd-accent, #d4943f);
-  color: var(--kd-accent, #d4943f);
+  fill: var(--kd-accent, var(--gate-accent));
+  color: var(--kd-accent, var(--gate-accent));
   filter: drop-shadow(0 0 10px rgba(var(--kd-accent-rgb, 212, 148, 63), 0.75));
 }
 
@@ -181,7 +203,7 @@
   font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 500;
-  color: rgba(244, 235, 224, 0.88);
+  color: var(--kd-ink);
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
 }
 
@@ -204,11 +226,11 @@
   padding: 17px 22px;
   border-radius: 999px;
   border: 1px solid rgba(var(--kd-accent-rgb, 212, 148, 63), 0.2);
-  background: rgba(33, 28, 22, 0.58);
+  background: var(--kd-surface-2);
   box-shadow:
     0 1px 0 rgba(244, 235, 224, 0.04) inset,
     0 8px 24px -12px rgba(0, 0, 0, 0.6);
-  color: #f6eee3;
+  color: var(--kd-ink);
   text-decoration: none;
   transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
 }
@@ -216,7 +238,7 @@
 .kd-link:hover {
   transform: scale(1.01);
   border-color: rgba(var(--kd-accent-rgb, 212, 148, 63), 0.4);
-  background: rgba(43, 36, 27, 0.7);
+  background: var(--kd-surface-2);
 }
 
 .kd-link-icon {
@@ -226,7 +248,7 @@
   flex-shrink: 0;
   width: 24px;
   height: 24px;
-  color: #f6eee3;
+  color: var(--kd-ink);
 }
 
 .kd-link-label {
@@ -236,12 +258,12 @@
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: #f6eee3;
+  color: var(--kd-ink);
 }
 
 .kd-link-arrow {
   flex-shrink: 0;
-  color: rgba(246, 238, 227, 0.58);
+  color: var(--kd-ink-3);
 }
 
 .kd-footer {
@@ -260,30 +282,30 @@
 .kd-footer-sublink {
   font-family: var(--font-sans);
   font-size: 0.76rem;
-  color: rgba(246, 238, 227, 0.4);
+  color: var(--kd-ink-3);
   text-decoration: none;
   transition: color 0.16s ease;
 }
 
 .kd-footer-sublink:hover {
-  color: rgba(246, 238, 227, 0.75);
+  color: var(--kd-ink-2);
 }
 
 .kd-footer-dot {
-  color: rgba(246, 238, 227, 0.3);
+  color: var(--kd-ink-3);
   font-size: 0.76rem;
 }
 
 .kd-footer-link {
   font-family: var(--font-sans);
   font-size: 0.85rem;
-  color: rgba(246, 238, 227, 0.58);
+  color: var(--kd-ink-3);
   text-decoration: none;
   transition: color 0.16s ease;
 }
 
 .kd-footer-link:hover {
-  color: #f6eee3;
+  color: var(--kd-ink);
 }
 
 .kd-toast {
@@ -291,8 +313,8 @@
   top: -4px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--kd-accent, #d4943f);
-  color: #1a1208;
+  background: var(--kd-accent, var(--gate-accent));
+  color: var(--kd-surface);
   font-size: 0.85rem;
   font-weight: 600;
   padding: 8px 16px;
@@ -304,7 +326,7 @@
 .kd-loading-card {
   border-radius: 2rem;
   min-height: 620px;
-  background: linear-gradient(100deg, #17130a 40%, #241c10 50%, #17130a 60%);
+  background: linear-gradient(100deg, var(--gate-on-accent) 40%, color-mix(in srgb, var(--gate-accent) 30%, var(--gate-on-accent)) 50%, var(--gate-on-accent) 60%);
   background-size: 200% 100%;
   animation: kd-shimmer 1.4s ease-in-out infinite;
 }

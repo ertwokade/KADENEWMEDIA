@@ -3,7 +3,19 @@ import { Link } from 'react-router-dom'
 import { useSEO } from '../hooks/useSEO'
 import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
+import '../styles/kade-gate.css'
+import '../styles/kade-surface.css'
+import './ProjectTracking.css'
 
+/**
+ * /proje-takip — müşteri paneline yönlendiren kapı sayfası.
+ *
+ * Önceki sürüm satır içi stillerle yazılmıştı ve ikon dairesi `#6C63FF`
+ * (mor) kullanıyordu; markanın hiçbir yerinde olmayan bir renkti. Sayfa artık
+ * giriş ekranlarıyla aynı dili konuşuyor: ortak tokenlar, keskin köşe,
+ * noktalı eyebrow, hairline ızgara. Yanındaki `ProjectTracking.css` hiçbir
+ * yerden import edilmiyordu (282 satır ölü kod) ve silindi.
+ */
 export default function ProjectTracking() {
   useSEO({
     title: 'Proje Takip | Kade New Media',
@@ -14,28 +26,21 @@ export default function ProjectTracking() {
 
   return (
     <PageTransition>
-      <section className="section" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center' }}>
-        <div className="container" style={{ textAlign: 'center' }}>
+      <section className="kade-surface pt-page">
+        <div className="gate-grid" aria-hidden="true" />
+        <div className="surface-shell pt-shell">
           <FadeIn>
-            <div style={{
-              width: 72, height: 72, borderRadius: '50%',
-              background: 'rgba(108,99,255,0.12)', border: '1.5px solid rgba(108,99,255,0.25)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 28px',
-            }}>
-              <HiOutlineClipboardCheck size={30} color="#6C63FF" />
-            </div>
-            <div className="section-badge" style={{ display: 'inline-flex', marginBottom: 16 }}>
-              <HiOutlineClipboardCheck size={14} /> Proje Takip
-            </div>
-            <h1 className="section-title" style={{ maxWidth: 560, margin: '0 auto 16px' }}>
-              Proje bilgilerinize <span>güvenli erişim</span>
-            </h1>
-            <p className="section-subtitle" style={{ maxWidth: 480, margin: '0 auto 40px' }}>
+            <span className="pt-mark" aria-hidden="true">
+              <HiOutlineClipboardCheck size={22} />
+            </span>
+            <p className="gate-eyebrow">Proje takip</p>
+            <h1>Proje bilgilerinize güvenli erişim</h1>
+            <p className="gate-lead">
               Aktif hizmetleriniz, proje kapsamınız ve teslimat kayıtlarınız müşteri panelinde yer alır.
             </p>
-            <Link to="/musteri-panel" className="btn btn-primary">
+            <Link to="/musteri-panel" className="gate-btn pt-cta">
               Müşteri panelini aç
+              <em aria-hidden="true">↗</em>
             </Link>
           </FadeIn>
         </div>

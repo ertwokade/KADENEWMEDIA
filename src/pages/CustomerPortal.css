@@ -1,296 +1,266 @@
+/* /musteri-panel — müşteri paneli.
+   ---------------------------------------------------------------------------
+   Giriş ekranlarının (styles/kade-gate.css) ve ürün yüzeyi kitinin
+   (styles/kade-surface.css) dilini kullanır: hairline ızgara, keskin köşe,
+   büyük harf mikro etiketler, DOLGU olarak altın. Bu dosyada sabit renk yoktur;
+   hepsi rol tokenlarından gelir, böylece tema düğmesini de izler.
+
+   Sayfanın kendi bölümleri, panelin girişten hemen sonra gelmesi gözetilerek
+   /giris ile aynı ritimde kurulur: "Hangi panele geçmek istiyorsunuz?" bloğu
+   çalışma alanı seçimindeki kart ızgarasının birebir aynısıdır. */
+
 .cp-page {
-  min-height: 100vh;
-  padding-bottom: 80px;
+  min-height: 100svh;
+  background: var(--gate-bg);
+  color: var(--gate-ink);
 }
 
-/* Header */
+.cp-container,
+.cp-header-inner {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 1160px) !important;
+  max-width: none !important;
+  margin: 0 auto;
+  padding-inline: clamp(18px, 4vw, 42px) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Üst şerit — kim olduğun ve çıkış
+-------------------------------------------------------------------------- */
 .cp-header {
-  border-bottom: 1px solid var(--border-color);
-  background: rgba(23, 19, 10, 0.02);
-  padding: 100px 0 24px;
-  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
+  border-bottom: 1px solid var(--gate-line);
 }
 
 .cp-header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-block: clamp(20px, 3vh, 30px) !important;
 }
 
 .cp-header-user {
   display: flex;
+  min-width: 0;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .cp-avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: #0a0a0a;
-  font-size: 1.25rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--gate-ink);
+  border-radius: 0;
+  background: var(--gate-accent);
+  color: var(--gate-on-accent);
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .cp-welcome {
-  font-size: 1.3rem;
+  margin: 0;
+  color: var(--gate-ink);
+  font-size: clamp(1rem, 2vw, 1.25rem);
   font-weight: 700;
-  margin-bottom: 2px;
-  color: var(--white);
+  letter-spacing: -0.03em;
 }
 
 .cp-welcome span {
-  color: var(--primary);
+  color: var(--gate-ink);
 }
 
 .cp-email {
-  font-size: 0.85rem;
-  color: var(--gray-light);
+  margin: 4px 0 0;
+  color: var(--gate-faint);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
 .cp-logout-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 18px;
-  background: rgba(23, 19, 10, 0.04);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  color: var(--gray-light);
-  font-size: 0.85rem;
+  min-height: 40px;
+  border: 1px solid var(--gate-line-strong);
+  border-radius: 0;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--gate-muted);
   font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  transition: border-color 0.18s ease, color 0.18s ease;
 }
 
 .cp-logout-btn:hover {
-  border-color: #ef4444;
-  color: #f87171;
+  border-color: var(--gate-ink);
+  color: var(--gate-ink);
 }
 
-/* Container */
+/* --------------------------------------------------------------------------
+   Gövde
+-------------------------------------------------------------------------- */
 .cp-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.cp-container-with-menu {
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  align-items: start;
+  padding-block: clamp(28px, 5vh, 56px) clamp(36px, 7vh, 80px) !important;
 }
 
 .cp-main-column {
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: clamp(28px, 5vh, 52px);
 }
 
-/* Access hub */
-.cp-access-section {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.cp-access-heading span {
-  display: inline-flex;
-  color: var(--primary);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  margin-bottom: 8px;
+/* Çalışma alanı seçimi — /giris'teki kart ızgarasının aynısı. */
+.cp-access-heading {
+  margin-bottom: clamp(18px, 3vh, 28px);
 }
 
 .cp-access-heading h2 {
-  color: var(--white);
-  font-size: clamp(1.35rem, 3vw, 2rem);
-  line-height: 1.15;
+  max-width: 18ch;
+  margin: 14px 0 0;
+  color: var(--gate-ink);
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
 }
 
-.cp-access-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+/* Eyebrow'u sitedeki noktalı etiketle aynı yap. */
+.cp-access-heading > span,
+.cp-access-heading > p:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--gate-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.cp-access-grid.single {
-  grid-template-columns: minmax(0, 680px);
+.cp-access-heading > span::before,
+.cp-access-heading > p:first-child::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gate-accent);
+  content: '';
 }
 
-.cp-access-card {
-  min-height: 250px;
-  height: 100%;
+.cp-access-section > a,
+.cp-access-section > div > a {
+  position: relative;
+  z-index: 1;
   display: flex;
+  min-height: 200px;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 22px;
-  border: 1px solid rgba(234, 195, 33, 0.18);
-  background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.11), rgba(23, 19, 10, 0.032) 44%),
-    rgba(23, 19, 10, 0.035);
-  border-radius: 16px;
-  padding: 24px;
-  color: var(--white);
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  border: 1px solid var(--gate-line);
+  padding: clamp(20px, 2.4vw, 28px);
+  background: var(--gate-panel);
+  color: var(--gate-ink) !important;
+  text-decoration: none;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease, border-color 0.3s ease;
 }
 
-.cp-access-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(234, 195, 33, 0.36);
-  background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.15), rgba(23, 19, 10, 0.045) 44%),
-    rgba(23, 19, 10, 0.045);
+.cp-access-section > a + a,
+.cp-access-section > div > a + a {
+  margin-top: -1px;
 }
 
-.cp-access-card.business {
-  border-color: rgba(0, 212, 170, 0.18);
-  background:
-    linear-gradient(135deg, rgba(0, 212, 170, 0.11), rgba(108, 142, 245, 0.075) 44%),
-    rgba(23, 19, 10, 0.035);
-}
-
-.cp-access-card.kit {
-  border-color: rgba(234, 195, 33, 0.24);
-  background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.14), rgba(23, 19, 10, 0.036) 44%),
-    rgba(23, 19, 10, 0.035);
-}
-
-.cp-access-card.business:hover {
-  border-color: rgba(0, 212, 170, 0.34);
-  background:
-    linear-gradient(135deg, rgba(0, 212, 170, 0.15), rgba(108, 142, 245, 0.1) 44%),
-    rgba(23, 19, 10, 0.045);
-}
-
-.cp-access-card.kit:hover {
-  border-color: rgba(234, 195, 33, 0.4);
-  background:
-    linear-gradient(135deg, rgba(234, 195, 33, 0.18), rgba(23, 19, 10, 0.048) 44%),
-    rgba(23, 19, 10, 0.045);
+.cp-access-section > a:hover,
+.cp-access-section > div > a:hover {
+  z-index: 2;
+  transform: translateY(-4px);
+  border-color: var(--gate-accent);
+  background: color-mix(in srgb, var(--gate-accent) 9%, var(--gate-panel));
 }
 
 .cp-access-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  border: 1px solid rgba(234, 195, 33, 0.24);
-  background: rgba(234, 195, 33, 0.1);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--gate-ink);
+  border-radius: 0;
+  background: var(--gate-accent);
+  color: var(--gate-on-accent);
 }
 
-.cp-access-card.business .cp-access-icon {
-  border-color: rgba(0, 212, 170, 0.24);
-  background: rgba(0, 212, 170, 0.1);
-  color: #5ff3d3;
+.cp-access-content {
+  margin-top: clamp(22px, 3vw, 34px);
 }
 
-.cp-access-card.kit .cp-access-icon {
-  border-color: rgba(234, 195, 33, 0.28);
-  background: rgba(234, 195, 33, 0.12);
-  color: var(--primary);
-}
-
-.cp-access-content span {
-  color: var(--gray);
-  font-size: 0.76rem;
-  font-weight: 800;
+.cp-access-content > span:first-child {
+  display: block;
+  color: var(--gate-decor);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .cp-access-content h3 {
-  color: var(--white);
-  font-size: clamp(1.15rem, 2.6vw, 1.55rem);
-  line-height: 1.18;
-  margin: 8px 0 9px;
+  margin: 10px 0 0;
+  color: var(--gate-ink);
+  font-size: clamp(1.25rem, 2.4vw, 1.875rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
 }
 
 .cp-access-content p {
-  color: var(--gray-light);
-  font-size: 0.9rem;
+  max-width: 60ch;
+  margin: 10px 0 0;
+  color: var(--gate-muted);
+  font-size: 0.875rem;
   line-height: 1.6;
 }
 
 .cp-access-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--primary);
-  font-size: 0.86rem;
-  font-weight: 800;
-}
-
-.cp-access-card.business .cp-access-cta {
-  color: #5ff3d3;
-}
-
-.cp-access-card.kit .cp-access-cta {
-  color: var(--primary);
-}
-
-/* Empty state */
-.cp-empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  background: rgba(23, 19, 10, 0.02);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-}
-
-.cp-empty-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(234, 195, 33, 0.1);
-  border: 1px solid rgba(234, 195, 33, 0.2);
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
+  gap: 9px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--gate-line);
+  color: var(--gate-ink);
+  font-size: 0.78125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.cp-empty-state h2 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.cp-empty-state p {
-  color: var(--gray-light);
-  margin-bottom: 24px;
-}
-
-/* Card Grid */
+/* --------------------------------------------------------------------------
+   Kart ızgarası — danışmanlık alanları, özellikler, paketler
+-------------------------------------------------------------------------- */
 .cp-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--gate-line);
+  border-left: 1px solid var(--gate-line);
 }
 
 .cp-card {
-  background: rgba(23, 19, 10, 0.03);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 24px;
-  transition: border-color 0.2s ease;
-}
-
-.cp-card:hover {
-  border-color: rgba(234, 195, 33, 0.2);
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border: 0;
+  border-right: 1px solid var(--gate-line);
+  border-bottom: 1px solid var(--gate-line);
+  border-radius: 0;
+  padding: clamp(18px, 2.2vw, 26px);
+  background: var(--gate-panel);
+  box-shadow: none;
 }
 
 .cp-card-full {
@@ -299,286 +269,308 @@
 
 .cp-card-header {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 20px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
 .cp-card-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(234, 195, 33, 0.1);
-  border: 1px solid rgba(234, 195, 33, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--primary);
-  flex-shrink: 0;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--gate-line-strong);
+  border-radius: 0;
+  background: transparent;
+  color: var(--gate-ink);
 }
 
 .cp-card-title {
-  font-size: 1rem;
+  margin: 0;
+  color: var(--gate-ink);
+  font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--white);
-  margin-bottom: 2px;
+  letter-spacing: -0.025em;
 }
 
 .cp-card-subtitle {
-  font-size: 0.8rem;
-  /* --gray açık temada #e6d9ba (açık bej) => krem kartta görünmez.
-     Panel açık-şema tasarlandığı için sabit, kontrastlı koyu ton (WCAG AA). */
-  color: rgba(23, 19, 10, 0.62);
+  margin: 3px 0 0;
+  color: var(--gate-muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
 }
 
 .cp-card-empty {
-  color: var(--gray-light);
-  font-size: 0.9rem;
-  padding: 12px 0;
-}
-
-/* List */
-.cp-list {
-  list-style: none;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 10px;
+  border: 1px dashed var(--gate-line-strong);
+  padding: 20px;
+  color: var(--gate-muted);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.cp-link {
+  color: var(--gate-ink) !important;
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid var(--gate-accent);
+}
+
+.cp-link:hover {
+  border-bottom-color: var(--gate-ink);
+}
+
+.cp-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .cp-list-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.9rem;
-  color: var(--gray-lighter);
+  border-bottom: 1px solid var(--gate-line);
+  padding: 12px 0;
+  color: var(--gate-ink);
+  font-size: 0.8125rem;
+}
+
+.cp-list-item:last-child {
+  border-bottom: 0;
 }
 
 .cp-list-check {
-  color: var(--primary);
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  color: var(--kade-success);
 }
 
-/* Features Grid */
+/* Özellik çipleri — hairline ızgara, iki sütun. */
 .cp-features-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  border-top: 1px solid var(--gate-line);
+  border-left: 1px solid var(--gate-line);
 }
 
 .cp-feature-chip {
   display: flex;
+  min-height: 44px;
   align-items: center;
-  gap: 6px;
-  padding: 7px 13px;
-  background: rgba(234, 195, 33, 0.08);
-  border: 1px solid rgba(234, 195, 33, 0.15);
-  border-radius: 20px;
-  font-size: 0.8rem;
-  color: var(--primary);
+  border: 0;
+  border-right: 1px solid var(--gate-line);
+  border-bottom: 1px solid var(--gate-line);
+  border-radius: 0;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--gate-ink);
+  font-size: 0.75rem;
   font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
-/* Packages Table */
+/* Paket satırları */
 .cp-packages-table {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  border-top: 1px solid var(--gate-line);
 }
 
-.cp-package-row {
+.cp-packages-table > * {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 18px;
-  background: rgba(23, 19, 10, 0.03);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  transition: border-color 0.2s ease;
+  border: 0;
+  border-bottom: 1px solid var(--gate-line);
+  border-radius: 0;
+  padding: 16px 0;
+  background: transparent;
 }
 
-.cp-package-row.cp-package-active {
-  border-color: rgba(234, 195, 33, 0.2);
+.cp-package-info {
+  min-width: 0;
 }
 
 .cp-package-name {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--white);
-  margin-bottom: 4px;
+  margin: 0;
+  color: var(--gate-ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .cp-package-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.78rem;
-  color: var(--gray);
+  gap: 7px;
+  margin: 5px 0 0;
+  color: var(--gate-faint);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
 }
 
-/* Badges */
-.cp-badge {
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
+/* Durum rozeti — yuvarlak hap değil, keskin köşeli etiket. */
+.cp-packages-table span[class*='badge'],
+.cp-packages-table span[class*='status'] {
+  border: 1px solid var(--kade-success);
+  border-radius: 0;
+  padding: 5px 10px;
+  background: transparent;
+  color: var(--kade-success);
+  font-size: 10px;
   font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
-.badge-active {
-  background: rgba(34, 197, 94, 0.12);
-  color: #4ade80;
-  border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-.badge-expired {
-  background: rgba(239, 68, 68, 0.1);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.badge-cancelled {
-  background: rgba(156, 163, 175, 0.1);
-  color: var(--gray-light);
-  border: 1px solid var(--border-color);
-}
-
-/* Stats Row */
+/* --------------------------------------------------------------------------
+   Sayaçlar
+-------------------------------------------------------------------------- */
 .cp-stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  border-top: 1px solid var(--border-color);
-  padding-top: 24px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--gate-line);
+  border-left: 1px solid var(--gate-line);
 }
 
 .cp-stat {
-  text-align: center;
-  padding: 16px;
-  background: rgba(23, 19, 10, 0.02);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  display: flex;
+  min-height: 108px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  border: 0;
+  border-right: 1px solid var(--gate-line);
+  border-bottom: 1px solid var(--gate-line);
+  border-radius: 0;
+  padding: 18px;
+  background: var(--gate-panel);
 }
 
 .cp-stat-num {
-  display: block;
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: var(--primary);
+  color: var(--gate-ink);
+  font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.055em;
   line-height: 1;
-  margin-bottom: 6px;
 }
 
 .cp-stat-label {
-  font-size: 0.78rem;
-  color: rgba(23, 19, 10, 0.62);
+  color: var(--gate-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-/* Support banner */
+/* --------------------------------------------------------------------------
+   Destek şeridi
+-------------------------------------------------------------------------- */
 .cp-support-banner {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 20px;
-  background: rgba(23, 19, 10, 0.02);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  font-size: 0.85rem;
-  color: var(--gray-light);
+  border: 1px solid var(--gate-line);
+  border-radius: 0;
+  padding: 16px 18px;
+  background: var(--gate-panel);
+  color: var(--gate-muted);
+  font-size: 0.8125rem;
 }
 
-.cp-link {
-  color: var(--primary);
-  font-weight: 600;
+.cp-support-banner svg {
+  flex: 0 0 auto;
+  color: var(--gate-ink);
 }
 
-.cp-link:hover {
-  text-decoration: underline;
-}
-
-/* Loading & Error */
-.cp-loading {
-  min-height: 80vh;
+/* --------------------------------------------------------------------------
+   Boş durum, yükleme, hata
+-------------------------------------------------------------------------- */
+.cp-empty-state {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  border: 1px dashed var(--gate-line-strong);
+  border-radius: 0;
+  padding: clamp(28px, 5vh, 52px);
+  background: transparent;
+  color: var(--gate-muted);
+}
+
+.cp-empty-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid var(--gate-line-strong);
+  color: var(--gate-ink);
+}
+
+.cp-loading,
+.cp-error-page {
+  display: flex;
+  min-height: 100svh;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  color: var(--gray);
+  background: var(--gate-bg);
+  color: var(--gate-ink);
+  text-align: center;
 }
 
 .cp-spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid var(--border-color);
-  border-top-color: var(--primary);
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--gate-line-strong);
+  border-top-color: var(--gate-accent);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: cp-spin 0.85s linear infinite;
 }
 
-@keyframes spin {
+@keyframes cp-spin {
   to { transform: rotate(360deg); }
 }
 
-.cp-error-page {
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  text-align: center;
-  color: var(--gray-light);
-  padding: 40px 20px;
-}
-
-.cp-error-page svg {
-  color: #f87171;
-}
-
-.cp-error-page h2 {
-  font-size: 1.2rem;
-  color: var(--white);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .cp-container-with-menu {
-    grid-template-columns: 1fr;
+/* Genel hareket azaltma kuralı süreyi 0.01ms'ye çekiyor; sonsuz dönen bir
+   yayda bu titremeye dönüşür, burada tamamen durdurulur. */
+@media (prefers-reduced-motion: reduce) {
+  .cp-spinner {
+    animation: none !important;
   }
+}
 
+/* --------------------------------------------------------------------------
+   Uyarlama
+-------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .cp-stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
   .cp-grid {
     grid-template-columns: 1fr;
   }
 
-  .cp-access-grid,
-  .cp-access-grid.single {
-    grid-template-columns: 1fr;
-  }
-
-  .cp-card-full {
-    grid-column: 1;
-  }
-
-  .cp-stats-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .cp-header-inner {
-    flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .cp-header {
-    padding-top: 80px;
+    flex-direction: column;
   }
 
-  .cp-package-row {
-    flex-direction: column;
+  .cp-packages-table > * {
     align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
   }
 }

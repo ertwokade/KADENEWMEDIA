@@ -1,175 +1,174 @@
-/* ============================================================================
-   HATA / DURUM SAYFALARI — 404, 401, 403, 429, bakım
-   ----------------------------------------------------------------------------
-   Tek iskelet, tek CSS ailesi. Eskiden `src/pages/NotFound.css` bu dosyanın
-   ilk 52 satırının neredeyse birebir kopyasıydı (`notfound-*` önekiyle); iki
-   dosya birlikte güncellenmediği için hata sayfaları zamanla ayrışıyordu.
-   404'e özel arama kutusu ve popüler sayfa bağlantıları da buraya taşındı.
-
-   Renk ve ölçüler merkezi tokenlardan gelir — bu sayfalar da markanın parçası.
-   ========================================================================== */
+/* Hata ve durum sayfaları — 401, 403, 429, bakım ve 404 tek iskeletten.
+   Renkler `styles/kade-gate.css` rollerinden gelir; burada sabit renk yoktur.
+   Kapsayıcı `.kade-surface` olduğu için ızgara, buton ve tipografi giriş
+   ekranlarıyla aynı dili konuşur. */
 
 .error-state-section {
-  position: relative;
-  min-height: 80vh;
   display: flex;
+  min-height: 100svh;
   align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  background: var(--gate-bg);
 }
 
 .error-state-container {
-  text-align: center;
-  padding: calc(var(--space-16) + var(--space-12)) var(--space-5) var(--space-20);
+  position: relative;
+  z-index: 2;
+  --surface-max: 760px;
+  text-align: left;
 }
 
-/* Durum kodu — altın gradyan yalnız burada, tek ve anlamlı vurgu olarak. */
+/* Kod — dev filigran. Okunması gereken bir metin değil, bu yüzden dekor
+   tonunda; başlık ve mesaj bilgiyi taşır. */
 .error-state-code {
-  font-family: var(--font-sans);
-  font-size: clamp(4.5rem, 12vw, 9rem);
-  font-weight: var(--fw-bold);
-  line-height: var(--lh-tight);
-  letter-spacing: var(--tracking-tight);
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: var(--space-4);
+  color: var(--kade-ink-ghost);
+  font-size: clamp(6rem, 22vw, 15rem);
+  font-weight: 700;
+  letter-spacing: -0.08em;
+  line-height: 0.8;
 }
 
-/* 404'te "0" vurgulanır, "4"ler geri çekilir. */
 .error-state-code--muted {
-  background: none;
-  -webkit-text-fill-color: currentcolor;
-  color: var(--kade-ink-4);
+  font-size: clamp(3.5rem, 12vw, 8rem);
 }
 
-.error-state-code--muted span {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.error-state-section h1 {
+  max-width: 16ch;
+  margin: clamp(18px, 3vh, 32px) 0 0;
+  color: var(--gate-ink);
+  font-size: clamp(1.75rem, 4.4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
 }
 
-.error-state-container h1 {
-  font-size: var(--fs-2xl);
-  line-height: var(--lh-heading);
-  letter-spacing: var(--tracking-tight);
-  color: var(--kade-ink);
-  margin-bottom: var(--space-3);
-}
-
-.error-state-container p {
-  color: var(--kade-ink-2);
-  font-size: var(--fs-md);
-  max-width: 46ch;
-  margin: 0 auto var(--space-8);
-  line-height: var(--lh-body);
+.error-state-section > .surface-shell > p,
+.error-state-section p {
+  max-width: 52ch;
+  margin: 16px 0 0;
+  color: var(--gate-muted);
+  font-size: 0.9375rem;
+  line-height: 1.65;
 }
 
 .error-state-actions {
   display: flex;
-  gap: var(--space-3);
-  justify-content: center;
   flex-wrap: wrap;
+  gap: 0;
+  margin-top: clamp(24px, 4vh, 36px);
 }
 
-/* ── 404: site içi arama ─────────────────────────────────────────────────── */
+/* Butonlar bitişik durur: sitedeki ikili aksiyon deseni. Negatif kenar boşluğu
+   ortadaki çift çizgiyi tekile indirir. */
+.error-state-actions .gate-btn + .gate-btn {
+  margin-left: -1px;
+}
 
+@media (max-width: 520px) {
+  .error-state-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .error-state-actions .gate-btn + .gate-btn {
+    margin-top: -1px;
+    margin-left: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   404'e özgü ek — arama kutusu ve popüler sayfalar
+   ---------------------------------------------------------------------------
+   Yalnız NotFound bu alanları `children` olarak gönderir; diğer dört durum
+   sayfası iskeletle yetinir.
+--------------------------------------------------------------------------- */
 .error-state-search {
   display: flex;
-  max-width: 480px;
-  margin: 0 auto var(--space-6);
-  border: 1px solid var(--kade-line-strong);
-  border-radius: var(--radius-pill);
-  overflow: hidden;
-  background: var(--kade-surface);
+  width: min(100%, 460px);
+  margin-top: clamp(28px, 5vh, 44px);
 }
 
-/* Focus halkası input'ta değil sarmalayıcıda: yuvarlak kenar bozulmasın. */
-.error-state-search:focus-within {
-  border-color: var(--kade-gold);
-  box-shadow: var(--shadow-focus);
-}
-
-.error-state-search-input {
+.kade-surface .error-state-search-input {
   flex: 1;
-  padding: var(--space-3) var(--space-5);
-  background: transparent;
-  border: none;
-  color: var(--kade-ink);
-  font-size: var(--fs-base);
-  outline: none;
-  min-height: var(--tap-min);
+  min-width: 0;
+  min-height: 50px;
+  border: 1px solid var(--gate-line-strong) !important;
+  border-right: 0 !important;
+  border-radius: 0 !important;
+  outline: 0;
+  padding: 0 16px !important;
+  background: transparent !important;
+  color: var(--gate-ink) !important;
+  font-family: inherit;
+  font-size: 13px !important;
+  box-shadow: none !important;
+  transition: border-color 0.18s ease;
 }
 
-.error-state-search-input::placeholder {
-  color: var(--kade-ink-3);
+.kade-surface .error-state-search-input::placeholder {
+  color: var(--gate-faint) !important;
+}
+
+.kade-surface .error-state-search-input:focus {
+  border-color: var(--gate-ink) !important;
 }
 
 .error-state-search-btn {
-  padding: var(--space-3) var(--space-5);
-  background: var(--kade-gold);
-  border: none;
-  color: var(--kade-on-brand);
+  display: grid;
+  width: 50px;
+  height: 50px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--gate-ink);
+  border-radius: 0;
+  background: var(--gate-accent);
+  color: var(--gate-on-accent);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  /* 44px dokunma hedefi — eski sürüm 38px'ti. */
-  min-width: var(--tap-min);
-  min-height: var(--tap-min);
-  justify-content: center;
+  transition: background 0.18s ease, color 0.18s ease;
 }
 
 .error-state-search-btn:hover {
-  background: var(--kade-gold-deep);
+  background: var(--gate-ink);
+  color: var(--gate-bg);
 }
 
-/* ── 404: popüler sayfalar ───────────────────────────────────────────────── */
-
 .error-state-popular {
-  margin-top: var(--space-12);
+  margin-top: clamp(28px, 5vh, 44px);
 }
 
 .error-state-popular-title {
-  font-size: var(--fs-2xs);
-  color: var(--kade-ink-3);
-  letter-spacing: var(--tracking-wider);
+  margin: 0 0 12px !important;
+  color: var(--gate-muted);
+  font-size: 11px !important;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-weight: var(--fw-semibold);
-  margin-bottom: var(--space-4);
 }
 
+/* Bağlantılar hairline ızgarada: kutular bitişik, aralarında tek çizgi. */
 .error-state-popular-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  justify-content: center;
+  display: grid;
+  width: min(100%, 460px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--gate-line);
+  border-left: 1px solid var(--gate-line);
 }
 
 .error-state-popular-link {
-  display: inline-flex;
+  display: flex;
+  min-height: 46px;
   align-items: center;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--kade-line);
-  background: transparent;
-  color: var(--kade-ink-2);
-  font-size: var(--fs-sm);
+  border-right: 1px solid var(--gate-line);
+  border-bottom: 1px solid var(--gate-line);
+  padding: 0 14px;
+  color: var(--gate-ink) !important;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-decoration: none;
-  min-height: var(--tap-min);
-  transition: border-color var(--dur-micro) var(--ease-out),
-              color var(--dur-micro) var(--ease-out);
+  text-transform: uppercase;
+  transition: background 0.18s ease;
 }
 
-.error-state-popular-link:hover,
-.error-state-popular-link:focus-visible {
-  border-color: var(--kade-gold);
-  color: var(--kade-ink);
-}
-
-@media (max-width: 768px) {
-  .error-state-container {
-    padding: calc(var(--space-16) + var(--space-6)) var(--space-4) var(--space-16);
-  }
+.error-state-popular-link:hover {
+  background: color-mix(in srgb, var(--gate-accent) 12%, transparent);
 }

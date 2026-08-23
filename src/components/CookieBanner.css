@@ -182,9 +182,9 @@
 }
 
 .cookie-accept {
-  background: #FFD400;
+  background: var(--kade-gold);
   color: #fffdf7;
-  box-shadow: 0 0 22px rgba(255, 212, 0, 0.28);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--kade-gold) 28%, transparent);
 }
 
 .cookie-decline {
@@ -194,7 +194,7 @@
 }
 
 .cookie-details {
-  color: #FFD400;
+  color: var(--kade-gold);
 }
 
 .kvkk-modal {

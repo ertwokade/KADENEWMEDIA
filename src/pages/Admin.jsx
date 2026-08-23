@@ -74,6 +74,8 @@ import {
   getMediaFileApi,
 } from '../api'
 import './Admin.css'
+import '../styles/kade-gate.css'
+import '../styles/kade-surface.css'
 
 // Local mode is no longer supported — always returns false
 function isLocalMode() { return false }
@@ -122,7 +124,7 @@ function LoginScreen({ onLogin }) {
   }
 
   return (
-    <div className={`admin-login-container ${localStorage.getItem('kade_admin_dark') === 'true' ? 'dark' : ''}`}>
+    <div className={`kade-surface admin-login-container ${localStorage.getItem('kade_admin_dark') === 'true' ? 'dark' : ''}`}>
       <div className="login-bg-pattern" />
       <div className="login-grid-overlay" />
       <motion.div
@@ -270,12 +272,12 @@ function DashboardSection({ stats, onNavigate }) {
           <div className="stat-label">Blog Yazısı</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(234, 195, 33, 0.10)', color: '#eac321' }}>🤝</div>
+          <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--gate-accent) 10%, transparent)', color: 'var(--gate-accent)' }}>🤝</div>
           <div className="stat-number">{stats.partners || 0}</div>
           <div className="stat-label">Partner</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>✉️</div>
+          <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--kade-success) 10%, transparent)', color: 'var(--kade-success)' }}>✉️</div>
           <div className="stat-number">{stats.messages || 0}</div>
           <div className="stat-label">Toplam Mesaj</div>
         </div>
@@ -295,12 +297,12 @@ function DashboardSection({ stats, onNavigate }) {
       <div style={{
         display: 'flex', alignItems: 'center', gap: 16,
         padding: '14px 20px', borderRadius: 12, marginBottom: 16,
-        background: 'rgba(46,204,113,0.06)', border: '1px solid rgba(46,204,113,0.2)',
+        background: 'color-mix(in srgb, var(--kade-success) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--kade-success) 20%, transparent)',
       }}>
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <div style={{
-            width: 10, height: 10, borderRadius: '50%', background: '#2ECC71',
-            boxShadow: visitorPulse ? '0 0 0 6px rgba(46,204,113,0.3)' : '0 0 0 0px rgba(46,204,113,0)',
+            width: 10, height: 10, borderRadius: '50%', background: 'var(--kade-success)',
+            boxShadow: visitorPulse ? '0 0 0 6px color-mix(in srgb, var(--kade-success) 30%, transparent)' : '0 0 0 0px color-mix(in srgb, var(--kade-success) 0%, transparent)',
             transition: 'box-shadow 0.4s ease',
           }} />
         </div>
@@ -309,7 +311,7 @@ function DashboardSection({ stats, onNavigate }) {
             Şu an sitede
           </span>
           {' '}
-          <span style={{ fontSize: '1rem', fontWeight: 700, color: '#2ECC71' }}>
+          <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--kade-success)' }}>
             {liveVisitors === null ? '...' : liveVisitors}
           </span>
           {' '}
@@ -323,7 +325,7 @@ function DashboardSection({ stats, onNavigate }) {
         const rpd = aiUsage.limits?.rpd || 250
         const pct = Math.min(100, Math.round((today / rpd) * 100))
         const remaining = Math.max(0, rpd - today)
-        const color = pct >= 90 ? '#E91E63' : pct >= 70 ? '#eac321' : '#6C63FF'
+        const color = pct >= 90 ? '#E91E63' : pct >= 70 ? 'var(--gate-accent)' : '#6C63FF'
         return (
           <div style={{
             padding: '14px 20px', borderRadius: 12, marginBottom: 16,
@@ -376,7 +378,7 @@ function DashboardSection({ stats, onNavigate }) {
                   style={{
                     width: '100%', maxWidth: 32,
                     height: `${Math.max((val / maxMsg) * 80, 8)}px`,
-                    background: 'linear-gradient(180deg, #eac321 0%, rgba(234,195,33,0.25) 100%)',
+                    background: 'linear-gradient(180deg, var(--gate-accent) 0%, color-mix(in srgb, var(--gate-accent) 25%, transparent) 100%)',
                     borderRadius: '4px 4px 2px 2px',
                     transition: 'height 0.4s ease',
                   }}
@@ -400,7 +402,7 @@ function DashboardSection({ stats, onNavigate }) {
               display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0',
               borderBottom: i < recentPartners.length - 1 ? '1px solid var(--border)' : 'none',
             }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: `${p.color || '#eac321'}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', overflow: 'hidden', flexShrink: 0 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: `${p.color || 'var(--gate-accent)'}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', overflow: 'hidden', flexShrink: 0 }}>
                 {p.logo && (p.logo.startsWith('data:') || p.logo.startsWith('http'))
                   ? <img src={p.logo} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   : <span>{p.logo || '🤝'}</span>
@@ -430,7 +432,7 @@ function DashboardSection({ stats, onNavigate }) {
               </div>
               <div className="dashboard-recent-info">
                 <div className="dashboard-recent-name">
-                  {!msg.read && <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#eac321', marginRight: 6, verticalAlign: 'middle' }} />}
+                  {!msg.read && <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: 'var(--gate-accent)', marginRight: 6, verticalAlign: 'middle' }} />}
                   {msg.name}
                   {msg.company && msg.company !== '-' && <span style={{ color: 'var(--text-tertiary)', fontWeight: 400, fontSize: '0.78rem' }}> · {msg.company}</span>}
                 </div>
@@ -484,7 +486,7 @@ function BlogSeoScore({ form }) {
   ]
   const passed = checks.filter(c => c.pass).length
   const score = Math.round((passed / checks.length) * 100)
-  const color = score >= 80 ? '#2ECC71' : score >= 50 ? '#eac321' : '#EF4444'
+  const color = score >= 80 ? 'var(--kade-success)' : score >= 50 ? 'var(--gate-accent)' : 'var(--gate-danger)'
   const label = score >= 80 ? 'İyi' : score >= 50 ? 'Orta' : 'Zayıf'
 
   return (
@@ -504,7 +506,7 @@ function BlogSeoScore({ form }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
         {checks.map((c, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, fontSize: '0.78rem' }}>
-            <span style={{ color: c.pass ? '#2ECC71' : '#EF4444', flexShrink: 0, marginTop: 1 }}>
+            <span style={{ color: c.pass ? 'var(--kade-success)' : 'var(--gate-danger)', flexShrink: 0, marginTop: 1 }}>
               {c.pass ? '✓' : '✗'}
             </span>
             <span>
@@ -530,11 +532,11 @@ function BlogSection({ showToast }) {
   const [form, setForm] = useState({
     titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
     contentTr: '', contentEn: '', category: '', categoryEn: '',
-    slug: '', image: '', color: '#eac321', readTime: 5, published: true, publishAt: '',
+    slug: '', image: '', color: 'var(--gate-accent)', readTime: 5, published: true, publishAt: '',
     date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
   })
 
-  const colors = ['#6C63FF', '#E91E63', '#eac321', '#2ECC71', '#00BCD4', '#9C27B0', '#FF9800', '#607D8B']
+  const colors = ['#6C63FF', '#E91E63', 'var(--gate-accent)', 'var(--kade-success)', '#00BCD4', '#9C27B0', '#FF9800', '#607D8B']
 
   const fetchBlogs = async () => {
     try {
@@ -562,7 +564,7 @@ function BlogSection({ showToast }) {
     setForm({
       titleTr: '', titleEn: '', excerptTr: '', excerptEn: '',
       contentTr: '', contentEn: '', category: '', categoryEn: '',
-      slug: '', image: '', color: '#eac321', readTime: 5, published: true, publishAt: '',
+      slug: '', image: '', color: 'var(--gate-accent)', readTime: 5, published: true, publishAt: '',
       date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
     })
     setEditingBlog(null)
@@ -577,7 +579,7 @@ function BlogSection({ showToast }) {
       category: blog.category || '', categoryEn: blog.categoryEn || '',
       slug: blog.slug || '',
       image: (blog.image && (blog.image.startsWith('http') || blog.image.startsWith('data:') || blog.image.startsWith('/'))) ? blog.image : '',
-      color: blog.color || '#eac321', readTime: blog.readTime || 5,
+      color: blog.color || 'var(--gate-accent)', readTime: blog.readTime || 5,
       published: blog.published !== false,
       publishAt: blog.publishAt ? new Date(blog.publishAt).toISOString().slice(0, 16) : '',
       date: blog.date || new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -875,7 +877,7 @@ function BlogSection({ showToast }) {
                       onClick={() => setForm({ ...form, published: !form.published })}
                       style={{
                         width: 44, height: 24, borderRadius: 12,
-                        background: form.published ? '#2ECC71' : 'var(--border)',
+                        background: form.published ? 'var(--kade-success)' : 'var(--border)',
                         position: 'relative', cursor: 'pointer', transition: 'background 0.2s',
                         flexShrink: 0,
                       }}
@@ -931,8 +933,8 @@ function BlogSection({ showToast }) {
           <>
           {selectedIds.size > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: 'rgba(239,68,68,0.08)', borderRadius: 8, marginBottom: 12 }}>
-              <span style={{ color: '#EF4444', fontWeight: 600 }}>{selectedIds.size} yazı seçildi</span>
-              <button className="btn btn-outline" style={{ color: '#EF4444', borderColor: '#EF4444', padding: '6px 14px', fontSize: '0.82rem' }} onClick={handleBulkDelete}>
+              <span style={{ color: 'var(--gate-danger)', fontWeight: 600 }}>{selectedIds.size} yazı seçildi</span>
+              <button className="btn btn-outline" style={{ color: 'var(--gate-danger)', borderColor: 'var(--gate-danger)', padding: '6px 14px', fontSize: '0.82rem' }} onClick={handleBulkDelete}>
                 🗑️ Seçilenleri Sil
               </button>
               <button className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '0.82rem' }} onClick={() => setSelectedIds(new Set())}>
@@ -993,8 +995,8 @@ function BlogSection({ showToast }) {
                       }}
                       style={{
                         padding: '4px 10px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600,
-                        background: blog.published !== false ? 'rgba(46,204,113,0.15)' : 'rgba(156,163,175,0.12)',
-                        color: blog.published !== false ? '#2ECC71' : 'var(--text-tertiary)',
+                        background: blog.published !== false ? 'color-mix(in srgb, var(--kade-success) 15%, transparent)' : 'rgba(156,163,175,0.12)',
+                        color: blog.published !== false ? 'var(--kade-success)' : 'var(--text-tertiary)',
                       }}
                     >
                       {blog.published !== false ? '● Yayında' : '○ Taslak'}
@@ -1003,7 +1005,7 @@ function BlogSection({ showToast }) {
                   <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                     {blog.date}
                     {blog.publishAt && new Date(blog.publishAt) > new Date() && (
-                      <div style={{ color: '#eac321', fontSize: '0.75rem', marginTop: 2 }}>
+                      <div style={{ color: 'var(--gate-accent)', fontSize: '0.75rem', marginTop: 2 }}>
                         ⏰ {new Date(blog.publishAt).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                       </div>
                     )}
@@ -1747,7 +1749,7 @@ function FAQEditor({ data, onSave }) {
 
 // ========== TESTIMONIALS EDITOR ==========
 function TestimonialsEditor({ data, onSave }) {
-  const emptyItem = { nameTr: '', nameEn: '', roleTr: '', roleEn: '', textTr: '', textEn: '', avatar: '', color: '#eac321' }
+  const emptyItem = { nameTr: '', nameEn: '', roleTr: '', roleEn: '', textTr: '', textEn: '', avatar: '', color: 'var(--gate-accent)' }
   const [items, setItems] = useState(data.items?.length ? data.items : [{ ...emptyItem }])
 
   useEffect(() => { if (data.items?.length) setItems(data.items) }, [data])
@@ -1757,7 +1759,7 @@ function TestimonialsEditor({ data, onSave }) {
     setItems(updated)
   }
 
-  const colors = ['#eac321', '#6C63FF', '#2ECC71', '#E91E63', '#00BCD4', '#FF9800']
+  const colors = ['var(--gate-accent)', '#6C63FF', 'var(--kade-success)', '#E91E63', '#00BCD4', '#FF9800']
 
   return (
     <div className="admin-form">
@@ -2092,7 +2094,7 @@ function PartnersSection({ showToast }) {
   const [showForm, setShowForm] = useState(false)
   const [editingPartner, setEditingPartner] = useState(null)
   const [form, setForm] = useState({
-    slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#eac321',
+    slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: 'var(--gate-accent)',
     descTr: '', descEn: '', longDescTr: '', longDescEn: '',
     servicesTr: '', servicesEn: '', resultsTr: '', resultsEn: '',
   })
@@ -2121,7 +2123,7 @@ function PartnersSection({ showToast }) {
 
   const resetForm = () => {
     setForm({
-      slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: '#eac321',
+      slug: '', name: '', category: '', categoryEn: '', logo: '🏢', color: 'var(--gate-accent)',
       descTr: '', descEn: '', longDescTr: '', longDescEn: '',
       servicesTr: '', servicesEn: '', resultsTr: '', resultsEn: '',
     })
@@ -2133,7 +2135,7 @@ function PartnersSection({ showToast }) {
     setForm({
       slug: partner.id || '', name: partner.name || '',
       category: partner.category || '', categoryEn: partner.categoryEn || '',
-      logo: partner.logo || '🏢', color: partner.color || '#eac321',
+      logo: partner.logo || '🏢', color: partner.color || 'var(--gate-accent)',
       descTr: partner.descTr || '', descEn: partner.descEn || '',
       longDescTr: partner.longDescTr || '', longDescEn: partner.longDescEn || '',
       servicesTr: (partner.servicesTr || []).join(', '),
@@ -2247,7 +2249,7 @@ function PartnersSection({ showToast }) {
                         type="text"
                         value={form.color}
                         onChange={(e) => setForm({ ...form, color: e.target.value })}
-                        placeholder="#eac321"
+                        placeholder="var(--gate-accent)"
                         style={{ flex: 1, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.88rem' }}
                       />
                       <div style={{ width: 32, height: 32, borderRadius: 8, background: form.color, border: '1px solid var(--border)', flexShrink: 0 }} />
@@ -2370,7 +2372,7 @@ function PartnersSection({ showToast }) {
                   <td>
                     <strong>{p.name}</strong>
                   </td>
-                  <td><span className="status-badge" style={{ background: `${p.color || '#eac321'}20`, color: p.color || '#eac321' }}>{p.category}</span></td>
+                  <td><span className="status-badge" style={{ background: `${p.color || 'var(--gate-accent)'}20`, color: p.color || 'var(--gate-accent)' }}>{p.category}</span></td>
                   <td>
                     <div className="table-actions">
                       <button className="table-action-btn" onClick={() => handleEdit(p)}><HiOutlinePencil size={14} /> Düzenle</button>
@@ -2407,11 +2409,11 @@ function profilePublicPath(slug) {
   return `/@${slug}`
 }
 
-const LINK_PROFILE_ACCENT_PRESETS = ['#d4943f', '#e0a81f', '#3fb6d4', '#8f6ad4', '#d4423f', '#4fd47a']
+const LINK_PROFILE_ACCENT_PRESETS = ['var(--gate-accent)', '#e0a81f', '#3fb6d4', '#8f6ad4', '#d4423f', '#4fd47a']
 
 const emptyLinkProfileForm = () => ({
   slug: '', name: '', handle: '', tagline: '', photo: '', active: true,
-  accentColor: '#d4943f',
+  accentColor: 'var(--gate-accent)',
   links: [{ label: '', url: '', icon: 'instagram' }],
 })
 
@@ -2445,7 +2447,7 @@ function LinkProfilesSection({ showToast }) {
     setForm({
       slug: profile.slug || '', name: profile.name || '', handle: profile.handle || '',
       tagline: profile.tagline || '', photo: profile.photo || '', active: profile.active !== false,
-      accentColor: profile.accentColor || '#d4943f',
+      accentColor: profile.accentColor || 'var(--gate-accent)',
       links: profile.links?.length
         ? profile.links.map((l) => ({ label: l?.label || '', url: l?.url || '', icon: l?.icon || 'instagram' }))
         : [{ label: '', url: '', icon: 'instagram' }],
@@ -2484,7 +2486,7 @@ function LinkProfilesSection({ showToast }) {
       tagline: form.tagline.trim(),
       photo: form.photo,
       active: form.active,
-      accentColor: form.accentColor || '#d4943f',
+      accentColor: form.accentColor || 'var(--gate-accent)',
       links: normalizedLinks,
     }
     try {
@@ -2595,7 +2597,7 @@ function LinkProfilesSection({ showToast }) {
                       type="text"
                       value={form.accentColor}
                       onChange={(e) => setForm({ ...form, accentColor: e.target.value })}
-                      placeholder="#d4943f"
+                      placeholder="var(--gate-accent)"
                       style={{ flex: 1, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.88rem' }}
                     />
                   </div>
@@ -2877,10 +2879,10 @@ function ShortLinksSection({ showToast }) {
 // ========== MESSAGES ==========
 const LEAD_STATUSES = [
   { value: 'yeni', label: 'Yeni', color: '#6C63FF' },
-  { value: 'gorusme-bekliyor', label: 'Görüşme Bekliyor', color: '#eac321' },
+  { value: 'gorusme-bekliyor', label: 'Görüşme Bekliyor', color: 'var(--gate-accent)' },
   { value: 'teklif-gonderildi', label: 'Teklif Gönderildi', color: '#00BCD4' },
-  { value: 'kazanildi', label: 'Kazanıldı', color: '#2ECC71' },
-  { value: 'kaybedildi', label: 'Kaybedildi', color: '#ff4444' },
+  { value: 'kazanildi', label: 'Kazanıldı', color: 'var(--kade-success)' },
+  { value: 'kaybedildi', label: 'Kaybedildi', color: 'var(--gate-danger)' },
 ]
 
 function LeadStatusBadge({ status }) {
@@ -2894,9 +2896,9 @@ function LeadStatusBadge({ status }) {
 
 function exportToExcel(headers, rows, filename) {
   const escCell = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-  const headerCells = headers.map(h => `<th style="background:#1a1a2e;color:#eac321;font-weight:bold;padding:10px 14px;border:1px solid #444;font-size:13px;white-space:nowrap;">${escCell(h)}</th>`).join('')
+  const headerCells = headers.map(h => `<th style="background:#1a1a2e;color:var(--gate-accent);font-weight:bold;padding:10px 14px;border:1px solid #444;font-size:13px;white-space:nowrap;">${escCell(h)}</th>`).join('')
   const dataRows = rows.map((r, i) =>
-    '<tr>' + r.map(v => `<td style="background:${i % 2 === 0 ? '#f9f9f9' : '#fff'};padding:8px 12px;border:1px solid #ddd;font-size:12px;">${escCell(v)}</td>`).join('') + '</tr>'
+    '<tr>' + r.map(v => `<td style="background:${i % 2 === 0 ? 'var(--gate-panel)' : '#fff'};padding:8px 12px;border:1px solid #ddd;font-size:12px;">${escCell(v)}</td>`).join('') + '</tr>'
   ).join('')
   const html = `
     <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
@@ -2924,9 +2926,9 @@ function exportMessagesExcel(messages) {
 
 const NOTE_TYPES = {
   note: { label: 'Not', Icon: HiOutlineAnnotation, color: 'var(--text-tertiary)', bg: 'rgba(156,163,175,0.15)' },
-  call: { label: 'Telefon', Icon: HiOutlinePhone, color: '#2ECC71', bg: 'rgba(46,204,113,0.15)' },
+  call: { label: 'Telefon', Icon: HiOutlinePhone, color: 'var(--kade-success)', bg: 'color-mix(in srgb, var(--kade-success) 15%, transparent)' },
   email: { label: 'E-posta', Icon: HiOutlineMail, color: '#6C63FF', bg: 'rgba(108,99,255,0.15)' },
-  meeting: { label: 'Toplantı', Icon: HiOutlineUserGroup, color: '#EAC321', bg: 'rgba(234,195,33,0.15)' },
+  meeting: { label: 'Toplantı', Icon: HiOutlineUserGroup, color: 'var(--gate-accent)', bg: 'color-mix(in srgb, var(--gate-accent) 15%, transparent)' },
 }
 
 function getNoteTypeMeta(type) {
@@ -3253,7 +3255,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
               </div>
 
               <div className="admin-form-actions" style={{ marginTop: 16 }}>
-                <button className="btn btn-outline" style={{ color: '#EF4444', borderColor: '#EF4444' }} onClick={() => handleDelete(selectedMessage._id)}>
+                <button className="btn btn-outline" style={{ color: 'var(--gate-danger)', borderColor: 'var(--gate-danger)' }} onClick={() => handleDelete(selectedMessage._id)}>
                   <HiOutlineTrash size={16} /> Sil
                 </button>
                 <a href={`mailto:${selectedMessage.email}`} className="btn btn-outline" title="Varsayılan e-posta uygulamasıyla aç">
@@ -3541,7 +3543,7 @@ function SettingsSection({ showToast }) {
             {smtpTesting ? '⏳ Test ediliyor...' : '🔌 SMTP Bağlantısını Test Et'}
           </button>
           {smtpResult && (
-            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: smtpResult.success ? '#2ECC71' : '#E91E63' }}>
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: smtpResult.success ? 'var(--kade-success)' : '#E91E63' }}>
               {smtpResult.success ? '✓' : '✕'} {smtpResult.message}
             </span>
           )}
@@ -3651,7 +3653,7 @@ function CalendarSection({ showToast }) {
   const dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
 
   const platformIcons = { instagram: '📸', tiktok: '🎵', youtube: '🎬', linkedin: '💼', facebook: '📘' }
-  const statusColors = { planned: '#6C63FF', ready: '#eac321', published: '#2ECC71', cancelled: '#ff4444' }
+  const statusColors = { planned: '#6C63FF', ready: 'var(--gate-accent)', published: 'var(--kade-success)', cancelled: 'var(--gate-danger)' }
   const statusLabels = { planned: 'Planlandı', ready: 'Hazır', published: 'Yayınlandı', cancelled: 'İptal' }
   const typeLabels = { post: 'Gönderi', story: 'Story', reel: 'Reels', video: 'Video', live: 'Canlı Yayın', ad: 'Reklam' }
 
@@ -3829,8 +3831,8 @@ function CalendarSection({ showToast }) {
         {[
           { label: 'Bu Ay Toplam', value: monthStats.total, color: '#6C63FF' },
           { label: 'Planlandı', value: monthStats.planned, color: '#6C63FF' },
-          { label: 'Hazır', value: monthStats.ready, color: '#eac321' },
-          { label: 'Yayınlandı', value: monthStats.published, color: '#2ECC71' },
+          { label: 'Hazır', value: monthStats.ready, color: 'var(--gate-accent)' },
+          { label: 'Yayınlandı', value: monthStats.published, color: 'var(--kade-success)' },
         ].map(s => (
           <div key={s.label} className="admin-stat-card" style={{ padding: 16 }}>
             <div className="stat-number" style={{ fontSize: '1.6rem', color: s.color, background: 'none', WebkitTextFillColor: s.color }}>{s.value}</div>
@@ -3870,7 +3872,7 @@ function CalendarSection({ showToast }) {
                   borderBottom: '1px solid var(--border)',
                   borderRight: '1px solid var(--border)',
                   cursor: 'pointer',
-                  background: isToday(day) ? 'rgba(234, 195, 33, 0.06)' : 'transparent',
+                  background: isToday(day) ? 'color-mix(in srgb, var(--gate-accent) 6%, transparent)' : 'transparent',
                   transition: 'background 0.2s',
                 }}
                 onMouseEnter={e => { if (!isToday(day)) e.currentTarget.style.background = 'var(--accent-alpha)' }}
@@ -4090,9 +4092,9 @@ function CalendarSection({ showToast }) {
                                     style={{
                                       padding: '6px 12px',
                                       borderRadius: 8,
-                                      border: `1px solid ${inviteRecipients.includes(u._id) ? '#eac321' : 'var(--border)'}`,
-                                      background: inviteRecipients.includes(u._id) ? 'rgba(234,195,33,0.15)' : 'transparent',
-                                      color: inviteRecipients.includes(u._id) ? '#eac321' : 'var(--text-secondary)',
+                                      border: `1px solid ${inviteRecipients.includes(u._id) ? 'var(--gate-accent)' : 'var(--border)'}`,
+                                      background: inviteRecipients.includes(u._id) ? 'color-mix(in srgb, var(--gate-accent) 15%, transparent)' : 'transparent',
+                                      color: inviteRecipients.includes(u._id) ? 'var(--gate-accent)' : 'var(--text-secondary)',
                                       cursor: 'pointer',
                                       fontSize: '0.82rem',
                                       fontWeight: 600,
@@ -4141,7 +4143,7 @@ function CalendarSection({ showToast }) {
                                     <button
                                       type="button"
                                       onClick={() => setInviteCustomEmails(prev => prev.filter(e => e !== email))}
-                                      style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', padding: 0 }}
+                                      style={{ background: 'none', border: 'none', color: 'var(--gate-danger)', cursor: 'pointer', padding: 0 }}
                                     >
                                       <HiOutlineX size={12} />
                                     </button>
@@ -4247,7 +4249,7 @@ function UsersSection({ showToast }) {
   })
 
   const roleLabels = { admin: 'Admin', editor: 'Editör', viewer: 'İzleyici' }
-  const roleColors = { admin: '#E91E63', editor: '#eac321', viewer: '#6C63FF' }
+  const roleColors = { admin: '#E91E63', editor: 'var(--gate-accent)', viewer: '#6C63FF' }
 
   const fetchUsers = async () => {
     try {
@@ -4596,9 +4598,9 @@ function NotificationDropdown({ show, onClose }) {
 
 // ========== ANALYTICS SECTION ==========
 const SOURCE_META = {
-  organic:     { name: 'Organik Arama',   icon: '🔍', color: '#2ECC71', desc: 'Google, Bing, Yandex gibi arama motorlarından gelen ziyaretçiler' },
+  organic:     { name: 'Organik Arama',   icon: '🔍', color: 'var(--kade-success)', desc: 'Google, Bing, Yandex gibi arama motorlarından gelen ziyaretçiler' },
   social:      { name: 'Sosyal Medya',    icon: '📱', color: '#6C63FF', desc: 'Instagram, TikTok, Facebook gibi sosyal platformlardan gelenler' },
-  direct:      { name: 'Direkt',          icon: '🔗', color: '#eac321', desc: "URL'yi doğrudan yazan, bookmark kullanan veya kaynağı bilinmeyen ziyaretçiler" },
+  direct:      { name: 'Direkt',          icon: '🔗', color: 'var(--gate-accent)', desc: "URL'yi doğrudan yazan, bookmark kullanan veya kaynağı bilinmeyen ziyaretçiler" },
   referral:    { name: 'Referans',        icon: '🌐', color: '#E91E63', desc: 'Başka bir web sitesindeki linkten tıklayarak gelenler' },
   paid:        { name: 'Ücretli Arama',   icon: '💰', color: '#FF9800', desc: 'Google Ads gibi ücretli arama reklamlarından gelenler' },
   paid_social: { name: 'Ücretli Sosyal',  icon: '💎', color: '#9C27B0', desc: 'Meta Ads, TikTok Ads gibi sosyal medya reklamlarından gelenler' },
@@ -4686,7 +4688,7 @@ function AnalyticsSection() {
               ? 'Google Analytics 4 verileri'
               : 'Site ziyaret istatistikleri'}
             {dataSource === 'ga4' && (
-              <span style={{ marginLeft: 8, fontSize: '0.72rem', background: 'rgba(46,204,113,0.15)', color: '#2ECC71', padding: '2px 8px', borderRadius: 6, fontWeight: 600 }}>
+              <span style={{ marginLeft: 8, fontSize: '0.72rem', background: 'color-mix(in srgb, var(--kade-success) 15%, transparent)', color: 'var(--kade-success)', padding: '2px 8px', borderRadius: 6, fontWeight: 600 }}>
                 GA4
               </span>
             )}
@@ -4723,7 +4725,7 @@ function AnalyticsSection() {
         // (Öncelik 7). Kısa, teknik olmayan bir bilgi notuyla değiştirildi;
         // gerçek kurulum ortam değişkenleri "Sistem Sağlığı" ekranından
         // (yalnızca var/yok olarak) izlenir.
-        <div className="admin-form" style={{ marginBottom: 16, padding: '10px 16px', background: 'rgba(234,195,33,0.06)', border: '1px solid rgba(234,195,33,0.15)' }}>
+        <div className="admin-form" style={{ marginBottom: 16, padding: '10px 16px', background: 'color-mix(in srgb, var(--gate-accent) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--gate-accent) 15%, transparent)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
             <span>ℹ️ Şu an <strong>dahili analitik</strong> gösteriliyor. Google Analytics 4 bağlamak için sunucu ortam değişkenlerinin yapılandırılması gerekir (sistem yöneticisi).</span>
           </div>
@@ -4739,25 +4741,25 @@ function AnalyticsSection() {
           <div className="stat-number">{loading ? '—' : totalVisits.toLocaleString('tr-TR')}</div>
           <div className="stat-label">Toplam Sayfa Goruntuleme</div>
           {growth !== null && !loading && (
-            <div style={{ fontSize: '0.75rem', color: growth >= 0 ? '#2ECC71' : '#E91E63', marginTop: 4 }}>
+            <div style={{ fontSize: '0.75rem', color: growth >= 0 ? 'var(--kade-success)' : '#E91E63', marginTop: 4 }}>
               {growth >= 0 ? '+' : ''}{growth}% onceki doneme gore
             </div>
           )}
         </div>
         {activeUsers !== undefined && activeUsers !== null && (
           <div className="admin-stat-card">
-            <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>AU</div>
+            <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--kade-success) 10%, transparent)', color: 'var(--kade-success)' }}>AU</div>
             <div className="stat-number">{loading ? '—' : activeUsers}</div>
             <div className="stat-label">Bugunku Aktif Kullanici</div>
           </div>
         )}
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(234, 195, 33, 0.10)', color: '#eac321' }}>PG</div>
+          <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--gate-accent) 10%, transparent)', color: 'var(--gate-accent)' }}>PG</div>
           <div className="stat-number">{loading ? '—' : pages.length}</div>
           <div className="stat-label">Ziyaret Edilen Sayfa</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(46, 204, 113, 0.10)', color: '#2ECC71' }}>AV</div>
+          <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--kade-success) 10%, transparent)', color: 'var(--kade-success)' }}>AV</div>
           <div className="stat-number">{loading ? '—' : dailyData.length > 0 ? Math.round(totalVisits / dailyData.length) : 0}</div>
           <div className="stat-label">Gunluk Ortalama</div>
         </div>
@@ -4797,7 +4799,7 @@ function AnalyticsSection() {
                     background: d.count > 0
                       ? dataSource === 'ga4'
                         ? 'linear-gradient(180deg, #4285F4 0%, rgba(66,133,244,0.35) 100%)'
-                        : 'linear-gradient(180deg, #eac321 0%, rgba(234,195,33,0.35) 100%)'
+                        : 'linear-gradient(180deg, var(--gate-accent) 0%, color-mix(in srgb, var(--gate-accent) 35%, transparent) 100%)'
                       : 'rgba(255,255,255,0.06)',
                     borderRadius: '4px 4px 2px 2px',
                     transition: 'height 0.5s ease',
@@ -4841,7 +4843,7 @@ function AnalyticsSection() {
             const r = 60, cx = 80, cy = 80, sw = 18
             let offset = 0
             const slices = sources.map(s => {
-              const meta = SOURCE_META[s.key] || { color: '#888' }
+              const meta = SOURCE_META[s.key] || { color: 'var(--gate-muted)' }
               const pct = s.value / 100
               const circumference = 2 * Math.PI * r
               const dashLen = circumference * pct
@@ -4872,7 +4874,7 @@ function AnalyticsSection() {
           {!loading && sources.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12, width: '100%' }}>
               {sources.map((s, i) => {
-                const meta = SOURCE_META[s.key] || { name: s.name, icon: '📊', color: '#888' }
+                const meta = SOURCE_META[s.key] || { name: s.name, icon: '📊', color: 'var(--gate-muted)' }
                 return (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.78rem' }}>
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: meta.color, flexShrink: 0 }} />
@@ -4900,7 +4902,7 @@ function AnalyticsSection() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {sources.map((s, i) => {
-                const meta = SOURCE_META[s.key] || { name: s.name, icon: '📊', color: '#888', desc: '' }
+                const meta = SOURCE_META[s.key] || { name: s.name, icon: '📊', color: 'var(--gate-muted)', desc: '' }
                 const hasDetails = s.details?.length > 0
                 return (
                   <div key={i} style={{ padding: '14px 16px', background: 'var(--bg-secondary)', borderRadius: 12, borderLeft: `3px solid ${meta.color}` }}>
@@ -4922,7 +4924,7 @@ function AnalyticsSection() {
                     {hasDetails && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
                         {s.details.map((d, j) => {
-                          const dm = DETAIL_META[d.key] || { name: d.key, icon: '•', color: '#888' }
+                          const dm = DETAIL_META[d.key] || { name: d.key, icon: '•', color: 'var(--gate-muted)' }
                           return (
                             <div key={j} style={{
                               display: 'flex', alignItems: 'center', gap: 4,
@@ -4956,7 +4958,7 @@ function AnalyticsSection() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
             {[
               {
-                icon: '🔍', title: 'SEO Optimizasyonu', color: '#2ECC71',
+                icon: '🔍', title: 'SEO Optimizasyonu', color: 'var(--kade-success)',
                 desc: 'Blog yazilarina anahtar kelime odakli meta description ve baslik ekleyin. Her yazi icin hedef anahtar kelime belirleyin.',
                 action: 'Blog yazilarini SEO icin optimize edin',
               },
@@ -5794,7 +5796,7 @@ function CouponsSection({ showToast }) {
                     {c.validFrom ? new Date(c.validFrom).toLocaleDateString('tr-TR') : '—'} → {c.validUntil ? new Date(c.validUntil).toLocaleDateString('tr-TR') : '—'}
                   </td>
                   <td>
-                    <span className="status-badge" style={{ background: c.active ? '#2ECC7120' : '#88888820', color: c.active ? '#2ECC71' : '#888' }}>
+                    <span className="status-badge" style={{ background: c.active ? '#2ECC7120' : '#88888820', color: c.active ? 'var(--kade-success)' : 'var(--gate-muted)' }}>
                       {c.active ? 'Aktif' : 'Pasif'}
                     </span>
                   </td>
@@ -5829,8 +5831,8 @@ function ShopierOrdersSection({ showToast }) {
     completed_with_record_error: 'Tamamlandı (kayıt hatası)', refunded: 'İade Edildi', partially_refunded: 'Kısmi İade',
   }
   const stateColors = {
-    completed: '#2ECC71', completed_reconciled: '#2ECC71', processing: '#eac321',
-    rejected: '#E91E63', ignored: '#888', needs_review: '#FF9800',
+    completed: 'var(--kade-success)', completed_reconciled: 'var(--kade-success)', processing: 'var(--gate-accent)',
+    rejected: '#E91E63', ignored: 'var(--gate-muted)', needs_review: '#FF9800',
     completed_with_record_error: '#FF9800', refunded: '#6C63FF', partially_refunded: '#6C63FF',
   }
   const refundableStates = ['completed', 'completed_reconciled', 'completed_with_record_error']
@@ -5892,7 +5894,7 @@ function ShopierOrdersSection({ showToast }) {
                   <td style={{ fontSize: '0.82rem' }}>{o.packageName || o.productReference || '—'}</td>
                   <td>{o.price != null ? `${o.currency === 'USD' ? '$' : '₺'}${Number(o.price).toLocaleString('tr-TR')}` : '—'}</td>
                   <td>
-                    <span className="status-badge" style={{ background: `${stateColors[o.state] || '#888'}20`, color: stateColors[o.state] || '#888' }}>
+                    <span className="status-badge" style={{ background: `${stateColors[o.state] || 'var(--gate-muted)'}20`, color: stateColors[o.state] || 'var(--gate-muted)' }}>
                       {stateLabels[o.state] || o.state}
                     </span>
                     {o.reason && <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{o.reason}</div>}
@@ -5970,7 +5972,7 @@ function SystemHealthSection() {
                 className="status-badge"
                 style={{
                   background: health.supabase.connected ? '#2ECC7120' : '#E91E6320',
-                  color: health.supabase.connected ? '#2ECC71' : '#E91E63',
+                  color: health.supabase.connected ? 'var(--kade-success)' : '#E91E63',
                 }}
               >
                 {health.supabase.connected ? '● Bağlı' : health.supabase.configured ? '● Yapılandırılmış ama bağlanamıyor' : '● Yapılandırılmamış'}
@@ -6067,7 +6069,7 @@ function ActivityLogSection() {
     return `${Math.floor(hours / 24)} gün önce`
   }
 
-  const typeColors = { create: '#2ECC71', update: '#eac321', delete: '#E91E63', message: '#6C63FF', system: '#607D8B', security: '#FF5722' }
+  const typeColors = { create: 'var(--kade-success)', update: 'var(--gate-accent)', delete: '#E91E63', message: '#6C63FF', system: '#607D8B', security: '#FF5722' }
   const typeLabels = { create: 'Oluşturma', update: 'Güncelleme', delete: 'Silme', message: 'Mesaj', system: 'Sistem', security: 'Güvenlik' }
 
   return (
@@ -6106,7 +6108,7 @@ function ActivityLogSection() {
           }}>
             <div style={{
               width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: `${typeColors[log.type] || '#888'}15`, fontSize: '1.1rem', flexShrink: 0,
+              background: `${typeColors[log.type] || 'var(--gate-muted)'}15`, fontSize: '1.1rem', flexShrink: 0,
             }}>{log.icon || '⚙️'}</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{log.action}</div>
@@ -6114,7 +6116,7 @@ function ActivityLogSection() {
             </div>
             <div style={{ textAlign: 'right', flexShrink: 0 }}>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>{formatTime(log.createdAt)}</div>
-              <span className="status-badge" style={{ background: `${typeColors[log.type] || '#888'}15`, color: typeColors[log.type] || '#888', marginTop: 4, display: 'inline-block', fontSize: '0.7rem' }}>
+              <span className="status-badge" style={{ background: `${typeColors[log.type] || 'var(--gate-muted)'}15`, color: typeColors[log.type] || 'var(--gate-muted)', marginTop: 4, display: 'inline-block', fontSize: '0.7rem' }}>
                 {log.user}
               </span>
             </div>
@@ -6259,7 +6261,7 @@ function NewsletterSection({ showToast }) {
           <div className="stat-label">Toplam Abone</div>
         </div>
         <div className="admin-stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(46,204,113,0.10)', color: '#2ECC71' }}>📅</div>
+          <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--kade-success) 10%, transparent)', color: 'var(--kade-success)' }}>📅</div>
           <div className="stat-number">
             {subscribers.filter(s => {
               if (!s.createdAt) return false
@@ -6497,11 +6499,11 @@ function RemindersSection({ showToast }) {
     setChecking(false)
   }
 
-  const priorityColors = { low: '#2ECC71', medium: '#eac321', high: '#E91E63' }
+  const priorityColors = { low: 'var(--kade-success)', medium: 'var(--gate-accent)', high: '#E91E63' }
   const priorityLabels = { low: 'Dusuk', medium: 'Orta', high: 'Yuksek' }
   const repeatLabels = { none: 'Tekrar Yok', daily: 'Gunluk', weekly: 'Haftalik', monthly: 'Aylik' }
   const statusLabels = { active: 'Aktif', paused: 'Duraklatildi', sent: 'Gonderildi' }
-  const statusColors = { active: '#2ECC71', paused: '#eac321', sent: '#888' }
+  const statusColors = { active: 'var(--kade-success)', paused: 'var(--gate-accent)', sent: 'var(--gate-muted)' }
 
   const getUserName = (userId) => {
     const u = users.find(u => u._id === userId)
@@ -6609,7 +6611,7 @@ function RemindersSection({ showToast }) {
                           <button
                             type="button"
                             onClick={() => removeEmail(email)}
-                            style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', padding: 0, fontSize: 14, lineHeight: 1, display: 'flex' }}
+                            style={{ background: 'none', border: 'none', color: 'var(--gate-danger)', cursor: 'pointer', padding: 0, fontSize: 14, lineHeight: 1, display: 'flex' }}
                           >
                             <HiOutlineX size={14} />
                           </button>
@@ -6633,7 +6635,7 @@ function RemindersSection({ showToast }) {
                             type="checkbox"
                             checked={(form.assignedUsers || []).includes(u._id)}
                             onChange={() => toggleUser(u._id)}
-                            style={{ accentColor: '#eac321' }}
+                            style={{ accentColor: 'var(--gate-accent)' }}
                           />
                           <span>{u.displayName || u.username}</span>
                           <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>({u.role || 'user'})</span>
@@ -6695,7 +6697,7 @@ function RemindersSection({ showToast }) {
                 key={r._id}
                 className="glass-card"
                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                style={{ padding: 20, borderLeft: `3px solid ${priorityColors[r.priority] || '#eac321'}`, opacity: r.status === 'sent' ? 0.6 : 1 }}
+                style={{ padding: 20, borderLeft: `3px solid ${priorityColors[r.priority] || 'var(--gate-accent)'}`, opacity: r.status === 'sent' ? 0.6 : 1 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: 200 }}>
@@ -6710,7 +6712,7 @@ function RemindersSection({ showToast }) {
                         </span>
                       )}
                       {isOverdue && (
-                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: '#ff444422', color: '#ff4444' }}>
+                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: 'var(--gate-danger)22', color: 'var(--gate-danger)' }}>
                           Suresi Gecmis
                         </span>
                       )}
@@ -6725,7 +6727,7 @@ function RemindersSection({ showToast }) {
                     {displayUsers.length > 0 && (
                       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
                         {displayUsers.map(uid => (
-                          <span key={uid} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: '#eac32122', color: '#eac321' }}>
+                          <span key={uid} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: '#eac32122', color: 'var(--gate-accent)' }}>
                             👤 {getUserName(uid)}
                           </span>
                         ))}
@@ -6746,7 +6748,7 @@ function RemindersSection({ showToast }) {
                     <button className="btn btn-secondary" style={{ fontSize: 12, padding: '4px 10px' }} onClick={() => handleEdit(r)}>
                       <HiOutlinePencil size={14} />
                     </button>
-                    <button className="btn btn-secondary" style={{ fontSize: 12, padding: '4px 10px', color: '#ff4444' }} onClick={() => handleDelete(r._id)}>
+                    <button className="btn btn-secondary" style={{ fontSize: 12, padding: '4px 10px', color: 'var(--gate-danger)' }} onClick={() => handleDelete(r._id)}>
                       <HiOutlineTrash size={14} />
                     </button>
                   </div>
@@ -6763,9 +6765,9 @@ function RemindersSection({ showToast }) {
 // ========== KANBAN CRM ==========
 const KANBAN_COLUMNS = [
   { id: 'yeni', label: 'Yeni Lead', color: '#6C63FF' },
-  { id: 'gorusme-bekliyor', label: 'Görüşme Bekleniyor', color: '#eac321' },
+  { id: 'gorusme-bekliyor', label: 'Görüşme Bekleniyor', color: 'var(--gate-accent)' },
   { id: 'teklif-gonderildi', label: 'Teklif Gönderildi', color: '#00BCD4' },
-  { id: 'kazanildi', label: 'Kazanıldı ✅', color: '#2ECC71' },
+  { id: 'kazanildi', label: 'Kazanıldı ✅', color: 'var(--kade-success)' },
   { id: 'kaybedildi', label: 'Kaybedildi ❌', color: '#E91E63' },
 ]
 
@@ -6912,7 +6914,7 @@ function ProposalBuilderSection({ showToast }) {
     finally { setSending(false) }
   }
 
-  const statusRenk = { taslak: '#888', gonderildi: '#00BCD4', onaylandi: '#2ECC71', reddedildi: '#E91E63' }
+  const statusRenk = { taslak: 'var(--gate-muted)', gonderildi: '#00BCD4', onaylandi: 'var(--kade-success)', reddedildi: '#E91E63' }
 
   return (
     <div>
@@ -7022,7 +7024,7 @@ function ProposalBuilderSection({ showToast }) {
               <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '1.1rem' }}>
                 {p.totalAmount?.toLocaleString('tr-TR')} {p.currency}
               </div>
-              <div style={{ padding: '3px 10px', borderRadius: 20, background: `${statusRenk[p.status] || '#888'}20`, color: statusRenk[p.status] || '#888', fontSize: '0.75rem', fontWeight: 600 }}>
+              <div style={{ padding: '3px 10px', borderRadius: 20, background: `${statusRenk[p.status] || 'var(--gate-muted)'}20`, color: statusRenk[p.status] || 'var(--gate-muted)', fontSize: '0.75rem', fontWeight: 600 }}>
                 {p.status}
               </div>
               <button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '0.78rem', color: '#E91E63' }}
@@ -7345,7 +7347,7 @@ function MediaLibrarySection({ showToast }) {
                   <span style={{ fontSize: '2.5rem' }}>📄</span>
                 )}
                 {selected.has(item._id) && (
-                  <div style={{ position: 'absolute', top: 6, right: 6, width: 20, height: 20, borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: '#111' }}>✓</div>
+                  <div style={{ position: 'absolute', top: 6, right: 6, width: 20, height: 20, borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--gate-ink)' }}>✓</div>
                 )}
               </div>
               <div style={{ padding: '8px 10px' }}>
@@ -7404,8 +7406,8 @@ function TasksSection({ showToast }) {
 
   const filtered = filterStatus === 'all' ? tasks : tasks.filter(t => t.status === filterStatus)
 
-  const priorityRenk = { dusuk: '#888', orta: '#eac321', yuksek: '#FF9800', acil: '#E91E63' }
-  const statusRenk = { beklemede: '#888', devam: '#00BCD4', tamamlandi: '#2ECC71', iptal: '#E91E63' }
+  const priorityRenk = { dusuk: 'var(--gate-muted)', orta: 'var(--gate-accent)', yuksek: '#FF9800', acil: '#E91E63' }
+  const statusRenk = { beklemede: 'var(--gate-muted)', devam: '#00BCD4', tamamlandi: 'var(--kade-success)', iptal: '#E91E63' }
 
   return (
     <div>
@@ -7465,7 +7467,7 @@ function TasksSection({ showToast }) {
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
         {['all', 'beklemede', 'devam', 'tamamlandi'].map(s => (
           <button key={s} onClick={() => setFilterStatus(s)}
-            style={{ padding: '5px 14px', borderRadius: 20, border: `1px solid ${filterStatus === s ? 'var(--primary)' : 'var(--border)'}`, background: filterStatus === s ? 'var(--primary)' : 'transparent', color: filterStatus === s ? '#111' : 'var(--text-secondary)', fontSize: '0.82rem', cursor: 'pointer' }}>
+            style={{ padding: '5px 14px', borderRadius: 20, border: `1px solid ${filterStatus === s ? 'var(--primary)' : 'var(--border)'}`, background: filterStatus === s ? 'var(--primary)' : 'transparent', color: filterStatus === s ? 'var(--gate-ink)' : 'var(--text-secondary)', fontSize: '0.82rem', cursor: 'pointer' }}>
             {s === 'all' ? 'Tümü' : s === 'beklemede' ? 'Beklemede' : s === 'devam' ? 'Devam Ediyor' : 'Tamamlandı'}
           </button>
         ))}
@@ -7476,7 +7478,7 @@ function TasksSection({ showToast }) {
           {filtered.length === 0 && <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Görev bulunamadı</div>}
           {filtered.map(task => (
             <div key={task._id} className="admin-form" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: priorityRenk[task.priority] || '#888', flexShrink: 0 }} />
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: priorityRenk[task.priority] || 'var(--gate-muted)', flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, textDecoration: task.status === 'tamamlandi' ? 'line-through' : 'none', opacity: task.status === 'tamamlandi' ? 0.5 : 1 }}>{task.title}</div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: 3 }}>
@@ -7487,7 +7489,7 @@ function TasksSection({ showToast }) {
               <select
                 value={task.status}
                 onChange={e => handleStatusChange(task, e.target.value)}
-                style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--card-bg)', color: statusRenk[task.status] || '#888', fontSize: '0.8rem', cursor: 'pointer' }}
+                style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--card-bg)', color: statusRenk[task.status] || 'var(--gate-muted)', fontSize: '0.8rem', cursor: 'pointer' }}
               >
                 <option value="beklemede">Beklemede</option>
                 <option value="devam">Devam Ediyor</option>
@@ -7687,7 +7689,7 @@ function SubscriptionsSection({ showToast }) {
     } catch (err) { showToast(err.message, 'error') }
   }
 
-  const statusRenk = { aktif: '#2ECC71', pasif: '#888', iptal: '#E91E63' }
+  const statusRenk = { aktif: 'var(--kade-success)', pasif: 'var(--gate-muted)', iptal: '#E91E63' }
 
   const expiringSoon = subs.filter(s => s.status === 'aktif' && s.daysUntilRenewal !== undefined && s.daysUntilRenewal <= 7 && s.daysUntilRenewal >= 0)
 
@@ -7746,7 +7748,7 @@ function SubscriptionsSection({ showToast }) {
                   {sub.services?.join(', ')}
                 </div>
                 {sub.nextRenewalDate && (
-                  <div style={{ fontSize: '0.72rem', color: sub.daysUntilRenewal <= 7 ? '#eac321' : 'var(--text-tertiary)', marginTop: 4 }}>
+                  <div style={{ fontSize: '0.72rem', color: sub.daysUntilRenewal <= 7 ? 'var(--gate-accent)' : 'var(--text-tertiary)', marginTop: 4 }}>
                     Yenileme: {new Date(sub.nextRenewalDate).toLocaleDateString('tr-TR')}
                     {sub.daysUntilRenewal !== undefined && ` (${sub.daysUntilRenewal} gün)`}
                   </div>
@@ -7755,7 +7757,7 @@ function SubscriptionsSection({ showToast }) {
               <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '1rem' }}>
                 {sub.monthlyAmount?.toLocaleString('tr-TR')} {sub.currency}/ay
               </div>
-              <div style={{ padding: '3px 10px', borderRadius: 20, background: `${statusRenk[sub.status] || '#888'}20`, color: statusRenk[sub.status] || '#888', fontSize: '0.75rem', fontWeight: 600 }}>
+              <div style={{ padding: '3px 10px', borderRadius: 20, background: `${statusRenk[sub.status] || 'var(--gate-muted)'}20`, color: statusRenk[sub.status] || 'var(--gate-muted)', fontSize: '0.75rem', fontWeight: 600 }}>
                 {sub.status}
               </div>
               <button className="btn btn-outline" style={{ fontSize: '0.78rem', padding: '4px 10px' }} onClick={() => handleRecordPayment(sub)} title="Ödeme Kaydet">
@@ -7801,7 +7803,7 @@ function NPSSurveysSection({ showToast }) {
     } catch (err) { showToast(err.message, 'error') }
   }
 
-  const categoryRenk = { destekci: '#2ECC71', pasif: '#eac321', kizgin: '#E91E63' }
+  const categoryRenk = { destekci: 'var(--kade-success)', pasif: 'var(--gate-accent)', kizgin: '#E91E63' }
 
   return (
     <div>
@@ -7819,8 +7821,8 @@ function NPSSurveysSection({ showToast }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
           {[
             { label: 'NPS Skoru', val: stats.npsScore ?? '—', color: '#6C63FF', suffix: '' },
-            { label: 'Ort. Puan', val: stats.avgScore ?? '—', color: '#eac321', suffix: '/10' },
-            { label: 'Toplam Yanıt', val: stats.total ?? 0, color: '#2ECC71', suffix: '' },
+            { label: 'Ort. Puan', val: stats.avgScore ?? '—', color: 'var(--gate-accent)', suffix: '/10' },
+            { label: 'Toplam Yanıt', val: stats.total ?? 0, color: 'var(--kade-success)', suffix: '' },
             { label: 'Destekçi', val: stats.categories?.destekci ?? 0, color: '#00BCD4', suffix: '' },
           ].map(s => (
             <div key={s.label} className="admin-stat-card">
@@ -7861,10 +7863,10 @@ function NPSSurveysSection({ showToast }) {
               </div>
               {s.completedAt ? (
                 <>
-                  <div style={{ fontSize: '1.6rem', fontWeight: 800, color: s.score >= 9 ? '#2ECC71' : s.score <= 6 ? '#E91E63' : '#eac321' }}>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 800, color: s.score >= 9 ? 'var(--kade-success)' : s.score <= 6 ? '#E91E63' : 'var(--gate-accent)' }}>
                     {s.score}/10
                   </div>
-                  <div style={{ padding: '3px 10px', borderRadius: 20, background: `${categoryRenk[s.category] || '#888'}20`, color: categoryRenk[s.category] || '#888', fontSize: '0.75rem', fontWeight: 600 }}>
+                  <div style={{ padding: '3px 10px', borderRadius: 20, background: `${categoryRenk[s.category] || 'var(--gate-muted)'}20`, color: categoryRenk[s.category] || 'var(--gate-muted)', fontSize: '0.75rem', fontWeight: 600 }}>
                     {s.category}
                   </div>
                 </>
@@ -7902,10 +7904,10 @@ function ReferralTrackingSection({ showToast }) {
   ]
 
   const statusColor = {
-    yeni: '#eac321',
+    yeni: 'var(--gate-accent)',
     'iletisime-gecildi': '#00BCD4',
     teklif: '#6C63FF',
-    kazandi: '#2ECC71',
+    kazandi: 'var(--kade-success)',
     odendi: '#14B8A6',
     kaybedildi: '#E91E63',
   }
@@ -8270,7 +8272,7 @@ function InvoicesSection({ showToast }) {
                 <strong>{invoice.clientName}</strong>
                 <div style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>{invoice.description || invoice.clientEmail || '-'}</div>
               </div>
-              <div style={{ fontWeight: 900, color: invoice.status === 'odendi' ? '#2ECC71' : '#eac321' }}>
+              <div style={{ fontWeight: 900, color: invoice.status === 'odendi' ? 'var(--kade-success)' : 'var(--gate-accent)' }}>
                 {invoice.currency || 'TRY'} {Number(invoice.amount || 0).toLocaleString('tr-TR')}
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
@@ -8520,16 +8522,16 @@ function ReportExportSection({ showToast }) {
 <style>
 @font-face{font-family:Poppins;src:url("https://kadenewmedia.com/fonts/poppins/poppins-latin-400-normal.woff2") format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:Poppins;src:url("https://kadenewmedia.com/fonts/poppins/poppins-latin-700-normal.woff2") format("woff2");font-weight:700 900;font-display:swap}
-body{font-family:Poppins,Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#111}
-h1{color:#111;border-bottom:3px solid #eac321;padding-bottom:12px}
+body{font-family:Poppins,Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:var(--gate-ink)}
+h1{color:var(--gate-ink);border-bottom:3px solid var(--gate-accent);padding-bottom:12px}
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
 .logo{font-size:1.6rem;font-weight:900}
-.logo span{color:#eac321}
+.logo span{color:var(--gate-accent)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
-.metric{background:#f9f9f9;border-radius:10px;padding:16px;text-align:center}
-.metric-val{font-size:1.8rem;font-weight:800;color:#111}
-.metric-lbl{font-size:0.82rem;color:#888;margin-top:4px}
-.notes{background:#f9f9f9;border-radius:10px;padding:20px;margin-top:24px}
+.metric{background:var(--gate-panel);border-radius:10px;padding:16px;text-align:center}
+.metric-val{font-size:1.8rem;font-weight:800;color:var(--gate-ink)}
+.metric-lbl{font-size:0.82rem;color:var(--gate-muted);margin-top:4px}
+.notes{background:var(--gate-panel);border-radius:10px;padding:20px;margin-top:24px}
 .footer{margin-top:40px;padding-top:16px;border-top:1px solid #eee;font-size:0.78rem;color:#999;text-align:center}
 </style></head><body>
 <div class="header">
@@ -8922,7 +8924,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
   )
 
   return (
-    <div className={`admin-dashboard ${darkMode ? 'dark' : ''}`}>
+    <div className={`kade-surface admin-dashboard ${darkMode ? 'dark' : ''}`}>
       <div className="admin-grid-bg" />
 
       {/* Mobile Menu Button — ikon-only olduğu için erişilebilir ada ve
@@ -9085,8 +9087,8 @@ const CONSULTING_LABELS = {
 
 function getEntitlementBadges(entitlements = {}) {
   return [
-    entitlements.hasConsultingPanelAccess && { label: 'Danışmanlık', color: '#eac321' },
-    entitlements.hasOrganizationKitAccess && { label: 'Organizasyon Kiti', color: '#eac321' },
+    entitlements.hasConsultingPanelAccess && { label: 'Danışmanlık', color: 'var(--gate-accent)' },
+    entitlements.hasOrganizationKitAccess && { label: 'Organizasyon Kiti', color: 'var(--gate-accent)' },
     entitlements.hasKadeKitBusinessAccess && { label: 'Kade Kit Business', color: '#5ff3d3' },
     entitlements.hasKadeRadarAccess && { label: 'Kade Radar', color: '#8da2ff' },
     entitlements.hasAIKnowledgeCenterAccess && { label: 'AI Bilgi Merkezi', color: '#c084fc' },
@@ -9249,9 +9251,9 @@ function PortalCustomersSection({ showToast }) {
                 >
                   <div style={{
                     width: 38, height: 38, borderRadius: '50%',
-                    background: c.status === 'active' ? 'rgba(234,195,33,0.15)' : 'rgba(255,255,255,0.05)',
+                    background: c.status === 'active' ? 'color-mix(in srgb, var(--gate-accent) 15%, transparent)' : 'rgba(255,255,255,0.05)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 800, fontSize: '0.9rem', color: '#eac321', flexShrink: 0,
+                    fontWeight: 800, fontSize: '0.9rem', color: 'var(--gate-accent)', flexShrink: 0,
                   }}>
                     {c.name?.charAt(0)?.toUpperCase() || '?'}
                   </div>
@@ -9260,9 +9262,9 @@ function PortalCustomersSection({ showToast }) {
                       <strong style={{ fontSize: '0.95rem' }}>{c.name}</strong>
                       <span style={{
                         fontSize: '0.72rem', fontWeight: 600, padding: '2px 8px', borderRadius: 20,
-                        background: c.status === 'active' ? 'rgba(46,204,113,0.12)' : 'rgba(239,68,68,0.1)',
-                        color: c.status === 'active' ? '#2ECC71' : '#f87171',
-                        border: `1px solid ${c.status === 'active' ? 'rgba(46,204,113,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                        background: c.status === 'active' ? 'color-mix(in srgb, var(--kade-success) 12%, transparent)' : 'rgba(239,68,68,0.1)',
+                        color: c.status === 'active' ? 'var(--kade-success)' : 'var(--gate-danger)',
+                        border: `1px solid ${c.status === 'active' ? 'color-mix(in srgb, var(--kade-success) 20%, transparent)' : 'rgba(239,68,68,0.2)'}`,
                       }}>
                         {c.status === 'active' ? 'Aktif' : 'Pasif'}
                       </span>
@@ -9292,7 +9294,7 @@ function PortalCustomersSection({ showToast }) {
                     )}
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#eac321' }}>{(c.packages || []).length} paket</div>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--gate-accent)' }}>{(c.packages || []).length} paket</div>
                     <div style={{ fontSize: '0.76rem', color: 'var(--text-tertiary)' }}>{activeCount} aktif</div>
                   </div>
                   <HiOutlineChevronDown size={16} style={{ color: 'var(--text-tertiary)', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
@@ -9321,7 +9323,7 @@ function PortalCustomersSection({ showToast }) {
                       </button>
                       <button
                         className="btn btn-outline"
-                        style={{ fontSize: '0.8rem', padding: '6px 14px', color: '#f87171', borderColor: 'rgba(239,68,68,0.3)' }}
+                        style={{ fontSize: '0.8rem', padding: '6px 14px', color: 'var(--gate-danger)', borderColor: 'rgba(239,68,68,0.3)' }}
                         onClick={() => handleDelete(c)}
                       >
                         <HiOutlineTrash size={14} /> Sil
@@ -9391,15 +9393,15 @@ function PortalCustomersSection({ showToast }) {
                           <div key={pkg.id} style={{
                             display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 16px',
                             background: 'rgba(0,0,0,0.15)', borderRadius: 10,
-                            border: `1px solid ${pkg.status === 'active' ? 'rgba(234,195,33,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                            border: `1px solid ${pkg.status === 'active' ? 'color-mix(in srgb, var(--gate-accent) 20%, transparent)' : 'rgba(255,255,255,0.06)'}`,
                           }}>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
                                 <strong style={{ fontSize: '0.88rem' }}>{pkg.name}</strong>
                                 <span style={{
                                   fontSize: '0.7rem', fontWeight: 600, padding: '2px 8px', borderRadius: 20,
-                                  background: pkg.status === 'active' ? 'rgba(46,204,113,0.12)' : 'rgba(239,68,68,0.1)',
-                                  color: pkg.status === 'active' ? '#2ECC71' : '#f87171',
+                                  background: pkg.status === 'active' ? 'color-mix(in srgb, var(--kade-success) 12%, transparent)' : 'rgba(239,68,68,0.1)',
+                                  color: pkg.status === 'active' ? 'var(--kade-success)' : 'var(--gate-danger)',
                                 }}>
                                   {pkg.status === 'active' ? 'Aktif' : 'Pasif'}
                                 </span>
@@ -9422,7 +9424,7 @@ function PortalCustomersSection({ showToast }) {
                               {(pkg.features || []).length > 0 && (
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
                                   {pkg.features.map((f, i) => (
-                                    <span key={i} style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(234,195,33,0.08)', color: '#eac321', border: '1px solid rgba(234,195,33,0.15)' }}>{f}</span>
+                                    <span key={i} style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: 20, background: 'color-mix(in srgb, var(--gate-accent) 8%, transparent)', color: 'var(--gate-accent)', border: '1px solid color-mix(in srgb, var(--gate-accent) 15%, transparent)' }}>{f}</span>
                                   ))}
                                 </div>
                               )}
@@ -9437,7 +9439,7 @@ function PortalCustomersSection({ showToast }) {
                               </button>
                               <button
                                 className="btn btn-outline"
-                                style={{ fontSize: '0.75rem', padding: '4px 10px', color: '#f87171', borderColor: 'rgba(239,68,68,0.3)' }}
+                                style={{ fontSize: '0.75rem', padding: '4px 10px', color: 'var(--gate-danger)', borderColor: 'rgba(239,68,68,0.3)' }}
                                 onClick={() => handleRemovePkg(c._id, pkg.id)}
                               >
                                 <HiOutlineTrash size={13} />

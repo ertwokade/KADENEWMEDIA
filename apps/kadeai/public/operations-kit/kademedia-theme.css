@@ -1,75 +1,120 @@
 :root {
-  --bg: #08090d !important;
-  --bg2: #0d0f14 !important;
-  --surface: rgba(255, 255, 255, 0.035) !important;
-  --surface-hover: rgba(255, 255, 255, 0.065) !important;
-  --border: rgba(255, 255, 255, 0.09) !important;
-  --border-hover: rgba(234, 195, 33, 0.26) !important;
-  --ink: #ffffff !important;
-  --ink2: #b7b7b7 !important;
-  --ink3: #747474 !important;
+  --bg: #f7f5e9 !important;
+  --bg2: #fbf9ee !important;
+  --surface: #fbf9ee !important;
+  --surface-hover: #efede1 !important;
+  --border: rgba(7, 7, 7, 0.15) !important;
+  --border-hover: rgba(7, 7, 7, 0.42) !important;
+  --ink: #070707 !important;
+  --ink2: #55544e !important;
+  --ink3: #85837a !important;
   --teal: #eac321 !important;
-  --teal-dim: rgba(234, 195, 33, 0.12) !important;
-  --teal-glow: rgba(234, 195, 33, 0.26) !important;
-  --indigo: #f4d95d !important;
-  --indigo-dim: rgba(244, 217, 93, 0.1) !important;
+  --teal-dim: rgba(234, 195, 33, 0.17) !important;
+  --teal-glow: rgba(234, 195, 33, 0.23) !important;
+  --indigo: #769db5 !important;
+  --indigo-dim: rgba(145, 182, 204, 0.18) !important;
+  --gold: #b18f05 !important;
+  --gold-dim: rgba(234, 195, 33, 0.16) !important;
+  --violet: #d56f96 !important;
+  --violet-dim: rgba(239, 142, 177, 0.16) !important;
+  --coral: #d64f5f !important;
+  --coral-dim: rgba(214, 79, 95, 0.12) !important;
+  --radius: 0px !important;
+  --radius-lg: 0px !important;
+  --shadow: none !important;
+}
+
+html[data-theme="dark"] {
+  --bg: #060706 !important;
+  --bg2: #0d0f0d !important;
+  --surface: #111311 !important;
+  --surface-hover: #181b18 !important;
+  --border: rgba(255, 255, 255, 0.09) !important;
+  --border-hover: rgba(248, 245, 233, 0.42) !important;
+  --ink: #f8f5e9 !important;
+  --ink2: #b8b4a9 !important;
+  --ink3: #77756e !important;
+  --teal: #eac321 !important;
+  --teal-dim: rgba(234, 195, 33, 0.14) !important;
+  --teal-glow: rgba(234, 195, 33, 0.22) !important;
+  --indigo: #91b6cc !important;
+  --indigo-dim: rgba(145, 182, 204, 0.14) !important;
   --gold: #eac321 !important;
-  --gold-dim: rgba(234, 195, 33, 0.12) !important;
-  --radius: 10px !important;
-  --radius-lg: 14px !important;
+  --gold-dim: rgba(234, 195, 33, 0.13) !important;
+  --shadow: 0 22px 60px rgba(0, 0, 0, 0.28) !important;
 }
 
 html,
-body {
-  background: transparent !important;
-}
-
-body {
-  background:
-    radial-gradient(circle at 20% 20%, rgba(234, 195, 33, 0.09), transparent 30%),
-    radial-gradient(circle at 78% 18%, rgba(234, 195, 33, 0.06), transparent 26%),
-    #08090d !important;
-}
-
+body,
 .app-shell,
 .workspace {
-  background: transparent !important;
+  background: var(--bg) !important;
 }
 
-.sidebar,
+body {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px),
+    radial-gradient(circle at 82% 4%, rgba(234, 195, 33, 0.18), transparent 27rem) !important;
+  background-size: 100% 176px, 390px 100%, auto !important;
+}
+
+html[data-theme="dark"] body {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px),
+    radial-gradient(circle at 82% 4%, rgba(234, 195, 33, 0.09), transparent 27rem) !important;
+  background-size: 100% 176px, 390px 100%, auto !important;
+}
+
+.sidebar {
+  background: var(--bg) !important;
+  border-color: var(--border) !important;
+}
+
+.sidebar .brand-text strong,
+.sidebar .nav-item:hover {
+  color: var(--ink) !important;
+}
+
+.sidebar .brand-text span,
+.sidebar .nav-item,
+.sidebar-footer,
+.sidebar .ptree-title {
+  color: var(--ink2) !important;
+}
+
 .topbar {
-  background: rgba(8, 9, 13, 0.86) !important;
-  border-color: rgba(234, 195, 33, 0.14) !important;
+  background: color-mix(in srgb, var(--bg) 86%, transparent) !important;
+  border-color: var(--border) !important;
 }
 
 .brand-mark {
-  background: linear-gradient(135deg, #eac321, #f4d95d) !important;
-  color: #08090d !important;
-  box-shadow: 0 0 18px rgba(234, 195, 33, 0.24) !important;
+  background: #eac321 !important;
+  color: #070707 !important;
+  box-shadow: none !important;
+  border: 1px solid var(--ink) !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 var(--ink) !important;
 }
 
 .nav-item.active,
 .filter-chip.active,
 .primary-btn {
-  background: #eac321 !important;
-  border-color: #eac321 !important;
-  color: #08090d !important;
+  background: var(--teal) !important;
+  border-color: var(--teal) !important;
+  color: #070707 !important;
+}
+
+.primary-btn:hover {
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+  box-shadow: none !important;
 }
 
 .nav-item.active i,
 .nav-item.active span {
-  color: #08090d !important;
-}
-
-.nav-item:hover,
-.icon-btn:hover,
-.ghost-btn:hover,
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: rgba(234, 195, 33, 0.42) !important;
-  color: #eac321 !important;
-  box-shadow: 0 0 0 3px rgba(234, 195, 33, 0.1) !important;
+  color: #070707 !important;
 }
 
 .panel,
@@ -79,22 +124,33 @@ select:focus {
 .metric-card,
 .page-card,
 .template-card,
-.doc-card {
-  border-color: rgba(255, 255, 255, 0.09) !important;
-  background: rgba(255, 255, 255, 0.035) !important;
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.16) !important;
+.doc-card,
+.analysis-history-item,
+.radar-card,
+.vibe-step {
+  border-color: var(--border) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow) !important;
 }
 
 .panel:hover,
 .kpi:hover,
 .production-card:hover,
 .page-card:hover,
-.template-card:hover {
-  border-color: rgba(234, 195, 33, 0.24) !important;
+.template-card:hover,
+.radar-card:hover {
+  border-color: var(--border-hover) !important;
 }
 
-.icon-area {
-  background: rgba(234, 195, 33, 0.1) !important;
+.icon-area,
+.answer-box,
+.transcript-summary {
+  background: var(--teal-dim) !important;
+}
+
+.answer-box,
+.transcript-summary {
+  border-left-color: var(--teal) !important;
 }
 
 .icon-area i,
@@ -103,13 +159,7 @@ select:focus {
 .word.positive,
 .nav-label,
 .ptree-nav-label {
-  color: #eac321 !important;
-}
-
-.answer-box,
-.transcript-summary {
-  border-left-color: #eac321 !important;
-  background: rgba(234, 195, 33, 0.1) !important;
+  color: var(--teal) !important;
 }
 
 .search-box,
@@ -117,18 +167,14 @@ select:focus {
 input,
 textarea,
 select {
-  background: rgba(0, 0, 0, 0.22) !important;
-  border-color: rgba(234, 195, 33, 0.14) !important;
+  background: var(--bg2) !important;
+  border-color: var(--border) !important;
 }
 
 html.embedded,
 html.embedded body {
   min-height: 100%;
   overflow: hidden !important;
-}
-
-html.embedded body {
-  background: #08090d !important;
 }
 
 html.embedded .mobile-overlay,

@@ -82,6 +82,18 @@
     {
       "source": "/bakim",
       "destination": "/app.html"
+    },
+    {
+      "source": "/links",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/kadelinks",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/kadirdemir",
+      "destination": "/app.html"
     }
   ],
   "headers": [
