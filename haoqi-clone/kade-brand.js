@@ -226,8 +226,31 @@
       nav.className='kade-mobile-controls';
       nav.setAttribute('aria-label','Site kontrolleri');
       nav.innerHTML='<button type="button" class="kade-mobile-services" data-kade-services-trigger aria-controls="kade-services-panel" aria-expanded="false" aria-label="Hizmetler"></button><button type="button" class="kade-language-toggle"><span></span></button><button type="button" class="kade-mobile-theme" aria-label="Theme: '+(document.documentElement.classList.contains('dark')?'dark':'light')+'"></button>';
-      document.body.appendChild(nav);
+      /* Kontroller görsel olarak başlıkta olduğundan DOM sırası da başlıkta
+         olmalı. Body sonuna eklemek, klavye kullanıcılarını tüm sayfayı
+         dolaştıktan sonra bu kontrollere ulaştırıyordu. */
+      (document.querySelector('header')||document.body).appendChild(nav);
       updateLanguageControl();
+    }
+    function updateHeroCta(){
+      var cta=document.querySelector('.kade-hero-cta');
+      if(!cta)return;
+      var services=cta.querySelector('[data-kade-hero-services]');
+      var quote=cta.querySelector('[data-kade-hero-quote]');
+      if(services)services.textContent=locale==='tr'?'Hizmetleri incele':'Explore services';
+      if(quote)quote.textContent=locale==='tr'?'Teklif al':'Get a quote';
+      cta.setAttribute('aria-label',locale==='tr'?'Hızlı başlangıç':'Quick start');
+    }
+    function installHeroCta(){
+      if(document.querySelector('.kade-hero-cta'))return;
+      var scroller=document.querySelector('div.w-full.h-full.overflow-y-auto');
+      var hero=scroller&&scroller.firstElementChild&&scroller.firstElementChild.firstElementChild;
+      if(!hero||!String(hero.className).includes('grid-cols-12'))return;
+      var cta=document.createElement('nav');
+      cta.className='kade-hero-cta';
+      cta.innerHTML='<a href="/hizmetler" data-kade-href="/hizmetler" data-kade-hero-services></a><a href="/teklif-al" data-kade-href="/teklif-al" data-kade-hero-quote></a>';
+      hero.appendChild(cta);
+      updateHeroCta();
     }
     function setLocale(next,animate){
       locale=next==='en'?'en':'tr';
@@ -237,6 +260,7 @@
       document.documentElement.setAttribute('data-locale',locale);
       document.title=locale==='tr'?'Kade New Media | Dijital Pazarlama Ajansı':'Kade New Media | Digital Marketing Agency';
       updateLanguageControl();
+      updateHeroCta();
       renderServicesPanel();
       /* Sayfa zaten Türkçe yayınlanıyor (metinler bundle ve sunucu HTML'inde
          çevrili). İlk yüklemede React'in metin düğümlerini textContent ile
@@ -260,6 +284,7 @@
     function installExperience(){
       installLanguageToggle();
       installMobileControls();
+      installHeroCta();
       installServicesPanel();
       setLocale(locale,false);
     }

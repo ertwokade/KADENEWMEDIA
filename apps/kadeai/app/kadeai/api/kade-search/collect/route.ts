@@ -63,3 +63,23 @@ export async function POST(req: NextRequest) {
     return failure(e, 'Toplama tamamlanamadı.')
   }
 }
+
+/**
+ * Vercel Cron yalnız GET gönderir. Her gün tek bir kaynağı döngüsel tarayıp
+ * ardından skorları yenilemek, altı ağır toplayıcıyı tek isteğe sıkıştırmadan
+ * haftanın tamamında güncel bir radar üretir.
+ */
+export async function GET(req: NextRequest) {
+  const guard = await requireCollectorAccess(req)
+  if (guard) return guard
+
+  try {
+    const mondayFirstIndex = ((new Date().getUTCDay() || 7) - 1) % SOURCE_ORDER.length
+    const source = SOURCE_ORDER[mondayFirstIndex]
+    const result = await collectSource({ source, countries: ['TR'], limit: 50, period: 7 })
+    const ozet = await finalizeCollection()
+    return NextResponse.json({ source, sonuc: result, ozet })
+  } catch (e) {
+    return failure(e, 'Zamanlanmış toplama tamamlanamadı.')
+  }
+}

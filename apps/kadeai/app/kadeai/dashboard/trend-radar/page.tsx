@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Activity, AlertTriangle, BarChart2, Bell, Eye, Lightbulb, Loader2,
-  Radio, Search, Sprout, Trash2, X,
+  MessageCircle, Radio, Search, Send, Sprout, Trash2, X,
 } from 'lucide-react'
 import { apiFetch } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
@@ -119,6 +119,8 @@ export default function TrendRadarPage() {
   const [watchTerm, setWatchTerm] = useState('')
   const [detail, setDetail] = useState<TrendDetail | null>(null)
   const [canCollect, setCanCollect] = useState(false)
+  const [digestSending, setDigestSending] = useState(false)
+  const [digestStatus, setDigestStatus] = useState('')
 
   const categoryOptions = useMemo(
     () => Object.entries(CATEGORIES).map(([key, def]) => ({ key, label: `${def.emoji} ${def.label}` })),
@@ -227,6 +229,21 @@ export default function TrendRadarPage() {
     const res = await apiFetch(`/api/kade-search/watchlist?term=${encodeURIComponent(term)}`, { method: 'DELETE' })
     const json = await res.json()
     if (res.ok) setWatchlist(json.liste ?? [])
+  }
+
+  const sendWeeklyDigest = async () => {
+    setDigestSending(true)
+    setDigestStatus('')
+    try {
+      const res = await apiFetch('/api/kade-search/weekly-digest', { method: 'POST' })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'WhatsApp özeti gönderilemedi.')
+      setDigestStatus(json.duplicate ? 'Bu haftanın özeti zaten gönderildi.' : `${json.items} fikir WhatsApp’a gönderildi.`)
+    } catch (e) {
+      setDigestStatus(e instanceof Error ? e.message : 'WhatsApp özeti gönderilemedi.')
+    } finally {
+      setDigestSending(false)
+    }
   }
 
   const isEmpty =
@@ -439,13 +456,36 @@ export default function TrendRadarPage() {
             </div>
 
             {canCollect && stats?.kaynaklar && (
-              <CollectPanel
-                sources={stats.kaynaklar}
-                onDone={() => {
-                  void loadStats()
-                  void loadTab()
-                }}
-              />
+              <>
+                <div className="space-y-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                  <div className="flex items-start gap-2.5">
+                    <MessageCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" />
+                    <div>
+                      <h3 className="text-sm font-semibold text-zinc-100">Haftalık WhatsApp özeti</h3>
+                      <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
+                        En güçlü dört içerik fikri her pazartesi 09:00’da otomatik gönderilir.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={sendWeeklyDigest}
+                    disabled={digestSending}
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-emerald-950 transition-colors hover:bg-emerald-400 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    {digestSending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                    {digestSending ? 'Gönderiliyor...' : 'Bu haftayı şimdi gönder'}
+                  </button>
+                  {digestStatus && <p className="text-[11px] text-zinc-400" role="status">{digestStatus}</p>}
+                </div>
+                <CollectPanel
+                  sources={stats.kaynaklar}
+                  onDone={() => {
+                    void loadStats()
+                    void loadTab()
+                  }}
+                />
+              </>
             )}
           </div>
 

@@ -93,6 +93,12 @@ export const SCRIPT_COPY = [
   ['"TOOLS"', '"ARAÇ"'],
   ['type:"tools"', 'type:"araç"'],
   ['type:"event"', 'type:"etkinlik"'],
+  /* Snapshot statik HTML olarak sunuluyor; ana sayfaya dönen Next Link'leri
+     görünür olur olmaz `/?_rsc=...` ön-getirmesi yapıyor ve statik kökte 404
+     üretiyordu. DOM çıktısını değiştirmeden yalnız bu iki kök Link'te
+     prefetch'i kapat. */
+  ['style:{fontVariationSettings:\'"wght" 700, "wdth" 120\'},href:"/"', 'style:{fontVariationSettings:\'"wght" 700, "wdth" 120\'},prefetch:!1,href:"/"'],
+  ['useActiveClass:!0,href:"/",activeClass:""', 'useActiveClass:!0,prefetch:!1,href:"/",activeClass:""'],
   /* Ana sayfa giriş kapısı: sahne üç modelin beş kare çizmesini bekliyor ve o
      sırada dolan bir çubuk gösteriyordu. Kapı kapatıldı — sayfa diğer rotalar
      gibi doğrudan açılıyor, sahne arkada yükleniyor. Rota geçiş animasyonu

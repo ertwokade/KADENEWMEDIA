@@ -218,6 +218,69 @@ export async function queryTrends(filters: TrendFilters = {}): Promise<CurrentTr
   return (data ?? []) as CurrentTrendRow[]
 }
 
+/** Zamanlanmış haftalık özet, kullanıcı çerezi taşımadığı için service-role ile okur. */
+export async function weeklyDigestCandidates(limit = 40): Promise<CurrentTrendRow[]> {
+  const db = createAdminClient()
+  const since = new Date(Date.now() - 14 * 86400e3).toISOString()
+  const { data, error } = await db
+    .from('kade_trend_current')
+    .select('*')
+    .gte('last_seen', since)
+    .in('stage', ['emerging', 'rising', 'peak'])
+    .order('score', { ascending: false, nullsFirst: false })
+    .limit(Math.min(Math.max(limit, 1), 100))
+  if (error) throw new Error(error.message)
+  return (data ?? []) as CurrentTrendRow[]
+}
+
+/** Mevcut çalışma tablosunun tekil anahtarını haftalık gönderim kilidi olarak kullanır. */
+export async function claimWeeklyDigest(weekKey: string) {
+  const db = createAdminClient()
+  const id = `weekly_digest_${weekKey}`
+  const { data: existing } = await db
+    .from('kade_trend_runs')
+    .select('status, started_at')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (existing?.status === 'ok') return { claimed: false, id }
+  if (existing?.status === 'running') {
+    const age = Date.now() - new Date(existing.started_at).getTime()
+    if (Number.isFinite(age) && age < 60 * 60 * 1000) return { claimed: false, id }
+  }
+  if (existing) await db.from('kade_trend_runs').delete().eq('id', id).neq('status', 'ok')
+
+  const { error } = await db.from('kade_trend_runs').insert({
+    id,
+    status: 'running',
+    sources: ['weekly_digest'],
+    countries: ['TR'],
+  })
+  if (error) {
+    if (error.code === '23505') return { claimed: false, id }
+    throw new Error(error.message)
+  }
+  return { claimed: true, id }
+}
+
+export async function completeWeeklyDigest(id: string, itemCount: number, startedMs: number) {
+  const db = createAdminClient()
+  const { error } = await db.from('kade_trend_runs').update({
+    status: 'ok',
+    finished_at: new Date().toISOString(),
+    items_found: itemCount,
+    items_new: 0,
+    duration_ms: Date.now() - startedMs,
+    errors: [],
+  }).eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function releaseWeeklyDigest(id: string) {
+  const db = createAdminClient()
+  await db.from('kade_trend_runs').delete().eq('id', id).neq('status', 'ok')
+}
+
 export async function getTrendDetail(id: string) {
   const supabase = await createClient()
   const { data: trend } = await supabase.from('kade_trend_current').select('*').eq('id', id).maybeSingle()
@@ -311,6 +374,7 @@ export async function statsSummary() {
   const { data: lastRun } = await supabase
     .from('kade_trend_runs')
     .select('*')
+    .not('id', 'like', 'weekly_digest_%')
     .order('started_at', { ascending: false })
     .limit(1)
     .maybeSingle()

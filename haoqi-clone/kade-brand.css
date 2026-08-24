@@ -179,18 +179,28 @@ footer a[href^="mailto:"]{text-transform:none!important}
 ::selection{background:#c0fe04;color:#000}
 
 @media(max-width:900px){
+  header.z-50>div:first-child{
+    position:relative;
+    z-index:2;
+    min-height:72px;
+    border-bottom:1px solid var(--line);
+    background:var(--bg);
+    background:color-mix(in srgb,var(--bg) 92%,transparent);
+    -webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
+  }
   .kade-mobile-controls{
     position:fixed;
     z-index:60;
     top:14px;
-    right:14px;
+    right:8px;
     display:flex;
     align-items:center;
-    gap:4px;
-    height:42px;
+    gap:0;
+    height:44px;
     color:var(--text);
   }
-  .kade-mobile-controls>button{display:inline-grid!important;place-items:center;width:36px!important;height:36px!important;padding:0!important;border:0!important;background:transparent!important;color:inherit!important}
+  .kade-mobile-controls>button{display:inline-grid!important;place-items:center;width:44px!important;height:44px!important;padding:0!important;border:0!important;background:transparent!important;color:inherit!important}
   .kade-mobile-services::before{
     content:'';
     width:20px;
@@ -199,8 +209,45 @@ footer a[href^="mailto:"]{text-transform:none!important}
     -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='black'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
     mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='black'%3E%3Crect x='3' y='3' width='7' height='7'/%3E%3Crect x='14' y='3' width='7' height='7'/%3E%3Crect x='3' y='14' width='7' height='7'/%3E%3Crect x='14' y='14' width='7' height='7'/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
   }
-  .kade-language-toggle{width:36px!important;height:36px!important;flex-basis:36px}
+  .kade-language-toggle{width:44px!important;height:44px!important;flex-basis:44px}
+  .kade-hero-cta{
+    position:absolute;
+    z-index:4;
+    top:clamp(178px,23dvh,225px);
+    left:24px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    max-width:calc(100% - 48px);
+    pointer-events:auto;
+  }
+  .kade-hero-cta a{
+    display:inline-flex;
+    min-height:44px;
+    align-items:center;
+    justify-content:center;
+    padding:0 16px;
+    border:1px solid currentColor;
+    background:var(--bg);
+    color:var(--text)!important;
+    font-family:inherit;
+    font-size:11px!important;
+    font-weight:700!important;
+    letter-spacing:.08em!important;
+    line-height:1!important;
+    text-transform:uppercase;
+    text-decoration:none!important;
+  }
+  .kade-hero-cta a:last-child{background:var(--accent);color:#101210!important;border-color:var(--accent)}
 }
+@media(max-width:380px){
+  header.z-50>div:first-child{padding-left:12px!important;padding-right:8px!important}
+  header.z-50>div:first-child>a{padding-left:4px!important;padding-right:4px!important;font-size:14px!important}
+  .kade-hero-cta{left:16px;max-width:calc(100% - 32px)}
+}
+.kade-hero-cta{display:none}
+@media(max-width:900px){.kade-hero-cta{display:flex}}
+@media(min-width:600px) and (max-width:900px){.kade-hero-cta{top:clamp(270px,27dvh,310px)}}
 
 /* ── Hizmetler sayfası (services sheet) ───────────────────────────────
    Built from the homepage's own vocabulary: full-bleed hairline column
