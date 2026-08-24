@@ -16,6 +16,7 @@ import { PUBLIC_APP_URL } from '@/lib/appConfig'
 
 // force-ssl: altyazi okuma + yazma + kanal videolarini listeleme icin yeterli.
 export const YOUTUBE_SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
+export const OAUTH_STATE_COOKIE = 'kade_yt_oauth_state'
 
 const PROVIDER = 'youtube'
 

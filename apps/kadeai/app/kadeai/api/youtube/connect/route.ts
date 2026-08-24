@@ -2,11 +2,9 @@ import { NextResponse } from 'next/server'
 import { randomBytes } from 'node:crypto'
 import { cookies } from 'next/headers'
 import { requireApiUser } from '@/lib/auth/server'
-import { buildAuthUrl, youtubeOAuthConfigured, youtubeOAuthStatus } from '@/lib/youtube/oauth'
+import { buildAuthUrl, OAUTH_STATE_COOKIE, youtubeOAuthConfigured, youtubeOAuthStatus } from '@/lib/youtube/oauth'
 
 export const dynamic = 'force-dynamic'
-
-export const OAUTH_STATE_COOKIE = 'kade_yt_oauth_state'
 
 export async function GET() {
   const guard = await requireApiUser()

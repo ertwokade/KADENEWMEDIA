@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
 import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server'
+import { NextRequest } from 'next/server'
 import { adminAuthEmail, isLoginIdentifier } from '../../lib/auth/adminIdentity'
 import { canAccessOwnedResource } from '../../lib/security/ownership'
 import {
@@ -13,7 +14,7 @@ import {
 } from '../../lib/featureAccess'
 import { countedDistributedRateLimit, distributedRateLimit } from '../../lib/rateLimit'
 import { getVercelGatewayToken } from '../../lib/ai/gatewayAuth'
-import { config as proxyConfig } from '../../proxy'
+import { config as proxyConfig, proxy } from '../../proxy'
 
 test('user A cannot access a resource owned by user B', () => {
   assert.equal(canAccessOwnedResource('user-a', 'user-a'), true)
@@ -92,6 +93,32 @@ test('proxy leaves the main-site API alone and still protects KadeAI routes', ()
   assert.equal(unstable_doesMiddlewareMatch({ config: proxyConfig, url: '/api/customer-portal' }), false)
   assert.equal(unstable_doesMiddlewareMatch({ config: proxyConfig, url: '/kadeai/api/assistant' }), true)
   assert.equal(unstable_doesMiddlewareMatch({ config: proxyConfig, url: '/kadeai/dashboard' }), true)
+})
+
+test('unauthenticated KadeAI routes keep the /kadeai prefix when redirecting', async () => {
+  const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const previousAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  delete process.env.NEXT_PUBLIC_SUPABASE_URL
+  delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  try {
+    for (const path of ['/kadeai/dashboard', '/kadeai/onboarding', '/kadeai/dashboard/settings']) {
+      const response = await proxy(new NextRequest(`https://kadenewmedia.com${path}`))
+      assert.equal(response.status, 307)
+      assert.equal(response.headers.get('location'), 'https://kadenewmedia.com/kadeai/login')
+    }
+  } finally {
+    if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    else process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl
+    if (previousAnonKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    else process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = previousAnonKey
+  }
+})
+
+test('KadeAI entry and reset-password links keep the /kadeai prefix', async () => {
+  const homeSource = await readFile(new URL('../../app/kadeai/page.tsx', import.meta.url), 'utf8')
+  const resetSource = await readFile(new URL('../../app/kadeai/reset-password/page.tsx', import.meta.url), 'utf8')
+  assert.match(homeSource, /redirect\(withBasePath\(appRoutes\.dashboard\)\)/)
+  assert.match(resetSource, /href=\{withBasePath\(appRoutes\.login\)\}/)
 })
 
 test('Gateway identity can be resolved from the active request explicitly', async () => {

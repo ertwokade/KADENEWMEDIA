@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
-import { appRoutes } from '@/lib/appConfig'
+import { appRoutes, withBasePath } from '@/lib/appConfig'
 
 export default function Home() {
-  redirect(appRoutes.dashboard)
+  redirect(withBasePath(appRoutes.dashboard))
 }

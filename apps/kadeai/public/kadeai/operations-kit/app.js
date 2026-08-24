@@ -356,7 +356,7 @@ function arr(v){ return Array.isArray(v)?v:[] }
 function str(v,fallback=""){ return typeof v==="string"?v:fallback }
 function num(v,fallback=0){ const n=Number(v); return Number.isFinite(n)?n:fallback }
 function bool(v){ return Boolean(v) }
-function idOf(v,prefix){ return str(v)||uid(prefix) }
+function idOf(v,prefix){ const value=str(v);return /^[a-zA-Z0-9_-]{1,128}$/.test(value)?value:uid(prefix) }
 
 function normalizeState(input,explicitEmptyArrays=new Set()){
   const base=clone(initialState);
@@ -469,7 +469,7 @@ function normalizeInventoryItem(i){
 
 function normalizeDoc(d){
   if(!isObj(d))return null;
-  return{id:d.id?str(d.id):undefined,title:str(d.title,"Doküman"),type:str(d.type,"Genel"),owner:str(d.owner,"Operasyon"),icon:str(d.icon,"📄")};
+  return{id:idOf(d.id,"doc"),title:str(d.title,"Doküman"),type:str(d.type,"Genel"),owner:str(d.owner,"Operasyon"),icon:str(d.icon,"📄")};
 }
 
 function normalizeUser(u){
@@ -1597,7 +1597,7 @@ function renderInventory(){
 function adjustQty(id,delta){ const item=state.inventory.find(i=>i.id===id);if(!item)return;item.qty=Math.max(0,item.qty+delta);saveState();renderInventory();showToast(`${item.name}: ${item.qty} adet`,"info") }
 function renderLibrary(){
   const el=document.getElementById("libraryList");if(!el)return;
-  el.innerHTML=state.docs.map(doc=>`<div class="doc-item" style="position:relative"><div style="font-size:28px">${doc.icon||"📄"}</div><h3>${esc(doc.title)}</h3><div class="card-meta"><span class="pill indigo">${esc(doc.type)}</span><span class="row-meta">${esc(doc.owner)}</span></div><button onclick="deleteDoc(${JSON.stringify(doc.id||doc.title)})" style="position:absolute;top:8px;right:8px;border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:20px;line-height:1;padding:2px;opacity:.5;transition:var(--transition)" title="Sil" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">×</button></div>`).join("")+`<div class="doc-item" style="border-style:dashed;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:.55;transition:var(--transition)" onclick="addDoc()" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.55"><div style="font-size:28px">+</div><h3 style="font-size:12px;font-weight:600">Yeni Doküman</h3></div>`;
+  el.innerHTML=state.docs.map(doc=>`<div class="doc-item" style="position:relative"><div style="font-size:28px">${esc(doc.icon||"📄")}</div><h3>${esc(doc.title)}</h3><div class="card-meta"><span class="pill indigo">${esc(doc.type)}</span><span class="row-meta">${esc(doc.owner)}</span></div><button onclick="deleteDoc('${doc.id}')" style="position:absolute;top:8px;right:8px;border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:20px;line-height:1;padding:2px;opacity:.5;transition:var(--transition)" title="Sil" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">×</button></div>`).join("")+`<div class="doc-item" style="border-style:dashed;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:.55;transition:var(--transition)" onclick="addDoc()" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.55"><div style="font-size:28px">+</div><h3 style="font-size:12px;font-weight:600">Yeni Doküman</h3></div>`;
 }
 function addDoc(){
   const title=prompt("Doküman adı:");if(!title?.trim())return;
@@ -1678,7 +1678,9 @@ function renderYoutubeRefs(){
   const sorted=_ytSort==="recent"
     ?[..._ytRefs].sort((a,b)=>new Date(b.date)-new Date(a.date))
     :[..._ytRefs].sort((a,b)=>b.views-a.views);
-  document.getElementById("youtubeReferences").innerHTML=sorted.length?sorted.map(r=>`<div class="reference-row"><div style="font-size:20px">▶</div><div style="flex:1"><div class="row-title" style="font-size:13px">${esc(r.title)}</div><div class="row-meta">${fmt.date(r.date)} · ${(r.views/1000).toFixed(0)}K izlenme</div></div><button type="button" class="ghost-btn" style="font-size:12px" onclick="document.getElementById('videoPrompt').value+='[Ref: ${esc(r.title)}]'">Ref al</button></div>`).join(""):`<div class="empty-state">Henüz referans video eklenmedi.</div>`;
+  const list=document.getElementById("youtubeReferences");
+  list.innerHTML=sorted.length?sorted.map((r,index)=>`<div class="reference-row"><div style="font-size:20px">▶</div><div style="flex:1"><div class="row-title" style="font-size:13px">${esc(r.title)}</div><div class="row-meta">${fmt.date(r.date)} · ${(r.views/1000).toFixed(0)}K izlenme</div></div><button type="button" class="ghost-btn" style="font-size:12px" data-youtube-ref="${index}">Ref al</button></div>`).join(""):`<div class="empty-state">Henüz referans video eklenmedi.</div>`;
+  list.querySelectorAll("[data-youtube-ref]").forEach(button=>button.addEventListener("click",()=>{const ref=sorted[Number(button.dataset.youtubeRef)];if(ref)document.getElementById("videoPrompt").value+=`[Ref: ${ref.title}]`}));
 }
 function renderAdminSpend(){ document.getElementById("adminSpend").innerHTML=`<table class="data-table"><thead><tr><th>Kullanıcı</th><th>Görsel</th><th>Video</th><th>Tahmini kullanım</th></tr></thead><tbody>${state.users.map(u=>`<tr><td style="font-weight:700">${esc(u.name)}</td><td><span class="pill indigo">${u.images}</span></td><td><span class="pill violet">${u.videos}</span></td><td><span class="cost-chip">${fmt.usd.format(u.spend)}</span></td></tr>`).join("")}</tbody></table><div style="margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--gold-dim)"><div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px">TAHMİNİ TOPLAM KULLANIM</div><div style="font-size:28px;font-weight:900;color:var(--gold)">${fmt.usd.format(state.totalUsdSpent||0)}</div></div>` }
 function renderModelCosts(){ document.getElementById("modelCosts").innerHTML=`<table class="data-table"><thead><tr><th>Model</th><th>Tip</th><th>Birim</th></tr></thead><tbody>${imageModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill teal">Görsel</span></td><td><span class="cost-chip">${fmt.usd.format(m.cost)}</span></td></tr>`).join("")}${videoModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill violet">Video</span></td><td><span class="cost-chip">${fmt.usd.format(m.base)}/10s</span></td></tr>`).join("")}</tbody></table>` }
@@ -1920,14 +1922,14 @@ function renderPageTree(){
 
 function pageTreeFavItem(p){
   const a=state.currentPageId===p.id;
-  return`<div class="ptree-row${a?" ptree-active":""}" onclick="openPageEditor('${p.id}');navigateTo('pages')" title="${esc(p.title||'Başlıksız')}"><span class="ptree-icon">${p.icon||"📄"}</span><span class="ptree-title">${esc(p.title||"Başlıksız")}</span><button class="ptree-add" onclick="event.stopPropagation();createPage('${p.id}')" title="Alt sayfa">+</button></div>`;
+  return`<div class="ptree-row${a?" ptree-active":""}" onclick="openPageEditor('${p.id}');navigateTo('pages')" title="${esc(p.title||'Başlıksız')}"><span class="ptree-icon">${esc(p.icon||"📄")}</span><span class="ptree-title">${esc(p.title||"Başlıksız")}</span><button class="ptree-add" onclick="event.stopPropagation();createPage('${p.id}')" title="Alt sayfa">+</button></div>`;
 }
 
 function pageTreeItem(p,depth){
   const a=state.currentPageId===p.id;
   const children=(state.pages||[]).filter(c=>c.parentId===p.id&&!c.inTrash);
   const pl=6+depth*14;
-  let html=`<div class="ptree-row${a?" ptree-active":""}" style="padding-left:${pl}px" onclick="openPageEditor('${p.id}');navigateTo('pages')" title="${esc(p.title||'Başlıksız')}"><span class="ptree-icon">${p.icon||"📄"}</span><span class="ptree-title">${esc(p.title||"Başlıksız")}</span><button class="ptree-add" onclick="event.stopPropagation();createPage('${p.id}')" title="Alt sayfa">+</button></div>`;
+  let html=`<div class="ptree-row${a?" ptree-active":""}" style="padding-left:${pl}px" onclick="openPageEditor('${p.id}');navigateTo('pages')" title="${esc(p.title||'Başlıksız')}"><span class="ptree-icon">${esc(p.icon||"📄")}</span><span class="ptree-title">${esc(p.title||"Başlıksız")}</span><button class="ptree-add" onclick="event.stopPropagation();createPage('${p.id}')" title="Alt sayfa">+</button></div>`;
   if(children.length)html+=`<div class="ptree-group" style="padding-left:8px">${children.map(c=>pageTreeItem(c,depth+1)).join("")}</div>`;
   return html;
 }
@@ -2326,7 +2328,7 @@ function showMentionPicker(blockEl){
   m.id="mentionPicker";
   m.style.cssText=`position:fixed;z-index:9999;background:var(--bg2);border:1px solid var(--border-hover);border-radius:var(--radius);box-shadow:var(--shadow);width:220px;max-height:220px;overflow-y:auto;padding:4px`;
   m.innerHTML=`<div style="padding:4px 10px 6px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)">Sayfa seç</div>`+
-    pages.map(p=>`<button onclick="insertMention('${p.id}')" class="slash-item"><span style="font-size:15px;flex:0 0 auto">${p.icon||"📄"}</span><span class="slash-lbl">${esc(p.title||"Başlıksız")}</span></button>`).join("");
+    pages.map(p=>`<button onclick="insertMention('${p.id}')" class="slash-item"><span style="font-size:15px;flex:0 0 auto">${esc(p.icon||"📄")}</span><span class="slash-lbl">${esc(p.title||"Başlıksız")}</span></button>`).join("");
   let left=rect.left,top=rect.bottom+4;
   if(left+228>window.innerWidth)left=window.innerWidth-232;
   if(top+230>window.innerHeight)top=rect.top-234;
@@ -2343,7 +2345,7 @@ function insertMention(pageId){
     // remove the @ character that triggered the picker
     if(r.startOffset>0){r.setStart(r.startContainer,r.startOffset-1);r.deleteContents()}
   }
-  document.execCommand("insertHTML",false,`<a class="page-mention" onclick="event.preventDefault();openPageEditor('${pageId}');navigateTo('pages')" href="#">${pg.icon||"📄"} ${esc(pg.title||"Başlıksız")}</a> `);
+  document.execCommand("insertHTML",false,`<a class="page-mention" onclick="event.preventDefault();openPageEditor('${pageId}');navigateTo('pages')" href="#">${esc(pg.icon||"📄")} ${esc(pg.title||"Başlıksız")}</a> `);
 }
 
 // ── Emoji Picker ──────────────────────────────────────────────────────────
@@ -2421,7 +2423,7 @@ function renderTrashModal(){
   const el=document.getElementById("trashList");if(!el)return;
   const trashed=(state.pages||[]).filter(p=>p.inTrash);
   el.innerHTML=trashed.length
-    ?trashed.map(p=>`<div class="trash-row"><span style="font-size:20px">${p.icon||"📄"}</span><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(p.title||"Başlıksız")}</div><div class="row-meta">Silindi</div></div><button class="ghost-btn" style="font-size:12px" onclick="restorePage('${p.id}')">Geri yükle</button><button class="danger-btn" style="font-size:12px;min-height:32px" onclick="permanentDeletePage('${p.id}')">Sil</button></div>`).join("")
+    ?trashed.map(p=>`<div class="trash-row"><span style="font-size:20px">${esc(p.icon||"📄")}</span><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(p.title||"Başlıksız")}</div><div class="row-meta">Silindi</div></div><button class="ghost-btn" style="font-size:12px" onclick="restorePage('${p.id}')">Geri yükle</button><button class="danger-btn" style="font-size:12px;min-height:32px" onclick="permanentDeletePage('${p.id}')">Sil</button></div>`).join("")
     :`<div class="empty-state">Çöp kutusu boş.</div>`;
 }
 
@@ -2489,7 +2491,7 @@ function showMovePageModal(){
     <h2 style="font-size:16px;font-weight:700;margin-bottom:14px">Sayfayı taşı</h2>
     <div style="display:grid;gap:8px">
       <button onclick="applyMovePage(null)" style="text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px">📁 Kök dizine taşı</button>
-      ${others.map(p=>`<button onclick="applyMovePage('${p.id}')" style="text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px">${p.icon||"📄"} ${esc(p.title||"Başlıksız")}</button>`).join("")}
+      ${others.map(p=>`<button onclick="applyMovePage('${p.id}')" style="text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px">${esc(p.icon||"📄")} ${esc(p.title||"Başlıksız")}</button>`).join("")}
     </div>
     <button onclick="document.getElementById('movePageModal').remove()" style="margin-top:14px;width:100%;border:0;background:transparent;color:var(--ink3);cursor:pointer;font-size:13px;padding:6px">İptal</button>
   </div>`;

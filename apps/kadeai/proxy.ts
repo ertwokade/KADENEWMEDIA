@@ -8,7 +8,7 @@ import {
   isSettingsOwnerUser,
   isSettingsOwnerOnlyRoute,
 } from '@/lib/featureAccess'
-import { stripBasePath } from '@/lib/appConfig'
+import { stripBasePath, withBasePath } from '@/lib/appConfig'
 import {
   countedDistributedRateLimit,
   distributedRateLimit,
@@ -102,7 +102,7 @@ export async function proxy(request: NextRequest) {
     }
 
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = withBasePath('/dashboard')
     url.search = ''
     return NextResponse.redirect(url)
   }
@@ -122,7 +122,7 @@ export async function proxy(request: NextRequest) {
         return NextResponse.json({ error: 'Kimlik doğrulama yapılandırılmamış.' }, { status: 503 })
       }
       const url = request.nextUrl.clone()
-      url.pathname = '/login'
+      url.pathname = withBasePath('/login')
       url.search = ''
       return NextResponse.redirect(url)
     }
@@ -167,7 +167,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.json({ error: 'Oturum açman gerekiyor.' }, { status: 401 })
     }
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = withBasePath('/login')
     url.search = ''
     return NextResponse.redirect(url)
   }
@@ -177,7 +177,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
     }
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = withBasePath('/dashboard')
     url.search = ''
     return NextResponse.redirect(url)
   }
@@ -187,7 +187,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
     }
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = withBasePath('/dashboard')
     url.search = ''
     return NextResponse.redirect(url)
   }
@@ -245,7 +245,7 @@ export async function proxy(request: NextRequest) {
 
   if (isAuthPage && user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = withBasePath('/dashboard')
     return NextResponse.redirect(url)
   }
 

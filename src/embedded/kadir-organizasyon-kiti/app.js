@@ -350,7 +350,7 @@ function arr(v){ return Array.isArray(v)?v:[] }
 function str(v,fallback=""){ return typeof v==="string"?v:fallback }
 function num(v,fallback=0){ const n=Number(v); return Number.isFinite(n)?n:fallback }
 function bool(v){ return Boolean(v) }
-function idOf(v,prefix){ return str(v)||uid(prefix) }
+function idOf(v,prefix){ const value=str(v);return /^[a-zA-Z0-9_-]{1,128}$/.test(value)?value:uid(prefix) }
 
 function normalizeState(input,explicitEmptyArrays=new Set()){
   const base=clone(initialState);
@@ -463,7 +463,7 @@ function normalizeInventoryItem(i){
 
 function normalizeDoc(d){
   if(!isObj(d))return null;
-  return{id:d.id?str(d.id):undefined,title:str(d.title,"Döküman"),type:str(d.type,"Genel"),owner:str(d.owner,"Operasyon"),icon:str(d.icon,"📄")};
+  return{id:idOf(d.id,"doc"),title:str(d.title,"Döküman"),type:str(d.type,"Genel"),owner:str(d.owner,"Operasyon"),icon:str(d.icon,"📄")};
 }
 
 function normalizeUser(u){
@@ -623,7 +623,12 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 
 // ── YARDIMCILAR ───────────────────────────────────────────────────────
-function esc(s){ return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;") }
+function esc(s){ return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;") }
+function safeImageUrl(value){
+  const raw=String(value||"").trim();
+  if(/^data:image\/(?:png|jpe?g|gif|webp);base64,[a-z0-9+/=]+$/i.test(raw))return esc(raw);
+  try{const url=new URL(raw,location.origin);return ["http:","https:","blob:"].includes(url.protocol)?esc(url.href):""}catch{return""}
+}
 function totalSpent(prods){ return arr(prods||state.productions).reduce((t,p)=>t+productionSpent(p),0) }
 function productionSpent(p){ return arr(p?.budgets).reduce((s,g)=>s+arr(g?.items).reduce((a,i)=>a+Number(i.amount||0),0),0) }
 function openTasks(){ return arr(state.productions).flatMap(p=>arr(p.tasks).filter(t=>!t.done).map(t=>({task:t,production:p}))) }
@@ -1148,7 +1153,9 @@ function renderCommentResult(result){
   const themeColors=["teal","indigo","gold","violet","coral"];
   document.getElementById("commentSummary").innerHTML=result.themes.length?`<div class="summary-bars">${result.themes.map((t,i)=>`<div class="summary-bar"><header><span>${esc(t.name)}</span><span class="pill ${themeColors[i%themeColors.length]}">${t.percent}%</span></header><div class="progress"><span style="width:${Math.max(t.percent,3)}%"></span></div><div class="row-meta">${t.count} yorum</div></div>`).join("")}</div>`:`<div class="empty-state">Analiz icin yorum ekle.</div>`;
   document.getElementById("recommendations").innerHTML=result.themes.length?`<ul class="recommendation-list">${result.themes.slice(0,5).map(t=>`<li><div class="rec-theme">💡 ${esc(t.name)}</div><div class="rec-action">${esc(t.next)}</div></li>`).join("")}</ul>`:`<div class="empty-state">Öneri icin analiz yap.</div>`;
-  document.getElementById("wordCloud").innerHTML=result.words.map(w=>`<span class="word ${w.sentiment}${activeWordFilter===w.word?" selected":""}" style="font-size:${w.size}px" data-word="${esc(w.word)}" onclick="filterByWord('${esc(w.word)}')">${esc(w.word)}</span>`).join(" ");
+  const wordCloud=document.getElementById("wordCloud");
+  wordCloud.innerHTML=result.words.map(w=>`<button type="button" class="word ${w.sentiment}${activeWordFilter===w.word?" selected":""}" style="font-size:${w.size}px" data-word="${esc(w.word)}">${esc(w.word)}</button>`).join(" ");
+  wordCloud.querySelectorAll("[data-word]").forEach(el=>el.addEventListener("click",()=>filterByWord(el.dataset.word||"")));
   const raw=document.getElementById("commentsInput").value;
   const allComments=raw.split(/\n+/).map(line=>{ const m=line.match(/^\s*\[(\d+)\]\s*(.+)$/); return{text:m?m[2].trim():line.trim(),likes:m?Number(m[1]):0} }).filter(c=>c.text.length>2);
   const filtered=activeWordFilter?allComments.filter(c=>c.text.toLocaleLowerCase("tr-TR").includes(activeWordFilter)):[...allComments].sort((a,b)=>b.likes-a.likes).slice(0,8);
@@ -1356,7 +1363,7 @@ function renderInventory(){
 function adjustQty(id,delta){ const item=state.inventory.find(i=>i.id===id);if(!item)return;item.qty=Math.max(0,item.qty+delta);saveState();renderInventory();showToast(`${item.name}: ${item.qty} adet`,"info") }
 function renderLibrary(){
   const el=document.getElementById("libraryList");if(!el)return;
-  el.innerHTML=state.docs.map(doc=>`<div class="doc-item" style="position:relative"><div style="font-size:28px">${doc.icon||"📄"}</div><h3>${esc(doc.title)}</h3><div class="card-meta"><span class="pill indigo">${esc(doc.type)}</span><span class="row-meta">${esc(doc.owner)}</span></div><button onclick="deleteDoc(${JSON.stringify(doc.id||doc.title)})" style="position:absolute;top:8px;right:8px;border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:20px;line-height:1;padding:2px;opacity:.5;transition:var(--transition)" title="Sil" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">×</button></div>`).join("")+`<div class="doc-item" style="border-style:dashed;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:.55;transition:var(--transition)" onclick="addDoc()" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.55"><div style="font-size:28px">+</div><h3 style="font-size:12px;font-weight:600">Yeni Döküman</h3></div>`;
+  el.innerHTML=state.docs.map(doc=>`<div class="doc-item" style="position:relative"><div style="font-size:28px">${esc(doc.icon||"📄")}</div><h3>${esc(doc.title)}</h3><div class="card-meta"><span class="pill indigo">${esc(doc.type)}</span><span class="row-meta">${esc(doc.owner)}</span></div><button onclick="deleteDoc('${doc.id}')" style="position:absolute;top:8px;right:8px;border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:20px;line-height:1;padding:2px;opacity:.5;transition:var(--transition)" title="Sil" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">×</button></div>`).join("")+`<div class="doc-item" style="border-style:dashed;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:.55;transition:var(--transition)" onclick="addDoc()" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.55"><div style="font-size:28px">+</div><h3 style="font-size:12px;font-weight:600">Yeni Döküman</h3></div>`;
 }
 function addDoc(){
   const title=prompt("Döküman adı:");if(!title?.trim())return;
@@ -1443,7 +1450,9 @@ function renderYoutubeRefs(){
   const sorted=_ytSort==="recent"
     ?[..._ytRefs].sort((a,b)=>new Date(b.date)-new Date(a.date))
     :[..._ytRefs].sort((a,b)=>b.views-a.views);
-  document.getElementById("youtubeReferences").innerHTML=sorted.map(r=>`<div class="reference-row"><div style="font-size:20px">▶</div><div style="flex:1"><div class="row-title" style="font-size:13px">${esc(r.title)}</div><div class="row-meta">${fmt.date(r.date)} · ${(r.views/1000).toFixed(0)}K izlenme</div></div><button type="button" class="ghost-btn" style="font-size:12px" onclick="document.getElementById('videoPrompt').value+='[Ref: ${esc(r.title)}]'">Ref al</button></div>`).join("");
+  const list=document.getElementById("youtubeReferences");
+  list.innerHTML=sorted.map((r,index)=>`<div class="reference-row"><div style="font-size:20px">▶</div><div style="flex:1"><div class="row-title" style="font-size:13px">${esc(r.title)}</div><div class="row-meta">${fmt.date(r.date)} · ${(r.views/1000).toFixed(0)}K izlenme</div></div><button type="button" class="ghost-btn" style="font-size:12px" data-youtube-ref="${index}">Ref al</button></div>`).join("");
+  list.querySelectorAll("[data-youtube-ref]").forEach(button=>button.addEventListener("click",()=>{const ref=sorted[Number(button.dataset.youtubeRef)];if(ref)document.getElementById("videoPrompt").value+=`[Ref: ${ref.title}]`}));
 }
 function renderAdminSpend(){ document.getElementById("adminSpend").innerHTML=`<table class="data-table"><thead><tr><th>Kullanici</th><th>Görsel</th><th>Video</th><th>Harcama</th></tr></thead><tbody>${state.users.map(u=>`<tr><td style="font-weight:700">${esc(u.name)}</td><td><span class="pill indigo">${u.images}</span></td><td><span class="pill violet">${u.videos}</span></td><td><span class="cost-chip">${fmt.usd.format(u.spend)}</span></td></tr>`).join("")}</tbody></table><div style="margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--gold-dim)"><div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px">TOPLAM — GERCEK DOLAR</div><div style="font-size:28px;font-weight:900;color:var(--gold)">${fmt.usd.format(state.totalUsdSpent||0)}</div></div>` }
 function renderModelCosts(){ document.getElementById("modelCosts").innerHTML=`<table class="data-table"><thead><tr><th>Model</th><th>Tip</th><th>Birim</th></tr></thead><tbody>${imageModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill teal">Görsel</span></td><td><span class="cost-chip">${fmt.usd.format(m.cost)}</span></td></tr>`).join("")}${videoModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill violet">Video</span></td><td><span class="cost-chip">${fmt.usd.format(m.base)}/10s</span></td></tr>`).join("")}</tbody></table>` }
@@ -1685,14 +1694,14 @@ function renderPageTree(){
 
 function pageTreeFavItem(p){
   const a=state.currentPageId===p.id;
-  return`<div class="ptree-row${a?" ptree-active":""}" onclick="openPageEditor('${p.id}');navigateTo('pages')" title="${esc(p.title||'Başlıksız')}"><span class="ptree-icon">${p.icon||"📄"}</span><span class="ptree-title">${esc(p.title||"Başlıksız")}</span><button class="ptree-add" onclick="event.stopPropagation();createPage('${p.id}')" title="Alt sayfa">+</button></div>`;
+  return`<div class="ptree-row${a?" ptree-active":""}" onclick="openPageEditor('${p.id}');navigateTo('pages')" title="${esc(p.title||'Başlıksız')}"><span class="ptree-icon">${esc(p.icon||"📄")}</span><span class="ptree-title">${esc(p.title||"Başlıksız")}</span><button class="ptree-add" onclick="event.stopPropagation();createPage('${p.id}')" title="Alt sayfa">+</button></div>`;
 }
 
 function pageTreeItem(p,depth){
   const a=state.currentPageId===p.id;
   const children=(state.pages||[]).filter(c=>c.parentId===p.id&&!c.inTrash);
   const pl=6+depth*14;
-  let html=`<div class="ptree-row${a?" ptree-active":""}" style="padding-left:${pl}px" onclick="openPageEditor('${p.id}');navigateTo('pages')" title="${esc(p.title||'Başlıksız')}"><span class="ptree-icon">${p.icon||"📄"}</span><span class="ptree-title">${esc(p.title||"Başlıksız")}</span><button class="ptree-add" onclick="event.stopPropagation();createPage('${p.id}')" title="Alt sayfa">+</button></div>`;
+  let html=`<div class="ptree-row${a?" ptree-active":""}" style="padding-left:${pl}px" onclick="openPageEditor('${p.id}');navigateTo('pages')" title="${esc(p.title||'Başlıksız')}"><span class="ptree-icon">${esc(p.icon||"📄")}</span><span class="ptree-title">${esc(p.title||"Başlıksız")}</span><button class="ptree-add" onclick="event.stopPropagation();createPage('${p.id}')" title="Alt sayfa">+</button></div>`;
   if(children.length)html+=`<div class="ptree-group" style="padding-left:8px">${children.map(c=>pageTreeItem(c,depth+1)).join("")}</div>`;
   return html;
 }
@@ -1818,30 +1827,45 @@ function renderBlocks(){
   refreshIcons();
 }
 
-function rawHtml(s){ return(s||"").replace(/<script[\s\S]*?<\/script>/gi,"").replace(/<\/?(script|style|iframe|object|embed)[^>]*>/gi,"") }
+function safeRichHtml(value){
+  const template=document.createElement("template");
+  template.innerHTML=String(value||"");
+  const dangerous=new Set(["SCRIPT","STYLE","IFRAME","OBJECT","EMBED","SVG","MATH","FORM","INPUT","BUTTON"]);
+  const allowed=new Set(["B","STRONG","I","EM","U","S","BR","CODE","A","DIV","P","SPAN"]);
+  [...template.content.querySelectorAll("*")].forEach(el=>{
+    if(dangerous.has(el.tagName)){el.remove();return}
+    if(!allowed.has(el.tagName)){el.replaceWith(...el.childNodes);return}
+    const href=el.tagName==="A"?el.getAttribute("href"):null;
+    [...el.attributes].forEach(attr=>el.removeAttribute(attr.name));
+    if(href){
+      try{const url=new URL(href,location.origin);if(["http:","https:","mailto:"].includes(url.protocol)){el.setAttribute("href",url.href);el.setAttribute("rel","noopener noreferrer")}}catch{}
+    }
+  });
+  return template.innerHTML;
+}
 
 function renderOneBlock(b,num){
   function wrap(inner){ return`<div class="nt-block-wrap" data-wrap-id="${b.id}" draggable="true"><div class="blk-ctrl-bar"><span class="blk-drag-handle" title="Sürükle">⠿</span><button class="blk-ctrl-btn" onclick="duplicateBlock('${b.id}')" title="Kopyala"><i data-lucide="copy"></i></button><button class="blk-ctrl-btn" onclick="deleteBlockById('${b.id}')" title="Sil"><i data-lucide="trash-2"></i></button></div>${inner}</div>` }
   switch(b.type){
-    case"paragraph":   return wrap(`<div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Yazmaya başla veya '/' yaz...">${rawHtml(b.content)}</div>`);
-    case"heading1":    return wrap(`<div class="block-editable nt-h1" contenteditable="true" data-block-id="${b.id}" data-ph="Başlık 1">${rawHtml(b.content)}</div>`);
-    case"heading2":    return wrap(`<div class="block-editable nt-h2" contenteditable="true" data-block-id="${b.id}" data-ph="Başlık 2">${rawHtml(b.content)}</div>`);
-    case"heading3":    return wrap(`<div class="block-editable nt-h3" contenteditable="true" data-block-id="${b.id}" data-ph="Başlık 3">${rawHtml(b.content)}</div>`);
-    case"bulletList":  return wrap(`<div class="nt-list-row"><span class="nt-bullet">•</span><div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Madde">${rawHtml(b.content)}</div></div>`);
-    case"numberedList":return wrap(`<div class="nt-list-row"><span class="nt-bullet nt-num">${num}.</span><div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Madde">${rawHtml(b.content)}</div></div>`);
-    case"todo":        return wrap(`<div class="nt-todo-row"><input type="checkbox" class="todo-cb" data-todo-id="${b.id}"${b.done?" checked":""}><div class="block-editable nt-p${b.done?" todo-done":""}" contenteditable="true" data-block-id="${b.id}" data-ph="Yapılacak">${rawHtml(b.content)}</div></div>`);
+    case"paragraph":   return wrap(`<div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Yazmaya başla veya '/' yaz...">${safeRichHtml(b.content)}</div>`);
+    case"heading1":    return wrap(`<div class="block-editable nt-h1" contenteditable="true" data-block-id="${b.id}" data-ph="Başlık 1">${safeRichHtml(b.content)}</div>`);
+    case"heading2":    return wrap(`<div class="block-editable nt-h2" contenteditable="true" data-block-id="${b.id}" data-ph="Başlık 2">${safeRichHtml(b.content)}</div>`);
+    case"heading3":    return wrap(`<div class="block-editable nt-h3" contenteditable="true" data-block-id="${b.id}" data-ph="Başlık 3">${safeRichHtml(b.content)}</div>`);
+    case"bulletList":  return wrap(`<div class="nt-list-row"><span class="nt-bullet">•</span><div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Madde">${safeRichHtml(b.content)}</div></div>`);
+    case"numberedList":return wrap(`<div class="nt-list-row"><span class="nt-bullet nt-num">${num}.</span><div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Madde">${safeRichHtml(b.content)}</div></div>`);
+    case"todo":        return wrap(`<div class="nt-todo-row"><input type="checkbox" class="todo-cb" data-todo-id="${b.id}"${b.done?" checked":""}><div class="block-editable nt-p${b.done?" todo-done":""}" contenteditable="true" data-block-id="${b.id}" data-ph="Yapılacak">${safeRichHtml(b.content)}</div></div>`);
     case"toggle":{
       const kids=(b.childBlocks||[]).map((c,i)=>renderOneBlock(c,i+1)).join("");
-      return wrap(`<div class="nt-toggle-row"><button class="toggle-arrow" onclick="toggleToggle('${b.id}')">${b.open?"▼":"▶"}</button><div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Başlık">${rawHtml(b.content)}</div></div>${b.open?`<div class="blocks-inner" style="padding-left:24px;margin-top:2px">${kids||`<div class="nt-toggle-hint" style="font-size:12px;opacity:.45;padding:4px 0">Yazmaya başla...</div>`}</div>`:""}`);
+      return wrap(`<div class="nt-toggle-row"><button class="toggle-arrow" onclick="toggleToggle('${b.id}')">${b.open?"▼":"▶"}</button><div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Başlık">${safeRichHtml(b.content)}</div></div>${b.open?`<div class="blocks-inner" style="padding-left:24px;margin-top:2px">${kids||`<div class="nt-toggle-hint" style="font-size:12px;opacity:.45;padding:4px 0">Yazmaya başla...</div>`}</div>`:""}`);
     }
-    case"quote":       return wrap(`<div class="nt-quote"><div class="block-editable nt-quote-text" contenteditable="true" data-block-id="${b.id}" data-ph="Alıntı...">${rawHtml(b.content)}</div></div>`);
-    case"callout":     return wrap(`<div class="nt-callout"><button class="callout-emoji" onclick="openCalloutEmoji('${b.id}',this)">${b.emoji||"💡"}</button><div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Not ekle...">${rawHtml(b.content)}</div></div>`);
+    case"quote":       return wrap(`<div class="nt-quote"><div class="block-editable nt-quote-text" contenteditable="true" data-block-id="${b.id}" data-ph="Alıntı...">${safeRichHtml(b.content)}</div></div>`);
+    case"callout":     return wrap(`<div class="nt-callout"><button class="callout-emoji" onclick="openCalloutEmoji('${b.id}',this)">${esc(b.emoji||"💡")}</button><div class="block-editable nt-p" contenteditable="true" data-block-id="${b.id}" data-ph="Not ekle...">${safeRichHtml(b.content)}</div></div>`);
     case"code":{
       const langs=["javascript","typescript","python","html","css","json","bash","sql","text"];
       return wrap(`<div class="nt-code-wrap"><div class="nt-code-header"><select class="nt-lang-sel" onchange="setCodeLang('${b.id}',this.value)">${langs.map(l=>`<option${(b.lang||"javascript")===l?" selected":""}>${l}</option>`).join("")}</select><button class="ghost-btn" style="font-size:11px;min-height:24px;padding:2px 8px" onclick="copyBlockCode('${b.id}')">Kopyala</button></div><pre class="block-editable nt-code" contenteditable="true" data-block-id="${b.id}" data-ph="Kod buraya...">${esc(b.content||"")}</pre></div>`);
     }
     case"divider":     return wrap(`<hr class="nt-divider"/>`);
-    case"image":       return wrap(b.content?`<div class="nt-img-wrap"><img src="${esc(b.content)}" class="nt-img" loading="lazy" alt="${esc(b.caption||"")}"/>${b.caption?`<div class="nt-caption">${esc(b.caption)}</div>`:""}</div>`:`<div class="img-url-form"><i data-lucide="image"></i><input type="url" placeholder="Görsel URL'si yapıştır ve Enter'a bas..." onkeydown="if(event.key==='Enter'){event.preventDefault();const pg=currentPage();const bl=getBlock(pg.id,'${b.id}');if(bl&&this.value){bl.content=this.value;pg.updatedAt=Date.now();saveState();renderBlocks()}}"/></div>`);
+    case"image":       return wrap(b.content&&safeImageUrl(b.content)?`<div class="nt-img-wrap"><img src="${safeImageUrl(b.content)}" class="nt-img" loading="lazy" alt="${esc(b.caption||"")}"/>${b.caption?`<div class="nt-caption">${esc(b.caption)}</div>`:""}</div>`:`<div class="img-url-form"><i data-lucide="image"></i><input type="url" placeholder="Görsel URL'si yapıştır ve Enter'a bas..." onkeydown="if(event.key==='Enter'){event.preventDefault();const pg=currentPage();const bl=getBlock(pg.id,'${b.id}');if(bl&&this.value){bl.content=this.value;pg.updatedAt=Date.now();saveState();renderBlocks()}}"/></div>`);
     case"table":       return wrap(renderTableBlock(b));
     case"toc":         return wrap(renderTocBlock());
     case"embed":       return wrap(renderEmbedBlock(b));
@@ -1894,7 +1918,16 @@ function scrollToBlock(id){ document.querySelector(`[data-wrap-id="${id}"]`)?.sc
 
 function renderEmbedBlock(b){
   if(!b.content)return`<div class="img-url-form"><i data-lucide="globe"></i><input type="url" placeholder="Embed URL yapıştır ve Enter'a bas..." onkeydown="if(event.key==='Enter'){event.preventDefault();const pg=currentPage();const bl=getBlock(pg.id,'${b.id}');if(bl&&this.value){bl.content=this.value;pg.updatedAt=Date.now();saveState();renderBlocks()}}"/></div>`;
-  return`<div class="nt-embed-wrap"><iframe src="${esc(b.content)}" style="width:100%;height:320px;border:1px solid var(--border);border-radius:10px" allowfullscreen loading="lazy"></iframe><button class="ghost-btn" style="font-size:11px;min-height:24px;margin-top:4px" onclick="const pg=currentPage();const bl=getBlock(pg.id,'${b.id}');if(bl){bl.content='';pg.updatedAt=Date.now();saveState();renderBlocks()}">URL değiştir</button></div>`;
+  let embedUrl="";
+  try{
+    const url=new URL(String(b.content));
+    let videoId="";
+    if(url.hostname==="youtu.be")videoId=url.pathname.split("/").filter(Boolean)[0]||"";
+    if(["youtube.com","www.youtube.com","m.youtube.com"].includes(url.hostname))videoId=url.searchParams.get("v")||url.pathname.match(/^\/embed\/([a-zA-Z0-9_-]{6,20})$/)?.[1]||"";
+    if(/^[a-zA-Z0-9_-]{6,20}$/.test(videoId))embedUrl=`https://www.youtube-nocookie.com/embed/${videoId}`;
+  }catch{}
+  if(!embedUrl)return`<div class="empty-state">Yalnızca geçerli YouTube bağlantıları gömülebilir.</div>`;
+  return`<div class="nt-embed-wrap"><iframe src="${embedUrl}" title="YouTube video" style="width:100%;height:320px;border:1px solid var(--border);border-radius:10px" sandbox="allow-scripts allow-same-origin allow-presentation" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe><button class="ghost-btn" style="font-size:11px;min-height:24px;margin-top:4px" onclick="const pg=currentPage();const bl=getBlock(pg.id,'${b.id}');if(bl){bl.content='';pg.updatedAt=Date.now();saveState();renderBlocks()}">URL değiştir</button></div>`;
 }
 
 // ── Block Operations ──────────────────────────────────────────────────────
@@ -2068,7 +2101,7 @@ function showMentionPicker(blockEl){
   m.id="mentionPicker";
   m.style.cssText=`position:fixed;z-index:9999;background:var(--bg2);border:1px solid var(--border-hover);border-radius:var(--radius);box-shadow:var(--shadow);width:220px;max-height:220px;overflow-y:auto;padding:4px`;
   m.innerHTML=`<div style="padding:4px 10px 6px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)">Sayfa seç</div>`+
-    pages.map(p=>`<button onclick="insertMention('${p.id}')" class="slash-item"><span style="font-size:15px;flex:0 0 auto">${p.icon||"📄"}</span><span class="slash-lbl">${esc(p.title||"Başlıksız")}</span></button>`).join("");
+    pages.map(p=>`<button onclick="insertMention('${p.id}')" class="slash-item"><span style="font-size:15px;flex:0 0 auto">${esc(p.icon||"📄")}</span><span class="slash-lbl">${esc(p.title||"Başlıksız")}</span></button>`).join("");
   let left=rect.left,top=rect.bottom+4;
   if(left+228>window.innerWidth)left=window.innerWidth-232;
   if(top+230>window.innerHeight)top=rect.top-234;
@@ -2086,7 +2119,7 @@ function insertMention(pageId){
     // remove the @ character that triggered the picker
     if(r.startOffset>0){r.setStart(r.startContainer,r.startOffset-1);r.deleteContents()}
   }
-  document.execCommand("insertHTML",false,`<a class="page-mention" onclick="event.preventDefault();openPageEditor('${pageId}');navigateTo('pages')" href="#">${pg.icon||"📄"} ${esc(pg.title||"Başlıksız")}</a> `);
+  document.execCommand("insertHTML",false,`<a class="page-mention" onclick="event.preventDefault();openPageEditor('${pageId}');navigateTo('pages')" href="#">${esc(pg.icon||"📄")} ${esc(pg.title||"Başlıksız")}</a> `);
 }
 
 // ── Emoji Picker ──────────────────────────────────────────────────────────
@@ -2164,7 +2197,7 @@ function renderTrashModal(){
   const el=document.getElementById("trashList");if(!el)return;
   const trashed=(state.pages||[]).filter(p=>p.inTrash);
   el.innerHTML=trashed.length
-    ?trashed.map(p=>`<div class="trash-row"><span style="font-size:20px">${p.icon||"📄"}</span><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(p.title||"Başlıksız")}</div><div class="row-meta">Silindi</div></div><button class="ghost-btn" style="font-size:12px" onclick="restorePage('${p.id}')">Geri yükle</button><button class="danger-btn" style="font-size:12px;min-height:32px" onclick="permanentDeletePage('${p.id}')">Sil</button></div>`).join("")
+    ?trashed.map(p=>`<div class="trash-row"><span style="font-size:20px">${esc(p.icon||"📄")}</span><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(p.title||"Başlıksız")}</div><div class="row-meta">Silindi</div></div><button class="ghost-btn" style="font-size:12px" onclick="restorePage('${p.id}')">Geri yükle</button><button class="danger-btn" style="font-size:12px;min-height:32px" onclick="permanentDeletePage('${p.id}')">Sil</button></div>`).join("")
     :`<div class="empty-state">Çöp kutusu boş.</div>`;
 }
 
@@ -2232,7 +2265,7 @@ function showMovePageModal(){
     <h2 style="font-size:16px;font-weight:700;margin-bottom:14px">Sayfayı taşı</h2>
     <div style="display:grid;gap:8px">
       <button onclick="applyMovePage(null)" style="text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px">📁 Kök dizine taşı</button>
-      ${others.map(p=>`<button onclick="applyMovePage('${p.id}')" style="text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px">${p.icon||"📄"} ${esc(p.title||"Başlıksız")}</button>`).join("")}
+      ${others.map(p=>`<button onclick="applyMovePage('${p.id}')" style="text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px">${esc(p.icon||"📄")} ${esc(p.title||"Başlıksız")}</button>`).join("")}
     </div>
     <button onclick="document.getElementById('movePageModal').remove()" style="margin-top:14px;width:100%;border:0;background:transparent;color:var(--ink3);cursor:pointer;font-size:13px;padding:6px">İptal</button>
   </div>`;

@@ -411,3 +411,34 @@ test('istemci build değişkenleri sunucu listesinde yer almaz', async () => {
     'VITE_GA_ID istemci listesinde raporlanmalı',
   )
 })
+
+test('organizasyon kitleri içe aktarılan veriyi çalıştırılabilir HTML veya JavaScript yapmaz', async () => {
+  const { readFile } = await import('node:fs/promises')
+  for (const path of [
+    'src/embedded/kadir-organizasyon-kiti/app.js',
+    'apps/kadeai/public/kadeai/operations-kit/app.js',
+  ]) {
+    const source = await readFile(new URL(`../../${path}`, import.meta.url), 'utf8')
+    assert.match(source, /function idOf\(v,prefix\)\{[^\n]*\^\[a-zA-Z0-9_-\]/, `${path}: içe aktarılan kimlikler inline handler içinde güvenli olmalı`)
+    assert.match(source, /function safeRichHtml\(value\)/, `${path}: zengin metin izin listesiyle temizlenmeli`)
+    assert.doesNotMatch(source, /function rawHtml\(/, `${path}: regex tabanlı eksik HTML filtresi geri gelmemeli`)
+    assert.doesNotMatch(source, /onclick="filterByWord\(/, `${path}: yorum kelimeleri inline JavaScript'e gömülmemeli`)
+    assert.doesNotMatch(source, /onclick="document\.getElementById\('videoPrompt'\)[^\n]*\$\{esc\(r\.title\)\}/, `${path}: video başlığı inline JavaScript'e gömülmemeli`)
+    assert.match(source, /\$\{esc\(p\.icon\|\|"📄"\)\}/, `${path}: içe aktarılan sayfa ikonları HTML olarak yorumlanmamalı`)
+  }
+})
+
+test('clickjacking koruması aynı origin KadeAI operasyon iframeini engellemez', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const vercel = JSON.parse(await readFile(new URL('../../apps/kadeai/vercel.json', import.meta.url), 'utf8'))
+  const globalHeaders = vercel.headers.find((rule) => rule.source === '/(.*)')?.headers ?? []
+  const xFrameOptions = globalHeaders.find((header) => header.key.toLowerCase() === 'x-frame-options')?.value
+  const csp = globalHeaders.find((header) => header.key.toLowerCase() === 'content-security-policy')?.value ?? ''
+  assert.equal(xFrameOptions, 'SAMEORIGIN')
+  assert.match(csp, /frame-ancestors 'self'/)
+
+  const operationsPage = await readFile(new URL('../../apps/kadeai/app/kadeai/dashboard/operations/page.tsx', import.meta.url), 'utf8')
+  const operationsFrame = await readFile(new URL('../../apps/kadeai/components/operations/OperationsFrame.tsx', import.meta.url), 'utf8')
+  assert.match(operationsPage, /withBasePath\('\/operations-kit\/index\.html'\)/, 'operasyon merkezi aynı origin kaynağı kullanıyor')
+  assert.match(operationsFrame, /<iframe/, 'operasyon merkezi iframe ile render ediliyor')
+})

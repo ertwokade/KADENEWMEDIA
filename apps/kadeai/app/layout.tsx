@@ -1,15 +1,19 @@
 import type { Metadata, Viewport } from 'next'
-import { Montserrat } from 'next/font/google'
+import localFont from 'next/font/local'
 import MobileInstallPrompt from '@/components/mobile/MobileInstallPrompt'
 import { ThemeProvider } from '@/lib/context/ThemeContext'
 import './globals.css'
 import './kade-skin.css'
 import { PUBLIC_APP_URL, withBasePath } from '@/lib/appConfig'
 
-const montserrat = Montserrat({
+const montserrat = localFont({
+  src: [
+    { path: '../public/fonts/kade/montserrat-400.ttf', weight: '400', style: 'normal' },
+    { path: '../public/fonts/kade/montserrat-500.ttf', weight: '500', style: 'normal' },
+    { path: '../public/fonts/kade/montserrat-600.ttf', weight: '600', style: 'normal' },
+    { path: '../public/fonts/kade/montserrat-700.ttf', weight: '700', style: 'normal' },
+  ],
   variable: '--font-poppins',
-  subsets: ['latin', 'latin-ext'],
-  weight: ['400', '500', '600', '700'],
   display: 'swap',
 })
 const siteUrl = PUBLIC_APP_URL

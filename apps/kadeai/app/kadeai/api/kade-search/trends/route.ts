@@ -5,7 +5,7 @@ import type { TrendFilters } from '@/lib/kade-search/types'
 
 export const dynamic = 'force-dynamic'
 
-export function filtersFromSearchParams(params: URLSearchParams): TrendFilters {
+function filtersFromSearchParams(params: URLSearchParams): TrendFilters {
   const num = (key: string) => (params.get(key) ? Number(params.get(key)) : undefined)
   return {
     platform: params.get('platform') ?? undefined,

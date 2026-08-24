@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getAuthenticatedUser } from '@/lib/auth/server'
-import { exchangeCode, fetchChannel, saveConnection } from '@/lib/youtube/oauth'
+import { exchangeCode, fetchChannel, OAUTH_STATE_COOKIE, saveConnection } from '@/lib/youtube/oauth'
 import { PUBLIC_APP_URL } from '@/lib/appConfig'
-import { OAUTH_STATE_COOKIE } from '../connect/route'
 
 export const dynamic = 'force-dynamic'
 

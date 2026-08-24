@@ -101,7 +101,7 @@ test('snapshot varlıkları eksiksiz, hazırlama scriptleri yok', async () => {
   // elle tamamlanamaz — biri düşerse anasayfa boş/bozuk yayına çıkar.
   for (const path of [
     'public/site.html',
-    'public/_next',
+    'public/_kade',
     'public/sticker_img',
     'public/img/kade-hello-art.jpg',
     'public/model/cnt.gltf',
@@ -136,7 +136,7 @@ test('ana sayfa snapshot\'tan, iç sayfalar React\'ten servis edilir', async () 
   // doğrular — snapshot dosyalarının varlığını doğrulayan ayrı bir test
   // aşağıdadır; ikisi bilerek ayrı tutulur çünkü "yönlendirme doğru" ile
   // "dosya yerinde" farklı arıza biçimleridir.
-  const vercel = JSON.parse(await readRepo('vercel.json'))
+  const vercel = JSON.parse(await readRepo('apps/kadeai/vercel.json'))
   const rootRewrite = (vercel.rewrites || []).find((rule) => rule.source === '/')
   assert.equal(rootRewrite?.destination, '/site.html', '`/` snapshot\'a rewrite edilmeli')
 
@@ -474,11 +474,11 @@ test('istatistikler uydurma veya anlamsız placeholder göstermez', async () => 
 
 test('anasayfa snapshot dosyaları yerinde', async () => {
   // Anasayfa ("/") derlenmiş bir statik snapshot ile servis ediliyor:
-  // public/site.html + public/_next/**. Snapshot bir dönem kaldırılmış,
+  // public/site.html + public/_kade/**. Snapshot bir dönem kaldırılmış,
   // yerine React anasayfası konmuştu; site sahibinin talebiyle geri alındı.
   // Kontrol artık ters yönde: parçalardan biri düşerse anasayfa boş yayına
   // çıkar, o yüzden varlıkları burada doğrulanır.
-  for (const path of ['public/site.html', 'public/_next']) {
+  for (const path of ['public/site.html', 'public/_kade']) {
     const found = await stat(new URL(path, ROOT)).then(() => true, () => false)
     assert.equal(found, true, `${path} yok — anasayfa snapshot'ı eksik`)
   }
@@ -503,7 +503,7 @@ test('build zinciri snapshot ve token bütünlüğünü doğruluyor', async () =
   // Anasayfayı snapshot'a taşıyan rewrite yerinde olmalı: düşerse "/" sessizce
   // React fallback'ine (dist/index.html) döner ve ziyaretçi bambaşka bir
   // anasayfa görür.
-  const vercel = JSON.parse(await readRepo('vercel.json'))
+  const vercel = JSON.parse(await readRepo('apps/kadeai/vercel.json'))
   const homeRule = (vercel.rewrites ?? []).find((rule) => rule.source === '/')
   assert.ok(homeRule, "vercel.json'da anasayfa için rewrite bulunmalı")
   assert.equal(homeRule.destination, '/site.html', 'anasayfa rewrite\'ı snapshot\'a gitmeli')
