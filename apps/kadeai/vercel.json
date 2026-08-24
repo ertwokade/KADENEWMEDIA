@@ -1,9 +1,118 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm ci",
+  "buildCommand": "cd ../.. && npm run legacy:build && node scripts/stage-static-into-next.mjs && cd apps/kadeai && npm run build",
+  "installCommand": "cd ../.. && npm install && cd apps/kadeai && npm install",
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/",
+      "destination": "/site.html"
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/partnerler/:id",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/portfolio/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/s/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/@:handle",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/401",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/403",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/429",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/bakim",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/links",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/kadelinks",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/kadirdemir",
+      "destination": "/app.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/kadirdemir",
+      "destination": "/@kadirdemir",
+      "permanent": true
+    },
+    {
+      "source": "/links",
+      "destination": "https://kadirardademir.com/links",
+      "permanent": true
+    },
+    {
+      "source": "/kadelinks",
+      "destination": "https://kadirardademir.com/links",
+      "permanent": true
+    },
+    {
+      "source": "/kadelinks/:path*",
+      "destination": "https://kadirardademir.com/links",
+      "permanent": true
+    }
+  ],
   "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https: data: blob:; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.google.com; worker-src 'self' blob:; frame-ancestors 'self';"
+        }
+      ]
+    },
     {
       "source": "/kadeai/manifest.json",
       "headers": [
@@ -16,11 +125,15 @@
   ],
   "crons": [
     {
-      "path": "/api/materials/sync",
+      "path": "/api/reminders?action=check",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/kadeai/api/materials/sync",
       "schedule": "0 4 * * *"
     },
     {
-      "path": "/api/kade-search/collect",
+      "path": "/kadeai/api/kade-search/collect",
       "schedule": "0 5 * * *"
     }
   ]
