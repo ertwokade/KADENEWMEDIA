@@ -192,6 +192,15 @@ test('KadeAI entry and reset-password links keep the /kadeai prefix', async () =
   assert.match(resetSource, /href=\{withBasePath\(appRoutes\.login\)\}/)
 })
 
+test('dashboard navigation always applies the physical /kadeai prefix', async () => {
+  const dashboardSource = await readFile(new URL('../../app/kadeai/dashboard/page.tsx', import.meta.url), 'utf8')
+  const sidebarSource = await readFile(new URL('../../components/layout/Sidebar.tsx', import.meta.url), 'utf8')
+  assert.match(dashboardSource, /href=\{withBasePath\('\/dashboard\/title'\)\}/)
+  assert.match(dashboardSource, /href=\{withBasePath\(href\)\}/)
+  assert.match(sidebarSource, /href=\{withBasePath\(item\.href\)\}/)
+  assert.match(sidebarSource, /stripBasePath\(usePathname\(\) \?\? ''\)/)
+})
+
 test('Gateway identity can be resolved from the active request explicitly', async () => {
   const request = new Request('https://example.com/api/generate/title', {
     headers: { 'x-vercel-oidc-token': 'unit-oidc-token' },

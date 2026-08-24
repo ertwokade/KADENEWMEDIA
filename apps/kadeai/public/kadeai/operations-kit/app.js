@@ -545,6 +545,7 @@ function saveState(){
   if(el)el.textContent=`${persisted?"Kaydedildi":"Geçici kayıt"} ${fmt.time()}`;
   updateBadge();
   syncUndoBtn();
+  if(operationsReportingReady)scheduleSilentOperationReport();
 }
 
 function buildCleanInitial(){
@@ -767,6 +768,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     if(document.documentElement.classList.contains("embedded")&&window.parent!==window){
       window.parent.postMessage({type:"kade:operations-ready"},location.origin);
     }
+    operationsReportingReady=true;
   }
 });
 
@@ -830,8 +832,30 @@ function showToast(msg,type="success"){
   c.appendChild(t);
   t.addEventListener("click",()=>removeToast(t));
   setTimeout(()=>removeToast(t),3500);
+  clearTimeout(operationSilentReportTimer);
+  operationSilentReportTimer=null;
+  if(operationsReportingReady&&!['Karanlık mod','Aydınlık mod'].includes(String(msg))){
+    reportOperation(msg,type);
+  }
 }
 function removeToast(t){ t.classList.add("toast-out"); t.addEventListener("animationend",()=>t.remove(),{once:true}) }
+
+let operationsReportingReady=false;
+let operationSilentReportTimer=null;
+function scheduleSilentOperationReport(){
+  clearTimeout(operationSilentReportTimer);
+  operationSilentReportTimer=setTimeout(()=>reportOperation('Operasyon verisi güncellendi','info'),1800);
+}
+function reportOperation(message,reportType="info"){
+  if(!document.documentElement.classList.contains("embedded")||window.parent===window)return;
+  const active=document.querySelector('.view.active');
+  window.parent.postMessage({
+    type:'kade:operations-report',
+    message:String(message||'').slice(0,320),
+    reportType:String(reportType||'info').slice(0,16),
+    view:active?.id||'dashboard',
+  },location.origin);
+}
 
 // ── TEMA ─────────────────────────────────────────────────────────────
 function loadTheme(){ const s=storageGet("kade-theme")==="dark"?"dark":"light"; document.documentElement.setAttribute("data-theme",s); updateThemeBtn(s) }

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Menu, Settings } from 'lucide-react'
 import { useSidebar } from '@/lib/context/SidebarContext'
-import { apiPath } from '@/lib/appConfig'
+import { apiPath, withBasePath } from '@/lib/appConfig'
 
 export default function DashboardMobileHeader() {
   const { toggle } = useSidebar()
@@ -32,7 +32,7 @@ export default function DashboardMobileHeader() {
       </button>
       {settingsAccess && (
         <Link
-          href="/dashboard/settings"
+          href={withBasePath('/dashboard/settings')}
           className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-black/10 bg-white/80 text-[#555249] shadow-sm"
           aria-label="Ayarlar"
         >

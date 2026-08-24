@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react'
 import { ProfileProvider, useProfile } from '@/lib/context/ProfileContext'
 import { getProfileCompletion } from '@/lib/profile/types'
+import { withBasePath } from '@/lib/appConfig'
 
 const platforms = ['YouTube', 'Instagram', 'TikTok', 'X', 'LinkedIn', 'Pinterest']
 
@@ -45,7 +46,7 @@ function OnboardingForm() {
     const savedToCloud = await saveAccount(draft)
     setMessage(savedToCloud ? 'Profil ve marka hesabınıza kaydedildi.' : 'Bilgiler bu cihazda kaydedildi; giriş yaptığınızda buluta eşitlenecek.')
     setSaving(false)
-    window.setTimeout(() => router.push('/dashboard'), 700)
+    window.setTimeout(() => router.push(withBasePath('/dashboard')), 700)
   }
 
   const inputClass = 'w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3.5 py-3 text-sm text-zinc-100 outline-none transition focus:border-amber-400 placeholder:text-zinc-600'

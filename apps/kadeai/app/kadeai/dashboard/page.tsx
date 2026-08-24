@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import DashboardMobileHeader from '@/components/dashboard/DashboardMobileHeader'
 import { TOOL_REGISTRY } from '@/lib/tools/registry'
+import { withBasePath } from '@/lib/appConfig'
 
 type ToolLink = { label: string; href: string }
 type ToolGroup = {
@@ -100,8 +101,8 @@ export default function DashboardPage() {
             <h1>FİKRİ<br />ÜRET.<br /><em>ETKİYE DÖNÜŞTÜR.</em></h1>
             <p>İçerik üretimi, performans analizi ve ajans operasyonu; aynı sistemde, aynı ritimde.</p>
             <div className="kade-home-actions">
-              <Link href="/dashboard/title" className="kade-home-primary"><Sparkles className="h-4 w-4" /> İÇERİK BAŞLAT</Link>
-              <Link href="/dashboard/operations?view=dashboard" className="kade-home-secondary">OPERASYONU AÇ <ArrowRight className="h-4 w-4" /></Link>
+              <Link href={withBasePath('/dashboard/title')} className="kade-home-primary"><Sparkles className="h-4 w-4" /> İÇERİK BAŞLAT</Link>
+              <Link href={withBasePath('/dashboard/operations?view=dashboard')} className="kade-home-secondary">OPERASYONU AÇ <ArrowRight className="h-4 w-4" /></Link>
             </div>
           </div>
 
@@ -123,7 +124,7 @@ export default function DashboardPage() {
           </div>
           <div className="kade-quick-grid">
             {quickTools.map(({ label, description, href, icon: Icon, tone }, index) => (
-              <Link key={href} href={href} className={`kade-quick-card kade-tone-${tone}`}>
+              <Link key={href} href={withBasePath(href)} className={`kade-quick-card kade-tone-${tone}`}>
                 <span className="kade-quick-index">0{index + 1}</span>
                 <span className="kade-quick-icon"><Icon className="h-5 w-5" /></span>
                 <strong>{label}</strong>
@@ -151,7 +152,7 @@ export default function DashboardPage() {
                 <p>{description}</p>
                 <div className="kade-library-links">
                   {items.map((item) => (
-                    <Link key={item.href} href={item.href}><span>{item.label}</span><ArrowRight className="h-3.5 w-3.5" /></Link>
+                    <Link key={item.href} href={withBasePath(item.href)}><span>{item.label}</span><ArrowRight className="h-3.5 w-3.5" /></Link>
                   ))}
                 </div>
               </article>

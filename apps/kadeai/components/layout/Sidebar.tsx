@@ -103,7 +103,7 @@ function NavLinkStatus({ isActive, dotClass }: { isActive: boolean; dotClass: st
 }
 
 export default function Sidebar() {
-  const pathname = usePathname() ?? ''  // usePathname() null dönebilir; boş yol güvenli varsayılan.
+  const pathname = stripBasePath(usePathname() ?? '')  // Fiziksel /kadeai önekini araç kayıtlarındaki mantıksal rotadan ayır.
   const { isOpen, close } = useSidebar()
   const [search, setSearch] = useState('')
   const [operationsView, setOperationsView] = useState('dashboard')
@@ -236,7 +236,7 @@ export default function Sidebar() {
 
         {/* Brand */}
         <div className="kade-sidebar-head relative flex items-center justify-between px-4 py-4 border-b border-zinc-100 flex-shrink-0">
-          <Link href="/dashboard" className="kade-brand group flex min-w-0 flex-1 items-center gap-3" onClick={() => close()}>
+          <Link href={withBasePath('/dashboard')} className="kade-brand group flex min-w-0 flex-1 items-center gap-3" onClick={() => close()}>
             <span className="kade-brand-symbol grid h-10 w-10 shrink-0 place-items-center" aria-hidden="true">K/</span>
             <span className="min-w-0 leading-none">
               <strong className="kade-brand-title block truncate">KADE AI</strong>
@@ -310,7 +310,7 @@ export default function Sidebar() {
                       return (
                         <li key={item.id}>
                           <Link
-                            href={item.href}
+                            href={withBasePath(item.href)}
                             onClick={(event) => handleLinkClick(event, item.href)}
                             data-active={isActive}
                             className={cn(
@@ -345,7 +345,7 @@ export default function Sidebar() {
           </div>
           {settingsAccess && (
             <Link
-              href="/dashboard/settings"
+              href={withBasePath('/dashboard/settings')}
               onClick={() => close()}
               className="kade-sidebar-footer flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-colors hover:bg-zinc-50"
             >
@@ -354,7 +354,7 @@ export default function Sidebar() {
             </Link>
           )}
           <Link
-            href="/logout"
+            href={withBasePath('/logout')}
             onClick={() => close()}
             className="flex items-center gap-2.5 rounded-xl border border-zinc-200 px-3 py-2.5 text-zinc-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
           >

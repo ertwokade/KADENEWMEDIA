@@ -224,7 +224,7 @@ export default function AccountSettingsPanel() {
         </div>
         <div className="flex flex-wrap items-center gap-3 border-t border-zinc-800 pt-4">
           <button onClick={save} disabled={saving} className="flex items-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-bold text-zinc-950 hover:bg-amber-300 disabled:opacity-50"><Check className="h-4 w-4" />{saving ? 'Kaydediliyor…' : saved ? 'Kaydedildi' : 'Briefi ve profili kaydet'}</button>
-          <Link href="/onboarding" className="rounded-lg border border-zinc-700 px-3 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800">Ayrıntılı düzenle</Link>
+          <Link href={withBasePath('/onboarding')} className="rounded-lg border border-zinc-700 px-3 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800">Ayrıntılı düzenle</Link>
           <button onClick={logout} className="ml-auto flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-zinc-500 hover:bg-red-950/40 hover:text-red-300"><LogOut className="h-4 w-4" /> Çıkış yap</button>
         </div>
         {error && <p className="text-xs text-amber-400">{error} Yerel kayıt kullanılmaya devam ediyor.</p>}

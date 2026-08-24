@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react'
 import { AIModel } from '@/types'
 import { useTheme } from '@/lib/context/ThemeContext'
+import { apiPath } from '@/lib/appConfig'
 
 interface OperationsFrameProps {
   src: string
@@ -21,6 +22,7 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
   const [timedOut, setTimedOut] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const reportQueueRef = useRef<Promise<unknown>>(Promise.resolve())
   const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false)
 
   useEffect(() => {
@@ -34,12 +36,27 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
       }
       if (event.data?.type === 'kade:operations-view' && typeof event.data.view === 'string') {
         onViewChange?.(event.data.view)
+        return
+      }
+      if (event.data?.type === 'kade:operations-report' && typeof event.data.message === 'string') {
+        const payload = {
+          message: event.data.message,
+          view: typeof event.data.view === 'string' ? event.data.view : activeView,
+          type: typeof event.data.reportType === 'string' ? event.data.reportType : 'info',
+        }
+        reportQueueRef.current = reportQueueRef.current
+          .then(() => fetch(apiPath('/api/operations-report'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }))
+          .catch(() => undefined)
       }
     }
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [onViewChange])
+  }, [activeView, onViewChange])
 
   useEffect(() => {
     if (!hydrated || loaded) return
