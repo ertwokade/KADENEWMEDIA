@@ -21,7 +21,5 @@ function run(command, args, cwd) {
 
 const root = resolve(process.cwd(), '..', '..')
 run('npm', ['run', 'legacy:build'], root)
-// Webpack avoids Turbopack's local loader port while producing the same client
-// artifacts this canary scan needs to inspect.
-run('npm', ['run', 'build', '--', '--webpack'], process.cwd())
+run('npm', ['run', 'build'], process.cwd())
 run(process.execPath, ['scripts/check-client-secrets.mjs'], process.cwd())
