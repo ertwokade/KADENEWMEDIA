@@ -436,6 +436,8 @@ test('clickjacking koruması aynı origin KadeAI operasyon iframeini engellemez'
   const csp = globalHeaders.find((header) => header.key.toLowerCase() === 'content-security-policy')?.value ?? ''
   assert.equal(xFrameOptions, 'SAMEORIGIN')
   assert.match(csp, /frame-ancestors 'self'/)
+  assert.match(csp, /frame-src[^;]*https:\/\/www\.youtube\.com/)
+  assert.match(csp, /frame-src[^;]*https:\/\/www\.youtube-nocookie\.com/)
 
   const operationsPage = await readFile(new URL('../../apps/kadeai/app/kadeai/dashboard/operations/page.tsx', import.meta.url), 'utf8')
   const operationsFrame = await readFile(new URL('../../apps/kadeai/components/operations/OperationsFrame.tsx', import.meta.url), 'utf8')
