@@ -218,7 +218,7 @@ export async function queryTrends(filters: TrendFilters = {}): Promise<CurrentTr
   return (data ?? []) as CurrentTrendRow[]
 }
 
-/** Zamanlanmış haftalık özet, kullanıcı çerezi taşımadığı için service-role ile okur. */
+/** Zamanlanmış özetler kullanıcı çerezi taşımadığı için service-role ile okur. */
 export async function weeklyDigestCandidates(limit = 40): Promise<CurrentTrendRow[]> {
   const db = createAdminClient()
   const since = new Date(Date.now() - 14 * 86400e3).toISOString()
@@ -233,10 +233,23 @@ export async function weeklyDigestCandidates(limit = 40): Promise<CurrentTrendRo
   return (data ?? []) as CurrentTrendRow[]
 }
 
-/** Mevcut çalışma tablosunun tekil anahtarını haftalık gönderim kilidi olarak kullanır. */
-export async function claimWeeklyDigest(weekKey: string) {
+/** Son günlük toplamada görülen tüm kullanılabilir içerik adaylarını döndürür. */
+export async function dailyDigestCandidates(limit = 80): Promise<CurrentTrendRow[]> {
   const db = createAdminClient()
-  const id = `weekly_digest_${weekKey}`
+  const since = new Date(Date.now() - 36 * 36e5).toISOString()
+  const { data, error } = await db
+    .from('kade_trend_current')
+    .select('*')
+    .gte('last_seen', since)
+    .in('stage', ['emerging', 'rising', 'peak', 'plateau', 'declining'])
+    .order('score', { ascending: false, nullsFirst: false })
+    .limit(Math.min(Math.max(limit, 1), 100))
+  if (error) throw new Error(error.message)
+  return (data ?? []) as CurrentTrendRow[]
+}
+
+async function claimDigest(id: string) {
+  const db = createAdminClient()
   const { data: existing } = await db
     .from('kade_trend_runs')
     .select('status, started_at')
@@ -253,7 +266,7 @@ export async function claimWeeklyDigest(weekKey: string) {
   const { error } = await db.from('kade_trend_runs').insert({
     id,
     status: 'running',
-    sources: ['weekly_digest'],
+    sources: [id.startsWith('daily_digest_') ? 'daily_digest' : 'weekly_digest'],
     countries: ['TR'],
   })
   if (error) {
@@ -263,7 +276,7 @@ export async function claimWeeklyDigest(weekKey: string) {
   return { claimed: true, id }
 }
 
-export async function completeWeeklyDigest(id: string, itemCount: number, startedMs: number) {
+async function completeDigest(id: string, itemCount: number, startedMs: number) {
   const db = createAdminClient()
   const { error } = await db.from('kade_trend_runs').update({
     status: 'ok',
@@ -276,9 +289,35 @@ export async function completeWeeklyDigest(id: string, itemCount: number, starte
   if (error) throw new Error(error.message)
 }
 
-export async function releaseWeeklyDigest(id: string) {
+async function releaseDigest(id: string) {
   const db = createAdminClient()
   await db.from('kade_trend_runs').delete().eq('id', id).neq('status', 'ok')
+}
+
+/** Mevcut çalışma tablosunun tekil anahtarını haftalık gönderim kilidi olarak kullanır. */
+export async function claimWeeklyDigest(weekKey: string) {
+  const id = `weekly_digest_${weekKey}`
+  return claimDigest(id)
+}
+
+export async function completeWeeklyDigest(id: string, itemCount: number, startedMs: number) {
+  return completeDigest(id, itemCount, startedMs)
+}
+
+export async function releaseWeeklyDigest(id: string) {
+  return releaseDigest(id)
+}
+
+export async function claimDailyDigest(dayKey: string) {
+  return claimDigest(`daily_digest_${dayKey}`)
+}
+
+export async function completeDailyDigest(id: string, itemCount: number, startedMs: number) {
+  return completeDigest(id, itemCount, startedMs)
+}
+
+export async function releaseDailyDigest(id: string) {
+  return releaseDigest(id)
 }
 
 export async function getTrendDetail(id: string) {

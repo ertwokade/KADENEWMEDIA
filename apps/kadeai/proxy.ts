@@ -53,6 +53,19 @@ function allowedMutationOrigins(request: NextRequest) {
   return allowed
 }
 
+function loginRedirectFor(request: NextRequest, pathname: string) {
+  const url = request.nextUrl.clone()
+  url.pathname = withBasePath('/login')
+  url.search = ''
+  const selectedTrend = pathname === '/dashboard/trend-radar'
+    ? request.nextUrl.searchParams.get('trend')?.trim().slice(0, 200)
+    : null
+  if (selectedTrend) {
+    url.searchParams.set('next', `/dashboard/trend-radar?trend=${encodeURIComponent(selectedTrend)}`)
+  }
+  return url
+}
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = nextResponseFor(request)
   const pathname = stripBasePath(request.nextUrl.pathname)
@@ -69,7 +82,7 @@ export async function proxy(request: NextRequest) {
   const isCronApi = [
     '/api/materials/sync',
     '/api/kade-search/collect',
-    '/api/kade-search/weekly-digest',
+    '/api/kade-search/daily-digest',
   ].includes(pathname)
   const cronSecret = process.env.CRON_SECRET?.trim()
   const hasCronAccess = Boolean(
@@ -142,10 +155,7 @@ export async function proxy(request: NextRequest) {
       if (isApi) {
         return NextResponse.json({ error: 'Kimlik doğrulama yapılandırılmamış.' }, { status: 503 })
       }
-      const url = request.nextUrl.clone()
-      url.pathname = withBasePath('/login')
-      url.search = ''
-      return NextResponse.redirect(url)
+      return NextResponse.redirect(loginRedirectFor(request, pathname))
     }
     return withOperationsSecurityHeaders(supabaseResponse)
   }
@@ -187,10 +197,7 @@ export async function proxy(request: NextRequest) {
     if (isApi) {
       return NextResponse.json({ error: 'Oturum açman gerekiyor.' }, { status: 401 })
     }
-    const url = request.nextUrl.clone()
-    url.pathname = withBasePath('/login')
-    url.search = ''
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(loginRedirectFor(request, pathname))
   }
 
   if (isSettingsOwnerRoute && !isSettingsOwnerUser(user)) {

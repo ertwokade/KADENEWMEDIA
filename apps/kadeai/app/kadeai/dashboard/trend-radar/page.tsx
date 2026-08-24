@@ -121,6 +121,8 @@ export default function TrendRadarPage() {
   const [canCollect, setCanCollect] = useState(false)
   const [digestSending, setDigestSending] = useState(false)
   const [digestStatus, setDigestStatus] = useState('')
+  const [selectionSending, setSelectionSending] = useState(false)
+  const [selectionStatus, setSelectionStatus] = useState('')
 
   const categoryOptions = useMemo(
     () => Object.entries(CATEGORIES).map(([key, def]) => ({ key, label: `${def.emoji} ${def.label}` })),
@@ -202,6 +204,7 @@ export default function TrendRadarPage() {
   }, [loadTab])
 
   const openDetail = async (trend: CurrentTrendRow) => {
+    setSelectionStatus('')
     try {
       const res = await apiFetch(`/api/kade-search/trend/${encodeURIComponent(trend.id)}`)
       const json = await res.json()
@@ -210,6 +213,19 @@ export default function TrendRadarPage() {
       /* detay acilamadi - liste calismaya devam eder */
     }
   }
+
+  useEffect(() => {
+    const trendId = new URLSearchParams(window.location.search).get('trend')
+    if (!trendId) return
+    let cancelled = false
+    void apiFetch(`/api/kade-search/trend/${encodeURIComponent(trendId)}`)
+      .then(async (res) => ({ res, json: await res.json() }))
+      .then(({ res, json }) => {
+        if (!cancelled && res.ok) setDetail(json.trend)
+      })
+      .catch(() => undefined)
+    return () => { cancelled = true }
+  }, [])
 
   const addWatch = async () => {
     if (!watchTerm.trim()) return
@@ -231,18 +247,34 @@ export default function TrendRadarPage() {
     if (res.ok) setWatchlist(json.liste ?? [])
   }
 
-  const sendWeeklyDigest = async () => {
+  const sendDailyDigest = async () => {
     setDigestSending(true)
     setDigestStatus('')
     try {
-      const res = await apiFetch('/api/kade-search/weekly-digest', { method: 'POST' })
+      const res = await apiFetch('/api/kade-search/daily-digest', { method: 'POST' })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'WhatsApp özeti gönderilemedi.')
-      setDigestStatus(json.duplicate ? 'Bu haftanın özeti zaten gönderildi.' : `${json.items} fikir WhatsApp’a gönderildi.`)
+      setDigestStatus(json.duplicate ? 'Bugünün seçkisi zaten gönderildi.' : `${json.items} aday WhatsApp’a gönderildi.`)
     } catch (e) {
       setDigestStatus(e instanceof Error ? e.message : 'WhatsApp özeti gönderilemedi.')
     } finally {
       setDigestSending(false)
+    }
+  }
+
+  const sendSelectedTrend = async () => {
+    if (!detail) return
+    setSelectionSending(true)
+    setSelectionStatus('')
+    try {
+      const res = await apiFetch(`/api/kade-search/trend/${encodeURIComponent(detail.id)}/whatsapp`, { method: 'POST' })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Seçilen içerik gönderilemedi.')
+      setSelectionStatus('Seçtiğin içerik WhatsApp’a gönderildi.')
+    } catch (e) {
+      setSelectionStatus(e instanceof Error ? e.message : 'Seçilen içerik gönderilemedi.')
+    } finally {
+      setSelectionSending(false)
     }
   }
 
@@ -461,20 +493,20 @@ export default function TrendRadarPage() {
                   <div className="flex items-start gap-2.5">
                     <MessageCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" />
                     <div>
-                      <h3 className="text-sm font-semibold text-zinc-100">Haftalık WhatsApp özeti</h3>
+                      <h3 className="text-sm font-semibold text-zinc-100">Günlük WhatsApp seçkisi</h3>
                       <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">
-                        En güçlü dört içerik fikri her pazartesi 09:00’da otomatik gönderilir.
+                        Yeni KadeAI adayları her gün 09:00’da gelir. Bağlantıya dokunup istediğini seçebilirsin.
                       </p>
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={sendWeeklyDigest}
+                    onClick={sendDailyDigest}
                     disabled={digestSending}
                     className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-emerald-950 transition-colors hover:bg-emerald-400 disabled:cursor-wait disabled:opacity-60"
                   >
                     {digestSending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                    {digestSending ? 'Gönderiliyor...' : 'Bu haftayı şimdi gönder'}
+                    {digestSending ? 'Gönderiliyor...' : 'Bugünün seçkisini şimdi gönder'}
                   </button>
                   {digestStatus && <p className="text-[11px] text-zinc-400" role="status">{digestStatus}</p>}
                 </div>
@@ -723,16 +755,30 @@ export default function TrendRadarPage() {
               </div>
             )}
 
-            {detail.url && (
-              <a
-                href={detail.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="mt-5 flex w-full items-center justify-center rounded-lg bg-[#f2c322] py-2.5 text-sm font-medium text-zinc-950 transition-colors hover:bg-[#ffda3f]"
-              >
-                Kaynağı aç
-              </a>
-            )}
+            <div className="mt-5 space-y-2">
+              {canCollect && (
+                <button
+                  type="button"
+                  onClick={sendSelectedTrend}
+                  disabled={selectionSending}
+                  className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 px-3 text-sm font-semibold text-emerald-950 transition-colors hover:bg-emerald-400 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {selectionSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+                  {selectionSending ? 'Gönderiliyor...' : 'Bunu WhatsApp’a gönder'}
+                </button>
+              )}
+              {selectionStatus && <p className="text-center text-[11px] text-zinc-400" role="status">{selectionStatus}</p>}
+              {detail.url && (
+                <a
+                  href={detail.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="flex min-h-11 w-full items-center justify-center rounded-lg bg-[#f2c322] px-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-[#ffda3f]"
+                >
+                  Kaynağı aç
+                </a>
+              )}
+            </div>
           </aside>
         </div>
       )}

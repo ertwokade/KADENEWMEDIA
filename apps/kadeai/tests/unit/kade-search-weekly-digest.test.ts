@@ -5,6 +5,12 @@ import {
   selectWeeklyDigestTrends,
   weeklyDigestKey,
 } from '../../lib/kade-search/weeklyDigest'
+import {
+  dailyDigestKey,
+  formatDailyDigest,
+  formatSelectedTrend,
+  selectDailyDigestTrends,
+} from '../../lib/kade-search/dailyDigest'
 import type { CurrentTrendRow } from '../../lib/kade-search/types'
 
 function trend(overrides: Partial<CurrentTrendRow> = {}): CurrentTrendRow {
@@ -48,4 +54,35 @@ test('WhatsApp özeti eyleme dönük fikir ve güvenli bağlantı üretir', () =
 test('javascript bağlantıları özete alınmaz', () => {
   const message = formatWeeklyDigest([trend({ url: 'javascript:alert(1)' })])
   assert.doesNotMatch(message, /javascript:/)
+})
+
+test('günlük anahtar İstanbul takvim gününü kullanır', () => {
+  assert.equal(dailyDigestKey(new Date('2026-08-24T21:30:00Z')), '2026-08-25')
+})
+
+test('günlük seçki çeşitlendirilmiş seçim bağlantıları üretir', () => {
+  const rows = [
+    trend({ id: 'tiktok:video:abc', title: 'A', normalized: 'a', score: 99 }),
+    trend({ id: 'youtube:topic:def', title: 'B', normalized: 'b', platform: 'youtube', score: 90 }),
+  ]
+  const selected = selectDailyDigestTrends(rows, 10)
+  const message = formatDailyDigest(selected, {
+    now: new Date('2026-08-25T06:00:00Z'),
+    dashboardUrl: 'https://kadenewmedia.com/kadeai/dashboard/trend-radar',
+  })
+  assert.match(message, /KadeAI · Günlük İçerik Seçimin/)
+  assert.match(message, /trend=tiktok%3Avideo%3Aabc/)
+  assert.match(message, /trend=youtube%3Atopic%3Adef/)
+  assert.ok(message.length <= 1800)
+})
+
+test('seçilen trend WhatsApp için fikir ve güvenli kaynak üretir', () => {
+  const message = formatSelectedTrend(
+    trend({ id: 'trend:selected' }),
+    'https://kadenewmedia.com/kadeai/dashboard/trend-radar',
+  )
+  assert.match(message, /KadeAI · Seçtiğin İçerik/)
+  assert.match(message, /İçerik fikri:/)
+  assert.match(message, /https:\/\/example\.com\/video/)
+  assert.match(message, /trend=trend%3Aselected/)
 })

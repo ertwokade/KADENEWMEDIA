@@ -25,6 +25,19 @@ function GoogleMark() {
   )
 }
 
+function requestedDashboardPath() {
+  const raw = new URLSearchParams(window.location.search).get('next')
+  if (!raw || raw.length > 500 || !raw.startsWith('/dashboard')) return null
+  try {
+    const url = new URL(raw, window.location.origin)
+    if (url.origin !== window.location.origin) return null
+    if (url.pathname !== appRoutes.dashboard && !url.pathname.startsWith(`${appRoutes.dashboard}/`)) return null
+    return `${url.pathname}${url.search}`
+  } catch {
+    return null
+  }
+}
+
 export default function AuthPage() {
   const [mode, setMode]         = useState<Mode>('login')
   const [identifier, setIdentifier] = useState('')
@@ -79,7 +92,7 @@ export default function AuthPage() {
       }
       if (result.next) {
         captureAnalytics('login_succeeded')
-        window.location.href = withBasePath(result.next)
+        window.location.href = withBasePath(mode === 'login' ? requestedDashboardPath() || result.next : result.next)
         return
       }
       setSuccess(result.message || 'İşlem tamamlandı.')
@@ -102,7 +115,7 @@ export default function AuthPage() {
     }
 
     try {
-      const callbackPath = `${appRoutes.authCallback}?next=${encodeURIComponent(appRoutes.dashboard)}`
+      const callbackPath = `${appRoutes.authCallback}?next=${encodeURIComponent(requestedDashboardPath() || appRoutes.dashboard)}`
       const redirectTo = new URL(withBasePath(callbackPath), window.location.origin).toString()
       const { error: oauthError } = await createSupabaseClient().auth.signInWithOAuth({
         provider: 'google',

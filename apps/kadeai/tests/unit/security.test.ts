@@ -114,6 +114,29 @@ test('unauthenticated KadeAI routes keep the /kadeai prefix when redirecting', a
   }
 })
 
+test('WhatsApp trend selection survives the login redirect', async () => {
+  const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const previousAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  delete process.env.NEXT_PUBLIC_SUPABASE_URL
+  delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  try {
+    const response = await proxy(new NextRequest(
+      'https://kadenewmedia.com/kadeai/dashboard/trend-radar?trend=google%3Akeyword%3Aabc',
+    ))
+    assert.equal(response.status, 307)
+    assert.equal(
+      response.headers.get('location'),
+      'https://kadenewmedia.com/kadeai/login?next=%2Fdashboard%2Ftrend-radar%3Ftrend%3Dgoogle%253Akeyword%253Aabc',
+    )
+  } finally {
+    if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    else process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl
+    if (previousAnonKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    else process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = previousAnonKey
+  }
+})
+
 test('proxy lets only configured cron routes reach their own secret guard', async () => {
   const previousCronSecret = process.env.CRON_SECRET
   const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -126,7 +149,7 @@ test('proxy lets only configured cron routes reach their own secret guard', asyn
     for (const path of [
       '/kadeai/api/materials/sync',
       '/kadeai/api/kade-search/collect',
-      '/kadeai/api/kade-search/weekly-digest',
+      '/kadeai/api/kade-search/daily-digest',
     ]) {
       const xHeaderResponse = await proxy(new NextRequest(`https://kadenewmedia.com${path}`, {
         headers: { 'x-cron-secret': 'unit-cron-secret' },
@@ -142,7 +165,7 @@ test('proxy lets only configured cron routes reach their own secret guard', asyn
     }
 
     const invalidSecret = await proxy(new NextRequest(
-      'https://kadenewmedia.com/kadeai/api/kade-search/weekly-digest',
+      'https://kadenewmedia.com/kadeai/api/kade-search/daily-digest',
       { headers: { 'x-cron-secret': 'wrong-secret' } },
     ))
     assert.equal(invalidSecret.status, 503)
