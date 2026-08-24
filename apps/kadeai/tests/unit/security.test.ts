@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
+import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server'
 import { adminAuthEmail, isLoginIdentifier } from '../../lib/auth/adminIdentity'
 import { canAccessOwnedResource } from '../../lib/security/ownership'
 import {
@@ -12,6 +13,7 @@ import {
 } from '../../lib/featureAccess'
 import { countedDistributedRateLimit, distributedRateLimit } from '../../lib/rateLimit'
 import { getVercelGatewayToken } from '../../lib/ai/gatewayAuth'
+import { config as proxyConfig } from '../../proxy'
 
 test('user A cannot access a resource owned by user B', () => {
   assert.equal(canAccessOwnedResource('user-a', 'user-a'), true)
@@ -83,6 +85,13 @@ test('proxy forwards server request headers to route handlers', async () => {
   assert.match(source, /new Headers\(request\.headers\)/)
   assert.match(source, /NextResponse\.next\(\{ request: \{ headers: requestHeaders \} \}\)/)
   assert.doesNotMatch(source, /NextResponse\.next\(\{ request \}\)/)
+})
+
+test('proxy leaves the main-site API alone and still protects KadeAI routes', () => {
+  assert.equal(unstable_doesMiddlewareMatch({ config: proxyConfig, url: '/api/auth?action=csrf' }), false)
+  assert.equal(unstable_doesMiddlewareMatch({ config: proxyConfig, url: '/api/customer-portal' }), false)
+  assert.equal(unstable_doesMiddlewareMatch({ config: proxyConfig, url: '/kadeai/api/assistant' }), true)
+  assert.equal(unstable_doesMiddlewareMatch({ config: proxyConfig, url: '/kadeai/dashboard' }), true)
 })
 
 test('Gateway identity can be resolved from the active request explicitly', async () => {

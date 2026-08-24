@@ -253,5 +253,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  /* Ana sitenin Pages Router backend'i `/api/*` altında kendi JWT + CSRF
+     güvenliğini uygular. KadeAI proxy'si bu rotalara girerse onları Supabase
+     oturumu isteyen KadeAI endpoint'leri sanıp daha handler'a ulaşmadan 401
+     döndürür. Yalnız kök API önekini dışarıda bırak; `/kadeai/api/*` bu negatif
+     eşleşmeye takılmaz ve KadeAI korumalarından geçmeye devam eder. */
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }
