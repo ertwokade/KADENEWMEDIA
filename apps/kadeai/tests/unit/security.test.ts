@@ -114,6 +114,54 @@ test('unauthenticated KadeAI routes keep the /kadeai prefix when redirecting', a
   }
 })
 
+test('proxy lets only configured cron routes reach their own secret guard', async () => {
+  const previousCronSecret = process.env.CRON_SECRET
+  const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const previousAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.CRON_SECRET = 'unit-cron-secret'
+  delete process.env.NEXT_PUBLIC_SUPABASE_URL
+  delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  try {
+    for (const path of [
+      '/kadeai/api/materials/sync',
+      '/kadeai/api/kade-search/collect',
+      '/kadeai/api/kade-search/weekly-digest',
+    ]) {
+      const xHeaderResponse = await proxy(new NextRequest(`https://kadenewmedia.com${path}`, {
+        headers: { 'x-cron-secret': 'unit-cron-secret' },
+      }))
+      assert.equal(xHeaderResponse.status, 200)
+      assert.equal(xHeaderResponse.headers.get('x-middleware-next'), '1')
+
+      const bearerResponse = await proxy(new NextRequest(`https://kadenewmedia.com${path}`, {
+        headers: { authorization: 'Bearer unit-cron-secret' },
+      }))
+      assert.equal(bearerResponse.status, 200)
+      assert.equal(bearerResponse.headers.get('x-middleware-next'), '1')
+    }
+
+    const invalidSecret = await proxy(new NextRequest(
+      'https://kadenewmedia.com/kadeai/api/kade-search/weekly-digest',
+      { headers: { 'x-cron-secret': 'wrong-secret' } },
+    ))
+    assert.equal(invalidSecret.status, 503)
+
+    const unrelatedApi = await proxy(new NextRequest(
+      'https://kadenewmedia.com/kadeai/api/assistant',
+      { headers: { 'x-cron-secret': 'unit-cron-secret' } },
+    ))
+    assert.equal(unrelatedApi.status, 503)
+  } finally {
+    if (previousCronSecret === undefined) delete process.env.CRON_SECRET
+    else process.env.CRON_SECRET = previousCronSecret
+    if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    else process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl
+    if (previousAnonKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    else process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = previousAnonKey
+  }
+})
+
 test('KadeAI entry and reset-password links keep the /kadeai prefix', async () => {
   const homeSource = await readFile(new URL('../../app/kadeai/page.tsx', import.meta.url), 'utf8')
   const resetSource = await readFile(new URL('../../app/kadeai/reset-password/page.tsx', import.meta.url), 'utf8')

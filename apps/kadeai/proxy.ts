@@ -66,6 +66,20 @@ export async function proxy(request: NextRequest) {
   const protectedApi = isApi && !isPublicApi
   const requiresAuth = isDashboard || isOperationsKit || isOwnerRoute || isSettingsOwnerRoute || protectedApi
   const isAiApi = pathname === '/api/assistant' || pathname === '/api/image' || pathname === '/api/transcribe' || pathname === '/api/youtube/comments' || pathname.startsWith('/api/generate/')
+  const isCronApi = [
+    '/api/materials/sync',
+    '/api/kade-search/collect',
+    '/api/kade-search/weekly-digest',
+  ].includes(pathname)
+  const cronSecret = process.env.CRON_SECRET?.trim()
+  const hasCronAccess = Boolean(
+    isCronApi
+    && cronSecret
+    && (
+      request.headers.get('x-cron-secret')?.trim() === cronSecret
+      || request.headers.get('authorization')?.trim() === `Bearer ${cronSecret}`
+    )
+  )
 
   if (isApi && !['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
     const origin = request.headers.get('origin')
@@ -105,6 +119,13 @@ export async function proxy(request: NextRequest) {
     url.pathname = withBasePath('/dashboard')
     url.search = ''
     return NextResponse.redirect(url)
+  }
+
+  // Vercel Cron isteklerinin Supabase oturumu yoktur. Yalnız zamanlanmış üç
+  // KadeAI ucu, doğru CRON_SECRET taşıdığında proxy'den geçebilir; handler'lar
+  // aynı anahtarı yeniden doğrulayarak ikinci savunma hattını korur.
+  if (hasCronAccess) {
+    return withOperationsSecurityHeaders(supabaseResponse)
   }
 
   if (process.env.NODE_ENV !== 'production' && process.env.KADE_DISABLE_AUTH === '1' && requiresAuth) {
