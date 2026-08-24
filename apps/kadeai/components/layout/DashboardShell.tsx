@@ -31,7 +31,7 @@ function AutoModelApplier({ toolId }: { toolId?: string }) {
 }
 
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''  // usePathname() null dönebilir; boş yol güvenli varsayılan.
   const toolId = pathname.split('/dashboard/')[1]?.split('/')[0]
 
   return (

@@ -60,3 +60,8 @@ kade-site-snapshot-*/
 # Gizli anahtarlar (vercel link .env.local üretir); şablon dosya takipte kalır.
 .env*
 !.env.example
+
+# Tek dağıtım: statik site build sırasında apps/kadeai/public/ köküne kopyalanır.
+# Yalnız KadeAI'ın kendi varlıkları (public/kadeai/) sürüm kontrolünde tutulur.
+apps/kadeai/public/*
+!apps/kadeai/public/kadeai/

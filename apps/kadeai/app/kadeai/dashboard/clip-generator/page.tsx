@@ -10,7 +10,7 @@ import {
   Upload, Scissors, Download, Zap, CheckCircle,
   Loader2, AlertCircle, Film, TrendingUp, Sparkles,
 } from 'lucide-react'
-import type { ClipSuggestion } from '@/app/api/generate/clips/route'
+import type { ClipSuggestion } from '@/app/kadeai/api/generate/clips/route'
 import { withBasePath } from '@/lib/appConfig'
 import { extractAudio } from '@/lib/media/extractAudio'
 

@@ -1,4 +1,4 @@
-import AuthPage from '@/app/auth/page'
+import AuthPage from '@/app/kadeai/auth/page'
 
 export const dynamic = 'force-dynamic'
 

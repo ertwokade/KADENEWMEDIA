@@ -1,47 +1,12 @@
 {
-  "framework": "vite",
-  "buildCommand": "npm run legacy:build",
-  "outputDirectory": "dist",
-  "crons": [
-    {
-      "path": "/api/reminders?action=check",
-      "schedule": "0 6 * * *"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/kadirdemir",
-      "destination": "/@kadirdemir",
-      "permanent": true
-    },
-    {
-      "source": "/links",
-      "destination": "https://kadirardademir.com/links",
-      "permanent": true
-    },
-    {
-      "source": "/kadelinks",
-      "destination": "https://kadirardademir.com/links",
-      "permanent": true
-    },
-    {
-      "source": "/kadelinks/:path*",
-      "destination": "https://kadirardademir.com/links",
-      "permanent": true
-    }
-  ],
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "cd ../.. && npm run legacy:build && node scripts/stage-static-into-next.mjs && cd apps/kadeai && npm run build",
+  "installCommand": "cd ../.. && npm install && cd apps/kadeai && npm install",
   "rewrites": [
     {
       "source": "/sitemap.xml",
       "destination": "/api/sitemap"
-    },
-    {
-      "source": "/kadeai",
-      "destination": "https://kadeai.vercel.app/kadeai"
-    },
-    {
-      "source": "/kadeai/:path*",
-      "destination": "https://kadeai.vercel.app/kadeai/:path*"
     },
     {
       "source": "/",
@@ -96,6 +61,28 @@
       "destination": "/app.html"
     }
   ],
+  "redirects": [
+    {
+      "source": "/kadirdemir",
+      "destination": "/@kadirdemir",
+      "permanent": true
+    },
+    {
+      "source": "/links",
+      "destination": "https://kadirardademir.com/links",
+      "permanent": true
+    },
+    {
+      "source": "/kadelinks",
+      "destination": "https://kadirardademir.com/links",
+      "permanent": true
+    },
+    {
+      "source": "/kadelinks/:path*",
+      "destination": "https://kadirardademir.com/links",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -125,6 +112,29 @@
           "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https: data: blob:; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.google.com; worker-src 'self' blob:; frame-ancestors 'self';"
         }
       ]
+    },
+    {
+      "source": "/kadeai/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        }
+      ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/reminders?action=check",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/kadeai/api/materials/sync",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/kadeai/api/kade-search/collect",
+      "schedule": "0 5 * * *"
     }
   ]
 }

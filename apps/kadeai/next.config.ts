@@ -1,10 +1,24 @@
 import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
-import { dirname } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '/kadeai'
+/* TEK DAĞITIM MİMARİSİ
+   ---------------------------------------------------------------------------
+   Bu uygulama artık sitenin TAMAMINI barındırıyor: statik pazarlama sitesi
+   `public/` altından, KadeAI ise `app/kadeai/` altından servis ediliyor.
+
+   Next'in `basePath`i BİLEREK kaldırıldı. Onun yerine rotalar fiziksel olarak
+   `app/kadeai/` klasöründe duruyor; üretilen URL'ler birebir aynı (/kadeai/...)
+   olduğu için Google ve Supabase'e kayıtlı OAuth redirect adresleri bozulmuyor.
+   basePath kalsaydı `/api/*` (ana sitenin 30 route'u) da /kadeai altına
+   sıkışırdı ve ana sitenin backend'i erişilemez olurdu.
+
+   APP_BASE_PATH sabiti duruyor: `withBasePath()` 18 dosyada kullanılıyor ve
+   bağlantıları hâlâ /kadeai ile öneklemesi gerekiyor. */
+const APP_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '/kadeai'
 const projectRoot = dirname(fileURLToPath(import.meta.url))
+const repoRoot = resolve(projectRoot, '..', '..')
 const isProduction = process.env.NODE_ENV === 'production'
 const supabaseOrigin = (() => {
   try {
@@ -37,16 +51,41 @@ const contentSecurityPolicy = [
 ].join('; ')
 
 const nextConfig: NextConfig = {
-  basePath,
   output: 'standalone',
   skipTrailingSlashRedirect: true,
   allowedDevOrigins: ['127.0.0.1'],
+  /* Kök, REPO köküdür — apps/kadeai değil. Ana sitenin `api/*` route modülleri
+     repo kökünde duruyor ve `pages/api/[...path].js` onları oradan import
+     ediyor; kök apps/kadeai kalsaydı Turbopack proje dışına çıkan bu import'u
+     çözemezdi. `outputFileTracingRoot` da aynı sebeple genişletiliyor ki
+     dağıtım paketine o dosyalar dahil edilsin. */
   turbopack: {
-    root: projectRoot,
+    root: repoRoot,
   },
+  outputFileTracingRoot: repoRoot,
 
   env: {
-    NEXT_PUBLIC_BASE_PATH: basePath,
+    NEXT_PUBLIC_BASE_PATH: APP_BASE_PATH,
+  },
+
+  /* STATİK SİTE YÖNLENDİRMESİ
+     ---------------------------------------------------------------------------
+     Next `public/` dosyalarını yalnız BİREBİR adla sunar: /logo.png çalışır ama
+     /giris için public/giris/index.html'i kendiliğinden bulmaz, 404 döner.
+     Statik site 45+ sayfayı dizin/index.html biçiminde tuttuğu için köprü şart.
+
+     `fallback` aşaması seçildi: yalnız hiçbir Next rotası VE hiçbir public
+     dosyası eşleşmediğinde çalışır. Böylece /kadeai/* ve /api/* önce kendi
+     rotalarına gider, geri kalan her şey statik siteye düşer. */
+  async rewrites() {
+    return {
+      beforeFiles: [],
+      afterFiles: [],
+      fallback: [
+        { source: '/', destination: '/index.html' },
+        { source: '/:path*', destination: '/:path*/index.html' },
+      ],
+    }
   },
 
   async headers() {

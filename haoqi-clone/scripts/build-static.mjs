@@ -23,7 +23,9 @@ async function walk(dir) {
       continue
     }
     if (SKIP_FILES.has(entry.name) || entry.name.endsWith('.bak')) continue
-    const target = join(out, rel)
+    /* _next → _kade: yol Next.js dağıtımında rezerve, bkz. kade-html-transform.mjs */
+    const outRel = rel.startsWith('_next/') ? `_kade/${rel.slice(6)}` : rel
+    const target = join(out, outRel)
     await mkdir(dirname(target), { recursive: true })
     if (extname(entry.name).toLowerCase() === '.html') {
       await writeFile(target, transformHtml(await readFile(source, 'utf8')))

@@ -23,6 +23,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "electron/**",
     "backend/.venv/**",
+    /* Statik site build sırasında public/ köküne kopyalanır
+       (bkz. scripts/stage-static-into-next.mjs); bizim kodumuz değil. */
+    "public/**",
   ]),
 ]);
 

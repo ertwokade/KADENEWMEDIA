@@ -103,7 +103,7 @@ function NavLinkStatus({ isActive, dotClass }: { isActive: boolean; dotClass: st
 }
 
 export default function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''  // usePathname() null dönebilir; boş yol güvenli varsayılan.
   const { isOpen, close } = useSidebar()
   const [search, setSearch] = useState('')
   const [operationsView, setOperationsView] = useState('dashboard')

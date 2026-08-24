@@ -169,7 +169,9 @@ test('oturum gerektiren her API route handler kendi kontrolünü de yapar', asyn
   const { readdir } = await import('node:fs/promises')
   const { join, relative } = await import('node:path')
 
-  const API_ROOT = new URL('../../app/api/', import.meta.url).pathname
+  /* Rotalar tek dağıtım mimarisinde app/kadeai/api/ altına taşındı; URL'leri
+     /kadeai/api/* olarak aynı kaldı (bkz. apps/kadeai/next.config.ts). */
+  const API_ROOT = new URL('../../app/kadeai/api/', import.meta.url).pathname
 
   async function routeFiles(dir: string): Promise<string[]> {
     const out: string[] = []
@@ -229,7 +231,7 @@ test('admin sırrı sabit zamanlı karşılaştırılır', async () => {
   // üzerinden sır bayt bayt tahmin edilebilir.
   for (const route of ['pricing', 'custom-offer']) {
     const source = await readFile(
-      new URL(`../../app/api/payments/admin/${route}/route.ts`, import.meta.url),
+      new URL(`../../app/kadeai/api/payments/admin/${route}/route.ts`, import.meta.url),
       'utf8',
     )
     assert.match(source, /hasValidAdminSecret/, `${route}: paylaşılan doğrulayıcıyı kullanmalı`)

@@ -1,6 +1,10 @@
+/* Snapshot varlık yolu artık /_kade/ (bkz. kade-html-transform.mjs): tek
+   dağıtım mimarisinde /_next/ Next.js'in kendi çıktısına ayrıldı. Bu tespitler
+   "klonlanan Next uygulaması mı" sorusunu yanıtlıyor, bu yüzden İKİ yolu da
+   tanımalılar — yoksa marka yaması ve erişim düzeltmeleri sessizce atlanır. */
 (function(){
   'use strict';
-  var isNextApp=!!document.querySelector('script[src*="/_next/"]');
+  var isNextApp=!!document.querySelector('script[src*="/_next/"], script[src*="/_kade/"]');
   /* Only the cloned Next app needs to wait for its native reveal. Static
      routes are server-rendered HTML, so mark them loaded immediately. */
   if(!isNextApp)document.documentElement.setAttribute('data-kade-loaded','');
@@ -453,7 +457,7 @@
       if(/Kade Media/i.test(text.nodeValue||''))text.nodeValue=text.nodeValue.replace(/Kade Media/gi,'Kade New Media');
     });
   }
-  var hydrated=!!document.querySelector('script[src*="/_next/"]');
+  var hydrated=!!document.querySelector('script[src*="/_next/"], script[src*="/_kade/"]');
   function startEnhancements(){
     /* Do not touch <html> or React-owned text before hydration. Doing so caused
        React error #418 and made the header jump back to its server markup. */

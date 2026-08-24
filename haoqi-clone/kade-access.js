@@ -1,3 +1,7 @@
+/* Snapshot varlık yolu artık /_kade/ (bkz. kade-html-transform.mjs): tek
+   dağıtım mimarisinde /_next/ Next.js'in kendi çıktısına ayrıldı. Bu tespitler
+   "klonlanan Next uygulaması mı" sorusunu yanıtlıyor, bu yüzden İKİ yolu da
+   tanımalılar — yoksa marka yaması ve erişim düzeltmeleri sessizce atlanır. */
 /* Giriş / kayıt girişi.
    KadeAI ve danışmanlık iki ayrı çalışma alanı ve ikisinin de giriş + kayıt
    adımı var; tek bir ikon "giriş mi, hesap mı?" sorusunu açıkta bırakıyor.
@@ -131,7 +135,7 @@
      animasyonu bittiğinde <html data-kade-loaded> işaretini koyuyor; o gelene
      kadar bekle. Statik rotalarda React yok, hemen kurulabilir. */
   function safeToInstall() {
-    if (!document.querySelector('script[src*="/_next/"]')) return true;
+    if (!document.querySelector('script[src*="/_next/"], script[src*="/_kade/"]')) return true;
     return document.documentElement.hasAttribute('data-kade-loaded');
   }
   var waited = 0;
@@ -142,7 +146,7 @@
        yerleşene kadar (ya da süre dolana kadar) beklemeye devam et. */
     var header = document.querySelector('header .kade-access-trigger,.hud nav .kade-access-trigger');
     var strip = document.querySelector('.kade-mobile-controls');
-    var needsStrip = !!document.querySelector('script[src*="/_next/"]');
+    var needsStrip = !!document.querySelector('script[src*="/_next/"], script[src*="/_kade/"]');
     var done = header && (!needsStrip || (strip && strip.querySelector('.kade-access-trigger')));
     if (done || waited > 30000) clearInterval(timer);
   }, 250);

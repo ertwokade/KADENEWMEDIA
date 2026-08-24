@@ -100,8 +100,21 @@ export const SCRIPT_COPY = [
   ['x={"/":{entryLoading:{enabled:!0},routeLoading:{enabled:!0}}}', 'x={"/":{entryLoading:{enabled:!1},routeLoading:{enabled:!0}}}']
 ]
 
+/* KLON VARLIK YOLU: /_next/ → /_kade/
+
+   Klonlanan anasayfa da bir Next.js snapshot'ı ve chunk'larını /_next/ altından
+   çağırıyor. Site tek bir Next.js dağıtımına taşındığında o yol Next'in kendi
+   build çıktısına ayrılır (Vercel public/_next'i sunmaz), dolayısıyla klonun
+   13 chunk'ı 404 olur ve anasayfa açılmaz.
+
+   Yol adı burada yeniden yazılır; klasörün kendisini build-static.mjs aynı ada
+   kopyalar. Değişim hem HTML'de hem chunk içeriğinde geçerli olmalı, çünkü
+   snapshot kendi içinde de mutlak yolla referans veriyor. */
+const ASSET_PATH = ['/_next/', '/_kade/']
+
 export function transformScript(code) {
   for (const [from, to] of SCRIPT_COPY) code = code.split(from).join(to)
+  code = code.split(ASSET_PATH[0]).join(ASSET_PATH[1])
   return code
 }
 
@@ -121,6 +134,7 @@ const BODY_ASSETS = ['/kade-routes.js', '/kade-access.js', '/kade-footer.js', '/
 
 export function transformHtml(html) {
   for (const [from, to] of COPY) html = html.split(from).join(to)
+  html = html.split(ASSET_PATH[0]).join(ASSET_PATH[1])
   if (!html.includes('data-kade-bootstrap')) html = html.replace('<head>', '<head>' + BOOTSTRAP + CRITICAL_FIRST_PAINT)
   for (const [marker, tag] of HEAD_ASSETS) {
     if (!html.includes(marker)) html = html.replace('</head>', tag + '</head>')

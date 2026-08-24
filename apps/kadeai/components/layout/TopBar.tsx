@@ -16,7 +16,7 @@ interface TopBarProps {
 }
 
 function ModuleBadge() {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''  // usePathname() null dönebilir; boş yol güvenli varsayılan.
 
   if (pathname.startsWith('/dashboard/operations')) {
     return (
@@ -37,7 +37,7 @@ function ModuleBadge() {
 export default function TopBar({ title, description, showModelSelector = true }: TopBarProps) {
   const { selectedModel, setSelectedModel } = useModel()
   const { toggle } = useSidebar()
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''  // usePathname() null dönebilir; boş yol güvenli varsayılan.
 
   const isOperations = pathname.startsWith('/dashboard/operations')
 

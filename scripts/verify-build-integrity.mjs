@@ -5,7 +5,9 @@
  * İki regresyonu kalıcı olarak kilitler:
  *
  *  1) Anasayfa snapshot'ı eksiksiz çıksın. Anasayfa (yalnız "/") derlenmiş bir
- *     statik snapshot ile servis ediliyor: public/site.html + public/_next/**.
+ *     statik snapshot ile servis ediliyor: public/site.html + public/_kade/**.
+ *     (Yol adı _next DEĞİL: tek dağıtım mimarisinde /_next/ Next.js'in kendi
+ *     build çıktısına ayrılmıştır — bkz. haoqi-clone/kade-html-transform.mjs.)
  *     Build sonunda snapshot hem dist/site.html hem de fiziksel
  *     dist/index.html olarak bulunur; Vercel rewrite önceliğine güvenilmez. Bir
  *     dönem kaldırılmış, yerine React anasayfası konmuştu; site sahibinin
@@ -68,13 +70,13 @@ if (!snapshotHtml) {
   // site.html'in referans verdiği HER chunk dist'te bulunmalı. Eksik tek bir
   // dosya bile anasayfayı boş ekrana düşürür ve bu ancak canlıda fark edilir.
   const referenced = [...new Set(
-    [...snapshotHtml.matchAll(/(?:src|href)="(\/_next\/static\/chunks\/[^"]+)"/g)].map((m) => m[1]),
+    [...snapshotHtml.matchAll(/(?:src|href)="(\/_kade\/static\/chunks\/[^"]+)"/g)].map((m) => m[1]),
   )]
   const missing = []
   for (const path of referenced) {
     if (!await exists(join(DIST, path.slice(1)))) missing.push(path)
   }
-  if (!referenced.length) fail('dist/site.html hiçbir /_next/ chunk\'ına referans vermiyor — snapshot bozuk')
+  if (!referenced.length) fail('dist/site.html hiçbir /_kade/ chunk\'ına referans vermiyor — snapshot bozuk')
   else if (missing.length) fail(`snapshot chunk'ları eksik (${missing.length}): ${missing.join(', ')}`)
   else ok(`snapshot'ın ${referenced.length} chunk referansının tamamı dist'te`)
 
@@ -99,10 +101,10 @@ if (!snapshotHtml) {
 for (const file of htmlFiles) {
   if (file === SNAPSHOT || file === INDEX) continue
   const html = await readFile(file, 'utf8')
-  const nextRefs = html.match(/(?:src|href)="\/?_next\//g) || []
-  if (nextRefs.length) fail(`${rel(file)}: ${nextRefs.length} adet /_next/ referansı var — snapshot iç sayfaya sızmış`)
+  const nextRefs = html.match(/(?:src|href)="\/?_(?:next|kade)\//g) || []
+  if (nextRefs.length) fail(`${rel(file)}: ${nextRefs.length} adet snapshot varlık referansı var — snapshot iç sayfaya sızmış`)
 }
-if (!failures.some((f) => f.includes('sızmış'))) ok(`${htmlFiles.length - 2} iç sayfa HTML'inde /_next/ referansı yok`)
+if (!failures.some((f) => f.includes('sızmış'))) ok(`${htmlFiles.length - 2} iç sayfa HTML'inde snapshot varlık referansı yok`)
 
 // React iç sayfaları ve app.html aynı uygulama bundle'ını yüklemeli. Anasayfa
 // özellikle Haoqi snapshot'ıdır ve bu karşılaştırmaya dahil edilmez.

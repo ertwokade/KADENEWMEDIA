@@ -1,10 +1,14 @@
+/* Snapshot varlık yolu artık /_kade/ (bkz. kade-html-transform.mjs): tek
+   dağıtım mimarisinde /_next/ Next.js'in kendi çıktısına ayrıldı. Bu tespitler
+   "klonlanan Next uygulaması mı" sorusunu yanıtlıyor, bu yüzden İKİ yolu da
+   tanımalılar — yoksa marka yaması ve erişim düzeltmeleri sessizce atlanır. */
 /* Shared route furniture for the static pages: a breadcrumb/meta strip under
    the page head and a full site index above the footer, so every route links
    to every other one instead of ending in a dead stop. */
 (function () {
   'use strict';
   var shell = document.querySelector('.article-shell');
-  if (!shell || document.querySelector('script[src*="/_next/"]')) return;
+  if (!shell || document.querySelector('script[src*="/_next/"], script[src*="/_kade/"]')) return;
 
   var GROUPS = [
     ['Hizmetler', [

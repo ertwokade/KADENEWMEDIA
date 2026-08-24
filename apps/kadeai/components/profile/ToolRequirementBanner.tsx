@@ -9,7 +9,7 @@ import { getMissingProfileFields, PROFILE_FIELD_LABELS } from '@/lib/profile/typ
 import { getToolByRoute } from '@/lib/tools/registry'
 
 export default function ToolRequirementBanner() {
-  const pathname = stripBasePath(usePathname())
+  const pathname = stripBasePath(usePathname() ?? '')  // usePathname() null dönebilir
   const { account, loading, cloudBacked } = useProfile()
   const tool = getToolByRoute(pathname)
   if (!tool || tool.requiredProfileFields.length === 0) return null
