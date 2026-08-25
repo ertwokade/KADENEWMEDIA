@@ -1,39 +1,8 @@
 import { useEffect, useState } from 'react'
 import { HiOutlineSave, HiOutlinePlus, HiOutlineTrash } from 'react-icons/hi'
+import { KADE_CASE_STUDIES } from '../../../data/caseStudies'
 
-const CASE_STUDIES_DEFAULTS = {
-  summaryStats: [
-    { value: '%300+', labelTr: 'Ortalama Etkileşim Artışı', labelEn: 'Avg Engagement Growth', ikon: '📈' },
-    { value: '10+', labelTr: 'Mutlu Marka', labelEn: 'Happy Brands', ikon: '👥' },
-    { value: '5M+', labelTr: 'Toplam Erişim', labelEn: 'Total Reach', ikon: '👁' },
-    { value: '6.8x', labelTr: 'En Yüksek ROAS', labelEn: 'Highest ROAS', ikon: '📊' },
-  ],
-  cases: [
-    {
-      id: 'flavora',
-      client: 'Flavora',
-      industryTr: 'Yiyecek & İçecek',
-      industryEn: 'Food & Beverage',
-      logo: '🍕',
-      color: '#eac321',
-      durationTr: '6 Ay',
-      durationEn: '6 Months',
-      platforms: ['Instagram', 'TikTok'],
-      challengeTr: 'Flavora, yeni açılan bir restoran zinciri olarak dijital varlığını sıfırdan oluşturmak istiyordu.',
-      challengeEn: 'Flavora, as a newly opened restaurant chain, wanted to build its digital presence from scratch.',
-      solutionTr: 'Instagram ve TikTok odaklı bir strateji oluşturduk.',
-      solutionEn: 'We created an Instagram and TikTok-focused strategy.',
-      metrics: [
-        { labelTr: 'Takipçi Artışı', labelEn: 'Follower Growth', before: '0', after: '45K', change: '+45K', ikon: '👥' },
-        { labelTr: 'Aylık Erişim', labelEn: 'Monthly Reach', before: '0', after: '1.2M', change: '+1.2M', ikon: '👁' },
-      ],
-      testimonialTextTr: '',
-      testimonialTextEn: '',
-      testimonialName: '',
-      testimonialRole: '',
-    },
-  ],
-}
+const CASE_STUDIES_DEFAULTS = KADE_CASE_STUDIES
 
 function normalize(data) {
   const base = { ...CASE_STUDIES_DEFAULTS, ...(data || {}) }

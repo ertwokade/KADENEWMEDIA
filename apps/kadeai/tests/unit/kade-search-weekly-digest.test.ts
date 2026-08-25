@@ -68,9 +68,10 @@ test('günlük seçki çeşitlendirilmiş seçim bağlantıları üretir', () =>
   const selected = selectDailyDigestTrends(rows, 10)
   const message = formatDailyDigest(selected, {
     now: new Date('2026-08-25T06:00:00Z'),
-    dashboardUrl: 'https://kadenewmedia.com/kadeai/dashboard/trend-radar',
+    dashboardUrl: 'https://kadenewmedia.com/kadeai/dashboard/kade-search',
   })
   assert.match(message, /KadeAI · Günlük İçerik Seçimin/)
+  assert.match(message, /incele/i)
   assert.match(message, /trend=tiktok%3Avideo%3Aabc/)
   assert.match(message, /trend=youtube%3Atopic%3Adef/)
   assert.ok(message.length <= 1800)

@@ -12,7 +12,7 @@ import {
   MessageSquare, Mail, Radio, AlertCircle,
   Copy, BookMarked, Activity, Library, Radar, Captions,
   ChevronRight, Clapperboard, LayoutDashboard,
-  CircleDollarSign, LogOut,
+  CircleDollarSign, ListChecks, LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSidebar } from '@/lib/context/SidebarContext'
@@ -56,6 +56,7 @@ const iconMap = {
   library: Library,
   history: History,
   'circle-dollar': CircleDollarSign,
+  'list-checks': ListChecks,
 } as const
 
 function buildNavItems(ownerAccess: boolean, settingsAccess: boolean) {

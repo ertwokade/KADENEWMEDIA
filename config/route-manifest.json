@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "expectedCount": 204,
+  "expectedCount": 207,
   "generatedFrom": "Kade Media full-site audit inventory",
   "routes": [
     {
@@ -2629,6 +2629,9 @@
       "route": "/kadeai/dashboard/trend-radar", "type": "page", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/dashboard/trend-radar"
     },
     {
+      "route": "/kadeai/dashboard/kade-search", "type": "page", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/dashboard/kade-search"
+    },
+    {
       "route": "/kadeai/dashboard/video-factory", "type": "page", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/dashboard/video-factory"
     },
     {
@@ -2642,6 +2645,9 @@
     },
     {
       "route": "/kadeai/api/kade-search/daily-digest", "type": "api", "app": "kadeai", "methods": ["GET", "POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/daily-digest"
+    },
+    {
+      "route": "/kadeai/api/kade-search/approvals", "type": "api", "app": "kadeai", "methods": ["GET", "POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/approvals"
     },
     {
       "route": "/kadeai/api/kade-search/ideas", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/ideas"
@@ -2681,6 +2687,9 @@
     },
     {
       "route": "/kadeai/api/operations-report", "type": "api", "app": "kadeai", "methods": ["POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/operations-report"
+    },
+    {
+      "route": "/kadeai/api/reports/weekly-site", "type": "api", "app": "kadeai", "methods": ["GET", "POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/reports/weekly-site"
     },
     {
       "route": "/kadeai/api/packages", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/packages"

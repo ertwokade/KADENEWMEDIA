@@ -41,7 +41,7 @@ async function deliver(req: NextRequest) {
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://kadenewmedia.com'
     const message = formatDailyDigest(trends, {
-      dashboardUrl: `${siteUrl}/kadeai/dashboard/trend-radar`,
+      dashboardUrl: `${siteUrl}/kadeai/dashboard/kade-search`,
     })
     const delivery = await sendWhatsAppMessage(message)
     await completeDailyDigest(claim.id, trends.length, startedMs)

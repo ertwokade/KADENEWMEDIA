@@ -72,7 +72,7 @@ function rootApiExists(route) {
 
 assert(manifest.schemaVersion === 1, 'Unsupported route manifest schema')
 assert(manifest.routes.length === manifest.expectedCount, `Expected ${manifest.expectedCount} routes, found ${manifest.routes.length}`)
-assert(manifest.expectedCount === 204, `Inventory contract changed: ${manifest.expectedCount}`)
+assert(manifest.expectedCount === 207, `Inventory contract changed: ${manifest.expectedCount}`)
 
 const seen = new Set()
 for (const entry of manifest.routes) {

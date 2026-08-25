@@ -157,6 +157,28 @@ test('WhatsApp trend selection survives the login redirect', async () => {
   }
 })
 
+test('KadeSearch approval selection survives the login redirect', async () => {
+  const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const previousAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  delete process.env.NEXT_PUBLIC_SUPABASE_URL
+  delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  try {
+    const response = await proxy(new NextRequest(
+      'https://kadenewmedia.com/kadeai/dashboard/kade-search?trend=google%3Akeyword%3Aabc',
+    ))
+    assert.equal(response.status, 307)
+    assert.equal(
+      response.headers.get('location'),
+      'https://kadenewmedia.com/kadeai/login?next=%2Fdashboard%2Fkade-search%3Ftrend%3Dgoogle%253Akeyword%253Aabc',
+    )
+  } finally {
+    if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    else process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl
+    if (previousAnonKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    else process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = previousAnonKey
+  }
+})
+
 test('proxy lets only configured cron routes reach their own secret guard', async () => {
   const previousCronSecret = process.env.CRON_SECRET
   const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -170,6 +192,7 @@ test('proxy lets only configured cron routes reach their own secret guard', asyn
       '/kadeai/api/materials/sync',
       '/kadeai/api/kade-search/collect',
       '/kadeai/api/kade-search/daily-digest',
+      '/kadeai/api/reports/weekly-site',
     ]) {
       const xHeaderResponse = await proxy(new NextRequest(`https://kadenewmedia.com${path}`, {
         headers: { 'x-cron-secret': 'unit-cron-secret' },

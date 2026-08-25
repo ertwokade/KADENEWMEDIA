@@ -20,6 +20,7 @@ import type {
   TrendFilters,
   TrendRow,
 } from './types'
+import type { ApprovalDraft, ApprovalIdeaSnapshot, ApprovalStatus } from './approvals'
 
 const CHUNK = 200
 
@@ -266,7 +267,7 @@ async function claimDigest(id: string) {
   const { error } = await db.from('kade_trend_runs').insert({
     id,
     status: 'running',
-    sources: [id.startsWith('daily_digest_') ? 'daily_digest' : 'weekly_digest'],
+    sources: [id.startsWith('daily_digest_') ? 'daily_digest' : id.startsWith('weekly_site_report_') ? 'weekly_site_report' : 'weekly_digest'],
     countries: ['TR'],
   })
   if (error) {
@@ -317,6 +318,18 @@ export async function completeDailyDigest(id: string, itemCount: number, started
 }
 
 export async function releaseDailyDigest(id: string) {
+  return releaseDigest(id)
+}
+
+export async function claimWeeklySiteReport(weekKey: string) {
+  return claimDigest(`weekly_site_report_${weekKey}`)
+}
+
+export async function completeWeeklySiteReport(id: string, itemCount: number, startedMs: number) {
+  return completeDigest(id, itemCount, startedMs)
+}
+
+export async function releaseWeeklySiteReport(id: string) {
   return releaseDigest(id)
 }
 
@@ -743,6 +756,73 @@ export async function watchlistRemove(userId: string, term: string) {
     .eq('user_id', userId)
     .eq('normalized', normalizeText(term))
   if (error) throw new Error(error.message)
+}
+
+export interface ContentApprovalRow {
+  id: string
+  user_id: string
+  trend_id: string
+  status: ApprovalStatus
+  idea: ApprovalIdeaSnapshot
+  draft: ApprovalDraft
+  notes: string | null
+  approved_at: string | null
+  published_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export async function approvalList(userId: string): Promise<ContentApprovalRow[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('kade_content_approvals')
+    .select('*')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false })
+    .limit(200)
+  if (error) throw new Error(error.message)
+  return (data ?? []) as ContentApprovalRow[]
+}
+
+export async function approvalGet(userId: string, trendIdValue: string): Promise<ContentApprovalRow | null> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('kade_content_approvals')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('trend_id', trendIdValue)
+    .maybeSingle()
+  if (error) throw new Error(error.message)
+  return data as ContentApprovalRow | null
+}
+
+export async function approvalUpsert(input: {
+  userId: string
+  trendId: string
+  status: ApprovalStatus
+  idea: ApprovalIdeaSnapshot
+  draft: ApprovalDraft
+  notes?: string | null
+}) {
+  const supabase = await createClient()
+  const now = new Date().toISOString()
+  const { data, error } = await supabase
+    .from('kade_content_approvals')
+    .upsert({
+      user_id: input.userId,
+      trend_id: input.trendId,
+      status: input.status,
+      idea: input.idea,
+      draft: input.draft,
+      notes: input.notes?.trim() || null,
+      approved_at: ['approved', 'published'].includes(input.status) ? now : null,
+      published_at: input.status === 'published' ? now : null,
+      updated_at: now,
+    }, { onConflict: 'user_id,trend_id' })
+    .select('*')
+    .single()
+  if (error) throw new Error(error.message)
+  return data as ContentApprovalRow
 }
 
 /**

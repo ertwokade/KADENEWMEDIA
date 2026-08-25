@@ -5,19 +5,17 @@ import PageTransition from '../components/PageTransition'
 import { FadeIn } from '../components/Animations'
 import PageBgAnimation from '../components/PageBgAnimation'
 import { useSiteContent } from '../hooks/useSiteContent'
+import { KADE_CASE_STUDIES } from '../data/caseStudies'
 import './CaseStudies.css'
 
-const CASE_STUDIES_EMPTY = { summaryStats: [], cases: [] }
-
 export default function CaseStudies() {
-  const { content } = useSiteContent('caseStudies', CASE_STUDIES_EMPTY)
+  const { content } = useSiteContent('caseStudies', KADE_CASE_STUDIES)
   const stats = Array.isArray(content?.summaryStats) ? content.summaryStats : []
   const cases = Array.isArray(content?.cases) ? content.cases : []
   useSEO({
     title: 'Vaka Çalışmaları | Kade New Media',
-    description: 'Müşteri izniyle yayınlanan, doğrulanmış Kade New Media vaka çalışmaları.',
+    description: 'Kade New Media ve KadeAI ürünlerinde uyguladığımız, kapsamı ve ölçümü açık dijital dönüşüm vaka çalışmaları.',
     path: '/basari-hikayeleri',
-    noindex: true,
   })
 
   return (
@@ -28,7 +26,7 @@ export default function CaseStudies() {
         <div className="container">
           <FadeIn><div className="section-badge"><HiOutlineDocumentText size={14} />Vaka çalışmaları</div></FadeIn>
           <FadeIn delay={0.1}><h1 className="section-title">Doğrulanmış <span>sonuç arşivi</span></h1></FadeIn>
-          <FadeIn delay={0.2}><p className="section-subtitle">Kampanya sonuçlarını ve müşteri isimlerini ancak ölçüm kaynağı ve yayın izni doğrulandıktan sonra paylaşıyoruz.</p></FadeIn>
+          <FadeIn delay={0.2}><p className="section-subtitle">Önce kendi ürünlerimizde uyguladığımız sistemleri; kapsamı, yöntemi ve ölçümü açık biçimde paylaşıyoruz. Müşteri sonuçlarını yalnızca izin ve kaynak doğrulamasından sonra ekliyoruz.</p></FadeIn>
         </div>
       </section>
       {stats.length > 0 && <section className="section"><div className="container case-stats-grid">{stats.map((stat, index) => <article className="glass-card case-stat" key={`${stat.labelTr}-${index}`}><span>{stat.ikon}</span><strong>{stat.value}</strong><p>{stat.labelTr}</p></article>)}</div></section>}

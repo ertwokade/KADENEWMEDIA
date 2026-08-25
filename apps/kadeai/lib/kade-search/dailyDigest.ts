@@ -54,7 +54,7 @@ export function formatDailyDigest(
   opts: { now?: Date; dashboardUrl?: string } = {},
 ) {
   const now = opts.now ?? new Date()
-  const dashboardUrl = opts.dashboardUrl ?? 'https://kadenewmedia.com/kadeai/dashboard/trend-radar'
+  const dashboardUrl = opts.dashboardUrl ?? 'https://kadenewmedia.com/kadeai/dashboard/kade-search'
   const date = new Intl.DateTimeFormat('tr-TR', {
     timeZone: 'Europe/Istanbul', day: 'numeric', month: 'long', weekday: 'long',
   }).format(now)
@@ -62,7 +62,7 @@ export function formatDailyDigest(
     '*KadeAI · Günlük İçerik Seçimin*',
     date,
     '',
-    'İstediğin adayın Seç bağlantısına dokun. KadeAI detayı açıp seçtiğin içeriği WhatsApp’a gönderecek.',
+    'Adayları KadeSearch Onay Merkezi’nde incele. Onayladığın içerik için çekime hazır üretim paketi hazırlanacak.',
     '',
   ]
   const footer = ['', `Tüm adaylar: ${dashboardUrl}`]
@@ -77,7 +77,7 @@ export function formatDailyDigest(
     const item = [
       `${index + 1}. *${clean(trend.title, 58)}*`,
       `${PLATFORM_LABELS[trend.platform] ?? trend.platform} · ${STAGE_LABELS[trend.stage ?? ''] ?? 'İzlemede'} · skor ${Math.round(trend.score ?? 0)}`,
-      `Seç: ${selectionUrl}`,
+      `İncele / onayla: ${selectionUrl}`,
       '',
     ]
     if ([...lines, ...item, ...footer].join('\n').length > 1780) break

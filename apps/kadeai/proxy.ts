@@ -57,11 +57,11 @@ function loginRedirectFor(request: NextRequest, pathname: string) {
   const url = request.nextUrl.clone()
   url.pathname = withBasePath('/login')
   url.search = ''
-  const selectedTrend = pathname === '/dashboard/trend-radar'
+  const selectedTrend = ['/dashboard/trend-radar', '/dashboard/kade-search'].includes(pathname)
     ? request.nextUrl.searchParams.get('trend')?.trim().slice(0, 200)
     : null
   if (selectedTrend) {
-    url.searchParams.set('next', `/dashboard/trend-radar?trend=${encodeURIComponent(selectedTrend)}`)
+    url.searchParams.set('next', `${pathname}?trend=${encodeURIComponent(selectedTrend)}`)
   }
   return url
 }
@@ -89,6 +89,7 @@ export async function proxy(request: NextRequest) {
     '/api/kade-search/collect',
     '/api/kade-search/daily-digest',
     '/api/kade-search/weekly-digest',
+    '/api/reports/weekly-site',
     '/api/operations-report',
   ].includes(pathname)
   const cronSecret = process.env.CRON_SECRET?.trim()

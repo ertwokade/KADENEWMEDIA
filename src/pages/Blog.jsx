@@ -29,9 +29,6 @@ export default function Blog() {
     title: isEN ? 'Blog | Kade New Media' : 'Blog | Kade New Media',
     description: isEN ? 'Verified Kade New Media articles and practical notes.' : 'Doğrulanmış Kade New Media yazıları ve pratik notları.',
     path: '/blog',
-    // Liste dolu olsa da ürün kararı gereği public arşiv indeks dışıdır.
-    // Detay bağlantıları `follow` ile taranabilir kalır.
-    noindex: true,
   })
 
   useEffect(() => {

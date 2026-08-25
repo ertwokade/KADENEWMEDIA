@@ -139,6 +139,10 @@
     {
       "path": "/kadeai/api/kade-search/daily-digest",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/kadeai/api/reports/weekly-site",
+      "schedule": "0 7 * * 1"
     }
   ]
 }
