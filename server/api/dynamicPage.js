@@ -122,8 +122,10 @@ export default async function handler(req, res) {
 
   try {
     const page = await resolvePage(type, slug);
-    const routePrefix = type === 'profile' ? '/@' : `/${type === 'partner' ? 'partnerler' : type}`;
-    const canonical = `${SITE_URL}${routePrefix}/${slug}`;
+    const routePath = type === 'profile'
+      ? `/@${slug}`
+      : `/${type === 'partner' ? 'partnerler' : type}/${slug}`;
+    const canonical = `${SITE_URL}${routePath}`;
     const html = setMeta(await appShell(req), {
       ...(page || {}),
       canonical,

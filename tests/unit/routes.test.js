@@ -55,4 +55,5 @@ test('dynamic public pages are server-validated before the SPA shell is served',
   }
   assert.match(dispatcher, /'dynamic-page': dynamicPage/)
   assert.match(renderer, /res\.status\(page \? 200 : 404\)\.send\(html\)/)
+  assert.match(renderer, /`\/@\$\{slug\}`/)
 })
