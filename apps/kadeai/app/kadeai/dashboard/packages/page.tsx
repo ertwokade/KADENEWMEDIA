@@ -88,7 +88,7 @@ export default function PackagesPage() {
       <TopBar title="Paketler" />
       <div className="mx-auto max-w-6xl px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-zinc-100">Paketler</h1>
+          <h2 className="text-2xl font-semibold text-zinc-100">Paketler</h2>
           <p className="mt-1 text-sm text-zinc-400">Sana uygun planı seç. Fiyat, seçimden sonra <span className="text-amber-400">15 dakika</span> geçerlidir.</p>
         </div>
 

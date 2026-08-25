@@ -73,11 +73,16 @@ export async function proxy(request: NextRequest) {
   const isAuthPage = pathname.startsWith('/auth') || pathname === '/login'
   const isDashboard = pathname.startsWith('/dashboard') || pathname === '/onboarding'
   const isOperationsKit = pathname.startsWith('/operations-kit')
+  // Operasyon uygulamasının HTML kabuğu ve API'leri oturumla korunur. Kabuğun
+  // çalışması için gereken aynı-origin statik dosyalar ise script/style isteği
+  // sırasında oturum yenilemesine bağımlı olmamalı; aksi halde JS yerine giriş
+  // HTML'i dönüyor ve iframe yalnızca statik iskelette kalıyor.
+  const isOperationsKitAsset = isOperationsKit && /\.(?:css|js|png|svg|webp|woff2?)$/i.test(pathname)
   const isOwnerRoute = isOwnerOnlyRoute(pathname)
   const isSettingsOwnerRoute = isSettingsOwnerOnlyRoute(pathname)
   const isPublicApi = pathname === '/api/health' || pathname === '/api/auth/password' || pathname === '/api/auth/recovery' || pathname === '/api/auth/recovery-session' || pathname === '/api/payments/webhook'
   const protectedApi = isApi && !isPublicApi
-  const requiresAuth = isDashboard || isOperationsKit || isOwnerRoute || isSettingsOwnerRoute || protectedApi
+  const requiresAuth = isDashboard || (isOperationsKit && !isOperationsKitAsset) || isOwnerRoute || isSettingsOwnerRoute || protectedApi
   const isAiApi = pathname === '/api/assistant' || pathname === '/api/image' || pathname === '/api/transcribe' || pathname === '/api/youtube/comments' || pathname.startsWith('/api/generate/')
   const isCronApi = [
     '/api/materials/sync',

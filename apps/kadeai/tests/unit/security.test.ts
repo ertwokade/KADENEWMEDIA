@@ -114,6 +114,26 @@ test('unauthenticated KadeAI routes keep the /kadeai prefix when redirecting', a
   }
 })
 
+test('operations kit static assets load without turning into login HTML', async () => {
+  const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const previousAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  delete process.env.NEXT_PUBLIC_SUPABASE_URL
+  delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  try {
+    for (const path of ['/kadeai/operations-kit/app.js', '/kadeai/operations-kit/styles.css']) {
+      const response = await proxy(new NextRequest(`https://kadenewmedia.com${path}`))
+      assert.equal(response.status, 200)
+      assert.equal(response.headers.get('location'), null)
+      assert.equal(response.headers.get('x-content-type-options'), 'nosniff')
+    }
+  } finally {
+    if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    else process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl
+    if (previousAnonKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    else process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = previousAnonKey
+  }
+})
+
 test('WhatsApp trend selection survives the login redirect', async () => {
   const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const previousAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
