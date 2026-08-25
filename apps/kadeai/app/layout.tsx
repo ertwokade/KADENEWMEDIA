@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import MobileInstallPrompt from '@/components/mobile/MobileInstallPrompt'
+import KadeDocumentTitle from '@/components/metadata/KadeDocumentTitle'
 import { ThemeProvider } from '@/lib/context/ThemeContext'
 import './globals.css'
 import './kade-skin.css'
@@ -67,8 +68,15 @@ export const metadata: Metadata = {
     title: 'KadeAI',
   },
   icons: {
-    icon: withBasePath('/icons/icon-192.png'),
-    apple: withBasePath('/icons/icon-192.png'),
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/favicon.png', sizes: '512x512', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [{ url: '/favicon.png', sizes: '512x512', type: 'image/png' }],
   },
   other: {
     'mobile-web-app-capable': 'yes',
@@ -91,6 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-full" suppressHydrationWarning>
         <ThemeProvider>
+          <KadeDocumentTitle />
           {children}
           <MobileInstallPrompt />
         </ThemeProvider>

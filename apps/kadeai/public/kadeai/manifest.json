@@ -1,6 +1,6 @@
 {
-  "name": "Kade Media",
-  "short_name": "KadeMedia",
+  "name": "KadeAI | Kade New Media",
+  "short_name": "KadeAI",
   "description": "AI destekli icerik, operasyon ve sosyal medya analiz platformu",
   "id": "/kadeai/",
   "start_url": "/kadeai/dashboard",

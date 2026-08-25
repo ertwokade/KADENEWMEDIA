@@ -138,9 +138,28 @@ const HEAD_ASSETS = [
 
 const BODY_ASSETS = ['/kade-routes.js', '/kade-access.js', '/kade-footer.js', '/kade-brand.js', '/kade-entry-watchdog.js']
 
+const KADE_FAVICONS = '<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/favicon.png"><link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">'
+
+function normalizeTitle(html) {
+  return html.replace(/<title>([\s\S]*?)<\/title>/i, (tag, rawTitle) => {
+    const title = rawTitle
+      .trim()
+      .replace(/(?:\s*\|\s*Kade New Media){2,}/g, ' | Kade New Media')
+    return `<title>${title}</title>`
+  })
+}
+
+function normalizeFavicons(html) {
+  html = html.replace(/<link\b[^>]*\brel=["'](?:shortcut\s+)?icon["'][^>]*\/?\s*>/gi, '')
+  html = html.replace(/<link\b[^>]*\brel=["']apple-touch-icon["'][^>]*\/?\s*>/gi, '')
+  return html.replace('</head>', KADE_FAVICONS + '</head>')
+}
+
 export function transformHtml(html) {
   for (const [from, to] of COPY) html = html.split(from).join(to)
   html = html.split(ASSET_PATH[0]).join(ASSET_PATH[1])
+  html = normalizeTitle(html)
+  html = normalizeFavicons(html)
   if (!html.includes('data-kade-bootstrap')) html = html.replace('<head>', '<head>' + BOOTSTRAP + CRITICAL_FIRST_PAINT)
   for (const [marker, tag] of HEAD_ASSETS) {
     if (!html.includes(marker)) html = html.replace('</head>', tag + '</head>')
