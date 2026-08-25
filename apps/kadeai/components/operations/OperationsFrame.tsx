@@ -21,6 +21,7 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
   const [loaded, setLoaded] = useState(false)
   const [timedOut, setTimedOut] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
+  const [reportError, setReportError] = useState('')
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const reportQueueRef = useRef<Promise<unknown>>(Promise.resolve())
   const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false)
@@ -50,7 +51,13 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           }))
-          .catch(() => undefined)
+          .then(async (response) => {
+            if (!response.ok) throw new Error('Operasyon raporu gönderilemedi.')
+            setReportError('')
+          })
+          .catch(() => {
+            setReportError('WhatsApp operasyon raporu gönderilemedi. Bildirim ayarlarını kontrol edin.')
+          })
       }
     }
 
@@ -96,6 +103,11 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
 
   return (
     <div className="kade-operations-frame relative h-full w-full overflow-hidden" aria-busy={!loaded}>
+      {reportError && (
+        <div role="alert" className="absolute left-1/2 top-3 z-30 w-[min(92%,32rem)] -translate-x-1/2 rounded-lg border border-red-500/40 bg-red-950/95 px-4 py-3 text-center text-xs font-medium text-red-100 shadow-xl">
+          {reportError}
+        </div>
+      )}
       {!loaded && !timedOut && (
         <div
           role="status"

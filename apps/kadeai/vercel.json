@@ -14,15 +14,15 @@
     },
     {
       "source": "/blog/:slug",
-      "destination": "/app.html"
+      "destination": "/api/dynamic-page?type=blog&slug=:slug"
     },
     {
       "source": "/partnerler/:id",
-      "destination": "/app.html"
+      "destination": "/api/dynamic-page?type=partner&slug=:id"
     },
     {
       "source": "/portfolio/:slug",
-      "destination": "/app.html"
+      "destination": "/api/dynamic-page?type=portfolio&slug=:slug"
     },
     {
       "source": "/s/:slug",
@@ -30,7 +30,7 @@
     },
     {
       "source": "/@:handle",
-      "destination": "/app.html"
+      "destination": "/api/dynamic-page?type=profile&slug=:handle"
     },
     {
       "source": "/401",

@@ -64,7 +64,7 @@ export default function VideoFactoryPage() {
       <TopBar title="Video Fabrikası" />
       <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-zinc-100">Video Fabrikası</h1>
+          <h2 className="text-2xl font-semibold text-zinc-100">Video Fabrikası</h2>
           <p className="mt-1 text-sm text-zinc-400">
             Bir konu ver, KadeAI senaryoyu yazsın, seslendirsin, altyazılasın ve videoyu kursun.
           </p>

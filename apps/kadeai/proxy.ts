@@ -83,6 +83,8 @@ export async function proxy(request: NextRequest) {
     '/api/materials/sync',
     '/api/kade-search/collect',
     '/api/kade-search/daily-digest',
+    '/api/kade-search/weekly-digest',
+    '/api/operations-report',
   ].includes(pathname)
   const cronSecret = process.env.CRON_SECRET?.trim()
   const hasCronAccess = Boolean(
@@ -134,8 +136,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Vercel Cron isteklerinin Supabase oturumu yoktur. Yalnız zamanlanmış üç
-  // KadeAI ucu, doğru CRON_SECRET taşıdığında proxy'den geçebilir; handler'lar
+  // Vercel Cron isteklerinin Supabase oturumu yoktur. Zamanlanmış KadeAI uçları,
+  // doğru CRON_SECRET taşıdığında proxy'den geçebilir; handler'lar
   // aynı anahtarı yeniden doğrulayarak ikinci savunma hattını korur.
   if (hasCronAccess) {
     return withOperationsSecurityHeaders(supabaseResponse)

@@ -5,13 +5,8 @@ const projectRoot = new URL('../', import.meta.url)
 const manifest = JSON.parse(await readFile(new URL('../config/route-manifest.json', import.meta.url), 'utf8'))
 const appSource = await readFile(new URL('../src/App.jsx', import.meta.url), 'utf8')
 const dispatcherSource = await readFile(new URL('../api/[...path].js', import.meta.url), 'utf8')
-const blogDetailSource = await readFile(new URL('../src/pages/BlogDetail.jsx', import.meta.url), 'utf8')
-const partnerDetailSource = await readFile(new URL('../src/pages/PartnerDetail.jsx', import.meta.url), 'utf8')
 
-const expectedMissing = new Set([
-  '/blog/:slug',
-  '/partnerler/:id',
-])
+const expectedMissing = new Set()
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
@@ -29,10 +24,23 @@ async function fileExists(url) {
   }
 }
 
+async function discoverKadeRoutes(directory, segments = [], found = new Set()) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const nextUrl = new URL(`${entry.name}${entry.isDirectory() ? '/' : ''}`, directory)
+    if (entry.isDirectory()) {
+      const nextSegments = /^\(.+\)$/.test(entry.name) ? segments : [...segments, entry.name]
+      await discoverKadeRoutes(nextUrl, nextSegments, found)
+    } else if (entry.name === 'page.tsx' || entry.name === 'route.ts') {
+      found.add(`/${segments.join('/')}`)
+    }
+  }
+  return found
+}
+
 function rootPageExists(route) {
   if (route === '/') return true
-  if (route === '/blog/:slug') return !/<NotFound\s*\/>/.test(blogDetailSource)
-  if (route === '/partnerler/:id') return !/<NotFound\s*\/>/.test(partnerDetailSource)
+  if (route === '/blog/:slug') return /path="\/blog\/:slug"/.test(appSource) && dispatcherSource.includes('dynamicPage')
+  if (route === '/partnerler/:id') return /path="\/partnerler\/:id"/.test(appSource) && dispatcherSource.includes('dynamicPage')
   if (route === '/links' || route === '/kadelinks') return appSource.includes(`path="${route}"`)
   if (route.startsWith('/hizmetler/')) return appSource.includes('path="/hizmetler/:slug"')
   if (route === '/portfolio/:slug') return appSource.includes('path="/portfolio/:slug"')
@@ -44,12 +52,12 @@ function rootPageExists(route) {
 }
 
 async function kadeRouteExists(route, type) {
-  const relative = route.replace(/^\/kadeai\/?/, '')
+  const relative = route.replace(/^\//, '')
   if (type === 'api') {
     return fileExists(new URL(`../apps/kadeai/app/${relative}/route.ts`, import.meta.url))
   }
-  if (relative === 'auth/callback') {
-    return fileExists(new URL('../apps/kadeai/app/auth/callback/route.ts', import.meta.url))
+  if (relative === 'kadeai/auth/callback') {
+    return fileExists(new URL('../apps/kadeai/app/kadeai/auth/callback/route.ts', import.meta.url))
   }
   return fileExists(new URL(`../apps/kadeai/app/${relative ? `${relative}/` : ''}page.tsx`, import.meta.url))
 }
@@ -64,7 +72,7 @@ function rootApiExists(route) {
 
 assert(manifest.schemaVersion === 1, 'Unsupported route manifest schema')
 assert(manifest.routes.length === manifest.expectedCount, `Expected ${manifest.expectedCount} routes, found ${manifest.routes.length}`)
-assert(manifest.expectedCount === 170, `Inventory contract changed: ${manifest.expectedCount}`)
+assert(manifest.expectedCount === 204, `Inventory contract changed: ${manifest.expectedCount}`)
 
 const seen = new Set()
 for (const entry of manifest.routes) {
@@ -91,6 +99,16 @@ for (const entry of manifest.routes) {
 
 assert(sourceMismatches.length === 0, `Manifest/source mismatch:\n${JSON.stringify(sourceMismatches, null, 2)}`)
 
+// Manifest yalnız kendi içindeki kayıtları değil fiziksel App Router ağacını
+// da kapsamalı. Aksi hâlde yeni bir route eklenip envantere unutulduğunda eski
+// doğrulayıcı sessizce yeşil dönüyordu.
+const discoveredKadeRoutes = await discoverKadeRoutes(new URL('../apps/kadeai/app/kadeai/', import.meta.url), ['kadeai'])
+const declaredKadeRoutes = new Set(manifest.routes.filter((entry) => entry.app === 'kadeai').map((entry) => entry.route))
+const undeclaredKadeRoutes = [...discoveredKadeRoutes].filter((route) => !declaredKadeRoutes.has(route)).sort()
+const staleKadeRoutes = [...declaredKadeRoutes].filter((route) => !discoveredKadeRoutes.has(route)).sort()
+assert(undeclaredKadeRoutes.length === 0, `Manifest dışında KadeAI route'ları var:\n${JSON.stringify(undeclaredKadeRoutes, null, 2)}`)
+assert(staleKadeRoutes.length === 0, `Manifestte artık fiziksel karşılığı olmayan KadeAI route'ları var:\n${JSON.stringify(staleKadeRoutes, null, 2)}`)
+
 const scripts = await readdir(new URL('../scripts/', import.meta.url))
 assert(scripts.includes('validate-route-manifest.mjs'), `Validator missing under ${join(projectRoot.pathname, 'scripts')}`)
 
@@ -100,4 +118,6 @@ console.log(JSON.stringify({
   missing: [...declaredMissing],
   duplicates: [],
   sourceMismatches: [],
+  undeclaredKadeRoutes: [],
+  staleKadeRoutes: [],
 }, null, 2))

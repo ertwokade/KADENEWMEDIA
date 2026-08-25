@@ -75,8 +75,9 @@ export default function LinkProfile() {
     getLinkProfileBySlugApi(slug)
       .then((data) => {
         if (cancelled) return
-        setProfile(data)
-        setStatus('ready')
+        const resolved = data || FALLBACK_PROFILES[slug] || null
+        setProfile(resolved)
+        setStatus(resolved ? 'ready' : 'not-found')
       })
       .catch(() => {
         if (cancelled) return

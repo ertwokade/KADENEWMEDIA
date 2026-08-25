@@ -58,10 +58,37 @@ Disallow: /proje-takip
 Disallow: /kade-kit-business
 Disallow: /organizasyon-kiti
 
+User-agent: OAI-AdsBot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
+
 User-agent: ClaudeBot
 Allow: /
 Disallow: /admin
 Disallow: /admin/
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
+
+User-agent: Claude-User
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /kade-kit-business
+Disallow: /organizasyon-kiti
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /admin
 Disallow: /api/
 Disallow: /musteri-panel
 Disallow: /proje-takip

@@ -1,8 +1,14 @@
 import 'server-only'
 
-import { whatsappConfiguration } from './whatsappConfig'
+import { callMeBotResponseQueued, whatsappConfiguration } from './whatsappConfig'
 
 export { whatsappConfiguration }
+
+const MAX_ATTEMPTS = 2
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 export async function sendWhatsAppMessage(message: string) {
   const config = whatsappConfiguration()
@@ -13,11 +19,37 @@ export async function sendWhatsAppMessage(message: string) {
   url.searchParams.set('text', message.slice(0, 1800))
   url.searchParams.set('apikey', config.apiKey)
 
-  const response = await fetch(url, {
-    method: 'GET',
-    cache: 'no-store',
-    signal: AbortSignal.timeout(20_000),
-  })
-  if (!response.ok) throw new Error(`WhatsApp sağlayıcısı ${response.status} durumuyla yanıtladı.`)
-  return { provider: 'callmebot' as const, recipient: config.phone.slice(-4).padStart(config.phone.length, '*') }
+  let lastError: unknown
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(20_000),
+      })
+      const providerMessage = (await response.text()).trim().slice(0, 500)
+
+      if (!response.ok) {
+        const error = new Error(`WhatsApp sağlayıcısı ${response.status} durumuyla yanıtladı.`)
+        if (response.status < 500 && response.status !== 429) throw error
+        lastError = error
+      } else if (!callMeBotResponseQueued(providerMessage)) {
+        throw new Error(`WhatsApp sağlayıcısı mesajı kabul etmedi: ${providerMessage || 'boş yanıt'}`)
+      } else {
+        return {
+          provider: 'callmebot' as const,
+          providerStatus: 'queued' as const,
+          recipient: config.phone.slice(-4).padStart(config.phone.length, '*'),
+        }
+      }
+    } catch (error) {
+      lastError = error
+      if (attempt === MAX_ATTEMPTS) break
+    }
+
+    await delay(500 * attempt)
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('WhatsApp sağlayıcısına ulaşılamadı.')
 }

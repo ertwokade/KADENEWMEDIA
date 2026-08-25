@@ -140,6 +140,10 @@ const BODY_ASSETS = ['/kade-routes.js', '/kade-access.js', '/kade-footer.js', '/
 
 const KADE_FAVICONS = '<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/favicon.png"><link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">'
 
+const HOMEPAGE_SEO = `<link rel="canonical" href="https://kadenewmedia.com/"><meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"><meta name="author" content="Kade New Media"><meta name="geo.region" content="TR-34"><meta name="geo.placename" content="İstanbul"><meta property="og:type" content="website"><meta property="og:site_name" content="Kade New Media"><meta property="og:title" content="Kade New Media | New Media ve Dijital Pazarlama Ajansı"><meta property="og:description" content="İstanbul merkezli new media ve dijital pazarlama ajansı. Sosyal medya yönetimi, içerik üretimi, reklam, video prodüksiyon ve web tasarımı."><meta property="og:url" content="https://kadenewmedia.com/"><meta property="og:image" content="https://kadenewmedia.com/og-image.png"><meta property="og:locale" content="tr_TR"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Kade New Media | New Media ve Dijital Pazarlama Ajansı"><meta name="twitter:description" content="Strateji, içerik, reklam, prodüksiyon ve yapay zekâ destekli dijital büyüme hizmetleri."><meta name="twitter:image" content="https://kadenewmedia.com/og-image.png"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":["Organization","ProfessionalService"],"@id":"https://kadenewmedia.com/#organization","name":"Kade New Media","alternateName":["Kade Media","Kademedia","Kadenewmedia","Kade"],"url":"https://kadenewmedia.com/","logo":"https://kadenewmedia.com/favicon.png","image":"https://kadenewmedia.com/og-image.png","description":"İstanbul merkezli new media, dijital medya ve pazarlama ajansı.","email":"thekademedia@gmail.com","areaServed":{"@type":"Country","name":"Türkiye"},"knowsAbout":["New media","Dijital pazarlama","Sosyal medya yönetimi","İçerik üretimi","Dijital reklam","Video prodüksiyon","Web tasarımı","Yapay zekâ destekli içerik üretimi"],"sameAs":["https://instagram.com/kadenewmedia","https://tiktok.com/@kadenewmedia","https://www.youtube.com/@kadenewmedia","https://x.com/kadenewmedia","https://www.linkedin.com/company/kadenewmedia"]},{"@type":"WebSite","@id":"https://kadenewmedia.com/#website","url":"https://kadenewmedia.com/","name":"Kade New Media","inLanguage":"tr-TR","publisher":{"@id":"https://kadenewmedia.com/#organization"}}]}</script>`
+
+const HOMEPAGE_H1 = '<h1 data-kade-seo-title style="position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important">Kade New Media — New Media ve Dijital Pazarlama Ajansı</h1>'
+
 function normalizeTitle(html) {
   return html.replace(/<title>([\s\S]*?)<\/title>/i, (tag, rawTitle) => {
     const title = rawTitle
@@ -156,8 +160,14 @@ function normalizeFavicons(html) {
 }
 
 export function transformHtml(html) {
+  const isHomepageSnapshot = /<title>HAOQI©2026<\/title>/i.test(html)
   for (const [from, to] of COPY) html = html.split(from).join(to)
   html = html.split(ASSET_PATH[0]).join(ASSET_PATH[1])
+  if (isHomepageSnapshot) {
+    html = html.replace(/<html\b[^>]*\blang=["']en["']/i, (tag) => tag.replace(/lang=["']en["']/i, 'lang="tr"'))
+    if (!html.includes('https://kadenewmedia.com/#website')) html = html.replace('</head>', HOMEPAGE_SEO + '</head>')
+    if (!html.includes('data-kade-seo-title')) html = html.replace('<body>', `<body>${HOMEPAGE_H1}`)
+  }
   html = normalizeTitle(html)
   html = normalizeFavicons(html)
   if (!html.includes('data-kade-bootstrap')) html = html.replace('<head>', '<head>' + BOOTSTRAP + CRITICAL_FIRST_PAINT)

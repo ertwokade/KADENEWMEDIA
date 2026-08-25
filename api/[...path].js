@@ -2,6 +2,7 @@ import auth from '../server/api/auth.js'
 import blog from '../server/api/blog.js'
 import customerAuth from '../server/api/customer-auth.js'
 import customerPortal from '../server/api/customer-portal.js'
+import dynamicPage from '../server/api/dynamicPage.js'
 import customers from '../server/api/customers.js'
 import shopier from '../server/api/shopier.js'
 import calendarInvite from '../server/api/calendar-invite.js'
@@ -37,6 +38,7 @@ const handlers = {
   blog,
   'customer-auth': customerAuth,
   'customer-portal': customerPortal,
+  'dynamic-page': dynamicPage,
   customers,
   shopier,
   'calendar-invite': calendarInvite,

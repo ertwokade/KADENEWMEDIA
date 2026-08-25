@@ -79,7 +79,12 @@ const nextConfig: NextConfig = {
      rotalarına gider, geri kalan her şey statik siteye düşer. */
   async rewrites() {
     return {
-      beforeFiles: [],
+      beforeFiles: [
+        { source: '/blog/:slug', destination: '/api/dynamic-page?type=blog&slug=:slug' },
+        { source: '/partnerler/:id', destination: '/api/dynamic-page?type=partner&slug=:id' },
+        { source: '/portfolio/:slug', destination: '/api/dynamic-page?type=portfolio&slug=:slug' },
+        { source: '/@:handle', destination: '/api/dynamic-page?type=profile&slug=:handle' },
+      ],
       afterFiles: [],
       fallback: [
         { source: '/', destination: '/index.html' },

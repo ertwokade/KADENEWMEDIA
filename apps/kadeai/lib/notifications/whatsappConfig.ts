@@ -7,3 +7,7 @@ export function whatsappConfiguration() {
   if (!apiKey || apiKey.length > 256 || /[\r\n]/.test(apiKey) || placeholderApiKey) missing.push('WA_APIKEY')
   return { configured: missing.length === 0, missing, phone, apiKey }
 }
+
+export function callMeBotResponseQueued(body: string) {
+  return /message\s+queued/i.test(body)
+}

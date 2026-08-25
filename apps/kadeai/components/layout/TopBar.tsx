@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, Sparkles, Activity, Command } from 'lucide-react'
+import { Menu, Sparkles, Activity } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useModel } from '@/lib/context/ModelContext'
 import { useSidebar } from '@/lib/context/SidebarContext'
@@ -72,11 +72,6 @@ export default function TopBar({ title, description, showModelSelector = true }:
       </div>
 
       <div className="kade-topbar-actions order-3 ml-auto flex w-auto flex-shrink-0 items-center gap-2 sm:order-none sm:ml-4">
-      <button type="button" className="kade-command-button hidden h-10 items-center gap-2 rounded-xl border px-3 text-xs font-semibold xl:inline-flex" title="Hızlı komutlar yakında">
-        <Command className="h-3.5 w-3.5" />
-        Komutlar
-        <kbd className="rounded-md px-1.5 py-0.5 text-[9px]">⌘ K</kbd>
-      </button>
       {showModelSelector && (
         /* Model seçici üst barın yarısını kaplayan bir panel gibi duruyordu;
            artık sağ uçta küçük bir düğme. Açılır liste aynı, yalnızca tetikleyici

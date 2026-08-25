@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "expectedCount": 170,
+  "expectedCount": 204,
   "generatedFrom": "Kade Media full-site audit inventory",
   "routes": [
     {
@@ -150,8 +150,8 @@
         "anonymous"
       ],
       "implemented": true,
-      "expectedStatus": 200,
-      "testPath": "/portfolio/flavora-sosyal-medya"
+      "expectedStatus": 404,
+      "testPath": "/portfolio/audit-not-found"
     },
     {
       "route": "/ekip",
@@ -494,7 +494,7 @@
       "roles": [
         "anonymous"
       ],
-      "implemented": false,
+      "implemented": true,
       "expectedStatus": 404,
       "testPath": "/blog/audit-not-found"
     },
@@ -509,7 +509,7 @@
       "roles": [
         "anonymous"
       ],
-      "implemented": false,
+      "implemented": true,
       "expectedStatus": 404,
       "testPath": "/partnerler/000000000000000000000000"
     },
@@ -1397,7 +1397,7 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/api/auth"
+      "testPath": "/api/auth?action=session"
     },
     {
       "route": "/api/auth/login",
@@ -1509,8 +1509,8 @@
         "anonymous"
       ],
       "implemented": true,
-      "expectedStatus": 200,
-      "testPath": "/api/contact"
+      "expectedStatus": 403,
+      "testPath": "/api/contact?action=unsubscribe&email=audit%40example.com&token=0000000000000000000000000000000000000000000000000000000000000000"
     },
     {
       "route": "/api/content",
@@ -1561,7 +1561,7 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/api/customer-auth"
+      "testPath": "/api/customer-auth?action=session"
     },
     {
       "route": "/api/customer-portal",
@@ -1958,7 +1958,7 @@
         "anonymous"
       ],
       "implemented": true,
-      "expectedStatus": 200,
+      "expectedStatus": 401,
       "testPath": "/kadeai/api/auth/recovery-session"
     },
     {
@@ -2615,6 +2615,108 @@
       "implemented": true,
       "expectedStatus": 200,
       "testPath": "/kadeai/api/generate/youtube-seo"
+    },
+    {
+      "route": "/kadeai/dashboard/materyal", "type": "page", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/dashboard/materyal"
+    },
+    {
+      "route": "/kadeai/dashboard/packages", "type": "page", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/dashboard/packages"
+    },
+    {
+      "route": "/kadeai/dashboard/subtitles", "type": "page", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/dashboard/subtitles"
+    },
+    {
+      "route": "/kadeai/dashboard/trend-radar", "type": "page", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/dashboard/trend-radar"
+    },
+    {
+      "route": "/kadeai/dashboard/video-factory", "type": "page", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/dashboard/video-factory"
+    },
+    {
+      "route": "/kadeai/api/dubbing/tts", "type": "api", "app": "kadeai", "methods": ["POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/dubbing/tts"
+    },
+    {
+      "route": "/kadeai/api/kade-search/alerts", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/alerts"
+    },
+    {
+      "route": "/kadeai/api/kade-search/collect", "type": "api", "app": "kadeai", "methods": ["POST", "GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/collect"
+    },
+    {
+      "route": "/kadeai/api/kade-search/daily-digest", "type": "api", "app": "kadeai", "methods": ["GET", "POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/daily-digest"
+    },
+    {
+      "route": "/kadeai/api/kade-search/ideas", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/ideas"
+    },
+    {
+      "route": "/kadeai/api/kade-search/pulse", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/pulse"
+    },
+    {
+      "route": "/kadeai/api/kade-search/radar", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/radar"
+    },
+    {
+      "route": "/kadeai/api/kade-search/sources", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/sources"
+    },
+    {
+      "route": "/kadeai/api/kade-search/stats", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/stats"
+    },
+    {
+      "route": "/kadeai/api/kade-search/trend/[id]", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/trend/audit-id"
+    },
+    {
+      "route": "/kadeai/api/kade-search/trend/[id]/whatsapp", "type": "api", "app": "kadeai", "methods": ["POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/trend/audit-id/whatsapp"
+    },
+    {
+      "route": "/kadeai/api/kade-search/trends", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/trends"
+    },
+    {
+      "route": "/kadeai/api/kade-search/watchlist", "type": "api", "app": "kadeai", "methods": ["GET", "POST", "DELETE"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/watchlist"
+    },
+    {
+      "route": "/kadeai/api/kade-search/weekly-digest", "type": "api", "app": "kadeai", "methods": ["GET", "POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/kade-search/weekly-digest"
+    },
+    {
+      "route": "/kadeai/api/materials", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/materials"
+    },
+    {
+      "route": "/kadeai/api/materials/sync", "type": "api", "app": "kadeai", "methods": ["POST", "GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/materials/sync"
+    },
+    {
+      "route": "/kadeai/api/operations-report", "type": "api", "app": "kadeai", "methods": ["POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/operations-report"
+    },
+    {
+      "route": "/kadeai/api/packages", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/packages"
+    },
+    {
+      "route": "/kadeai/api/payments/admin/custom-offer", "type": "api", "app": "kadeai", "methods": ["POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/payments/admin/custom-offer"
+    },
+    {
+      "route": "/kadeai/api/payments/admin/pricing", "type": "api", "app": "kadeai", "methods": ["GET", "PUT"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/payments/admin/pricing"
+    },
+    {
+      "route": "/kadeai/api/payments/shopier/redirect", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/payments/shopier/redirect"
+    },
+    {
+      "route": "/kadeai/api/subtitles/translate", "type": "api", "app": "kadeai", "methods": ["POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/subtitles/translate"
+    },
+    {
+      "route": "/kadeai/api/video", "type": "api", "app": "kadeai", "methods": ["POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/video"
+    },
+    {
+      "route": "/kadeai/api/youtube/callback", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/youtube/callback"
+    },
+    {
+      "route": "/kadeai/api/youtube/captions", "type": "api", "app": "kadeai", "methods": ["GET", "POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/youtube/captions"
+    },
+    {
+      "route": "/kadeai/api/youtube/connect", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/youtube/connect"
+    },
+    {
+      "route": "/kadeai/api/youtube/disconnect", "type": "api", "app": "kadeai", "methods": ["POST"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/youtube/disconnect"
+    },
+    {
+      "route": "/kadeai/api/youtube/status", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/youtube/status"
+    },
+    {
+      "route": "/kadeai/api/youtube/videos", "type": "api", "app": "kadeai", "methods": ["GET"], "access": "private", "roles": ["authenticated"], "implemented": true, "expectedStatus": 200, "testPath": "/kadeai/api/youtube/videos"
     }
   ]
 }

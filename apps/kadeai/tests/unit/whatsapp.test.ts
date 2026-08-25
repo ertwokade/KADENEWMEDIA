@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { afterEach, test } from 'node:test'
-import { whatsappConfiguration } from '../../lib/notifications/whatsappConfig'
+import { callMeBotResponseQueued, whatsappConfiguration } from '../../lib/notifications/whatsappConfig'
 
 const originalPhone = process.env.WA_PHONE
 const originalApiKey = process.env.WA_APIKEY
@@ -38,4 +38,11 @@ test('WhatsApp configuration rejects example API keys', () => {
   const config = whatsappConfiguration()
   assert.equal(config.configured, false)
   assert.deepEqual(config.missing, ['WA_APIKEY'])
+})
+
+test('CallMeBot success parser only accepts a queued acknowledgement', () => {
+  assert.equal(callMeBotResponseQueued('Message queued. You will receive it in a few seconds.'), true)
+  assert.equal(callMeBotResponseQueued('Message Queued'), true)
+  assert.equal(callMeBotResponseQueued('APIKey is invalid'), false)
+  assert.equal(callMeBotResponseQueued(''), false)
 })
