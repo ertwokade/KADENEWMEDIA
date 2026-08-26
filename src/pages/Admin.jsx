@@ -1172,16 +1172,22 @@ function ContentSection({ showToast }) {
     ...(content.about || {}),
     team: content.about?.team?.length ? content.about.team : ABOUT_CONTENT_FALLBACK.team,
   }), [content.about])
-  const footerData = useMemo(() => content.footer || {
-    email: BRAND.email,
-    phone: BRAND.phone,
-    address: BRAND.address,
-    city: BRAND.city,
-    instagram: 'https://instagram.com/kadenewmedia',
-    youtube: 'https://www.youtube.com/@kadenewmedia',
-    tiktok: 'https://tiktok.com/@kadenewmedia',
-    linkedin: 'https://www.linkedin.com/company/kadenewmedia',
-    whatsapp: BRAND.whatsapp,
+  const footerData = useMemo(() => {
+    const saved = content.footer || {}
+    const migrateSocial = (value, official) => (
+      !value || String(value).includes('kademediacom') ? official : value
+    )
+    return {
+      email: saved.email === 'hello@kademedia.com' ? BRAND.email : (saved.email || BRAND.email),
+      phone: saved.phone || BRAND.phone,
+      address: saved.address || BRAND.address,
+      city: saved.city || BRAND.city,
+      instagram: migrateSocial(saved.instagram, 'https://instagram.com/kadenewmedia'),
+      youtube: migrateSocial(saved.youtube, 'https://www.youtube.com/@kadenewmedia'),
+      tiktok: migrateSocial(saved.tiktok, 'https://tiktok.com/@kadenewmedia'),
+      linkedin: migrateSocial(saved.linkedin, 'https://www.linkedin.com/company/kadenewmedia'),
+      whatsapp: saved.whatsapp || BRAND.whatsapp,
+    }
   }, [content.footer])
   const careersData = useMemo(() => content.careers || { tr: [], en: [] }, [content.careers])
   const basinData = useMemo(() => content.basin || {}, [content.basin])
