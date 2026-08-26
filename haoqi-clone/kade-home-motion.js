@@ -134,12 +134,15 @@
       email.href = 'mailto:thekademedia@gmail.com';
       email.textContent = 'thekademedia@gmail.com';
     }
-    const socials = [...document.querySelectorAll('a[target="_blank"]')].slice(-3);
     const socialData = [
       ['Instagram', 'https://www.instagram.com/kadenewmedia/'],
       ['TikTok', 'https://www.tiktok.com/@kadenewmedia'],
+      ['YouTube', 'https://www.youtube.com/@kadenewmedia'],
+      ['X', 'https://x.com/kadenewmedia'],
       ['LinkedIn', 'https://www.linkedin.com/company/kadenewmedia/'],
+      ['WhatsApp', 'https://wa.me/905067293423'],
     ];
+    const socials = [...document.querySelectorAll('a[target="_blank"]')].slice(-socialData.length);
     socials.forEach((a, i) => {
       if (!socialData[i]) return;
       a.textContent = socialData[i][0];
