@@ -81,7 +81,7 @@ const nextConfig: NextConfig = {
     return {
       beforeFiles: [
         { source: '/blog/:slug', destination: '/api/dynamic-page?type=blog&slug=:slug' },
-        { source: '/partnerler/:id', destination: '/api/dynamic-page?type=partner&slug=:id' },
+        { source: '/partnerler/:slug', destination: '/api/dynamic-page?type=partner&slug=:slug' },
         { source: '/portfolio/:slug', destination: '/api/dynamic-page?type=portfolio&slug=:slug' },
         { source: '/@:handle', destination: '/api/dynamic-page?type=profile&slug=:handle' },
       ],

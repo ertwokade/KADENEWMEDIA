@@ -17,8 +17,8 @@
       "destination": "/api/dynamic-page?type=blog&slug=:slug"
     },
     {
-      "source": "/partnerler/:id",
-      "destination": "/api/dynamic-page?type=partner&slug=:id"
+      "source": "/partnerler/:slug",
+      "destination": "/api/dynamic-page?type=partner&slug=:slug"
     },
     {
       "source": "/portfolio/:slug",

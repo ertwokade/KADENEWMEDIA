@@ -53,6 +53,8 @@ test('dynamic public pages are server-validated before the SPA shell is served',
   for (const type of ['blog', 'partner', 'portfolio', 'profile']) {
     assert.match(vercelConfig, new RegExp(`type=${type}`), type)
   }
+  assert.match(vercelConfig, /"source": "\/partnerler\/:slug"/)
+  assert.match(vercelConfig, /"destination": "\/api\/dynamic-page\?type=partner&slug=:slug"/)
   assert.match(dispatcher, /'dynamic-page': dynamicPage/)
   assert.match(renderer, /res\.status\(page \? 200 : 404\)\.send\(html\)/)
   assert.match(renderer, /`\/@\$\{slug\}`/)
