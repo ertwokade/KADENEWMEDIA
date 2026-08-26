@@ -2,7 +2,8 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
 import { chromium } from 'playwright'
 
-const BASE = process.env.AUDIT_URL || 'http://127.0.0.1:4173'
+const localAuditPort = 41730 + (process.pid % 1000)
+const BASE = process.env.AUDIT_URL || `http://127.0.0.1:${localAuditPort}`
 const outputDir = new URL('../docs/design-references/', import.meta.url)
 await mkdir(outputDir, { recursive: true })
 
@@ -18,7 +19,7 @@ const routes = [
   '/hizmetler/video-produksiyon', '/hizmetler/strateji-danismanlik', '/hizmetler/web-sitesi-tasarimi',
 ]
 const noindexRoutes = new Set([
-  '/portfolio', '/partnerler', '/blog', '/referanslar', '/basari-hikayeleri', '/giris',
+  '/portfolio', '/partnerler', '/referanslar', '/giris',
   '/musteri-panel', '/proje-takip',
   '/tesekkur', '/admin', '/organizasyon-kiti', '/organizasyon-kiti/plan/fractional-new-media-director',
   '/organizasyon-kiti/medya-yol-haritasi', '/organizasyon-kiti/yonetim-toplantilari',
@@ -41,7 +42,11 @@ const addError = (message) => { errors.push(message) }
 
 let child
 if (!process.env.AUDIT_URL) {
-  child = spawn(process.execPath, ['scripts/serve-dist.mjs'], { cwd: new URL('..', import.meta.url), stdio: ['ignore', 'pipe', 'pipe'] })
+  child = spawn(process.execPath, ['scripts/serve-dist.mjs'], {
+    cwd: new URL('..', import.meta.url),
+    env: { ...process.env, PORT: String(localAuditPort) },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
   for (let attempt = 0; attempt < 50; attempt += 1) {
     try {
       if ((await fetch(BASE)).ok) break
@@ -52,7 +57,11 @@ if (!process.env.AUDIT_URL) {
 
 const browser = await chromium.launch({ headless: true })
 try {
-  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' })
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: 'reduce',
+    serviceWorkers: 'block',
+  })
   const page = await context.newPage()
   const consoleErrors = []
   page.on('console', message => {
@@ -104,7 +113,12 @@ try {
     audit.links.filter(Boolean).forEach(href => {
       try {
         const url = new URL(href, BASE)
-        if (url.origin === BASE && !url.hash && !url.pathname.startsWith('/api/')) internalLinks.add(url.pathname)
+        if (
+          url.origin === BASE &&
+          !url.hash &&
+          !url.pathname.startsWith('/api/') &&
+          (process.env.AUDIT_URL || !url.pathname.startsWith('/kadeai/'))
+        ) internalLinks.add(url.pathname)
       } catch { /* ignore malformed external values here; browser reports them elsewhere */ }
     })
   }
@@ -114,7 +128,9 @@ try {
     if (response.status() >= 400) addError(`broken internal link ${link}: HTTP ${response.status()}`)
   }
 
-  for (const invalid of ['/olmayan-route', '/hizmetler/gecersiz', '/partnerler/gecersiz', '/blog/gecersiz', '/organizasyon-kiti/gecersiz']) {
+  const invalidRoutes = ['/olmayan-route', '/hizmetler/gecersiz', '/organizasyon-kiti/gecersiz']
+  if (process.env.AUDIT_URL) invalidRoutes.push('/partnerler/gecersiz', '/blog/gecersiz')
+  for (const invalid of invalidRoutes) {
     const response = await context.request.get(`${BASE}${invalid}`, { maxRedirects: 0 })
     if (response.status() !== 404) addError(`${invalid}: expected true HTTP 404, received ${response.status()}`)
   }
@@ -132,17 +148,24 @@ try {
   } else addError('mobile navigation control missing')
 
   await page.goto(`${BASE}/iletisim`, { waitUntil: 'domcontentloaded' })
-  await page.fill('#name', 'Audit Kullanıcısı')
-  await page.fill('#email', 'audit@example.com')
-  await page.fill('#message', 'Bu yalnızca istemci doğrulama testidir ve gönderilmemelidir.')
-  await page.locator('form.contact-form').evaluate(form => { form.noValidate = true })
-  await page.locator('form.contact-form button[type="submit"]').click()
-  const consentError = await page.locator('.form-error-msg').textContent({ timeout: 3000 }).catch(() => '')
-  if (!consentError?.includes('KVKK')) addError('contact consent validation did not trigger')
-  await page.locator('.kvkk-consent .checkbox-mark').click()
-  await page.locator('form.contact-form button[type="submit"]').click()
-  await page.waitForURL(`${BASE}/tesekkur`, { timeout: 3000 }).catch(() => {})
-  const confirmedCopy = await page.getByText('İletişim talebiniz sunucu tarafından başarıyla kaydedildi.').textContent({ timeout: 2000 }).catch(() => '')
+  const contactForm = page.locator('form[data-contact-form]')
+  await contactForm.locator('input[name="name"]').fill('Audit Kullanıcısı')
+  await contactForm.locator('input[name="email"]').fill('audit@example.com')
+  await contactForm.locator('textarea[name="message"]').fill('Bu yalnızca canlı form doğrulama testidir.')
+  const consentControl = contactForm.locator('input[name="consent"]')
+  let contactRequests = 0
+  const countContactRequest = request => {
+    if (request.method() === 'POST' && new URL(request.url()).pathname === '/api/contact') contactRequests += 1
+  }
+  page.on('request', countContactRequest)
+  await contactForm.locator('button[type="submit"]').click()
+  await page.waitForTimeout(150)
+  const consentInvalid = await consentControl.evaluate(control => !control.checkValidity())
+  if (!consentInvalid || contactRequests !== 0) addError('contact consent validation did not trigger')
+  await consentControl.check()
+  await contactForm.locator('button[type="submit"]').click()
+  const confirmedCopy = await contactForm.locator('.form-status').getByText('Mesajınız alındı. Teşekkürler.').textContent({ timeout: 8000 }).catch(() => '')
+  page.off('request', countContactRequest)
   if (!confirmedCopy) addError('successful contact response did not produce a confirmed state')
 
   await page.goto(`${BASE}/tesekkur?direct=1`, { waitUntil: 'domcontentloaded' })
@@ -174,7 +197,11 @@ try {
     }
   }
 
-  const noJs = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } })
+  const noJs = await browser.newContext({
+    javaScriptEnabled: false,
+    serviceWorkers: 'block',
+    viewport: { width: 390, height: 844 },
+  })
   const noJsPage = await noJs.newPage()
   for (const route of ['/', '/hizmetler', '/iletisim']) {
     const response = await noJsPage.goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded' })
