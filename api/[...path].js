@@ -99,7 +99,7 @@ const PUBLIC_ACTIONS = new Set([
   'newsletter', 'apply', 'analyzer-lead', 'submit',
 ])
 
-function isPublicPost(req) {
+export function isPublicPost(req) {
   if (String(req.method || '').toUpperCase() !== 'POST') return false
   const route = normalizeRoute(req)
   const action = req.query?.action
@@ -112,8 +112,14 @@ function isPublicPost(req) {
   // Shopier webhook — external POST with its own signature verification.
   // Admin reconciliation is intentionally excluded and uses cookie auth + CSRF.
   if (route === 'shopier' && !req.query?.action) return true
+  // Anonymous analytics events are write-only and separately rate limited.
+  if (route === 'content' && (action === 'heartbeat' || action === 'pageview')) return true
   // Public contact actions
   if (route === 'contact' && (!action || PUBLIC_ACTIONS.has(action))) return true
+  // The public quote form writes a validated lead; admin quote mutations keep CSRF.
+  if (route === 'ops' && req.query?.resource === 'quotes') return true
+  // Public short links record click counters; creation and mutation stay protected.
+  if (route === 'shortlinks' && action === 'click') return true
   // Public survey response
   if (route === 'surveys' && action === 'submit') return true
   return false

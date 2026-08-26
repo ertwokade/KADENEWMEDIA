@@ -12,7 +12,7 @@ import { reconcileShopierOrders } from '../../server/api/_lib/shopierReconciliat
 import { publicBlogFilter } from '../../server/api/blog.js'
 import { sanitizePartnerUpdate } from '../../server/api/partners.js'
 import { isKnownContentSection, isPublicContentSection } from '../../server/api/content.js'
-import apiHandler from '../../api/[...path].js'
+import apiHandler, { isPublicPost } from '../../api/[...path].js'
 
 function responseDouble() {
   return {
@@ -103,6 +103,16 @@ test('API dispatcher applies no-store even to unknown endpoints', async () => {
   await apiHandler({ method: 'GET', query: { path: ['does-not-exist'] }, headers: {}, url: '/api/does-not-exist' }, res)
   assert.equal(res.statusCode, 404)
   assert.equal(res.headers['cache-control'], 'private, no-store, max-age=0')
+})
+
+test('only explicitly public write endpoints bypass CSRF', () => {
+  const request = (path, query = {}) => ({ method: 'POST', query: { path: [path], ...query } })
+  assert.equal(isPublicPost(request('content', { action: 'heartbeat' })), true)
+  assert.equal(isPublicPost(request('content', { action: 'pageview' })), true)
+  assert.equal(isPublicPost(request('ops', { resource: 'quotes' })), true)
+  assert.equal(isPublicPost(request('shortlinks', { action: 'click' })), true)
+  assert.equal(isPublicPost(request('ops', { resource: 'invoices' })), false)
+  assert.equal(isPublicPost(request('content', { action: 'ai-usage' })), false)
 })
 
 test('Shopier webhook signature rejects forged payloads', () => {

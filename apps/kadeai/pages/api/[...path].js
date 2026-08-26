@@ -18,9 +18,10 @@ export { default } from '../../../../api/[...path].js'
 
 export const config = {
   api: {
-    /* Modüller gövdeyi kendileri ayrıştırıyor (ham imza doğrulaması yapan
-       Shopier webhook'u dahil), Next'in araya girmemesi gerekiyor. */
-    bodyParser: false,
+    /* Handler'lar `req.body` bekliyor. Shopier imzası ham baytlar üzerinden
+       değil, ayrıştırılmış callback alanlarından hesaplandığı için varsayılan
+       Next ayrıştırıcısı bütün JSON ve form uçları için güvenlidir. */
+    bodyParser: true,
     externalResolver: true,
   },
 }
