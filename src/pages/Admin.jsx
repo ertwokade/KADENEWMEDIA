@@ -32,6 +32,7 @@ import { PACKAGE_SCOPES } from '../data/packages'
 import { SERVICE_DETAILS } from '../data/serviceDetails'
 import { ABOUT_CONTENT_FALLBACK } from '../data/about'
 import { HOMEPAGE_DEFAULTS } from '../data/homepage'
+import { BRAND } from '../config/brand'
 import { getPackageEntitlements } from '../config/entitlements'
 import { PROJECT_CATEGORIES, PROJECT_KINDS, normalizeProjects, hasDetailContent, slugify } from '../data/projects'
 import { SERVICES as NMA_SERVICES } from '../data/newMediaAgency'
@@ -1171,7 +1172,17 @@ function ContentSection({ showToast }) {
     ...(content.about || {}),
     team: content.about?.team?.length ? content.about.team : ABOUT_CONTENT_FALLBACK.team,
   }), [content.about])
-  const footerData = useMemo(() => content.footer || {}, [content.footer])
+  const footerData = useMemo(() => content.footer || {
+    email: BRAND.email,
+    phone: BRAND.phone,
+    address: BRAND.address,
+    city: BRAND.city,
+    instagram: 'https://instagram.com/kadenewmedia',
+    youtube: 'https://www.youtube.com/@kadenewmedia',
+    tiktok: 'https://tiktok.com/@kadenewmedia',
+    linkedin: 'https://www.linkedin.com/company/kadenewmedia',
+    whatsapp: BRAND.whatsapp,
+  }, [content.footer])
   const careersData = useMemo(() => content.careers || { tr: [], en: [] }, [content.careers])
   const basinData = useMemo(() => content.basin || {}, [content.basin])
   const nedenBizData = useMemo(() => content.nedenBiz || {}, [content.nedenBiz])
@@ -3394,7 +3405,7 @@ function SettingsSection({ showToast }) {
   const [siteSettings, setSiteSettings] = useState({
     businessName: 'Kade New Media',
     phone: '+90 506 729 34 23',
-    email: 'hello@kademedia.com',
+    email: 'thekademedia@gmail.com',
     address: 'Biruni Teknopark, Zeytinburnu/İstanbul',
     instagram: '',
     youtube: '',
@@ -8552,7 +8563,7 @@ h1{color:var(--gate-ink);border-bottom:3px solid var(--gate-accent);padding-bott
   ${metrics.newLeads ? `<div class="metric"><div class="metric-val">${safeMetrics.newLeads}</div><div class="metric-lbl">Yeni Lead</div></div>` : ''}
 </div>
 ${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong><p style="margin:8px 0 0">${safeMetrics.notes}</p></div>` : ''}
-<div class="footer">Kade New Media Dijital Pazarlama | hello@kademedia.com | 0506 729 34 23 | kadenewmedia.com</div>
+<div class="footer">Kade New Media Dijital Pazarlama | thekademedia@gmail.com | 0506 729 34 23 | kadenewmedia.com</div>
 </body></html>`
 
     const blob = new Blob([html], { type: 'text/html' })

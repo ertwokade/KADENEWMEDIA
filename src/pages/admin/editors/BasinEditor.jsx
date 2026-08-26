@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { HiOutlineSave, HiOutlinePlus, HiOutlineTrash } from 'react-icons/hi'
 
 const BASIN_DEFAULTS = {
-  contactEmail: 'basin@kademedia.com',
+  contactEmail: 'thekademedia@gmail.com',
   responseTime: '24 saat içinde',
   ctaTitle: 'Röportaj veya iş birliği mi istiyorsunuz?',
   ctaSubtitle: 'Sosyal medya, dijital pazarlama ve ajansçılık konularında görüş almak için bize ulaşın.',

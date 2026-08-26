@@ -58,7 +58,7 @@ async function installAdminFixture(page) {
         json: [{
           section: 'footer',
           data: {
-            email: 'hello@kademedia.com',
+            email: 'thekademedia@gmail.com',
             phone: '0506 729 34 23',
             address: 'Kade New Media',
             city: 'İstanbul',

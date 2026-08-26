@@ -10,7 +10,9 @@ export default function Footer() {
   // boş dizi olduğundan sosyal medya satırı tamamen boştu).
   // Statik BRAND değerleri taban olarak kalır: API erişilemezse footer boşalmaz.
   const { content } = useSiteContent('footer', BRAND)
-  const email = content.email || BRAND.email
+  // 2026 öncesi panel kaydındaki eski alan adı canlı veride hâlâ bulunabilir;
+  // bu tek eski değeri resmî marka hesabına sessizce taşı.
+  const email = content.email === 'hello@kademedia.com' ? BRAND.email : (content.email || BRAND.email)
   const socials = buildSocialLinks(content, SOCIAL_LINKS)
 
   return (

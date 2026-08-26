@@ -17,9 +17,16 @@ export const BRAND = {
   social: {},
 }
 
-// Doğrulanmış resmi hesaplar sağlandığında merkezi olarak buraya eklenir.
-// Admin panelinden girilen adresler bu listeye çalışma anında eklenir.
-export const SOCIAL_LINKS = []
+// Resmî marka hesapları statik taban olarak her sayfada aynı kalır. Admin
+// içeriği ek hesap sağlayabilir; aynı etiket gelirse bu doğrulanmış adresler
+// önceliklidir.
+export const SOCIAL_LINKS = [
+  { label: 'INSTAGRAM', href: 'https://instagram.com/kadenewmedia' },
+  { label: 'YOUTUBE', href: 'https://www.youtube.com/@kadenewmedia' },
+  { label: 'TIKTOK', href: 'https://tiktok.com/@kadenewmedia' },
+  { label: 'LINKEDIN', href: 'https://www.linkedin.com/company/kadenewmedia' },
+  { label: 'WHATSAPP', href: 'https://wa.me/905067293423' },
+]
 
 // Admin footer formundaki alan adları → görünen etiket.
 // Sıra, footer'da gösterim sırasını belirler.

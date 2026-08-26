@@ -130,7 +130,7 @@
     "seoIssues": [],
     "securityIssues": [],
     "result": "PASS",
-    "notes": "title=\"İş Ortakları | Kade New Media\"; h1=1; canonical=1; robots=\"index, follow\""
+    "notes": "title=\"İş Ortakları | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, follow\""
   },
   {
     "route": "/kariyer",
@@ -168,7 +168,7 @@
     "seoIssues": [],
     "securityIssues": [],
     "result": "PASS",
-    "notes": "title=\"Portfolyo | Kade New Media\"; h1=1; canonical=1; robots=\"index, follow\""
+    "notes": "title=\"Portfolyo | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, follow\""
   },
   {
     "route": "/portfolio/:slug",
@@ -339,7 +339,7 @@
     "seoIssues": [],
     "securityIssues": [],
     "result": "PASS",
-    "notes": "title=\"Müşteri Referansları | Kade New Media\"; h1=1; canonical=1; robots=\"index, follow\""
+    "notes": "title=\"Müşteri Referansları | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, follow\""
   },
   {
     "route": "/tesekkur",
@@ -358,7 +358,7 @@
     "seoIssues": [],
     "securityIssues": [],
     "result": "PASS",
-    "notes": "title=\"Teşekkürler | Kade New Media\"; h1=1; canonical=1; robots=\"index, follow\""
+    "notes": "title=\"Talep Durumu | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, follow\""
   },
   {
     "route": "/teklif-al",
@@ -1568,7 +1568,7 @@
     "type": "protected",
     "environment": "production",
     "method": "GET",
-    "role": "owner:demirk314@gmail.com",
+    "role": "owner:thekademedia@gmail.com",
     "expectedStatus": 200,
     "actualStatus": null,
     "finalUrl": "",
@@ -2499,7 +2499,7 @@
     "type": "api",
     "environment": "production",
     "method": "GET",
-    "role": "owner:demirk314@gmail.com",
+    "role": "owner:thekademedia@gmail.com",
     "expectedStatus": 200,
     "actualStatus": null,
     "finalUrl": "",
@@ -3312,6 +3312,25 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
+    "route": "/kadeai/dashboard/kade-search",
+    "type": "page",
+    "environment": "production",
+    "method": "GET",
+    "role": "authenticated",
+    "expectedStatus": 200,
+    "actualStatus": null,
+    "finalUrl": "",
+    "redirects": [],
+    "consoleErrors": [],
+    "networkErrors": [],
+    "axeViolations": [],
+    "responsiveIssues": [],
+    "seoIssues": [],
+    "securityIssues": [],
+    "result": "BLOCKED",
+    "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
+  },
+  {
     "route": "/kadeai/dashboard/video-factory",
     "type": "page",
     "environment": "production",
@@ -3389,6 +3408,25 @@
   },
   {
     "route": "/kadeai/api/kade-search/daily-digest",
+    "type": "api",
+    "environment": "production",
+    "method": "GET",
+    "role": "authenticated",
+    "expectedStatus": 200,
+    "actualStatus": null,
+    "finalUrl": "",
+    "redirects": [],
+    "consoleErrors": [],
+    "networkErrors": [],
+    "axeViolations": [],
+    "responsiveIssues": [],
+    "seoIssues": [],
+    "securityIssues": [],
+    "result": "BLOCKED",
+    "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
+  },
+  {
+    "route": "/kadeai/api/kade-search/approvals",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3639,6 +3677,25 @@
     "type": "api",
     "environment": "production",
     "method": "POST",
+    "role": "authenticated",
+    "expectedStatus": 200,
+    "actualStatus": null,
+    "finalUrl": "",
+    "redirects": [],
+    "consoleErrors": [],
+    "networkErrors": [],
+    "axeViolations": [],
+    "responsiveIssues": [],
+    "seoIssues": [],
+    "securityIssues": [],
+    "result": "BLOCKED",
+    "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
+  },
+  {
+    "route": "/kadeai/api/reports/weekly-site",
+    "type": "api",
+    "environment": "production",
+    "method": "GET",
     "role": "authenticated",
     "expectedStatus": 200,
     "actualStatus": null,

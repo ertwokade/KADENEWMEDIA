@@ -51,7 +51,7 @@ Denetim tarihi: 19 Temmuz 2026
 - [ ] Supabase URL + anon key; service role yalnız server secret olarak
 - [ ] En az bir production AI provider server-side key’i; `AI_PROVIDER_MODE=live`
 - [ ] `KADE_DISABLE_AUTH=0`
-- [ ] Settings owner davranışı için kodda sabit hesap doğrulandı: `demirk314@gmail.com`
+- [x] Settings owner davranışı için kodda sabit marka hesabı doğrulandı: `thekademedia@gmail.com`
 - [ ] Owner modu gerekiyorsa `NEXT_PUBLIC_KADE_OWNER_MODE=1` ve `KADE_OWNER_EMAIL(S)` tutarlı
 - [ ] Telemetry yalnız onay ve veri işleme kararıyla enable edilir
 

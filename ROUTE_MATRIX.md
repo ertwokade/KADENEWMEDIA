@@ -135,7 +135,7 @@ Bu dosya önceki bir oturumda üretilmiş mevcut route manifest üzerine kurulmu
 | /kadeai/dashboard/performance | protected | private | authenticated | Evet | 200 |
 | /kadeai/dashboard/quote-extractor | protected | private | authenticated | Evet | 200 |
 | /kadeai/dashboard/retention-analysis | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/settings | protected | private | **owner:demirk314@gmail.com (hardcoded)** | Evet | 200 |
+| /kadeai/dashboard/settings | protected | private | **owner:thekademedia@gmail.com (hardcoded)** | Evet | 200 |
 | /kadeai/dashboard/shopier | protected | private | configured-owner | Evet | 200 |
 | /kadeai/dashboard/social-audit | protected | private | authenticated | Evet | 200 |
 | /kadeai/dashboard/templates | protected | private | authenticated | Evet | 200 |
@@ -154,7 +154,7 @@ Bu dosya önceki bir oturumda üretilmiş mevcut route manifest üzerine kurulmu
 | /kadeai/api/backend/health | api | private | authenticated | Evet | 200 |
 | /kadeai/api/calendar | api | private | authenticated | Evet | 200 |
 | /kadeai/api/config | api | private | authenticated | Evet | 200 |
-| /kadeai/api/env-status | api | private | **owner:demirk314@gmail.com (hardcoded)** | Evet | 200 |
+| /kadeai/api/env-status | api | private | **owner:thekademedia@gmail.com (hardcoded)** | Evet | 200 |
 | /kadeai/api/health | api | public | anonymous | Evet | 200 |
 | /kadeai/api/history | api | private | authenticated | Evet | 200 |
 | /kadeai/api/image | api | private | authenticated | Evet | 200 |

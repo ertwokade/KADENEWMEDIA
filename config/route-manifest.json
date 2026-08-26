@@ -1242,7 +1242,7 @@
       ],
       "access": "private",
       "roles": [
-        "owner:demirk314@gmail.com"
+        "owner:thekademedia@gmail.com"
       ],
       "implemented": true,
       "expectedStatus": 200,
@@ -2033,7 +2033,7 @@
       ],
       "access": "private",
       "roles": [
-        "owner:demirk314@gmail.com"
+        "owner:thekademedia@gmail.com"
       ],
       "implemented": true,
       "expectedStatus": 200,

@@ -6,7 +6,7 @@ Denetim tarihi: 19 Temmuz 2026
 
 ## OWASP Top 10 (2021)
 
-- [x] A01 Broken Access Control — root admin API’lerinde DB-backed kullanıcı/rol/permission; KadeAI proxy + handler auth; Supabase sorgularında `user_id`; ayarlar yalnız `demirk314@gmail.com`.
+- [x] A01 Broken Access Control — root admin API’lerinde DB-backed kullanıcı/rol/permission; KadeAI proxy + handler auth; Supabase sorgularında `user_id`; ayarlar yalnız `thekademedia@gmail.com`.
 - [-] A01 — production Supabase RLS/payment migration’larının gerçekten uygulanmış olduğu staging ve production üzerinde doğrulanmalı.
 - [x] A02 Cryptographic Failures — JWT secret minimum 32 karakter, HttpOnly/Secure/SameSite cookie, timing-safe webhook/CSRF karşılaştırması, şifreler bcrypt cost 12.
 - [-] A02 — gerçek secret rotasyonu ve secret manager kullanımı deployment kontrolüdür; repoda doğrulanamaz.
@@ -50,7 +50,7 @@ Denetim tarihi: 19 Temmuz 2026
 - [x] KadeAI mutating API origin kontrolü proxy seviyesinde.
 - [x] Admin kullanıcı silme/rol/permission/password değişikliği eski session’ları iptal ediyor.
 - [x] Customer password değişimi ve login sessionVersion kullanıyor.
-- [x] KadeAI settings UI/API yalnız `demirk314@gmail.com`.
+- [x] KadeAI settings UI/API yalnız `thekademedia@gmail.com`.
 - [x] KadeAI owner/dashboard erişimi yalnız UI gizlemeye dayanmıyor; proxy server-side uygular.
 - [-] Gerçek Supabase kullanıcılarıyla A/B tenant E2E testi tarayıcı/auth fixture olmadığı için çalıştırılamadı.
 

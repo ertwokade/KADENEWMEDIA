@@ -94,6 +94,8 @@ test('anonymous content access is limited to the explicit public section allow-l
   assert.equal(isPublicContentSection('footer'), true)
   assert.equal(isKnownContentSection('calendar'), true)
   assert.equal(isPublicContentSection('calendar'), false)
+  assert.equal(isKnownContentSection('site-settings'), true)
+  assert.equal(isPublicContentSection('site-settings'), false)
   assert.equal(isKnownContentSection('typo-section'), false)
   assert.equal(isPublicContentSection('typo-section'), false)
 })

@@ -12,7 +12,7 @@ export const CONTENT_SECTIONS = new Set([
   'homepage', 'hero', 'stats', 'services', 'faq', 'testimonials', 'packages',
   'priceCalculator', 'about', 'footer', 'careers', 'basin', 'nedenBiz',
   'tesekkur', 'referralProgram', 'podcastWebinar', 'caseStudies',
-  'newsletterArchive', 'calendar', 'portfolio',
+  'newsletterArchive', 'calendar', 'portfolio', 'site-settings',
 ]);
 
 export const PUBLIC_CONTENT_SECTIONS = new Set([
