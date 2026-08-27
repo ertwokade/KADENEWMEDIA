@@ -111,11 +111,17 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
 
 /* Existing tool pages inherit the same paper-and-hairline system. */
 .kade-panel .bg-zinc-950, .kade-panel .bg-zinc-950\/70, .kade-panel .bg-zinc-950\/60 { background-color: var(--kade-bg) !important; }
-.kade-panel .bg-zinc-900, .kade-panel .bg-zinc-900\/90, .kade-panel .bg-zinc-900\/80, .kade-panel .bg-zinc-900\/70, .kade-panel .bg-zinc-900\/60, .kade-panel .bg-zinc-900\/50 { background-color: var(--kade-surface) !important; }
+.kade-panel .bg-zinc-900, .kade-panel .bg-zinc-900\/90, .kade-panel .bg-zinc-900\/80, .kade-panel .bg-zinc-900\/75, .kade-panel .bg-zinc-900\/70, .kade-panel .bg-zinc-900\/60, .kade-panel .bg-zinc-900\/50 { background-color: var(--kade-surface) !important; }
 .kade-panel .bg-zinc-800, .kade-panel .bg-zinc-800\/50, .kade-panel .bg-zinc-800\/30, .kade-panel .bg-zinc-700 { background-color: var(--kade-surface-soft) !important; }
 .kade-panel .text-zinc-50, .kade-panel .text-zinc-100, .kade-panel .text-zinc-200 { color: var(--kade-ink) !important; }
 .kade-panel .text-zinc-300, .kade-panel .text-zinc-400, .kade-panel .text-zinc-500 { color: var(--kade-muted) !important; }
 .kade-panel .text-zinc-600 { color: var(--kade-faint) !important; }
+
+/* Content Studio keeps its editorial hero dark while card typography follows the active theme. */
+.kade-content-studio h2.text-white,
+.kade-content-studio p.text-white { color: var(--kade-ink) !important; }
+.kade-content-studio-hero .text-zinc-300,
+.kade-content-studio-hero .text-zinc-400 { color: #d4d4d8 !important; }
 .kade-panel .border-zinc-800, .kade-panel .border-zinc-700, .kade-panel .border-zinc-700\/70, .kade-panel .border-zinc-700\/60, .kade-panel .border-zinc-700\/50 { border-color: var(--kade-line) !important; }
 .kade-panel .border-zinc-600 { border-color: var(--kade-line-strong) !important; }
 .kade-panel input, .kade-panel textarea, .kade-panel select { border-color: var(--kade-line-strong) !important; border-radius: 0 !important; background: var(--kade-surface) !important; color: var(--kade-ink) !important; box-shadow: none !important; }

@@ -209,11 +209,11 @@ export default function ContentStudioPage() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-zinc-950">
+    <div className="kade-content-studio flex h-full flex-col bg-zinc-950">
       <TopBar title="İçerik Stüdyosu" description="Bir kaynaktan, kendi marka sesinle haftalık yayın paketi" />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7">
         <section className="mx-auto max-w-7xl space-y-5">
-          <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-900 to-violet-950/40 p-5 sm:p-6">
+          <div className="kade-content-studio-hero overflow-hidden rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-900 to-violet-950/40 p-5 sm:p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[.16em] text-violet-300"><Sparkles className="h-4 w-4" /> Kaynak bağlı üretim</p>
