@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { apiFetch } from '@/lib/client/api'
 import TopBar from '@/components/layout/TopBar'
+import CapabilityNotice from '@/components/ui/CapabilityNotice'
 import { useModel } from '@/lib/context/ModelContext'
 import { extractAudio, readMediaDuration } from '@/lib/media/extractAudio'
 import {
@@ -263,6 +264,7 @@ export default function SubtitlesPage() {
   return (
     <div className="flex h-full flex-col">
       <TopBar title="Altyazı Stüdyosu" description="Videodan altyazı üret, çevir, düzenle ve YouTube'a yükle" />
+      <div className="px-4 pt-4 sm:px-6"><CapabilityNotice need="transcribe" /></div>
 
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">

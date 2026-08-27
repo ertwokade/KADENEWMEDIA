@@ -5,6 +5,7 @@ import { useState, useRef, useCallback } from 'react'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
 import TopBar from '@/components/layout/TopBar'
+import CapabilityNotice from '@/components/ui/CapabilityNotice'
 import { cn } from '@/lib/utils'
 import {
   Upload, Scissors, Download, Zap, CheckCircle,
@@ -186,6 +187,7 @@ export default function ClipGeneratorPage() {
   return (
     <div className="flex flex-col h-full">
       <TopBar title="Klip Üretici" description="Videodan viral 9:16 klipler — Reels · Shorts · TikTok" />
+      <div className="px-4 pt-4 sm:px-6"><CapabilityNotice need="transcribe" /></div>
 
       <div className="flex-1 overflow-y-auto">
         <div className="flex min-h-full flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">

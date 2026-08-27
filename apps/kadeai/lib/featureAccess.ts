@@ -53,10 +53,13 @@ const COMMON_DISABLED_ROUTES = [
   '/api/generate/course',
 ]
 
-const OWNER_ONLY_ROUTES = [
-  '/dashboard/shopier',
-  '/api/shopier',
-]
+/**
+ * Sahip rotaları. Eskiden `NEXT_PUBLIC_KADE_OWNER_MODE` bayrağına bağlıydı;
+ * bayrak canlıda set edilmediği için Satış Merkezi hesap sahibine bile
+ * kapanmıştı. Artık erişim BAYRAĞA değil KİMLİĞE bakıyor — bkz.
+ * ADMIN_ONLY_ROUTES ile aynı kural.
+ */
+const OWNER_ONLY_ROUTES: string[] = []
 
 /**
  * Maliyet/marj gibi platform yönetimi uçları. `OWNER_ONLY_ROUTES`'tan farkı:
@@ -67,6 +70,8 @@ const OWNER_ONLY_ROUTES = [
 const ADMIN_ONLY_ROUTES = [
   '/api/admin',
   '/dashboard/admin',
+  '/dashboard/shopier',
+  '/api/shopier',
 ]
 
 const SETTINGS_OWNER_ONLY_ROUTES = [

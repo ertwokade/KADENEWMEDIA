@@ -102,11 +102,16 @@ export default function TitlePage() {
 
               <div>
                 <label className="block text-zinc-400 text-xs font-medium mb-1.5">Ton</label>
-                <div className="space-y-1">
+                {/* Hemen üstteki Platform ile aynı çip yerleşimi: aynı formda
+                    iki farklı seçim stili olmasın, dikey yer de boşa gitmesin. */}
+                <div className="flex flex-wrap gap-1.5">
                   {tones.map(t => (
                     <button key={t} type="button" onClick={() => setTone(t)}
-                      className={cn('w-full text-left py-1.5 px-3 rounded-lg text-xs transition-colors capitalize',
-                        tone === t ? 'bg-violet-500/20 text-violet-300' : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800')}>
+                      aria-pressed={tone === t}
+                      className={cn('py-1.5 px-2.5 rounded-lg text-xs font-medium transition-colors capitalize border',
+                        tone === t
+                          ? 'bg-violet-500/20 text-violet-300 border-violet-500/40'
+                          : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-600')}>
                       {t}
                     </button>
                   ))}

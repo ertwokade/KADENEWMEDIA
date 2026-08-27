@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAvailableModels } from '@/lib/ai/modelRouter'
-import { isAllowedOwnerUser, isOwnerMode, isSettingsOwnerUser } from '@/lib/featureAccess'
+import { isAllowedOwnerUser, isSettingsOwnerUser } from '@/lib/featureAccess'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
 import { getVercelGatewayToken } from '@/lib/ai/gatewayAuth'
 
@@ -26,7 +26,10 @@ export async function GET(request: Request) {
       const supabase = await createClient()
       const { data: { user } } = await supabase.auth.getUser()
       operationsSync = Boolean(user)
-      ownerAccess = isOwnerMode() && isAllowedOwnerUser(user)
+      // Kimlik yeter: KADE_OWNER_EMAILS listesindeki hesap ya da kade_admin.
+      // Ayrıca bir ortam bayrağı ARANMAZ; bayrak set edilmediği için sahip
+      // kendi Satış Merkezi'ni ve Platform Yönetimi'ni menüde göremiyordu.
+      ownerAccess = isAllowedOwnerUser(user) || isSettingsOwnerUser(user)
       settingsAccess = isSettingsOwnerUser(user)
     } catch {
       operationsSync = false
@@ -54,7 +57,13 @@ export async function GET(request: Request) {
     imageConfigured,
     imageFallbackAvailable: false,
     imageProvider: imageConfigured ? 'configured' : 'none',
-    video: false,
+    // Video ve dublaj ayrı FastAPI servisinde koşuyor. Bu bayrak eskiden
+    // SABİT false'tu, yani arayüz servis ayakta olsa bile bilemiyordu;
+    // artık servis adresinin tanımlı olup olmadığını yansıtıyor.
+    video: configured('KADE_FASTAPI_BASE_URL'),
+    // Transkripsiyon Groq Whisper ile yapılıyor; anahtar yoksa Klip Üretici,
+    // Altyazı ve Dublaj tıklanınca 503 alıyordu — arayüz önceden uyarabilsin.
+    transcribe: configured('GROQ_API_KEY'),
     youtube: configured('YOUTUBE_API_KEY'),
     operationsSync,
     ownerAccess,

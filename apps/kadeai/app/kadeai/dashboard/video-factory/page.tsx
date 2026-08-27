@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { apiFetch } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
 import TopBar from '@/components/layout/TopBar'
+import CapabilityNotice from '@/components/ui/CapabilityNotice'
 import { cn } from '@/lib/utils'
 
 type Aspect = 'portrait' | 'landscape'
@@ -62,6 +63,7 @@ export default function VideoFactoryPage() {
   return (
     <div className="min-h-screen bg-zinc-950">
       <TopBar title="Video Fabrikası" />
+      <div className="px-4 pt-4 sm:px-6"><CapabilityNotice need="video" /></div>
       <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-6">
           <h2 className="text-2xl font-semibold text-zinc-100">Video Fabrikası</h2>

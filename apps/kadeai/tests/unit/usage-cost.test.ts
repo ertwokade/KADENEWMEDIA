@@ -3,7 +3,7 @@ import { test } from 'node:test'
 import { estimateCostUsd, getModelRate, resetRateCacheForTests } from '../../lib/ai/pricing'
 import { getLimitForTier, isTokenQuotaEnforced, FREE_TIER } from '../../lib/payments/limits'
 import { entitlementAllows, tierOf } from '../../lib/payments/planRules'
-import { isAdminOnlyRoute } from '../../lib/featureAccess'
+import { canAccessFeature, isAdminOnlyRoute } from '../../lib/featureAccess'
 
 test('bilinmeyen modelin maliyeti sıfır değil, null döner', () => {
   // 0 dönerse admin panelindeki brüt marj olduğundan iyi görünür.
@@ -84,4 +84,22 @@ test('maliyet uçları admin-only rota sınıfında', () => {
   assert.equal(isAdminOnlyRoute('/dashboard/admin'), true)
   assert.equal(isAdminOnlyRoute('/dashboard/title'), false)
   assert.equal(isAdminOnlyRoute('/api/administrator'), false)
+})
+
+test('sahip rotaları ortam bayrağına DEĞİL kimliğe bağlı', () => {
+  // NEXT_PUBLIC_KADE_OWNER_MODE canlıda set edilmediği için Satış Merkezi
+  // hesap sahibine bile kapanmıştı; artık admin rota sınıfında.
+  assert.equal(isAdminOnlyRoute('/dashboard/shopier'), true)
+  assert.equal(isAdminOnlyRoute('/api/shopier'), true)
+  assert.equal(isAdminOnlyRoute('/dashboard/admin'), true)
+  assert.equal(isAdminOnlyRoute('/api/admin/usage'), true)
+})
+
+test('sahip rotaları owner-mode bayrağıyla artık engellenmiyor', () => {
+  // canAccessFeature ikinci parametresi false (owner mode kapalı) olsa bile
+  // Satış Merkezi erişilebilir kalmalı; kimlik kontrolü proxy'de yapılıyor.
+  assert.equal(canAccessFeature('/dashboard/shopier', false), true)
+  assert.equal(canAccessFeature('/dashboard/admin', false), true)
+  // Sürümde kapalı araçlar kapalı kalmayı sürdürüyor.
+  assert.equal(canAccessFeature('/dashboard/editor', false), false)
 })

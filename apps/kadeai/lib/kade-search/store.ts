@@ -36,8 +36,39 @@ export function trendId(platform: string, kind: string, externalId?: string | nu
 
 /* --------------------------------- Yazma --------------------------------- */
 
+/**
+ * Yarım kalmış koşuların üst yaş sınırı. Toplama işi serverless'ta çalışıyor;
+ * fonksiyon zaman aşımına uğrarsa `finishRun` hiç çağrılmıyor ve satır sonsuza
+ * kadar `running` kalıyordu (canlıda saatlerdir asılı bir koşu bulundu).
+ */
+const STALE_RUN_MS = 30 * 60 * 1000
+
+/**
+ * Bitmemiş eski koşuları `failed` olarak kapatır.
+ *
+ * Silmek yerine işaretlenir: koşunun gerçekten yarıda kaldığı görünür kalsın,
+ * kaç kez olduğu ölçülebilsin.
+ */
+export async function sweepStaleRuns() {
+  const db = createAdminClient()
+  const cutoff = new Date(Date.now() - STALE_RUN_MS).toISOString()
+  const { data } = await db
+    .from('kade_trend_runs')
+    .update({
+      status: 'failed',
+      finished_at: new Date().toISOString(),
+      errors: ['Koşu zaman aşımına uğradı; sonucu bildirilmedi.'],
+    })
+    .eq('status', 'running')
+    .lt('started_at', cutoff)
+    .select('id')
+  return data?.length ?? 0
+}
+
 export async function startRun(sources: string[], countries: string[]) {
   const db = createAdminClient()
+  // Yeni koşu başlamadan önce asılı kalanları kapat.
+  await sweepStaleRuns().catch(() => 0)
   const id = `run_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`
   await db.from('kade_trend_runs').insert({
     id,
@@ -422,6 +453,10 @@ export async function statsSummary() {
     .from('kade_trend_alerts')
     .select('*', { count: 'exact', head: true })
     .eq('seen', false)
+
+  // Panel açılırken asılı kalmış koşuları da kapat: kullanıcı sonsuza kadar
+  // "çalışıyor" gören bir satırla karşılaşmasın.
+  await sweepStaleRuns().catch(() => 0)
 
   const { data: lastRun } = await supabase
     .from('kade_trend_runs')
