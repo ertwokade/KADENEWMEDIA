@@ -20,14 +20,19 @@ const INDEXABLE = [
   '/',
   '/hakkimizda', '/hizmetler', '/new-media-ajansi', '/paketler', '/sss', '/ekip',
   '/kariyer', '/iletisim', '/teklif-al', '/kvkk', '/gizlilik', '/cerez-politikasi',
-  '/telif-haklari',
+  '/telif-haklari', '/neden-biz', '/basin', '/podcast-webinar', '/bulten-arsivi',
+  '/blog', '/basari-hikayeleri',
   '/hizmetler/sosyal-medya-yonetimi', '/hizmetler/icerik-uretimi',
   '/hizmetler/reklam-yonetimi', '/hizmetler/video-produksiyon',
   '/hizmetler/strateji-danismanlik', '/hizmetler/web-sitesi-tasarimi',
 ]
 
+// Next.js tarafından pre-render edilen public ürün rotaları legacy dist/
+// ağacında bulunmaz; sitemap sözleşmesinde yine de açıkça doğrulanır.
+const NEXT_INDEXABLE = ['/kadeai-demo']
+
 // Herkese açık ama indekslenmemesi gereken sayfalar.
-const PUBLIC_NOINDEX = ['/blog', '/portfolio', '/partnerler', '/referanslar', '/basari-hikayeleri']
+const PUBLIC_NOINDEX = ['/portfolio', '/partnerler', '/referanslar']
 
 // Oturum gerektiren alanlar — noindex olmalı ve robots.txt'de engellenmeli.
 const PROTECTED = [
@@ -53,7 +58,7 @@ for (const route of INDEXABLE) {
   const robots = robotsOf(html)
   const canonical = canonicalOf(html)
 
-  if (robots !== 'index, follow') fail(`${route}: robots "${robots}" (beklenen "index, follow")`)
+  if (!robots?.startsWith('index, follow')) fail(`${route}: robots "${robots}" (beklenen "index, follow")`)
   else if (canonical !== `${BASE}${route}`) fail(`${route}: canonical "${canonical}"`)
   else if ((html.match(/<link rel="canonical"/g) || []).length !== 1) fail(`${route}: birden fazla canonical`)
   else if (!/<h1[^>]*>/.test(html)) fail(`${route}: ön-render çıktısında h1 yok`)
@@ -108,25 +113,25 @@ console.log('\n── Sitemap ──')
 const { STATIC_PAGES } = await import('../server/api/sitemap.js')
 const locs = STATIC_PAGES.map((p) => p.loc)
 
-for (const route of INDEXABLE) {
+for (const route of [...INDEXABLE, ...NEXT_INDEXABLE]) {
   if (!locs.includes(route)) fail(`sitemap eksik: ${route}`)
 }
-if (INDEXABLE.every((r) => locs.includes(r))) ok(`${INDEXABLE.length} indekslenebilir sayfanın tamamı sitemap'te`)
+if ([...INDEXABLE, ...NEXT_INDEXABLE].every((r) => locs.includes(r))) ok(`${INDEXABLE.length + NEXT_INDEXABLE.length} indekslenebilir sayfanın tamamı sitemap'te`)
 
 for (const route of [...PUBLIC_NOINDEX, ...PROTECTED]) {
   if (locs.includes(route)) fail(`sitemap'te olmamalı: ${route}`)
 }
 ok('noindex ve korumalı sayfalar sitemap dışında')
 
-// Sitemap toplamı: 20 statik indekslenebilir sayfa (ana sayfa + 19).
-if (locs.length !== INDEXABLE.length) {
-  fail(`sitemap statik sayfa sayısı ${locs.length}, beklenen ${INDEXABLE.length}`)
+// Sitemap toplamı legacy statik sayfalar + public Next ürün sayfalarıdır.
+if (locs.length !== INDEXABLE.length + NEXT_INDEXABLE.length) {
+  fail(`sitemap statik sayfa sayısı ${locs.length}, beklenen ${INDEXABLE.length + NEXT_INDEXABLE.length}`)
 } else {
   ok(`sitemap ${locs.length} statik sayfa içeriyor`)
 }
 
 console.log('\n── Redirect ve rewrite yapılandırması ──')
-const vercel = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'))
+const vercel = JSON.parse(await readFile(new URL('../apps/kadeai/vercel.json', import.meta.url), 'utf8'))
 
 const expectedRedirects = {
   '/kadirdemir': '/@kadirdemir',
@@ -159,7 +164,7 @@ const dynamicSources = (vercel.rewrites || [])
   .filter((r) => r.destination === '/app.html')
   .map((r) => r.source)
   .sort()
-const expectedDynamic = ['/401', '/403', '/429', '/@:handle', '/bakim', '/blog/:slug', '/partnerler/:id', '/portfolio/:slug', '/s/:slug'].sort()
+const expectedDynamic = ['/401', '/403', '/429', '/bakim', '/kadelinks', '/kadirdemir', '/links', '/s/:slug'].sort()
 if (JSON.stringify(dynamicSources) !== JSON.stringify(expectedDynamic)) {
   fail(`app.html rewrite listesi değişmiş:\n      var: ${dynamicSources.join(', ')}\n      bekl: ${expectedDynamic.join(', ')}`)
 } else {

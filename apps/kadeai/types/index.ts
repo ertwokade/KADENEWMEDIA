@@ -54,6 +54,11 @@ export interface GenerateResult {
   content: string
   model: AIModel
   tokensUsed?: number
+  /** Sağlayıcı input/output ayrımı bildirdiyse dolu; maliyet hesabı bunu kullanır. */
+  inputTokens?: number
+  outputTokens?: number
+  /** Çağrı kullanıcının kendi sağlayıcı anahtarıyla yapıldıysa true. */
+  byok?: boolean
   routingReason?: string
 }
 

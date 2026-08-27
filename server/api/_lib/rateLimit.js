@@ -90,10 +90,17 @@ export async function rateLimitCheck(req, options = {}) {
       if (redisResult) return redisResult;
     } catch (err) {
       console.error('Persistent rate limit error:', err.message);
-      if (isProductionRuntime()) {
+      if (isProductionRuntime() && !options.failOpen) {
         // Redis configured but unreachable — fail closed to prevent brute force
         return { allowed: false, retryAfter: Math.ceil(windowMs / 60000), error: 'Rate limit backend unavailable' };
       }
+      /* failOpen: limiter'ın KENDİ arızası isteği düşürmemeli.
+         Ödeme webhook'u gibi yollarda fail-closed davranış, Upstash'teki kısa
+         bir kesintide her Shopier bildirimini 429'lar: para tahsil edilmiş
+         olur ama abonelik açılmaz. Orada gerçek kapı imza doğrulaması ve
+         idempotency'dir; rate limit yalnız flood'a karşı ikincil bir katman,
+         bu yüzden arızasında geçirgen olmalı. Public okuma yollarında da
+         Redis kesintisi sayfaları düşürmesin diye aynı tercih kullanılır. */
     }
   } else if (isProductionRuntime()) {
     console.warn('UPSTASH_REDIS not configured — falling back to in-memory rate limiting');

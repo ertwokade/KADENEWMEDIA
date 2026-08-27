@@ -17,33 +17,20 @@ import { getPricingSnapshot } from './pricingConfig'
  * çalışma anında `createDynamicOffer()` ile üretilir (bkz. offers.ts).
  */
 
-// —— Özellik matrisi (featureAccess ile eşleşir) ——————————————————————————
+// —— Özellik matrisi ve paket adları ——————————————————————————————————————
+//
+// Artık ikisi de admin panelinden yönetilebiliyor (§13). Varsayılanlar
+// pricingConfig.ts'te; buradaki okumalar fiyatla aynı senkron snapshot'tan
+// gelir, böylece checkout/webhook akışı asenkron hale gelmez.
 
-const TIER_FEATURES: Record<PlanTier, readonly string[]> = {
-  baslangic: ['content-generation', 'image-basic', 'video-factory-basic'],
-  pro: [
-    'content-generation',
-    'image-advanced',
-    'video-factory',
-    'auto-captions',
-    'clip-generator',
-  ],
-  sinirsiz: [
-    'content-generation',
-    'image-advanced',
-    'video-factory',
-    'auto-captions',
-    'clip-generator',
-    'auto-publish',
-    'bulk',
-    'priority-queue',
-  ],
+/** Paketin açtığı özellikler — entitlement grant'ine bu liste yazılır. */
+function tierFeatures(tier: PlanTier): readonly string[] {
+  return getPricingSnapshot().tierFeatures[tier]
 }
 
-const TIER_LABEL: Record<PlanTier, string> = {
-  baslangic: 'Başlangıç',
-  pro: 'Pro',
-  sinirsiz: 'Sınırsız',
+/** Kullanıcıya görünen paket adı. */
+function tierLabel(tier: PlanTier): string {
+  return getPricingSnapshot().tierLabels[tier]
 }
 
 const PERIOD_LABEL: Record<BillingPeriod, string> = {
@@ -74,13 +61,13 @@ function buildProduct(tier: PlanTier, period: BillingPeriod, apiIncluded: boolea
   const apiLabel = apiIncluded ? 'API Dahil' : 'Kendi Anahtarın'
   return Object.freeze({
     id: buildProductId(tier, period, apiIncluded),
-    name: `KadeAI ${TIER_LABEL[tier]} — ${PERIOD_LABEL[period]} (${apiLabel})`,
+    name: `KadeAI ${tierLabel(tier)} — ${PERIOD_LABEL[period]} (${apiLabel})`,
     amountMinor: priceMinor(tier, period, apiIncluded),
     currency: 'TRY' as const,
     tier,
     period,
     apiIncluded,
-    features: TIER_FEATURES[tier],
+    features: tierFeatures(tier),
   })
 }
 
@@ -138,4 +125,17 @@ export function periodDurationDays(period: BillingPeriod): number {
   return period === 'weekly' ? 7 : period === 'monthly' ? 30 : 365
 }
 
-export { TIER_LABEL, PERIOD_LABEL, TIER_FEATURES }
+export { PERIOD_LABEL, tierLabel, tierFeatures }
+
+/**
+ * Geriye dönük uyumluluk: eskiden sabit birer nesne olan TIER_LABEL ve
+ * TIER_FEATURES artık DB'den beslendiği için fonksiyonla okunuyor. Çağıran
+ * kod sabit nesne bekliyorsa güncel snapshot'tan üretilmiş kopya alır.
+ */
+export function TIER_LABEL_MAP(): Record<PlanTier, string> {
+  return { ...getPricingSnapshot().tierLabels }
+}
+
+export function TIER_FEATURES_MAP(): Record<PlanTier, readonly string[]> {
+  return { ...getPricingSnapshot().tierFeatures }
+}

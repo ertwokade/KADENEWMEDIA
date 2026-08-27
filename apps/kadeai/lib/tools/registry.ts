@@ -52,6 +52,9 @@ const brandBasics: ProfileField[] = ['brand.name', 'brand.niche', 'brand.audienc
 export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('overview', 'Genel Bakış', 'platform', '/dashboard', 'layout-dashboard', 'Araçlara ve çalışma alanına genel bakış.', [], false),
   tool('packages', 'Paketler', 'platform', '/dashboard/packages', 'circle-dollar', 'Abonelik paketleri ve satın alma.', [], false),
+  tool('api-keys', 'Kendi API Anahtarların', 'platform', '/dashboard/api-keys', 'key-round', 'BYOK sağlayıcı anahtarlarını şifreli olarak yönet.', [], false),
+  tool('quote', 'Teklif Al', 'platform', '/dashboard/quote', 'file-text', 'İhtiyacına özel paket ve fiyat talep et.', [], false),
+  tool('orchestrate', 'Akışlar', 'platform', '/dashboard/orchestrate', 'git-branch', 'Araçları zincirleyerek uçtan uca çalıştır.', [], false),
   tool('operations', 'Operasyon Merkezi', 'operations', '/dashboard/operations?view=dashboard', 'layout-dashboard', 'Bütçe, görev ve üretim özeti.', [], false),
   tool('sentscan', 'SentScan', 'operations', '/dashboard/operations?view=comments', 'message-square', 'Yorum ve transkript analizi.', [], false),
   tool('production-crm', 'Prodüksiyon CRM', 'operations', '/dashboard/operations?view=crm', 'clapperboard', 'Prodüksiyon, görev, bütçe ve envanter.', [], false),
@@ -61,6 +64,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('notes', 'Notlar', 'operations', '/dashboard/operations?view=pages', 'book-open', 'Ekip notları ve dokümanlar.', [], false),
   tool('operations-settings', 'Operasyon Ayarları', 'operations', '/dashboard/operations?view=settings', 'settings', 'Operasyon alanı ayarları.', [], false),
 
+  tool('content-studio', 'İçerik Stüdyosu', 'production', '/dashboard/content-studio', 'copy', 'Bir kaynaktan marka sesine uygun haftalık yayın paketi üretir ve saklar.', [], false),
   tool('title', 'Başlık Üretici', 'production', '/dashboard/title', 'wand', 'Platforma uygun başlıklar üretir.', brandBasics),
   tool('text-generator', 'Metin Oluşturucu', 'production', '/dashboard/text-generator', 'file-text', 'Marka bağlamıyla kullanıma hazır metin üretir.', brandBasics),
   tool('description', 'Video Açıklama', 'production', '/dashboard/description', 'file-text', 'Video açıklaması ve CTA üretir.', brandBasics),
@@ -102,6 +106,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('history', 'Geçmiş', 'planning', '/dashboard/history', 'history', 'Araç çalıştırmalarını arar, filtreler ve yeniden açar.', [], false),
 
   { ...tool('shopier', 'Satış Merkezi', 'owner', '/dashboard/shopier', 'circle-dollar', 'Teklif ve satış takibi.', [], false), permissions: ['owner'] },
+  { ...tool('admin-cost', 'Platform Yönetimi', 'owner', '/dashboard/admin', 'bar-chart', 'AI maliyeti, brüt marj ve teklif pipeline\'ı.', [], false), permissions: ['owner'] },
   { ...tool('settings', 'Ayarlar', 'settings', '/dashboard/settings', 'settings', 'Profil, marka, entegrasyon ve sistem ayarları.', [], false), permissions: ['settings-owner'] },
 ]
 

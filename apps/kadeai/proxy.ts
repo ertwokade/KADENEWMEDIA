@@ -4,6 +4,7 @@ import {
   canAccessFeature,
   isAllowedOwnerUser,
   isOwnerMode,
+  isAdminOnlyRoute,
   isOwnerOnlyRoute,
   isSettingsOwnerUser,
   isSettingsOwnerOnlyRoute,
@@ -80,9 +81,10 @@ export async function proxy(request: NextRequest) {
   const isOperationsKitAsset = isOperationsKit && /\.(?:css|js|png|svg|webp|woff2?)$/i.test(pathname)
   const isOwnerRoute = isOwnerOnlyRoute(pathname)
   const isSettingsOwnerRoute = isSettingsOwnerOnlyRoute(pathname)
-  const isPublicApi = pathname === '/api/health' || pathname === '/api/auth/password' || pathname === '/api/auth/recovery' || pathname === '/api/auth/recovery-session' || pathname === '/api/payments/webhook'
+  const isAdminRoute = isAdminOnlyRoute(pathname)
+  const isPublicApi = pathname === '/api/health' || pathname === '/api/auth/password' || pathname === '/api/auth/recovery' || pathname === '/api/auth/recovery-session' || pathname === '/api/payments/webhook' || pathname === '/api/legal'
   const protectedApi = isApi && !isPublicApi
-  const requiresAuth = isDashboard || (isOperationsKit && !isOperationsKitAsset) || isOwnerRoute || isSettingsOwnerRoute || protectedApi
+  const requiresAuth = isDashboard || (isOperationsKit && !isOperationsKitAsset) || isOwnerRoute || isSettingsOwnerRoute || isAdminRoute || protectedApi
   const isAiApi = pathname === '/api/assistant' || pathname === '/api/image' || pathname === '/api/transcribe' || pathname === '/api/youtube/comments' || pathname.startsWith('/api/generate/')
   const isCronApi = [
     '/api/materials/sync',
@@ -206,6 +208,18 @@ export async function proxy(request: NextRequest) {
       return NextResponse.json({ error: 'Oturum açman gerekiyor.' }, { status: 401 })
     }
     return NextResponse.redirect(loginRedirectFor(request, pathname))
+  }
+
+  // Platform yönetimi uçları: handler ile aynı kural (owner e-postası veya
+  // kade_admin). İkinci savunma hattı; handler kendi kontrolünü de yapar.
+  if (isAdminRoute && !isAllowedOwnerUser(user) && !isSettingsOwnerUser(user)) {
+    if (isApi) {
+      return NextResponse.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
+    }
+    const url = request.nextUrl.clone()
+    url.pathname = withBasePath('/dashboard')
+    url.search = ''
+    return NextResponse.redirect(url)
   }
 
   if (isSettingsOwnerRoute && !isSettingsOwnerUser(user)) {

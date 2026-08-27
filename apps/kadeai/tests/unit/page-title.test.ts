@@ -4,6 +4,7 @@ import { resolveKadePageTitle } from '@/lib/pageTitle'
 
 test('KadeAI public root uses the Kade brand title', () => {
   assert.equal(resolveKadePageTitle('/kadeai'), 'KadeAI | Kade New Media')
+  assert.equal(resolveKadePageTitle('/kadeai-demo'), 'KadeAI Demo | AI Sosyal Medya ve İçerik Platformu')
 })
 
 test('KadeAI dashboard routes use the active tool name', () => {

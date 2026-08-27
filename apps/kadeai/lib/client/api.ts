@@ -91,6 +91,11 @@ function saveGenerationResult(url: string, init: RequestInit | undefined, respon
       tool: url === '/api/image' ? 'image' : (url.split('/').pop() || 'generation'),
       status: response.status,
     })
+    if (response.ok) {
+      captureAnalytics('tool_used', {
+        tool: url === '/api/image' ? 'image' : (url.split('/').pop() || 'generation'),
+      })
+    }
 
     let inputData: Record<string, unknown> = {}
     if (typeof init?.body === 'string') {

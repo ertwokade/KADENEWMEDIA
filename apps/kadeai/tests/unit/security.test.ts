@@ -354,6 +354,7 @@ test('oturum gerektiren her API route handler kendi kontrolünü de yapar', asyn
     ['payments/admin/pricing/route.ts', 'sunucular-arası sır (hasValidAdminSecret)'],
     ['payments/admin/custom-offer/route.ts', 'sunucular-arası sır (hasValidAdminSecret)'],
     ['packages/route.ts', 'genel paket kataloğu — giriş öncesi fiyat sayfasında okunur'],
+    ['legal/route.ts', 'yayınlanmış yasal metinler — mevzuat gereği giriş yapmadan da okunabilmeli'],
   ])
 
   // Kabul edilen iki biçim:
@@ -400,4 +401,30 @@ test('admin sırrı sabit zamanlı karşılaştırılır', async () => {
   const helper = await readFile(new URL('../../lib/auth/adminSecret.ts', import.meta.url), 'utf8')
   assert.match(helper, /timingSafeEqual/, 'sabit zamanlı karşılaştırma kullanılmalı')
   assert.match(helper, /if \(!secret\) return false/, 'sır tanımsızsa kapalı düşmeli')
+})
+
+test('custom teklifler 15 dakikadan uzun üretilemez ve expired webhook yetki vermez', async () => {
+  const offers = await readFile(new URL('../../lib/payments/offers.ts', import.meta.url), 'utf8')
+  assert.match(offers, /requestedValidity[\s\S]*:\s*15/)
+  assert.match(offers, /Math\.min\([\s\S]*15/)
+
+  const webhook = await readFile(new URL('../../app/kadeai/api/payments/webhook/route.ts', import.meta.url), 'utf8')
+  const expiryCheck = webhook.indexOf("order.status === 'expired'")
+  const entitlementGrant = webhook.lastIndexOf('grantEntitlementForOrder')
+  assert.ok(expiryCheck > -1, 'expired sipariş açıkça reddedilmeli')
+  assert.ok(entitlementGrant > -1 && expiryCheck < entitlementGrant, 'expiry kontrolü entitlement grant öncesinde olmalı')
+  assert.match(webhook, /status:\s*'expired'/)
+})
+
+test('BYOK sırları doğrudan istemciye açılamaz', async () => {
+  const migration = await readFile(new URL('../../supabase/migrations/202608260004_user_provider_keys.sql', import.meta.url), 'utf8')
+  assert.match(migration, /REVOKE ALL ON public\.user_provider_keys FROM anon, authenticated/)
+
+  const route = await readFile(new URL('../../app/kadeai/api/provider-keys/route.ts', import.meta.url), 'utf8')
+  assert.doesNotMatch(route, /decryptSecret|encrypted_secret/)
+  assert.match(route, /listUserProviderKeyStatus/)
+
+  const keyStore = await readFile(new URL('../../lib/ai/userProviderKeys.ts', import.meta.url), 'utf8')
+  assert.match(keyStore, /encryptSecret\(clean\)/)
+  assert.match(keyStore, /key_hint/)
 })

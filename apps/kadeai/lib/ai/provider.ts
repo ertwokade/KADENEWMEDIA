@@ -5,6 +5,10 @@ import { getAvailableModels, routeModelForTask } from '@/lib/ai/modelRouter'
 import { getRequestProfileInstruction } from '@/lib/ai/profileContext'
 import { assertAuthenticatedUser } from '@/lib/auth/server'
 import { generateMockContent } from '@/lib/ai/mockProvider'
+import { getActiveEntitlement } from '@/lib/payments/access'
+import { getUserProviderKey, type UserKeyProvider } from '@/lib/ai/userProviderKeys'
+import { recordAiUsage, getUserUsageSummary } from '@/lib/usage/ledger'
+import { isTokenQuotaEnforced, FREE_TIER, type LimitTier } from '@/lib/payments/limits'
 
 function hasEnv(name: string) {
   return Boolean(process.env[name]?.trim())
@@ -37,12 +41,14 @@ async function parseChatCompletionResponse(
 ): Promise<{
   content: string
   tokensUsed?: number
+  inputTokens?: number
+  outputTokens?: number
 }> {
   const rawBody = await response.text()
   let data: {
     error?: { message?: string }
     choices?: Array<{ message?: { content?: string | Array<{ type?: string; text?: string }> } }>
-    usage?: { total_tokens?: number }
+    usage?: { total_tokens?: number; prompt_tokens?: number; completion_tokens?: number }
   } = {}
   try {
     data = rawBody ? JSON.parse(rawBody) : {}
@@ -62,6 +68,8 @@ async function parseChatCompletionResponse(
   return {
     content,
     tokensUsed: data.usage?.total_tokens,
+    inputTokens: data.usage?.prompt_tokens,
+    outputTokens: data.usage?.completion_tokens,
   }
 }
 
@@ -112,6 +120,8 @@ async function generateWithOpenAICompatibleEndpoint({
     content: data.content,
     model: requestedModel,
     tokensUsed: data.tokensUsed,
+    inputTokens: data.inputTokens,
+    outputTokens: data.outputTokens,
   }
 }
 
@@ -185,6 +195,8 @@ async function generateWithGroq(
     content: response.choices[0]?.message?.content || '',
     model: actualModel,
     tokensUsed: response.usage?.total_tokens,
+    inputTokens: response.usage?.prompt_tokens,
+    outputTokens: response.usage?.completion_tokens,
   }
 }
 
@@ -267,19 +279,28 @@ async function generateWithGemini(
   systemPrompt: string,
   maxTokens: number,
   model: GenerateRequest['model'],
-  modelConfig: ModelConfig
+  modelConfig: ModelConfig,
+  apiKeyOverride?: string,
 ): Promise<GenerateResult> {
-  if (!hasEnv('GEMINI_API_KEY')) {
+  const apiKey = apiKeyOverride?.trim() || process.env.GEMINI_API_KEY?.trim()
+  if (!apiKey) {
     return generateWithFallbackGroq(prompt, systemPrompt, maxTokens)
   }
 
   const { GoogleGenerativeAI } = await import('@google/generative-ai')
-  const geminiAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+  const geminiAI = new GoogleGenerativeAI(apiKey)
   const geminiModel = geminiAI.getGenerativeModel({ model: modelConfig.geminiModel || 'gemini-2.5-flash' })
   const fullPrompt = `${systemPrompt}\n\n${prompt}`
   const result = await geminiModel.generateContent(fullPrompt)
   const content = result.response.text()
-  return { content, model }
+  const usage = result.response.usageMetadata
+  return {
+    content,
+    model,
+    tokensUsed: usage?.totalTokenCount,
+    inputTokens: usage?.promptTokenCount,
+    outputTokens: usage?.candidatesTokenCount,
+  }
 }
 
 async function generateWithMistral(
@@ -309,7 +330,16 @@ async function generateWithMistral(
   }
 }
 
-async function generateWithResolvedModel(req: GenerateRequest, gatewayToken?: string): Promise<GenerateResult> {
+interface ByokCredential {
+  provider: UserKeyProvider
+  apiKey: string
+}
+
+async function generateWithResolvedModel(
+  req: GenerateRequest,
+  gatewayToken?: string,
+  byok?: ByokCredential,
+): Promise<GenerateResult> {
   const { prompt, model, systemPrompt, maxTokens = 1500 } = req
   const sysText = systemPrompt || 'Sen uzman bir sosyal medya içerik stratejistisin. Türkçe yanıt ver.'
   const modelConfig = getModelConfig(model)
@@ -332,7 +362,7 @@ async function generateWithResolvedModel(req: GenerateRequest, gatewayToken?: st
     }
 
     if (modelConfig.provider === 'google' && modelConfig.geminiModel) {
-      return generateWithGemini(prompt, sysText, maxTokens, model, modelConfig)
+      return generateWithGemini(prompt, sysText, maxTokens, model, modelConfig, byok?.provider === 'google' ? byok.apiKey : undefined)
     }
 
     if (modelConfig.provider === 'mistral') {
@@ -340,12 +370,13 @@ async function generateWithResolvedModel(req: GenerateRequest, gatewayToken?: st
     }
 
     if (model === 'claude') {
-      if (!hasEnv('ANTHROPIC_API_KEY')) {
+      const anthropicKey = byok?.provider === 'anthropic' ? byok.apiKey : process.env.ANTHROPIC_API_KEY?.trim()
+      if (!anthropicKey) {
         return generateWithFallbackGroq(prompt, sysText, maxTokens)
       }
 
       const Anthropic = (await import('@anthropic-ai/sdk')).default
-      const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 25_000, maxRetries: 1 })
+      const anthropic = new Anthropic({ apiKey: anthropicKey, timeout: 25_000, maxRetries: 1 })
       const response = await anthropic.messages.create({
         model: 'claude-sonnet-4-5',
         max_tokens: maxTokens,
@@ -360,16 +391,23 @@ async function generateWithResolvedModel(req: GenerateRequest, gatewayToken?: st
       })
       const content = response.content[0].type === 'text' ? response.content[0].text : ''
       const tokensUsed = response.usage.input_tokens + response.usage.output_tokens
-      return { content, model, tokensUsed }
+      return {
+        content,
+        model,
+        tokensUsed,
+        inputTokens: response.usage.input_tokens,
+        outputTokens: response.usage.output_tokens,
+      }
     }
 
     if (model === 'gpt4o') {
-      if (!hasEnv('OPENAI_API_KEY')) {
+      const openaiKey = byok?.provider === 'openai' ? byok.apiKey : process.env.OPENAI_API_KEY?.trim()
+      if (!openaiKey) {
         return generateWithGroq(prompt, sysText, maxTokens, 'groq-gpt-oss-120b', 'openai/gpt-oss-120b')
       }
 
       const OpenAI = (await import('openai')).default
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 25_000, maxRetries: 1 })
+      const openai = new OpenAI({ apiKey: openaiKey, timeout: 25_000, maxRetries: 1 })
       const response = await openai.chat.completions.create({
         model: 'gpt-4o',
         max_tokens: maxTokens,
@@ -379,7 +417,13 @@ async function generateWithResolvedModel(req: GenerateRequest, gatewayToken?: st
         ],
       })
       const content = response.choices[0].message.content || ''
-      return { content, model, tokensUsed: response.usage?.total_tokens }
+      return {
+        content,
+        model,
+        tokensUsed: response.usage?.total_tokens,
+        inputTokens: response.usage?.prompt_tokens,
+        outputTokens: response.usage?.completion_tokens,
+      }
     }
 
     throw new Error(`Bilinmeyen model: ${model}`)
@@ -389,8 +433,116 @@ async function generateWithResolvedModel(req: GenerateRequest, gatewayToken?: st
   }
 }
 
+function byokProviderForModel(model: GenerateRequest['model']): UserKeyProvider | null {
+  if (model === 'claude') return 'anthropic'
+  if (model === 'gpt4o') return 'openai'
+  if (getModelConfig(model).provider === 'google') return 'google'
+  return null
+}
+
+async function generateWithByok(req: GenerateRequest, userId: string): Promise<GenerateResult> {
+  let targetModel = req.model
+  let provider = targetModel === 'auto' ? null : byokProviderForModel(targetModel)
+  let apiKey: string | null = null
+
+  if (provider) apiKey = await getUserProviderKey(userId, provider)
+
+  if (!provider || !apiKey) {
+    for (const candidate of [
+      { provider: 'openai' as const, model: 'gpt4o' as const },
+      { provider: 'anthropic' as const, model: 'claude' as const },
+      { provider: 'google' as const, model: 'gemini-flash' as const },
+    ]) {
+      const candidateKey = await getUserProviderKey(userId, candidate.provider)
+      if (candidateKey) {
+        provider = candidate.provider
+        targetModel = candidate.model
+        apiKey = candidateKey
+        break
+      }
+    }
+  }
+
+  if (!provider || !apiKey) {
+    throw new Error('Kendi Anahtarın paketi için önce OpenAI, Anthropic veya Gemini API anahtarı eklemelisin.')
+  }
+
+  const result = await generateWithResolvedModel(
+    { ...req, model: targetModel },
+    undefined,
+    { provider, apiKey },
+  )
+  return {
+    ...result,
+    byok: true,
+    routingReason: `${provider} BYOK anahtarı kullanıldı; KadeAI sağlayıcı anahtarı kullanılmadı`,
+  }
+}
+
+/**
+ * İstek yolundan araç adını çıkarır: `/kadeai/api/generate/title` → `title`.
+ * Kullanım defterine hangi aracın harcadığını yazmak için; rotalara dokunmadan.
+ */
+function toolNameFromRequest(request?: Request): string {
+  if (!request) return 'unknown'
+  try {
+    const segments = new URL(request.url).pathname.split('/').filter(Boolean)
+    const generateIndex = segments.indexOf('generate')
+    if (generateIndex >= 0 && segments[generateIndex + 1]) return segments.slice(generateIndex + 1).join('/')
+    const apiIndex = segments.indexOf('api')
+    if (apiIndex >= 0 && segments[apiIndex + 1]) return segments.slice(apiIndex + 1).join('/')
+    return segments.at(-1) || 'unknown'
+  } catch {
+    return 'unknown'
+  }
+}
+
+/**
+ * AI üretiminin tek giriş kapısı.
+ *
+ * Kota kontrolü ve kullanım defteri BURADA yapılır; her generate rotasında
+ * ayrı ayrı değil. Böylece yeni bir rota eklendiğinde muhasebe otomatik gelir
+ * ve tarayıcının bildirdiği token sayısına hiçbir yerde güvenilmez.
+ */
 export async function generateContent(req: GenerateRequest, request?: Request): Promise<GenerateResult> {
-  await assertAuthenticatedUser()
+  const user = await assertAuthenticatedUser()
+  const entitlement = user ? await getActiveEntitlement() : null
+  const tier: LimitTier = (entitlement?.tier as LimitTier) ?? FREE_TIER
+
+  if (user && isTokenQuotaEnforced()) {
+    const summary = await getUserUsageSummary(user.id, tier)
+    // summary === null → defter okunamadı; kotayı zorlamadan devam et (fail-open).
+    if (summary && summary.remaining !== null && summary.remaining <= 0) {
+      throw new Error('Aylık AI token kotan doldu. Paketini yükseltebilir veya kendi API anahtarını bağlayabilirsin.')
+    }
+  }
+
+  const result = await runGeneration(req, request, user, entitlement)
+
+  if (user) {
+    const config = getModelConfig(result.model)
+    void recordAiUsage({
+      userId: user.id,
+      tool: toolNameFromRequest(request),
+      model: result.model,
+      provider: config.provider,
+      tier,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      totalTokens: result.tokensUsed,
+      byok: result.byok,
+    })
+  }
+
+  return result
+}
+
+async function runGeneration(
+  req: GenerateRequest,
+  request: Request | undefined,
+  user: Awaited<ReturnType<typeof assertAuthenticatedUser>>,
+  entitlement: Awaited<ReturnType<typeof getActiveEntitlement>>,
+): Promise<GenerateResult> {
   const gatewayToken = await getVercelGatewayToken(request)
   const prompt = typeof req.prompt === 'string' ? req.prompt.trim() : ''
   if (!prompt) throw new Error('İstek metni boş olamaz.')
@@ -409,6 +561,10 @@ export async function generateContent(req: GenerateRequest, request?: Request): 
   const enrichedRequest: GenerateRequest = profileInstruction
     ? { ...boundedRequest, systemPrompt: `${boundedRequest.systemPrompt || 'Kullanıcıya doğru ve yararlı bir yanıt ver.'}${profileInstruction}` }
     : boundedRequest
+
+  if (user && entitlement?.api_included === false) {
+    return generateWithByok(enrichedRequest, user.id)
+  }
 
   if (enrichedRequest.model !== 'auto') return generateWithResolvedModel(enrichedRequest, gatewayToken)
 

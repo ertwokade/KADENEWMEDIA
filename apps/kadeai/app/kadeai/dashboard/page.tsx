@@ -35,6 +35,7 @@ const groups: ToolGroup[] = [
     title: 'İçerik üretimi', eyebrow: 'Üret', icon: Wand2, tone: 'violet',
     description: 'Fikirden yayına, platforma uygun metinleri hızla hazırla.',
     items: [
+      { label: 'İçerik Stüdyosu', href: '/dashboard/content-studio' },
       { label: 'Başlık Üretici', href: '/dashboard/title' },
       { label: 'Metin Oluşturucu', href: '/dashboard/text-generator' },
       { label: 'Video Açıklama', href: '/dashboard/description' },
@@ -78,6 +79,7 @@ const groups: ToolGroup[] = [
 ]
 
 const quickTools = [
+  { label: 'Haftalık paket üret', description: 'Bir kaynaktan 7 yayın formatı', href: '/dashboard/content-studio', icon: FileText, tone: 'violet' },
   { label: 'Başlık üret', description: 'Kanalına uygun güçlü açılışlar', href: '/dashboard/title', icon: Sparkles, tone: 'violet' },
   { label: 'Metin oluştur', description: 'Brief’ten yayına hazır içerik', href: '/dashboard/text-generator', icon: FileText, tone: 'blue' },
   { label: 'Hook geliştir', description: 'İlk saniyede dikkati yakala', href: '/dashboard/hook', icon: Zap, tone: 'coral' },

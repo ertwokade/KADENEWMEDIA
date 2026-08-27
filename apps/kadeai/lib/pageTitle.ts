@@ -8,6 +8,7 @@ const PUBLIC_PAGE_TITLES: Record<string, string> = {
   '/logout': 'Çıkış Yapılıyor | KadeAI',
   '/onboarding': 'Marka Profilini Oluştur | KadeAI',
   '/reset-password': 'Şifreyi Yenile | KadeAI',
+  '/kadeai-demo': 'KadeAI Demo | AI Sosyal Medya ve İçerik Platformu',
 }
 
 function normalizedOperationsRoute(pathname: string, search: string) {

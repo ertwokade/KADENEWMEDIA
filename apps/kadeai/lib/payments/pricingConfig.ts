@@ -30,10 +30,29 @@ const DEFAULT_PERIOD_FACTOR: Record<BillingPeriod, number> = {
 
 const DEFAULT_API_EXCLUDED_DISCOUNT = 0.4
 
+const DEFAULT_TIER_LABELS: Record<PlanTier, string> = {
+  baslangic: 'Başlangıç',
+  pro: 'Pro',
+  sinirsiz: 'Sınırsız',
+}
+
+const DEFAULT_TIER_FEATURES: Record<PlanTier, string[]> = {
+  baslangic: ['content-generation', 'image-basic', 'video-factory-basic'],
+  pro: ['content-generation', 'image-advanced', 'video-factory', 'auto-captions', 'clip-generator'],
+  sinirsiz: [
+    'content-generation', 'image-advanced', 'video-factory', 'auto-captions',
+    'clip-generator', 'auto-publish', 'bulk', 'priority-queue',
+  ],
+}
+
 export interface PricingSnapshot {
   tierMonthlyTry: Record<PlanTier, number>
   periodFactor: Record<BillingPeriod, number>
   apiExcludedDiscount: number
+  /** Kullanıcıya görünen paket adları (§13). */
+  tierLabels: Record<PlanTier, string>
+  /** Paketin açtığı özellikler; entitlement grant'ine bu liste yazılır. */
+  tierFeatures: Record<PlanTier, string[]>
   fetchedAt: number
   source: 'default' | 'db'
 }
@@ -42,8 +61,52 @@ let cache: PricingSnapshot = {
   tierMonthlyTry: { ...DEFAULT_TIER_MONTHLY_TRY },
   periodFactor: { ...DEFAULT_PERIOD_FACTOR },
   apiExcludedDiscount: DEFAULT_API_EXCLUDED_DISCOUNT,
+  tierLabels: { ...DEFAULT_TIER_LABELS },
+  tierFeatures: cloneFeatures(DEFAULT_TIER_FEATURES),
   fetchedAt: 0,
   source: 'default',
+}
+
+function cloneFeatures(value: Record<PlanTier, string[]>): Record<PlanTier, string[]> {
+  return {
+    baslangic: [...value.baslangic],
+    pro: [...value.pro],
+    sinirsiz: [...value.sinirsiz],
+  }
+}
+
+const TIERS: PlanTier[] = ['baslangic', 'pro', 'sinirsiz']
+
+/** Boş ya da bozuk ad, paketi isimsiz bırakır — bu değerler reddedilir. */
+function sanitizeLabelMap(value: unknown): Partial<Record<PlanTier, string>> {
+  if (!value || typeof value !== 'object') return {}
+  const out: Partial<Record<PlanTier, string>> = {}
+  for (const key of TIERS) {
+    const raw = (value as Record<string, unknown>)[key]
+    if (typeof raw !== 'string') continue
+    const label = raw.trim().slice(0, 60)
+    if (label) out[key] = label
+  }
+  return out
+}
+
+/**
+ * Özellik listesi entitlement'a yazıldığı için BOŞ dizi kabul edilmez:
+ * yanlışlıkla temizlenen bir paket, satın alan kullanıcıyı yetkisiz bırakırdı.
+ */
+function sanitizeFeatureMap(value: unknown): Partial<Record<PlanTier, string[]>> {
+  if (!value || typeof value !== 'object') return {}
+  const out: Partial<Record<PlanTier, string[]>> = {}
+  for (const key of TIERS) {
+    const raw = (value as Record<string, unknown>)[key]
+    if (!Array.isArray(raw)) continue
+    const features = [...new Set(
+      raw.map((item) => typeof item === 'string' ? item.trim().slice(0, 60) : '')
+        .filter(Boolean),
+    )].slice(0, 40)
+    if (features.length > 0) out[key] = features
+  }
+  return out
 }
 
 const TTL_MS = 60_000
@@ -78,7 +141,7 @@ async function refreshFromDb(): Promise<void> {
     const admin = createAdminClient()
     const { data, error } = await admin
       .from('kadeai_pricing_overrides')
-      .select('tier_monthly_try, period_factor, api_excluded_discount')
+      .select('tier_monthly_try, period_factor, api_excluded_discount, tier_labels, tier_features')
       .eq('id', 1)
       .maybeSingle()
     if (error || !data) return
@@ -89,6 +152,8 @@ async function refreshFromDb(): Promise<void> {
       periodFactor: { ...DEFAULT_PERIOD_FACTOR, ...sanitizePeriodMap(data.period_factor) },
       apiExcludedDiscount:
         Number.isFinite(discount) && discount >= 0 && discount < 1 ? discount : DEFAULT_API_EXCLUDED_DISCOUNT,
+      tierLabels: { ...DEFAULT_TIER_LABELS, ...sanitizeLabelMap(data.tier_labels) },
+      tierFeatures: { ...cloneFeatures(DEFAULT_TIER_FEATURES), ...sanitizeFeatureMap(data.tier_features) },
       fetchedAt: Date.now(),
       source: 'db',
     }
@@ -119,6 +184,8 @@ export interface PricingOverrideInput {
   tierMonthlyTry?: Partial<Record<PlanTier, number>>
   periodFactor?: Partial<Record<BillingPeriod, number>>
   apiExcludedDiscount?: number
+  tierLabels?: Partial<Record<PlanTier, string>>
+  tierFeatures?: Partial<Record<PlanTier, string[]>>
   updatedBy?: string
 }
 
@@ -136,12 +203,17 @@ export async function updatePricingOverrides(input: PricingOverrideInput): Promi
       ? input.apiExcludedDiscount
       : current.apiExcludedDiscount
 
+  const mergedLabels = { ...current.tierLabels, ...sanitizeLabelMap(input.tierLabels) }
+  const mergedFeatures = { ...current.tierFeatures, ...sanitizeFeatureMap(input.tierFeatures) }
+
   const { error } = await admin
     .from('kadeai_pricing_overrides')
     .update({
       tier_monthly_try: mergedTier,
       period_factor: mergedPeriod,
       api_excluded_discount: mergedDiscount,
+      tier_labels: mergedLabels,
+      tier_features: mergedFeatures,
       updated_at: new Date().toISOString(),
       updated_by: input.updatedBy || null,
     })
@@ -153,10 +225,20 @@ export async function updatePricingOverrides(input: PricingOverrideInput): Promi
     tierMonthlyTry: mergedTier,
     periodFactor: mergedPeriod,
     apiExcludedDiscount: mergedDiscount,
+    tierLabels: mergedLabels,
+    tierFeatures: mergedFeatures,
     fetchedAt: Date.now(),
     source: 'db',
   }
   return cache
 }
 
-export { DEFAULT_TIER_MONTHLY_TRY, DEFAULT_PERIOD_FACTOR, DEFAULT_API_EXCLUDED_DISCOUNT }
+export {
+  DEFAULT_TIER_MONTHLY_TRY,
+  DEFAULT_PERIOD_FACTOR,
+  DEFAULT_API_EXCLUDED_DISCOUNT,
+  DEFAULT_TIER_LABELS,
+  DEFAULT_TIER_FEATURES,
+  sanitizeLabelMap,
+  sanitizeFeatureMap,
+}

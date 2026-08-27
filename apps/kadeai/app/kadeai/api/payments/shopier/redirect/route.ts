@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     // 15 dk kuralı: süresi dolmuş kişiye özel teklif ödenemez.
     if (order.expires_at && new Date(order.expires_at).getTime() < Date.now()) {
       await admin.from('payment_orders')
-        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+        .update({ status: 'expired', updated_at: new Date().toISOString() })
         .eq('id', order.id)
       return htmlMessage('Bu teklifin süresi (15 dk) doldu. Lütfen yeni bir teklif oluşturun.', 410)
     }

@@ -5,6 +5,7 @@ import { apiFetch } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
 import TopBar from '@/components/layout/TopBar'
 import { cn } from '@/lib/utils'
+import { captureAnalytics } from '@/lib/analytics/client'
 
 type Tier = 'baslangic' | 'pro' | 'sinirsiz'
 type Period = 'weekly' | 'monthly' | 'yearly'
@@ -15,12 +16,22 @@ interface Pkg {
   tier: Tier
   period: Period
   apiIncluded: boolean
+  tierLabel?: string
   amountMinor: number
   currency: string
   features: string[]
 }
 
-const TIER_LABEL: Record<Tier, string> = { baslangic: 'Başlangıç', pro: 'Pro', sinirsiz: 'Sınırsız' }
+interface CustomOffer {
+  id: string
+  product_id: string
+  productName: string
+  amount_minor: number
+  currency: string
+  checkout_url: string
+  expires_at: string
+}
+
 const PERIOD_LABEL: Record<Period, string> = { weekly: 'Haftalık', monthly: 'Aylık', yearly: 'Yıllık' }
 const FEATURE_LABEL: Record<string, string> = {
   'content-generation': 'İçerik üretimi',
@@ -49,11 +60,25 @@ export default function PackagesPage() {
   const [loading, setLoading] = useState(true)
   const [buying, setBuying] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [offers, setOffers] = useState<CustomOffer[]>([])
+  // Ödeme öncesi onay gereken yasal metinler. Hukuk danışmanı metinleri
+  // yayınlayana kadar bu liste boştur ve satın alma akışı değişmez.
+  const [legalDocuments, setLegalDocuments] = useState<Array<{ slug: string; title: string }>>([])
+  const [acceptedLegal, setAcceptedLegal] = useState<string[]>([])
 
   useEffect(() => {
-    apiFetch(apiPath('/api/packages'))
-      .then((r) => r.json())
-      .then((d) => setPackages(d.packages || []))
+    Promise.all([
+      apiFetch(apiPath('/api/packages')).then((r) => r.json()),
+      apiFetch(apiPath('/api/payments/offers')).then((r) => r.ok ? r.json() : { offers: [] }),
+      apiFetch(apiPath('/api/legal')).then((r) => r.ok ? r.json() : { checkoutDocuments: [] }),
+    ])
+      .then(([packageData, offerData, legalData]) => {
+        setPackages(packageData.packages || [])
+        setOffers(offerData.offers || [])
+        setLegalDocuments(legalData.checkoutDocuments || [])
+        captureAnalytics('package_viewed')
+        if (offerData.offers?.length) captureAnalytics('custom_offer_viewed', { count: offerData.offers.length })
+      })
       .catch(() => setError('Paketler yüklenemedi.'))
       .finally(() => setLoading(false))
   }, [])
@@ -70,10 +95,11 @@ export default function PackagesPage() {
       const res = await apiFetch(apiPath('/api/payments/checkout'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: pkg.id }),
+        body: JSON.stringify({ productId: pkg.id, acceptedDocuments: acceptedLegal }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Ödeme başlatılamadı.')
+      captureAnalytics('checkout_started', { productId: pkg.id, amountMinor: pkg.amountMinor })
       // Shopier yönlendirme sayfasına git (15 dk geçerli)
       window.location.href = data.checkoutUrl.startsWith('http') ? data.checkoutUrl : apiPath(data.checkoutUrl)
     } catch (e) {
@@ -83,14 +109,65 @@ export default function PackagesPage() {
     }
   }
 
+  const legalReady = legalDocuments.every((document) => acceptedLegal.includes(document.slug))
+
   return (
     <div className="min-h-screen bg-zinc-950">
       <TopBar title="Paketler" />
       <div className="mx-auto max-w-6xl px-4 py-8">
+        {legalDocuments.length > 0 && (
+          <section className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+            <h2 className="text-sm font-semibold text-zinc-100">Ödeme öncesi onay</h2>
+            <ul className="mt-3 space-y-2">
+              {legalDocuments.map((document) => (
+                <li key={document.slug}>
+                  <label className="flex items-start gap-2 text-sm text-zinc-300">
+                    <input
+                      type="checkbox"
+                      checked={acceptedLegal.includes(document.slug)}
+                      onChange={(event) => setAcceptedLegal((current) => event.target.checked
+                        ? [...current, document.slug]
+                        : current.filter((slug) => slug !== document.slug))}
+                      className="mt-0.5 h-4 w-4 accent-violet-500"
+                    />
+                    <span>
+                      <a href={apiPath(`/legal/${document.slug}`)} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-zinc-100">
+                        {document.title}
+                      </a>
+                      &apos;ni okudum ve onaylıyorum.
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         <div className="mb-6">
           <h2 className="text-2xl font-semibold text-zinc-100">Paketler</h2>
           <p className="mt-1 text-sm text-zinc-400">Sana uygun planı seç. Fiyat, seçimden sonra <span className="text-amber-400">15 dakika</span> geçerlidir.</p>
         </div>
+
+        {offers.length > 0 && (
+          <section className="mb-8 rounded-2xl border border-amber-400/35 bg-amber-400/10 p-5">
+            <p className="text-xs font-bold uppercase tracking-wider text-amber-300">Size Özel Teklif</p>
+            <div className="mt-3 space-y-3">
+              {offers.map((offer) => (
+                <div key={offer.id} className="flex flex-col gap-3 rounded-xl border border-amber-300/20 bg-zinc-950/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 className="text-sm font-semibold text-zinc-100">{offer.productName}</h3>
+                    <p className="mt-1 text-xs text-zinc-400">
+                      {formatPrice(offer.amount_minor)} · {new Date(offer.expires_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })} saatine kadar geçerli
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => { captureAnalytics('checkout_started', { customOffer: true }); window.location.href = apiPath(offer.checkout_url) }}
+                    className="rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-amber-300"
+                  >Özel teklifi öde</button>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Periyot + API seçici */}
         <div className="mb-8 flex flex-wrap items-center gap-4">
@@ -127,7 +204,7 @@ export default function PackagesPage() {
                 )}
               >
                 <div className="mb-1 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-zinc-100">{TIER_LABEL[pkg.tier]}</h3>
+                  <h3 className="text-lg font-semibold text-zinc-100">{pkg.tierLabel || pkg.name}</h3>
                   {pkg.tier === 'pro' && <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs text-violet-300">En popüler</span>}
                 </div>
                 <div className="mb-4">
@@ -143,7 +220,7 @@ export default function PackagesPage() {
                 </ul>
                 <button
                   onClick={() => buy(pkg)}
-                  disabled={buying === pkg.id}
+                  disabled={buying === pkg.id || !legalReady}
                   className={cn(
                     'rounded-lg px-4 py-2.5 text-sm font-medium transition disabled:opacity-50',
                     pkg.tier === 'pro' ? 'bg-violet-500 text-white hover:bg-violet-400' : 'bg-zinc-100 text-zinc-900 hover:bg-white',

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
   Check, CheckCircle2, Clock3, Copy, ExternalLink, Loader2, MessageCircle,
-  PackageCheck, RefreshCw, Send, Sparkles, ThumbsDown, Undo2,
+  PackageCheck, RefreshCw, Sparkles, ThumbsDown, Undo2,
 } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
 import { apiFetch } from '@/lib/client/api'

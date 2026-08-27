@@ -33,6 +33,30 @@ export interface DynamicOfferResult {
  * giris yapmis olmali). Hesabi olmayan yeni bir aday icin bu fonksiyon
  * acik bir hata doner; guest/magic-link checkout ayri bir gelistirme.
  */
+/** Tek sayfada dönülen kullanıcı sayısı; Supabase üst sınırı 1000. */
+const USER_PAGE_SIZE = 1000
+/** Tarama tavanı — sonsuz döngüye ve aşırı sorguya karşı. */
+const MAX_USER_PAGES = 20
+
+/**
+ * E-postaya göre kullanıcı bulur.
+ *
+ * `listUsers()` parametresiz çağrıldığında YALNIZCA ilk sayfayı (varsayılan 50
+ * kayıt) döner. Kullanıcı sayısı bunu aştığında 51. kullanıcı için teklif
+ * oluşturmak "hesap bulunamadi" hatasına düşüyordu; sayfalar sırayla taranıyor.
+ */
+async function findUserByEmail(admin: ReturnType<typeof createAdminClient>, email: string) {
+  for (let page = 1; page <= MAX_USER_PAGES; page += 1) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: USER_PAGE_SIZE })
+    if (error) throw new Error('Kullanici sorgulanamadi.')
+    const users = data?.users ?? []
+    const match = users.find((user) => (user.email || '').toLowerCase() === email)
+    if (match) return match
+    if (users.length < USER_PAGE_SIZE) return null
+  }
+  return null
+}
+
 export async function createDynamicOffer(input: CreateDynamicOfferInput): Promise<DynamicOfferResult> {
   const product = getPaymentProduct(input.productId)
   if (!product) {
@@ -51,14 +75,19 @@ export async function createDynamicOffer(input: CreateDynamicOfferInput): Promis
 
   const admin = createAdminClient()
 
-  const { data: userList, error: userLookupError } = await admin.auth.admin.listUsers()
-  if (userLookupError) throw new Error('Kullanici sorgulanamadi.')
-  const matchedUser = userList.users.find((u) => (u.email || '').toLowerCase() === email)
+  const matchedUser = await findUserByEmail(admin, email)
   if (!matchedUser) {
     throw new Error('Bu e-posta ile kayitli bir KadeAI hesabi bulunamadi. Musteri once hesap olusturmali, sonra tekrar deneyin.')
   }
 
-  const validityMinutes = Math.min(Math.max(Number(input.validityMinutes) || 1440, 5), 10080)
+  // Fiyat kilidi güvenlik sınırıdır: custom checkout her zaman en fazla
+  // 15 dakika yaşar. Admin istemcisi daha uzun bir değer gönderse bile
+  // sunucu bu süreyi genişletmez.
+  const requestedValidity = Number(input.validityMinutes)
+  const validityMinutes = Math.min(
+    Math.max(Number.isFinite(requestedValidity) && requestedValidity > 0 ? requestedValidity : 15, 5),
+    15,
+  )
   const expiresAt = new Date(Date.now() + validityMinutes * 60_000).toISOString()
   const orderId = randomUUID()
   const provider = getPaymentProvider()
@@ -75,7 +104,7 @@ export async function createDynamicOffer(input: CreateDynamicOfferInput): Promis
     analytics_consent: false,
     expires_at: expiresAt,
   })
-  if (insertError) throw new Error(`Teklif kaydedilemedi: ${insertError.message}`)
+  if (insertError) throw new Error('Teklif kaydedilemedi.')
 
   const callbackUrl = new URL(
     '/kadeai/api/payments/webhook',

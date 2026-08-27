@@ -90,6 +90,7 @@ export default function AuthPage() {
         setError(result.error || 'İşlem tamamlanamadı.')
         return
       }
+      if (mode === 'signup') captureAnalytics('signup')
       if (result.next) {
         captureAnalytics('login_succeeded')
         window.location.href = withBasePath(mode === 'login' ? requestedDashboardPath() || result.next : result.next)

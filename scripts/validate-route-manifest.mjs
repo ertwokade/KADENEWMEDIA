@@ -1,4 +1,5 @@
 import { readFile, readdir, stat } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 const projectRoot = new URL('../', import.meta.url)
@@ -39,6 +40,7 @@ async function discoverKadeRoutes(directory, segments = [], found = new Set()) {
 
 function rootPageExists(route) {
   if (route === '/') return true
+  if (route === '/kadeai-demo') return existsSync(new URL('../apps/kadeai/app/kadeai-demo/page.tsx', import.meta.url))
   if (route === '/blog/:slug') return /path="\/blog\/:slug"/.test(appSource) && dispatcherSource.includes('dynamicPage')
   if (route === '/partnerler/:id') return /path="\/partnerler\/:id"/.test(appSource) && dispatcherSource.includes('dynamicPage')
   if (route === '/links' || route === '/kadelinks') return appSource.includes(`path="${route}"`)
@@ -72,7 +74,7 @@ function rootApiExists(route) {
 
 assert(manifest.schemaVersion === 1, 'Unsupported route manifest schema')
 assert(manifest.routes.length === manifest.expectedCount, `Expected ${manifest.expectedCount} routes, found ${manifest.routes.length}`)
-assert(manifest.expectedCount === 207, `Inventory contract changed: ${manifest.expectedCount}`)
+assert(manifest.expectedCount === 226, `Inventory contract changed: ${manifest.expectedCount}`)
 
 const seen = new Set()
 for (const entry of manifest.routes) {

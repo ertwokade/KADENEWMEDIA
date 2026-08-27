@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
 import { captureServerAnalytics } from '@/lib/analytics/server'
+import { getRequiredCheckoutDocuments, recordLegalConsents } from '@/lib/legal/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,9 +19,22 @@ export async function POST(request: NextRequest) {
   try {
     const user = await assertAuthenticatedUser()
     if (!user) return NextResponse.json({ error: 'Oturum gerekli.' }, { status: 401, headers })
-    const body = await request.json() as { productId?: string }
+    const body = await request.json() as { productId?: string; acceptedDocuments?: string[] }
     const product = getPaymentProduct(String(body.productId || ''))
     if (!product) return NextResponse.json({ error: 'Geçersiz ürün.' }, { status: 400, headers })
+
+    // Ödeme öncesi onay (§5). YAYINLANMIŞ ve onay bayrağı açık metin yoksa
+    // liste boştur ve bu blok davranışı değiştirmez; hukuk danışmanı metinleri
+    // yayınladığı anda zorunluluk kendiliğinden devreye girer.
+    const requiredDocuments = await getRequiredCheckoutDocuments()
+    const accepted = new Set((Array.isArray(body.acceptedDocuments) ? body.acceptedDocuments : []).map(String))
+    const missing = requiredDocuments.filter((document) => !accepted.has(document.slug))
+    if (missing.length > 0) {
+      return NextResponse.json({
+        error: 'Ödemeye geçmeden önce sözleşmeleri onaylaman gerekiyor.',
+        requiredDocuments,
+      }, { status: 428, headers })
+    }
 
     const provider = getPaymentProvider()
     const idempotencyKey = request.headers.get('idempotency-key') || randomUUID()
@@ -74,6 +88,8 @@ export async function POST(request: NextRequest) {
       .update({ external_id: checkout.externalId, checkout_url: checkout.checkoutUrl })
       .eq('id', orderId).eq('user_id', user.id)
     if (updateError) throw new Error('Ödeme yönlendirmesi kaydedilemedi.')
+    // Onay kanıtı siparişe bağlanır; metin sürümüyle birlikte saklanır.
+    void recordLegalConsents({ userId: user.id, orderId, documents: requiredDocuments })
     void captureServerAnalytics('payment_started', user.id, analyticsConsent)
     return NextResponse.json({ orderId, checkoutUrl: checkout.checkoutUrl, provider: provider.name }, { status: 201, headers })
   } catch (error) {

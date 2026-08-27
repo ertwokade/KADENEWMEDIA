@@ -5,9 +5,25 @@ import posthog from 'posthog-js'
 export const ANALYTICS_CONSENT_KEY = 'kade-analytics-consent'
 
 export type AnalyticsEvent =
+  | 'signup'
+  | 'demo_started'
+  | 'package_viewed'
+  | 'checkout_started'
+  | 'checkout_completed'
+  | 'quote_requested'
+  | 'custom_offer_viewed'
+  | 'subscription_activated'
+  | 'tool_used'
+  | 'churn'
+  | 'upgrade'
+  | 'downgrade'
   | 'login_succeeded'
   | 'login_failed'
   | 'logout'
+  // Not: ai_request_* olayları BİLİNÇLİ olarak bağlanmadı. Her AI çağrısında
+  // ek bir HTTP isteği üretmek sıcak yolu yavaşlatır ve maliyet doğurur;
+  // token/maliyet/başarı verisi zaten ai_usage_events defterinde tutuluyor
+  // (bkz. lib/usage/ledger.ts) ve admin panelinden okunuyor.
   | 'ai_request_completed'
   | 'ai_request_failed'
   | 'payment_started'

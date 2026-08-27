@@ -22,6 +22,7 @@ export default function SocialAuditPage() {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [missingEvidence, setMissingEvidence] = useState<string[]>([])
 
   const togglePlatform = (platform: string) => {
     setPlatforms((current) =>
@@ -40,6 +41,7 @@ export default function SocialAuditPage() {
     setLoading(true)
     setError('')
     setContent('')
+    setMissingEvidence([])
 
     try {
       const response = await apiFetch('/api/generate/social-audit', {
@@ -50,6 +52,7 @@ export default function SocialAuditPage() {
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Analiz üretilemedi')
       setContent(data.content)
+      setMissingEvidence(data.evidence?.missing || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Hata oluştu')
     } finally {
@@ -161,12 +164,19 @@ export default function SocialAuditPage() {
             {error && <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">{error}</div>}
             {loading && <LoadingState model={selectedModel} />}
             {content && !loading && (
+              <div className="space-y-3">
+                {missingEvidence.length > 0 && (
+                  <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-xs leading-5 text-amber-200">
+                    Kanıt eksik: {missingEvidence.join(', ')}. Bu alanlarda rapor tahmin üretmez; “Veri yok” veya “Varsayım” etiketi kullanır.
+                  </div>
+                )}
               <div className="rounded-xl border border-yellow-400/20 bg-zinc-900 p-4">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-xs font-semibold text-yellow-300">Sosyal medya raporu</p>
                   <CopyButton text={content} />
                 </div>
                 <pre className="whitespace-pre-wrap text-sm leading-7 text-zinc-200">{content}</pre>
+              </div>
               </div>
             )}
             {!content && !loading && !error && (

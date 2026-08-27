@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPricingSnapshot, updatePricingOverrides } from '@/lib/payments/pricingConfig'
-import { TIER_LABEL, PERIOD_LABEL } from '@/lib/payments/catalog'
+import { TIER_LABEL_MAP, PERIOD_LABEL } from '@/lib/payments/catalog'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
 import { hasValidAdminSecret } from '@/lib/auth/adminSecret'
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       apiExcludedDiscount: snapshot.apiExcludedDiscount,
       source: snapshot.source,
       fetchedAt: snapshot.fetchedAt,
-      tierLabels: TIER_LABEL,
+      tierLabels: TIER_LABEL_MAP(),
       periodLabels: PERIOD_LABEL,
     },
     { headers },

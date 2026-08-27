@@ -1,4 +1,5 @@
 import { getSupabase, isValidUuid, isUniqueViolation } from './_lib/supabase.js';
+import { rateLimitCheck } from './_lib/rateLimit.js'
 import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { logActivity } from './notifications.js';
@@ -77,6 +78,12 @@ function rowToProfile(row) {
 }
 
 export default async function handler(req, res) {
+  /* Public okuma yolu: kimlik doğrulaması yok, her istek DB'ye gidiyor ve
+     handle/slug numaralandırılabilir. Cömert limit + failOpen: Redis kesintisi
+     public profil sayfalarını düşürmemeli. */
+  const rl = await rateLimitCheck(req, { namespace: 'link-profiles', maxRequests: 240, failOpen: true })
+  if (!rl.allowed) return res.status(429).json({ error: 'Çok fazla istek' })
+
   if (cors(req, res)) return;
 
   const supabase = getSupabase();

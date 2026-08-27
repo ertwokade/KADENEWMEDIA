@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
 import { getSupabase, isUniqueViolation } from './_lib/supabase.js'
+import { rateLimitCheck } from './_lib/rateLimit.js'
 import { cors } from './_lib/cors.js'
 import { buildPackageObject } from './_lib/packages.js'
 import { requireAdmin, requirePermission } from './_lib/auth.js'
@@ -158,6 +159,19 @@ export default async function handler(req, res) {
 
   if (req.query?.action === 'refund') {
     return handleMarkRefunded(req, res, supabase)
+  }
+
+  /* Flood koruması. Limit BİLEREK cömert: bu yol Shopier'in sunucularından
+     çağrılıyor ve düşen her bildirim, tahsil edilmiş ama açılmamış bir abonelik
+     demek. failOpen ile limiter'ın kendi arızası da bildirimi düşürmez —
+     gerçek kapı aşağıdaki imza doğrulaması ve sipariş rezervasyonudur. */
+  const webhookRl = await rateLimitCheck(req, {
+    namespace: 'shopier-webhook',
+    maxRequests: 120,
+    failOpen: true,
+  })
+  if (!webhookRl.allowed) {
+    return res.status(429).json({ error: 'Çok fazla istek' })
   }
 
   const body = parseBody(req)

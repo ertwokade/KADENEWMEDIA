@@ -58,6 +58,17 @@ const OWNER_ONLY_ROUTES = [
   '/api/shopier',
 ]
 
+/**
+ * Maliyet/marj gibi platform yönetimi uçları. `OWNER_ONLY_ROUTES`'tan farkı:
+ * `NEXT_PUBLIC_KADE_OWNER_MODE` bayrağına bağlı DEĞİL — kim olduğuna bakılır.
+ * Erişim kuralı handler'daki ile birebir aynıdır (owner e-postası veya
+ * kade_admin), böylece proxy meşru bir sahibi kilitlemez.
+ */
+const ADMIN_ONLY_ROUTES = [
+  '/api/admin',
+  '/dashboard/admin',
+]
+
 const SETTINGS_OWNER_ONLY_ROUTES = [
   '/dashboard/settings',
   '/api/env-status',
@@ -76,6 +87,10 @@ function matchesRoute(pathname: string, route: string) {
 
 export function isOwnerOnlyRoute(pathname: string) {
   return OWNER_ONLY_ROUTES.some((route) => matchesRoute(pathname, route))
+}
+
+export function isAdminOnlyRoute(pathname: string) {
+  return ADMIN_ONLY_ROUTES.some((route) => matchesRoute(pathname, route))
 }
 
 export function isSettingsOwnerOnlyRoute(pathname: string) {

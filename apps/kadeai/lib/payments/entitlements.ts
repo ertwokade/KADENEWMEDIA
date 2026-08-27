@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { BillingPeriod, PlanTier } from './types'
-import { getPaymentProduct, periodDurationDays, TIER_FEATURES } from './catalog'
+import { getPaymentProduct, periodDurationDays, tierFeatures } from './catalog'
 
 /**
  * Ödeme onaylandığında kullanıcıya paket yetkisini OTOMATİK veren katman.
@@ -41,10 +41,37 @@ export interface OrderForGrant {
  * Sipariş için yetki üretir. Idempotent: aynı sipariş için tek yetki
  * (entitlements_source_order_uidx sayesinde ikinci çağrı çakışırsa yok sayılır).
  */
+export type TierChange = 'new' | 'upgrade' | 'downgrade' | 'renewal'
+
+const TIER_RANK: Record<PlanTier, number> = { baslangic: 1, pro: 2, sinirsiz: 3 }
+
+/** Yeni paketin öncekine göre yönü — analytics ve müşteri iletişimi için. */
+async function resolveTierChange(
+  admin: SupabaseClient,
+  userId: string,
+  nextTier: PlanTier,
+): Promise<TierChange> {
+  const { data } = await admin
+    .from('entitlements')
+    .select('tier')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .gt('expires_at', new Date().toISOString())
+    .order('expires_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const previous = (data as { tier?: PlanTier } | null)?.tier
+  if (!previous) return 'new'
+  if (TIER_RANK[nextTier] > TIER_RANK[previous]) return 'upgrade'
+  if (TIER_RANK[nextTier] < TIER_RANK[previous]) return 'downgrade'
+  return 'renewal'
+}
+
 export async function grantEntitlementForOrder(
   admin: SupabaseClient,
   order: OrderForGrant,
-): Promise<{ granted: boolean; reason?: string }> {
+): Promise<{ granted: boolean; reason?: string; tierChange?: TierChange }> {
   const plan = parseProductId(order.product_id)
   if (!plan) {
     // Katalog dışı ürün (ör. sandbox-credit) — yetki üretme.
@@ -55,6 +82,10 @@ export async function grantEntitlementForOrder(
   const product = getPaymentProduct(order.product_id)
   if (!product) return { granted: false, reason: 'bilinmeyen-ürün' }
 
+  // Yön tespiti INSERT'ten ÖNCE yapılmalı; sonrasında yeni yetki de
+  // "önceki" sayılır ve her satın alma 'renewal' görünürdü.
+  const tierChange = await resolveTierChange(admin, order.user_id, plan.tier)
+
   const now = new Date()
   const expires = new Date(now.getTime() + periodDurationDays(plan.period) * 86_400_000)
 
@@ -63,7 +94,7 @@ export async function grantEntitlementForOrder(
     tier: plan.tier,
     period: plan.period,
     api_included: plan.apiIncluded,
-    features: TIER_FEATURES[plan.tier],
+    features: tierFeatures(plan.tier),
     status: 'active',
     source_order_id: order.id,
     starts_at: now.toISOString(),
@@ -76,5 +107,5 @@ export async function grantEntitlementForOrder(
     throw new Error(`Yetki verilemedi: ${error.message}`)
   }
 
-  return { granted: true }
+  return { granted: true, tierChange }
 }
