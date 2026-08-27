@@ -51,8 +51,21 @@ export async function GET(request: NextRequest) {
         .order('created_at', { ascending: false })
         .limit(20),
     ])
-    if (ordersResult.error) throw new Error('Siparişler okunamadı.')
-    if (entitlementsResult.error) throw new Error('Yetkiler okunamadı.')
+    // Hangi kaynağın düştüğü GÖRÜNÜR olmalı: tek bir "okunamadı" mesajı
+    // eksik migration ile gerçek bir arıza arasındaki farkı gizliyordu.
+    const sourceErrors: Record<string, string> = {}
+    if (ordersResult.error) sourceErrors.orders = ordersResult.error.message
+    if (entitlementsResult.error) sourceErrors.entitlements = entitlementsResult.error.message
+    if (usersResult.error) sourceErrors.profiles = usersResult.error.message
+    if (auditResult.error) sourceErrors.auditEvents = auditResult.error.message
+
+    // Sipariş ve yetki olmadan satış merkezi anlamlı değil; ikisi zorunlu.
+    if (ordersResult.error || entitlementsResult.error) {
+      return NextResponse.json({
+        error: 'Satış merkezi verileri okunamadı.',
+        sourceErrors,
+      }, { status: 503, headers })
+    }
 
     const orders = ordersResult.data || []
     const paid = orders.filter((item) => item.status === 'paid')
@@ -81,6 +94,8 @@ export async function GET(request: NextRequest) {
       },
       orders,
       auditEvents: auditResult.error ? [] : auditResult.data,
+      // Zorunlu olmayan kaynaklar düştüyse panel yine açılır, sebebi görünür.
+      sourceErrors: Object.keys(sourceErrors).length ? sourceErrors : undefined,
       packages: listPackages(),
       pricing: getPricingSnapshot(),
     }, { headers })
