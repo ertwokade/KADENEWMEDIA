@@ -410,10 +410,27 @@ test('custom teklifler 15 dakikadan uzun üretilemez ve expired webhook yetki ve
 
   const webhook = await readFile(new URL('../../app/kadeai/api/payments/webhook/route.ts', import.meta.url), 'utf8')
   const expiryCheck = webhook.indexOf("order.status === 'expired'")
-  const entitlementGrant = webhook.lastIndexOf('grantEntitlementForOrder')
   assert.ok(expiryCheck > -1, 'expired sipariş açıkça reddedilmeli')
-  assert.ok(entitlementGrant > -1 && expiryCheck < entitlementGrant, 'expiry kontrolü entitlement grant öncesinde olmalı')
   assert.match(webhook, /status:\s*'expired'/)
+
+  // Ölçülen değişmez: expired bir sipariş yetki ÜRETEMEZ.
+  //
+  // Bunu 'grantEntitlementForOrder' metninin dosyada nerede geçtiğine bakarak
+  // ölçmek yanıltıcı: grant tek bir yardımcıya taşındığında tanım, POST'un
+  // üstüne çıkıyor ve kontrol gerçek bir sorun olmadan düşüyor. Bu yüzden
+  // ÇAĞRI YERLERİ kontrol ediliyor.
+  // `await` şart: fonksiyon TANIMI da eşleşirse (POST'un üstünde durur)
+  // kontrol gerçek bir sorun olmadan düşer.
+  const grantCallSites = [...webhook.matchAll(/await ensureEntitlement\(/g)].map((match) => match.index ?? -1)
+  assert.ok(grantCallSites.length > 0, 'yetki verme çağrısı bulunmalı')
+  for (const site of grantCallSites) {
+    assert.ok(expiryCheck < site, 'expiry kontrolü her yetki verme çağrısından önce gelmeli')
+  }
+
+  // grantEntitlementForOrder yalnız o yardımcının içinden çağrılmalı; başka
+  // bir yerden doğrudan çağrılırsa expiry kontrolü atlanabilirdi.
+  const directGrantCalls = [...webhook.matchAll(/await grantEntitlementForOrder\(/g)]
+  assert.equal(directGrantCalls.length, 1, 'grantEntitlementForOrder tek bir yerden çağrılmalı')
 })
 
 test('BYOK sırları doğrudan istemciye açılamaz', async () => {

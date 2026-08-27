@@ -6,8 +6,69 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
 import { captureServerAnalytics } from '@/lib/analytics/server'
+import { recordAuditEvent } from '@/lib/audit/server'
 
 export const dynamic = 'force-dynamic'
+
+interface PaidOrder {
+  id: string
+  user_id: string
+  product_id: string
+  analytics_consent?: boolean | null
+}
+
+/**
+ * Ödenmiş sipariş için paket yetkisini garanti eder.
+ *
+ * Idempotent: aynı sipariş için ikinci çağrı `source_order_id` unique index'i
+ * sayesinde yeni yetki üretmez. Bu yüzden hem ilk olayda hem de yinelenen
+ * olayda güvenle çağrılabilir.
+ *
+ * Başarısızlık SESSİZ KALMAZ: audit trail'e `outcome: 'failed'` olarak yazılır.
+ * Aksi halde "para tahsil edildi, paket açılmadı" durumu yalnızca Sentry'de
+ * kalıyor ve satış merkezinde hiçbir iz bırakmıyordu.
+ */
+async function ensureEntitlement(admin: ReturnType<typeof createAdminClient>, order: PaidOrder) {
+  const consented = order.analytics_consent === true
+  try {
+    const grant = await grantEntitlementForOrder(admin, {
+      id: order.id,
+      user_id: order.user_id,
+      product_id: order.product_id,
+    })
+    if (!grant.granted) {
+      // 'zaten-verilmiş' beklenen ve iyi bir durum; diğer sebepler ürün
+      // kataloğu dışı sipariş demektir ve iz bırakmalı.
+      if (grant.reason && grant.reason !== 'zaten-verilmiş') {
+        void recordAuditEvent({
+          actorUserId: order.user_id,
+          action: 'entitlement.grant_skipped',
+          resourceType: 'payment_order',
+          resourceId: order.id,
+          outcome: 'failed',
+          metadata: { reason: grant.reason, productId: order.product_id },
+        })
+      }
+      return
+    }
+
+    void captureServerAnalytics('checkout_completed', order.user_id, consented)
+    void captureServerAnalytics('subscription_activated', order.user_id, consented)
+    // Paket yönü: yükseltme/düşürme ayrımı ürün kararları için gerekli.
+    if (grant.tierChange === 'upgrade') void captureServerAnalytics('upgrade', order.user_id, consented)
+    if (grant.tierChange === 'downgrade') void captureServerAnalytics('downgrade', order.user_id, consented)
+  } catch (grantError) {
+    captureApiError(grantError, '/api/payments/webhook#grant')
+    void recordAuditEvent({
+      actorUserId: order.user_id,
+      action: 'entitlement.grant_failed',
+      resourceType: 'payment_order',
+      resourceId: order.id,
+      outcome: 'failed',
+      metadata: { productId: order.product_id },
+    })
+  }
+}
 
 export async function POST(request: NextRequest) {
   const limit = rateLimit(getRateLimitKey(request, 'payment-webhook'), 60, 60_000)
@@ -62,7 +123,15 @@ export async function POST(request: NextRequest) {
       order_id: event.orderId,
       status: event.status,
     })
-    if (eventError?.code === '23505') return NextResponse.json({ ok: true, duplicate: true }, { headers })
+    if (eventError?.code === '23505') {
+      // Aynı olay daha önce işlendi. Ama ilk denemede yetki verme adımı
+      // düşmüş olabilir (ör. tablo yok, geçici DB hatası). Sipariş ödenmişse
+      // yetkiyi burada TEKRAR dene: grant zaten idempotent (source_order_id
+      // üzerinde unique index). Aksi halde ödeme alınmış, paket hiç açılmamış
+      // bir sipariş sessizce öyle kalırdı.
+      if (event.status === 'paid') await ensureEntitlement(admin, order)
+      return NextResponse.json({ ok: true, duplicate: true }, { headers })
+    }
     if (eventError) throw new Error('Ödeme olayı kaydedilemedi.')
     const { error: updateError } = await admin.from('payment_orders')
       .update({ status: event.status, updated_at: new Date().toISOString() })
@@ -70,25 +139,7 @@ export async function POST(request: NextRequest) {
     if (updateError) throw new Error('Ödeme durumu güncellenemedi.')
     if (order) {
       // Ödeme başarılıysa paket yetkisini OTOMATİK ver.
-      if (event.status === 'paid') {
-        try {
-          const grant = await grantEntitlementForOrder(admin, {
-            id: order.id,
-            user_id: order.user_id,
-            product_id: order.product_id,
-          })
-          if (grant.granted) {
-            const consented = order.analytics_consent === true
-            void captureServerAnalytics('checkout_completed', order.user_id, consented)
-            void captureServerAnalytics('subscription_activated', order.user_id, consented)
-            // Paket yönü: yükseltme/düşürme ayrımı ürün kararları için gerekli.
-            if (grant.tierChange === 'upgrade') void captureServerAnalytics('upgrade', order.user_id, consented)
-            if (grant.tierChange === 'downgrade') void captureServerAnalytics('downgrade', order.user_id, consented)
-          }
-        } catch (grantError) {
-          captureApiError(grantError, '/api/payments/webhook#grant')
-        }
-      }
+      if (event.status === 'paid') await ensureEntitlement(admin, order)
       const analyticsEvent = event.status === 'paid' ? 'payment_completed' : 'payment_failed'
       void captureServerAnalytics(analyticsEvent, order.user_id, order.analytics_consent === true)
     }
