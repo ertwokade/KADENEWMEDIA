@@ -3,18 +3,39 @@
 @theme inline {
   --font-sans: var(--font-poppins);
   --font-mono: var(--font-poppins);
+}
 
-  --color-zinc-50: #fafafa;
-  --color-zinc-100: #f4f4f5;
-  --color-zinc-200: #e4e4e7;
-  --color-zinc-300: #d4d4d8;
-  --color-zinc-400: #a1a1aa;
-  --color-zinc-500: #71717a;
-  --color-zinc-600: #52525b;
-  --color-zinc-700: #3f3f46;
-  --color-zinc-800: #27272a;
-  --color-zinc-900: #111113;
-  --color-zinc-950: #08090d;
+/*
+ * Palet, marka tokenlarına BAĞLIDIR (bkz. kade-skin.css → "TAILWIND KÖPRÜSÜ").
+ *
+ * `inline` KULLANILMAZ: inline, değeri derleme sırasında sınıfın içine gömer
+ * ve tema değiştiğinde renk değişmez — eski kurulumda tam olarak bu oluyordu,
+ * bu yüzden aşağıda her sınıf varyantı ayrıca !important ile boyanıyordu.
+ * Değişken referansı kalınca `bg-zinc-900/70` gibi opaklık varyantları da
+ * çalışma anında doğru temaya düşer.
+ */
+@theme {
+  --color-zinc-50:  var(--kade-n-50);
+  --color-zinc-100: var(--kade-n-100);
+  --color-zinc-200: var(--kade-n-200);
+  --color-zinc-300: var(--kade-n-300);
+  --color-zinc-400: var(--kade-n-400);
+  --color-zinc-500: var(--kade-n-500);
+  --color-zinc-600: var(--kade-n-600);
+  --color-zinc-700: var(--kade-n-700);
+  --color-zinc-800: var(--kade-n-800);
+  --color-zinc-900: var(--kade-n-900);
+  --color-zinc-950: var(--kade-n-950);
+
+  --color-violet-50:  var(--kade-a-50);
+  --color-violet-200: var(--kade-a-200);
+  --color-violet-300: var(--kade-a-300);
+  --color-violet-400: var(--kade-a-400);
+  --color-violet-500: var(--kade-a-500);
+  --color-violet-600: var(--kade-a-600);
+  --color-violet-700: var(--kade-a-700);
+  --color-violet-900: var(--kade-a-900);
+  --color-violet-950: var(--kade-a-950);
 }
 
 html,
@@ -1210,32 +1231,6 @@ html[data-theme="light"] .kade-panel main {
   color: #17130a;
 }
 
-html[data-theme="light"] .kade-panel .bg-zinc-950,
-html[data-theme="light"] .kade-panel .bg-zinc-950\/70,
-html[data-theme="light"] .kade-panel .bg-zinc-950\/60 {
-  background: #f7f5ed !important;
-}
-
-html[data-theme="light"] .kade-panel .bg-zinc-900,
-html[data-theme="light"] .kade-panel .bg-zinc-900\/90,
-html[data-theme="light"] .kade-panel .bg-zinc-900\/80,
-html[data-theme="light"] .kade-panel .bg-zinc-900\/70,
-html[data-theme="light"] .kade-panel .bg-zinc-900\/60,
-html[data-theme="light"] .kade-panel .bg-zinc-900\/55,
-html[data-theme="light"] .kade-panel .bg-zinc-900\/50 {
-  background: #fffdf6 !important;
-}
-
-html[data-theme="light"] .kade-panel .bg-zinc-800,
-html[data-theme="light"] .kade-panel .bg-zinc-800\/50,
-html[data-theme="light"] .kade-panel .bg-zinc-800\/30 {
-  background: #f0ede3 !important;
-}
-
-html[data-theme="light"] .kade-panel .bg-zinc-700 {
-  background: #ded8c9 !important;
-}
-
 html[data-theme="light"] .kade-panel .bg-white,
 html[data-theme="light"] .kade-panel .bg-white\/80 {
   background: #fffdf6 !important;
@@ -1246,42 +1241,6 @@ html[data-theme="light"] .kade-panel .kade-dashboard-hero {
     radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--kade-accent) 22%, transparent), transparent 34%),
     #11110f !important;
   border-color: color-mix(in srgb, var(--kade-accent) 22%, transparent) !important;
-}
-
-html[data-theme="light"] .kade-panel .text-zinc-100 {
-  color: #17130a !important;
-}
-
-html[data-theme="light"] .kade-panel .text-zinc-200 {
-  color: #2d281e !important;
-}
-
-html[data-theme="light"] .kade-panel .text-zinc-300 {
-  color: #443d31 !important;
-}
-
-html[data-theme="light"] .kade-panel .text-zinc-400 {
-  color: #625a4c !important;
-}
-
-html[data-theme="light"] .kade-panel .text-zinc-500 {
-  color: #71685a !important;
-}
-
-html[data-theme="light"] .kade-panel .text-zinc-600 {
-  color: #7a7061 !important;
-}
-
-html[data-theme="light"] .kade-panel .border-zinc-800,
-html[data-theme="light"] .kade-panel .border-zinc-700,
-html[data-theme="light"] .kade-panel .border-zinc-700\/70,
-html[data-theme="light"] .kade-panel .border-zinc-700\/60,
-html[data-theme="light"] .kade-panel .border-zinc-700\/50 {
-  border-color: rgba(23, 19, 10, 0.13) !important;
-}
-
-html[data-theme="light"] .kade-panel .border-zinc-600 {
-  border-color: rgba(23, 19, 10, 0.2) !important;
 }
 
 html[data-theme="light"] .kade-panel input,

@@ -52,6 +52,74 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
   color-scheme: dark;
 }
 
+/* ---------------------------------------------------------------------------
+   TAILWIND KÖPRÜSÜ
+   ---------------------------------------------------------------------------
+   Araç sayfaları renkleri Tailwind sınıflarıyla yazıyor (bg-zinc-900,
+   text-zinc-400, bg-violet-500 …). Bu tonlar önce markaya bağlı değildi;
+   globals.css her sınıf varyantını tek tek !important ile yeniden boyuyordu
+   (bg-zinc-900\/90, \/80, \/70 …). Listede olmayan her varyant boyasız
+   kalıyor, arayüz yamalı görünüyordu.
+
+   Çözüm: paletin KENDİSİNİ markaya bağlamak. Aşağıdaki değişkenler
+   globals.css'teki @theme bloğundan Tailwind'in renk tokenlarına
+   bağlanır; bg-zinc-900/70 gibi opaklık varyantları da otomatik doğru
+   renge düşer, ek kural gerekmez.
+
+   AÇIK TEMADA YÖN TERSTİR: Tailwind'de 950 en koyu tondur, ama açık temada
+   sayfa zemini odur — bu yüzden 950 en AÇIK, 50 en KOYU mürekkeptir.
+   -------------------------------------------------------------------------- */
+:root {
+  --kade-n-50:  #17130a;
+  --kade-n-100: #17130a;
+  --kade-n-200: #2b2417;
+  --kade-n-300: rgba(23, 19, 10, .82);
+  --kade-n-400: rgba(23, 19, 10, .68);
+  --kade-n-500: rgba(23, 19, 10, .54);
+  --kade-n-600: #c9c2ae;
+  --kade-n-700: #ded8c9;
+  --kade-n-800: #f0ede3;
+  --kade-n-900: #fffdf6;
+  --kade-n-950: var(--kade-bg);
+
+  /* Vurgu: violet ikinci bir marka rengi gibi davranıyordu; altına bağlandı. */
+  --kade-a-50:  color-mix(in srgb, var(--kade-accent) 12%, transparent);
+  --kade-a-200: color-mix(in srgb, var(--kade-accent) 30%, transparent);
+  --kade-a-300: var(--kade-accent-text);
+  --kade-a-400: var(--kade-accent-strong);
+  --kade-a-500: var(--kade-accent);
+  --kade-a-600: var(--kade-accent-strong);
+  --kade-a-700: var(--kade-accent-strong);
+  --kade-a-900: var(--kade-accent-strong);
+  --kade-a-950: var(--kade-accent-strong);
+}
+
+html[data-theme='dark'], html[data-theme-mode='dark'] {
+  --kade-n-50:  #ffffff;
+  --kade-n-100: #f5f4f0;
+  --kade-n-200: #e4e5e3;
+  --kade-n-300: rgba(230, 232, 232, .86);
+  --kade-n-400: rgba(230, 232, 232, .72);
+  --kade-n-500: rgba(230, 232, 232, .54);
+  --kade-n-600: #3b3f40;
+  --kade-n-700: #272a2b;
+  --kade-n-800: var(--kade-surface-soft);
+  --kade-n-900: var(--kade-surface);
+  --kade-n-950: var(--kade-bg);
+
+  --kade-a-300: var(--kade-accent-text);
+  --kade-a-400: #ebc669;
+}
+
+/* Altın bir DOLGU rengidir; üzerine daima --kade-on-accent yazılır.
+   Yalnız TAM tonu hedefler: `bg-violet-500/20` gibi saydam tint'ler
+   (seçili çip zeminleri) bu kuralın dışında kalır. */
+.kade-panel [class~="bg-violet-500"],
+.kade-panel [class~="bg-violet-600"] {
+  color: var(--kade-on-accent) !important;
+}
+
+
 .kade-panel, .kade-panel .kade-main { background: var(--kade-bg) !important; color: var(--kade-ink); }
 .kade-panel .kade-main { position: relative; isolation: isolate; }
 .kade-panel .kade-main::before {
