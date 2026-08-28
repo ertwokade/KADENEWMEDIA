@@ -7,7 +7,6 @@ import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
 import { Platform, AIModel } from '@/types'
 import { collectSettledResults, getPlatformLabel, getModelLabel, getModelColor, cn } from '@/lib/utils'
-import { COMPARE_MODELS } from '@/lib/ai/models'
 
 const platforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin', 'pinterest']
 
@@ -19,7 +18,13 @@ interface ViralAnalysis {
   revize_edilmis_baslik: string
 }
 
-interface ModelResult { model: AIModel; analysis: ViralAnalysis }
+interface ModelResult {
+  model: AIModel
+  analysis: ViralAnalysis
+  /** A/B modunda hangi başlığın sonucu olduğunu ayırt etmek için. */
+  subject?: string
+  kazanan?: boolean
+}
 
 function ScoreBadge({ score }: { score: number }) {
   const color = score >= 80 ? 'text-emerald-400' : score >= 60 ? 'text-amber-400' : 'text-red-400'
@@ -44,9 +49,18 @@ function AnalysisCard({ result }: { result: ModelResult }) {
   const a = result.analysis
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-wrap items-center gap-2 mb-2">
         <span className={cn('text-xs font-bold', getModelColor(result.model))}>{getModelLabel(result.model)}</span>
+        {result.kazanan !== undefined && (
+          <span className={cn('rounded-full px-2 py-0.5 text-[11px] font-semibold',
+            result.kazanan ? 'bg-emerald-500/15 text-emerald-300' : 'bg-zinc-700 text-zinc-400')}>
+            {result.kazanan ? 'Kazanan' : 'Alternatif'}
+          </span>
+        )}
       </div>
+      {result.subject && result.kazanan !== undefined && (
+        <p className="mb-2 text-sm text-zinc-200">{result.subject}</p>
+      )}
 
       <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-5 flex items-center gap-4">
         <div className="text-center">
@@ -104,8 +118,12 @@ function AnalysisCard({ result }: { result: ModelResult }) {
 }
 
 export default function ViralScorePage() {
-  const { selectedModel } = useModel()
+  const { selectedModel, compareModels } = useModel()
   const [title, setTitle]           = useState('')
+  // A/B karşılaştırması: ayrı bir araç olarak duruyordu ve aynı uca
+  // (/api/generate/viral-score) istek atıyordu. İkinci başlık burada
+  // opsiyonel bir alan; doluysa iki başlık puanlanıp kazanan işaretlenir.
+  const [rivalTitle, setRivalTitle] = useState('')
   const [platform, setPlatform]     = useState<Platform>('youtube')
   const [description, setDescription] = useState('')
   const [hashtags, setHashtags]     = useState('')
@@ -114,14 +132,14 @@ export default function ViralScorePage() {
   const [results, setResults]       = useState<ModelResult[]>([])
   const [error, setError]           = useState('')
 
-  const analyze = async (model: AIModel): Promise<ModelResult> => {
+  const analyze = async (model: AIModel, subject: string = title): Promise<ModelResult> => {
     const res = await apiFetch('/api/generate/viral-score', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, platform, model, description, hashtags }),
+      body: JSON.stringify({ title: subject, platform, model, description, hashtags }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error)
-    return { model: data.model || model, analysis: data.analysis }
+    return { model: data.model || model, analysis: data.analysis, subject }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -129,7 +147,17 @@ export default function ViralScorePage() {
     if (!title.trim()) return
     setLoading(true); setError(''); setResults([])
     try {
-      setResults([await analyze(selectedModel)])
+      const rival = rivalTitle.trim()
+      if (!rival) {
+        setResults([await analyze(selectedModel)])
+      } else {
+        const [a, b] = await Promise.all([
+          analyze(selectedModel, title),
+          analyze(selectedModel, rival),
+        ])
+        const aWins = a.analysis.toplam_puan >= b.analysis.toplam_puan
+        setResults([{ ...a, kazanan: aWins }, { ...b, kazanan: !aWins }])
+      }
     } catch (err) { setError(err instanceof Error ? err.message : 'Hata') }
     finally { setLoading(false) }
   }
@@ -138,7 +166,7 @@ export default function ViralScorePage() {
     if (!title.trim()) return
     setAllLoading(true); setError(''); setResults([])
     try {
-      const settled = await Promise.allSettled(COMPARE_MODELS.map(analyze))
+      const settled = await Promise.allSettled(compareModels.map((model) => analyze(model)))
       const { values, failureMessage } = collectSettledResults(settled)
       if (!values.length) throw new Error(failureMessage || 'Modellerden sonuç alınamadı.')
       setResults(values)
@@ -151,7 +179,7 @@ export default function ViralScorePage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="Viral Skor" description="İçeriğinin viral potansiyelini analiz et" />
+      <TopBar title="Viral Skor" description="Viral potansiyeli ölç, iki başlığı A/B karşılaştır" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:h-full lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80">
@@ -159,6 +187,13 @@ export default function ViralScorePage() {
               <div>
                 <label className="block text-zinc-400 text-xs font-medium mb-1.5">Video Başlığı</label>
                 <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Analiz edilecek başlık"
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
+              </div>
+              <div>
+                <label className="block text-zinc-400 text-xs font-medium mb-1.5">
+                  Karşılaştırılacak başlık <span className="text-zinc-600">(opsiyonel — A/B)</span>
+                </label>
+                <input value={rivalTitle} onChange={e => setRivalTitle(e.target.value)} placeholder="İkinci başlığı gir, kazananı seçelim"
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
               </div>
               <div>
@@ -187,12 +222,14 @@ export default function ViralScorePage() {
               <div className="space-y-2">
                 <button type="submit" disabled={isLoading || !title.trim()}
                   className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 transition-colors">
-                  {loading ? 'Analiz ediliyor...' : 'Viral Skor Al'}
+                  {loading ? 'Analiz ediliyor...' : rivalTitle.trim() ? 'İki Başlığı Karşılaştır' : 'Viral Skor Al'}
                 </button>
-                <button type="button" onClick={handleAskAll} disabled={isLoading || !title.trim()}
-                  className="w-full py-2.5 rounded-lg bg-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-600 disabled:opacity-50 transition-colors">
-                  {allLoading ? 'Modeller karşılaştırılıyor...' : '3 Modelle Karşılaştır'}
-                </button>
+                {compareModels.length > 0 && (
+                  <button type="button" onClick={handleAskAll} disabled={isLoading || !title.trim()}
+                    className="w-full py-2.5 rounded-lg bg-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-600 disabled:opacity-50 transition-colors">
+                    {allLoading ? 'Modeller karşılaştırılıyor...' : `${compareModels.length} Modelle Karşılaştır`}
+                  </button>
+                )}
               </div>
             </form>
           </div>
@@ -203,7 +240,7 @@ export default function ViralScorePage() {
 
             {results.length > 0 && !isLoading && (
               <div className={cn('grid gap-6', results.length > 1 ? 'grid-cols-1 xl:grid-cols-3' : 'grid-cols-1')}>
-                {results.map(r => <AnalysisCard key={r.model} result={r} />)}
+                {results.map((r, index) => <AnalysisCard key={`${r.model}-${index}`} result={r} />)}
               </div>
             )}
 

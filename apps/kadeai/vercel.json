@@ -143,6 +143,10 @@
     {
       "path": "/kadeai/api/reports/weekly-site",
       "schedule": "0 7 * * 1"
+    },
+    {
+      "path": "/kadeai/api/subscriptions/sweep",
+      "schedule": "30 3 * * *"
     }
   ]
 }

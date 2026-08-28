@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "expectedCount": 226,
+  "expectedCount": 227,
   "generatedFrom": "Kade Media full-site audit inventory",
   "routes": [
     {
@@ -1702,6 +1702,21 @@
       "testPath": "/kadeai/api/reports/weekly-site"
     },
     {
+      "route": "/kadeai/api/subscriptions/sweep",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "owner"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/subscriptions/sweep"
+    },
+    {
       "route": "/kadeai/api/subtitles/translate",
       "type": "api",
       "app": "kadeai",
@@ -2843,7 +2858,8 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/ab-test"
+      "testPath": "/kadeai/dashboard/ab-test",
+      "note": "yönlendirme — viral-score / trend-radar"
     },
     {
       "route": "/kadeai/dashboard/ai-thumbnail",
@@ -3323,7 +3339,8 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/trends"
+      "testPath": "/kadeai/dashboard/trends",
+      "note": "yönlendirme — viral-score / trend-radar"
     },
     {
       "route": "/kadeai/dashboard/viral-score",

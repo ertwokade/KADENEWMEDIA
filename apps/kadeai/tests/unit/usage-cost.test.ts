@@ -4,6 +4,7 @@ import { estimateCostUsd, getModelRate, resetRateCacheForTests } from '../../lib
 import { getLimitForTier, isTokenQuotaEnforced, FREE_TIER } from '../../lib/payments/limits'
 import { entitlementAllows, tierOf } from '../../lib/payments/planRules'
 import { canAccessFeature, isAdminOnlyRoute } from '../../lib/featureAccess'
+import { compareModelsFrom } from '../../lib/ai/models'
 
 test('bilinmeyen modelin maliyeti sıfır değil, null döner', () => {
   // 0 dönerse admin panelindeki brüt marj olduğundan iyi görünür.
@@ -102,4 +103,16 @@ test('sahip rotaları owner-mode bayrağıyla artık engellenmiyor', () => {
   assert.equal(canAccessFeature('/dashboard/admin', false), true)
   // Sürümde kapalı araçlar kapalı kalmayı sürdürüyor.
   assert.equal(canAccessFeature('/dashboard/editor', false), false)
+})
+
+test('karşılaştırma modelleri yapılandırılmış sağlayıcılarla kesişir', () => {
+  // Canlıda yalnız Gemini yapılandırılıyken "3 Modelle Karşılaştır" üç ayrı
+  // model adı gösteriyor ama üçü de aynı yedeğe düşüyordu.
+  assert.deepEqual(compareModelsFrom(['gemini-flash']), [], 'tek model kaldıysa karşılaştırma anlamsız')
+  assert.deepEqual(compareModelsFrom([]), [])
+  assert.deepEqual(
+    compareModelsFrom(['gemini-flash', 'groq-llama-70b', 'baska-model']),
+    ['groq-llama-70b', 'gemini-flash'],
+  )
+  assert.equal(compareModelsFrom(['cerebras-glm-4-7', 'groq-llama-70b', 'gemini-flash']).length, 3)
 })

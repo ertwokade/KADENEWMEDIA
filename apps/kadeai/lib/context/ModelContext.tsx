@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
 import { AIModel } from '@/types'
-import { SELECTABLE_MODELS } from '@/lib/ai/models'
+import { SELECTABLE_MODELS, compareModelsFrom } from '@/lib/ai/models'
+import { apiFetch } from '@/lib/client/api'
 
 export const MANUAL_MODEL_STORAGE_KEY = 'kade-manual-model-v1'
 
@@ -12,6 +13,8 @@ interface ModelContextType {
   autoReason: string | null
   isAutoSelected: boolean
   applyToolDefault: (toolId: string) => void
+  /** Yapılandırılmış sağlayıcılarla kesişen karşılaştırma modelleri. */
+  compareModels: AIModel[]
 }
 
 const ModelContext = createContext<ModelContextType | undefined>(undefined)
@@ -24,6 +27,23 @@ export function ModelProvider({ children, initialToolId }: { children: ReactNode
       : 'Görevin içeriği ve çalışan sağlayıcılar değerlendirilir.'
   )
   const [isAutoSelected, setIsAutoSelected] = useState(true)
+  const [compareModels, setCompareModels] = useState<AIModel[]>([])
+
+  // Hangi sağlayıcıların yapılandırıldığını sunucu bilir; tek yerden okunup
+  // karşılaştırma sunan tüm araçlara dağıtılır.
+  useEffect(() => {
+    let cancelled = false
+    apiFetch('/api/config', { cache: 'no-store' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        if (cancelled || !Array.isArray(data?.availableModels)) return
+        setCompareModels(compareModelsFrom(data.availableModels))
+      })
+      .catch(() => {
+        // Okunamazsa karşılaştırma kapalı kalır; yanlış model adı göstermekten iyidir.
+      })
+    return () => { cancelled = true }
+  }, [])
 
   const setSelectedModel = useCallback((model: AIModel) => {
     setSelectedModelRaw(model)
@@ -57,7 +77,7 @@ export function ModelProvider({ children, initialToolId }: { children: ReactNode
   }, [])
 
   return (
-    <ModelContext.Provider value={{ selectedModel, setSelectedModel, autoReason, isAutoSelected, applyToolDefault }}>
+    <ModelContext.Provider value={{ selectedModel, setSelectedModel, autoReason, isAutoSelected, applyToolDefault, compareModels }}>
       {children}
     </ModelContext.Provider>
   )

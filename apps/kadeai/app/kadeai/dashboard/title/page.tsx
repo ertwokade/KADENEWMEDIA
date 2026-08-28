@@ -8,7 +8,6 @@ import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
 import { Platform, ContentTone, AIModel } from '@/types'
 import { collectSettledResults, getPlatformLabel, getModelLabel, getModelColor, cn } from '@/lib/utils'
-import { COMPARE_MODELS } from '@/lib/ai/models'
 
 const platforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin', 'pinterest']
 const tones: ContentTone[] = ['bilgilendirici', 'eğlenceli', 'ilham verici', 'dikkat çekici', 'samimi']
@@ -16,7 +15,7 @@ const tones: ContentTone[] = ['bilgilendirici', 'eğlenceli', 'ilham verici', 'd
 interface PlatformResult { platform: Platform; titles: string[]; model: AIModel }
 
 export default function TitlePage() {
-  const { selectedModel } = useModel()
+  const { selectedModel, compareModels } = useModel()
   const [topic, setTopic]           = useState('')
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['youtube'])
   const [tone, setTone]             = useState<ContentTone>('bilgilendirici')
@@ -58,7 +57,7 @@ export default function TitlePage() {
     if (!topic.trim()) return
     setLoading(true); setError(''); setResults([])
     try {
-      const models: AIModel[] = COMPARE_MODELS
+      const models: AIModel[] = compareModels
       const platform = selectedPlatforms[0]
       const settled = await Promise.allSettled(models.map(m => generate(platform, m)))
       const { values, failureMessage } = collectSettledResults(settled)
@@ -132,10 +131,10 @@ export default function TitlePage() {
                   className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   {loading ? 'Üretiliyor...' : `${selectedPlatforms.length} Platforma Başlık Üret`}
                 </button>
-                <button type="button" onClick={handleAskAll} disabled={loading || !topic.trim()}
+                {compareModels.length > 0 && <button type="button" onClick={handleAskAll} disabled={loading || !topic.trim()}
                   className="w-full py-2.5 rounded-lg bg-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-600 disabled:opacity-50 transition-colors">
-                  {loading ? 'Yanıtlanıyor...' : '3 Modelle Karşılaştır'}
-                </button>
+                  {loading ? 'Yanıtlanıyor...' : `${compareModels.length} Modelle Karşılaştır`}
+                </button>}
               </div>
             </form>
           </div>

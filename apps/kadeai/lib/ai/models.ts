@@ -528,6 +528,20 @@ export const COMPARE_MODELS: AIModel[] = [
   'gemini-flash',
 ]
 
+/**
+ * Karşılaştırmaya GERÇEKTEN girebilecek modeller.
+ *
+ * COMPARE_MODELS sabit bir listeydi ve anahtarı olmayan sağlayıcılar da
+ * içindeydi: canlıda yalnız Gemini yapılandırılıyken "3 Modelle Karşılaştır"
+ * üç ayrı model adı gösteriyor ama üçü de aynı yedeğe düşüyordu. Artık
+ * yapılandırılmış sağlayıcılarla kesişim alınıyor; ikiden az kalırsa
+ * karşılaştırma anlamsızdır ve boş dizi döner (arayüz butonu gizler).
+ */
+export function compareModelsFrom(available: readonly string[]): AIModel[] {
+  const usable = COMPARE_MODELS.filter((model) => available.includes(model))
+  return usable.length >= 2 ? usable : []
+}
+
 export function getModelConfig(model: AIModel): ModelConfig {
   return MODEL_CONFIGS[model] ?? MODEL_CONFIGS['groq-llama-70b']
 }

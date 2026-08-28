@@ -91,6 +91,7 @@ export async function proxy(request: NextRequest) {
     '/api/kade-search/weekly-digest',
     '/api/reports/weekly-site',
     '/api/operations-report',
+    '/api/subscriptions/sweep',
   ].includes(pathname)
   const cronSecret = process.env.CRON_SECRET?.trim()
   const hasCronAccess = Boolean(

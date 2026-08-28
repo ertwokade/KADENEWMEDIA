@@ -6,7 +6,6 @@ import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
 import { AIModel } from '@/types'
-import { COMPARE_MODELS } from '@/lib/ai/models'
 import { cn, collectSettledResults, copyToClipboard, getModelColor, getModelLabel } from '@/lib/utils'
 import { Copy, Check } from 'lucide-react'
 
@@ -158,7 +157,7 @@ function ResultCard({
 }
 
 export default function ClickbaitDetectorPage() {
-  const { selectedModel } = useModel()
+  const { selectedModel, compareModels } = useModel()
   const [title, setTitle] = useState('')
   const [platform, setPlatform] = useState<Platform>('youtube')
   const [loading, setLoading] = useState(false)
@@ -205,7 +204,7 @@ export default function ClickbaitDetectorPage() {
     setError('')
     setResults([])
     try {
-      const models: AIModel[] = COMPARE_MODELS
+      const models: AIModel[] = compareModels
       const settled = await Promise.allSettled(models.map(analyze))
       const { values, failureMessage } = collectSettledResults(settled)
       if (!values.length) throw new Error(failureMessage || 'Modellerden sonuç alınamadı.')
@@ -264,14 +263,16 @@ export default function ClickbaitDetectorPage() {
                 >
                   {loading ? 'Analiz ediliyor...' : 'Analiz Et'}
                 </button>
-                <button
-                  type="button"
-                  onClick={handleAskAll}
-                  disabled={isLoading || !title.trim()}
-                  className="w-full py-2.5 rounded-lg bg-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-600 disabled:opacity-50 transition-colors"
-                >
-                  {allLoading ? 'Modeller karşılaştırılıyor...' : '3 Modelle Karşılaştır'}
-                </button>
+                {compareModels.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleAskAll}
+                    disabled={isLoading || !title.trim()}
+                    className="w-full py-2.5 rounded-lg bg-zinc-700 text-zinc-200 text-sm font-medium hover:bg-zinc-600 disabled:opacity-50 transition-colors"
+                  >
+                    {allLoading ? 'Modeller karşılaştırılıyor...' : `${compareModels.length} Modelle Karşılaştır`}
+                  </button>
+                )}
               </div>
             </form>
           </div>
