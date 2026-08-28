@@ -108,6 +108,10 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
   --kade-info-300: #2c5a72;
   --kade-info-400: #2c5a72;
   --kade-info-500: #6f9bb5;
+  --kade-ok-deep:   #d9e7d6;
+  --kade-warn-deep: #f2e6c4;
+  --kade-err-deep:  #f3d9d5;
+  --kade-info-deep: #d8e5ee;
 }
 
 html[data-theme='dark'], html[data-theme-mode='dark'] {
@@ -138,6 +142,10 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
   --kade-info-300: #a9c9dc;
   --kade-info-400: var(--kade-blue);
   --kade-info-500: #5f8aa6;
+  --kade-ok-deep:   #1d2a1c;
+  --kade-warn-deep: #2c2413;
+  --kade-err-deep:  #2e1b19;
+  --kade-info-deep: #1a252c;
 }
 
 /* KOYU ADA
@@ -149,8 +157,7 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
    Çözüm, tek tek metin kuralı yazmak değil: nötr rampayı bu ADANIN İÇİNDE
    koyu tema değerlerine sabitlemek. CSS değişkenleri miras alındığı için
    içerideki bütün Tailwind sınıfları kendiliğinden doğru tarafa düşer. */
-html[data-theme='light'] .kade-panel .kade-sidebar,
-html[data-theme='light'] .kade-panel aside.kade-sidebar {
+html[data-theme='light'] .kade-sidebar {
   --kade-n-50:  #ffffff;
   --kade-n-100: #f5f4f0;
   --kade-n-200: #e4e5e3;

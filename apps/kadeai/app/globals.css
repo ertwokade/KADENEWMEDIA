@@ -37,32 +37,96 @@
   --color-violet-900: var(--kade-a-900);
   --color-violet-950: var(--kade-a-950);
 
-  /* Semantik aileler. teal→emerald, cyan→blue, orange→amber takma adları
-     kaynak kodda karışık kullanılıyor; hepsi aynı role bağlanır. */
+  /* Semantik aileler — TAM rampa.
+     Yalnız 300/400/500 bağlamak yetmiyor: kodda text-amber-200, bg-red-950,
+     border-cyan-900 gibi tonlar da var ve bağlanmayan her ton Tailwind'in
+     kendi paletine düşüp açık temada okunmaz hale geliyor.
+     50-300 metin · 400-600 dolgu/kenar · 700-950 derin zemin.
+     teal→emerald, cyan→blue, orange→amber takma adları aynı role bağlanır. */
+
+  --color-emerald-50: var(--kade-ok-300);
+  --color-emerald-100: var(--kade-ok-300);
+  --color-emerald-200: var(--kade-ok-300);
   --color-emerald-300: var(--kade-ok-300);
   --color-emerald-400: var(--kade-ok-400);
   --color-emerald-500: var(--kade-ok-500);
+  --color-emerald-600: var(--kade-ok-500);
+  --color-emerald-700: var(--kade-ok-deep);
+  --color-emerald-800: var(--kade-ok-deep);
+  --color-emerald-900: var(--kade-ok-deep);
+  --color-emerald-950: var(--kade-ok-deep);
+
+  --color-teal-50: var(--kade-ok-300);
+  --color-teal-100: var(--kade-ok-300);
+  --color-teal-200: var(--kade-ok-300);
   --color-teal-300: var(--kade-ok-300);
   --color-teal-400: var(--kade-ok-400);
   --color-teal-500: var(--kade-ok-500);
+  --color-teal-600: var(--kade-ok-500);
+  --color-teal-700: var(--kade-ok-deep);
+  --color-teal-800: var(--kade-ok-deep);
+  --color-teal-900: var(--kade-ok-deep);
+  --color-teal-950: var(--kade-ok-deep);
 
+  --color-amber-50: var(--kade-warn-300);
+  --color-amber-100: var(--kade-warn-300);
+  --color-amber-200: var(--kade-warn-300);
   --color-amber-300: var(--kade-warn-300);
   --color-amber-400: var(--kade-warn-400);
   --color-amber-500: var(--kade-warn-500);
+  --color-amber-600: var(--kade-warn-500);
+  --color-amber-700: var(--kade-warn-deep);
+  --color-amber-800: var(--kade-warn-deep);
+  --color-amber-900: var(--kade-warn-deep);
+  --color-amber-950: var(--kade-warn-deep);
+
+  --color-orange-50: var(--kade-warn-300);
+  --color-orange-100: var(--kade-warn-300);
+  --color-orange-200: var(--kade-warn-300);
   --color-orange-300: var(--kade-warn-300);
   --color-orange-400: var(--kade-warn-400);
   --color-orange-500: var(--kade-warn-500);
+  --color-orange-600: var(--kade-warn-500);
+  --color-orange-700: var(--kade-warn-deep);
+  --color-orange-800: var(--kade-warn-deep);
+  --color-orange-900: var(--kade-warn-deep);
+  --color-orange-950: var(--kade-warn-deep);
 
+  --color-red-50: var(--kade-err-300);
+  --color-red-100: var(--kade-err-300);
+  --color-red-200: var(--kade-err-300);
   --color-red-300: var(--kade-err-300);
   --color-red-400: var(--kade-err-400);
   --color-red-500: var(--kade-err-500);
+  --color-red-600: var(--kade-err-500);
+  --color-red-700: var(--kade-err-deep);
+  --color-red-800: var(--kade-err-deep);
+  --color-red-900: var(--kade-err-deep);
+  --color-red-950: var(--kade-err-deep);
 
+  --color-blue-50: var(--kade-info-300);
+  --color-blue-100: var(--kade-info-300);
+  --color-blue-200: var(--kade-info-300);
   --color-blue-300: var(--kade-info-300);
   --color-blue-400: var(--kade-info-400);
   --color-blue-500: var(--kade-info-500);
+  --color-blue-600: var(--kade-info-500);
+  --color-blue-700: var(--kade-info-deep);
+  --color-blue-800: var(--kade-info-deep);
+  --color-blue-900: var(--kade-info-deep);
+  --color-blue-950: var(--kade-info-deep);
+
+  --color-cyan-50: var(--kade-info-300);
+  --color-cyan-100: var(--kade-info-300);
+  --color-cyan-200: var(--kade-info-300);
   --color-cyan-300: var(--kade-info-300);
   --color-cyan-400: var(--kade-info-400);
   --color-cyan-500: var(--kade-info-500);
+  --color-cyan-600: var(--kade-info-500);
+  --color-cyan-700: var(--kade-info-deep);
+  --color-cyan-800: var(--kade-info-deep);
+  --color-cyan-900: var(--kade-info-deep);
+  --color-cyan-950: var(--kade-info-deep);
 }
 
 html,
