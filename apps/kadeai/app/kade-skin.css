@@ -140,6 +140,34 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
   --kade-info-500: #5f8aa6;
 }
 
+/* KOYU ADA
+   ---------------------------------------------------------------------------
+   Kenar çubuğu markanın gereği olarak HER İKİ temada da koyu kalır. Palet
+   temaya bağlandığı için açık temada içindeki text-zinc-* sınıfları koyu
+   mürekkebe dönüyor ve koyu zemin üstünde okunmaz oluyordu.
+
+   Çözüm, tek tek metin kuralı yazmak değil: nötr rampayı bu ADANIN İÇİNDE
+   koyu tema değerlerine sabitlemek. CSS değişkenleri miras alındığı için
+   içerideki bütün Tailwind sınıfları kendiliğinden doğru tarafa düşer. */
+html[data-theme='light'] .kade-panel .kade-sidebar,
+html[data-theme='light'] .kade-panel aside.kade-sidebar {
+  --kade-n-50:  #ffffff;
+  --kade-n-100: #f5f4f0;
+  --kade-n-200: #e4e5e3;
+  --kade-n-300: rgba(230, 232, 232, .86);
+  --kade-n-400: rgba(230, 232, 232, .72);
+  --kade-n-500: rgba(230, 232, 232, .54);
+  --kade-n-600: #3b3f40;
+  --kade-n-700: #272a2b;
+  --kade-n-800: #191b1b;
+  --kade-n-900: #151717;
+  --kade-n-950: #11110f;
+  --kade-ink: #f7f3e8;
+  --kade-muted: rgba(230, 232, 232, .78);
+  --kade-line: rgba(255, 255, 255, .08);
+  --kade-accent-text: #ebc669;
+}
+
 /* Altın bir DOLGU rengidir; üzerine daima --kade-on-accent yazılır.
    Yalnız TAM tonu hedefler: `bg-violet-500/20` gibi saydam tint'ler
    (seçili çip zeminleri) bu kuralın dışında kalır. */
