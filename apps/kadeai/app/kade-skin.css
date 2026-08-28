@@ -171,7 +171,12 @@ html[data-theme='light'] .kade-sidebar {
   --kade-n-950: #11110f;
   --kade-ink: #f7f3e8;
   --kade-muted: rgba(230, 232, 232, .78);
+  --kade-faint: rgba(230, 232, 232, .62);
   --kade-line: rgba(255, 255, 255, .08);
+  --kade-line-strong: rgba(230, 232, 232, .26);
+  --kade-surface: #151717;
+  --kade-surface-soft: #191b1b;
+  --kade-surface-raised: #191b1b;
   --kade-accent-text: #ebc669;
 }
 
