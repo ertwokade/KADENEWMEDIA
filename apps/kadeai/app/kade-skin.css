@@ -92,6 +92,22 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
   --kade-a-700: var(--kade-accent-strong);
   --kade-a-900: var(--kade-accent-strong);
   --kade-a-950: var(--kade-accent-strong);
+
+  /* Semantik renkler. Blanket kurallar bütün aileyi TEK tona düzleştiriyordu;
+     ton bilgisi (300 metin, 500 dolgu) kayboluyor ve hiyerarşi siliniyordu.
+     Ton korunuyor, hue markaya yaklaştırılıyor. */
+  --kade-ok-300:  #2f6b2b;
+  --kade-ok-400:  #2f6b2b;
+  --kade-ok-500:  #4e8a49;
+  --kade-warn-300: var(--kade-accent-text);
+  --kade-warn-400: var(--kade-accent-text);
+  --kade-warn-500: #c69526;
+  --kade-err-300: #a32f26;
+  --kade-err-400: #a32f26;
+  --kade-err-500: #c4554b;
+  --kade-info-300: #2c5a72;
+  --kade-info-400: #2c5a72;
+  --kade-info-500: #6f9bb5;
 }
 
 html[data-theme='dark'], html[data-theme-mode='dark'] {
@@ -109,6 +125,19 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
 
   --kade-a-300: var(--kade-accent-text);
   --kade-a-400: #ebc669;
+
+  --kade-ok-300:  #9ed49a;
+  --kade-ok-400:  #86c281;
+  --kade-ok-500:  var(--kade-green);
+  --kade-warn-300: #ebc669;
+  --kade-warn-400: #dcae3f;
+  --kade-warn-500: #b8862a;
+  --kade-err-300: #f0a8a0;
+  --kade-err-400: #e08a80;
+  --kade-err-500: #c96b62;
+  --kade-info-300: #a9c9dc;
+  --kade-info-400: var(--kade-blue);
+  --kade-info-500: #5f8aa6;
 }
 
 /* Altın bir DOLGU rengidir; üzerine daima --kade-on-accent yazılır.
@@ -197,18 +226,6 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
 .kade-panel input:focus, .kade-panel textarea:focus, .kade-panel select:focus { border-color: var(--kade-ink) !important; box-shadow: 4px 4px 0 var(--kade-accent) !important; }
 .kade-panel button.rounded-xl, .kade-panel a.rounded-xl, .kade-panel .rounded-2xl { border-radius: 0 !important; }
 .kade-panel .kade-main button { border-radius: 0 !important; }
-.kade-panel [class*='bg-violet-'] { background-color: color-mix(in srgb, var(--kade-pink) 28%, var(--kade-surface)) !important; }
-.kade-panel [class*='border-violet-'] { border-color: color-mix(in srgb, var(--kade-pink) 72%, var(--kade-line)) !important; }
-.kade-panel [class*='text-violet-'] { color: color-mix(in srgb, var(--kade-pink) 70%, var(--kade-ink)) !important; }
-.kade-panel [class*='bg-orange-'], .kade-panel [class*='bg-amber-'] { background-color: color-mix(in srgb, var(--kade-accent) 24%, var(--kade-surface)) !important; }
-.kade-panel [class*='border-orange-'], .kade-panel [class*='border-amber-'] { border-color: color-mix(in srgb, var(--kade-accent) 70%, var(--kade-line)) !important; }
-.kade-panel [class*='text-orange-'], .kade-panel [class*='text-amber-'] { color: color-mix(in srgb, var(--kade-accent-strong) 78%, var(--kade-ink)) !important; }
-.kade-panel [class*='bg-cyan-'], .kade-panel [class*='bg-blue-'] { background-color: color-mix(in srgb, var(--kade-blue) 27%, var(--kade-surface)) !important; }
-.kade-panel [class*='border-cyan-'], .kade-panel [class*='border-blue-'] { border-color: color-mix(in srgb, var(--kade-blue) 76%, var(--kade-line)) !important; }
-.kade-panel [class*='text-cyan-'], .kade-panel [class*='text-blue-'] { color: color-mix(in srgb, var(--kade-blue) 67%, var(--kade-ink)) !important; }
-.kade-panel [class*='bg-emerald-'], .kade-panel [class*='bg-teal-'] { background-color: color-mix(in srgb, var(--kade-green) 26%, var(--kade-surface)) !important; }
-.kade-panel [class*='border-emerald-'], .kade-panel [class*='border-teal-'] { border-color: color-mix(in srgb, var(--kade-green) 75%, var(--kade-line)) !important; }
-.kade-panel [class*='text-emerald-'], .kade-panel [class*='text-teal-'] { color: color-mix(in srgb, var(--kade-green) 66%, var(--kade-ink)) !important; }
 .kade-panel .bg-\[\#f2c322\] { background: var(--kade-accent) !important; color: var(--kade-on-accent) !important; box-shadow: none !important; }
 .kade-panel .bg-\[\#f2c322\]:hover { background: var(--kade-ink) !important; color: var(--kade-bg) !important; }
 .kade-panel .kade-main .overflow-y-auto > .gap-5 { width: min(100%, 1480px); margin-inline: auto; }

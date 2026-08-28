@@ -36,6 +36,33 @@
   --color-violet-700: var(--kade-a-700);
   --color-violet-900: var(--kade-a-900);
   --color-violet-950: var(--kade-a-950);
+
+  /* Semantik aileler. teal→emerald, cyan→blue, orange→amber takma adları
+     kaynak kodda karışık kullanılıyor; hepsi aynı role bağlanır. */
+  --color-emerald-300: var(--kade-ok-300);
+  --color-emerald-400: var(--kade-ok-400);
+  --color-emerald-500: var(--kade-ok-500);
+  --color-teal-300: var(--kade-ok-300);
+  --color-teal-400: var(--kade-ok-400);
+  --color-teal-500: var(--kade-ok-500);
+
+  --color-amber-300: var(--kade-warn-300);
+  --color-amber-400: var(--kade-warn-400);
+  --color-amber-500: var(--kade-warn-500);
+  --color-orange-300: var(--kade-warn-300);
+  --color-orange-400: var(--kade-warn-400);
+  --color-orange-500: var(--kade-warn-500);
+
+  --color-red-300: var(--kade-err-300);
+  --color-red-400: var(--kade-err-400);
+  --color-red-500: var(--kade-err-500);
+
+  --color-blue-300: var(--kade-info-300);
+  --color-blue-400: var(--kade-info-400);
+  --color-blue-500: var(--kade-info-500);
+  --color-cyan-300: var(--kade-info-300);
+  --color-cyan-400: var(--kade-info-400);
+  --color-cyan-500: var(--kade-info-500);
 }
 
 html,
