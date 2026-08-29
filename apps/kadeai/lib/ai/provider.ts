@@ -480,6 +480,58 @@ async function generateWithByok(req: GenerateRequest, userId: string): Promise<G
 }
 
 /**
+ * SAĞLAYICI SAĞLIK HAFIZASI
+ * -----------------------------------------------------------------------------
+ * `auto` yönlendirmesi aday modelleri sırayla dener ve her deneme 25 sn'lik
+ * sağlayıcı timeout'una kadar bekleyebilir. Canlıda ölçüldü: `auto` 76 saniye,
+ * açıkça seçilmiş model 4 saniye sürüyordu — aradaki fark, yanıt vermeyen bir
+ * sağlayıcının her istekte yeniden denenmesiydi. "Otomatik" arayüzün
+ * varsayılanı olduğu için bu, kullanıcıların ÇOĞUNLUKLA gördüğü yoldu.
+ *
+ * Başarısız olan model kısa süre için devre dışı bırakılır; başarı kaydı siler.
+ * Bellek örnek başınadır (serverless), kalıcı olması da gerekmez: amaç aynı
+ * örnek üzerinden gelen sonraki isteklerin aynı duvara toslamaması.
+ */
+const PROVIDER_COOLDOWN_MS = 5 * 60_000
+const recentProviderFailures = new Map<string, number>()
+
+function isProviderCoolingDown(model: string) {
+  const failedAt = recentProviderFailures.get(model)
+  if (!failedAt) return false
+  if (Date.now() - failedAt > PROVIDER_COOLDOWN_MS) {
+    recentProviderFailures.delete(model)
+    return false
+  }
+  return true
+}
+
+function markProviderFailed(model: string) {
+  recentProviderFailures.set(model, Date.now())
+}
+
+function markProviderHealthy(model: string) {
+  recentProviderFailures.delete(model)
+}
+
+/**
+ * Açık API anahtarı olan sağlayıcılar öne alınır.
+ *
+ * Vercel AI Gateway kimliği OIDC ile çözülür ve "yapılandırılmış" görünür;
+ * gerçekte yanıt vermediğinde ise auto sırasının BAŞINDA durduğu için her
+ * isteğe 25 saniye ekliyordu. Anahtarı elle girilmiş bir sağlayıcı varsa
+ * ona öncelik vermek daha güvenilir bir varsayılan.
+ */
+function preferExplicitlyKeyedProviders(models: GenerateRequest['model'][]): GenerateRequest['model'][] {
+  const score = (model: GenerateRequest['model']) => {
+    const provider = getModelConfig(model).provider
+    if (provider === 'vercel') return 1
+    return 0
+  }
+  return [...models].sort((a, b) => score(a) - score(b))
+}
+
+
+/**
  * İstek yolundan araç adını çıkarır: `/kadeai/api/generate/title` → `title`.
  * Kullanım defterine hangi aracın harcadığını yazmak için; rotalara dokunmadan.
  */
@@ -581,9 +633,14 @@ async function runGeneration(
 
   const available = new Set(availableModels)
   const fallbackOrder: GenerateRequest['model'][] = [routed.model, ...routed.alternatives]
-  const candidates = [...new Set(fallbackOrder)].filter(
+  const usable = [...new Set(fallbackOrder)].filter(
     (model) => model !== 'auto' && available.has(model)
   )
+
+  // Son dakikalarda düşen sağlayıcıyı atla. Hepsi düşmüşse listeyi olduğu gibi
+  // bırak: kullanıcıyı seçeneksiz bırakmaktansa denemek yeğdir.
+  const healthy = usable.filter((model) => !isProviderCoolingDown(model))
+  const candidates = preferExplicitlyKeyedProviders(healthy.length > 0 ? healthy : usable)
 
   // Router her zaman bir model döndürür. Hiç anahtar yoksa ilk isteğin
   // kullanıcıya açıklayıcı yapılandırma hatasını vermesine izin ver.
@@ -593,12 +650,14 @@ async function runGeneration(
   for (const [index, model] of candidates.entries()) {
     try {
       const result = await generateWithResolvedModel({ ...enrichedRequest, model }, gatewayToken)
+      markProviderHealthy(model)
       const routingReason = index === 0
         ? routed.reason
         : `${routed.reason}; ilk sağlayıcı yanıt vermediği için ${getModelConfig(model).shortLabel} yedeği kullanıldı`
       return { ...result, routingReason }
     } catch (error) {
       lastError = error
+      markProviderFailed(model)
       const message = error instanceof Error ? error.message : 'Bilinmeyen sağlayıcı hatası'
       console.error('[kadeai/ai] sağlayıcı isteği başarısız:', {
         model,
