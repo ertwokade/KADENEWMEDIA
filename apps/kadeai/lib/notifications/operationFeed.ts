@@ -83,12 +83,20 @@ export async function notifyOperation(input: OperationInput): Promise<void> {
     if (budget === 0) return
     if (!whatsappConfiguration().configured) return
 
+    // Bütçe DENEMEYİ sayar, başarıyı değil.
+    //
+    // Önce yalnız gönderilmiş satırlar sayılıyordu; sağlayıcı hata verince
+    // hiçbir satır "gönderildi" olmuyor, bütçe hiç dolmuyor ve her yeni olay
+    // yeniden deniyordu. Canlıda tam bu oldu: sağlayıcı 503 dönerken elli
+    // kadar istek üst üste gitti ve büyük olasılıkla hız sınırına takıldık.
+    // Son bir saatte oluşan olay sayısı tavanı belirler; sağlayıcı düşse de
+    // üstüne gidilmez.
     const since = new Date(Date.now() - 3_600_000).toISOString()
     const { count } = await admin
       .from('operation_events')
       .select('id', { count: 'exact', head: true })
-      .gte('notified_at', since)
-    if ((count ?? 0) >= budget) return
+      .gte('created_at', since)
+    if ((count ?? 0) > budget) return
 
     const lines = [`${LABEL[input.kind]} — ${input.title}`]
     if (input.detail) lines.push(input.detail)
