@@ -110,7 +110,15 @@ function configured(name: string) {
 export function getAvailableModels(): AIModel[] {
   const models: AIModel[] = ['auto']
 
-  if (hasVercelGatewayRuntime()) models.push('vercel-qwen-flash')
+  // Vercel AI Gateway OIDC ile "çalışıyor" görünüyor ama hesabın faturalandırma
+  // durumunu bilmiyor. Canlıda ölçüldü: gateway modeli her istekte
+  // 500 "AI Gateway requires a valid credit card on file" döndürüyor ve auto
+  // sırasında denendiği için her isteğe saniyeler ekliyordu.
+  // Artık açık bir anahtar şart: kimlik çözülüyor olması kullanılabilir
+  // olduğunu KANITLAMAZ.
+  if (hasVercelGatewayRuntime() && configured('AI_GATEWAY_API_KEY')) {
+    models.push('vercel-qwen-flash')
+  }
 
   if (configured('GROQ_API_KEY')) {
     models.push(
@@ -137,14 +145,16 @@ export function getAvailableModels(): AIModel[] {
     }
   }
   if (configured('GEMINI_API_KEY')) {
+    // gemini-flash (gemini-2.5-flash), gemini-flash-lite (gemini-2.5-flash-lite)
+    // ve gemini (Pro) canlıda 500 "[GoogleGenerativeAI Error]" döndürüyor —
+    // bu sürüm adları anahtarımıza açık değil. Listede durdukları için hem
+    // seçicide görünüyor hem auto sırasında denenip zaman harcıyorlardı.
+    // Yalnız ÖLÇÜLEREK çalıştığı doğrulanmış kimlikler bırakıldı.
     models.push(
-      'gemini-flash',
-      'gemini-flash-lite',
       'gemini-flash-latest',
       'gemini-lite-latest',
       'gemini-3-5-flash',
-      'gemini-3-1-lite',
-      'gemini'
+      'gemini-3-1-lite'
     )
   }
   if (configured('MISTRAL_API_KEY')) {

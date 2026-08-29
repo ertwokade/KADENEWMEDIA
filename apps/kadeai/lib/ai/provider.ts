@@ -652,10 +652,10 @@ async function runGeneration(
 
   if (enrichedRequest.model !== 'auto') return generateWithResolvedModel(enrichedRequest, gatewayToken)
 
+  // Not: gateway modeli burada AYRICA eklenmez. Eskiden ekleniyordu ve
+  // getAvailableModels()'in kasıtlı elemesini geçersiz kılıyordu; faturası
+  // olmayan gateway her auto isteğinde yeniden deneniyordu.
   const availableModels = getAvailableModels()
-  if (gatewayToken && !availableModels.includes('vercel-qwen-flash')) {
-    availableModels.push('vercel-qwen-flash')
-  }
 
   const routed = routeModelForTask({
     prompt: boundedRequest.prompt,

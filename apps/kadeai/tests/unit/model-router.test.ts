@@ -64,14 +64,46 @@ test('yalnızca Gateway bağlıyken yaratıcı görev ekonomik modele yönlenir'
   assert.deepEqual(result.alternatives, [])
 })
 
-test('Vercel ortamında ekonomik AI Gateway modeli otomatik kullanıma açılır', () => {
-  const previous = process.env.VERCEL
+test('AI Gateway modeli yalnız açık anahtar varken sunulur', () => {
+  // Eskiden Vercel ortamında olmak yeterliydi. Canlıda ölçüldü: OIDC kimliği
+  // çözülüyor olmasına rağmen gateway her istekte
+  // 500 "AI Gateway requires a valid credit card on file" döndürüyordu ve
+  // auto sırasında denendiği için her isteğe saniyeler ekliyordu.
+  // Kimliğin çözülmesi, hesabın o servisi KULLANABİLDİĞİNİ kanıtlamaz.
+  const previousVercel = process.env.VERCEL
+  const previousKey = process.env.AI_GATEWAY_API_KEY
   process.env.VERCEL = '1'
   try {
-    assert.ok(getAvailableModels().includes('vercel-qwen-flash'))
+    delete process.env.AI_GATEWAY_API_KEY
+    assert.equal(getAvailableModels().includes('vercel-qwen-flash'), false, 'anahtarsız sunulmamalı')
+
+    process.env.AI_GATEWAY_API_KEY = 'test-anahtari'
+    assert.equal(getAvailableModels().includes('vercel-qwen-flash'), true, 'anahtar varken sunulmalı')
   } finally {
-    if (previous === undefined) delete process.env.VERCEL
-    else process.env.VERCEL = previous
+    if (previousVercel === undefined) delete process.env.VERCEL
+    else process.env.VERCEL = previousVercel
+    if (previousKey === undefined) delete process.env.AI_GATEWAY_API_KEY
+    else process.env.AI_GATEWAY_API_KEY = previousKey
+  }
+})
+
+test('yanıt vermeyen Gemini sürüm adları kullanıma sunulmaz', () => {
+  // gemini-2.5-flash / -flash-lite ve Pro canlıda 500 donduruyor; bu surum
+  // adlari anahtara acik degil. Listede kalirlarsa hem secicide gorunur hem
+  // auto sirasinda denenip zaman harcarlar.
+  const previous = process.env.GEMINI_API_KEY
+  process.env.GEMINI_API_KEY = 'test-anahtari'
+  try {
+    const models = getAvailableModels()
+    for (const dead of ['gemini-flash', 'gemini-flash-lite', 'gemini']) {
+      assert.equal(models.includes(dead as never), false, `${dead} sunulmamalı`)
+    }
+    for (const alive of ['gemini-flash-latest', 'gemini-lite-latest', 'gemini-3-5-flash', 'gemini-3-1-lite']) {
+      assert.equal(models.includes(alive as never), true, `${alive} sunulmalı`)
+    }
+  } finally {
+    if (previous === undefined) delete process.env.GEMINI_API_KEY
+    else process.env.GEMINI_API_KEY = previous
   }
 })
 
