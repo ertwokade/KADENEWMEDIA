@@ -28,6 +28,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(await sendDailyOperationSummary(), { headers })
   } catch (error) {
     captureApiError(error, '/api/notifications/daily-summary')
-    return NextResponse.json({ error: 'Özet gönderilemedi.' }, { status: 503, headers })
+    // Uç yalnız sahibe açık; sağlayıcının gerçek yanıtını gizlemek teşhisi
+    // imkânsız kılıyordu. Mesaj metni sır içermez (anahtar URL'de kalır).
+    return NextResponse.json({
+      error: 'Özet gönderilemedi.',
+      reason: error instanceof Error ? error.message : String(error),
+    }, { status: 503, headers })
   }
 }
