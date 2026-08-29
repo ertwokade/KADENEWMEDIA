@@ -238,12 +238,18 @@ export default function Sidebar() {
 
         {/* Brand */}
         <div className="kade-sidebar-head relative flex items-center justify-between px-4 py-4 border-b border-zinc-100 flex-shrink-0">
-          <Link href={withBasePath('/dashboard')} className="kade-brand group flex min-w-0 flex-1 items-center gap-3" onClick={() => close()}>
-            <span className="kade-brand-symbol grid h-10 w-10 shrink-0 place-items-center" aria-hidden="true">K/</span>
-            <span className="min-w-0 leading-none">
-              <strong className="kade-brand-title block truncate">KADE AI</strong>
-              <span className="kade-brand-subtitle mt-1.5 block truncate">NEW MEDIA SYSTEM</span>
-            </span>
+          {/* Marka: yazı yerine logo. Logo zaten şimşek + KADE kelimesini
+              içeriyor, bu yüzden ayrıca bir "K/" karesi ve alt başlık
+              tekrarlanmıyor. */}
+          <Link href={withBasePath('/dashboard')} className="kade-brand group flex min-w-0 flex-1 items-center" onClick={() => close()}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={withBasePath('/brand/kade-logo.png')}
+              alt="Kade New Media"
+              width={514}
+              height={180}
+              className="h-9 w-auto max-w-full object-contain object-left"
+            />
           </Link>
           <button onClick={close} aria-label="Menüyü kapat" className="lg:hidden rounded-lg p-2 text-[#aaa79c] transition-colors hover:bg-white/5 hover:text-[#fffdf5]">
             <X className="w-4 h-4" />

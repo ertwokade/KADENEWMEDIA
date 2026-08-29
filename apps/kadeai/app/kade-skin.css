@@ -17,15 +17,19 @@
    İKİNCİL TONLAR (blue/pink/green) araç kategorilerini ayırt etmek içindir,
    marka rengi değildir. */
 :root {
-  --kade-bg: #fdf6e3;
-  --kade-surface: #fbfaf4;
-  --kade-surface-soft: #f3ecd9;
+  /* Zemin ile yüzey arasında GÖRÜNÜR bir basamak olmalı. Önceki değerlerde
+     sayfa #fdf6e3, kart #fbfaf4 idi — neredeyse aynı renk, bu yüzden açık
+     temada kart, form ve alan sınırları birbirine karışıp her şey tek düz
+     krem gibi görünüyordu. Zemin koyulaştırıldı, yüzeyler beyaza çekildi. */
+  --kade-bg: #f1ebda;
+  --kade-surface: #fffefa;
+  --kade-surface-soft: #f7f2e6;
   --kade-surface-raised: #ffffff;
   --kade-ink: #17130a;
   --kade-muted: rgba(23, 19, 10, .72);
   --kade-faint: rgba(23, 19, 10, .62);
-  --kade-line: rgba(23, 19, 10, .12);
-  --kade-line-strong: rgba(23, 19, 10, .28);
+  --kade-line: rgba(23, 19, 10, .17);
+  --kade-line-strong: rgba(23, 19, 10, .34);
   --kade-accent: #e0a81f;
   --kade-accent-strong: #8a5a00;
   --kade-accent-text: #8a5a00;
@@ -76,10 +80,10 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
   --kade-n-300: rgba(23, 19, 10, .82);
   --kade-n-400: rgba(23, 19, 10, .68);
   --kade-n-500: rgba(23, 19, 10, .54);
-  --kade-n-600: #c9c2ae;
-  --kade-n-700: #ded8c9;
-  --kade-n-800: #f0ede3;
-  --kade-n-900: #fffdf6;
+  --kade-n-600: #c2baa4;
+  --kade-n-700: #d9d2c0;
+  --kade-n-800: var(--kade-surface-soft);
+  --kade-n-900: var(--kade-surface);
   --kade-n-950: var(--kade-bg);
 
   /* Vurgu: violet ikinci bir marka rengi gibi davranıyordu; altına bağlandı. */
@@ -203,12 +207,9 @@ html[data-theme='light'] .kade-sidebar {
 .kade-panel .kade-sidebar-head { min-height: 73px; }
 .kade-panel .kade-brand { color: var(--kade-ink) !important; }
 .kade-panel .kade-brand:hover { background: transparent !important; }
-.kade-panel .kade-brand-symbol {
-  border: 1px solid var(--kade-ink); border-radius: 0 !important; background: var(--kade-accent) !important; color: var(--kade-on-accent) !important;
-  box-shadow: 5px 5px 0 var(--kade-ink) !important; font-size: 12px; font-weight: 700; letter-spacing: -.05em;
-}
-.kade-panel .kade-brand-title { color: var(--kade-ink); font-size: 16px; font-weight: 700; letter-spacing: -.045em; }
-.kade-panel .kade-brand-subtitle, .kade-panel .kade-sidebar-kicker { color: var(--kade-faint); font-size: 8px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+/* kade-brand-symbol / -title / -subtitle kuralları kaldırıldı: marka artık
+   yazı değil logo. -kicker ("ÇALIŞMA ALANI" gibi bölüm başlıkları) duruyor. */
+.kade-panel .kade-sidebar-kicker { color: var(--kade-faint); font-size: 8px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
 .kade-panel aside.kade-sidebar .kade-sidebar-search {
   height: 40px; border: 0 !important; border-bottom: 1px solid var(--kade-line-strong) !important; border-radius: 0 !important;
   background: transparent !important; color: var(--kade-ink) !important;
@@ -268,11 +269,22 @@ html[data-theme='light'] .kade-sidebar {
 .kade-panel .kade-main button { border-radius: 0 !important; }
 .kade-panel .bg-\[\#f2c322\] { background: var(--kade-accent) !important; color: var(--kade-on-accent) !important; box-shadow: none !important; }
 .kade-panel .bg-\[\#f2c322\]:hover { background: var(--kade-ink) !important; color: var(--kade-bg) !important; }
-.kade-panel .kade-main .overflow-y-auto > .gap-5 { width: min(100%, 1480px); margin-inline: auto; }
+/* İçerik genişliği: 1480px'te form solda küçük kalıp sağda geniş bir boşluk
+   oluşuyordu. Okunur bir tavana çekildi. */
+.kade-panel .kade-main .overflow-y-auto > .gap-5 { width: min(100%, 1180px); margin-inline: auto; }
 .kade-panel .kade-main form label { color: var(--kade-muted) !important; font-weight: 600; }
 @media (min-width: 1024px) {
-  .kade-panel .kade-main .lg\:flex-row > .lg\:w-80 { width: clamp(23rem, 29vw, 27rem) !important; }
-  .kade-panel .kade-main .lg\:flex-row > .lg\:w-80 > form, .kade-panel .kade-main .lg\:flex-row > .lg\:w-80 > .space-y-4, .kade-panel .kade-main .lg\:flex-row > .flex-1.min-w-0 { border: 1px solid var(--kade-line); border-radius: 0; background: color-mix(in srgb, var(--kade-surface) 84%, transparent); padding: 1.35rem; box-shadow: none; }
+  .kade-panel .kade-main .lg\:flex-row > .lg\:w-80 { width: clamp(20rem, 27vw, 23rem) !important; }
+  /* Kart yalnız FORM sütununa verilir. Sonuç sütunu da kart alınca, sonuç
+     yokken sayfanın yarısı kocaman boş bir çerçeve oluyordu; sonuçlar zaten
+     kendi kartlarıyla geliyor, kutu içinde kutu gerekmiyor. */
+  .kade-panel .kade-main .lg\:flex-row > .lg\:w-80 > form,
+  .kade-panel .kade-main .lg\:flex-row > .lg\:w-80 > .space-y-4 {
+    border: 1px solid var(--kade-line-strong); border-radius: 0;
+    background: var(--kade-surface); padding: 1.35rem; box-shadow: none;
+  }
+  /* Sonuç sütunu: çerçevesiz, sadece hizalama. */
+  .kade-panel .kade-main .lg\:flex-row > .flex-1.min-w-0 { padding: 0; border: 0; background: none; }
 }
 
 /* Dashboard hero */
