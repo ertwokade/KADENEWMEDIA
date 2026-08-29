@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       model: model as AIModel,
       systemPrompt: YOUTUBE_SEO_SYSTEM_PROMPT,
       maxTokens: 2500,
-    })
+    }, req)
 
     const seo = parseStructuredOutput(result.content)
 

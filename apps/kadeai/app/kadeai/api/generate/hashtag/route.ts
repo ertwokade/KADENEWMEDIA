@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       model,
       systemPrompt: SYSTEM_PROMPTS.hashtagExpert,
       maxTokens: 2000,
-    })
+    }, req)
 
     let hashtags: { yuksek: string[]; orta: string[]; dusuk: string[]; niche: string[] } = {
       yuksek: [], orta: [], dusuk: [], niche: [],

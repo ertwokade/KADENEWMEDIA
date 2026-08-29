@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       model: model as AIModel,
       systemPrompt: BIO_LINK_SYSTEM_PROMPT,
       maxTokens: 2500,
-    })
+    }, req)
 
     const bio = parseStructuredOutput(result.content)
 

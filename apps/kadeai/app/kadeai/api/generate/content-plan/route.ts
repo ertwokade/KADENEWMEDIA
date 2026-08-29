@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       model: model as AIModel,
       systemPrompt: CONTENT_PLAN_SYSTEM_PROMPT,
       maxTokens: 8000,
-    })
+    }, req)
 
     const plan = parseStructuredOutput(result.content)
 

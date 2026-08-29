@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       maxTokens: 2000,
       systemPrompt: 'Sen sosyal medya performans analistisin. Yalnızca verilen metriklerden çıkarım yap, olmayan veriyi uydurma ve yanıtını sadece geçerli JSON olarak ver.',
       prompt: `Platform: ${platform}\nNiş: ${niche}\nMetrikler:\n${metricLines.join('\n')}\n\nBu hesabın performansını analiz et. Platform ve niş bağlamına göre güçlü alanları, sorunları ve ölçülebilir sonraki adımları üret.\nJSON: {"genel_durum":"2-3 cümlelik kanıta dayalı özet","guclu_metrikler":[{"metrik":"","yorum":""}],"iyilestirme_alanlari":[{"metrik":"","sorun":"","oneri":""}],"oncelikli_aksiyonlar":["somut aksiyon"],"hedef_metrikler":{"metrik adı":"gerçekçi hedef aralığı"},"buyume_stratejisi":"önümüzdeki 30 gün için ölçülebilir iyileştirme planı","icerik_stratejisi":"platforma ve nişe uygun içerik önerisi"}`,
-    })
+    }, req)
 
     return NextResponse.json({
       analysis: parseStructuredOutput(result.content),

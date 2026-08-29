@@ -1,6 +1,7 @@
 import { getAuthenticatedUser } from '@/lib/auth/server'
 import { isSettingsOwnerUser } from '@/lib/featureAccess'
 import { getVercelGatewayToken, VERCEL_GATEWAY_STATUS_KEY } from '@/lib/ai/gatewayAuth'
+import { whatsappConfiguration } from '@/lib/notifications/whatsappConfig'
 
 const COMMON_ENV_KEYS = [
   'AI_GATEWAY_API_KEY',
@@ -20,7 +21,9 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   const user = await getAuthenticatedUser()
-  if (!user) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
+  if (!user) return Response.json({
+    // Deger DEGIL, yalnizca yapilandirilmis olup olmadigi.
+    WHATSAPP: whatsappConfiguration().configured, error: 'Oturum gerekli.' }, { status: 401 })
   if (!isSettingsOwnerUser(user)) {
     return Response.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
   }

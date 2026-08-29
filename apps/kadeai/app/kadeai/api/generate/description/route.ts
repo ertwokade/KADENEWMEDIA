@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       model,
       systemPrompt: SYSTEM_PROMPTS.descriptionWriter,
       maxTokens: 2500,
-    })
+    }, req)
 
     return NextResponse.json({ description: result.content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {

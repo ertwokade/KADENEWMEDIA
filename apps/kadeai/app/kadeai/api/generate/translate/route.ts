@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       model,
       systemPrompt: DUBBING_SYSTEM_PROMPT,
       maxTokens: 3000,
-    })
+    }, req)
 
     let translation: Record<string, unknown> = {}
     try {

@@ -41,7 +41,7 @@ Bu içeriği analiz et.
 - Platforma göre düzeltme reçetesi
 - Revize hook ve revize akış önerisi
 - 100 üzerinden retention skoru`,
-    })
+    }, req)
 
     return NextResponse.json(
       { content: result.content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed },

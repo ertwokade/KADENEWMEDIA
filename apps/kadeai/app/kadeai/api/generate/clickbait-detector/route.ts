@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       model: model as AIModel,
       systemPrompt: CLICKBAIT_SYSTEM_PROMPT,
       maxTokens: 2000,
-    })
+    }, req)
 
     const parsed = extractJsonObject(result.content)
     const data = parsed ? normalizeClickbait(parsed, title) : null

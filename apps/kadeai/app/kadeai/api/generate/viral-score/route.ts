@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       model,
       systemPrompt: SYSTEM_PROMPTS.viralScoreAnalyst,
       maxTokens: 2500,
-    })
+    }, req)
 
     const parsed = extractJsonObject(result.content)
     const analysis = parsed ? normalizeAnalysis(parsed, title) : null

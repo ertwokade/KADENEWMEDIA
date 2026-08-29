@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       model,
       systemPrompt: SYSTEM_PROMPTS.hookGenerator,
       maxTokens: 2500,
-    })
+    }, req)
 
     const parsed = extractJsonArray<unknown[]>(result.content)
     const validated = Array.isArray(parsed) ? parsed.flatMap((item) => {

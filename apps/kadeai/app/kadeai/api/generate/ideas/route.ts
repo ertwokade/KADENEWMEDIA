@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       model,
       systemPrompt: IDEAS_SYSTEM_PROMPT,
       maxTokens: 4000,
-    })
+    }, req)
 
     let ideas: Array<{ baslik: string; aciklama: string; tip: string; viral_neden: string; zorluk: string }> = []
     try {

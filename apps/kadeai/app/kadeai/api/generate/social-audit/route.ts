@@ -64,7 +64,7 @@ Verilen metriklerde bulunuyorsa takipçi büyümesi, gösterim, erişim, etkile�
 8. 30 günlük içerik takvimi
 9. Satışa bağlanacak teklif/CTA önerileri
 10. En öncelikli 5 görev`,
-    })
+    }, req)
 
     return NextResponse.json(
       {

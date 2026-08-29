@@ -283,6 +283,15 @@ html[data-theme='light'] .kade-sidebar {
     border: 1px solid var(--kade-line-strong); border-radius: 0;
     background: var(--kade-surface); padding: 1.35rem; box-shadow: none;
   }
+  /* Sonuç YOKKEN form sola yapisik kalip sagda genis bir bosluk biraktiyordu.
+     Bos durum kutusu (.h-64) varsa satir daraltilip ortalanir; sonuc gelince
+     kural dusar ve tam genislige geri doner. :has() desteklemeyen tarayicida
+     davranis eskisi gibi kalir, bozulma olmaz. */
+  .kade-panel .kade-main .lg\:flex-row:has(> .flex-1.min-w-0 > .h-64) {
+    max-width: 62rem;
+    margin-inline: auto;
+  }
+
   /* Sonuç sütunu: çerçevesiz, sadece hizalama. */
   .kade-panel .kade-main .lg\:flex-row > .flex-1.min-w-0 { padding: 0; border: 0; background: none; }
 }

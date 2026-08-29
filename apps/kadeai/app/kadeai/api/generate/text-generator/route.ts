@@ -37,7 +37,7 @@ Bu bilgilerle kullanıma hazır Türkçe metin üret.
 2. Kısa alternatif başlık/hook seçenekleri
 3. CTA önerileri
 4. Yayınlamadan önce kontrol listesi`,
-    })
+    }, req)
 
     return NextResponse.json(
       { content: result.content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed },

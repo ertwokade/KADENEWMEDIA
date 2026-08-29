@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       model: model as AIModel,
       systemPrompt: COMPETITOR_SYSTEM_PROMPT,
       maxTokens: 3000,
-    })
+    }, req)
 
     const analysis = parseStructuredOutput(result.content)
 

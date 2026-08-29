@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
   try {
     const { topic, niche, platforms, count, model } = await req.json()
     if (!topic || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
-    const result = await generateContent({ prompt: buildBulkPrompt(topic, niche || '', platforms || ['instagram','youtube','tiktok'], count || 5), model: model as AIModel, systemPrompt: BULK_SYSTEM_PROMPT, maxTokens: 4000 })
+    const result = await generateContent({ prompt: buildBulkPrompt(topic, niche || '', platforms || ['instagram','youtube','tiktok'], count || 5), model: model as AIModel, systemPrompt: BULK_SYSTEM_PROMPT, maxTokens: 4000 }, req)
     const selectedPlatforms = Array.isArray(platforms) && platforms.length > 0 ? platforms : ['instagram', 'youtube', 'tiktok']
     const data = normalizeBulkOutput(parseStructuredOutput(result.content), selectedPlatforms)
     return NextResponse.json({ data, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })

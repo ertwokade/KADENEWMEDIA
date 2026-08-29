@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       maxTokens: 3000,
       systemPrompt: CLIP_EXTRACTION_SYSTEM_PROMPT,
       prompt: buildClipExtractionPrompt(transcript, videoDuration),
-    })
+    }, req)
     const raw = result.content
 
     let clips: Omit<ClipSuggestion, 'words'>[] = []

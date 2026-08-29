@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       model: model as AIModel,
       systemPrompt: THREAD_SYSTEM_PROMPT,
       maxTokens: 4000,
-    })
+    }, req)
 
     const thread = parseStructuredOutput(result.content)
 
