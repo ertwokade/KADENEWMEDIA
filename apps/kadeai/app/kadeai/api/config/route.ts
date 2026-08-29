@@ -17,10 +17,11 @@ export async function GET(request: Request) {
   let settingsAccess = false
   const gatewayToken = await getVercelGatewayToken(request)
   const aiGateway = Boolean(gatewayToken)
+  // Gateway modeli burada AYRICA eklenmez: getAvailableModels() onu bilerek
+  // eliyor (açık AI_GATEWAY_API_KEY yoksa hesap gateway'i kullanamıyor ve
+  // istek 500 dönüyor). Buradaki kopya eleme kuralını geçersiz kılıyor,
+  // seçicide yanıt veremeyen bir model gösteriyordu.
   const availableModels = getAvailableModels()
-  if (gatewayToken && !availableModels.includes('vercel-qwen-flash')) {
-    availableModels.push('vercel-qwen-flash')
-  }
   if (configured('NEXT_PUBLIC_SUPABASE_URL') && configured('NEXT_PUBLIC_SUPABASE_ANON_KEY')) {
     try {
       const supabase = await createClient()
