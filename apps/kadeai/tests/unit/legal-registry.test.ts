@@ -21,3 +21,13 @@ test('bilinmeyen slug için spec dönmez', () => {
   assert.equal(getLegalSpec('uydurma-metin'), undefined)
   assert.ok(getLegalSpec('mesafeli-satis'))
 })
+
+test('ana sitede yayında olan metinler ödeme onayı gerektirenlerle karışmaz', () => {
+  // Panelde "eksik" sayılmayacak olanlar yalnız checkoutConsent=false olanlar;
+  // mesafeli satış / ön bilgilendirme / iade sürümlenmiş olmak ZORUNDA.
+  const mainSite = LEGAL_DOCUMENTS.filter((d) => d.existingPath && !d.checkoutConsent)
+  assert.equal(mainSite.length, 4)
+  for (const document of LEGAL_DOCUMENTS.filter((d) => d.checkoutConsent)) {
+    assert.equal(document.existingPath, undefined, `${document.slug} ana siteye devredilemez`)
+  }
+})

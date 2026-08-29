@@ -101,12 +101,18 @@ export async function GET(request: NextRequest) {
     let totalCostUsd = 0
     let unpricedRequests = 0
     let byokRequests = 0
+    // Hangi modellerin fiyatı bilinmiyor? "Bir şeyler eksik" demek yerine
+    // doldurulmaya hazır bir iskelet üretebilmek için toplanıyor.
+    const unpricedModels = new Set<string>()
 
     for (const row of rows) {
       const tokens = Number(row.total_tokens) || 0
       const cost = row.cost_usd === null || row.cost_usd === undefined ? null : Number(row.cost_usd)
       totalTokens += tokens
-      if (cost === null) unpricedRequests += 1
+      if (cost === null) {
+        unpricedRequests += 1
+        unpricedModels.add(row.model)
+      }
       else totalCostUsd += cost
       if (row.byok) byokRequests += 1
 
@@ -167,6 +173,11 @@ export async function GET(request: NextRequest) {
         .sort((a, b) => b.amountMinor - a.amountMinor),
       rates: listModelRates(),
       ratesReviewedAt: RATES_REVIEWED_AT,
+      unpricedModels: [...unpricedModels].sort(),
+      // AI_MODEL_RATES_JSON'a olduğu gibi yapıştırılıp iki sayı doldurulur.
+      unpricedTemplate: unpricedModels.size
+        ? JSON.stringify(Object.fromEntries([...unpricedModels].sort().map((model) => [model, { in: 0, out: 0 }])))
+        : null,
     }, { headers })
   } catch (error) {
     captureApiError(error, '/api/admin/usage#get')

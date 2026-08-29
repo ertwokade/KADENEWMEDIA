@@ -22,6 +22,7 @@ interface DocumentStatus {
   version: number | null
   updatedAt: string | null
   hasBody: boolean
+  coveredByMainSite: boolean
 }
 
 interface DocumentRow {
@@ -113,7 +114,10 @@ export default function LegalDocuments() {
     }
   }
 
-  const missing = documents.filter((document) => !document.published)
+  // Ana sitede yayında olan metinler eksik sayılmaz; sayacın 0/13 demesi
+  // yanıltıcıydı.
+  const covered = documents.filter((document) => document.published || document.coveredByMainSite)
+  const missing = documents.filter((document) => !document.published && !document.coveredByMainSite)
 
   return (
     <div className="space-y-5">
@@ -138,7 +142,10 @@ export default function LegalDocuments() {
       {loading ? <p className="text-sm text-zinc-500">Durum okunuyor…</p> : (
         <section className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
           <h3 className="text-sm font-semibold text-zinc-100">
-            Zorunlu metinler <span className="ml-1 text-xs font-normal text-zinc-500">{documents.length - missing.length}/{documents.length} yayında</span>
+            Zorunlu metinler{' '}
+            <span className="ml-1 text-xs font-normal text-zinc-500">
+              {covered.length}/{documents.length} hazır · {missing.length} eksik
+            </span>
           </h3>
           <ul className="mt-3 space-y-1.5">
             {documents.map((document) => (
@@ -147,7 +154,7 @@ export default function LegalDocuments() {
                   onClick={() => void openDocument(document.slug)}
                   className={`flex w-full items-start gap-2 rounded-lg border p-2.5 text-left transition ${selected === document.slug ? 'border-violet-500/50 bg-violet-500/5' : 'border-zinc-800 hover:border-zinc-700'}`}
                 >
-                  {document.published
+                  {document.published || document.coveredByMainSite
                     ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
                     : <CircleDashed className="mt-0.5 h-4 w-4 shrink-0 text-zinc-600" />}
                   <span className="min-w-0">

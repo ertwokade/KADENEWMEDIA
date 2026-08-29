@@ -44,6 +44,8 @@ interface UsageReport {
   revenueByProduct?: Array<{ key: string; amountMinor: number }>
   rates?: Array<{ model: string; in: number; out: number }>
   ratesReviewedAt?: string
+  unpricedModels?: string[]
+  unpricedTemplate?: string | null
 }
 
 const WINDOWS = [7, 30, 90] as const
@@ -146,8 +148,21 @@ export default function CostPanel() {
 
               {totals.unpricedRequests > 0 && (
                 <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-xs leading-5 text-amber-200">
-                  {totals.unpricedRequests} çağrının modeli fiyat tablosunda yok. Maliyet olduğundan
-                  düşük görünüyor; eksik modeller için <code className="font-mono">AI_MODEL_RATES_JSON</code> tanımlanabilir.
+                  <p>
+                    {totals.unpricedRequests} çağrının modeli fiyat tablosunda yok
+                    {report.unpricedModels?.length ? `: ${report.unpricedModels.join(', ')}` : ''}.
+                    Maliyet olduğundan düşük görünüyor.
+                  </p>
+                  {report.unpricedTemplate && (
+                    <>
+                      <p className="mt-2">
+                        Sağlayıcının fiyat sayfasından 1M token başına USD değerlerini yaz ve
+                        <code className="mx-1 font-mono">AI_MODEL_RATES_JSON</code>
+                        ortam değişkenine bu satırı koy — deploy gerekmez, bir sonraki okumada devreye girer:
+                      </p>
+                      <pre className="mt-2 overflow-x-auto rounded bg-zinc-950 p-2 font-mono text-[11px] text-zinc-300">{report.unpricedTemplate}</pre>
+                    </>
+                  )}
                 </div>
               )}
 

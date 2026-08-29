@@ -21,6 +21,13 @@ export interface LegalDocumentStatus extends LegalDocumentSpec {
   version: number | null
   updatedAt: string | null
   hasBody: boolean
+  /**
+   * Metin ana sitede zaten yayında mı? Bu dördü (KVKK, Gizlilik, Çerez,
+   * Telif) KadeAI'den önce yayımlanmıştı; panelde "eksik" görünmeleri
+   * yanıltıcıydı. Ödeme öncesi onay gerektiren metinler bunun kapsamında
+   * DEĞİL — onlar sürümlenmiş olmak zorunda, bkz. legal_consents.
+   */
+  coveredByMainSite: boolean
 }
 
 async function fetchAll(): Promise<LegalDocumentRow[]> {
@@ -46,6 +53,7 @@ export async function getLegalStatus(): Promise<LegalDocumentStatus[]> {
       version: row?.version ?? null,
       updatedAt: row?.updated_at ?? null,
       hasBody: Boolean(row?.body?.trim()),
+      coveredByMainSite: Boolean(spec.existingPath) && !spec.checkoutConsent,
     }
   })
 }
