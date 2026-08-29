@@ -495,6 +495,38 @@ async function generateWithByok(req: GenerateRequest, userId: string): Promise<G
 const PROVIDER_COOLDOWN_MS = 5 * 60_000
 const recentProviderFailures = new Map<string, number>()
 
+/**
+ * Bir adaya ayrılan üst süre.
+ *
+ * Yukarıdaki hafıza tek başına yetmedi: trafik düşük olduğu için neredeyse her
+ * istek soğuk başlıyor ve bellek hep boş geliyor. Ölçüm: yanıt vermeyen ilk
+ * aday yedeğe düşmeden önce ~125 saniye harcıyordu, çünkü sağlayıcı zinciri
+ * iç içe 25 sn'lik timeout'lar barındırıyor.
+ *
+ * Bu sınır soğuk başlangıçtan bağımsız çalışır: kötü aday sabit bir bedelle
+ * elenir, sıradaki aday denenir. Gemini'nin sağlıklı yanıt süresi ölçümde
+ * 4 saniyeydi, 15 saniye rahat bir tavan.
+ */
+const CANDIDATE_TIMEOUT_MS = 15_000
+
+/**
+ * `promise`i süreyle sınırlar. Zaman aşımında altta koşan istek iptal
+ * EDİLMEZ — sonucu artık beklenmez. Amaç kullanıcıyı bekletmemek.
+ */
+async function withCandidateTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`Sağlayıcı ${ms / 1000} sn içinde yanıt vermedi.`)), ms)
+      }),
+    ])
+  } finally {
+    if (timer) clearTimeout(timer)
+  }
+}
+
 function isProviderCoolingDown(model: string) {
   const failedAt = recentProviderFailures.get(model)
   if (!failedAt) return false
@@ -649,7 +681,11 @@ async function runGeneration(
   let lastError: unknown
   for (const [index, model] of candidates.entries()) {
     try {
-      const result = await generateWithResolvedModel({ ...enrichedRequest, model }, gatewayToken)
+      // Son adayda sınır uygulanmaz: elde başka seçenek yokken erken vazgeçip
+      // kullanıcıyı boş döndürmektense sağlayıcının kendi süresini bekle.
+      const isLastCandidate = index === candidates.length - 1
+      const attempt = generateWithResolvedModel({ ...enrichedRequest, model }, gatewayToken)
+      const result = isLastCandidate ? await attempt : await withCandidateTimeout(attempt, CANDIDATE_TIMEOUT_MS)
       markProviderHealthy(model)
       const routingReason = index === 0
         ? routed.reason
