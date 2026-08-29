@@ -5,6 +5,7 @@ import { signInWithAdminCredentials } from '@/lib/auth/adminBridge'
 import { isLoginIdentifier } from '@/lib/auth/adminIdentity'
 import { getSignupPasswordError, mapSignupProviderError } from '@/lib/auth/passwordPolicy'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
+import { notifyOperation } from '@/lib/notifications/operationFeed'
 
 export const dynamic = 'force-dynamic'
 
@@ -130,6 +131,13 @@ export async function POST(request: NextRequest) {
         error: 'Hesap oluşturma işlemi doğrulanamadı. Lütfen kısa süre sonra tekrar deneyin.',
       }, { status: 503, headers })
     }
+
+    void notifyOperation({
+      kind: 'signup',
+      title: email,
+      detail: data.session ? 'Hesap açıldı' : 'Doğrulama e-postası bekleniyor',
+      userId: data.user.id,
+    })
 
     return NextResponse.json({
       ok: true,

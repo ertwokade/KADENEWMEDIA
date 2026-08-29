@@ -3,6 +3,7 @@ import 'server-only'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { captureServerAnalytics } from '@/lib/analytics/server'
 import { recordAuditEvent } from '@/lib/audit/server'
+import { notifyOperation } from '@/lib/notifications/operationFeed'
 
 /**
  * Abonelik yaşam döngüsü süpürücüsü.
@@ -57,6 +58,12 @@ export async function sweepExpiredEntitlements(): Promise<SweepResult> {
     // gönderimi rıza olmadan çalışmaz, bu yüzden consent=false geçilir ve
     // olay yalnızca audit trail'e yazılır.
     void captureServerAnalytics('churn', userId, false)
+    void notifyOperation({
+      kind: 'subscription_churned',
+      title: 'Abonelik yenilenmedi',
+      detail: 'Süresi doldu, yeni yetki yok',
+      userId,
+    })
     void recordAuditEvent({
       actorUserId: userId,
       action: 'subscription.churned',

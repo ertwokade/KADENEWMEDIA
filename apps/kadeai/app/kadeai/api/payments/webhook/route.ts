@@ -7,6 +7,7 @@ import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
 import { captureServerAnalytics } from '@/lib/analytics/server'
 import { recordAuditEvent } from '@/lib/audit/server'
+import { notifyOperation } from '@/lib/notifications/operationFeed'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,11 +55,23 @@ async function ensureEntitlement(admin: ReturnType<typeof createAdminClient>, or
 
     void captureServerAnalytics('checkout_completed', order.user_id, consented)
     void captureServerAnalytics('subscription_activated', order.user_id, consented)
+    void notifyOperation({
+      kind: 'subscription_activated',
+      title: order.product_id,
+      detail: grant.tierChange === 'upgrade' ? 'Yükseltme' : grant.tierChange === 'downgrade' ? 'Düşürme' : 'Yeni abonelik',
+      userId: order.user_id,
+    })
     // Paket yönü: yükseltme/düşürme ayrımı ürün kararları için gerekli.
     if (grant.tierChange === 'upgrade') void captureServerAnalytics('upgrade', order.user_id, consented)
     if (grant.tierChange === 'downgrade') void captureServerAnalytics('downgrade', order.user_id, consented)
   } catch (grantError) {
     captureApiError(grantError, '/api/payments/webhook#grant')
+    void notifyOperation({
+      kind: 'error',
+      title: 'Ödeme alındı ama paket açılamadı',
+      detail: `Sipariş ${order.id} · ${order.product_id}`,
+      userId: order.user_id,
+    })
     void recordAuditEvent({
       actorUserId: order.user_id,
       action: 'entitlement.grant_failed',
@@ -142,6 +155,12 @@ export async function POST(request: NextRequest) {
       if (event.status === 'paid') await ensureEntitlement(admin, order)
       const analyticsEvent = event.status === 'paid' ? 'payment_completed' : 'payment_failed'
       void captureServerAnalytics(analyticsEvent, order.user_id, order.analytics_consent === true)
+      void notifyOperation({
+        kind: event.status === 'paid' ? 'payment_completed' : 'payment_failed',
+        title: order.product_id,
+        detail: `${(order.amount_minor / 100).toLocaleString('tr-TR')} ${order.currency}`,
+        userId: order.user_id,
+      })
     }
     return NextResponse.json({ ok: true, duplicate: false }, { headers })
   } catch (error) {

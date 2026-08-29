@@ -8,6 +8,7 @@ import { generateMockContent } from '@/lib/ai/mockProvider'
 import { getActiveEntitlement } from '@/lib/payments/access'
 import { getUserProviderKey, type UserKeyProvider } from '@/lib/ai/userProviderKeys'
 import { recordAiUsage, getUserUsageSummary } from '@/lib/usage/ledger'
+import { notifyOperation } from '@/lib/notifications/operationFeed'
 import { isTokenQuotaEnforced, FREE_TIER, type LimitTier } from '@/lib/payments/limits'
 
 function hasEnv(name: string) {
@@ -605,9 +606,16 @@ export async function generateContent(req: GenerateRequest, request?: Request): 
 
   if (user) {
     const config = getModelConfig(result.model)
+    const tool = toolNameFromRequest(request)
+    void notifyOperation({
+      kind: 'tool_used',
+      title: tool,
+      detail: `${result.model}${result.tokensUsed ? ` · ${result.tokensUsed} token` : ''}`,
+      userId: user.id,
+    })
     void recordAiUsage({
       userId: user.id,
-      tool: toolNameFromRequest(request),
+      tool,
       model: result.model,
       provider: config.provider,
       tier,

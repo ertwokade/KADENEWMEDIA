@@ -147,6 +147,10 @@
     {
       "path": "/kadeai/api/subscriptions/sweep",
       "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/kadeai/api/notifications/daily-summary",
+      "schedule": "0 20 * * *"
     }
   ]
 }

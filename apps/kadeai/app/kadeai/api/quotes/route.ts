@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { assertAuthenticatedUser } from '@/lib/auth/server'
 import { createQuoteRequest, listOwnQuoteRequests, QuoteValidationError, validateQuoteInput } from '@/lib/quotes/kadeaiQuotes'
 import { recordAuditEvent } from '@/lib/audit/server'
+import { notifyOperation } from '@/lib/notifications/operationFeed'
 import { captureApiError } from '@/lib/observability/server'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 
@@ -45,6 +46,12 @@ export async function POST(request: NextRequest) {
       resourceType: 'kadeai_quote_request',
       resourceId: quote.id,
       metadata: { apiNeeded: quote.api_needed },
+    })
+    void notifyOperation({
+      kind: 'quote_requested',
+      title: `${quote.first_name} ${quote.last_name}${quote.company ? ` · ${quote.company}` : ''}`,
+      detail: `${quote.email}${quote.team_size ? ` · ${quote.team_size} kişi` : ''}${quote.api_needed ? ' · API istiyor' : ''}`,
+      userId: user.id,
     })
     return NextResponse.json({ quote }, { status: 201, headers })
   } catch (error) {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "expectedCount": 227,
+  "expectedCount": 228,
   "generatedFrom": "Kade Media full-site audit inventory",
   "routes": [
     {
@@ -1451,6 +1451,21 @@
       "implemented": true,
       "expectedStatus": 200,
       "testPath": "/kadeai/api/materials/sync"
+    },
+    {
+      "route": "/kadeai/api/notifications/daily-summary",
+      "type": "api",
+      "app": "kadeai",
+      "methods": [
+        "GET"
+      ],
+      "access": "private",
+      "roles": [
+        "owner"
+      ],
+      "implemented": true,
+      "expectedStatus": 200,
+      "testPath": "/kadeai/api/notifications/daily-summary"
     },
     {
       "route": "/kadeai/api/operations-report",

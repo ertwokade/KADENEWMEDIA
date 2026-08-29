@@ -8,6 +8,7 @@ import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
 import { captureServerAnalytics } from '@/lib/analytics/server'
 import { getRequiredCheckoutDocuments, recordLegalConsents } from '@/lib/legal/server'
+import { notifyOperation } from '@/lib/notifications/operationFeed'
 
 export const dynamic = 'force-dynamic'
 
@@ -91,6 +92,12 @@ export async function POST(request: NextRequest) {
     // Onay kanıtı siparişe bağlanır; metin sürümüyle birlikte saklanır.
     void recordLegalConsents({ userId: user.id, orderId, documents: requiredDocuments })
     void captureServerAnalytics('payment_started', user.id, analyticsConsent)
+    void notifyOperation({
+      kind: 'checkout_started',
+      title: product.name,
+      detail: `${(product.amountMinor / 100).toLocaleString('tr-TR')} ${product.currency} · ${user.email ?? user.id}`,
+      userId: user.id,
+    })
     return NextResponse.json({ orderId, checkoutUrl: checkout.checkoutUrl, provider: provider.name }, { status: 201, headers })
   } catch (error) {
     captureApiError(error, '/api/payments/checkout')
