@@ -21,9 +21,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   const user = await getAuthenticatedUser()
-  if (!user) return Response.json({
-    // Deger DEGIL, yalnizca yapilandirilmis olup olmadigi.
-    WHATSAPP: whatsappConfiguration().configured, error: 'Oturum gerekli.' }, { status: 401 })
+  if (!user) return Response.json({ error: 'Oturum gerekli.' }, { status: 401 })
   if (!isSettingsOwnerUser(user)) {
     return Response.json({ error: 'Bu alan yalnızca hesap sahibine açıktır.' }, { status: 403 })
   }
@@ -32,6 +30,9 @@ export async function GET(request: Request) {
     COMMON_ENV_KEYS.map((key) => [key, Boolean(process.env[key]?.trim())])
   )
   status[VERCEL_GATEWAY_STATUS_KEY] = Boolean(await getVercelGatewayToken(request))
+  // Değer DEĞİL, yalnızca yapılandırılmış olup olmadığı. Bildirim gitmediğinde
+  // sebebini dışarıdan görebilmek için.
+  status.WHATSAPP = whatsappConfiguration().configured
 
   return Response.json(status, {
     headers: {
