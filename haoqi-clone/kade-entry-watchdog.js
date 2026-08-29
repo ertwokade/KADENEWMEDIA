@@ -49,6 +49,45 @@
     root.setAttribute('data-kade-loaded', '');
   }
 
+
+  /* İKİNCİ EMNİYET AĞI: satır içi opacity:0 ile donup kalan içerik
+     ---------------------------------------------------------------------
+     Anlık görüntü, kaynak sitenin animasyon ÖNCESİ halini taşıyor: anasayfada
+     30 eleman style="opacity:0" ile geliyor ve kaynak sitenin kendi JS'i
+     bunları açıyor. Marka katmanı bu elemanların içine Kade metnini yazıyor,
+     ama açma animasyonu o elemanlarda tetiklenmediğinde metin DOM'da durduğu
+     hâlde hiç görünmüyor — anasayfa boş geliyordu.
+     Yukarıdaki watchdog yalnız yükleme çubuğunu kurtarıyor, bunu değil.
+     Burada sayfa oturduktan sonra hâlâ tam 0'da kalanların opaklığı
+     bırakılıyor. Animasyon sonradan çalışırsa kendi değerini yazar. */
+  var REVEAL_AFTER_MS = 2500;
+  var REVEAL_ATTEMPTS = 4;
+  var REVEAL_GAP_MS = 1200;
+
+  function releaseFrozenOpacity() {
+    var nodes = document.querySelectorAll('[style*="opacity"]');
+    var freed = 0;
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      /* Tam 0 olmayanlara dokunma: animasyon çalışıyor demektir. */
+      if (el.style.opacity !== '0') continue;
+      el.style.removeProperty('opacity');
+      freed++;
+    }
+    return freed;
+  }
+
+  function scheduleReveal() {
+    var attempt = 0;
+    (function tick() {
+      releaseFrozenOpacity();
+      if (++attempt < REVEAL_ATTEMPTS) setTimeout(tick, REVEAL_GAP_MS);
+    })();
+  }
+
+  if (document.readyState === 'complete') setTimeout(scheduleReveal, REVEAL_AFTER_MS);
+  else window.addEventListener('load', function () { setTimeout(scheduleReveal, REVEAL_AFTER_MS); });
+
   document.addEventListener('visibilitychange', function () {
     /* Coming back to a throttled tab: give the real render loop a chance to
        finish the entry animation on its own before overriding it. */
