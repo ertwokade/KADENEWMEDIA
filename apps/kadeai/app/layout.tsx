@@ -76,11 +76,13 @@ export const metadata: Metadata = {
       { url: '/favicon.png', sizes: '512x512', type: 'image/png' },
     ],
     shortcut: '/favicon.ico',
-    apple: [{ url: '/favicon.png', sizes: '512x512', type: 'image/png' }],
+    // 180x180: iOS'un beklediği boyut. Önceden 512'lik dosya 180 diye
+    // bildiriliyordu; ana site tarafında da aynı hata vardı.
+    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   other: {
     'mobile-web-app-capable': 'yes',
-    'msapplication-TileColor': '#f7f9fc',
+    'msapplication-TileColor': '#11110f',
     'msapplication-TileImage': withBasePath('/icons/icon-192.png'),
   },
 }
