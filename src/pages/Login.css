@@ -3,7 +3,7 @@
    burada yalnız bu ekranın form bileşenleri var.
 
    Düzen: tam genişlik HUD + ortalanmış tek sütun + künye satırı. Aynı iskelet
-   KadeAI girişinde de (apps/kadeai/app/kade-skin.css) kullanılır; iki kapı
+   KadexAI girişinde de (apps/kadexai/app/kade-skin.css) kullanılır; iki kapı
    arka arkaya görüldüğü için birebir aynı yapıda duruyorlar. */
 
 .gate-auth {
@@ -167,7 +167,7 @@
   color: var(--gate-faint) !important;
 }
 
-/* Odak: sert kenar + kaydırılmış vurgu bloğu. Aynı jest KadeAI panelindeki
+/* Odak: sert kenar + kaydırılmış vurgu bloğu. Aynı jest KadexAI panelindeki
    form alanlarında da var; iki ürün yüzeyi tek dil konuşsun. */
 .kade-gate .gate-input:focus {
   border-color: var(--gate-ink) !important;

@@ -128,10 +128,10 @@ export default async function handler(req, res) {
       const startOf30d = new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString();
 
       const [todayRes, lastMinuteRes, total30dRes, tokensRes] = await Promise.all([
-        supabase.from('kade_ai_usage').select('*', { count: 'exact', head: true }).gte('created_at', startOfDay),
-        supabase.from('kade_ai_usage').select('*', { count: 'exact', head: true }).gte('created_at', startOfMinute),
-        supabase.from('kade_ai_usage').select('*', { count: 'exact', head: true }).gte('created_at', startOf30d),
-        supabase.from('kade_ai_usage').select('total_tokens').gte('created_at', startOfDay),
+        supabase.from('kadexai_usage').select('*', { count: 'exact', head: true }).gte('created_at', startOfDay),
+        supabase.from('kadexai_usage').select('*', { count: 'exact', head: true }).gte('created_at', startOfMinute),
+        supabase.from('kadexai_usage').select('*', { count: 'exact', head: true }).gte('created_at', startOf30d),
+        supabase.from('kadexai_usage').select('total_tokens').gte('created_at', startOfDay),
       ]);
       if (todayRes.error) throw todayRes.error;
       if (lastMinuteRes.error) throw lastMinuteRes.error;

@@ -20,13 +20,13 @@
       "port": 3001
     },
     {
-      "name": "kadeai",
+      "name": "kadexai",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
         "dev",
         "--prefix",
-        "apps/kadeai"
+        "apps/kadexai"
       ],
       "port": 3000
     },

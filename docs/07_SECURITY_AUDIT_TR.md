@@ -8,7 +8,7 @@ saldırı denemesi (pentest), otomatik tarayıcı (Burp/ZAP/Snyk vb.) veya canl�
 trafik analizi YAPILMADAN yürütüldü — çünkü bu oturumda canlı bir dağıtım,
 gerçek Supabase kredensiyali veya harici tarama izni yok (bkz.
 `docs/BLOCKERS_TR.md` #1). Kapsam yalnızca **kök `kademedia` uygulamasının
-`server/api/**` katmanı**dır; `apps/kadeai` ve `apps/studio-web/worker` bu
+`server/api/**` katmanı**dır; `apps/kadexai` ve `apps/studio-web/worker` bu
 turda incelenmedi (ayrı bir geçiş gerektirir).
 
 Bu belge Faz 8'in tam kapsamını KAPATMIYOR — yalnızca kod-seviyesinde
@@ -30,7 +30,7 @@ işlerden önce gelmeli.
 | Dosya yükleme | `_lib/uploadValidation.js` | MIME beyanına güvenmiyor, magic-byte imza kontrolü yapıyor (JPEG/PNG/WebP/GIF/MP4/PDF), 2MB sınır, base64 format kontrolü |
 | XSS/HTML sanitizasyon | `_lib/sanitize.js` | `sanitize-html` ile sıkı allowlist (tag/attribute/style/scheme), `javascript:` şeması engelli, linklere otomatik `rel="noopener noreferrer"` |
 | Mass assignment | `partners.js` (`sanitizePartnerUpdate`) ve benzer desenler | Yalnızca izin verilen alanlar update objesine kopyalanıyor, `tests/unit/security.test.js`'te doğrulandı |
-| Row Level Security | `apps/kadeai/supabase/migrations/202607210001...sql` | Tüm `kade_%` tabloları RLS+FORCE RLS ile korunuyor, `anon`/`authenticated` rollerinden erişim REVOKE edilmiş — yalnızca service-role (backend) erişebilir |
+| Row Level Security | `apps/kadexai/supabase/migrations/202607210001...sql` | Tüm `kade_%` tabloları RLS+FORCE RLS ile korunuyor, `anon`/`authenticated` rollerinden erişim REVOKE edilmiş — yalnızca service-role (backend) erişebilir |
 | SQL/kod enjeksiyonu | tüm `server/api/**` | Supabase query builder tutarlı kullanılıyor; `.rpc()`, ham SQL string birleştirme veya `eval`/`new Function` **hiçbir yerde bulunamadı** |
 | Seed/bootstrap endpoint | `seed.js` | Production'da varsayılan olarak 404 (yalnızca `SEED_ENDPOINT_ENABLED=true` ile açılıyor), saatte 3 istek sınırı, timing-safe secret karşılaştırma, sahte demo veri eklemiyor |
 | Rol/izin modeli | `_lib/auth.js` | `requirePermission`/`requireAdmin` her admin route'unda backend zorunlu (frontend değil) — Faz 4'te doğrulandı, `system-health`/`coupons`/`shopier orders` gibi yeni rotalar da bu desene uydu |
@@ -47,7 +47,7 @@ işlerden önce gelmeli.
 
 ## 3. Bu turda incelenmeyen / canlı test gerektiren alanlar (açık)
 
-- **`apps/kadeai` ve `apps/studio-web`/`studio-worker`** — bu denetim yalnızca kök `kademedia` API katmanını kapsadı.
+- **`apps/kadexai` ve `apps/studio-web`/`studio-worker`** — bu denetim yalnızca kök `kademedia` API katmanını kapsadı.
 - **Gerçek penetrasyon testi / otomatik tarama** — kod incelemesi false-negative riskini tamamen ortadan kaldırmaz; canlı ortamda bağımsız bir pentest önerilir.
 - **BYOK / kullanıcı API anahtarı saklama** — henüz tasarlanmadı bile (bkz. `docs/05` §5) — şifreleme anahtarı yönetimi ayrı, aceleye getirilmemesi gereken bir güvenlik projesi.
 - **Bağımlılık/tedarik zinciri taraması** (`npm audit`, Dependabot, SBOM) — bu turda çalıştırılmadı.

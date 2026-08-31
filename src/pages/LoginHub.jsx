@@ -29,10 +29,10 @@ const workspaces = [
   },
   {
     title: 'Content AI',
-    description: 'KADE AI içerik araçlarını açın, üretimlerinize ve çalışma alanınıza devam edin.',
+    description: 'KadexAI içerik araçlarını açın, üretimlerinize ve çalışma alanınıza devam edin.',
     features: ['İçerik, başlık ve senaryo üretimi', 'Trend radarı ve rakip analizi', 'İçerik takvimi ve arşiv'],
     cta: 'Content AI girişine git',
-    to: '/kadeai/login',
+    to: '/kadexai/login',
     icon: HiOutlineSparkles,
     external: true,
   },

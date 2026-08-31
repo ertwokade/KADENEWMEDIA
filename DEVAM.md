@@ -13,7 +13,7 @@ Site **iki ayrı kod tabanından** besleniyor:
 |---|---|---|
 | Statik klon | `haoqi-clone/` | Anasayfa + tüm pazarlama sayfaları |
 | React uygulaması | `src/` | Giriş ekranları, müşteri paneli, admin, hata sayfaları |
-| KadeAI | `apps/kadeai/` | `/kadeai/*` |
+| KadexAI | `apps/kadexai/` | `/kadexai/*` |
 
 `npm run legacy:build` sırayla: vite build → `generate-static-routes` → `verify-build-integrity`
 → `haoqi-clone/scripts/build-static.mjs` → `scripts/merge-clone.mjs`. Son adım klon çıktısını
@@ -39,7 +39,7 @@ styles/kade-tokens.css   → styles/kade-gate.css   → styles/kade-surface.css 
 
 Kapsam: `/giris`, `/giris/danismanlik`, `/musteri-panel`, `/proje-takip`, `/organizasyon-kiti`
 (+5 bölüm +plan), `/kade-kit-business`, `/@handle`, `/admin`, `/401 /403 /429 /bakim /404`,
-KadeAI giriş ekranı, anasayfa sosyal ikonları.
+KadexAI giriş ekranı, anasayfa sosyal ikonları.
 
 Yol üstünde düzeltilen hatalar:
 - `lazyWithRetry` (`src/utils/lazyWithRetry.js`) — lazy chunk gelmediğinde Suspense fallback'i
@@ -53,19 +53,19 @@ Yol üstünde düzeltilen hatalar:
 
 ### 2b. Tek dağıtım mimarisi (dal: `birlestirme/tek-deployment`, **canlıda DEĞİL**)
 
-`/kadeai` artık ayrı projeye proxy'lenmiyor; Next.js uygulaması sitenin tamamını barındırıyor:
+`/kadexai` artık ayrı projeye proxy'lenmiyor; Next.js uygulaması sitenin tamamını barındırıyor:
 
 ```
-/kadeai/*  → apps/kadeai/app/kadeai/    (Next rotaları, 73 API route dahil)
-/api/*     → apps/kadeai/pages/api/      (ana sitenin 30 route'u, DEĞİŞTİRİLMEDEN)
-diğer      → apps/kadeai/public/         (statik site, build'de kopyalanır)
+/kadexai/*  → apps/kadexai/app/kadexai/    (Next rotaları, 73 API route dahil)
+/api/*     → apps/kadexai/pages/api/      (ana sitenin 30 route'u, DEĞİŞTİRİLMEDEN)
+diğer      → apps/kadexai/public/         (statik site, build'de kopyalanır)
 ```
 
 Kritik kararlar ve **neden**:
 
-- **Next `basePath` kaldırıldı**, rotalar fiziksel olarak `app/kadeai/` altına taşındı.
+- **Next `basePath` kaldırıldı**, rotalar fiziksel olarak `app/kadexai/` altına taşındı.
   URL'ler birebir aynı kaldı → Google/Supabase'e kayıtlı OAuth redirect adresleri bozulmadı.
-  basePath kalsaydı `/api/*` de `/kadeai` altına sıkışır, ana sitenin backend'i erişilemez olurdu.
+  basePath kalsaydı `/api/*` de `/kadexai` altına sıkışır, ana sitenin backend'i erişilemez olurdu.
 - **Ana sitenin route modülleri `(req,res)` imzalı** → Next'in **Pages Router** API formatıyla
   birebir uyumlu. Adapter yazılmadı, modüller değiştirilmedi.
 - **`/_next/` → `/_kade/`**: Klonlanan anasayfa da bir Next snapshot'ı ve chunk'larını `/_next/`
@@ -78,13 +78,13 @@ Kritik kararlar ve **neden**:
   içindeki 5 tespit iki yolu da tanıyacak şekilde güncellendi.
 - **Fallback rewrite**: Next `public/` dosyalarını yalnız birebir adla sunar, `/giris` için
   `public/giris/index.html`'i bulmaz. `next.config.ts`'te `fallback` aşamasında rewrite eklendi.
-- KadeAI'ın public varlıkları `public/kadeai/` altına alındı (`withBasePath()` zaten
-  `/kadeai/...` üretiyordu).
-- İki `vercel.json` birleşti → **`apps/kadeai/vercel.json`** (Root Directory orası olduğu için;
+- KadexAI'ın public varlıkları `public/kadexai/` altına alındı (`withBasePath()` zaten
+  `/kadexai/...` üretiyordu).
+- İki `vercel.json` birleşti → **`apps/kadexai/vercel.json`** (Root Directory orası olduğu için;
   repo kökündeki kopya silindi).
 
 **Yerel doğrulama:** tek sunucudan `/`, `/giris`, `/giris/danismanlik`, `/hizmetler`,
-`/musteri-panel`, `/kadeai/login` → 200. `/api/*` ana sitenin kendi yanıtını döndürüyor.
+`/musteri-panel`, `/kadexai/login` → 200. `/api/*` ana sitenin kendi yanıtını döndürüyor.
 Anasayfa 3B "hello" dahil tam çiziliyor, 0 kırık kaynak. Lint + typecheck temiz, 46/46 test.
 
 ### 2c. Vercel ayarları (canlı projede **yapıldı**)
@@ -93,7 +93,7 @@ Anasayfa 3B "hello" dahil tam çiziliyor, 0 kırık kaynak. Lint + typecheck tem
 - Framework Preset: Next.js
 - Build Command override: **kapatıldı** (vercel.json devralsın)
 - Output Directory override: **kapatıldı**
-- Root Directory: **`apps/kadeai`**
+- Root Directory: **`apps/kadexai`**
 - "Include files outside the root directory": **Enabled**
 - "Skip deployments…": **Disabled** ← Root Directory girilince Vercel bunu otomatik açtı;
   açık kalsaydı `src/` veya `haoqi-clone/` değişiklikleri deploy'u atlardı.
@@ -102,12 +102,12 @@ Anasayfa 3B "hello" dahil tam çiziliyor, 0 kırık kaynak. Lint + typecheck tem
 
 ## 3. Yapılması gerekenler
 
-### 3a. ÖNCE: KadeAI env değişkenleri (bloklayıcı)
+### 3a. ÖNCE: KadexAI env değişkenleri (bloklayıcı)
 
 Canlı proje ana sitenin değişkenlerine sahip (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
-`JWT_SECRET`, SMTP, SHOPIER, GA4, Upstash, `GEMINI_API_KEY`…) ama **KadeAI'ınkilere sahip değil**.
+`JWT_SECRET`, SMTP, SHOPIER, GA4, Upstash, `GEMINI_API_KEY`…) ama **KadexAI'ınkilere sahip değil**.
 
-`apps/kadeai/scripts/validate-env.mjs` şunları **zorunlu** tutuyor — eksikse build patlar:
+`apps/kadexai/scripts/validate-env.mjs` şunları **zorunlu** tutuyor — eksikse build patlar:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL     NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -117,17 +117,17 @@ CEREBRAS_API_KEY             OPENROUTER_API_KEY
 GEMINI_API_KEY  ← zaten var
 ```
 
-Ayrıca çalışma anında gerekenler: `KADEAI_ADMIN_API_SECRET`, `KADE_TOKEN_ENCRYPTION_KEY`,
+Ayrıca çalışma anında gerekenler: `KADEXAI_ADMIN_API_SECRET`, `KADE_TOKEN_ENCRYPTION_KEY`,
 `KADE_OWNER_EMAIL(S)`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_SITE_URL`, Sentry (`SENTRY_DSN`,
 `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`), PostHog,
 Google OAuth (`GOOGLE_OAUTH_*`), `RESEND_API_KEY`, `YOUTUBE_API_KEY`, `PAYMENT_*`.
-Tam liste: `apps/kadeai/.env.example`.
+Tam liste: `apps/kadexai/.env.example`.
 
-**Bunlar `demirk314-3297/kadeai` projesinde ve "Sensitive" işaretli — okunamıyorlar.**
+**Bunlar `demirk314-3297/kadexai` projesinde ve "Sensitive" işaretli — okunamıyorlar.**
 `vercel env pull` yerlerine `[SENSITIVE]` yazıyor. Kaynaklarından (Supabase paneli, ilgili AI
 sağlayıcı panelleri) yeniden alınıp `kadeertwo/kadenewmedia` projesine elle girilmeleri gerekiyor.
 
-`NEXT_PUBLIC_BASE_PATH` **girilmemeli** (varsayılan `/kadeai` doğru).
+`NEXT_PUBLIC_BASE_PATH` **girilmemeli** (varsayılan `/kadexai` doğru).
 
 ### 3b. SONRA: preview ile doğrula
 
@@ -136,7 +136,7 @@ npx vercel            # --prod YOK, preview üretir
 ```
 
 Preview URL'de kontrol: `/` (anasayfa çizilmeli), `/giris`, `/giris/danismanlik`,
-`/kadeai/login`, giriş yapıp `/musteri-panel` ve `/kadeai/dashboard`, `/api/auth?action=csrf`
+`/kadexai/login`, giriş yapıp `/musteri-panel` ve `/kadexai/dashboard`, `/api/auth?action=csrf`
 (csrfToken dönmeli).
 
 ### 3c. EN SON: canlıya al
@@ -157,10 +157,10 @@ git push origin main
   output, tint ve tail renkleri + CSS'teki `sepia(.55) saturate(1.5)` filtresi birlikte çalışıyor.
   `#000000` denendi, obje tamamen kayboldu (cam malzeme arkasındaki zemini kırıyor). Yama geri
   alındı, hero **dokunulmamış** halde. Kullanıcı "boş ver" dedi, ama sorun duruyor.
-- **Gözle görülmeyen yüzeyler**: `/kade-kit-business`, `/@handle` ve KadeAI dashboard'unun içi
+- **Gözle görülmeyen yüzeyler**: `/kade-kit-business`, `/@handle` ve KadexAI dashboard'unun içi
   gerçek veriyle görülmedi (yerelde giriş yapılamıyor). Kod doğru, build geçiyor, ama render
   edilmiş hâlleri doğrulanmadı.
-- **KadeAI önizlemesi kaba çıkmıştı**: `kade-skin.css` önizlemesinde düzen bozuk göründü, çünkü
+- **KadexAI önizlemesi kaba çıkmıştı**: `kade-skin.css` önizlemesinde düzen bozuk göründü, çünkü
   gerçek bileşenlerdeki Tailwind sınıfları elle yeniden kurulamadı. Palet doğrulandı, yerleşim
   değil — ama yerleşime zaten dokunulmadı.
 - **Klon rotalarının React kopyaları**: `Home.jsx`, `Services.jsx`, `Blog.jsx` vb. hâlâ derleniyor
@@ -174,11 +174,11 @@ git push origin main
 
 ```bash
 npm run legacy:build                        # statik site + klon katmanı
-node scripts/stage-static-into-next.mjs     # dist/ → apps/kadeai/public/
-cd apps/kadeai && npm run build             # birleşik Next derlemesi
-cd apps/kadeai && npx next start -p 3100    # birleşik sunucu (yerel test)
+node scripts/stage-static-into-next.mjs     # dist/ → apps/kadexai/public/
+cd apps/kadexai && npm run build             # birleşik Next derlemesi
+cd apps/kadexai && npx next start -p 3100    # birleşik sunucu (yerel test)
 node haoqi-clone/server.mjs                 # yalnız klon, port 4180
 ```
 
-Yerelde `.env` ve `apps/kadeai/.env.local` **placeholder** Supabase bilgileri taşıyor; bu yüzden
+Yerelde `.env` ve `apps/kadexai/.env.local` **placeholder** Supabase bilgileri taşıyor; bu yüzden
 giriş yapılamıyor ve `/api/*` 503 döner. Bu beklenen davranış, hata değil.

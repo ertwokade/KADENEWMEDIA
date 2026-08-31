@@ -954,14 +954,14 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai",
+    "route": "/kadexai",
     "type": "page",
     "environment": "production",
     "method": "GET",
     "role": "anonymous",
     "expectedStatus": 200,
     "actualStatus": 200,
-    "finalUrl": "https://kadenewmedia.com/kadeai",
+    "finalUrl": "https://kadenewmedia.com/kadexai",
     "redirects": [],
     "consoleErrors": [],
     "networkErrors": [],
@@ -970,17 +970,17 @@
     "seoIssues": [],
     "securityIssues": [],
     "result": "PASS",
-    "notes": "title=\"KadeAI | Kade New Media\"; h1=0; canonical=1; robots=\"noindex, nofollow\""
+    "notes": "title=\"KadexAI | Kade New Media\"; h1=0; canonical=1; robots=\"noindex, nofollow\""
   },
   {
-    "route": "/kadeai/auth",
+    "route": "/kadexai/auth",
     "type": "page",
     "environment": "production",
     "method": "GET",
     "role": "anonymous",
     "expectedStatus": 200,
     "actualStatus": 200,
-    "finalUrl": "https://kadenewmedia.com/kadeai/auth",
+    "finalUrl": "https://kadenewmedia.com/kadexai/auth",
     "redirects": [],
     "consoleErrors": [],
     "networkErrors": [],
@@ -989,19 +989,19 @@
     "seoIssues": [],
     "securityIssues": [],
     "result": "PASS",
-    "notes": "title=\"KadeAI | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, nofollow\""
+    "notes": "title=\"KadexAI | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, nofollow\""
   },
   {
-    "route": "/kadeai/auth/callback",
+    "route": "/kadexai/auth/callback",
     "type": "page",
     "environment": "production",
     "method": "GET",
     "role": "anonymous",
     "expectedStatus": 307,
     "actualStatus": 307,
-    "finalUrl": "https://kadenewmedia.com/kadeai/auth/callback",
+    "finalUrl": "https://kadenewmedia.com/kadexai/auth/callback",
     "redirects": [
-      "https://kadenewmedia.com/kadeai/login?auth_error=Giri%C5%9F+do%C4%9Frulama+kodu+bulunamad%C4%B1."
+      "https://kadenewmedia.com/kadexai/login?auth_error=Giri%C5%9F+do%C4%9Frulama+kodu+bulunamad%C4%B1."
     ],
     "consoleErrors": [],
     "networkErrors": [],
@@ -1013,14 +1013,14 @@
     "notes": ""
   },
   {
-    "route": "/kadeai/login",
+    "route": "/kadexai/login",
     "type": "page",
     "environment": "production",
     "method": "GET",
     "role": "anonymous",
     "expectedStatus": 200,
     "actualStatus": 200,
-    "finalUrl": "https://kadenewmedia.com/kadeai/login",
+    "finalUrl": "https://kadenewmedia.com/kadexai/login",
     "redirects": [],
     "consoleErrors": [],
     "networkErrors": [],
@@ -1029,17 +1029,17 @@
     "seoIssues": [],
     "securityIssues": [],
     "result": "PASS",
-    "notes": "title=\"KadeAI | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, nofollow\""
+    "notes": "title=\"KadexAI | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, nofollow\""
   },
   {
-    "route": "/kadeai/logout",
+    "route": "/kadexai/logout",
     "type": "page",
     "environment": "production",
     "method": "GET",
     "role": "anonymous",
     "expectedStatus": 200,
     "actualStatus": 200,
-    "finalUrl": "https://kadenewmedia.com/kadeai/logout",
+    "finalUrl": "https://kadenewmedia.com/kadexai/logout",
     "redirects": [],
     "consoleErrors": [],
     "networkErrors": [],
@@ -1048,10 +1048,10 @@
     "seoIssues": [],
     "securityIssues": [],
     "result": "PASS",
-    "notes": "title=\"KadeAI | Kade New Media\"; h1=0; canonical=1; robots=\"noindex, nofollow\""
+    "notes": "title=\"KadexAI | Kade New Media\"; h1=0; canonical=1; robots=\"noindex, nofollow\""
   },
   {
-    "route": "/kadeai/onboarding",
+    "route": "/kadexai/onboarding",
     "type": "page",
     "environment": "production",
     "method": "GET",
@@ -1070,14 +1070,14 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/reset-password",
+    "route": "/kadexai/reset-password",
     "type": "page",
     "environment": "production",
     "method": "GET",
     "role": "anonymous",
     "expectedStatus": 200,
     "actualStatus": 200,
-    "finalUrl": "https://kadenewmedia.com/kadeai/reset-password",
+    "finalUrl": "https://kadenewmedia.com/kadexai/reset-password",
     "redirects": [],
     "consoleErrors": [],
     "networkErrors": [],
@@ -1086,10 +1086,10 @@
     "seoIssues": [],
     "securityIssues": [],
     "result": "PASS",
-    "notes": "title=\"KadeAI | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, nofollow\""
+    "notes": "title=\"KadexAI | Kade New Media\"; h1=1; canonical=1; robots=\"noindex, nofollow\""
   },
   {
-    "route": "/kadeai/dashboard",
+    "route": "/kadexai/dashboard",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1108,7 +1108,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/ab-test",
+    "route": "/kadexai/dashboard/ab-test",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1127,7 +1127,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/ai-thumbnail",
+    "route": "/kadexai/dashboard/ai-thumbnail",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1146,7 +1146,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/analytics",
+    "route": "/kadexai/dashboard/analytics",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1165,7 +1165,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/bio-link",
+    "route": "/kadexai/dashboard/bio-link",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1184,7 +1184,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/bulk",
+    "route": "/kadexai/dashboard/bulk",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1203,7 +1203,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/calendar",
+    "route": "/kadexai/dashboard/calendar",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1222,7 +1222,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/carousel",
+    "route": "/kadexai/dashboard/carousel",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1241,7 +1241,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/clickbait-detector",
+    "route": "/kadexai/dashboard/clickbait-detector",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1260,7 +1260,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/clip-generator",
+    "route": "/kadexai/dashboard/clip-generator",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1279,7 +1279,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/collab-mail",
+    "route": "/kadexai/dashboard/collab-mail",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1298,7 +1298,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/comment-analysis",
+    "route": "/kadexai/dashboard/comment-analysis",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1317,7 +1317,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/competitor",
+    "route": "/kadexai/dashboard/competitor",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1336,7 +1336,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/content-plan",
+    "route": "/kadexai/dashboard/content-plan",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1355,7 +1355,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/description",
+    "route": "/kadexai/dashboard/description",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1374,7 +1374,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/dubbing",
+    "route": "/kadexai/dashboard/dubbing",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1393,7 +1393,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/faq",
+    "route": "/kadexai/dashboard/faq",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1412,7 +1412,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/hashtag",
+    "route": "/kadexai/dashboard/hashtag",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1431,7 +1431,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/history",
+    "route": "/kadexai/dashboard/history",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1450,7 +1450,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/hook",
+    "route": "/kadexai/dashboard/hook",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1469,7 +1469,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/ideas",
+    "route": "/kadexai/dashboard/ideas",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1488,7 +1488,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/operations",
+    "route": "/kadexai/dashboard/operations",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1507,7 +1507,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/performance",
+    "route": "/kadexai/dashboard/performance",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1526,7 +1526,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/quote-extractor",
+    "route": "/kadexai/dashboard/quote-extractor",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1545,7 +1545,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/retention-analysis",
+    "route": "/kadexai/dashboard/retention-analysis",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1564,7 +1564,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/settings",
+    "route": "/kadexai/dashboard/settings",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1583,7 +1583,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/shopier",
+    "route": "/kadexai/dashboard/shopier",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1602,7 +1602,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/social-audit",
+    "route": "/kadexai/dashboard/social-audit",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1621,7 +1621,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/templates",
+    "route": "/kadexai/dashboard/templates",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1640,7 +1640,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/text-generator",
+    "route": "/kadexai/dashboard/text-generator",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1659,7 +1659,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/thread",
+    "route": "/kadexai/dashboard/thread",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1678,7 +1678,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/title",
+    "route": "/kadexai/dashboard/title",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1697,7 +1697,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/trends",
+    "route": "/kadexai/dashboard/trends",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1716,7 +1716,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/viral-score",
+    "route": "/kadexai/dashboard/viral-score",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -1735,7 +1735,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/youtube-seo",
+    "route": "/kadexai/dashboard/youtube-seo",
     "type": "protected",
     "environment": "production",
     "method": "GET",
@@ -2324,7 +2324,7 @@
     "notes": ""
   },
   {
-    "route": "/kadeai/api/assistant",
+    "route": "/kadexai/api/assistant",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2343,7 +2343,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/auth/logout",
+    "route": "/kadexai/api/auth/logout",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2362,7 +2362,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/auth/password",
+    "route": "/kadexai/api/auth/password",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2381,7 +2381,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: mutating veya authenticated API için local fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/auth/recovery",
+    "route": "/kadexai/api/auth/recovery",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2400,14 +2400,14 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: mutating veya authenticated API için local fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/auth/recovery-session",
+    "route": "/kadexai/api/auth/recovery-session",
     "type": "api",
     "environment": "production",
     "method": "GET",
     "role": "anonymous",
     "expectedStatus": 401,
     "actualStatus": 401,
-    "finalUrl": "https://kadenewmedia.com/kadeai/api/auth/recovery-session",
+    "finalUrl": "https://kadenewmedia.com/kadexai/api/auth/recovery-session",
     "redirects": [],
     "consoleErrors": [],
     "networkErrors": [],
@@ -2419,7 +2419,7 @@
     "notes": ""
   },
   {
-    "route": "/kadeai/api/auth/update-password",
+    "route": "/kadexai/api/auth/update-password",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2438,7 +2438,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/backend/health",
+    "route": "/kadexai/api/backend/health",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2457,7 +2457,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/calendar",
+    "route": "/kadexai/api/calendar",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2476,7 +2476,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/config",
+    "route": "/kadexai/api/config",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2495,7 +2495,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/env-status",
+    "route": "/kadexai/api/env-status",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2514,14 +2514,14 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/health",
+    "route": "/kadexai/api/health",
     "type": "api",
     "environment": "production",
     "method": "GET",
     "role": "anonymous",
     "expectedStatus": 200,
     "actualStatus": 200,
-    "finalUrl": "https://kadenewmedia.com/kadeai/api/health",
+    "finalUrl": "https://kadenewmedia.com/kadexai/api/health",
     "redirects": [],
     "consoleErrors": [],
     "networkErrors": [],
@@ -2533,7 +2533,7 @@
     "notes": ""
   },
   {
-    "route": "/kadeai/api/history",
+    "route": "/kadexai/api/history",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2552,7 +2552,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/image",
+    "route": "/kadexai/api/image",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2571,7 +2571,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/operations-state",
+    "route": "/kadexai/api/operations-state",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2590,7 +2590,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/payments/checkout",
+    "route": "/kadexai/api/payments/checkout",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2609,7 +2609,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/payments/status",
+    "route": "/kadexai/api/payments/status",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2628,7 +2628,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/payments/webhook",
+    "route": "/kadexai/api/payments/webhook",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2647,7 +2647,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: mutating veya authenticated API için local fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/profile",
+    "route": "/kadexai/api/profile",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2666,7 +2666,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/templates",
+    "route": "/kadexai/api/templates",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2685,7 +2685,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/transcribe",
+    "route": "/kadexai/api/transcribe",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2704,7 +2704,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/youtube/comments",
+    "route": "/kadexai/api/youtube/comments",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -2723,7 +2723,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/analytics",
+    "route": "/kadexai/api/generate/analytics",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2742,7 +2742,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/bio-link",
+    "route": "/kadexai/api/generate/bio-link",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2761,7 +2761,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/bulk",
+    "route": "/kadexai/api/generate/bulk",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2780,7 +2780,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/carousel",
+    "route": "/kadexai/api/generate/carousel",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2799,7 +2799,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/clickbait-detector",
+    "route": "/kadexai/api/generate/clickbait-detector",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2818,7 +2818,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/clips",
+    "route": "/kadexai/api/generate/clips",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2837,7 +2837,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/collab-mail",
+    "route": "/kadexai/api/generate/collab-mail",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2856,7 +2856,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/comment-analysis",
+    "route": "/kadexai/api/generate/comment-analysis",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2875,7 +2875,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/competitor",
+    "route": "/kadexai/api/generate/competitor",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2894,7 +2894,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/content-plan",
+    "route": "/kadexai/api/generate/content-plan",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2913,7 +2913,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/description",
+    "route": "/kadexai/api/generate/description",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2932,7 +2932,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/faq",
+    "route": "/kadexai/api/generate/faq",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2951,7 +2951,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/hashtag",
+    "route": "/kadexai/api/generate/hashtag",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2970,7 +2970,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/hook",
+    "route": "/kadexai/api/generate/hook",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -2989,7 +2989,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/ideas",
+    "route": "/kadexai/api/generate/ideas",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3008,7 +3008,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/performance",
+    "route": "/kadexai/api/generate/performance",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3027,7 +3027,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/quote-extractor",
+    "route": "/kadexai/api/generate/quote-extractor",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3046,7 +3046,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/retention-analysis",
+    "route": "/kadexai/api/generate/retention-analysis",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3065,7 +3065,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/social-audit",
+    "route": "/kadexai/api/generate/social-audit",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3084,7 +3084,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/text-generator",
+    "route": "/kadexai/api/generate/text-generator",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3103,7 +3103,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/thread",
+    "route": "/kadexai/api/generate/thread",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3122,7 +3122,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/title",
+    "route": "/kadexai/api/generate/title",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3141,7 +3141,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/translate",
+    "route": "/kadexai/api/generate/translate",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3160,7 +3160,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/trends",
+    "route": "/kadexai/api/generate/trends",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3179,7 +3179,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/tts",
+    "route": "/kadexai/api/generate/tts",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3198,7 +3198,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/viral-score",
+    "route": "/kadexai/api/generate/viral-score",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3217,7 +3217,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/generate/youtube-seo",
+    "route": "/kadexai/api/generate/youtube-seo",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3236,7 +3236,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/materyal",
+    "route": "/kadexai/dashboard/materyal",
     "type": "page",
     "environment": "production",
     "method": "GET",
@@ -3255,7 +3255,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/packages",
+    "route": "/kadexai/dashboard/packages",
     "type": "page",
     "environment": "production",
     "method": "GET",
@@ -3274,7 +3274,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/subtitles",
+    "route": "/kadexai/dashboard/subtitles",
     "type": "page",
     "environment": "production",
     "method": "GET",
@@ -3293,7 +3293,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/trend-radar",
+    "route": "/kadexai/dashboard/trend-radar",
     "type": "page",
     "environment": "production",
     "method": "GET",
@@ -3312,7 +3312,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/kade-search",
+    "route": "/kadexai/dashboard/kade-search",
     "type": "page",
     "environment": "production",
     "method": "GET",
@@ -3331,7 +3331,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/dashboard/video-factory",
+    "route": "/kadexai/dashboard/video-factory",
     "type": "page",
     "environment": "production",
     "method": "GET",
@@ -3350,7 +3350,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/dubbing/tts",
+    "route": "/kadexai/api/dubbing/tts",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3369,7 +3369,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/alerts",
+    "route": "/kadexai/api/kade-search/alerts",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3388,7 +3388,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/collect",
+    "route": "/kadexai/api/kade-search/collect",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3407,7 +3407,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/daily-digest",
+    "route": "/kadexai/api/kade-search/daily-digest",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3426,7 +3426,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/approvals",
+    "route": "/kadexai/api/kade-search/approvals",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3445,7 +3445,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/ideas",
+    "route": "/kadexai/api/kade-search/ideas",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3464,7 +3464,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/pulse",
+    "route": "/kadexai/api/kade-search/pulse",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3483,7 +3483,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/radar",
+    "route": "/kadexai/api/kade-search/radar",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3502,7 +3502,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/sources",
+    "route": "/kadexai/api/kade-search/sources",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3521,7 +3521,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/stats",
+    "route": "/kadexai/api/kade-search/stats",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3540,7 +3540,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/trend/[id]",
+    "route": "/kadexai/api/kade-search/trend/[id]",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3559,7 +3559,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/trend/[id]/whatsapp",
+    "route": "/kadexai/api/kade-search/trend/[id]/whatsapp",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3578,7 +3578,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/trends",
+    "route": "/kadexai/api/kade-search/trends",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3597,7 +3597,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/watchlist",
+    "route": "/kadexai/api/kade-search/watchlist",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3616,7 +3616,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/kade-search/weekly-digest",
+    "route": "/kadexai/api/kade-search/weekly-digest",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3635,7 +3635,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/materials",
+    "route": "/kadexai/api/materials",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3654,7 +3654,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/materials/sync",
+    "route": "/kadexai/api/materials/sync",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3673,7 +3673,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/operations-report",
+    "route": "/kadexai/api/operations-report",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3692,7 +3692,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/reports/weekly-site",
+    "route": "/kadexai/api/reports/weekly-site",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3711,7 +3711,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/packages",
+    "route": "/kadexai/api/packages",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3730,7 +3730,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/payments/admin/custom-offer",
+    "route": "/kadexai/api/payments/admin/custom-offer",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3749,7 +3749,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/payments/admin/pricing",
+    "route": "/kadexai/api/payments/admin/pricing",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3768,7 +3768,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/payments/shopier/redirect",
+    "route": "/kadexai/api/payments/shopier/redirect",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3787,7 +3787,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/subtitles/translate",
+    "route": "/kadexai/api/subtitles/translate",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3806,7 +3806,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/video",
+    "route": "/kadexai/api/video",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3825,7 +3825,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/youtube/callback",
+    "route": "/kadexai/api/youtube/callback",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3844,7 +3844,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/youtube/captions",
+    "route": "/kadexai/api/youtube/captions",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3863,7 +3863,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/youtube/connect",
+    "route": "/kadexai/api/youtube/connect",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3882,7 +3882,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/youtube/disconnect",
+    "route": "/kadexai/api/youtube/disconnect",
     "type": "api",
     "environment": "production",
     "method": "POST",
@@ -3901,7 +3901,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/youtube/status",
+    "route": "/kadexai/api/youtube/status",
     "type": "api",
     "environment": "production",
     "method": "GET",
@@ -3920,7 +3920,7 @@
     "notes": "BLOCKED_BY_ENVIRONMENT: authenticated test fixture/credential yok."
   },
   {
-    "route": "/kadeai/api/youtube/videos",
+    "route": "/kadexai/api/youtube/videos",
     "type": "api",
     "environment": "production",
     "method": "GET",

@@ -10,7 +10,7 @@ mimari kararların gerekçesi için `docs/02`, güvenlik denetimi için
 - **Framework Preset:** `vercel.json`'da `"framework": "vite"` **zorunlu** — proje dashboard'undaki Framework Preset ayarı yanlışlıkla "Services" olarak kalırsa (bu, PR #8 denemesinden kalma bir ayardı ve bu oturumda düzeltildi) her deployment 2-3 saniyede başarısız olur. `vercel.json`'daki `framework` alanı bu dashboard ayarını override eder — **bu satırı vercel.json'dan silmeyin.**
 - **Build komutu:** `npm run legacy:build` (`vite build` + `index.html`→`app.html` yeniden adlandırma + statik rota üretimi).
 - **Sorun giderme:** `npx vercel ls kademedia` ile son deployment'ların durumunu kontrol edin; `● Error` art arda görülüyorsa `npx vercel build` ile yerelde build'i taklit edip hatayı erken yakalayın.
-- **apps/kadeai:** Ayrı bir Vercel projesi (`kadeai`), kök `vercel.json`'daki `rewrites` ile `/kadeai/**` altında sunuluyor — iki proje birbirinden bağımsız deploy edilir.
+- **apps/kadexai:** Ayrı bir Vercel projesi (`kadexai`), kök `vercel.json`'daki `rewrites` ile `/kadexai/**` altında sunuluyor — iki proje birbirinden bağımsız deploy edilir.
 
 ## 2. Ortam değişkenleri (kritik olanlar)
 
@@ -31,7 +31,7 @@ durumunu** canlıda gösterir — gerçek değerleri asla göstermez.
 
 ## 3. Veritabanı migrasyonları
 
-Migration dosyaları `apps/kadeai/supabase/migrations/*.sql` — kronolojik
+Migration dosyaları `apps/kadexai/supabase/migrations/*.sql` — kronolojik
 sırayla, ellemeden uygulanmalı. Bu oturumda eklenen ve **henüz canlıya
 uygulanmamış** olanlar (blocker #1):
 

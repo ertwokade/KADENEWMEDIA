@@ -33,9 +33,9 @@ web çıktısını tek platformda üretme.
 |---|---|---|
 | Proje çalışma alanı (fikir/kaynak toplama) | Kade'ye doğrudan değer katar | Şartnamenin §14 "Kade Creator Studio" talebiyle doğrudan örtüşüyor — bu, Faz 5'in ana konsepti olmalı |
 | Marka hafızası (kullanıcı stilini hatırlama) | MVP sonrası düşünülmeli | Değerli ama gerçek kullanım verisi/geri bildirim olmadan doğru "hafıza" modeli tasarlamak riskli — önce temel araçlar, sonra kişiselleştirme katmanı |
-| Yeniden kullanılabilir şablonlar/beceriler | Kade'ye doğrudan değer katar | Mevcut kadeai'nin 35 aracıyla (docs/02 karar #2) doğrudan uyumlu bir genişleme — "kaydedilmiş prompt/şablon" özelliği kadeai'ye nispeten ucuz eklenebilir |
-| Prompt kütüphanesi | Kade'ye doğrudan değer katar | Aynı gerekçe, kadeai'nin mevcut AI sağlayıcı altyapısına (`lib/ai/provider.ts`) doğal bir ek |
-| Tek akışta metin+görsel+video+web üretimi | MVP sonrası düşünülmeli | Kade Studio (video) + kadeai (metin/görsel) zaten ayrı ürünler olarak var (docs/02 karar #1) — bunları TEK bir akışta birleştirmek büyük bir mimari proje, önce her biri kendi başına olgunlaşmalı |
+| Yeniden kullanılabilir şablonlar/beceriler | Kade'ye doğrudan değer katar | Mevcut kadexai'nin 35 aracıyla (docs/02 karar #2) doğrudan uyumlu bir genişleme — "kaydedilmiş prompt/şablon" özelliği kadexai'ye nispeten ucuz eklenebilir |
+| Prompt kütüphanesi | Kade'ye doğrudan değer katar | Aynı gerekçe, kadexai'nin mevcut AI sağlayıcı altyapısına (`lib/ai/provider.ts`) doğal bir ek |
+| Tek akışta metin+görsel+video+web üretimi | MVP sonrası düşünülmeli | Kade Studio (video) + kadexai (metin/görsel) zaten ayrı ürünler olarak var (docs/02 karar #1) — bunları TEK bir akışta birleştirmek büyük bir mimari proje, önce her biri kendi başına olgunlaşmalı |
 
 ## 3. ChatCut (`chatcut.io`) — Konuşmalı/transkript-tabanlı video kurgu
 

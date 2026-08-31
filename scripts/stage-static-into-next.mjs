@@ -3,12 +3,12 @@
  * Statik siteyi Next.js dağıtımının `public/` köküne yerleştirir.
  *
  * Tek dağıtım mimarisinde Next.js uygulaması sitenin tamamını barındırır:
- *   /kadeai/*  → apps/kadeai/app/kadeai/   (Next rotaları)
- *   /api/*     → apps/kadeai/pages/api/     (ana sitenin 30 route'u)
- *   diğer      → apps/kadeai/public/        (bu betiğin kopyaladığı statik site)
+ *   /kadexai/*  → apps/kadexai/app/kadexai/   (Next rotaları)
+ *   /api/*     → apps/kadexai/pages/api/     (ana sitenin 30 route'u)
+ *   diğer      → apps/kadexai/public/        (bu betiğin kopyaladığı statik site)
  *
- * `public/kadeai/` KadeAI'ın kendi varlıklarıdır ve KORUNUR — `withBasePath()`
- * onları /kadeai/... adresinden çağırır. Kopyalama o klasöre dokunmaz.
+ * `public/kadexai/` KadexAI'ın kendi varlıklarıdır ve KORUNUR — `withBasePath()`
+ * onları /kadexai/... adresinden çağırır. Kopyalama o klasöre dokunmaz.
  */
 import { cp, mkdir, readdir, rm, stat } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
@@ -16,8 +16,8 @@ import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const from = join(root, 'dist')
-const to = join(root, 'apps', 'kadeai', 'public')
-const KEEP = new Set(['kadeai'])
+const to = join(root, 'apps', 'kadexai', 'public')
+const KEEP = new Set(['kadexai'])
 
 if (!await stat(from).catch(() => null)) {
   console.error('dist/ yok — önce `npm run legacy:build` çalıştırın.')
@@ -34,7 +34,7 @@ await mkdir(to, { recursive: true })
 let n = 0
 for (const entry of await readdir(from, { withFileTypes: true })) {
   if (KEEP.has(entry.name)) {
-    console.warn(`  ! dist/${entry.name} atlandı — KadeAI ad alanıyla çakışıyor`)
+    console.warn(`  ! dist/${entry.name} atlandı — KadexAI ad alanıyla çakışıyor`)
     continue
   }
   await cp(join(from, entry.name), join(to, entry.name), { recursive: true })

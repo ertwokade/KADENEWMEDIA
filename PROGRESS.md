@@ -5,7 +5,7 @@ Son güncelleme: 2026-07-20
 ## Durum
 
 - [x] Mevcut repository, kullanıcı değişiklikleri ve yerel araçlar incelendi.
-- [x] Mevcut Vite sitesi ve `apps/kadeai` ürününü koruyan izole workspace yaklaşımı seçildi.
+- [x] Mevcut Vite sitesi ve `apps/kadexai` ürününü koruyan izole workspace yaklaşımı seçildi.
 - [x] pnpm workspace ve temel uygulamalar
 - [x] PostgreSQL/Drizzle şeması ve migration
 - [x] Redis/BullMQ ve MinIO storage

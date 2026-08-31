@@ -9,7 +9,7 @@ export default defineConfig([
     'dist',
     '**/.next/**',
     'src/embedded/**',
-    'apps/kadeai/**',
+    'apps/kadexai/**',
     'kadeallinone/**',
   ]),
   // Client-side (src/)

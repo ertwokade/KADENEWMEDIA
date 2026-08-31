@@ -6,7 +6,7 @@ import { getSupabase } from './_lib/supabase.js';
 async function logAiUsage(scope, model, usageMeta) {
   try {
     const supabase = getSupabase();
-    const { error } = await supabase.from('kade_ai_usage').insert({
+    const { error } = await supabase.from('kadexai_usage').insert({
       scope,
       model,
       prompt_tokens: usageMeta?.promptTokenCount || 0,

@@ -14,7 +14,7 @@ export default function CaseStudies() {
   const cases = Array.isArray(content?.cases) ? content.cases : []
   useSEO({
     title: 'Vaka Çalışmaları | Kade New Media',
-    description: 'Kade New Media ve KadeAI ürünlerinde uyguladığımız, kapsamı ve ölçümü açık dijital dönüşüm vaka çalışmaları.',
+    description: 'Kade New Media ve KadexAI ürünlerinde uyguladığımız, kapsamı ve ölçümü açık dijital dönüşüm vaka çalışmaları.',
     path: '/basari-hikayeleri',
   })
 

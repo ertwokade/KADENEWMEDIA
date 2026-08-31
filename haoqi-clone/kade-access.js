@@ -3,7 +3,7 @@
    "klonlanan Next uygulaması mı" sorusunu yanıtlıyor, bu yüzden İKİ yolu da
    tanımalılar — yoksa marka yaması ve erişim düzeltmeleri sessizce atlanır. */
 /* Giriş / kayıt girişi.
-   KadeAI ve danışmanlık iki ayrı çalışma alanı ve ikisinin de giriş + kayıt
+   KadexAI ve danışmanlık iki ayrı çalışma alanı ve ikisinin de giriş + kayıt
    adımı var; tek bir ikon "giriş mi, hesap mı?" sorusunu açıkta bırakıyor.
    Bu yüzden başlıkta ikon + kısa etiketli bir çip duruyor, açılınca iki alanı
    ve eylemlerini gösteren küçük bir panel geliyor. Mobil kontrol şeridinde
@@ -14,11 +14,11 @@
   'use strict';
   var AREAS = [
     {
-      tr: 'KadeAI', en: 'KadeAI',
+      tr: 'KadexAI', en: 'KadexAI',
       trSub: 'İçerik ve operasyon paneli', enSub: 'Content and operations workspace',
       actions: [
-        { href: '/kadeai/login', tr: 'Giriş yap', en: 'Sign in', primary: true },
-        { href: '/kadeai/login', tr: 'Kayıt ol', en: 'Sign up' }
+        { href: '/kadexai/login', tr: 'Giriş yap', en: 'Sign in', primary: true },
+        { href: '/kadexai/login', tr: 'Kayıt ol', en: 'Sign up' }
       ]
     },
     {

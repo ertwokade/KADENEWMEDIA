@@ -2,15 +2,15 @@ import { readFile, writeFile } from 'node:fs/promises'
 
 const manifest = JSON.parse(await readFile(new URL('../config/route-manifest.json', import.meta.url), 'utf8'))
 const rootBase = process.env.AUDIT_URL || ''
-const kadeBase = process.env.KADEAI_AUDIT_URL || ''
+const kadeBase = process.env.KADEXAI_AUDIT_URL || ''
 const rootApiBase = process.env.ROOT_API_AUDIT_URL || ''
-const kadeApiBase = process.env.KADEAI_API_AUDIT_URL || ''
+const kadeApiBase = process.env.KADEXAI_API_AUDIT_URL || ''
 const environment = process.env.AUDIT_ENVIRONMENT || 'local'
 const authenticated = process.env.AUDIT_AUTHENTICATED === '1'
 
 function baseFor(entry) {
-  if (entry.type === 'api') return entry.app === 'kadeai' ? kadeApiBase : rootApiBase
-  return entry.app === 'kadeai' ? kadeBase : rootBase
+  if (entry.type === 'api') return entry.app === 'kadexai' ? kadeApiBase : rootApiBase
+  return entry.app === 'kadexai' ? kadeBase : rootBase
 }
 
 function isSafePassiveRequest(entry) {

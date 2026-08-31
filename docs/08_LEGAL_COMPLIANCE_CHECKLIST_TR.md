@@ -40,7 +40,7 @@ yayında kalmaya devam etmemeli (bkz. `docs/BLOCKERS_TR.md` #2).
 | Fikri Mülkiyet ve Telif Politikası | Var (`/telif-haklari`, içerik onay bekliyor) | — |
 | Kullanıcı İçeriği ve Lisans Koşulları | **Yok** | Müşteri panelinde kullanıcı içeriği (medya/link profili) yükleniyor ama lisans koşulu yok |
 | Kabul Edilebilir Kullanım Politikası | **Yok** | — |
-| AI Kullanım ve Çıktı Politikası | **Yok** | `chat.js`/kadeai AI araçları var ama AI çıktısına dair sorumluluk reddi/kullanım politikası public olarak yok |
+| AI Kullanım ve Çıktı Politikası | **Yok** | `chat.js`/kadexai AI araçları var ama AI çıktısına dair sorumluluk reddi/kullanım politikası public olarak yok |
 | API Kullanım Koşulları | **Yok** | Şu an public bir API sunulmuyor, uygulanabilirliği düşük |
 | Takedown/İhlal Bildirim Prosedürü | **Yok** | Kullanıcı içeriği barındıran `/@link` sistemi için önemli bir boşluk |
 | Veri Sahibi Başvuru Formu | **Yok** | KVKK md.11 kapsamında zorunlu — gerçek bir boşluk |

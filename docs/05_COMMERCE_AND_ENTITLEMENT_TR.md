@@ -9,14 +9,14 @@
   (`reference, name, features[], access{jsonb}, status, expires_at`). Entitlement
   kontrolü `buildEntitlementsFromPackages()` ile `access` JSON alanından
   türetiliyor.
-- **`apps/kadeai`:** `payment_orders`, `entitlements` tablosu (`tier, period,
-  api_included, features[], status, expires_at`), `kadeai_pricing_overrides`.
+- **`apps/kadexai`:** `payment_orders`, `entitlements` tablosu (`tier, period,
+  api_included, features[], status, expires_at`), `kadexai_pricing_overrides`.
   Supabase Auth (`auth.users`) ile ilişkili.
 
 **Karar (bu turda verildi): Bu iki sistemi TEK bir şemada zorla birleştirmeyeceğiz.**
 Gerekçe: şartname §1.2 "mevcut mimariyi anlamadan değiştirme" ve "gereksiz
 mikroservis/karmaşa ekleme" kurallarına uyarak — iki sistem zaten çalışıyor, farklı
-auth modelleri kullanıyor (kök: özel JWT; kadeai: Supabase Auth), zorla birleştirme
+auth modelleri kullanıyor (kök: özel JWT; kadexai: Supabase Auth), zorla birleştirme
 hem veri kaybı riski hem de büyük bir auth-migration projesi doğurur ki bu şartnamenin
 "veri kaybına yol açabilecek migration üretme" yasağıyla çelişir. Bunun yerine
 **her ikisi de aynı KAVRAMSAL modele (aşağıda) uyacak şekilde ayrı ayrı
@@ -27,16 +27,16 @@ genişletilecek.**
 Şartnamedeki 27 varlık, mevcut iki sistemin üzerine şu şekilde eşleniyor
 (yeni tablo gerektirenler işaretli):
 
-| Şartname varlığı | Kök karşılığı | kadeai karşılığı | Aksiyon |
+| Şartname varlığı | Kök karşılığı | kadexai karşılığı | Aksiyon |
 |---|---|---|---|
-| Plan/Price | `kade_customer_packages.reference/price` (statik referans) | `kadeai_pricing_overrides` | Var, yeterli |
+| Plan/Price | `kade_customer_packages.reference/price` (statik referans) | `kadexai_pricing_overrides` | Var, yeterli |
 | Feature/FeatureValue | `kade_customer_packages.access` (JSONB) | `entitlements.features[]` | Var (JSON/array modeli), şema-zorlamalı tabloya çevirme **önerilmez** — JSON esnekliği paket çeşitliliği için avantaj |
 | UsageLimit/CreditWallet | **Yok** | **Yok** | Yeni tablo gerekiyor — bkz. §3 |
 | CustomOffer/OfferLine | **Yok** (yalnızca statik teklif formu var) | `payments/admin/custom-offer` route'u var ama kalıcı durum makinesi yok | Yeni — bkz. §4 |
 | QuoteRequest | `kade_quotes` | — | Var |
 | Order/OrderLine | `kade_shopier_orders` | `payment_orders` | Var |
 | Payment/Refund | Shopier webhook state machine | Shopier webhook state machine | Var (refund state'i her ikisinde de yok — bkz. bulgular) |
-| Subscription/SubscriptionChange | `kade_subscriptions` (ajans aboneliği, farklı bağlam) | **Yok** (kadeai paketleri tek-dönemli görünüyor) | Kısmi |
+| Subscription/SubscriptionChange | `kade_subscriptions` (ajans aboneliği, farklı bağlam) | **Yok** (kadexai paketleri tek-dönemli görünüyor) | Kısmi |
 | Entitlement | `access` JSON | `entitlements` tablosu | Var, iki farklı şekilde |
 | APIAccessPolicy / UserApiCredential (BYOK) | **Yok** | **Yok** | Yeni — bkz. §5, blocker |
 | AuditLog | `kade_activity_log` | **Doğrulanmadı** | Kısmi — bkz. §6 |
@@ -84,13 +84,13 @@ vb.), şartnamenin 19 durumluk makinesiyle **örtüşmüyor**.
 makinesini **eşleyen** bir `CHECK` constraint + admin UI güncellemesi Faz 3'te
 yapılacak (bu turda kapsam dışı — canlı veri olmadan migration riskli).
 
-`apps/kadeai`'de `payments/admin/custom-offer` route'u zaten var (önceki
-oturumlarda eklenmiş, PR #3) — bu, kadeai tarafında kısmi bir başlangıç.
+`apps/kadexai`'de `payments/admin/custom-offer` route'u zaten var (önceki
+oturumlarda eklenmiş, PR #3) — bu, kadexai tarafında kısmi bir başlangıç.
 
 ## 5. BYOK / API anahtarı modeli (§8.4) — gerçek boşluk, blocker
 
-Ne kökte ne kadeai'de kullanıcının kendi API anahtarını (BYOK) şifreli saklayıp
-kullanabileceği bir mekanizma bulunamadı. `apps/kadeai`'nin AI sağlayıcı anahtarları
+Ne kökte ne kadexai'de kullanıcının kendi API anahtarını (BYOK) şifreli saklayıp
+kullanabileceği bir mekanizma bulunamadı. `apps/kadexai`'nin AI sağlayıcı anahtarları
 (Gemini/Claude/GPT4o/Groq/Mistral) hepsi **sunucu tarafı, tek bir merkezi env
 değişkeni** — kullanıcı bazlı BYOK yok.
 
@@ -117,7 +117,7 @@ not edildi.
 Şartname §8.7 "yetkilendirmeyi hem frontend hem backend seviyesinde uygula, backend
 zorunlu" diyor. Bu oturumun MongoDB→Supabase taşımasında doğrulandığı üzere kökte
 `requirePermission`/`requireAdmin` her admin route'unda server-side çalışıyor;
-`apps/kadeai`'de RLS (Row Level Security) + route-seviyeli kontrol var (23 testin
+`apps/kadexai`'de RLS (Row Level Security) + route-seviyeli kontrol var (23 testin
 bir kısmı IDOR/tenant-izolasyon senaryolarını kapsıyor, bkz. docs/01). **Bu madde
 zaten karşılanıyor, ek iş gerekmiyor.**
 

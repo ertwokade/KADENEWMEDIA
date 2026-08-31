@@ -256,7 +256,7 @@ export default function Login() {
 
                 {/* Content AI ayrı bir hesap: yanlış kapıya gelen ziyaretçi burada
                     şifresini üç kez denemek yerine doğru kapıyı görsün. */}
-                <a className="gate-crosslink" href="/kadeai/login">
+                <a className="gate-crosslink" href="/kadexai/login">
                   <span>Content AI aramıştınız?</span>
                   <strong>İçerik araçlarına git <em aria-hidden="true">↗</em></strong>
                 </a>

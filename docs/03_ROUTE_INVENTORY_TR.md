@@ -1,8 +1,8 @@
 # 03 — Rota Envanteri (Faz 1)
 
-Tarih: 23 Temmuz 2026. Kaynak: `src/App.jsx` (kök, elle çıkarıldı) ve `apps/kadeai/app/**` (find ile otomatik çıkarıldı). Kökteki önceki `ROUTE_MATRIX.md`/`ROUTE_AUDIT.md` ile çapraz kontrol edildi; bu belge güncel/taze halidir.
+Tarih: 23 Temmuz 2026. Kaynak: `src/App.jsx` (kök, elle çıkarıldı) ve `apps/kadexai/app/**` (find ile otomatik çıkarıldı). Kökteki önceki `ROUTE_MATRIX.md`/`ROUTE_AUDIT.md` ile çapraz kontrol edildi; bu belge güncel/taze halidir.
 
-**En önemli bulgu:** `apps/kadeai/app/dashboard/**` altında zaten 39 araç sayfası var ve bunların çoğu şartnamenin §15 (genel sosyal medya araçları) ve §16 (kişisel analiz) bölümlerinde "oluştur" denen araçlarla **birebir veya çok yakın örtüşüyor** (hook, title, description, hashtag, thread, carousel, clickbait-detector, viral-score, retention-analysis, competitor, social-audit, content-plan, comment-analysis, trends, performance, analytics, ideas, ab-test). Ayrıca `video-factory`, `clip-generator`, `dubbing` gibi sayfalar şartname §17'nin istediği "ChatCut alternatifi video editör" ile örtüşüyor olabilir. **Sonraki fazlarda bu envantere karşı gap-analizi yapılmadan hiçbir §15/§16/§17 özelliği "sıfırdan inşa" olarak ele alınmamalı** — aksi halde zaten var olan bir şey tekrar yazılır.
+**En önemli bulgu:** `apps/kadexai/app/dashboard/**` altında zaten 39 araç sayfası var ve bunların çoğu şartnamenin §15 (genel sosyal medya araçları) ve §16 (kişisel analiz) bölümlerinde "oluştur" denen araçlarla **birebir veya çok yakın örtüşüyor** (hook, title, description, hashtag, thread, carousel, clickbait-detector, viral-score, retention-analysis, competitor, social-audit, content-plan, comment-analysis, trends, performance, analytics, ideas, ab-test). Ayrıca `video-factory`, `clip-generator`, `dubbing` gibi sayfalar şartname §17'nin istediği "ChatCut alternatifi video editör" ile örtüşüyor olabilir. **Sonraki fazlarda bu envantere karşı gap-analizi yapılmadan hiçbir §15/§16/§17 özelliği "sıfırdan inşa" olarak ele alınmamalı** — aksi halde zaten var olan bir şey tekrar yazılır.
 
 ---
 
@@ -46,7 +46,7 @@ Tarih: 23 Temmuz 2026. Kaynak: `src/App.jsx` (kök, elle çıkarıldı) ve `apps
 
 **Webhook:** `/api/shopier` (POST, imza doğrulamalı). **Cron:** `/api/reminders?action=check` (günlük).
 
-## B. `apps/kadeai` (`/kadeai/**`, ayrı Vercel projesi, rewrite ile bağlı)
+## B. `apps/kadexai` (`/kadexai/**`, ayrı Vercel projesi, rewrite ile bağlı)
 
 ### Sayfalar (39 dashboard alt sayfası + 5 auth/onboarding sayfası)
 
@@ -71,7 +71,7 @@ Auth (`auth/*`), ödeme (`payments/checkout`, `payments/webhook`, `payments/stat
 ## C. Yetim/gizli/preview rota taraması
 
 - Kökte `App.jsx` dışında ekstra bir route tanımı bulunamadı; SPA `*` fallback'i ile tüm bilinmeyen yollar 404'e düşüyor (statik `app.html` sunumu doğrulanmalı — bkz. BLOCKERS, bu turda canlı HTTP testi yapılmadı).
-- `apps/kadeai`'de sayfa listesiyle `generate/*` API listesi karşılaştırıldığında birebir örtüşüyor — yetim API rotası görünmüyor.
+- `apps/kadexai`'de sayfa listesiyle `generate/*` API listesi karşılaştırıldığında birebir örtüşüyor — yetim API rotası görünmüyor.
 - Preview/test amaçlı ayrı bir rota tespit edilmedi.
 
 ## D. Sonraki adım

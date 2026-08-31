@@ -1,4 +1,4 @@
-# AUDIT_CHECKLIST.md — Kade New Media / Kade Studio / KadeAI Denetim Envanteri
+# AUDIT_CHECKLIST.md — Kade New Media / Kade Studio / KadexAI Denetim Envanteri
 
 Son güncelleme: 22 Temmuz 2026 (Aşama 1 — ilk envanter)
 
@@ -7,7 +7,7 @@ Son güncelleme: 22 Temmuz 2026 (Aşama 1 — ilk envanter)
 Bu repo, tek bir küçük site değil, **üç ayrı ürünü** aynı monorepo altında barındırıyor:
 
 1. **Kök dizin (legacy)** — Vite + React 19 ile yazılmış `kadenewmedia.com` pazarlama sitesi + Express tabanlı `server/api/*` (Vercel'de `api/[...path].js` catch-all üzerinden servis ediliyor). ~158 kaynak dosyası (`src/`) + 41 backend dosyası (`server/`).
-2. **`apps/kadeai`** — Next.js 16 App Router ile yazılmış, `/kadeai` altında çalışan bir **içerik/operasyon paneli** (sosyal medya AI araçları, ödeme/paket sistemi, Supabase auth). ~344 dosya. Kullanıcı talimatındaki "ödeme ve fiyatlandırma uygulaması" tanımı kısmen doğru — ödeme burada var, ama uygulamanın asıl işi 30'dan fazla AI içerik üretim aracı (başlık, hashtag, klip üretici, YouTube SEO, vb.).
+2. **`apps/kadexai`** — Next.js 16 App Router ile yazılmış, `/kadexai` altında çalışan bir **içerik/operasyon paneli** (sosyal medya AI araçları, ödeme/paket sistemi, Supabase auth). ~344 dosya. Kullanıcı talimatındaki "ödeme ve fiyatlandırma uygulaması" tanımı kısmen doğru — ödeme burada var, ama uygulamanın asıl işi 30'dan fazla AI içerik üretim aracı (başlık, hashtag, klip üretici, YouTube SEO, vb.).
 3. **`apps/studio-web` + `apps/studio-worker` + `packages/*`** — Kullanıcı talimatında hiç bahsedilmeyen, ayrı bir **video düzenleme stüdyosu** ("Kade Studio"): timeline editörü, FFmpeg export, PostgreSQL/Drizzle, Redis/BullMQ, MinIO, Docker Compose. ~122 dosya.
 
 Toplam birinci taraf dosya sayısı (node_modules/.next/dist hariç): **yaklaşık 677 dosya** (158 + 344 + 38 + 28 + 56 + 41 + 2 + 8 + kök seviye dosyalar). Bu, "satır satır" gerçek bir güvenlik + işlevsellik + SEO + metin + test denetiminin tek oturumda bitirilebilecek bir iş olmadığı anlamına geliyor; kullanıcı talimatının kendisi de 18 aşamalı bir sıra tanımlıyor. Bu belge, o çok aşamalı çalışmanın **canlı envanteridir** — her dosya tek seferde değil, ilgili aşama gerçekten o dosyaya dokunduğunda "İncelendi" olarak işaretlenecektir. Şu an itibarıyla çoğu dosya "İncelenecek" durumundadır; bunu "İncelendi, sorun bulunmadı" gibi göstermek yanlış güven verir.
@@ -29,10 +29,10 @@ Ayrıca repoda **daha önceki oturumlardan kalma kapsamlı denetim belgeleri zat
 | `CONTENT_REQUIRED.md` | Eksik içerik listesi | İncelenecek — "sahte fiyat/metin uydurma" kuralına uygunluk kontrol edilecek |
 | `ENVIRONMENT_BLOCKERS.md` | Bu ortamda test edilemeyen alanlar (browser, Upstash, Supabase staging, Shopier sandbox, rol fixture'ları) | **Geçerli — bu oturumda da aynı kısıtlar geçerli** |
 | `FIX_SUMMARY.md` | Önceki oturumda yapılan düzeltmeler özeti | Geçerli, aşağıda özetlendi |
-| `apps/kadeai/SECURITY_AUDIT.md`, `SECURITY.md`, `PRODUCTION_READINESS_REPORT.md`, `MIGRATION_REPORT.md` | KadeAI'a özel denetim/güvenlik/prod-hazırlık belgeleri | İncelenecek |
-| `apps/kadeai/_audit/` | Denetim script/çıktıları dizini | İncelenecek |
+| `apps/kadexai/SECURITY_AUDIT.md`, `SECURITY.md`, `PRODUCTION_READINESS_REPORT.md`, `MIGRATION_REPORT.md` | KadexAI'a özel denetim/güvenlik/prod-hazırlık belgeleri | İncelenecek |
+| `apps/kadexai/_audit/` | Denetim script/çıktıları dizini | İncelenecek |
 
-Önceki oturumda (bkz. `FIX_SUMMARY.md`) yapılmış ama **commit/push/merge/deploy edilmemiş** işler: 169 rotalı route-manifest + doğrulayıcı, sayfa bazlı SEO fallback'leri, Shopier server-owned katalog + idempotent webhook + uzlaştırma, KadeAI production AI kotasının Upstash Lua tabanlı atomik modele taşınması, bundle-secret tarayıcısı, FastAPI sertleştirmesi, Supabase migration/RLS script'leri, 30 yeni test. **Bu çalışmanın gerçekten `main`'e ulaşıp ulaşmadığı `git log` ile ayrıca doğrulanmalı** (git log'da bununla eşleşen "Supabase migration" ve "sanitize-html" commit'leri görüldü, ama Shopier/Upstash/bundle-secret commit'leri bu oturumda henüz teyit edilmedi).
+Önceki oturumda (bkz. `FIX_SUMMARY.md`) yapılmış ama **commit/push/merge/deploy edilmemiş** işler: 169 rotalı route-manifest + doğrulayıcı, sayfa bazlı SEO fallback'leri, Shopier server-owned katalog + idempotent webhook + uzlaştırma, KadexAI production AI kotasının Upstash Lua tabanlı atomik modele taşınması, bundle-secret tarayıcısı, FastAPI sertleştirmesi, Supabase migration/RLS script'leri, 30 yeni test. **Bu çalışmanın gerçekten `main`'e ulaşıp ulaşmadığı `git log` ile ayrıca doğrulanmalı** (git log'da bununla eşleşen "Supabase migration" ve "sanitize-html" commit'leri görüldü, ama Shopier/Upstash/bundle-secret commit'leri bu oturumda henüz teyit edilmedi).
 
 ## Aşama 1 — Dizin/modül seviyesi envanter (dosya bazlı ayrıntı sonraki aşamalarda doldurulacak)
 
@@ -43,12 +43,12 @@ Ayrıca repoda **daha önceki oturumlardan kalma kapsamlı denetim belgeleri zat
 | Legacy Express API (kaynak) | `server/api/*.js` (auth, blog, contact, crm, customers, shopier, seed, shortLinks, sitemap, users, vb. 27 dosya) | 41 | İncelenecek — Aşama 2/6, `server/api/seed.js` öncelikli (bkz. ROUTE_MATRIX.md notu) |
 | Legacy API giriş noktaları (Vercel) | `api/[...path].js` (152 satır), `api/sitemap.js` | 2 | İncelenecek — Aşama 2 |
 | Kök build/config | `vite.config.js`, `vercel.json`, `eslint.config.js`, `tsconfig.base.json`, `.env.example`, `docker-compose.yml` | ~10 | İncelendi (bu oturumda okundu) — vercel.json'daki Vercel Services çelişkisi ROUTE_MATRIX.md'de raporlandı |
-| KadeAI Next.js route handler'ları | `apps/kadeai/app/api/**/route.ts` | 51 | İncelenecek — Aşama 2/9, öncelik: `payments/*`, `auth/*` |
-| KadeAI dashboard sayfaları | `apps/kadeai/app/dashboard/**/page.tsx` | 37 | İncelenecek — Aşama 4 |
-| KadeAI ödeme/katalog mantığı | `apps/kadeai/lib/payments/` (catalog.ts okundu) | İncelenecek | `catalog.ts` İncelendi (bu oturumda okundu) — fiyatlar kodda sabit, admin düzenleme endpointi yok |
-| KadeAI backend (FastAPI, medya servisi) | `apps/kadeai/backend/` | çok sayıda | İncelenecek — Aşama 2 |
-| KadeAI Supabase migration'ları | `apps/kadeai/supabase/` | İncelenecek | İncelenecek — Aşama 2/12, ENVIRONMENT_BLOCKERS.md'de staging erişimi yok olarak işaretli |
-| KadeAI test dosyaları | `apps/kadeai/tests/` | İncelenecek | İncelenecek — Aşama 15 |
+| KadexAI Next.js route handler'ları | `apps/kadexai/app/api/**/route.ts` | 51 | İncelenecek — Aşama 2/9, öncelik: `payments/*`, `auth/*` |
+| KadexAI dashboard sayfaları | `apps/kadexai/app/dashboard/**/page.tsx` | 37 | İncelenecek — Aşama 4 |
+| KadexAI ödeme/katalog mantığı | `apps/kadexai/lib/payments/` (catalog.ts okundu) | İncelenecek | `catalog.ts` İncelendi (bu oturumda okundu) — fiyatlar kodda sabit, admin düzenleme endpointi yok |
+| KadexAI backend (FastAPI, medya servisi) | `apps/kadexai/backend/` | çok sayıda | İncelenecek — Aşama 2 |
+| KadexAI Supabase migration'ları | `apps/kadexai/supabase/` | İncelenecek | İncelenecek — Aşama 2/12, ENVIRONMENT_BLOCKERS.md'de staging erişimi yok olarak işaretli |
+| KadexAI test dosyaları | `apps/kadexai/tests/` | İncelenecek | İncelenecek — Aşama 15 |
 | Kade Studio web | `apps/studio-web/` | 38 | İncelenecek — kullanıcı talimatı kapsamında değil ama "birinci taraf kod" olduğu için Aşama 2 güvenlik taramasına dahil edilecek |
 | Kade Studio worker | `apps/studio-worker/` | 28 | İncelenecek |
 | Paylaşılan paketler | `packages/*` (editor-core, shared, db) | 56 | İncelenecek |

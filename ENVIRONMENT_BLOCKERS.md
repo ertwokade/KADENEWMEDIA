@@ -15,7 +15,7 @@ Kod şu anda request-attempt maliyetini minute/day bazında ayırır. Paket bazl
 Local/staging Supabase URL/CLI bağlantısı yok. Hazır statik doğrulama:
 
 ```bash
-npm --prefix apps/kadeai run audit:supabase
+npm --prefix apps/kadexai run audit:supabase
 supabase db reset
 supabase test db
 ```
@@ -28,4 +28,4 @@ Gerçek provider product ID, sandbox credential ve job scheduler yok. `SHOPIER_E
 
 ## 5. Role fixtures ve production passive sampling
 
-Admin/editor/viewer/customer/KadeAI/onboarding/quota durumları için staging hesapları yok. Production'da yalnız GET/HEAD ile CDN header, canonical, redirect ve asset 4xx/5xx örneklenmeli; gerçek form, ödeme veya kullanıcı oluşturma yapılmamalı.
+Admin/editor/viewer/customer/KadexAI/onboarding/quota durumları için staging hesapları yok. Production'da yalnız GET/HEAD ile CDN header, canonical, redirect ve asset 4xx/5xx örneklenmeli; gerçek form, ödeme veya kullanıcı oluşturma yapılmamalı.

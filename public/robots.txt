@@ -11,10 +11,10 @@ Disallow: /proje-takip
 Disallow: /giris
 Disallow: /kade-kit-business
 Disallow: /kade-kit-business/
-Disallow: /kadeai/dashboard
-Disallow: /kadeai/api/
-Disallow: /kadeai/onboarding
-Allow: /kadeai-demo
+Disallow: /kadexai/dashboard
+Disallow: /kadexai/api/
+Disallow: /kadexai/onboarding
+Allow: /kadexai-demo
 Disallow: /organizasyon-kiti
 Disallow: /organizasyon-kiti/
 

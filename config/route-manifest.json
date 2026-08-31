@@ -492,9 +492,9 @@
       "testPath": "/api/users"
     },
     {
-      "route": "/kadeai/api/admin/content",
+      "route": "/kadexai/api/admin/content",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "PUT"
@@ -505,12 +505,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/admin/content"
+      "testPath": "/kadexai/api/admin/content"
     },
     {
-      "route": "/kadeai/api/admin/legal",
+      "route": "/kadexai/api/admin/legal",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "PUT"
@@ -521,12 +521,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/admin/legal"
+      "testPath": "/kadexai/api/admin/legal"
     },
     {
-      "route": "/kadeai/api/admin/quotes",
+      "route": "/kadexai/api/admin/quotes",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "PATCH"
@@ -537,12 +537,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/admin/quotes"
+      "testPath": "/kadexai/api/admin/quotes"
     },
     {
-      "route": "/kadeai/api/admin/usage",
+      "route": "/kadexai/api/admin/usage",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -552,12 +552,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/admin/usage"
+      "testPath": "/kadexai/api/admin/usage"
     },
     {
-      "route": "/kadeai/api/assistant",
+      "route": "/kadexai/api/assistant",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -567,12 +567,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/assistant"
+      "testPath": "/kadexai/api/assistant"
     },
     {
-      "route": "/kadeai/api/auth/logout",
+      "route": "/kadexai/api/auth/logout",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -582,12 +582,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/auth/logout"
+      "testPath": "/kadexai/api/auth/logout"
     },
     {
-      "route": "/kadeai/api/auth/password",
+      "route": "/kadexai/api/auth/password",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -597,12 +597,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/auth/password"
+      "testPath": "/kadexai/api/auth/password"
     },
     {
-      "route": "/kadeai/api/auth/recovery",
+      "route": "/kadexai/api/auth/recovery",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -612,12 +612,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/auth/recovery"
+      "testPath": "/kadexai/api/auth/recovery"
     },
     {
-      "route": "/kadeai/api/auth/recovery-session",
+      "route": "/kadexai/api/auth/recovery-session",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -627,12 +627,12 @@
       ],
       "implemented": true,
       "expectedStatus": 401,
-      "testPath": "/kadeai/api/auth/recovery-session"
+      "testPath": "/kadexai/api/auth/recovery-session"
     },
     {
-      "route": "/kadeai/api/auth/update-password",
+      "route": "/kadexai/api/auth/update-password",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -642,12 +642,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/auth/update-password"
+      "testPath": "/kadexai/api/auth/update-password"
     },
     {
-      "route": "/kadeai/api/backend/health",
+      "route": "/kadexai/api/backend/health",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -657,12 +657,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/backend/health"
+      "testPath": "/kadexai/api/backend/health"
     },
     {
-      "route": "/kadeai/api/calendar",
+      "route": "/kadexai/api/calendar",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST",
@@ -675,12 +675,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/calendar"
+      "testPath": "/kadexai/api/calendar"
     },
     {
-      "route": "/kadeai/api/config",
+      "route": "/kadexai/api/config",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -690,12 +690,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/config"
+      "testPath": "/kadexai/api/config"
     },
     {
-      "route": "/kadeai/api/content-studio",
+      "route": "/kadexai/api/content-studio",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST"
@@ -706,12 +706,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/content-studio"
+      "testPath": "/kadexai/api/content-studio"
     },
     {
-      "route": "/kadeai/api/dubbing/tts",
+      "route": "/kadexai/api/dubbing/tts",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -721,12 +721,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/dubbing/tts"
+      "testPath": "/kadexai/api/dubbing/tts"
     },
     {
-      "route": "/kadeai/api/env-status",
+      "route": "/kadexai/api/env-status",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -736,12 +736,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/env-status"
+      "testPath": "/kadexai/api/env-status"
     },
     {
-      "route": "/kadeai/api/generate/analytics",
+      "route": "/kadexai/api/generate/analytics",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -751,12 +751,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/analytics"
+      "testPath": "/kadexai/api/generate/analytics"
     },
     {
-      "route": "/kadeai/api/generate/bio-link",
+      "route": "/kadexai/api/generate/bio-link",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -766,12 +766,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/bio-link"
+      "testPath": "/kadexai/api/generate/bio-link"
     },
     {
-      "route": "/kadeai/api/generate/bulk",
+      "route": "/kadexai/api/generate/bulk",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -781,12 +781,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/bulk"
+      "testPath": "/kadexai/api/generate/bulk"
     },
     {
-      "route": "/kadeai/api/generate/carousel",
+      "route": "/kadexai/api/generate/carousel",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -796,12 +796,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/carousel"
+      "testPath": "/kadexai/api/generate/carousel"
     },
     {
-      "route": "/kadeai/api/generate/clickbait-detector",
+      "route": "/kadexai/api/generate/clickbait-detector",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -811,12 +811,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/clickbait-detector"
+      "testPath": "/kadexai/api/generate/clickbait-detector"
     },
     {
-      "route": "/kadeai/api/generate/clips",
+      "route": "/kadexai/api/generate/clips",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -826,12 +826,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/clips"
+      "testPath": "/kadexai/api/generate/clips"
     },
     {
-      "route": "/kadeai/api/generate/collab-mail",
+      "route": "/kadexai/api/generate/collab-mail",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -841,12 +841,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/collab-mail"
+      "testPath": "/kadexai/api/generate/collab-mail"
     },
     {
-      "route": "/kadeai/api/generate/comment-analysis",
+      "route": "/kadexai/api/generate/comment-analysis",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -856,12 +856,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/comment-analysis"
+      "testPath": "/kadexai/api/generate/comment-analysis"
     },
     {
-      "route": "/kadeai/api/generate/competitor",
+      "route": "/kadexai/api/generate/competitor",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -871,12 +871,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/competitor"
+      "testPath": "/kadexai/api/generate/competitor"
     },
     {
-      "route": "/kadeai/api/generate/content-plan",
+      "route": "/kadexai/api/generate/content-plan",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -886,12 +886,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/content-plan"
+      "testPath": "/kadexai/api/generate/content-plan"
     },
     {
-      "route": "/kadeai/api/generate/description",
+      "route": "/kadexai/api/generate/description",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -901,12 +901,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/description"
+      "testPath": "/kadexai/api/generate/description"
     },
     {
-      "route": "/kadeai/api/generate/faq",
+      "route": "/kadexai/api/generate/faq",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -916,12 +916,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/faq"
+      "testPath": "/kadexai/api/generate/faq"
     },
     {
-      "route": "/kadeai/api/generate/hashtag",
+      "route": "/kadexai/api/generate/hashtag",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -931,12 +931,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/hashtag"
+      "testPath": "/kadexai/api/generate/hashtag"
     },
     {
-      "route": "/kadeai/api/generate/hook",
+      "route": "/kadexai/api/generate/hook",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -946,12 +946,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/hook"
+      "testPath": "/kadexai/api/generate/hook"
     },
     {
-      "route": "/kadeai/api/generate/ideas",
+      "route": "/kadexai/api/generate/ideas",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -961,12 +961,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/ideas"
+      "testPath": "/kadexai/api/generate/ideas"
     },
     {
-      "route": "/kadeai/api/generate/performance",
+      "route": "/kadexai/api/generate/performance",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -976,12 +976,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/performance"
+      "testPath": "/kadexai/api/generate/performance"
     },
     {
-      "route": "/kadeai/api/generate/quote-extractor",
+      "route": "/kadexai/api/generate/quote-extractor",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -991,12 +991,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/quote-extractor"
+      "testPath": "/kadexai/api/generate/quote-extractor"
     },
     {
-      "route": "/kadeai/api/generate/retention-analysis",
+      "route": "/kadexai/api/generate/retention-analysis",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1006,12 +1006,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/retention-analysis"
+      "testPath": "/kadexai/api/generate/retention-analysis"
     },
     {
-      "route": "/kadeai/api/generate/social-audit",
+      "route": "/kadexai/api/generate/social-audit",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1021,12 +1021,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/social-audit"
+      "testPath": "/kadexai/api/generate/social-audit"
     },
     {
-      "route": "/kadeai/api/generate/text-generator",
+      "route": "/kadexai/api/generate/text-generator",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1036,12 +1036,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/text-generator"
+      "testPath": "/kadexai/api/generate/text-generator"
     },
     {
-      "route": "/kadeai/api/generate/thread",
+      "route": "/kadexai/api/generate/thread",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1051,12 +1051,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/thread"
+      "testPath": "/kadexai/api/generate/thread"
     },
     {
-      "route": "/kadeai/api/generate/title",
+      "route": "/kadexai/api/generate/title",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1066,12 +1066,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/title"
+      "testPath": "/kadexai/api/generate/title"
     },
     {
-      "route": "/kadeai/api/generate/translate",
+      "route": "/kadexai/api/generate/translate",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1081,12 +1081,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/translate"
+      "testPath": "/kadexai/api/generate/translate"
     },
     {
-      "route": "/kadeai/api/generate/trends",
+      "route": "/kadexai/api/generate/trends",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1096,12 +1096,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/trends"
+      "testPath": "/kadexai/api/generate/trends"
     },
     {
-      "route": "/kadeai/api/generate/tts",
+      "route": "/kadexai/api/generate/tts",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1111,12 +1111,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/tts"
+      "testPath": "/kadexai/api/generate/tts"
     },
     {
-      "route": "/kadeai/api/generate/viral-score",
+      "route": "/kadexai/api/generate/viral-score",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1126,12 +1126,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/viral-score"
+      "testPath": "/kadexai/api/generate/viral-score"
     },
     {
-      "route": "/kadeai/api/generate/youtube-seo",
+      "route": "/kadexai/api/generate/youtube-seo",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1141,12 +1141,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/generate/youtube-seo"
+      "testPath": "/kadexai/api/generate/youtube-seo"
     },
     {
-      "route": "/kadeai/api/health",
+      "route": "/kadexai/api/health",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1156,12 +1156,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/health"
+      "testPath": "/kadexai/api/health"
     },
     {
-      "route": "/kadeai/api/history",
+      "route": "/kadexai/api/history",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST",
@@ -1173,12 +1173,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/history"
+      "testPath": "/kadexai/api/history"
     },
     {
-      "route": "/kadeai/api/image",
+      "route": "/kadexai/api/image",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1188,12 +1188,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/image"
+      "testPath": "/kadexai/api/image"
     },
     {
-      "route": "/kadeai/api/kade-search/alerts",
+      "route": "/kadexai/api/kade-search/alerts",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1203,12 +1203,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/alerts"
+      "testPath": "/kadexai/api/kade-search/alerts"
     },
     {
-      "route": "/kadeai/api/kade-search/approvals",
+      "route": "/kadexai/api/kade-search/approvals",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST"
@@ -1219,12 +1219,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/approvals"
+      "testPath": "/kadexai/api/kade-search/approvals"
     },
     {
-      "route": "/kadeai/api/kade-search/collect",
+      "route": "/kadexai/api/kade-search/collect",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST",
         "GET"
@@ -1235,12 +1235,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/collect"
+      "testPath": "/kadexai/api/kade-search/collect"
     },
     {
-      "route": "/kadeai/api/kade-search/daily-digest",
+      "route": "/kadexai/api/kade-search/daily-digest",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST"
@@ -1251,12 +1251,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/daily-digest"
+      "testPath": "/kadexai/api/kade-search/daily-digest"
     },
     {
-      "route": "/kadeai/api/kade-search/ideas",
+      "route": "/kadexai/api/kade-search/ideas",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1266,12 +1266,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/ideas"
+      "testPath": "/kadexai/api/kade-search/ideas"
     },
     {
-      "route": "/kadeai/api/kade-search/pulse",
+      "route": "/kadexai/api/kade-search/pulse",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1281,12 +1281,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/pulse"
+      "testPath": "/kadexai/api/kade-search/pulse"
     },
     {
-      "route": "/kadeai/api/kade-search/radar",
+      "route": "/kadexai/api/kade-search/radar",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1296,12 +1296,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/radar"
+      "testPath": "/kadexai/api/kade-search/radar"
     },
     {
-      "route": "/kadeai/api/kade-search/sources",
+      "route": "/kadexai/api/kade-search/sources",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1311,12 +1311,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/sources"
+      "testPath": "/kadexai/api/kade-search/sources"
     },
     {
-      "route": "/kadeai/api/kade-search/stats",
+      "route": "/kadexai/api/kade-search/stats",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1326,12 +1326,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/stats"
+      "testPath": "/kadexai/api/kade-search/stats"
     },
     {
-      "route": "/kadeai/api/kade-search/trend/[id]",
+      "route": "/kadexai/api/kade-search/trend/[id]",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1341,12 +1341,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/trend/audit-id"
+      "testPath": "/kadexai/api/kade-search/trend/audit-id"
     },
     {
-      "route": "/kadeai/api/kade-search/trend/[id]/whatsapp",
+      "route": "/kadexai/api/kade-search/trend/[id]/whatsapp",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1356,12 +1356,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/trend/audit-id/whatsapp"
+      "testPath": "/kadexai/api/kade-search/trend/audit-id/whatsapp"
     },
     {
-      "route": "/kadeai/api/kade-search/trends",
+      "route": "/kadexai/api/kade-search/trends",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1371,12 +1371,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/trends"
+      "testPath": "/kadexai/api/kade-search/trends"
     },
     {
-      "route": "/kadeai/api/kade-search/watchlist",
+      "route": "/kadexai/api/kade-search/watchlist",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST",
@@ -1388,12 +1388,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/watchlist"
+      "testPath": "/kadexai/api/kade-search/watchlist"
     },
     {
-      "route": "/kadeai/api/kade-search/weekly-digest",
+      "route": "/kadexai/api/kade-search/weekly-digest",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST"
@@ -1404,12 +1404,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/kade-search/weekly-digest"
+      "testPath": "/kadexai/api/kade-search/weekly-digest"
     },
     {
-      "route": "/kadeai/api/legal",
+      "route": "/kadexai/api/legal",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1419,12 +1419,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/legal"
+      "testPath": "/kadexai/api/legal"
     },
     {
-      "route": "/kadeai/api/materials",
+      "route": "/kadexai/api/materials",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1434,12 +1434,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/materials"
+      "testPath": "/kadexai/api/materials"
     },
     {
-      "route": "/kadeai/api/materials/sync",
+      "route": "/kadexai/api/materials/sync",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST",
         "GET"
@@ -1450,12 +1450,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/materials/sync"
+      "testPath": "/kadexai/api/materials/sync"
     },
     {
-      "route": "/kadeai/api/notifications/daily-summary",
+      "route": "/kadexai/api/notifications/daily-summary",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1465,12 +1465,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/notifications/daily-summary"
+      "testPath": "/kadexai/api/notifications/daily-summary"
     },
     {
-      "route": "/kadeai/api/operations-report",
+      "route": "/kadexai/api/operations-report",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1480,12 +1480,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/operations-report"
+      "testPath": "/kadexai/api/operations-report"
     },
     {
-      "route": "/kadeai/api/operations-state",
+      "route": "/kadexai/api/operations-state",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "PUT"
@@ -1496,12 +1496,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/operations-state"
+      "testPath": "/kadexai/api/operations-state"
     },
     {
-      "route": "/kadeai/api/orchestrate",
+      "route": "/kadexai/api/orchestrate",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST"
@@ -1512,12 +1512,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/orchestrate"
+      "testPath": "/kadexai/api/orchestrate"
     },
     {
-      "route": "/kadeai/api/packages",
+      "route": "/kadexai/api/packages",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1527,12 +1527,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/packages"
+      "testPath": "/kadexai/api/packages"
     },
     {
-      "route": "/kadeai/api/payments/admin/custom-offer",
+      "route": "/kadexai/api/payments/admin/custom-offer",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1542,12 +1542,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/payments/admin/custom-offer"
+      "testPath": "/kadexai/api/payments/admin/custom-offer"
     },
     {
-      "route": "/kadeai/api/payments/admin/pricing",
+      "route": "/kadexai/api/payments/admin/pricing",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "PUT"
@@ -1558,12 +1558,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/payments/admin/pricing"
+      "testPath": "/kadexai/api/payments/admin/pricing"
     },
     {
-      "route": "/kadeai/api/payments/checkout",
+      "route": "/kadexai/api/payments/checkout",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1573,12 +1573,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/payments/checkout"
+      "testPath": "/kadexai/api/payments/checkout"
     },
     {
-      "route": "/kadeai/api/payments/offers",
+      "route": "/kadexai/api/payments/offers",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1588,12 +1588,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/payments/offers"
+      "testPath": "/kadexai/api/payments/offers"
     },
     {
-      "route": "/kadeai/api/payments/owner",
+      "route": "/kadexai/api/payments/owner",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST"
@@ -1604,12 +1604,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/payments/owner"
+      "testPath": "/kadexai/api/payments/owner"
     },
     {
-      "route": "/kadeai/api/payments/shopier/redirect",
+      "route": "/kadexai/api/payments/shopier/redirect",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1619,12 +1619,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/payments/shopier/redirect"
+      "testPath": "/kadexai/api/payments/shopier/redirect"
     },
     {
-      "route": "/kadeai/api/payments/status",
+      "route": "/kadexai/api/payments/status",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1634,12 +1634,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/payments/status"
+      "testPath": "/kadexai/api/payments/status"
     },
     {
-      "route": "/kadeai/api/payments/webhook",
+      "route": "/kadexai/api/payments/webhook",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1649,12 +1649,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/payments/webhook"
+      "testPath": "/kadexai/api/payments/webhook"
     },
     {
-      "route": "/kadeai/api/profile",
+      "route": "/kadexai/api/profile",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "PUT"
@@ -1665,12 +1665,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/profile"
+      "testPath": "/kadexai/api/profile"
     },
     {
-      "route": "/kadeai/api/provider-keys",
+      "route": "/kadexai/api/provider-keys",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "PUT",
@@ -1682,12 +1682,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/provider-keys"
+      "testPath": "/kadexai/api/provider-keys"
     },
     {
-      "route": "/kadeai/api/quotes",
+      "route": "/kadexai/api/quotes",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST"
@@ -1698,12 +1698,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/quotes"
+      "testPath": "/kadexai/api/quotes"
     },
     {
-      "route": "/kadeai/api/reports/weekly-site",
+      "route": "/kadexai/api/reports/weekly-site",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST"
@@ -1714,12 +1714,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/reports/weekly-site"
+      "testPath": "/kadexai/api/reports/weekly-site"
     },
     {
-      "route": "/kadeai/api/subscriptions/sweep",
+      "route": "/kadexai/api/subscriptions/sweep",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1729,12 +1729,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/subscriptions/sweep"
+      "testPath": "/kadexai/api/subscriptions/sweep"
     },
     {
-      "route": "/kadeai/api/subtitles/translate",
+      "route": "/kadexai/api/subtitles/translate",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1744,12 +1744,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/subtitles/translate"
+      "testPath": "/kadexai/api/subtitles/translate"
     },
     {
-      "route": "/kadeai/api/templates",
+      "route": "/kadexai/api/templates",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST",
@@ -1762,12 +1762,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/templates"
+      "testPath": "/kadexai/api/templates"
     },
     {
-      "route": "/kadeai/api/transcribe",
+      "route": "/kadexai/api/transcribe",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1777,12 +1777,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/transcribe"
+      "testPath": "/kadexai/api/transcribe"
     },
     {
-      "route": "/kadeai/api/usage",
+      "route": "/kadexai/api/usage",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1792,12 +1792,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/usage"
+      "testPath": "/kadexai/api/usage"
     },
     {
-      "route": "/kadeai/api/video",
+      "route": "/kadexai/api/video",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1807,12 +1807,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/video"
+      "testPath": "/kadexai/api/video"
     },
     {
-      "route": "/kadeai/api/youtube/callback",
+      "route": "/kadexai/api/youtube/callback",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1822,12 +1822,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/youtube/callback"
+      "testPath": "/kadexai/api/youtube/callback"
     },
     {
-      "route": "/kadeai/api/youtube/captions",
+      "route": "/kadexai/api/youtube/captions",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET",
         "POST"
@@ -1838,12 +1838,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/youtube/captions"
+      "testPath": "/kadexai/api/youtube/captions"
     },
     {
-      "route": "/kadeai/api/youtube/comments",
+      "route": "/kadexai/api/youtube/comments",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1853,12 +1853,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/youtube/comments"
+      "testPath": "/kadexai/api/youtube/comments"
     },
     {
-      "route": "/kadeai/api/youtube/connect",
+      "route": "/kadexai/api/youtube/connect",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1868,12 +1868,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/youtube/connect"
+      "testPath": "/kadexai/api/youtube/connect"
     },
     {
-      "route": "/kadeai/api/youtube/disconnect",
+      "route": "/kadexai/api/youtube/disconnect",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "POST"
       ],
@@ -1883,12 +1883,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/youtube/disconnect"
+      "testPath": "/kadexai/api/youtube/disconnect"
     },
     {
-      "route": "/kadeai/api/youtube/status",
+      "route": "/kadexai/api/youtube/status",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1898,12 +1898,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/youtube/status"
+      "testPath": "/kadexai/api/youtube/status"
     },
     {
-      "route": "/kadeai/api/youtube/videos",
+      "route": "/kadexai/api/youtube/videos",
       "type": "api",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -1913,7 +1913,7 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/api/youtube/videos"
+      "testPath": "/kadexai/api/youtube/videos"
     },
     {
       "route": "/sitemap.xml",
@@ -2291,9 +2291,9 @@
       "testPath": "/iletisim"
     },
     {
-      "route": "/kadeai",
+      "route": "/kadexai",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2303,10 +2303,10 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai"
+      "testPath": "/kadexai"
     },
     {
-      "route": "/kadeai-demo",
+      "route": "/kadexai-demo",
       "type": "page",
       "app": "root",
       "methods": [
@@ -2318,12 +2318,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai-demo"
+      "testPath": "/kadexai-demo"
     },
     {
-      "route": "/kadeai/auth",
+      "route": "/kadexai/auth",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2333,12 +2333,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/auth"
+      "testPath": "/kadexai/auth"
     },
     {
-      "route": "/kadeai/auth/callback",
+      "route": "/kadexai/auth/callback",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2348,12 +2348,12 @@
       ],
       "implemented": true,
       "expectedStatus": 307,
-      "testPath": "/kadeai/auth/callback"
+      "testPath": "/kadexai/auth/callback"
     },
     {
-      "route": "/kadeai/dashboard/admin",
+      "route": "/kadexai/dashboard/admin",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2363,12 +2363,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/admin"
+      "testPath": "/kadexai/dashboard/admin"
     },
     {
-      "route": "/kadeai/dashboard/api-keys",
+      "route": "/kadexai/dashboard/api-keys",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2378,12 +2378,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/api-keys"
+      "testPath": "/kadexai/dashboard/api-keys"
     },
     {
-      "route": "/kadeai/dashboard/kade-search",
+      "route": "/kadexai/dashboard/kade-search",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2393,12 +2393,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/kade-search"
+      "testPath": "/kadexai/dashboard/kade-search"
     },
     {
-      "route": "/kadeai/dashboard/materyal",
+      "route": "/kadexai/dashboard/materyal",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2408,12 +2408,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/materyal"
+      "testPath": "/kadexai/dashboard/materyal"
     },
     {
-      "route": "/kadeai/dashboard/orchestrate",
+      "route": "/kadexai/dashboard/orchestrate",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2423,12 +2423,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/orchestrate"
+      "testPath": "/kadexai/dashboard/orchestrate"
     },
     {
-      "route": "/kadeai/dashboard/packages",
+      "route": "/kadexai/dashboard/packages",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2438,12 +2438,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/packages"
+      "testPath": "/kadexai/dashboard/packages"
     },
     {
-      "route": "/kadeai/dashboard/quote",
+      "route": "/kadexai/dashboard/quote",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2453,12 +2453,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/quote"
+      "testPath": "/kadexai/dashboard/quote"
     },
     {
-      "route": "/kadeai/dashboard/subtitles",
+      "route": "/kadexai/dashboard/subtitles",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2468,12 +2468,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/subtitles"
+      "testPath": "/kadexai/dashboard/subtitles"
     },
     {
-      "route": "/kadeai/dashboard/trend-radar",
+      "route": "/kadexai/dashboard/trend-radar",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2483,12 +2483,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/trend-radar"
+      "testPath": "/kadexai/dashboard/trend-radar"
     },
     {
-      "route": "/kadeai/dashboard/video-factory",
+      "route": "/kadexai/dashboard/video-factory",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2498,12 +2498,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/video-factory"
+      "testPath": "/kadexai/dashboard/video-factory"
     },
     {
-      "route": "/kadeai/legal/[slug]",
+      "route": "/kadexai/legal/[slug]",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2513,12 +2513,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/legal/mesafeli-satis"
+      "testPath": "/kadexai/legal/mesafeli-satis"
     },
     {
-      "route": "/kadeai/login",
+      "route": "/kadexai/login",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2528,12 +2528,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/login"
+      "testPath": "/kadexai/login"
     },
     {
-      "route": "/kadeai/logout",
+      "route": "/kadexai/logout",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2543,12 +2543,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/logout"
+      "testPath": "/kadexai/logout"
     },
     {
-      "route": "/kadeai/onboarding",
+      "route": "/kadexai/onboarding",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2558,12 +2558,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/onboarding"
+      "testPath": "/kadexai/onboarding"
     },
     {
-      "route": "/kadeai/reset-password",
+      "route": "/kadexai/reset-password",
       "type": "page",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2573,7 +2573,7 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/reset-password"
+      "testPath": "/kadexai/reset-password"
     },
     {
       "route": "/kadelinks",
@@ -2846,9 +2846,9 @@
       "testPath": "/kade-kit-business"
     },
     {
-      "route": "/kadeai/dashboard",
+      "route": "/kadexai/dashboard",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2858,12 +2858,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard"
+      "testPath": "/kadexai/dashboard"
     },
     {
-      "route": "/kadeai/dashboard/ab-test",
+      "route": "/kadexai/dashboard/ab-test",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2873,13 +2873,13 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/ab-test",
+      "testPath": "/kadexai/dashboard/ab-test",
       "note": "yönlendirme — viral-score / trend-radar"
     },
     {
-      "route": "/kadeai/dashboard/ai-thumbnail",
+      "route": "/kadexai/dashboard/ai-thumbnail",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2889,12 +2889,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/ai-thumbnail"
+      "testPath": "/kadexai/dashboard/ai-thumbnail"
     },
     {
-      "route": "/kadeai/dashboard/analytics",
+      "route": "/kadexai/dashboard/analytics",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2904,12 +2904,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/analytics"
+      "testPath": "/kadexai/dashboard/analytics"
     },
     {
-      "route": "/kadeai/dashboard/bio-link",
+      "route": "/kadexai/dashboard/bio-link",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2919,12 +2919,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/bio-link"
+      "testPath": "/kadexai/dashboard/bio-link"
     },
     {
-      "route": "/kadeai/dashboard/bulk",
+      "route": "/kadexai/dashboard/bulk",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2934,12 +2934,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/bulk"
+      "testPath": "/kadexai/dashboard/bulk"
     },
     {
-      "route": "/kadeai/dashboard/calendar",
+      "route": "/kadexai/dashboard/calendar",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2949,12 +2949,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/calendar"
+      "testPath": "/kadexai/dashboard/calendar"
     },
     {
-      "route": "/kadeai/dashboard/carousel",
+      "route": "/kadexai/dashboard/carousel",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2964,12 +2964,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/carousel"
+      "testPath": "/kadexai/dashboard/carousel"
     },
     {
-      "route": "/kadeai/dashboard/clickbait-detector",
+      "route": "/kadexai/dashboard/clickbait-detector",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2979,12 +2979,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/clickbait-detector"
+      "testPath": "/kadexai/dashboard/clickbait-detector"
     },
     {
-      "route": "/kadeai/dashboard/clip-generator",
+      "route": "/kadexai/dashboard/clip-generator",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -2994,12 +2994,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/clip-generator"
+      "testPath": "/kadexai/dashboard/clip-generator"
     },
     {
-      "route": "/kadeai/dashboard/collab-mail",
+      "route": "/kadexai/dashboard/collab-mail",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3009,12 +3009,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/collab-mail"
+      "testPath": "/kadexai/dashboard/collab-mail"
     },
     {
-      "route": "/kadeai/dashboard/comment-analysis",
+      "route": "/kadexai/dashboard/comment-analysis",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3024,12 +3024,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/comment-analysis"
+      "testPath": "/kadexai/dashboard/comment-analysis"
     },
     {
-      "route": "/kadeai/dashboard/competitor",
+      "route": "/kadexai/dashboard/competitor",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3039,12 +3039,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/competitor"
+      "testPath": "/kadexai/dashboard/competitor"
     },
     {
-      "route": "/kadeai/dashboard/content-plan",
+      "route": "/kadexai/dashboard/content-plan",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3054,12 +3054,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/content-plan"
+      "testPath": "/kadexai/dashboard/content-plan"
     },
     {
-      "route": "/kadeai/dashboard/content-studio",
+      "route": "/kadexai/dashboard/content-studio",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3069,12 +3069,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/content-studio"
+      "testPath": "/kadexai/dashboard/content-studio"
     },
     {
-      "route": "/kadeai/dashboard/description",
+      "route": "/kadexai/dashboard/description",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3084,12 +3084,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/description"
+      "testPath": "/kadexai/dashboard/description"
     },
     {
-      "route": "/kadeai/dashboard/dubbing",
+      "route": "/kadexai/dashboard/dubbing",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3099,12 +3099,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/dubbing"
+      "testPath": "/kadexai/dashboard/dubbing"
     },
     {
-      "route": "/kadeai/dashboard/faq",
+      "route": "/kadexai/dashboard/faq",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3114,12 +3114,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/faq"
+      "testPath": "/kadexai/dashboard/faq"
     },
     {
-      "route": "/kadeai/dashboard/hashtag",
+      "route": "/kadexai/dashboard/hashtag",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3129,12 +3129,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/hashtag"
+      "testPath": "/kadexai/dashboard/hashtag"
     },
     {
-      "route": "/kadeai/dashboard/history",
+      "route": "/kadexai/dashboard/history",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3144,12 +3144,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/history"
+      "testPath": "/kadexai/dashboard/history"
     },
     {
-      "route": "/kadeai/dashboard/hook",
+      "route": "/kadexai/dashboard/hook",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3159,12 +3159,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/hook"
+      "testPath": "/kadexai/dashboard/hook"
     },
     {
-      "route": "/kadeai/dashboard/ideas",
+      "route": "/kadexai/dashboard/ideas",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3174,12 +3174,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/ideas"
+      "testPath": "/kadexai/dashboard/ideas"
     },
     {
-      "route": "/kadeai/dashboard/operations",
+      "route": "/kadexai/dashboard/operations",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3189,12 +3189,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/operations"
+      "testPath": "/kadexai/dashboard/operations"
     },
     {
-      "route": "/kadeai/dashboard/performance",
+      "route": "/kadexai/dashboard/performance",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3204,12 +3204,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/performance"
+      "testPath": "/kadexai/dashboard/performance"
     },
     {
-      "route": "/kadeai/dashboard/quote-extractor",
+      "route": "/kadexai/dashboard/quote-extractor",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3219,12 +3219,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/quote-extractor"
+      "testPath": "/kadexai/dashboard/quote-extractor"
     },
     {
-      "route": "/kadeai/dashboard/retention-analysis",
+      "route": "/kadexai/dashboard/retention-analysis",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3234,12 +3234,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/retention-analysis"
+      "testPath": "/kadexai/dashboard/retention-analysis"
     },
     {
-      "route": "/kadeai/dashboard/settings",
+      "route": "/kadexai/dashboard/settings",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3249,12 +3249,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/settings"
+      "testPath": "/kadexai/dashboard/settings"
     },
     {
-      "route": "/kadeai/dashboard/shopier",
+      "route": "/kadexai/dashboard/shopier",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3264,12 +3264,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/shopier"
+      "testPath": "/kadexai/dashboard/shopier"
     },
     {
-      "route": "/kadeai/dashboard/social-audit",
+      "route": "/kadexai/dashboard/social-audit",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3279,12 +3279,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/social-audit"
+      "testPath": "/kadexai/dashboard/social-audit"
     },
     {
-      "route": "/kadeai/dashboard/templates",
+      "route": "/kadexai/dashboard/templates",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3294,12 +3294,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/templates"
+      "testPath": "/kadexai/dashboard/templates"
     },
     {
-      "route": "/kadeai/dashboard/text-generator",
+      "route": "/kadexai/dashboard/text-generator",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3309,12 +3309,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/text-generator"
+      "testPath": "/kadexai/dashboard/text-generator"
     },
     {
-      "route": "/kadeai/dashboard/thread",
+      "route": "/kadexai/dashboard/thread",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3324,12 +3324,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/thread"
+      "testPath": "/kadexai/dashboard/thread"
     },
     {
-      "route": "/kadeai/dashboard/title",
+      "route": "/kadexai/dashboard/title",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3339,12 +3339,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/title"
+      "testPath": "/kadexai/dashboard/title"
     },
     {
-      "route": "/kadeai/dashboard/trends",
+      "route": "/kadexai/dashboard/trends",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3354,13 +3354,13 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/trends",
+      "testPath": "/kadexai/dashboard/trends",
       "note": "yönlendirme — viral-score / trend-radar"
     },
     {
-      "route": "/kadeai/dashboard/viral-score",
+      "route": "/kadexai/dashboard/viral-score",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3370,12 +3370,12 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/viral-score"
+      "testPath": "/kadexai/dashboard/viral-score"
     },
     {
-      "route": "/kadeai/dashboard/youtube-seo",
+      "route": "/kadexai/dashboard/youtube-seo",
       "type": "protected",
-      "app": "kadeai",
+      "app": "kadexai",
       "methods": [
         "GET"
       ],
@@ -3385,7 +3385,7 @@
       ],
       "implemented": true,
       "expectedStatus": 200,
-      "testPath": "/kadeai/dashboard/youtube-seo"
+      "testPath": "/kadexai/dashboard/youtube-seo"
     },
     {
       "route": "/organizasyon-kiti",

@@ -33,7 +33,7 @@ export default function TelifHaklari() {
 
               <h2>2. Marka ve Logo</h2>
               <p>
-                "Kade New Media", "kadeadmin", "KadeAI" ve ilişkili logo/marka unsurları Kade New
+                "Kade New Media", "kadeadmin", "KadexAI" ve ilişkili logo/marka unsurları Kade New
                 Media'nın tescilli veya tescilsiz markalarıdır. Bu unsurların izinsiz kullanımı,
                 değiştirilmesi veya taklit edilmesi yasal işlem konusu olabilir.
               </p>

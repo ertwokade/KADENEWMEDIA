@@ -8,7 +8,7 @@ dayanıyor (spekülasyon değil) — kanıt olarak dosya yolları verildi.
 
 ## KARAR 1 — Video editör (şartname §17) temeli: Kade Studio
 
-**Soru:** `apps/studio-web`/`apps/studio-worker` (Kade Studio), `apps/kadeai`'nin
+**Soru:** `apps/studio-web`/`apps/studio-worker` (Kade Studio), `apps/kadexai`'nin
 video sayfaları (video-factory/clip-generator/dubbing) ve şartnamenin istediği
 "ChatCut alternatifi, özgün AI video editör" — üçü aynı şey mi, hangisi temel
 alınmalı?
@@ -23,7 +23,7 @@ alınmalı?
   proje/timeline/export API'leri, versiyonlama (timeline snapshot). Bu, 20 Temmuz
   2026'da tek bir yoğun oturumda inşa edilmiş, gerçek ve çalışan bir mimari — iskelet
   değil.
-- `apps/kadeai`'nin video sayfaları **birer editör değil, tekil AI araçları**:
+- `apps/kadexai`'nin video sayfaları **birer editör değil, tekil AI araçları**:
   `video-factory` sunucu tarafında prompt-to-video üretiyor (mpturbo/
   MoneyPrinterTurbo motoruyla), `clip-generator` tamamen tarayıcı-içi (ffmpeg.wasm)
   çalışıyor ve sunucu tarafı proje/kuyruk/kredi durumu yok (sayfa kapanınca kaybolur),
@@ -33,7 +33,7 @@ alınmalı?
 
 **Karar: Şartname §17'nin temeli olarak Kade Studio kullanılacak.** Sıfırdan
 dördüncü bir video ürünü inşa edilmeyecek — bu hem şartnamenin §1.2 "gereksiz
-karmaşa ekleme" kuralına hem de mühendislik mantığına aykırı olurdu. `kadeai`'nin
+karmaşa ekleme" kuralına hem de mühendislik mantığına aykırı olurdu. `kadexai`'nin
 `video-factory`/`clip-generator` sayfaları **ayrı, tamamlayıcı tekil araçlar**
 olarak kalacak (kaldırılmayacak, ama ChatCut-alternatifi kapsamına dahil
 edilmeyecek — mimarileri buna uygun değil).
@@ -47,7 +47,7 @@ doğrulama), prod Whisper entegrasyonunun doğrulanması.
 
 ## KARAR 2 — Sosyal medya araçları (§15/§16): mevcut olanı genişlet, kopyalama
 
-**Bulgu:** `apps/kadeai`'nin 35 dashboard sayfasının çoğu şartnamenin §15
+**Bulgu:** `apps/kadexai`'nin 35 dashboard sayfasının çoğu şartnamenin §15
 listesiyle **kısmen ila tam** örtüşüyor (metin/caption, içerik fikri, hashtag,
 içerik takvimi, kısa-içerik-çıkarma tam; hook/başlık-analizi/platform-yeniden-yazma
 kısmi). **Gerçek boşluklar**: CTA oluşturucu, marka tonu kontrolü, içerik kalite
@@ -83,7 +83,7 @@ resmî platform API entegrasyonu ayrı bir blocker olarak işaretli kalacak.
 ## KARAR 3 — İki ayrı ticaret/kimlik sistemi birleştirilmeyecek
 
 Bkz. `docs/05_COMMERCE_AND_ENTITLEMENT_TR.md` §1 — gerekçe orada detaylı: kök
-(özel JWT) ve kadeai (Supabase Auth) farklı auth modelleri kullanıyor, zorla
+(özel JWT) ve kadexai (Supabase Auth) farklı auth modelleri kullanıyor, zorla
 birleştirme büyük bir migration riski taşır ve şartnamenin "mevcut mimariyi
 anlamadan değiştirme" ve "veri kaybı riski taşıyan migration üretme" yasaklarıyla
 çelişir. Her iki sistem de aynı KAVRAMSAL modele ayrı ayrı hizalanacak.

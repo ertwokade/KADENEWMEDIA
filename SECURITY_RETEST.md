@@ -11,7 +11,7 @@
 - Sitemap host/domain ve XML escape: PASS.
 - Shopier price/currency/disabled product: PASS.
 - Shopier reconciliation: PASS; entitlement üretmez.
-- KadeAI quota/idempotency/fail-closed: PASS (unit), canlı Upstash BLOCKED; aylık paket kotası/finalize-refund açık Medium risktir.
+- KadexAI quota/idempotency/fail-closed: PASS (unit), canlı Upstash BLOCKED; aylık paket kotası/finalize-refund açık Medium risktir.
 - FastAPI auth/path/size/content-type/timeout/error redaction: PASS.
 - Supabase final RLS/grants static audit: PASS; live User A/B matrisi BLOCKED.
 - Üç sentetik canary bundle taraması: PASS; sıfır canary FAIL olacak biçimde assertion var.

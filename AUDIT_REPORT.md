@@ -1,7 +1,7 @@
 # Kade Media Teknik, Güvenlik ve Production Readiness Denetimi
 
-Denetim tarihi: 19 Temmuz 2026  
-Kapsam: root Vite/React + Express/Vercel API, MongoDB, `/kadeai` Next.js/Supabase/FastAPI, 169 route/test girdisi.  
+Denetim tarihi: 19 Temmuz 2026
+Kapsam: root Vite/React + Express/Vercel API, MongoDB, `/kadexai` Next.js/Supabase/FastAPI, 169 route/test girdisi.
 Hariç: bağımsız ve ignore edilen `kadeallinone` nested repository ile `kademedia-orijinal-yedek`; bunlar aktif deployment kaynakları kabul edilmedi.
 
 ## 1. Yönetici özeti
@@ -17,11 +17,11 @@ Kod şu anda lint, TypeScript, unit ve production build seviyesinde temizdir. Yi
 - Ana site: React 19, React Router 7, Vite 8; Vercel static build + `api/[...path].js` catch-all serverless API.
 - Yerel API: Express 5 (`server.js`); aynı `server/api/*` handler’larını kullanır.
 - Root veri/auth: MongoDB 7, bcrypt, JWT HttpOnly cookie, imzalı double-submit CSRF, role/permission matrisi.
-- KadeAI: Next.js 16.2.10 App Router, TypeScript, Next proxy, Supabase Auth/Postgres/RLS, provider tabanlı AI katmanı.
-- KadeAI backend: ayrı FastAPI servisi; bearer token ile iç servis erişimi.
-- Ödeme: root Shopier webhook; KadeAI provider abstraction + server product catalog + prepared Supabase payment tabloları.
-- Deployment: root Vercel; `/kadeai/:path*` ayrı KadeAI deployment’ına rewrite.
-- Package manager: npm; root ve `apps/kadeai` ayrı `package-lock.json` kullanır.
+- KadexAI: Next.js 16.2.10 App Router, TypeScript, Next proxy, Supabase Auth/Postgres/RLS, provider tabanlı AI katmanı.
+- KadexAI backend: ayrı FastAPI servisi; bearer token ile iç servis erişimi.
+- Ödeme: root Shopier webhook; KadexAI provider abstraction + server product catalog + prepared Supabase payment tabloları.
+- Deployment: root Vercel; `/kadexai/:path*` ayrı KadexAI deployment’ına rewrite.
+- Package manager: npm; root ve `apps/kadexai` ayrı `package-lock.json` kullanır.
 
 ## 3. Çalıştırılan komutlar ve sonuçlar
 
@@ -31,19 +31,19 @@ Kod şu anda lint, TypeScript, unit ve production build seviyesinde temizdir. Yi
 | `npm run test:unit` | PASS — 11/11 |
 | `npm run build` | PASS — 536 module, 37 route entry, 434 ms son ölçüm |
 | Root static HTTP smoke | PASS — 38/38 HTTP 200 |
-| `npm --prefix apps/kadeai run lint` | PASS |
-| `npm --prefix apps/kadeai run typecheck` | PASS |
-| `npm --prefix apps/kadeai run test:unit` | PASS — 7/7 |
-| `npm --prefix apps/kadeai run build` | PASS — compile 15.9 s, TS 6.8 s, 41 static page |
-| `npm --prefix apps/kadeai run test:bundle-secrets` | PASS/PARTIAL — 0 configured canary secret |
+| `npm --prefix apps/kadexai run lint` | PASS |
+| `npm --prefix apps/kadexai run typecheck` | PASS |
+| `npm --prefix apps/kadexai run test:unit` | PASS — 7/7 |
+| `npm --prefix apps/kadexai run build` | PASS — compile 15.9 s, TS 6.8 s, 41 static page |
+| `npm --prefix apps/kadexai run test:bundle-secrets` | PASS/PARTIAL — 0 configured canary secret |
 | Root `npm audit --omit=dev --audit-level=moderate` | PASS — 0 vulnerability |
-| KadeAI dependency audit | PASS — 0 vulnerability |
-| `npm --prefix apps/kadeai run test:backend` | FAIL — `python` komutu yok |
-| `python3 -m pytest apps/kadeai/backend/tests -q` | FAIL — `pytest` kurulu değil |
+| KadexAI dependency audit | PASS — 0 vulnerability |
+| `npm --prefix apps/kadexai run test:backend` | FAIL — `python` komutu yok |
+| `python3 -m pytest apps/kadexai/backend/tests -q` | FAIL — `pytest` kurulu değil |
 | Playwright/browser E2E | NOT TESTABLE — uygulama içi browser listesi boş |
 | `git diff --check` | PASS |
 
-`npm run verify:all` root lint/test/build aşamalarını tamamladı. Aynı anda başlayan iki KadeAI build’i geçici Next lock çakışması oluşturduğu için KadeAI build tek süreç olarak yeniden çalıştırıldı ve exit code 0 ile tamamlandı.
+`npm run verify:all` root lint/test/build aşamalarını tamamladı. Aynı anda başlayan iki KadexAI build’i geçici Next lock çakışması oluşturduğu için KadexAI build tek süreç olarak yeniden çalıştırıldı ve exit code 0 ile tamamlandı.
 
 ## 4. Kritik ve yüksek risk özeti
 
@@ -214,27 +214,27 @@ CRITICAL bulgu tespit edilmedi. Canlı sisteme saldırı, gerçek ödeme veya ge
 | Alan | Değer |
 |---|---|
 | Kategori / Severity | Abuse Prevention / MEDIUM |
-| Etkilenen route/dosya | Root auth/public endpoints; tüm KadeAI AI/generate endpoint’leri |
+| Etkilenen route/dosya | Root auth/public endpoints; tüm KadexAI AI/generate endpoint’leri |
 | Etkilenen kullanıcı/rol | Anonymous ve authenticated AI kullanıcıları |
-| Açıklama | Root Upstash olmadan, KadeAI ise her durumda instance-local Map ile limit uygular. Kredi ledger’ı tüm AI çağrılarında atomik merkezi quota olarak görünmüyor. |
+| Açıklama | Root Upstash olmadan, KadexAI ise her durumda instance-local Map ile limit uygular. Kredi ledger’ı tüm AI çağrılarında atomik merkezi quota olarak görünmüyor. |
 | Kök neden | Serverless distributed store entegrasyonu yalnız root için opsiyonel. |
 | Güvenli reproduksiyon | Kaynakta iki instance’ın ayrı Map tuttuğunu göster; gerçek yük testi yapılmadı. |
 | Beklenen / mevcut | User/IP quota tüm instance’larda ortak ve atomik olmalı. |
 | Etki | Multi-instance bypass, maliyet/abuse. |
 | Uygulanan düzeltme | Root env/release zorunluluğu belgelendi; mevcut fail-closed Upstash davranışı korundu. |
 | Değiştirilen dosyalar | `.env.example`, release/security docs |
-| Eklenen test | KadeAI mevcut rate-limit E2E kaynak testi var; browser çalışmadı. |
+| Eklenen test | KadexAI mevcut rate-limit E2E kaynak testi var; browser çalışmadı. |
 | Doğrulama | PARTIAL. |
 | Kalan risk | Production blocker. |
-| Düzeltilemediyse nedeni/öneri | KadeAI’ye Redis/Upstash user-keyed limiter ve DB transaction/RPC usage ledger eklenmeli. |
+| Düzeltilemediyse nedeni/öneri | KadexAI’ye Redis/Upstash user-keyed limiter ve DB transaction/RPC usage ledger eklenmeli. |
 
 ### F-010 — Supabase payment/RLS migration deployment kanıtı yok
 
 | Alan | Değer |
 |---|---|
 | Kategori / Severity | Database Authorization / MEDIUM |
-| Etkilenen route/dosya | KadeAI profile/history/templates/calendar/payment; Supabase migrations |
-| Etkilenen kullanıcı/rol | Tüm KadeAI tenant’ları |
+| Etkilenen route/dosya | KadexAI profile/history/templates/calendar/payment; Supabase migrations |
+| Etkilenen kullanıcı/rol | Tüm KadexAI tenant’ları |
 | Açıklama | Migration SQL explicit RLS ve payment ownership içeriyor; ancak dosya yorumları production uygulamasının hazırlanmış fakat doğrulanmamış olduğunu belirtiyor. |
 | Kök neden | Deployment state repository kaynak kodundan kanıtlanamaz. |
 | Güvenli reproduksiyon | Migration metnini unit testle incele; production DB’ye bağlanılmadı. |
@@ -242,7 +242,7 @@ CRITICAL bulgu tespit edilmedi. Canlı sisteme saldırı, gerçek ödeme veya ge
 | Etki | Migration uygulanmadıysa tenant isolation/ödeme tabloları beklenen güvenliği sağlamaz. |
 | Uygulanan düzeltme | Release kapısı ve migration sırası belgelendi; SQL text unit guard mevcut. |
 | Değiştirilen dosyalar | `RELEASE_CHECKLIST.md`, `SECURITY_CHECKLIST.md` |
-| Eklenen test | Mevcut KadeAI RLS/unit ownership testleri 7/7 geçti. |
+| Eklenen test | Mevcut KadexAI RLS/unit ownership testleri 7/7 geçti. |
 | Doğrulama | PARTIAL. |
 | Kalan risk | Production blocker. |
 | Düzeltilemediyse nedeni/öneri | Staging backup, apply, two-user RLS test ve rollback provası gerekir. |
@@ -337,7 +337,7 @@ CRITICAL bulgu tespit edilmedi. Canlı sisteme saldırı, gerçek ödeme veya ge
 | Etki | Görsel regresyon ve WCAG ihlali gözden kaçabilir. |
 | Uygulanan düzeltme | Sonuç uydurulmadı; route satırları NOT TESTABLE ve release blocker. |
 | Değiştirilen dosyalar | Rapor/checklists. |
-| Eklenen test | Çalıştırılmadı; mevcut KadeAI Playwright suite incelendi. |
+| Eklenen test | Çalıştırılmadı; mevcut KadexAI Playwright suite incelendi. |
 | Doğrulama | NOT TESTABLE. |
 | Kalan risk | Production blocker. |
 | Düzeltilemediyse nedeni/öneri | Browser bağlanınca 320–1920 viewport, keyboard, console, axe ve auth role fixture ile çalıştır. |
@@ -366,7 +366,7 @@ CRITICAL bulgu tespit edilmedi. Canlı sisteme saldırı, gerçek ödeme veya ge
 | Alan | Değer |
 |---|---|
 | Kategori / Severity | Testability / MAINTAINABILITY |
-| Etkilenen route/dosya | `apps/kadeai/backend`, package test script |
+| Etkilenen route/dosya | `apps/kadexai/backend`, package test script |
 | Etkilenen kullanıcı/rol | Release ekibi |
 | Açıklama | npm script `python` bekliyor; sistem yalnız `python3` sağlıyor ve pytest kurulmamış. |
 | Kök neden | Python toolchain bootstrap/venv CI adımı yok. |
@@ -385,11 +385,11 @@ CRITICAL bulgu tespit edilmedi. Canlı sisteme saldırı, gerçek ödeme veya ge
 | Alan | Değer |
 |---|---|
 | Kategori / Severity | Secret Detection / LOW |
-| Etkilenen route/dosya | KadeAI client bundle secret check |
+| Etkilenen route/dosya | KadexAI client bundle secret check |
 | Etkilenen kullanıcı/rol | Tüm kullanıcılar |
 | Açıklama | Script başarıyla çalıştı fakat environment boş olduğundan “0 configured secret” kontrol etti. |
 | Kök neden | CI canary secret fixture yok. |
-| Güvenli reproduksiyon | `npm --prefix apps/kadeai run test:bundle-secrets`. |
+| Güvenli reproduksiyon | `npm --prefix apps/kadexai run test:bundle-secrets`. |
 | Beklenen / mevcut | Bilinen fake server secret’lar inject edilip bundle’da bulunmadığı doğrulanmalı. |
 | Etki | Yanlış güven hissi; gerçek key sızıntısı kaynak scan dışında kaçabilir. |
 | Uygulanan düzeltme | Tracked file regex scan yapıldı; yalnız placeholder private-key metni bulundu; kısıt raporlandı. |
@@ -434,10 +434,10 @@ Detaylı liste `RELEASE_CHECKLIST.md` içindedir. Özet blocker’lar:
 
 1. Browser bağlı Playwright responsive/console/axe ve role-based E2E.
 2. FastAPI venv/pytest kurulumu ve backend testlerinin geçmesi.
-3. Root production Upstash doğrulaması; KadeAI distributed limiter/atomic usage planı.
+3. Root production Upstash doğrulaması; KadexAI distributed limiter/atomic usage planı.
 4. Supabase RLS/payment migration staging apply, two-user negatif test ve rollback provası.
 5. Root Shopier server catalog fiyat/currency doğrulaması ve reconciliation runbook.
-6. Payment migration tamamlanana kadar KadeAI `PAYMENT_PROVIDER=disabled`.
+6. Payment migration tamamlanana kadar KadexAI `PAYMENT_PROVIDER=disabled`.
 7. Consent öncesi internal analytics için ürün/hukuk kararı.
 
 ## 9. Değiştirilen dosyalar
@@ -453,13 +453,13 @@ Detaylı liste `RELEASE_CHECKLIST.md` içindedir. Özet blocker’lar:
 
 ## 11. 19 Temmuz 2026 tam-site retest güncellemesi
 
-Bu bölüm önceki bulguları geçersiz kılmaz; son retest sonucunu kaydeder. F-008 Shopier sunucu kataloğu ve uzlaştırma akışı tamamlandı. F-009 için production'da yalnız Upstash REST tabanlı atomik sayaç kullanan, yapılandırma yoksa fail-closed çalışan ortak kota katmanı eklendi. F-017 Python 3.12 `.venv` ve 5/5 pytest ile kapatıldı. F-018 üç sentetik canary zorunluluğu ve root/KadeAI/FastAPI build taramasıyla kapatıldı.
+Bu bölüm önceki bulguları geçersiz kılmaz; son retest sonucunu kaydeder. F-008 Shopier sunucu kataloğu ve uzlaştırma akışı tamamlandı. F-009 için production'da yalnız Upstash REST tabanlı atomik sayaç kullanan, yapılandırma yoksa fail-closed çalışan ortak kota katmanı eklendi. F-017 Python 3.12 `.venv` ve 5/5 pytest ile kapatıldı. F-018 üç sentetik canary zorunluluğu ve root/KadexAI/FastAPI build taramasıyla kapatıldı.
 
 - Route manifesti: 169 toplam, 161 uygulanmış, beklenen 8 eksik, 0 duplicate, 0 kaynak uyuşmazlığı.
 - Pasif local-production rota retesti: 44 PASS, 0 FAIL, 125 BLOCKED_BY_ENVIRONMENT.
-- Root test: 15/15; KadeAI test: 10/10; FastAPI: 5/5.
-- Root/KadeAI lint ve KadeAI type-check: PASS.
-- Root build: 536 modül ve 37 statik route entry; KadeAI build: 41 statik sayfa; PASS.
+- Root test: 15/15; KadexAI test: 10/10; FastAPI: 5/5.
+- Root/KadexAI lint ve KadexAI type-check: PASS.
+- Root build: 536 modül ve 37 statik route entry; KadexAI build: 41 statik sayfa; PASS.
 - Dependency audit: her iki npm ağacında 0 vulnerability.
 - Bundle taraması: üç sentetik canary, PASS; sıfır canary artık FAIL.
 - Browser/axe/cross-browser/rol bazlı gerçek E2E, canlı Upstash ve staging Supabase uygulaması ortam eksikliği nedeniyle kapatılamadı.

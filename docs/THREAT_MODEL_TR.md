@@ -28,8 +28,8 @@ Durum değerleri: **Doğrulandı** (kod okunarak kanıtlandı) / **Yapısal N/A*
 |---|---|---|
 | Auth bypass | Doğrulandı | `requireAuth`/`getAuthorizedUser` her admin uçta zorunlu; `chat.js` istisnası bulunup kapatıldı |
 | Broken access control / RBAC | Doğrulandı | `requirePermission(permission, {write})` deseni tutarlı; Faz 4'te roller/izinler UI'sı da eklendi |
-| IDOR/BOLA | Doğrulandı (kök API için) | Müşteri-taraflı uçlar oturumdan türetiyor; admin uçları `requirePermission` ile korunuyor. `apps/kadeai` bu turda incelenmedi |
-| Tenant izolasyonu | Yapısal N/A | Kök uygulama tek-tenant (tek ajans); çoklu-tenant izolasyonu kadeai'nin RLS'inde (bu turda incelenmedi) |
+| IDOR/BOLA | Doğrulandı (kök API için) | Müşteri-taraflı uçlar oturumdan türetiyor; admin uçları `requirePermission` ile korunuyor. `apps/kadexai` bu turda incelenmedi |
+| Tenant izolasyonu | Yapısal N/A | Kök uygulama tek-tenant (tek ajans); çoklu-tenant izolasyonu kadexai'nin RLS'inde (bu turda incelenmedi) |
 | Session güvenliği | Doğrulandı | JWT + `session_version`, `HttpOnly`+`SameSite=Strict`+koşullu `Secure` |
 | Password policy | Doğrulandı | Min 12 karakter zorunlu (`users.js`/`seed.js`), bcrypt cost 12 |
 | MFA/2FA | Doğrulanmadı — Yok | Hiç yok, şartname §11'de müşteri paneli için "2FA seçeneği" istiyor — açık bir boşluk |

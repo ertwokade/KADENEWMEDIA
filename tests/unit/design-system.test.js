@@ -136,7 +136,7 @@ test('ana sayfa snapshot\'tan, iç sayfalar React\'ten servis edilir', async () 
   // doğrular — snapshot dosyalarının varlığını doğrulayan ayrı bir test
   // aşağıdadır; ikisi bilerek ayrı tutulur çünkü "yönlendirme doğru" ile
   // "dosya yerinde" farklı arıza biçimleridir.
-  const vercel = JSON.parse(await readRepo('apps/kadeai/vercel.json'))
+  const vercel = JSON.parse(await readRepo('apps/kadexai/vercel.json'))
   const rootRewrite = (vercel.rewrites || []).find((rule) => rule.source === '/')
   assert.equal(rootRewrite?.destination, '/site.html', '`/` snapshot\'a rewrite edilmeli')
 
@@ -503,7 +503,7 @@ test('build zinciri snapshot ve token bütünlüğünü doğruluyor', async () =
   // Anasayfayı snapshot'a taşıyan rewrite yerinde olmalı: düşerse "/" sessizce
   // React fallback'ine (dist/index.html) döner ve ziyaretçi bambaşka bir
   // anasayfa görür.
-  const vercel = JSON.parse(await readRepo('apps/kadeai/vercel.json'))
+  const vercel = JSON.parse(await readRepo('apps/kadexai/vercel.json'))
   const homeRule = (vercel.rewrites ?? []).find((rule) => rule.source === '/')
   assert.ok(homeRule, "vercel.json'da anasayfa için rewrite bulunmalı")
   assert.equal(homeRule.destination, '/site.html', 'anasayfa rewrite\'ı snapshot\'a gitmeli')

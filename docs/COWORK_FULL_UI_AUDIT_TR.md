@@ -53,7 +53,7 @@ Ayrıca: raporlanan 6 adet 404 rotası **kasıtlıdır ve doğru davranmaktadır
                  && node scripts/generate-static-routes.mjs"
 ```
 
-**Sonuç:** Production, `src/` altındaki Vite + React uygulamasından derleniyor. `npm run build` (studio-web) ve `apps/kadeai` production pazarlama sitesine **girmiyor**.
+**Sonuç:** Production, `src/` altındaki Vite + React uygulamasından derleniyor. `npm run build` (studio-web) ve `apps/kadexai` production pazarlama sitesine **girmiyor**.
 
 Ancak `vercel.json`'ın **deploy edilmiş sürümü** bundan farklıdır — bkz. §1.6.
 

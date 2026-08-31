@@ -117,7 +117,7 @@ try {
           url.origin === BASE &&
           !url.hash &&
           !url.pathname.startsWith('/api/') &&
-          (process.env.AUDIT_URL || !url.pathname.startsWith('/kadeai/'))
+          (process.env.AUDIT_URL || !url.pathname.startsWith('/kadexai/'))
         ) internalLinks.add(url.pathname)
       } catch { /* ignore malformed external values here; browser reports them elsewhere */ }
     })

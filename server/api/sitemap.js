@@ -13,7 +13,7 @@ export const STATIC_PAGES = [
   { loc: '/hizmetler', changefreq: 'monthly', priority: '0.9' },
   { loc: '/new-media-ajansi', changefreq: 'monthly', priority: '0.9' },
   { loc: '/paketler', changefreq: 'monthly', priority: '0.9' },
-  { loc: '/kadeai-demo', changefreq: 'weekly', priority: '0.9' },
+  { loc: '/kadexai-demo', changefreq: 'weekly', priority: '0.9' },
   { loc: '/hakkimizda', changefreq: 'monthly', priority: '0.8' },
   { loc: '/neden-biz', changefreq: 'monthly', priority: '0.8' },
   { loc: '/iletisim', changefreq: 'yearly', priority: '0.8' },

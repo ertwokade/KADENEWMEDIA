@@ -17,12 +17,12 @@ maddeler `src/pages/Admin.jsx` içinde gerçek, çalışan bir bölüm/nav
 |---|---|---|---|
 | 1 | Genel bakış ve KPI dashboard | Var | `DashboardSection` (`Admin.jsx`) |
 | 2 | Kullanıcılar | Var | `UsersSection` |
-| 3 | Organizasyonlar/ekipler | Yok | Kade New Media tek-tenant bir ajans modeli; çoklu organizasyon/ekip kavramı yok. Şartnamenin bu maddesi muhtemelen kadeai'nin SaaS/çoklu-kullanıcı yapısı için — kökte anlamı sınırlı |
+| 3 | Organizasyonlar/ekipler | Yok | Kade New Media tek-tenant bir ajans modeli; çoklu organizasyon/ekip kavramı yok. Şartnamenin bu maddesi muhtemelen kadexai'nin SaaS/çoklu-kullanıcı yapısı için — kökte anlamı sınırlı |
 | 4 | Roller ve izinler | Var | Faz 4'te eklendi — `UsersSection` içinde 30 modüllük izin matrisi + backend `requirePermission()` |
 | 5 | Paketler | Var | `Packages.jsx` admin editörü + `PackagesEditor` |
 | 6 | Fiyatlar | Var | Önceki oturumda gerçek admin-editable hale getirildi (commit `9c2a6aa`) |
 | 7 | Özellikler ve limitler | Kısmen | `access` (JSONB, boolean özellik bayrakları) var; sayısal kullanım limiti/kredi sayacı (`UsageLimit`) tasarlandı ama uygulanmadı (bkz. `docs/05` §3, blocker #1) |
-| 8 | Ürünler ve araçlar | Kısmen | Paket tanımları (`PACKAGE_DEFINITIONS`) kod içinde sabit, admin UI'dan CRUD edilmiyor — yalnızca fiyat/not alanları editable. kadeai'nin 35 aracı ayrı bir üründe, kökten yönetilmiyor |
+| 8 | Ürünler ve araçlar | Kısmen | Paket tanımları (`PACKAGE_DEFINITIONS`) kod içinde sabit, admin UI'dan CRUD edilmiyor — yalnızca fiyat/not alanları editable. kadexai'nin 35 aracı ayrı bir üründe, kökten yönetilmiyor |
 | 9 | Add-on'lar | Var (farklı isimle) | Faz 4'te doğrulandı — çoklu paket ekleme (`handleAddPackage`/`customPackage`) işlevsel olarak add-on'a eşdeğer, entitlement'lar birleşiyor |
 | 10 | Kupon/kampanyalar | Kısmen | Faz 4'te eklendi (`CouponsSection`, `kade_coupons`) — admin CRUD tam, checkout/ödeme akışına kablolanmadı (blocker #14) |
 | 11 | Teklif talepleri | Var | `QuoteLeadsSection` |

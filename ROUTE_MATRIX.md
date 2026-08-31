@@ -1,13 +1,13 @@
 # ROUTE_MATRIX.md — Kade New Media Rota Envanteri
 
-Kaynak: `config/route-manifest.json` (schemaVersion 1, beklenen kayıt sayısı 169, gerçek kayıt sayısı 169) + doğrudan dosya sistemi taraması (`src/pages`, `apps/kadeai/app`, `api/`).
+Kaynak: `config/route-manifest.json` (schemaVersion 1, beklenen kayıt sayısı 169, gerçek kayıt sayısı 169) + doğrudan dosya sistemi taraması (`src/pages`, `apps/kadexai/app`, `api/`).
 
 Bu dosya önceki bir oturumda üretilmiş mevcut route manifest üzerine kurulmuştur; sıfırdan yeniden icat edilmemiştir. Sayılar bu oturumda `node` ile doğrudan JSON üzerinden doğrulanmıştır (22 Temmuz 2026).
 
 ## Özet
 
 - Toplam rota (manifestte): 169
-- Uygulamaya göre: root 79, kadeai 90
+- Uygulamaya göre: root 79, kadexai 90
 - Erişime göre: public 60, private 109
 - Türe göre: page 43, dynamic 4, protected 44, api 78
 - Manifestte "implemented: false" (yani 404 bekleniyor / sayfa yok) olarak işaretli **6 rota** tespit edildi: `/fiyat-hesaplama`, `/basin`, `/neden-biz`, `/referans-programi`, `/podcast-webinar`, `/bulten-arsivi`, ayrıca `/blog/:slug` ve `/partnerler/:id` dinamik rotaları da "implemented: false".
@@ -99,108 +99,108 @@ Bu dosya önceki bir oturumda üretilmiş mevcut route manifest üzerine kurulmu
 
 **Dikkat — `/api/seed`:** Manifestte "public / anonymous" olarak işaretli bir seed endpointi görünüyor. Bu isimlendirme tipik olarak veritabanı tohumlama/test amaçlı bir endpointi işaret eder ve production'da genel erişime açık olması güvenlik riskidir. Bu endpoint güvenlik denetimi aşamasında öncelikli olarak incelenecek (kod, `server.js` / `api/[...path].js` içinde aranacak).
 
-## kadeai (apps/kadeai, /kadeai altında Next.js) — 90 rota
+## kadexai (apps/kadexai, /kadexai altında Next.js) — 90 rota
 
 | Rota | Tip | Erişim | Roller | Uygulanmış mı | Beklenen HTTP |
 |---|---|---|---|---|---|
-| /kadeai | page | public | anonymous | Evet | 200 |
-| /kadeai/auth | page | public | anonymous | Evet | 200 |
-| /kadeai/auth/callback | page | public | anonymous | Evet | 307 |
-| /kadeai/login | page | public | anonymous | Evet | 200 |
-| /kadeai/logout | page | public | anonymous | Evet | 200 |
-| /kadeai/onboarding | page | private | authenticated | Evet | 200 |
-| /kadeai/reset-password | page | public | anonymous | Evet | 200 |
-| /kadeai/dashboard | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/ab-test | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/ai-thumbnail | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/analytics | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/bio-link | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/bulk | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/calendar | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/carousel | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/clickbait-detector | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/clip-generator | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/collab-mail | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/comment-analysis | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/competitor | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/content-plan | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/description | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/dubbing | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/faq | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/hashtag | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/history | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/hook | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/ideas | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/operations | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/performance | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/quote-extractor | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/retention-analysis | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/settings | protected | private | **owner:thekademedia@gmail.com (hardcoded)** | Evet | 200 |
-| /kadeai/dashboard/shopier | protected | private | configured-owner | Evet | 200 |
-| /kadeai/dashboard/social-audit | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/templates | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/text-generator | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/thread | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/title | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/trends | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/viral-score | protected | private | authenticated | Evet | 200 |
-| /kadeai/dashboard/youtube-seo | protected | private | authenticated | Evet | 200 |
-| /kadeai/api/assistant | api | private | authenticated | Evet | 200 |
-| /kadeai/api/auth/logout | api | private | authenticated | Evet | 200 |
-| /kadeai/api/auth/password | api | public | anonymous | Evet | 200 |
-| /kadeai/api/auth/recovery | api | public | anonymous | Evet | 200 |
-| /kadeai/api/auth/recovery-session | api | public | anonymous | Evet | 200 |
-| /kadeai/api/auth/update-password | api | private | authenticated | Evet | 200 |
-| /kadeai/api/backend/health | api | private | authenticated | Evet | 200 |
-| /kadeai/api/calendar | api | private | authenticated | Evet | 200 |
-| /kadeai/api/config | api | private | authenticated | Evet | 200 |
-| /kadeai/api/env-status | api | private | **owner:thekademedia@gmail.com (hardcoded)** | Evet | 200 |
-| /kadeai/api/health | api | public | anonymous | Evet | 200 |
-| /kadeai/api/history | api | private | authenticated | Evet | 200 |
-| /kadeai/api/image | api | private | authenticated | Evet | 200 |
-| /kadeai/api/operations-state | api | private | authenticated | Evet | 200 |
-| /kadeai/api/packages | api | private | authenticated (kodda `dynamic=force-dynamic`, salt-okunur GET) | Evet | 200 |
-| /kadeai/api/payments/checkout | api | private | authenticated | Evet | 200 |
-| /kadeai/api/payments/status | api | private | authenticated | Evet | 200 |
-| /kadeai/api/payments/webhook | api | public | anonymous (imzalı webhook) | Evet | 200 |
-| /kadeai/api/profile | api | private | authenticated | Evet | 200 |
-| /kadeai/api/templates | api | private | authenticated | Evet | 200 |
-| /kadeai/api/transcribe | api | private | authenticated | Evet | 200 |
-| /kadeai/api/youtube/comments | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/analytics | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/bio-link | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/bulk | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/carousel | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/clickbait-detector | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/clips | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/collab-mail | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/comment-analysis | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/competitor | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/content-plan | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/description | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/faq | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/hashtag | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/hook | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/ideas | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/performance | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/quote-extractor | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/retention-analysis | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/social-audit | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/text-generator | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/thread | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/title | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/translate | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/trends | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/tts | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/viral-score | api | private | authenticated | Evet | 200 |
-| /kadeai/api/generate/youtube-seo | api | private | authenticated | Evet | 200 |
+| /kadexai | page | public | anonymous | Evet | 200 |
+| /kadexai/auth | page | public | anonymous | Evet | 200 |
+| /kadexai/auth/callback | page | public | anonymous | Evet | 307 |
+| /kadexai/login | page | public | anonymous | Evet | 200 |
+| /kadexai/logout | page | public | anonymous | Evet | 200 |
+| /kadexai/onboarding | page | private | authenticated | Evet | 200 |
+| /kadexai/reset-password | page | public | anonymous | Evet | 200 |
+| /kadexai/dashboard | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/ab-test | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/ai-thumbnail | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/analytics | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/bio-link | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/bulk | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/calendar | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/carousel | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/clickbait-detector | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/clip-generator | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/collab-mail | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/comment-analysis | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/competitor | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/content-plan | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/description | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/dubbing | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/faq | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/hashtag | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/history | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/hook | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/ideas | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/operations | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/performance | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/quote-extractor | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/retention-analysis | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/settings | protected | private | **owner:thekademedia@gmail.com (hardcoded)** | Evet | 200 |
+| /kadexai/dashboard/shopier | protected | private | configured-owner | Evet | 200 |
+| /kadexai/dashboard/social-audit | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/templates | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/text-generator | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/thread | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/title | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/trends | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/viral-score | protected | private | authenticated | Evet | 200 |
+| /kadexai/dashboard/youtube-seo | protected | private | authenticated | Evet | 200 |
+| /kadexai/api/assistant | api | private | authenticated | Evet | 200 |
+| /kadexai/api/auth/logout | api | private | authenticated | Evet | 200 |
+| /kadexai/api/auth/password | api | public | anonymous | Evet | 200 |
+| /kadexai/api/auth/recovery | api | public | anonymous | Evet | 200 |
+| /kadexai/api/auth/recovery-session | api | public | anonymous | Evet | 200 |
+| /kadexai/api/auth/update-password | api | private | authenticated | Evet | 200 |
+| /kadexai/api/backend/health | api | private | authenticated | Evet | 200 |
+| /kadexai/api/calendar | api | private | authenticated | Evet | 200 |
+| /kadexai/api/config | api | private | authenticated | Evet | 200 |
+| /kadexai/api/env-status | api | private | **owner:thekademedia@gmail.com (hardcoded)** | Evet | 200 |
+| /kadexai/api/health | api | public | anonymous | Evet | 200 |
+| /kadexai/api/history | api | private | authenticated | Evet | 200 |
+| /kadexai/api/image | api | private | authenticated | Evet | 200 |
+| /kadexai/api/operations-state | api | private | authenticated | Evet | 200 |
+| /kadexai/api/packages | api | private | authenticated (kodda `dynamic=force-dynamic`, salt-okunur GET) | Evet | 200 |
+| /kadexai/api/payments/checkout | api | private | authenticated | Evet | 200 |
+| /kadexai/api/payments/status | api | private | authenticated | Evet | 200 |
+| /kadexai/api/payments/webhook | api | public | anonymous (imzalı webhook) | Evet | 200 |
+| /kadexai/api/profile | api | private | authenticated | Evet | 200 |
+| /kadexai/api/templates | api | private | authenticated | Evet | 200 |
+| /kadexai/api/transcribe | api | private | authenticated | Evet | 200 |
+| /kadexai/api/youtube/comments | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/analytics | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/bio-link | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/bulk | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/carousel | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/clickbait-detector | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/clips | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/collab-mail | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/comment-analysis | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/competitor | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/content-plan | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/description | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/faq | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/hashtag | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/hook | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/ideas | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/performance | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/quote-extractor | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/retention-analysis | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/social-audit | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/text-generator | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/thread | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/title | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/translate | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/trends | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/tts | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/viral-score | api | private | authenticated | Evet | 200 |
+| /kadexai/api/generate/youtube-seo | api | private | authenticated | Evet | 200 |
 
 ## Kullanıcı talimatındaki "Vercel birleştirme" anlatısıyla kod arasındaki fark — GÜNCEL DURUM
 
-Kullanıcı talimatı; kök `vercel.json` içinde "Vercel Services" mimarisi (`legacy` + `kadeai` servisleri), `kadirdemirs-patch-3` branch'i, `PR #8`, ve `/kadeai/api/payments/admin/pricing` endpointinin var olduğunu ve kısmen tamamlandığını varsayıyordu. Bu oturumda önce yüzeysel bir `git branch -a` taraması bu branch'i bulamamıştı; daha kapsamlı bir tarama (`git branch -a -v`, uzak dallar dahil) ve bir üst-oturum-önbelleğinden (`origin/pr/8`) sonucu **branch bulundu ve incelendi**:
+Kullanıcı talimatı; kök `vercel.json` içinde "Vercel Services" mimarisi (`legacy` + `kadexai` servisleri), `kadirdemirs-patch-3` branch'i, `PR #8`, ve `/kadexai/api/payments/admin/pricing` endpointinin var olduğunu ve kısmen tamamlandığını varsayıyordu. Bu oturumda önce yüzeysel bir `git branch -a` taraması bu branch'i bulamamıştı; daha kapsamlı bir tarama (`git branch -a -v`, uzak dallar dahil) ve bir üst-oturum-önbelleğinden (`origin/pr/8`) sonucu **branch bulundu ve incelendi**:
 
-- `main`'deki `vercel.json` içinde `"services"` anahtarı **yok** — mevcut, production'da çalışan yapı `/kadeai` isteklerini ayrı bir Vercel projesine (`https://kadeai.vercel.app`) `rewrite` eden klasik iki-proje yapılandırması.
-- **`kadirdemirs-patch-3`/`PR #8` gerçekten mevcut** (`remotes/origin/kadirdemirs-patch-3` = `remotes/origin/pr/8`, aynı commit `b538cbe`). İçeriği: `main`'e göre TEK farkı kök `vercel.json`'ı `"services":{"legacy":{...},"kadeai":{...}}` yapısına çeviriyor. **Bu şema Vercel'in resmî dokümantasyonunda (`https://vercel.com/docs/project-configuration`, son güncelleme 2026-06-16) doğrulanmış tam alan listesinde yok** — geçersiz bir yapılandırma. Detaylı analiz ve öneri: `VERCEL_SERVICES_MIGRATION_REPORT_TR.md`.
-- `apps/kadeai/app/api/payments/admin/pricing` **artık kodda mevcut** — ama bu, `kadirdemirs-patch-3`'e özgü bir ekleme değil; `main`'de zaten önceden merge edilmiş PR #6'nın parçası (`pricingConfig.ts` + dedike `kadeai_pricing_overrides` tablosu). `kadirdemirs-patch-3` bu dosyaları `main`'den miras alıyor, kendi başına eklemiyor.
+- `main`'deki `vercel.json` içinde `"services"` anahtarı **yok** — mevcut, production'da çalışan yapı `/kadexai` isteklerini ayrı bir Vercel projesine (`https://kadexai.vercel.app`) `rewrite` eden klasik iki-proje yapılandırması.
+- **`kadirdemirs-patch-3`/`PR #8` gerçekten mevcut** (`remotes/origin/kadirdemirs-patch-3` = `remotes/origin/pr/8`, aynı commit `b538cbe`). İçeriği: `main`'e göre TEK farkı kök `vercel.json`'ı `"services":{"legacy":{...},"kadexai":{...}}` yapısına çeviriyor. **Bu şema Vercel'in resmî dokümantasyonunda (`https://vercel.com/docs/project-configuration`, son güncelleme 2026-06-16) doğrulanmış tam alan listesinde yok** — geçersiz bir yapılandırma. Detaylı analiz ve öneri: `VERCEL_SERVICES_MIGRATION_REPORT_TR.md`.
+- `apps/kadexai/app/api/payments/admin/pricing` **artık kodda mevcut** — ama bu, `kadirdemirs-patch-3`'e özgü bir ekleme değil; `main`'de zaten önceden merge edilmiş PR #6'nın parçası (`pricingConfig.ts` + dedike `kadexai_pricing_overrides` tablosu). `kadirdemirs-patch-3` bu dosyaları `main`'den miras alıyor, kendi başına eklemiyor.
 
 Sonuç: kullanıcı talimatındaki anlatı GitHub'da gerçek bir dala dayanıyordu, ama o daldaki asıl değişiklik (vercel.json'ın "services" şemasına çevrilmesi) teknik olarak geçersiz ve merge edilmemeli.

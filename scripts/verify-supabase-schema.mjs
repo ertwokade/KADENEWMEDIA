@@ -22,7 +22,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url))
-const MIGRATIONS = join(ROOT, 'apps/kadeai/supabase/migrations')
+const MIGRATIONS = join(ROOT, 'apps/kadexai/supabase/migrations')
 const API_DIR = join(ROOT, 'server/api')
 
 // ── 1) Şemayı oku ───────────────────────────────────────────────────────────

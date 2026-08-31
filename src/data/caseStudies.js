@@ -11,8 +11,8 @@ export const KADE_CASE_STUDIES = {
       industryTr: 'New Media ve Yazılım', industryEn: 'New Media and Software', logo: 'K/', color: '#eac321',
       durationTr: 'Sürekli geliştiriliyor', durationEn: 'Continuously improved',
       platforms: ['Web', 'Vercel', 'Supabase'],
-      challengeTr: 'Kurumsal site, müşteri alanı, yönetim paneli ve KadeAI farklı çalışma biçimlerine sahipti. Tek dağıtımda güvenli biçimde çalışmaları ve yüzlerce rotanın kaybolmadan izlenmesi gerekiyordu.',
-      challengeEn: 'The corporate site, customer area, admin panel and KadeAI had different runtime needs. They needed to work safely in one deployment without losing route coverage.',
+      challengeTr: 'Kurumsal site, müşteri alanı, yönetim paneli ve KadexAI farklı çalışma biçimlerine sahipti. Tek dağıtımda güvenli biçimde çalışmaları ve yüzlerce rotanın kaybolmadan izlenmesi gerekiyordu.',
+      challengeEn: 'The corporate site, customer area, admin panel and KadexAI had different runtime needs. They needed to work safely in one deployment without losing route coverage.',
       solutionTr: 'Uygulamaları tek Vercel dağıtımında birleştirdik; 207 rotalık doğrulama envanteri, güvenlik kontrolleri, sitemap üretimi ve kritik sayfa testleri kurduk.',
       solutionEn: 'We unified the applications in one Vercel deployment and added a 207-route validation inventory, security checks, sitemap generation and critical page tests.',
       metrics: [
@@ -21,7 +21,7 @@ export const KADE_CASE_STUDIES = {
       ],
     },
     {
-      id: 'kadeai-operations', client: 'KadeAI · Kendi Ürünümüz',
+      id: 'kadexai-operations', client: 'KadexAI · Kendi Ürünümüz',
       industryTr: 'AI Destekli Operasyon', industryEn: 'AI-assisted Operations', logo: 'AI', color: '#34d399',
       durationTr: 'Sürekli geliştiriliyor', durationEn: 'Continuously improved',
       platforms: ['KadeSearch', 'WhatsApp', 'Operations'],

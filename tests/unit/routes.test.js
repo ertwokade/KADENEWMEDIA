@@ -12,7 +12,7 @@ test('critical public and protected route declarations remain present', async ()
 })
 
 test('sitemap contains only public indexable routes', () => {
-  const privatePrefixes = ['/admin', '/giris', '/musteri-panel', '/organizasyon-kiti', '/kadeai', '/api']
+  const privatePrefixes = ['/admin', '/giris', '/musteri-panel', '/organizasyon-kiti', '/kadexai', '/api']
   for (const page of STATIC_PAGES) {
     assert.equal(privatePrefixes.some((prefix) => page.loc === prefix || page.loc.startsWith(`${prefix}/`)), false, page.loc)
   }
@@ -46,7 +46,7 @@ test('Kadir profile remains available when the profile API has no row', async ()
 
 test('dynamic public pages are server-validated before the SPA shell is served', async () => {
   const [vercelConfig, dispatcher, renderer] = await Promise.all([
-    readFile(new URL('../../apps/kadeai/vercel.json', import.meta.url), 'utf8'),
+    readFile(new URL('../../apps/kadexai/vercel.json', import.meta.url), 'utf8'),
     readFile(new URL('../../api/[...path].js', import.meta.url), 'utf8'),
     readFile(new URL('../../server/api/dynamicPage.js', import.meta.url), 'utf8'),
   ])

@@ -2,7 +2,7 @@
 
 Koddan doğrudan çıkarıldı (`src/App.jsx`, `scripts/generate-static-routes.mjs`,
 `server/api/sitemap.js`, `public/robots.txt`, `vercel.json`, `api/[...path].js`,
-`apps/kadeai/app/**`, `apps/studio-web/app/**`).
+`apps/kadexai/app/**`, `apps/studio-web/app/**`).
 Dinamik segmentler (`:handle`, `:slug`, `:id`, `[projectId]`, `[exportId]`) gerçek değerlerle çalışır.
 
 **Son güncelleme:** 28 Temmuz 2026 — teknik SEO düzeltmeleri sonrası, canlıda doğrulandı.
@@ -113,7 +113,7 @@ robots.txt'de engelli. `*` (bilinmeyen rota) artık sunucu tarafında gerçek 40
 |---|---|
 | `/robots.txt` | Statik |
 | `/sitemap.xml` | → `/api/sitemap` (25 URL: 20 statik + 5 partner detayı) |
-| `/kadeai` | → `kadeai.vercel.app` (rewrite, `noindex`) |
+| `/kadexai` | → `kadexai.vercel.app` (rewrite, `noindex`) |
 | `/api/*` | robots.txt'de engelli |
 
 ## 8) Kök Site — API Uçları (`/api/*`)
@@ -154,28 +154,28 @@ robots.txt'de engelli. `*` (bilinmeyen rota) artık sunucu tarafında gerçek 40
 
 ---
 
-## 9) Kade AI — Sayfalar (`kadenewmedia.com/kadeai/*`)
+## 9) KadexAI — Sayfalar (`kadenewmedia.com/kadexai/*`)
 
 | Yol | Açıklama |
 |---|---|
-| `/kadeai` | Ana sayfa |
-| `/kadeai/login` · `/kadeai/logout` · `/kadeai/auth` · `/kadeai/auth/callback` | Kimlik |
-| `/kadeai/onboarding` | Onboarding |
-| `/kadeai/reset-password` | Şifre sıfırlama |
-| `/kadeai/dashboard` | Panel ana sayfası |
+| `/kadexai` | Ana sayfa |
+| `/kadexai/login` · `/kadexai/logout` · `/kadexai/auth` · `/kadexai/auth/callback` | Kimlik |
+| `/kadexai/onboarding` | Onboarding |
+| `/kadexai/reset-password` | Şifre sıfırlama |
+| `/kadexai/dashboard` | Panel ana sayfası |
 
-**Dashboard araçları** (`/kadeai/dashboard/*`):
+**Dashboard araçları** (`/kadexai/dashboard/*`):
 `ab-test` · `ai-thumbnail` · `analytics` · `bio-link` · `bulk` · `calendar` · `carousel` · `clickbait-detector` · `clip-generator` · `collab-mail` · `comment-analysis` · `competitor` · `content-plan` · `description` · `dubbing` · `faq` · `hashtag` · `history` · `hook` · `ideas` · `operations` · `packages` · `performance` · `quote-extractor` · `retention-analysis` · `settings` · `shopier` · `social-audit` · `templates` · `text-generator` · `thread` · `title` · `trends` · `video-factory` · `viral-score` · `youtube-seo`
 
-## 10) Kade AI — API Uçları (`/kadeai/api/*`)
+## 10) KadexAI — API Uçları (`/kadexai/api/*`)
 
 | Grup | Yollar |
 |---|---|
-| Kimlik | `/kadeai/api/auth/logout` · `/auth/password` · `/auth/recovery` · `/auth/recovery-session` · `/auth/update-password` |
-| Üretim (AI) | `/kadeai/api/generate/{analytics, bio-link, bulk, carousel, clickbait-detector, clips, collab-mail, comment-analysis, competitor, content-plan, description, faq, hashtag, hook, ideas, performance, quote-extractor, retention-analysis, social-audit, text-generator, thread, title, translate, trends, tts, viral-score, youtube-seo}` |
-| Ödeme | `/kadeai/api/payments/{checkout, status, webhook}` · `/payments/shopier/redirect` · `/payments/admin/custom-offer` · `/payments/admin/pricing` |
-| Medya | `/kadeai/api/{image, video, transcribe}` |
-| Diğer | `/kadeai/api/{assistant, calendar, config, env-status, health, history, operations-state, packages, profile, templates}` · `/backend/health` · `/youtube/comments` |
+| Kimlik | `/kadexai/api/auth/logout` · `/auth/password` · `/auth/recovery` · `/auth/recovery-session` · `/auth/update-password` |
+| Üretim (AI) | `/kadexai/api/generate/{analytics, bio-link, bulk, carousel, clickbait-detector, clips, collab-mail, comment-analysis, competitor, content-plan, description, faq, hashtag, hook, ideas, performance, quote-extractor, retention-analysis, social-audit, text-generator, thread, title, translate, trends, tts, viral-score, youtube-seo}` |
+| Ödeme | `/kadexai/api/payments/{checkout, status, webhook}` · `/payments/shopier/redirect` · `/payments/admin/custom-offer` · `/payments/admin/pricing` |
+| Medya | `/kadexai/api/{image, video, transcribe}` |
+| Diğer | `/kadexai/api/{assistant, calendar, config, env-status, health, history, operations-state, packages, profile, templates}` · `/backend/health` · `/youtube/comments` |
 
 ---
 

@@ -31,6 +31,6 @@ ile çıktıyı uygulama derlemesinin üzerine bindirir.
 | `kade-html-transform.mjs` | Tek doğruluk kaynağı: metin/bağlantı değişimleri + enjeksiyonlar |
 | `kade-brand.css/js` | Marka dili, hizmetler paneli, dil ve tema kontrolleri |
 | `kade-routes.css/js` | Statik rotaların ortak tasarımı, breadcrumb ve site indeksi |
-| `kade-access.js` | KadeAI / danışmanlık giriş-kayıt menüsü |
+| `kade-access.js` | KadexAI / danışmanlık giriş-kayıt menüsü |
 | `kade-footer.js` | Ana sayfa site haritası footer'ı |
 | `kade-entry-watchdog.js` | Giriş yükleyicisi takılırsa sayfayı açar |

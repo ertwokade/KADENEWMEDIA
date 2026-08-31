@@ -14,7 +14,7 @@ Tarih: 22 Temmuz 2026
 - Hata durumunda public kullanıcıya sadece `{ reply: null, fallback: true }` dönüyor — stack trace/hata detayı sızmıyor; admin modda daha açıklayıcı hata gösteriliyor (kabul edilebilir, çünkü admin zaten yetkili).
 - **Model adı kodda sabit** (`gemini-2.5-flash`, hard-coded) — merkezi config/env üzerinden yönetilmiyor. Kullanıcı talimatı bunu açıkça istemişti.
 
-### 2. `apps/kadeai` — `lib/ai/provider.ts` (çoklu sağlayıcı: Gemini, Groq, Mistral, Anthropic, OpenAI)
+### 2. `apps/kadexai` — `lib/ai/provider.ts` (çoklu sağlayıcı: Gemini, Groq, Mistral, Anthropic, OpenAI)
 
 - Gemini için **eski SDK** kullanılıyor: `@google/generative-ai@0.24.1`. Kullanıcı talimatı güncel `@google/genai` paketinin değerlendirilmesini istemişti — bu oturumda **değiştirilmedi** (canlı API testi olmadan SDK göçü riskli; ayrı, test edilebilir bir oturumda yapılmalı).
 - Model seçimi `lib/ai/models.ts` + `lib/ai/modelRouter.ts` üzerinden merkezi (`modelConfig.geminiModel || 'gemini-2.5-flash'`) — legacy'nin aksine burada gerçek bir merkezi config var.
@@ -34,10 +34,10 @@ Bu oturumda incelenen AI uçlarının çoğu (`/api/generate/*`) serbest metin �
 
 ## Bu oturumda YAPILMAYAN (net biçimde işaretlenen) AI çalışmaları
 
-Kullanıcı talimatının 9. aşaması 10 potansiyel yeni AI özelliği öneriyordu (sosyal medya taslağı, metni doğallaştırma, hizmet/paket açıklaması taslağı, blog taslağı, SEO title/meta önerisi, lead özetleme, lead sınıflandırma, paket önerisi, içerik takvimi, tekrar/yapay ifade tespiti). `apps/kadeai`'de zaten **30'dan fazla benzer AI aracı mevcut** (başlık, hashtag, içerik planı, YouTube SEO, rakip analizi, yorum analizi vb. — bkz. `ROUTE_MATRIX.md`). Bu oturumda **yeni bir AI özelliği eklenmedi**; mevcutların güvenlik/mimari denetimi yapıldı. Yapısal (Zod doğrulamalı) lead-sınıflandırma/paket-önerisi özelliği açık bir boşluk olarak kalıyor.
+Kullanıcı talimatının 9. aşaması 10 potansiyel yeni AI özelliği öneriyordu (sosyal medya taslağı, metni doğallaştırma, hizmet/paket açıklaması taslağı, blog taslağı, SEO title/meta önerisi, lead özetleme, lead sınıflandırma, paket önerisi, içerik takvimi, tekrar/yapay ifade tespiti). `apps/kadexai`'de zaten **30'dan fazla benzer AI aracı mevcut** (başlık, hashtag, içerik planı, YouTube SEO, rakip analizi, yorum analizi vb. — bkz. `ROUTE_MATRIX.md`). Bu oturumda **yeni bir AI özelliği eklenmedi**; mevcutların güvenlik/mimari denetimi yapıldı. Yapısal (Zod doğrulamalı) lead-sınıflandırma/paket-önerisi özelliği açık bir boşluk olarak kalıyor.
 
 ## Öneriler
 
-1. `server/api/chat.js`'deki sabit `gemini-2.5-flash` model adını `apps/kadeai/lib/ai/models.ts`'deki gibi merkezi bir config/env değişkenine taşı.
+1. `server/api/chat.js`'deki sabit `gemini-2.5-flash` model adını `apps/kadexai/lib/ai/models.ts`'deki gibi merkezi bir config/env değişkenine taşı.
 2. `@google/generative-ai` → `@google/genai` göçünü ayrı, test edilebilir bir değişiklik olarak planla (canlı API çağrısı gerektirir, bu ortamda güvenle doğrulanamaz).
 3. Lead sınıflandırma / paket önerisi gibi karar-destek özellikleri eklenecekse Zod schema + server-side doğrulama ile (model çıktısındaki paket ID'sini asla doğrudan DB işlemine sokmadan, aktif paket listesiyle karşılaştırarak) inşa edilmeli — kullanıcı talimatı bunu açıkça istiyor ve mevcut mimari (Zod zaten var) buna hazır.

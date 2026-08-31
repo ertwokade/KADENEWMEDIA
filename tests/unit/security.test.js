@@ -428,7 +428,7 @@ test('organizasyon kitleri içe aktarılan veriyi çalıştırılabilir HTML vey
   const { readFile } = await import('node:fs/promises')
   for (const path of [
     'src/embedded/kadir-organizasyon-kiti/app.js',
-    'apps/kadeai/public/kadeai/operations-kit/app.js',
+    'apps/kadexai/public/kadexai/operations-kit/app.js',
   ]) {
     const source = await readFile(new URL(`../../${path}`, import.meta.url), 'utf8')
     assert.match(source, /function idOf\(v,prefix\)\{[^\n]*\^\[a-zA-Z0-9_-\]/, `${path}: içe aktarılan kimlikler inline handler içinde güvenli olmalı`)
@@ -440,9 +440,9 @@ test('organizasyon kitleri içe aktarılan veriyi çalıştırılabilir HTML vey
   }
 })
 
-test('clickjacking koruması aynı origin KadeAI operasyon iframeini engellemez', async () => {
+test('clickjacking koruması aynı origin KadexAI operasyon iframeini engellemez', async () => {
   const { readFile } = await import('node:fs/promises')
-  const vercel = JSON.parse(await readFile(new URL('../../apps/kadeai/vercel.json', import.meta.url), 'utf8'))
+  const vercel = JSON.parse(await readFile(new URL('../../apps/kadexai/vercel.json', import.meta.url), 'utf8'))
   const globalHeaders = vercel.headers.find((rule) => rule.source === '/(.*)')?.headers ?? []
   const xFrameOptions = globalHeaders.find((header) => header.key.toLowerCase() === 'x-frame-options')?.value
   const csp = globalHeaders.find((header) => header.key.toLowerCase() === 'content-security-policy')?.value ?? ''
@@ -451,8 +451,8 @@ test('clickjacking koruması aynı origin KadeAI operasyon iframeini engellemez'
   assert.match(csp, /frame-src[^;]*https:\/\/www\.youtube\.com/)
   assert.match(csp, /frame-src[^;]*https:\/\/www\.youtube-nocookie\.com/)
 
-  const operationsPage = await readFile(new URL('../../apps/kadeai/app/kadeai/dashboard/operations/page.tsx', import.meta.url), 'utf8')
-  const operationsFrame = await readFile(new URL('../../apps/kadeai/components/operations/OperationsFrame.tsx', import.meta.url), 'utf8')
+  const operationsPage = await readFile(new URL('../../apps/kadexai/app/kadexai/dashboard/operations/page.tsx', import.meta.url), 'utf8')
+  const operationsFrame = await readFile(new URL('../../apps/kadexai/components/operations/OperationsFrame.tsx', import.meta.url), 'utf8')
   assert.match(operationsPage, /withBasePath\('\/operations-kit\/index\.html'\)/, 'operasyon merkezi aynı origin kaynağı kullanıyor')
   assert.match(operationsFrame, /<iframe/, 'operasyon merkezi iframe ile render ediliyor')
 })

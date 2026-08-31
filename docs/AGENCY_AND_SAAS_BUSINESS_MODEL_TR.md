@@ -6,7 +6,7 @@
 |---|---|---|
 | Ajans retainer paketleri | `kade_customer_packages` (`durationDays`, `price`, `access`) | Var — mevcut paket sistemi zaten bu model |
 | Proje bazlı hizmet | `kade_quotes` (teklif talebi) + `ProposalBuilderSection` | Var, durum makinesi Faz 3'te şartnameye kısmen hizalandı |
-| Tool aboneliği | kadeai'nin `entitlements`/`payment_orders` tablosu | Var (ayrı sistem, docs/02 karar #3 gereği kasıtlı olarak birleştirilmedi) |
+| Tool aboneliği | kadexai'nin `entitlements`/`payment_orders` tablosu | Var (ayrı sistem, docs/02 karar #3 gereği kasıtlı olarak birleştirilmedi) |
 | Kredi paketi | **Yok** | `docs/05` §3'te tasarlandı (`kade_usage_wallets`), uygulanmadı — canlı kredensiyal + hangi metriklerin gerçekten satılacağına dair ticari karar bekliyor |
 | Add-on | `kade_customer_packages` çoklu-paket stacking | Var (farklı isimle, Faz 4'te doğrulandı — bkz. `docs/06`) |
 | Creator campaign management fee | **Yok** | Creator ağı hiç yok (Faz 7), bu gelir katmanı da yok — birbirine bağımlı |

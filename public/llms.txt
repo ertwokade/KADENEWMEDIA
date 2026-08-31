@@ -24,11 +24,11 @@ Kade Media, markaların sosyal medya ve dijital varlığını uçtan uca yöneti
 - [İletişim](https://kadenewmedia.com/iletisim): Proje talepleri için iletişim kanalları.
 - [Teklif Al](https://kadenewmedia.com/teklif-al): İhtiyaca göre yazılı teklif talep etme formu.
 
-## KadeAI
+## KadexAI
 
-- [KadeAI Ürün Demosu](https://kadenewmedia.com/kadeai-demo): Sosyal medya analizi, içerik üretimi, planlama ve yeni medya operasyon araçlarını bir araya getiren KadeAI ürününün örnek veriyle çalışan interaktif tanıtımı.
+- [KadexAI Ürün Demosu](https://kadenewmedia.com/kadexai-demo): Sosyal medya analizi, içerik üretimi, planlama ve yeni medya operasyon araçlarını bir araya getiren KadexAI ürününün örnek veriyle çalışan interaktif tanıtımı.
 
-KadeAI, Kade New Media tarafından geliştirilen AI destekli sosyal medya analizi, içerik üretimi, planlama ve yeni medya operasyon platformudur. Kamuya açık demo ziyaretçinin sosyal hesaplarına bağlanmaz ve veri olmayan yerde performans metriği iddia etmez. Özel çalışma alanları ile API rotaları kimlik doğrulama gerektirir ve indekslenmemelidir.
+KadexAI, Kade New Media tarafından geliştirilen AI destekli sosyal medya analizi, içerik üretimi, planlama ve yeni medya operasyon platformudur. Kamuya açık demo ziyaretçinin sosyal hesaplarına bağlanmaz ve veri olmayan yerde performans metriği iddia etmez. Özel çalışma alanları ile API rotaları kimlik doğrulama gerektirir ve indekslenmemelidir.
 
 ## Politikalar
 

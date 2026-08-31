@@ -10,7 +10,7 @@ bağlı — bkz. `git log`.
 
 ## Faz 2 — Mimari kararlar
 
-- `d22eaae` — 4 bağlayıcı mimari karar (Kade Studio = video editör tabanı, kadeai araçları genişletilecek, iki ticaret sistemi birleştirilmeyecek, npm lockfile birincil), tasarım sistemi denetimi, 401/403/429/bakım sayfaları eklendi.
+- `d22eaae` — 4 bağlayıcı mimari karar (Kade Studio = video editör tabanı, kadexai araçları genişletilecek, iki ticaret sistemi birleştirilmeyecek, npm lockfile birincil), tasarım sistemi denetimi, 401/403/429/bakım sayfaları eklendi.
 
 ## Faz 3 — Ticaret ve ödeme güvenliği
 

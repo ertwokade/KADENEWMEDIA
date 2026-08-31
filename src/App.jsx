@@ -217,7 +217,7 @@ function App() {
   const prevPath = useRef(null)
 
   // Dekoratif altın imleç sadece pazarlama sayfalarında kalsın — admin ve
-  // araç/panel sayfalarında (Kade AI panelleri dahil) normal imleç kullanılır.
+  // araç/panel sayfalarında (KadexAI panelleri dahil) normal imleç kullanılır.
   useEffect(() => {
     document.body.classList.toggle('kade-app-ui', isAppUI)
     return () => document.body.classList.remove('kade-app-ui')

@@ -29,7 +29,7 @@ const INDEXABLE = [
 
 // Next.js tarafından pre-render edilen public ürün rotaları legacy dist/
 // ağacında bulunmaz; sitemap sözleşmesinde yine de açıkça doğrulanır.
-const NEXT_INDEXABLE = ['/kadeai-demo']
+const NEXT_INDEXABLE = ['/kadexai-demo']
 
 // Herkese açık ama indekslenmemesi gereken sayfalar.
 const PUBLIC_NOINDEX = ['/portfolio', '/partnerler', '/referanslar']
@@ -131,7 +131,7 @@ if (locs.length !== INDEXABLE.length + NEXT_INDEXABLE.length) {
 }
 
 console.log('\n── Redirect ve rewrite yapılandırması ──')
-const vercel = JSON.parse(await readFile(new URL('../apps/kadeai/vercel.json', import.meta.url), 'utf8'))
+const vercel = JSON.parse(await readFile(new URL('../apps/kadexai/vercel.json', import.meta.url), 'utf8'))
 
 const expectedRedirects = {
   '/kadirdemir': '/@kadirdemir',

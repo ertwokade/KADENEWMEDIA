@@ -1,8 +1,8 @@
-# CLAUDE CODE ANA UYGULAMA PROMPTU — KADE NEW MEDIA + KADE AI
+# CLAUDE CODE ANA UYGULAMA PROMPTU — KADE NEW MEDIA + KadexAI
 
 ## 0. Görevin niteliği
 
-Bu görev yalnızca tasarım düzeltme, birkaç sayfa ekleme veya öneri raporu hazırlama görevi değildir. Mevcut kod tabanını baştan sona denetleyerek Kade New Media ve Kade AI ekosistemini teknik, ticari, hukuki, güvenlik, SEO, mobil kullanılabilirlik ve satış operasyonu bakımından üretime ve gerçek satışa hazır hâle getireceksin.
+Bu görev yalnızca tasarım düzeltme, birkaç sayfa ekleme veya öneri raporu hazırlama görevi değildir. Mevcut kod tabanını baştan sona denetleyerek Kade New Media ve KadexAI ekosistemini teknik, ticari, hukuki, güvenlik, SEO, mobil kullanılabilirlik ve satış operasyonu bakımından üretime ve gerçek satışa hazır hâle getireceksin.
 
 Çalışma boyunca bütün açıklamalarını, ilerleme bildirimlerini, raporları, görev listelerini, commit açıklamalarını ve kullanıcıya sunduğun sonuç özetlerini Türkiye Türkçesiyle yaz. Kod içindeki mevcut İngilizce isimlendirmeyi sırf Türkçeleştirmek için bozma; fakat kullanıcıya yönelik metinler doğal Türkçe olmalı.
 
@@ -309,7 +309,7 @@ Her benchmark fikri için `docs/REFERENCE_PRODUCT_GAP_ANALYSIS_TR.md` içinde ş
 Site içindeki bütün metinleri denetle. Marka adını ve ürün ilişkilerini tutarlı hâle getir:
 
 - Kade New Media: ana marka/ajans
-- Kade AI: ürün ailesi veya platform; gerçek şirket statüsü doğrulanmadan ayrı şirket gibi sunma
+- KadexAI: ürün ailesi veya platform; gerçek şirket statüsü doğrulanmadan ayrı şirket gibi sunma
 - Kade Media/Kademedia/Kadenewmedia varyasyonları: SEO amaçlı görünür metin içinde spam yapmadan entity eşlemesi
 
 Doğrulanmamış kurucu, ekip, müşteri, ödül, sonuç veya başarı uydurma.
@@ -1056,7 +1056,7 @@ Uygun değilse kurma; bunun yerine mevcut admin panelinde gerekli CRM fonksiyonl
 - Orijinal içerik hash/provenance kaydı uygun olduğunda
 - Görsellerde gerektiğinde görünür veya görünmez watermark
 
-### Kullanıcı/Kade AI içeriği
+### Kullanıcı/KadexAI içeriği
 
 - Private-by-default storage
 - Kısa süreli signed URL
@@ -1908,10 +1908,10 @@ Site genelinde marka adının yazımını standartlaştır.
 •	Kade Media
 •	Kade Newmedia
 •	KADE
-•	Kade AI
+•	KadexAI
 •	Kade Digital
 Birincil marka ile ürün isimlerinin ilişkisini açıkça tanımla.
-apps/kadeai uygulamasının ayrı bir şirket mi, ürün mü veya Kade New Media hizmeti mi olduğunu kullanıcıya ve arama motorlarına anlaşılır biçimde göster.
+apps/kadexai uygulamasının ayrı bir şirket mi, ürün mü veya Kade New Media hizmeti mi olduğunu kullanıcıya ve arama motorlarına anlaşılır biçimde göster.
 Marka entity sayfası veya güçlü bir “Hakkımızda” sayfası oluştur. Bu sayfa şunları açıklamalıdır:
 •	Kade New Media nedir?
 •	Hangi hizmetleri verir?
@@ -2455,7 +2455,7 @@ Kritik içerik sadece client-side JavaScript sonrasında görünüyorsa mevcut m
 •	Status code
 •	Sitemap
 •	Internal links
-apps/kadeai
+apps/kadexai
 Şu sayfaları varsayılan olarak indeksleme dışı tutmayı değerlendir:
 •	Login
 •	Register
@@ -2469,7 +2469,7 @@ apps/kadeai
 •	Başarılı veya başarısız ödeme dönüş sayfaları
 •	Test ve preview sayfaları
 Public ve gerçekten değerli ürün veya paket sayfaları varsa bunları kontrollü biçimde indekslenebilir yap.
-/kadeai ile ana site arasında canonical çakışması oluşturma.
+/kadexai ile ana site arasında canonical çakışması oluşturma.
 API endpointlerinin indekslenmesini engelle.
 Preview Vercel domainlerini noindex yap.
 Production custom domainini yanlışlıkla noindex bırakma.

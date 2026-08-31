@@ -8,5 +8,5 @@ output
 test-results
 playwright-report
 .env
-apps/kadeai
+apps/kadexai
 public/_next

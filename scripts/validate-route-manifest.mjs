@@ -40,7 +40,7 @@ async function discoverKadeRoutes(directory, segments = [], found = new Set()) {
 
 function rootPageExists(route) {
   if (route === '/') return true
-  if (route === '/kadeai-demo') return existsSync(new URL('../apps/kadeai/app/kadeai-demo/page.tsx', import.meta.url))
+  if (route === '/kadexai-demo') return existsSync(new URL('../apps/kadexai/app/kadexai-demo/page.tsx', import.meta.url))
   if (route === '/blog/:slug') return /path="\/blog\/:slug"/.test(appSource) && dispatcherSource.includes('dynamicPage')
   if (route === '/partnerler/:id') return /path="\/partnerler\/:id"/.test(appSource) && dispatcherSource.includes('dynamicPage')
   if (route === '/links' || route === '/kadelinks') return appSource.includes(`path="${route}"`)
@@ -56,12 +56,12 @@ function rootPageExists(route) {
 async function kadeRouteExists(route, type) {
   const relative = route.replace(/^\//, '')
   if (type === 'api') {
-    return fileExists(new URL(`../apps/kadeai/app/${relative}/route.ts`, import.meta.url))
+    return fileExists(new URL(`../apps/kadexai/app/${relative}/route.ts`, import.meta.url))
   }
-  if (relative === 'kadeai/auth/callback') {
-    return fileExists(new URL('../apps/kadeai/app/kadeai/auth/callback/route.ts', import.meta.url))
+  if (relative === 'kadexai/auth/callback') {
+    return fileExists(new URL('../apps/kadexai/app/kadexai/auth/callback/route.ts', import.meta.url))
   }
-  return fileExists(new URL(`../apps/kadeai/app/${relative ? `${relative}/` : ''}page.tsx`, import.meta.url))
+  return fileExists(new URL(`../apps/kadexai/app/${relative ? `${relative}/` : ''}page.tsx`, import.meta.url))
 }
 
 function rootApiExists(route) {
@@ -92,7 +92,7 @@ for (const route of expectedMissing) assert(declaredMissing.has(route), `Missing
 const sourceMismatches = []
 for (const entry of manifest.routes) {
   let exists
-  if (entry.app === 'kadeai') exists = await kadeRouteExists(entry.route, entry.type)
+  if (entry.app === 'kadexai') exists = await kadeRouteExists(entry.route, entry.type)
   else if (entry.type === 'api') exists = rootApiExists(entry.route)
   else exists = rootPageExists(entry.route)
 
@@ -104,12 +104,12 @@ assert(sourceMismatches.length === 0, `Manifest/source mismatch:\n${JSON.stringi
 // Manifest yalnız kendi içindeki kayıtları değil fiziksel App Router ağacını
 // da kapsamalı. Aksi hâlde yeni bir route eklenip envantere unutulduğunda eski
 // doğrulayıcı sessizce yeşil dönüyordu.
-const discoveredKadeRoutes = await discoverKadeRoutes(new URL('../apps/kadeai/app/kadeai/', import.meta.url), ['kadeai'])
-const declaredKadeRoutes = new Set(manifest.routes.filter((entry) => entry.app === 'kadeai').map((entry) => entry.route))
+const discoveredKadeRoutes = await discoverKadeRoutes(new URL('../apps/kadexai/app/kadexai/', import.meta.url), ['kadexai'])
+const declaredKadeRoutes = new Set(manifest.routes.filter((entry) => entry.app === 'kadexai').map((entry) => entry.route))
 const undeclaredKadeRoutes = [...discoveredKadeRoutes].filter((route) => !declaredKadeRoutes.has(route)).sort()
 const staleKadeRoutes = [...declaredKadeRoutes].filter((route) => !discoveredKadeRoutes.has(route)).sort()
-assert(undeclaredKadeRoutes.length === 0, `Manifest dışında KadeAI route'ları var:\n${JSON.stringify(undeclaredKadeRoutes, null, 2)}`)
-assert(staleKadeRoutes.length === 0, `Manifestte artık fiziksel karşılığı olmayan KadeAI route'ları var:\n${JSON.stringify(staleKadeRoutes, null, 2)}`)
+assert(undeclaredKadeRoutes.length === 0, `Manifest dışında KadexAI route'ları var:\n${JSON.stringify(undeclaredKadeRoutes, null, 2)}`)
+assert(staleKadeRoutes.length === 0, `Manifestte artık fiziksel karşılığı olmayan KadexAI route'ları var:\n${JSON.stringify(staleKadeRoutes, null, 2)}`)
 
 const scripts = await readdir(new URL('../scripts/', import.meta.url))
 assert(scripts.includes('validate-route-manifest.mjs'), `Validator missing under ${join(projectRoot.pathname, 'scripts')}`)
