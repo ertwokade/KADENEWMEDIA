@@ -16,6 +16,9 @@ interface ViralAnalysis {
   guclu_yonler: string[]
   iyilestirme_onerileri: string[]
   revize_edilmis_baslik: string
+  /** Performans tahmini alanları doldurulduğunda gelir. */
+  tahminler?: Record<string, string>
+  ideal_yayin_zamani?: string
 }
 
 interface ModelResult {
@@ -38,6 +41,11 @@ function ScoreBar({ score }: { score: number }) {
       <div className={cn('h-full rounded-full transition-all', bg)} style={{ width: `${score}%` }} />
     </div>
   )
+}
+
+const forecastLabels: Record<string, string> = {
+  ctr_tahmini: 'Tahmini CTR', ilk_48_saat: 'İlk 48 saat',
+  viral_potansiyel: 'Viral potansiyel', uzun_vadeli: 'Uzun vade',
 }
 
 const criteriaLabels: Record<string, string> = {
@@ -107,6 +115,23 @@ function AnalysisCard({ result }: { result: ModelResult }) {
         )}
       </div>
 
+      {a.tahminler && Object.keys(a.tahminler).length > 0 && (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {Object.entries(a.tahminler).map(([key, val]) => (
+            <div key={key} className="rounded-lg border border-zinc-700/50 bg-zinc-800/50 p-3">
+              <p className="text-zinc-500 text-[11px]">{forecastLabels[key] || key}</p>
+              <p className="text-zinc-200 text-sm font-semibold mt-1">{val}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {a.ideal_yayin_zamani && (
+        <p className="text-zinc-400 text-xs">
+          <span className="text-zinc-500">İdeal yayın zamanı:</span> {a.ideal_yayin_zamani}
+        </p>
+      )}
+
       {a.revize_edilmis_baslik && (
         <div className="rounded-lg border border-violet-500/20 bg-violet-500/5 p-3">
           <p className="text-violet-400 text-xs font-semibold mb-1">Revize Başlık</p>
@@ -127,19 +152,56 @@ export default function ViralScorePage() {
   const [platform, setPlatform]     = useState<Platform>('youtube')
   const [description, setDescription] = useState('')
   const [hashtags, setHashtags]     = useState('')
+  // Performans Tahmini ayrı bir araç olarak duruyordu ama aynı başlığı aynı
+  // 0-100 ölçeğinde puanlıyordu; tek farkı thumbnail ve nişi de hesaba katıp
+  // CTR/48 saat öngörüsü eklemesiydi. Bu iki alan doluysa o uç kullanılır.
+  const [thumbnailDesc, setThumbnailDesc] = useState('')
+  const [niche, setNiche]           = useState('')
   const [loading, setLoading]       = useState(false)
   const [allLoading, setAllLoading] = useState(false)
   const [results, setResults]       = useState<ModelResult[]>([])
   const [error, setError]           = useState('')
 
+  const forecastMode = Boolean(thumbnailDesc.trim() || niche.trim())
+
   const analyze = async (model: AIModel, subject: string = title): Promise<ModelResult> => {
-    const res = await apiFetch('/api/generate/viral-score', {
+    if (!forecastMode) {
+      const res = await apiFetch('/api/generate/viral-score', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: subject, platform, model, description, hashtags }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      return { model: data.model || model, analysis: data.analysis, subject }
+    }
+
+    const res = await apiFetch('/api/generate/performance', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: subject, platform, model, description, hashtags }),
+      body: JSON.stringify({
+        title: subject, platform, model, niche,
+        thumbnailDesc, contentDesc: description,
+      }),
     })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error)
-    return { model: data.model || model, analysis: data.analysis, subject }
+    const d = data.data ?? {}
+    // İki uç aynı bilgiyi farklı adlarla döndürüyor; kart tek biçim bekliyor.
+    return {
+      model: data.model || model,
+      subject,
+      analysis: {
+        toplam_puan: Number(d.genel_skor) || 0,
+        kriterler: {},
+        guclu_yonler: Array.isArray(d.guclu_yonler) ? d.guclu_yonler : [],
+        iyilestirme_onerileri: [
+          ...(Array.isArray(d.optimizasyon_onerileri) ? d.optimizasyon_onerileri : []),
+          ...(Array.isArray(d.zayif_yonler) ? d.zayif_yonler : []),
+        ],
+        revize_edilmis_baslik: '',
+        tahminler: d.tahminler && typeof d.tahminler === 'object' ? d.tahminler : undefined,
+        ideal_yayin_zamani: typeof d.ideal_yayin_zamani === 'string' ? d.ideal_yayin_zamani : undefined,
+      },
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -179,7 +241,7 @@ export default function ViralScorePage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="Viral Skor" description="Viral potansiyeli ölç, iki başlığı A/B karşılaştır" />
+      <TopBar title="Viral Skor" description="Viral potansiyeli ölç, iki başlığı A/B karşılaştır, performans tahmini al" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:h-full lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80">
@@ -219,10 +281,26 @@ export default function ViralScorePage() {
                 <input value={hashtags} onChange={e => setHashtags(e.target.value)} placeholder="#teknoloji #youtube"
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
               </div>
+              <div className="space-y-4 border-t border-zinc-700/60 pt-4">
+                <p className="text-zinc-500 text-[11px]">
+                  Aşağıdakileri doldurursan skorun yanında CTR ve ilk 48 saat tahmini de gelir.
+                </p>
+                <div>
+                  <label className="block text-zinc-400 text-xs font-medium mb-1.5">Thumbnail <span className="text-zinc-600">(opsiyonel)</span></label>
+                  <textarea value={thumbnailDesc} onChange={e => setThumbnailDesc(e.target.value)} rows={2}
+                    placeholder="Kapak görselini anlat: yüz ifadesi, metin, renk..."
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322] resize-none" />
+                </div>
+                <div>
+                  <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niş <span className="text-zinc-600">(opsiyonel)</span></label>
+                  <input value={niche} onChange={e => setNiche(e.target.value)} placeholder="teknoloji, yemek, oyun..."
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
+                </div>
+              </div>
               <div className="space-y-2">
                 <button type="submit" disabled={isLoading || !title.trim()}
                   className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 transition-colors">
-                  {loading ? 'Analiz ediliyor...' : rivalTitle.trim() ? 'İki Başlığı Karşılaştır' : 'Viral Skor Al'}
+                  {loading ? 'Analiz ediliyor...' : rivalTitle.trim() ? 'İki Başlığı Karşılaştır' : forecastMode ? 'Skor + Tahmin Al' : 'Viral Skor Al'}
                 </button>
                 {compareModels.length > 0 && (
                   <button type="button" onClick={handleAskAll} disabled={isLoading || !title.trim()}

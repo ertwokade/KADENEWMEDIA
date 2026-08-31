@@ -210,3 +210,17 @@ html.embedded .view.active {
     padding: 18px 16px 36px !important;
   }
 }
+
+/* KPI kartlarının üst şeridi kart başına ayrı bir renk kullanıyordu:
+   "Aktif Üretim" mavi, "Açık Görev" kırmızı. Bu renkler bir durum
+   anlatmıyordu — açık görev bir hata değil — yalnızca dekoratifti ve
+   panelin geri kalanındaki tek vurgulu dille çakışıyordu. Tek vurguya
+   indiriliyor; --coral ve --indigo gerçek uyarı/bilgi anlamı taşıdıkları
+   diğer yerlerde olduğu gibi kalıyor. */
+.kpi.teal::before,
+.kpi.indigo::before,
+.kpi.coral::before,
+.kpi.gold::before,
+.kpi.violet::before {
+  background: var(--teal) !important;
+}

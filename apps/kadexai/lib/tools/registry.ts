@@ -81,7 +81,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('subtitles', 'Altyazı Stüdyosu', 'media', '/dashboard/subtitles', 'captions', 'Videodan altyazı üretir, çevirir ve YouTube’a yükler.', [], false),
   tool('dubbing', 'Dublaj Stüdyosu', 'media', '/dashboard/dubbing', 'mic', 'Videoyu otomatik olarak başka dillerde seslendirir.', [], false),
 
-  tool('viral-score', 'Viral Skor', 'analysis', '/dashboard/viral-score', 'trending-up', 'Girilen içerik sinyallerinden tahmini viral potansiyel analizi.', ['brand.niche', 'brand.audience']),
+  tool('viral-score', 'Viral Skor', 'analysis', '/dashboard/viral-score', 'trending-up', 'Viral potansiyeli puanlar, iki başlığı karşılaştırır, thumbnail verilirse CTR tahmini ekler.', ['brand.niche', 'brand.audience']),
   tool('clickbait-detector', 'Clickbait Dedektörü', 'analysis', '/dashboard/clickbait-detector', 'alert-circle', 'Başlığın vaat ve yanıltıcılık riskini analiz eder.', [], false),
   tool('youtube-seo', 'YouTube SEO', 'analysis', '/dashboard/youtube-seo', 'search', 'Girilen video verilerini SEO açısından inceler.', ['brand.niche']),
   tool('retention-analysis', 'İzlenme Analizi', 'analysis', '/dashboard/retention-analysis', 'bar-chart', 'Girilen akış ve metriklerden izleyici tutma analizi.', ['brand.audience']),
@@ -90,7 +90,6 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('materyal', 'Materyal Kütüphanesi', 'analysis', '/dashboard/materyal', 'image-plus', 'Video ve fotoğraf materyallerini ara, izle ve indir.', [], false),
   tool('competitor', 'Rakip Analizi', 'analysis', '/dashboard/competitor', 'users', 'Kullanıcının sağladığı rakip bilgilerini analiz eder.', ['brand.niche']),
   tool('comment-analysis', 'Yorum Analizi', 'analysis', '/dashboard/comment-analysis', 'message-square', 'Yapıştırılan gerçek yorumları analiz eder.', [], false),
-  tool('performance', 'Performans Tahmini', 'analysis', '/dashboard/performance', 'activity', 'Verilen içerik sinyallerinden açıkça etiketli tahmin üretir.', ['brand.niche', 'brand.audience']),
   tool('analytics', 'Analitik', 'analysis', '/dashboard/analytics', 'bar-chart', 'Kullanıcının girdiği metriklerden performans özeti çıkarır.', ['brand.niche']),
   tool('faq', 'FAQ Üretici', 'analysis', '/dashboard/faq', 'bookmark', 'İçerikten soru ve cevaplar çıkarır.', ['brand.audience']),
   tool('quote-extractor', 'Alıntı Çıkarıcı', 'analysis', '/dashboard/quote-extractor', 'book-open', 'Verilen metinden kullanılabilir alıntılar çıkarır.', [], false),
