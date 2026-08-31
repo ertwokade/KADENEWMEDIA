@@ -237,3 +237,39 @@ Birleştirilen araçlar (toplam dört):
 | Analitik Dashboard | Sosyal Medya Analizi | İkisi de hesap metriklerinden büyüme önerisi çıkarıyordu |
 
 Eski rotalar yönlendirme olarak duruyor, API uçları korundu.
+
+## Kullanıcı ayrımı ve paket kısıtlaması (31 Ağustos 2026)
+
+**Adresler.** Panel her kullanıcı için kendi adresinde açılıyor:
+`/kadexai/<slug>/dashboard/...`. Slug bir yetki değil, yalnızca adres;
+başkasının adresini yazan erişim kazanmaz, kendi alanına yönlendirilir.
+Sahip adresi `kade`, hesaba `app_metadata` üzerinden atanmış durumda
+(oraya yalnızca servis rolü yazabilir; kullanıcının yazabildiği
+`user_metadata`'dan gelen `kade` reddediliyor).
+
+Geçiş sırasında iki arıza çıktı, ikisi de canlıyı kırardı:
+
+1. Yeniden adlandırmada tetikleyici eski isimli fonksiyona bağlı kalmış;
+   herkese sabit `ana-calisma-alani` yazıyordu. Adres global benzersiz
+   olunca **ikinci kayıttan itibaren hiç kimse kayıt olamazdı.** Sahte
+   hesaplarla test edilip doğrulandı, hesaplar silindi.
+2. TopBar modül rozeti hiç çalışmıyormuş: rotalar fiziksel olarak
+   `/kadexai` altında olduğu için `/dashboard/operations` karşılaştırması
+   hiçbir zaman tutmuyordu.
+
+**Yetkiler.** `ertugyld@gmail.com` ve SSO admin hesabı (`kade`)
+`app_metadata.kade_admin_role = 'admin'` taşıyor; ikisi de tam yetkili ve
+Sınırsız pakete sahip. Sahip YETKİSİ ile sahip ADRESİ ayrı: admin rolü olan
+hesaplar yetkilerini korur ama kendi adreslerinde açılır.
+
+**Paket kısıtlaması.** Artık gerçek: görsel üretimi, toplu içerik, klip,
+transkripsiyon ve altyazı çevirisi uçları paketi olmayana 402 döner.
+Menüdeki kilit yalnızca işaret; sınır uçta.
+
+Eşlemede kısıtlama açılsa ödeme yapan kullanıcıyı kesecek bir hata vardı:
+araç başına tek özellik yazılmıştı, oysa Pro/Sınırsız'da `image-basic`,
+Başlangıç'ta `video-factory` yok. Eşleme liste aldı, herhangi biri yeterli.
+Üst paketin hiçbir aracı kaybetmediğini doğrulayan test eklendi.
+
+Analiz ve metin araçları bilerek eşlenmedi: hangi pakete ait oldukları bir
+fiyatlandırma kararı, uydurulmadı.
