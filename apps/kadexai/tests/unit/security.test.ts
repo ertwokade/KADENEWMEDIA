@@ -238,7 +238,10 @@ test('KadexAI entry and reset-password links keep the /kadexai prefix', async ()
 test('dashboard navigation always applies the physical /kadexai prefix', async () => {
   const dashboardSource = await readFile(new URL('../../app/kadexai/dashboard/page.tsx', import.meta.url), 'utf8')
   const sidebarSource = await readFile(new URL('../../components/layout/Sidebar.tsx', import.meta.url), 'utf8')
-  assert.match(dashboardSource, /href=\{withBasePath\('\/dashboard\/title'\)\}/)
+  // Kural, tek bir baglantinin nasil yazildigi degil: panelde withBasePath'i
+  // atlayan ham bir /dashboard baglantisi bulunmamali.
+  assert.doesNotMatch(dashboardSource, /href="\/dashboard/)
+  assert.doesNotMatch(dashboardSource, /href=\{'\/dashboard/)
   assert.match(dashboardSource, /href=\{withBasePath\(href\)\}/)
   assert.match(sidebarSource, /href=\{withBasePath\(item\.href\)\}/)
   assert.match(sidebarSource, /stripBasePath\(usePathname\(\) \?\? ''\)/)

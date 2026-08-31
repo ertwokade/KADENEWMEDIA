@@ -9,6 +9,7 @@ import { apiFetch, LOCAL_HISTORY_KEY, LocalHistoryEntry } from '@/lib/client/api
 import { AIModel } from '@/types'
 import { apiPath } from '@/lib/appConfig'
 import { PROFILE_STORAGE_KEY } from '@/lib/profile/types'
+import { getToolById } from '@/lib/tools/registry'
 
 interface HistoryEntry {
   id: string
@@ -22,31 +23,17 @@ interface HistoryEntry {
   tokens_used?: number
 }
 
-const toolLabels: Record<string, string> = {
-  title: 'Başlık Üretici',
-  description: 'Video Açıklama',
-  hook: 'Hook Jeneratörü',
-  hashtag: 'Hashtag AI',
-  'viral-score': 'Viral Skor',
-  ideas: 'İçerik Fikirleri',
-  'text-generator': 'Metin Oluşturucu',
-  'social-audit': 'Sosyal Medya Analizi',
-  'retention-analysis': 'İzleyici Tutma Analizi',
-  'clickbait-detector': 'Clickbait Analizi',
+/** Araç adlarının kaynağı kayıt defteri; burada yalnızca birleştirilmiş ya da
+ *  kaldırılmış eski araçların geçmişte kalan id'leri karşılanıyor. */
+const LEGACY_TOOL_LABELS: Record<string, string> = {
   clips: 'Klip Analizi',
-  bulk: 'Toplu Üretim',
-  carousel: 'Carousel İçeriği',
-  'content-plan': 'İçerik Planı',
-  performance: 'Performans Analizi',
-  trends: 'Trend Araştırması',
-  competitor: 'Rakip Analizi',
-  'comment-analysis': 'Yorum Analizi',
-  'quote-extractor': 'Alıntı Çıkarıcı',
-  'youtube-seo': 'YouTube SEO',
-  faq: 'SSS Üretici',
+  trends: 'Trend Radarı',
   thread: 'Thread Yazarı',
-  'collab-mail': 'İş Birliği E-postası',
-  'bio-link': 'Bio Link Metni',
+  bulk: 'Toplu Üretim',
+}
+
+function toolLabel(id: string) {
+  return getToolById(id)?.name ?? LEGACY_TOOL_LABELS[id] ?? id
 }
 
 export default function HistoryPage() {
@@ -116,7 +103,7 @@ export default function HistoryPage() {
     if (filter !== 'tümü' && entry.tool !== filter) return false
     if (status !== 'tümü' && (entry.status || 'completed') !== status) return false
     if (from && new Date(entry.created_at) < new Date(`${from}T00:00:00`)) return false
-    if (normalizedQuery && !`${toolLabels[entry.tool] || entry.tool} ${entry.output} ${entry.error_message || ''}`.toLocaleLowerCase('tr-TR').includes(normalizedQuery)) return false
+    if (normalizedQuery && !`${toolLabel(entry.tool)} ${entry.output} ${entry.error_message || ''}`.toLocaleLowerCase('tr-TR').includes(normalizedQuery)) return false
     return true
   })
 
@@ -181,7 +168,7 @@ export default function HistoryPage() {
                 <button key={t} onClick={() => setFilter(t)}
                   className={cn('px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize',
                     filter === t ? 'bg-violet-500/20 text-violet-300' : 'text-zinc-500 hover:text-zinc-300')}>
-                  {t === 'tümü' ? 'Tümü' : (toolLabels[t] || t)}
+                  {t === 'tümü' ? 'Tümü' : toolLabel(t)}
                   {t === 'tümü' && <span className="ml-1 text-zinc-600">({entries.length})</span>}
                 </button>
               ))}
@@ -194,7 +181,7 @@ export default function HistoryPage() {
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-zinc-300 text-sm font-medium">{toolLabels[entry.tool] || entry.tool}</span>
+                    <span className="text-zinc-300 text-sm font-medium">{toolLabel(entry.tool)}</span>
                     <span className={cn('text-xs font-medium', getModelColor(entry.model as AIModel))}>
                       {getModelLabel(entry.model as AIModel)}
                     </span>

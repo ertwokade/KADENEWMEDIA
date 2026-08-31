@@ -76,15 +76,13 @@ function buildNavItems(ownerAccess: boolean, settingsAccess: boolean) {
   })).filter((group) => group.items.length > 0)
 }
 
-const catAccent: Record<string, { label: string; activeBg: string; activeIcon: string; dot: string }> = {
-  'PLATFORM':         { label: 'text-violet-500', activeBg: 'bg-violet-50 text-violet-700 border-violet-200',   activeIcon: 'text-violet-500', dot: 'bg-violet-400'  },
-  'OPERASYON':        { label: 'text-cyan-500',   activeBg: 'bg-cyan-50 text-cyan-700 border-cyan-200',         activeIcon: 'text-cyan-500',   dot: 'bg-cyan-400'    },
-  'ÜRETİM':          { label: 'text-orange-500', activeBg: 'bg-orange-50 text-orange-700 border-orange-200',    activeIcon: 'text-orange-500', dot: 'bg-orange-400'  },
-  'MEDYA':           { label: 'text-pink-500',   activeBg: 'bg-pink-50 text-pink-700 border-pink-200',          activeIcon: 'text-pink-500',   dot: 'bg-pink-400'    },
-  'ANALİZ':          { label: 'text-blue-500',   activeBg: 'bg-blue-50 text-blue-700 border-blue-200',          activeIcon: 'text-blue-500',   dot: 'bg-blue-400'    },
-  'PLANLAMA':        { label: 'text-teal-500',   activeBg: 'bg-teal-50 text-teal-700 border-teal-200',          activeIcon: 'text-teal-500',   dot: 'bg-teal-400'    },
-  'SAHİP':           { label: 'text-amber-500',  activeBg: 'bg-amber-50 text-amber-800 border-amber-200',         activeIcon: 'text-amber-500',  dot: 'bg-amber-400'   },
-  'AYARLAR':         { label: 'text-zinc-500',   activeBg: 'bg-zinc-100 text-zinc-700 border-zinc-200',         activeIcon: 'text-zinc-500',   dot: 'bg-zinc-400'    },
+// Gezinme tek vurgu rengi kullanir: kategori basina ayri renk, her sayfada
+// sekiz farkli vurgu demekti ve arayuzun geri kalaniyla catisiyordu.
+const NAV_ACTIVE = {
+  label: 'text-[color:var(--kade-a-600)]',
+  activeBg: 'bg-[color:var(--kade-a-50)] text-[color:var(--kade-n-100)] border-[color:var(--kade-a-200)]',
+  activeIcon: 'text-[color:var(--kade-a-600)]',
+  dot: 'bg-[color:var(--kade-a-500)]',
 }
 
 function NavLinkStatus({ isActive, dotClass }: { isActive: boolean; dotClass: string }) {
@@ -281,7 +279,7 @@ export default function Sidebar() {
           {filtered.map((group) => {
             const catOpen = isSearching || openCats.has(group.category)
             const activeInGroup = group.items.some(i => isHrefActive(i.href))
-            const accent = catAccent[group.category] ?? catAccent['AYARLAR']
+            const accent = NAV_ACTIVE
 
             return (
               <div key={group.category}>

@@ -1,7 +1,8 @@
 import 'server-only'
 
 import { getActiveEntitlement } from '@/lib/payments/access'
-import { getLimitForTier, listLimitsForTier, type LimitKey } from '@/lib/payments/limits'
+import { FREE_TIER, getLimitForTier, listLimitsForTier, type LimitKey } from '@/lib/payments/limits'
+import { getPricingSnapshot } from '@/lib/payments/pricingConfig'
 import { entitlementAllows, tierOf } from '@/lib/payments/planRules'
 
 /**
@@ -27,6 +28,9 @@ export async function getCurrentPlan() {
   const tier = tierOf(entitlement)
   return {
     tier,
+    // Görünen ad fiyat yapılandırmasından gelir; arayüzde ikinci bir
+    // tier->etiket eşlemesi tutulursa ikisi zamanla ayrışır.
+    label: tier === FREE_TIER ? 'Ücretsiz' : getPricingSnapshot().tierLabels[tier],
     period: entitlement?.period ?? null,
     apiIncluded: entitlement?.api_included ?? false,
     features: entitlement?.features ?? [],
