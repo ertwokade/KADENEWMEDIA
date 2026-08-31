@@ -45,13 +45,30 @@ test('sahibin adresi sabit, kimse onu alamaz', () => {
   }
   assert.notEqual(workspaceSlugForUser(musteri, false), OWNER_WORKSPACE_SLUG)
 
-  // Metadata'ya elle 'kade' yazılsa bile geçerli olmaz.
+  // user_metadata kullanıcının kendi yazabildiği bir alan; oraya elle 'kade'
+  // yazan biri sahibin adresini ele geçirememeli.
   const kurcalayan = {
     id: '33333333-3333-3333-3333-333333333333',
     email: 'x@y.com',
     user_metadata: { workspace_slug: OWNER_WORKSPACE_SLUG },
   }
   assert.notEqual(workspaceSlugForUser(kurcalayan, false), OWNER_WORKSPACE_SLUG)
+
+  // app_metadata'ya yalnızca servis rolü yazabilir; oradan gelen adres geçerli.
+  const atanmis = {
+    id: '44444444-4444-4444-4444-444444444444',
+    email: 'z@y.com',
+    app_metadata: { workspace_slug: OWNER_WORKSPACE_SLUG },
+  }
+  assert.equal(workspaceSlugForUser(atanmis, false), OWNER_WORKSPACE_SLUG)
+
+  // Atanan adres geçersizse (ayrılmış kelime) yine de kabul edilmez.
+  const bozuk = {
+    id: '55555555-5555-5555-5555-555555555555',
+    email: 'q@y.com',
+    app_metadata: { workspace_slug: 'dashboard' },
+  }
+  assert.notEqual(workspaceSlugForUser(bozuk, false), 'dashboard')
 })
 
 test('yol ayrıştırma gerçek rotaları alan sanmaz', () => {

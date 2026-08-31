@@ -81,6 +81,8 @@ export type SlugUserLike = {
   id: string
   email?: string | null
   user_metadata?: Record<string, unknown> | null
+  /** Yalnızca servis rolü yazabilir; kullanıcı değiştiremez. */
+  app_metadata?: Record<string, unknown> | null
 }
 
 /** Metadata'da saklanan adres anahtarı. Çakışma yüzünden addan türetilenden
@@ -111,6 +113,12 @@ function displayNameOf(user: SlugUserLike): string {
  * yetkilerini korur ama kendi adreslerinde açılır.
  */
 export function workspaceSlugForUser(user: SlugUserLike, sahip: boolean): string {
+  // app_metadata'ya yalnızca servis rolü yazabilir, kullanıcı değiştiremez.
+  // Bir hesaba elle adres atanmışsa (sahibin `kade` adresi dahil) kaynağı
+  // burasıdır ve her şeyin önüne geçer.
+  const atanan = user.app_metadata?.[WORKSPACE_SLUG_METADATA_KEY]
+  if (typeof atanan === 'string' && isValidWorkspaceSlug(atanan)) return atanan
+
   if (sahip) return OWNER_WORKSPACE_SLUG
 
   const kayitli = user.user_metadata?.[WORKSPACE_SLUG_METADATA_KEY]
