@@ -36,6 +36,31 @@
   --color-violet-700: var(--kade-a-700);
   --color-violet-900: var(--kade-a-900);
   --color-violet-950: var(--kade-a-950);
+  --color-violet-100: var(--kade-a-50);
+  --color-violet-800: var(--kade-a-900);
+
+  /* Dekoratif olarak serpilmis aileler. Bunlar bir anlam tasimiyordu, yalnizca
+     rastgele secilmis renklerdi; markanin vurgusuna baglaniyorlar. */
+  --color-purple-300: var(--kade-a-300);
+  --color-purple-400: var(--kade-a-400);
+  --color-purple-500: var(--kade-a-500);
+  --color-purple-900: var(--kade-a-900);
+  --color-fuchsia-300: var(--kade-a-300);
+  --color-fuchsia-400: var(--kade-a-400);
+  --color-fuchsia-500: var(--kade-a-500);
+  --color-pink-300: var(--kade-a-300);
+  --color-pink-400: var(--kade-a-400);
+  --color-pink-500: var(--kade-a-500);
+
+  /* lime her yerde "iyi/yukselen" anlaminda, rose "sorunlu" anlaminda
+     kullanilmis; semantik renklere baglaniyorlar. */
+  --color-lime-300: var(--kade-ok-300);
+  --color-lime-400: var(--kade-ok-400);
+  --color-lime-500: var(--kade-ok-500);
+  --color-lime-900: var(--kade-ok-deep);
+  --color-rose-300: var(--kade-err-300);
+  --color-rose-400: var(--kade-err-400);
+  --color-rose-500: var(--kade-err-500);
 
   /* Semantik aileler — TAM rampa.
      Yalnız 300/400/500 bağlamak yetmiyor: kodda text-amber-200, bg-red-950,
