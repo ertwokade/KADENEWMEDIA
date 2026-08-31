@@ -182,3 +182,23 @@ node haoqi-clone/server.mjs                 # yalnız klon, port 4180
 
 Yerelde `.env` ve `apps/kadexai/.env.local` **placeholder** Supabase bilgileri taşıyor; bu yüzden
 giriş yapılamıyor ve `/api/*` 503 döner. Bu beklenen davranış, hata değil.
+
+---
+
+## Adlandırma: KadeAI → KadexAI
+
+`apps/kadeai/` → `apps/kadexai/`, `/kadeai/*` → `/kadexai/*`.
+
+Eski yol kalıcı olarak yeni yola yönlendiriliyor (`vercel.json`), yani yer
+imleri ve paylaşılmış bağlantılar kırılmıyor.
+
+**Vercel'de elle yapılan ayar:** Root Directory `apps/kadeai` → `apps/kadexai`.
+Bu ayar klasör adına bağlı olduğu için adlandırmadan sonra her dağıtım
+"Error" veriyordu ve canlıya hiçbir şey çıkmıyordu. Aynı hata bir daha
+olursa ilk bakılacak yer burasıdır.
+
+**Hâlâ elle yapılması gereken:** Google OAuth ve Supabase'e kayıtlı dönüş
+adresleri `/kadeai/...` olarak duruyor. OAuth sağlayıcıları kayıtlı adresi
+birebir eşler ve yönlendirme İZLEMEZ; bu yüzden YouTube bağlantısı ve Google
+ile giriş, adresler konsolda `/kadexai/...` olarak güncellenene kadar
+çalışmaz.
