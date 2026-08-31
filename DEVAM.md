@@ -273,3 +273,18 @@ Başlangıç'ta `video-factory` yok. Eşleme liste aldı, herhangi biri yeterli.
 
 Analiz ve metin araçları bilerek eşlenmedi: hangi pakete ait oldukları bir
 fiyatlandırma kararı, uydurulmadı.
+
+### thekademedia@gmail.com hesabına sahiplik (31 Ağustos 2026)
+
+Hesap 31 Temmuz'da Google ile açılmış, hiçbir yetkisi yoktu. Diğer sahip
+hesapları `kade_users` tablosundaki bir satıra bağlı (`app_metadata.
+kade_admin_id`); o tabloda `password_hash` zorunlu olduğu için oraya satır
+açmak bu hesaba admin paneli parolası üretmek demekti. Hesap zaten Google
+ile giriyor, dolayısıyla doğru yol `KADE_OWNER_EMAILS`.
+
+Değişken hiç tanımlı değilmiş — e-postayla sahiplik yolu bugüne kadar hiç
+çalışmamış, tek yol admin rolüymüş. Vercel'e Config olarak eklendi.
+
+Hesabın adresi `app_metadata.workspace_slug = 'thekademedia'` olarak
+sabitlendi: sahip listesine girince `workspaceSlugForUser` ona da `kade`
+vermek isteyecekti ve SSO hesabındaki `kade` ile çakışacaktı.
