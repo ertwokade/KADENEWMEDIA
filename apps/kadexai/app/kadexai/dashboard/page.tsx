@@ -5,7 +5,7 @@ import {
 import DashboardMobileHeader from '@/components/dashboard/DashboardMobileHeader'
 import WorkspaceStatus from '@/components/dashboard/WorkspaceStatus'
 import { getAuthenticatedUser } from '@/lib/auth/server'
-import { isAllowedOwnerUser } from '@/lib/featureAccess'
+import { isAllowedOwnerEmail, isAllowedOwnerUser } from '@/lib/featureAccess'
 import { workspaceHref, workspaceSlugForUser } from '@/lib/workspace/slug'
 
 /**
@@ -30,7 +30,7 @@ const quickTools = [
 
 export default async function DashboardPage() {
   const user = await getAuthenticatedUser()
-  const slug = user ? workspaceSlugForUser(user, isAllowedOwnerUser(user)) : null
+  const slug = user ? workspaceSlugForUser(user, isAllowedOwnerEmail(user.email)) : null
 
   return (
     <div className="kade-home flex-1 overflow-y-auto">

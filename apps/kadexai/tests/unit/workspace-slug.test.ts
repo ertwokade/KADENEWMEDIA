@@ -77,7 +77,9 @@ test('proxy erişimi slug ile değil oturumla verir', async () => {
   assert.match(proxySource, /Bu çalışma alanına erişimin yok/)
 
   // Kullanıcının kendi adresi oturumdan hesaplanır, adresten okunmaz.
-  assert.match(proxySource, /workspaceSlugForUser\(user, isAllowedOwnerUser\(user\)\)/)
+  // Sahip adresi kullanıcının kendi yazabildiği user_metadata'dan değil,
+  // sunucudaki e-posta listesinden gelmeli.
+  assert.match(proxySource, /workspaceSlugForUser\(user, isAllowedOwnerEmail\(user\.email\)\)/)
 
   // Sahiplik kontrolleri hâlâ oturuma bakıyor olmalı.
   assert.match(proxySource, /isAdminRoute && !isAllowedOwnerUser\(user\)/)

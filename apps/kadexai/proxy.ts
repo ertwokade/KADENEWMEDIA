@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import {
   canAccessFeature,
+  isAllowedOwnerEmail,
   isAllowedOwnerUser,
   isOwnerMode,
   isAdminOnlyRoute,
@@ -239,7 +240,7 @@ export async function proxy(request: NextRequest) {
   // Adres doğrulaması. Slug hiçbir zaman yetki vermez: yalnızca kullanıcının
   // KENDİ adresinde olup olmadığına bakılır. Başkasının adresini yazan
   // kullanıcı erişim kazanmaz, kendi alanına gönderilir.
-  const kendiSlug = user ? workspaceSlugForUser(user, isAllowedOwnerUser(user)) : null
+  const kendiSlug = user ? workspaceSlugForUser(user, isAllowedOwnerEmail(user.email)) : null
 
   if (urlSlug && kendiSlug && urlSlug !== kendiSlug) {
     if (isApi) {

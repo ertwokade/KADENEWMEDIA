@@ -99,10 +99,16 @@ function displayNameOf(user: SlugUserLike): string {
  * Kullanıcının panel adresini veritabanına gitmeden belirler; proxy her
  * istekte bunu çağırdığı için sorgu yapmaması gerekiyor.
  *
- * Sıra: sahip sabit `kade` → metadata'daki adres → addan türetilen →
- * kimlikten yedek.
+ * Sıra: belirlenmiş sahip sabit `kade` → metadata'daki adres → addan
+ * türetilen → kimlikten yedek.
  *
- * Yine hatırlatma: bu bir adres hesabıdır, yetki kararı değildir.
+ * `kade` adresini yalnızca ikinci parametre true iken verir ve o parametre
+ * SUNUCU TARAFINDAN, ortam değişkenindeki e-posta listesinden hesaplanır.
+ * Kullanıcının kendi yazabildiği user_metadata'dan asla `kade` kabul
+ * edilmez; aksi halde herkes kendini sahibin adresine taşıyabilirdi.
+ *
+ * Sahip YETKİSİ ile sahip ADRESİ ayrı şeylerdir: admin rolü olan hesaplar
+ * yetkilerini korur ama kendi adreslerinde açılır.
  */
 export function workspaceSlugForUser(user: SlugUserLike, sahip: boolean): string {
   if (sahip) return OWNER_WORKSPACE_SLUG

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import DashboardShell from '@/components/layout/DashboardShell'
 import { getAuthenticatedUser, hasAuthenticatedUser } from '@/lib/auth/server'
 import { appRoutes, withBasePath } from '@/lib/appConfig'
-import { isAllowedOwnerUser } from '@/lib/featureAccess'
+import { isAllowedOwnerEmail, isAllowedOwnerUser } from '@/lib/featureAccess'
 import { WorkspaceProvider } from '@/lib/workspace/WorkspaceContext'
 import { workspaceSlugForUser } from '@/lib/workspace/slug'
 
@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // Panel içi bağlantılar kullanıcının kendi adresini taşısın diye slug
   // sunucuda çözülüp aşağı veriliyor. Yetki kararı değil, yalnızca adres.
   const user = await getAuthenticatedUser()
-  const slug = user ? workspaceSlugForUser(user, isAllowedOwnerUser(user)) : null
+  const slug = user ? workspaceSlugForUser(user, isAllowedOwnerEmail(user.email)) : null
 
   return (
     <WorkspaceProvider slug={slug}>

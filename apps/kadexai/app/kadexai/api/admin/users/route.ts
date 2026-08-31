@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { assertAuthenticatedUser } from '@/lib/auth/server'
-import { isAllowedOwnerEmail, isAllowedOwnerUser, isSettingsOwnerUser } from '@/lib/featureAccess'
+import { isAllowedOwnerUser, isSettingsOwnerUser } from '@/lib/featureAccess'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { captureApiError } from '@/lib/observability/server'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
@@ -97,7 +97,12 @@ export async function GET(request: NextRequest) {
 
     const simdi = Date.now()
     const satirlar: Satir[] = hesaplar.map((h) => {
-      const sahip = isAllowedOwnerEmail(h.email)
+      // Sahiplik e-posta listesi VEYA app_metadata'daki admin rolüyle gelir;
+      // yalnızca e-postaya bakmak admin hesaplarını "Ücretsiz" gösteriyordu.
+      const sahip = isAllowedOwnerUser({
+        email: h.email,
+        app_metadata: h.app_metadata as Record<string, unknown> | undefined,
+      })
       const hak = hakOf.get(h.id)
       const gecerli = hak && new Date(hak.expires_at).getTime() > simdi
       const kosu = kosuOf.get(h.id)
