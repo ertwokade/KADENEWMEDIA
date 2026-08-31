@@ -451,3 +451,19 @@ test('BYOK sırları doğrudan istemciye açılamaz', async () => {
   assert.match(keyStore, /encryptSecret\(clean\)/)
   assert.match(keyStore, /key_hint/)
 })
+
+test('kullanıcı listesi ucu yalnızca hesap sahibine açık', async () => {
+  const source = await readFile(new URL('../../app/kadexai/api/admin/users/route.ts', import.meta.url), 'utf8')
+
+  // Oturum + sahiplik kontrolü, handler'ın kendi savunma hattı olarak durmalı.
+  assert.match(source, /assertAuthenticatedUser\(\)/)
+  assert.match(source, /!isAllowedOwnerUser\(user\) && !isSettingsOwnerUser\(user\)/)
+  assert.match(source, /status: 403/)
+
+  // Kullanıcıların ürettiği içerik bu uçtan sızmamalı: tool_runs'tan yalnızca
+  // sayım için gereken alanlar okunur, çıktı/istem alanları değil.
+  assert.match(source, /from\('tool_runs'\)\.select\('user_id, created_at'\)/)
+  assert.doesNotMatch(source, /tool_runs'\)\.select\('\*'\)/)
+  assert.doesNotMatch(source, /\boutput\b/)
+  assert.doesNotMatch(source, /input_data/)
+})

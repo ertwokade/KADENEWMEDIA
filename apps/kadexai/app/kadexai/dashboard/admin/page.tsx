@@ -9,11 +9,13 @@
 import { useState } from 'react'
 import TopBar from '@/components/layout/TopBar'
 import CostPanel from '@/components/admin/CostPanel'
+import UsersPanel from '@/components/admin/UsersPanel'
 import QuotePipeline from '@/components/admin/QuotePipeline'
 import ContentEditor from '@/components/admin/ContentEditor'
 import LegalDocuments from '@/components/admin/LegalDocuments'
 
 const TABS = [
+  { id: 'users', label: 'Kullanıcılar' },
   { id: 'cost', label: 'Maliyet ve Marj' },
   { id: 'quotes', label: 'Teklif Talepleri' },
   { id: 'content', label: 'İçerik (CMS)' },
@@ -21,11 +23,11 @@ const TABS = [
 ] as const
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<(typeof TABS)[number]['id']>('cost')
+  const [tab, setTab] = useState<(typeof TABS)[number]['id']>('users')
 
   return (
     <div className="flex h-full flex-col">
-      <TopBar title="Platform Yönetimi" description="Maliyet, marj ve teklif akışı" showModelSelector={false} />
+      <TopBar title="Platform Yönetimi" description="Kullanıcılar, maliyet, marj ve teklif akışı" showModelSelector={false} />
       <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <div className="mx-auto max-w-5xl space-y-5">
           <nav className="flex gap-2 border-b border-zinc-800" role="tablist">
@@ -42,6 +44,7 @@ export default function AdminPage() {
             ))}
           </nav>
 
+          {tab === 'users' && <UsersPanel />}
           {tab === 'cost' && <CostPanel />}
           {tab === 'quotes' && <QuotePipeline />}
           {tab === 'content' && <ContentEditor />}
