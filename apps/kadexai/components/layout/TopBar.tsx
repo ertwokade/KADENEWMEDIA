@@ -2,6 +2,18 @@
 
 import { Menu, Sparkles, Activity } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import { stripBasePath } from '@/lib/appConfig'
+import { splitWorkspacePath } from '@/lib/workspace/slug'
+
+/**
+ * Rotalar fiziksel olarak /kadexai altında ve adres kullanıcının alanını
+ * taşıyor. Ham usePathname() ile "/dashboard/..." karşılaştırması hiçbir zaman
+ * tutmuyordu; operasyon rozeti bu yüzden hiç görünmüyor, her sayfada
+ * "AI STUDIO" yazıyordu.
+ */
+function mantiksalYol(raw: string) {
+  return splitWorkspacePath(stripBasePath(raw || '/')).kalan
+}
 import { useModel } from '@/lib/context/ModelContext'
 import { useSidebar } from '@/lib/context/SidebarContext'
 import ModelSelector from './ModelSelector'
@@ -16,7 +28,7 @@ interface TopBarProps {
 }
 
 function ModuleBadge() {
-  const pathname = usePathname() ?? ''  // usePathname() null dönebilir; boş yol güvenli varsayılan.
+  const pathname = mantiksalYol(usePathname() ?? '')  // usePathname() null dönebilir; boş yol güvenli varsayılan.
 
   if (pathname.startsWith('/dashboard/operations')) {
     return (
@@ -37,7 +49,7 @@ function ModuleBadge() {
 export default function TopBar({ title, description, showModelSelector = true }: TopBarProps) {
   const { selectedModel, setSelectedModel } = useModel()
   const { toggle } = useSidebar()
-  const pathname = usePathname() ?? ''  // usePathname() null dönebilir; boş yol güvenli varsayılan.
+  const pathname = mantiksalYol(usePathname() ?? '')  // usePathname() null dönebilir; boş yol güvenli varsayılan.
 
   const isOperations = pathname.startsWith('/dashboard/operations')
 

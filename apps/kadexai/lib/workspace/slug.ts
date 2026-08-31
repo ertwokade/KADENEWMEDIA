@@ -23,7 +23,8 @@ const RESERVED_SLUGS = new Set([
   'brand', 'downloads', 'ffmpeg', 'icons', 'manifest.json', 'operations-kit',
   'sw.js', 'next.svg', 'vercel.svg', 'file.svg', 'globe.svg', 'window.svg',
   // ileride çakışmaması için ayrılanlar
-  '_next', 'admin', 'assets', 'demo', 'kadeai', 'kadexai', 'public',
+  '_next', 'admin', 'assets', 'demo', 'kadeai', 'kadexai', 'kadexai-demo',
+  'kadeai-demo', 'public',
   'settings', 'static', 'workspace', 'hesap', 'panel',
 ])
 

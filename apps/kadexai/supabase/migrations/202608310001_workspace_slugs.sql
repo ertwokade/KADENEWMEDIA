@@ -22,7 +22,8 @@ INSERT INTO public.reserved_workspace_slugs (slug)
 VALUES
   ('api'), ('dashboard'), ('login'), ('logout'), ('onboarding'), ('auth'),
   ('legal'), ('reset-password'), ('admin'), ('settings'), ('kadexai'),
-  ('kadeai'), ('assets'), ('static'), ('_next'), ('public'), ('demo')
+  ('kadeai'), ('kadexai-demo'), ('kadeai-demo'), ('assets'), ('static'),
+  ('_next'), ('public'), ('demo')
 ON CONFLICT (slug) DO NOTHING;
 
 -- 2) Adres üretici. Türkçe harfleri karşılıklarına çevirir, geri kalanı

@@ -1,4 +1,5 @@
 import { stripBasePath } from '@/lib/appConfig'
+import { splitWorkspacePath } from '@/lib/workspace/slug'
 import { TOOL_REGISTRY } from '@/lib/tools/registry'
 
 const PUBLIC_PAGE_TITLES: Record<string, string> = {
@@ -18,7 +19,9 @@ function normalizedOperationsRoute(pathname: string, search: string) {
 }
 
 export function resolveKadePageTitle(rawPathname: string, search = '') {
-  const pathname = stripBasePath(rawPathname) || '/'
+  // Adres kullanıcının alanını taşıyor (/kade/dashboard/...); araç eşleşmesi
+  // alan bölümü ayıklandıktan sonra yapılmalı, yoksa başlık genel kalıyor.
+  const pathname = splitWorkspacePath(stripBasePath(rawPathname) || '/').kalan || '/'
   const publicTitle = PUBLIC_PAGE_TITLES[pathname]
   if (publicTitle) return publicTitle
 

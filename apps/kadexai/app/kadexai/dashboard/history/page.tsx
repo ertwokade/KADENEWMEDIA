@@ -27,6 +27,8 @@ interface HistoryEntry {
  *  kaldırılmış eski araçların geçmişte kalan id'leri karşılanıyor. */
 const LEGACY_TOOL_LABELS: Record<string, string> = {
   clips: 'Klip Analizi',
+  performance: 'Performans Tahmini',
+  analytics: 'Analitik',
   trends: 'Trend Radarı',
   thread: 'Thread Yazarı',
   bulk: 'Toplu Üretim',

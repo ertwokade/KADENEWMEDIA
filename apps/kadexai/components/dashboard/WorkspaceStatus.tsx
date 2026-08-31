@@ -30,6 +30,8 @@ type Run = {
  *  araçların karşılığı tutuluyor, yoksa iki ayrı isim listesi oluşuyor. */
 const LEGACY_TOOL_LABELS: Record<string, string> = {
   clips: 'Klip Analizi',
+  performance: 'Performans Tahmini',
+  analytics: 'Analitik',
   trends: 'Trend Radarı',
   'ab-test': 'Viral Skor · A/B',
   thread: 'Thread Yazarı',

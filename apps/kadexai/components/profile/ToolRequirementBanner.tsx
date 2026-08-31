@@ -5,11 +5,14 @@ import { AlertTriangle, CheckCircle2, LoaderCircle } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useProfile } from '@/lib/context/ProfileContext'
 import { stripBasePath, withBasePath } from '@/lib/appConfig'
+import { splitWorkspacePath } from '@/lib/workspace/slug'
 import { getMissingProfileFields, PROFILE_FIELD_LABELS } from '@/lib/profile/types'
 import { getToolByRoute } from '@/lib/tools/registry'
 
 export default function ToolRequirementBanner() {
-  const pathname = stripBasePath(usePathname() ?? '')  // usePathname() null dönebilir
+  // Adres kullanıcının alanını taşıyor; araç eşleşmesi alan bölümü
+  // ayıklandıktan sonra yapılmalı, yoksa uyarı hiç görünmüyor.
+  const pathname = splitWorkspacePath(stripBasePath(usePathname() ?? '')).kalan  // usePathname() null dönebilir
   const { account, loading, cloudBacked } = useProfile()
   const tool = getToolByRoute(pathname)
   if (!tool || tool.requiredProfileFields.length === 0) return null
