@@ -211,40 +211,40 @@ html[data-theme='light'] .kade-sidebar {
    yazı değil logo. -kicker ("ÇALIŞMA ALANI" gibi bölüm başlıkları) duruyor. */
 .kade-panel .kade-sidebar-kicker { color: var(--kade-faint); font-size: 8px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
 .kade-panel aside.kade-sidebar .kade-sidebar-search {
-  height: 40px; border: 0 !important; border-bottom: 1px solid var(--kade-line-strong) !important; border-radius: 0 !important;
+  height: 40px; border: 0 !important; border-bottom: 1px solid var(--kade-line-strong) !important;
   background: transparent !important; color: var(--kade-ink) !important;
 }
 .kade-panel aside.kade-sidebar .kade-sidebar-search::placeholder { color: var(--kade-faint) !important; }
 .kade-panel aside.kade-sidebar .kade-sidebar-search:focus { border-bottom-color: var(--kade-accent) !important; box-shadow: none !important; }
-.kade-panel aside.kade-sidebar .kade-sidebar-category { border-radius: 0 !important; color: var(--kade-faint) !important; }
+.kade-panel aside.kade-sidebar .kade-sidebar-category { color: var(--kade-faint) !important; }
 .kade-panel aside.kade-sidebar .kade-sidebar-category:hover { background: var(--kade-surface-soft) !important; }
 .kade-panel aside.kade-sidebar .kade-sidebar-category span { color: inherit !important; }
-.kade-panel aside.kade-sidebar .kade-sidebar-category span span { border: 0 !important; border-radius: 0 !important; background: transparent !important; color: var(--kade-faint) !important; }
+.kade-panel aside.kade-sidebar .kade-sidebar-category span span { border: 0 !important; background: transparent !important; color: var(--kade-faint) !important; }
 .kade-panel aside.kade-sidebar .kade-sidebar-link {
-  position: relative; min-height: 38px; border: 0 !important; border-bottom: 1px solid transparent !important; border-radius: 0 !important; color: var(--kade-muted) !important;
+  position: relative; min-height: 38px; border: 0 !important; border-bottom: 1px solid transparent !important; color: var(--kade-muted) !important;
 }
 .kade-panel aside.kade-sidebar .kade-sidebar-link:hover { border-bottom-color: var(--kade-line) !important; background: transparent !important; color: var(--kade-ink) !important; }
 .kade-panel aside.kade-sidebar .kade-sidebar-link[data-active='true'] { border-bottom-color: var(--kade-ink) !important; background: var(--kade-accent) !important; color: var(--kade-on-accent) !important; box-shadow: none !important; }
 .kade-panel aside.kade-sidebar .kade-sidebar-link[data-active='true']::after { position: absolute; right: 9px; width: 5px; height: 5px; background: var(--kade-on-accent); content: ''; }
 .kade-panel aside.kade-sidebar .kade-sidebar-link svg { color: currentColor !important; }
-.kade-panel .kade-sidebar-theme-row, .kade-panel .kade-sidebar-footer { border: 1px solid var(--kade-line) !important; border-radius: 0 !important; background: transparent !important; color: var(--kade-muted) !important; }
-.kade-panel .kade-sidebar-bottom > a:last-child { border-color: var(--kade-line) !important; border-radius: 0 !important; color: var(--kade-muted) !important; }
+.kade-panel .kade-sidebar-theme-row, .kade-panel .kade-sidebar-footer { border: 1px solid var(--kade-line) !important; background: transparent !important; color: var(--kade-muted) !important; }
+.kade-panel .kade-sidebar-bottom > a:last-child { border-color: var(--kade-line) !important; color: var(--kade-muted) !important; }
 
 /* Theme, topbar and model controls. */
-.kade-panel .kade-theme-toggle { display: inline-grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--kade-line-strong); border-radius: 0; background: transparent; color: var(--kade-ink); transition: background 160ms ease, color 160ms ease; }
+.kade-panel .kade-theme-toggle { display: inline-grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--kade-line-strong); background: transparent; color: var(--kade-ink); transition: background 160ms ease, color 160ms ease; }
 .kade-panel .kade-theme-toggle:hover { background: var(--kade-ink); color: var(--kade-bg); }
 .kade-panel .kade-topbar { position: relative; z-index: 30; min-height: 73px; border-color: var(--kade-line) !important; background: color-mix(in srgb, var(--kade-bg) 91%, transparent) !important; box-shadow: none !important; backdrop-filter: blur(18px); }
 .kade-panel .kade-topbar-title { color: var(--kade-ink) !important; font-size: 14px; letter-spacing: -.025em; }
 .kade-panel .kade-topbar-description { color: var(--kade-muted) !important; }
 .kade-panel .kade-topbar-context { color: var(--kade-faint); }
-.kade-panel .kade-module-badge { border: 0 !important; border-radius: 0 !important; background: var(--kade-accent) !important; color: var(--kade-on-accent) !important; }
+.kade-panel .kade-module-badge { border: 0 !important; background: var(--kade-accent) !important; color: var(--kade-on-accent) !important; }
 .kade-panel .kade-module-badge * { color: inherit !important; }
-.kade-panel .kade-command-button, .kade-panel .kade-model-trigger { height: 38px; border-color: var(--kade-line-strong) !important; border-radius: 0 !important; background: transparent !important; color: var(--kade-ink) !important; box-shadow: none !important; }
-.kade-panel .kade-command-button kbd, .kade-panel .kade-model-trigger .bg-zinc-950 { border-radius: 0 !important; background: var(--kade-surface-soft) !important; color: var(--kade-muted) !important; }
-.kade-panel .kade-model-menu { width: min(92vw, 520px); max-height: min(72vh, 620px); border-color: var(--kade-line-strong) !important; border-radius: 0 !important; background: var(--kade-surface-raised) !important; box-shadow: 10px 10px 0 var(--kade-ink) !important; }
+.kade-panel .kade-command-button, .kade-panel .kade-model-trigger { height: 38px; border-color: var(--kade-line-strong) !important; background: transparent !important; color: var(--kade-ink) !important; box-shadow: none !important; }
+.kade-panel .kade-command-button kbd, .kade-panel .kade-model-trigger .bg-zinc-950 { background: var(--kade-surface-soft) !important; color: var(--kade-muted) !important; }
+.kade-panel .kade-model-menu { width: min(92vw, 520px); max-height: min(72vh, 620px); border-color: var(--kade-line-strong) !important; background: var(--kade-surface-raised) !important; box-shadow: 10px 10px 0 var(--kade-ink) !important; }
 .kade-panel .kade-requirement-banner { min-height: 42px; border-color: var(--kade-line) !important; background: color-mix(in srgb, var(--kade-accent) 20%, var(--kade-bg)) !important; color: var(--kade-ink) !important; }
 .kade-panel .kade-requirement-banner svg { color: var(--kade-ink) !important; }
-.kade-panel .kade-requirement-banner a { border-radius: 0 !important; background: var(--kade-ink) !important; color: var(--kade-bg) !important; }
+.kade-panel .kade-requirement-banner a { background: var(--kade-ink) !important; color: var(--kade-bg) !important; }
 .kade-panel .kade-requirement-banner--ready { background: color-mix(in srgb, var(--kade-green) 25%, var(--kade-bg)) !important; }
 
 /* Existing tool pages inherit the same paper-and-hairline system. */
@@ -262,11 +262,9 @@ html[data-theme='light'] .kade-sidebar {
 .kade-content-studio-hero .text-zinc-400 { color: #d4d4d8 !important; }
 .kade-panel .border-zinc-800, .kade-panel .border-zinc-700, .kade-panel .border-zinc-700\/70, .kade-panel .border-zinc-700\/60, .kade-panel .border-zinc-700\/50 { border-color: var(--kade-line) !important; }
 .kade-panel .border-zinc-600 { border-color: var(--kade-line-strong) !important; }
-.kade-panel input, .kade-panel textarea, .kade-panel select { border-color: var(--kade-line-strong) !important; border-radius: 0 !important; background: var(--kade-surface) !important; color: var(--kade-ink) !important; box-shadow: none !important; }
+.kade-panel input, .kade-panel textarea, .kade-panel select { border-color: var(--kade-line-strong) !important; background: var(--kade-surface) !important; color: var(--kade-ink) !important; box-shadow: none !important; }
 .kade-panel input::placeholder, .kade-panel textarea::placeholder { color: var(--kade-faint) !important; }
 .kade-panel input:focus, .kade-panel textarea:focus, .kade-panel select:focus { border-color: var(--kade-ink) !important; box-shadow: 4px 4px 0 var(--kade-accent) !important; }
-.kade-panel button.rounded-xl, .kade-panel a.rounded-xl, .kade-panel .rounded-2xl { border-radius: 0 !important; }
-.kade-panel .kade-main button { border-radius: 0 !important; }
 .kade-panel .bg-\[\#f2c322\] { background: var(--kade-accent) !important; color: var(--kade-on-accent) !important; box-shadow: none !important; }
 .kade-panel .bg-\[\#f2c322\]:hover { background: var(--kade-ink) !important; color: var(--kade-bg) !important; }
 /* İçerik genişliği: 1480px'te form solda küçük kalıp sağda geniş bir boşluk
@@ -280,7 +278,7 @@ html[data-theme='light'] .kade-sidebar {
      kendi kartlarıyla geliyor, kutu içinde kutu gerekmiyor. */
   .kade-panel .kade-main .lg\:flex-row > .lg\:w-80 > form,
   .kade-panel .kade-main .lg\:flex-row > .lg\:w-80 > .space-y-4 {
-    border: 1px solid var(--kade-line-strong); border-radius: 0;
+    border: 1px solid var(--kade-line-strong);
     background: var(--kade-surface); padding: 1.35rem; box-shadow: none;
   }
   /* Sonuç YOKKEN form sola yapisik kalip sagda genis bir bosluk biraktiyordu.
@@ -300,16 +298,16 @@ html[data-theme='light'] .kade-sidebar {
 .kade-home { color: var(--kade-ink); scroll-behavior: smooth; }
 .kade-home-wrap { max-width: none; padding: 0 !important; }
 .kade-home-wrap > .lg\:hidden { margin: 16px; }
-.kade-home-hero { position: relative; display: grid; min-height: min(650px, calc(100dvh - 74px)); grid-template-columns: minmax(360px, .82fr) minmax(420px, 1.18fr); align-items: stretch; gap: 0; overflow: hidden; border: 0; border-bottom: 1px solid var(--kade-line); border-radius: 0; background: transparent; color: var(--kade-ink); }
+.kade-home-hero { position: relative; display: grid; min-height: min(650px, calc(100dvh - 74px)); grid-template-columns: minmax(360px, .82fr) minmax(420px, 1.18fr); align-items: stretch; gap: 0; overflow: hidden; border: 0; border-bottom: 1px solid var(--kade-line); background: transparent; color: var(--kade-ink); }
 .kade-home-hero::before { position: absolute; inset: 0; pointer-events: none; content: ''; background: linear-gradient(var(--kade-line) 1px, transparent 1px), linear-gradient(90deg, var(--kade-line) 1px, transparent 1px), radial-gradient(circle at 73% 43%, color-mix(in srgb, var(--kade-accent) 30%, transparent), transparent 31%); background-size: 100% 50%, 33.333% 100%, auto; opacity: .65; }
 .kade-home-hero-copy { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; min-width: 0; border-right: 1px solid var(--kade-line); padding: clamp(36px, 5vw, 82px); }
-.kade-home-pill { display: inline-flex; width: fit-content; align-items: center; gap: 10px; border: 0; border-radius: 0; padding: 0; background: transparent; color: var(--kade-muted); font-size: 9px; font-weight: 700; letter-spacing: .16em; }
+.kade-home-pill { display: inline-flex; width: fit-content; align-items: center; gap: 10px; border: 0; padding: 0; background: transparent; color: var(--kade-muted); font-size: 9px; font-weight: 700; letter-spacing: .16em; }
 .kade-home-pill span { width: 6px; height: 6px; background: var(--kade-accent); }
 .kade-home-hero h1 { margin-top: clamp(24px, 5vh, 54px); max-width: 12ch; color: var(--kade-ink); font-size: clamp(48px, 5.35vw, 92px); font-weight: 700; letter-spacing: -.075em; line-height: .86; }
 .kade-home-hero h1 em { color: var(--kade-ink); font-style: normal; }
 .kade-home-hero-copy > p { max-width: 46ch; margin-top: 30px; color: var(--kade-muted); font-size: 13px; font-weight: 500; line-height: 1.65; }
 .kade-home-actions { display: flex; flex-wrap: wrap; gap: 0; margin-top: 34px; }
-.kade-home-primary, .kade-home-secondary { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 9px; border: 1px solid var(--kade-ink); border-radius: 0; padding: 0 18px; font-size: 10px; font-weight: 700; letter-spacing: .11em; transition: background 160ms ease, color 160ms ease; }
+.kade-home-primary, .kade-home-secondary { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 9px; border: 1px solid var(--kade-ink); padding: 0 18px; font-size: 10px; font-weight: 700; letter-spacing: .11em; transition: background 160ms ease, color 160ms ease; }
 .kade-home-primary { background: var(--kade-accent); color: var(--kade-on-accent); }
 .kade-home-secondary { margin-left: -1px; background: var(--kade-bg); color: var(--kade-ink); }
 .kade-home-primary:hover, .kade-home-secondary:hover { background: var(--kade-ink); color: var(--kade-bg); }
@@ -331,17 +329,17 @@ html[data-theme='light'] .kade-sidebar {
 .kade-section-heading > div > span { color: var(--kade-muted); font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
 .kade-section-heading > div > span::before { display: inline-block; width: 6px; height: 6px; margin-right: 10px; background: var(--kade-accent); content: ''; }
 .kade-section-heading h2 { margin-top: 7px; color: var(--kade-ink); font-size: clamp(24px, 3vw, 43px); font-weight: 700; letter-spacing: -.055em; }
-.kade-section-heading > a, .kade-library-count { display: inline-flex; align-items: center; gap: 7px; border: 0; border-radius: 0; background: transparent; color: var(--kade-muted); font-size: 10px; font-weight: 700; }
+.kade-section-heading > a, .kade-library-count { display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; color: var(--kade-muted); font-size: 10px; font-weight: 700; }
 .kade-section-heading > a:hover { color: var(--kade-ink); }
 .kade-quick-grid, .kade-library-grid { display: grid; gap: 0; border-top: 1px solid var(--kade-line); border-left: 1px solid var(--kade-line); }
 .kade-quick-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .kade-library-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.kade-quick-card, .kade-library-card { position: relative; border: 0; border-right: 1px solid var(--kade-line); border-bottom: 1px solid var(--kade-line); border-radius: 0; background: color-mix(in srgb, var(--kade-surface) 70%, transparent); box-shadow: none; }
+.kade-quick-card, .kade-library-card { position: relative; border: 0; border-right: 1px solid var(--kade-line); border-bottom: 1px solid var(--kade-line); background: color-mix(in srgb, var(--kade-surface) 70%, transparent); box-shadow: none; }
 .kade-quick-card { display: grid; min-height: 180px; grid-template-columns: auto 1fr auto; grid-template-rows: auto 1fr auto auto; gap: 8px 12px; padding: 20px; }
 .kade-quick-card::before, .kade-library-card::before { position: absolute; inset: 0; border: 2px dotted transparent; pointer-events: none; content: ''; }
 .kade-quick-card:hover::before, .kade-library-card:hover::before { border-color: var(--kade-ink); }
 .kade-quick-index { color: var(--kade-faint); font-size: 9px; font-weight: 700; letter-spacing: .14em; }
-.kade-quick-icon, .kade-library-icon { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--kade-line-strong); border-radius: 0; background: var(--kade-accent); color: var(--kade-on-accent); }
+.kade-quick-icon, .kade-library-icon { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--kade-line-strong); background: var(--kade-accent); color: var(--kade-on-accent); }
 .kade-quick-icon { grid-column: 3; }
 .kade-quick-card strong { grid-column: 1 / -1; align-self: end; color: var(--kade-ink); font-size: 15px; font-weight: 700; letter-spacing: -.035em; }
 .kade-quick-card small { grid-column: 1 / 3; color: var(--kade-muted); font-size: 10px; line-height: 1.45; }
@@ -353,13 +351,8 @@ html[data-theme='light'] .kade-sidebar {
 .kade-library-card h3 { margin-top: 32px; color: var(--kade-ink); font-size: 22px; font-weight: 700; letter-spacing: -.045em; }
 .kade-library-card > p { min-height: 48px; margin-top: 8px; color: var(--kade-muted); font-size: 11px; line-height: 1.55; }
 .kade-library-links { display: grid; grid-template-columns: 1fr; gap: 0; margin-top: 20px; border-top: 1px solid var(--kade-line); }
-.kade-library-links a { display: flex; min-height: 39px; align-items: center; justify-content: space-between; gap: 8px; border: 0; border-bottom: 1px solid var(--kade-line); border-radius: 0; padding: 7px 0; background: transparent; color: var(--kade-muted); font-size: 10px; font-weight: 600; }
+.kade-library-links a { display: flex; min-height: 39px; align-items: center; justify-content: space-between; gap: 8px; border: 0; border-bottom: 1px solid var(--kade-line); padding: 7px 0; background: transparent; color: var(--kade-muted); font-size: 10px; font-weight: 600; }
 .kade-library-links a:hover { color: var(--kade-ink); }
-.kade-tone-violet .kade-quick-icon, .kade-tone-violet .kade-library-icon { background: var(--kade-accent); }
-.kade-tone-blue .kade-quick-icon, .kade-tone-blue .kade-library-icon { background: var(--kade-blue); }
-.kade-tone-coral .kade-quick-icon, .kade-tone-coral .kade-library-icon { background: var(--kade-pink); }
-.kade-tone-lime .kade-quick-icon, .kade-tone-lime .kade-library-icon { background: var(--kade-green); }
-.kade-tone-cyan .kade-quick-icon, .kade-tone-cyan .kade-library-icon { background: #9ecfc8; }
 
 @media (max-width: 1180px) {
   .kade-home-hero { grid-template-columns: minmax(320px, .95fr) minmax(330px, 1.05fr); }
@@ -392,10 +385,14 @@ html[data-theme='light'] .kade-sidebar {
    durumda. Hepsini tek tek düzenlemek yerine burada tokena bağlanıyorlar:
    marka rengi bir daha değişirse yine tek dosya güncellenir.
 =========================================================================== */
-.kade-panel .bg-\[\#f2c322\],
-.kade-panel .hover\:bg-\[\#ffda3f\]:hover {
+.kade-panel .bg-\[\#f2c322\] {
   background: var(--kade-accent) !important;
   color: var(--kade-on-accent) !important;
+}
+/* Hover: ayrı bir sarı (#ffda3f) yerine markanın kendi güçlü tonu. */
+.kade-panel .hover\:bg-\[\#ffda3f\]:hover {
+  background: var(--kade-accent-strong) !important;
+  color: var(--kade-bg) !important;
 }
 
 .kade-panel .focus\:border-\[\#f2c322\]:focus,
@@ -537,7 +534,6 @@ html[data-theme] .kade-auth-page {
   height: 38px;
   place-items: center;
   border: 1px solid var(--kade-line-strong);
-  border-radius: 0;
   background: transparent;
   color: var(--kade-ink);
   transition: background .16s ease, color .16s ease;
@@ -609,7 +605,6 @@ html[data-theme] .kade-auth-page {
   min-height: 46px;
   border: 0;
   border-right: 1px solid var(--kade-line-strong);
-  border-radius: 0;
   background: transparent;
   color: var(--kade-muted);
   font-family: inherit;
@@ -632,7 +627,6 @@ html[data-theme] .kade-auth-page {
   justify-content: center;
   gap: 10px;
   border: 1px solid var(--kade-line-strong);
-  border-radius: 0;
   background: var(--kade-surface-raised);
   color: var(--kade-ink);
   font-family: inherit;
@@ -697,7 +691,6 @@ html[data-theme] .kade-auth-page {
   width: 100%;
   min-height: 52px;
   border: 1px solid var(--kade-line-strong) !important;
-  border-radius: 0 !important;
   outline: 0;
   padding: 0 16px 0 46px !important;
   background: transparent !important;
@@ -746,7 +739,6 @@ html[data-theme='dark'] .kade-auth-success { border-color: #7ee2ac; background: 
   align-items: center;
   justify-content: space-between;
   border: 1px solid var(--kade-ink);
-  border-radius: 0;
   padding: 0 10px 0 20px;
   background: var(--kade-accent);
   color: var(--kade-on-accent);
