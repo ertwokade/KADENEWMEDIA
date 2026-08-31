@@ -4,7 +4,9 @@ import {
 } from 'lucide-react'
 import DashboardMobileHeader from '@/components/dashboard/DashboardMobileHeader'
 import WorkspaceStatus from '@/components/dashboard/WorkspaceStatus'
-import { withBasePath } from '@/lib/appConfig'
+import { getAuthenticatedUser } from '@/lib/auth/server'
+import { isAllowedOwnerUser } from '@/lib/featureAccess'
+import { workspaceHref, workspaceSlugForUser } from '@/lib/workspace/slug'
 
 /**
  * Çalışma alanı özeti.
@@ -26,7 +28,10 @@ const quickTools = [
   { label: 'Operasyonu aç', description: 'Günlük üretim merkezine geç', href: '/dashboard/operations?view=dashboard', icon: Clapperboard },
 ]
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const user = await getAuthenticatedUser()
+  const slug = user ? workspaceSlugForUser(user, isAllowedOwnerUser(user)) : null
+
   return (
     <div className="kade-home flex-1 overflow-y-auto">
       <div className="kade-home-wrap mx-auto w-full px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
@@ -48,7 +53,7 @@ export default function DashboardPage() {
           </div>
           <div className="kade-quick-grid">
             {quickTools.map(({ label, description, href, icon: Icon }, index) => (
-              <Link key={href} href={withBasePath(href)} className="kade-quick-card">
+              <Link key={href} href={workspaceHref(href, slug)} className="kade-quick-card">
                 <span className="kade-quick-index">0{index + 1}</span>
                 <span className="kade-quick-icon"><Icon className="h-5 w-5" /></span>
                 <strong>{label}</strong>

@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AlertTriangle, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react'
-import { apiPath, withBasePath } from '@/lib/appConfig'
+import { apiPath } from '@/lib/appConfig'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 import { getToolById } from '@/lib/tools/registry'
 
 type UsageResponse = {
@@ -55,6 +56,7 @@ function relativeTime(iso: string) {
 }
 
 export default function WorkspaceStatus() {
+  const alanYolu = useWorkspaceHref()
   const [usage, setUsage] = useState<UsageResponse | null>(null)
   const [runs, setRuns] = useState<Run[] | null>(null)
   const [loading, setLoading] = useState(true)
@@ -120,7 +122,7 @@ export default function WorkspaceStatus() {
       <div className="kade-recent">
         <div className="kade-recent-head">
           <span>Son çalışmalar</span>
-          <Link href={withBasePath('/dashboard/history')}>
+          <Link href={alanYolu('/dashboard/history')}>
             Tüm geçmiş <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -146,7 +148,7 @@ export default function WorkspaceStatus() {
               return (
                 <li key={run.id}>
                   {tool
-                    ? <Link href={withBasePath(tool.route)}>{row}</Link>
+                    ? <Link href={alanYolu(tool.route)}>{row}</Link>
                     : <span>{row}</span>}
                 </li>
               )

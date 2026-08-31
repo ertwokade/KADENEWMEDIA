@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils'
 import { useSidebar } from '@/lib/context/SidebarContext'
 import { TOOL_CATEGORIES, TOOL_REGISTRY } from '@/lib/tools/registry'
 import { apiPath, stripBasePath, withBasePath } from '@/lib/appConfig'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
+import { splitWorkspacePath } from '@/lib/workspace/slug'
 import ThemeToggle from '@/components/theme/ThemeToggle'
 
 const iconMap = {
@@ -103,10 +105,13 @@ function NavLinkStatus({ isActive, dotClass }: { isActive: boolean; dotClass: st
 }
 
 export default function Sidebar() {
-  const pathname = stripBasePath(usePathname() ?? '')  // Fiziksel /kadexai önekini araç kayıtlarındaki mantıksal rotadan ayır.
+  // Adres artık kullanıcının alanını taşıyor (/kade/dashboard/...). Aktif
+  // bağlantı eşleşmesi alan bölümü ayıklandıktan sonra yapılmalı.
+  const pathname = splitWorkspacePath(stripBasePath(usePathname() ?? '')).kalan  // Fiziksel /kadexai önekini araç kayıtlarındaki mantıksal rotadan ayır.
   const { isOpen, close } = useSidebar()
   const [search, setSearch] = useState('')
   const [operationsView, setOperationsView] = useState('dashboard')
+  const alanYolu = useWorkspaceHref()
   const [ownerAccess, setOwnerAccess] = useState(false)
   const [settingsAccess, setSettingsAccess] = useState(false)
   const [openCats, setOpenCats] = useState<Set<string>>(
@@ -176,7 +181,7 @@ export default function Sidebar() {
       event.preventDefault()
       const view = new URLSearchParams(hrefQuery || '').get('view') || 'dashboard'
       setOperationsView(view)
-      window.history.pushState(window.history.state, '', withBasePath(href))
+      window.history.pushState(window.history.state, '', alanYolu(href))
       window.dispatchEvent(new CustomEvent('kade:operations-request-view', { detail: { view } }))
     }
     close()
@@ -239,7 +244,7 @@ export default function Sidebar() {
           {/* Marka: yazı yerine logo. Logo zaten şimşek + KADE kelimesini
               içeriyor, bu yüzden ayrıca bir "K/" karesi ve alt başlık
               tekrarlanmıyor. */}
-          <Link href={withBasePath('/dashboard')} className="kade-brand group flex min-w-0 flex-1 items-center" onClick={() => close()}>
+          <Link href={alanYolu('/dashboard')} className="kade-brand group flex min-w-0 flex-1 items-center" onClick={() => close()}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={withBasePath('/brand/kade-logo.png')}
@@ -316,7 +321,7 @@ export default function Sidebar() {
                       return (
                         <li key={item.id}>
                           <Link
-                            href={withBasePath(item.href)}
+                            href={alanYolu(item.href)}
                             onClick={(event) => handleLinkClick(event, item.href)}
                             data-active={isActive}
                             className={cn(
@@ -351,7 +356,7 @@ export default function Sidebar() {
           </div>
           {settingsAccess && (
             <Link
-              href={withBasePath('/dashboard/settings')}
+              href={alanYolu('/dashboard/settings')}
               onClick={() => close()}
               className="kade-sidebar-footer flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-colors hover:bg-zinc-50"
             >

@@ -242,8 +242,11 @@ test('dashboard navigation always applies the physical /kadexai prefix', async (
   // atlayan ham bir /dashboard baglantisi bulunmamali.
   assert.doesNotMatch(dashboardSource, /href="\/dashboard/)
   assert.doesNotMatch(dashboardSource, /href=\{'\/dashboard/)
-  assert.match(dashboardSource, /href=\{withBasePath\(href\)\}/)
-  assert.match(sidebarSource, /href=\{withBasePath\(item\.href\)\}/)
+  assert.match(dashboardSource, /href=\{workspaceHref\(href, slug\)\}/)
+  // Menü bağlantıları kullanıcının kendi alan adresini taşır; ham /dashboard
+  // bağlantısı önekleri atlar.
+  assert.doesNotMatch(sidebarSource, /href="\/dashboard/)
+  assert.match(sidebarSource, /href=\{alanYolu\(item\.href\)\}/)
   assert.match(sidebarSource, /stripBasePath\(usePathname\(\) \?\? ''\)/)
 })
 

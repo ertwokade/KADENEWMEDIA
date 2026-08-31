@@ -9,6 +9,7 @@ import {
   isSettingsOwnerOnlyRoute,
 } from '@/lib/featureAccess'
 import { stripBasePath, withBasePath } from '@/lib/appConfig'
+import { splitWorkspacePath, workspaceSlugForUser } from '@/lib/workspace/slug'
 import {
   countedDistributedRateLimit,
   distributedRateLimit,
@@ -68,7 +69,12 @@ function loginRedirectFor(request: NextRequest, pathname: string) {
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = nextResponseFor(request)
-  const pathname = stripBasePath(request.nextUrl.pathname)
+  // Panel her kullanıcı için kendi adresinde açılır: /kadexai/<slug>/dashboard
+  // Alan bölümü buradan ayrılır ve geri kalan mantık eskisi gibi çalışır.
+  // Bu bir ADRES çözümüdür; yetki kararı aşağıda oturumdan verilir.
+  const { slug: urlSlug, kalan: pathname } = splitWorkspacePath(
+    stripBasePath(request.nextUrl.pathname)
+  )
   const isApi = pathname.startsWith('/api/')
   const isAuthPage = pathname.startsWith('/auth') || pathname === '/login'
   const isDashboard = pathname.startsWith('/dashboard') || pathname === '/onboarding'
@@ -120,17 +126,37 @@ export async function proxy(request: NextRequest) {
       return NextResponse.json({ error: 'İstek gövdesi izin verilen sınırı aşıyor.' }, { status: 413 })
     }
   }
+  /**
+   * Yanıtı sonlandırır: adres slug'lı geldiyse Next'in gerçek rotasına iç
+   * yönlendirme yapar, ardından operasyon kabuğunun güvenlik başlıklarını
+   * ekler. Tek noktada toplanmasının nedeni, aşağıdaki erken çıkışların da
+   * (cron, genel API, dev modu) yeniden yazmayı atlamaması.
+   *
+   * Yalnızca geçiş yanıtı (supabaseResponse) yeniden yazılır; yönlendirme ve
+   * JSON hataları olduğu gibi döner.
+   */
   const withOperationsSecurityHeaders = (response: NextResponse) => {
-    if (!isOperationsKit) return response
+    let out = response
+    if (urlSlug && response === supabaseResponse) {
+      const hedef = request.nextUrl.clone()
+      hedef.pathname = withBasePath(pathname)
+      out = NextResponse.rewrite(hedef, { request: { headers: new Headers(request.headers) } })
+      // Supabase oturumu tazelediyse çerezler yeni yanıta taşınmalı, aksi
+      // halde her istekte oturum düşer.
+      response.cookies.getAll().forEach((cookie) => out.cookies.set(cookie))
+    }
 
-    response.headers.set('X-Content-Type-Options', 'nosniff')
-    response.headers.set('Referrer-Policy', 'same-origin')
-    response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-    response.headers.set(
+    if (!isOperationsKit) return out
+    const response2 = out
+
+    response2.headers.set('X-Content-Type-Options', 'nosniff')
+    response2.headers.set('Referrer-Policy', 'same-origin')
+    response2.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+    response2.headers.set(
       'Content-Security-Policy',
       "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self'; font-src 'self'"
     )
-    return response
+    return response2
   }
 
   if (!canAccessFeature(pathname, isOwnerMode())) {
@@ -208,6 +234,28 @@ export async function proxy(request: NextRequest) {
       return NextResponse.json({ error: 'Oturum açman gerekiyor.' }, { status: 401 })
     }
     return NextResponse.redirect(loginRedirectFor(request, pathname))
+  }
+
+  // Adres doğrulaması. Slug hiçbir zaman yetki vermez: yalnızca kullanıcının
+  // KENDİ adresinde olup olmadığına bakılır. Başkasının adresini yazan
+  // kullanıcı erişim kazanmaz, kendi alanına gönderilir.
+  const kendiSlug = user ? workspaceSlugForUser(user, isAllowedOwnerUser(user)) : null
+
+  if (urlSlug && kendiSlug && urlSlug !== kendiSlug) {
+    if (isApi) {
+      return NextResponse.json({ error: 'Bu çalışma alanına erişimin yok.' }, { status: 403 })
+    }
+    const url = request.nextUrl.clone()
+    url.pathname = withBasePath(`/${kendiSlug}${pathname}`)
+    return NextResponse.redirect(url)
+  }
+
+  // Adressiz gelen panel isteği kullanıcının kendi adresine taşınır; böylece
+  // herkesin gezindiği tek bir kanonik adres olur.
+  if (!urlSlug && kendiSlug && (isDashboard || isOperationsKit)) {
+    const url = request.nextUrl.clone()
+    url.pathname = withBasePath(`/${kendiSlug}${pathname}`)
+    return NextResponse.redirect(url)
   }
 
   // Platform yönetimi uçları: handler ile aynı kural (owner e-postası veya

@@ -1,11 +1,24 @@
 import { redirect } from 'next/navigation'
 import DashboardShell from '@/components/layout/DashboardShell'
-import { hasAuthenticatedUser } from '@/lib/auth/server'
+import { getAuthenticatedUser, hasAuthenticatedUser } from '@/lib/auth/server'
 import { appRoutes, withBasePath } from '@/lib/appConfig'
+import { isAllowedOwnerUser } from '@/lib/featureAccess'
+import { WorkspaceProvider } from '@/lib/workspace/WorkspaceContext'
+import { workspaceSlugForUser } from '@/lib/workspace/slug'
 
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (!(await hasAuthenticatedUser())) redirect(withBasePath(appRoutes.login))
-  return <DashboardShell>{children}</DashboardShell>
+
+  // Panel içi bağlantılar kullanıcının kendi adresini taşısın diye slug
+  // sunucuda çözülüp aşağı veriliyor. Yetki kararı değil, yalnızca adres.
+  const user = await getAuthenticatedUser()
+  const slug = user ? workspaceSlugForUser(user, isAllowedOwnerUser(user)) : null
+
+  return (
+    <WorkspaceProvider slug={slug}>
+      <DashboardShell>{children}</DashboardShell>
+    </WorkspaceProvider>
+  )
 }
