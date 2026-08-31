@@ -202,3 +202,38 @@ adresleri `/kadeai/...` olarak duruyor. OAuth sağlayıcıları kayıtlı adresi
 birebir eşler ve yönlendirme İZLEMEZ; bu yüzden YouTube bağlantısı ve Google
 ile giriş, adresler konsolda `/kadexai/...` olarak güncellenene kadar
 çalışmaz.
+
+## Arayüz toparlama (31 Ağustos 2026)
+
+Yeniden adlandırma canlıya çıktı. Kök dizin `apps/kadexai` olarak
+düzeltildikten sonra `b39559d`den beri düşen bütün dağıtımlar geçti;
+`/kadexai/*` yayında, `/kadeai/*` kalıcı yönlendiriyor.
+
+Toplanan tutarsızlıklar:
+
+- **Genel Bakış** bir tanıtım açılış sayfasıydı (slogan, dev "AI" objesi,
+  altında bütün araçları listeleyen kütüphane). O kütüphane sol menünün
+  birebir kopyasıydı; aynı bağlantılar tek sayfada üç kez geçiyordu. Sayfa
+  artık plan, dönem içi istek, kullanılan token ve son çalışmaları canlı
+  veriden gösteriyor; gezinme sol menüde kaldı.
+- **Sol menü** kategori başına ayrı renk kullanıyordu (mor, camgöbeği,
+  turuncu, pembe, mavi, teal, kehribar). Tek marka vurgusuna indirildi.
+- **Beş renk ailesi** (pembe, gül, mor, fuşya, lime) palet köprüsünün
+  dışındaydı; dekoratif olanlar vurguya, anlamlı olanlar semantik renklere
+  bağlandı. Platform rozetleri tersine, köprü yüzünden marka renklerini
+  kaybetmişti; hex'e sabitlendi.
+- **Operasyon Merkezi** KPI kartlarının üst şeridi kart başına ayrı renk
+  kullanıyordu; tek vurguya indirildi.
+- **Araç adları** hem kayıt defterinde hem geçmiş sayfasında ayrı ayrı
+  tutuluyordu; tek kaynak kayıt defteri oldu.
+
+Birleştirilen araçlar (toplam dört):
+
+| Kaldırılan | Nereye | Neden |
+|---|---|---|
+| A/B Başlık Testi | Viral Skor | Aynı uca istek atıyordu |
+| Trend Araştırması | Trend Radarı | Aynı iş |
+| Performans Tahmini | Viral Skor | Aynı başlığı aynı 0-100 ölçeğinde puanlıyordu; çıktısında A/B alternatifleri bile üretiyordu |
+| Analitik Dashboard | Sosyal Medya Analizi | İkisi de hesap metriklerinden büyüme önerisi çıkarıyordu |
+
+Eski rotalar yönlendirme olarak duruyor, API uçları korundu.
