@@ -10,6 +10,23 @@ import { cn } from '@/lib/utils'
 
 const platformOptions = ['YouTube', 'Instagram', 'TikTok', 'LinkedIn', 'X']
 
+/**
+ * Analitik Dashboard ayrı bir araç olarak duruyordu ama aynı işi yapıyordu:
+ * hesap metriklerini alıp büyüme önerisi üretiyordu. Tek katkısı metrikleri
+ * serbest metin yerine adı konmuş alanlarla sormasıydı; o alanlar buraya
+ * taşındı ve yazılan değerler metrik metnine ekleniyor, uç değişmiyor.
+ */
+const METRIC_FIELDS: Array<{ key: string; label: string; placeholder: string; suffix: string }> = [
+  { key: 'followers', label: 'Takipçi / Abone', placeholder: '10000', suffix: '' },
+  { key: 'avg_views', label: 'Ortalama Görüntüleme', placeholder: '1500', suffix: '' },
+  { key: 'engagement_rate', label: 'Etkileşim Oranı', placeholder: '3.5', suffix: '%' },
+  { key: 'monthly_growth', label: 'Aylık Büyüme', placeholder: '2.1', suffix: '%' },
+  { key: 'ctr', label: 'Tıklama Oranı (CTR)', placeholder: '4.2', suffix: '%' },
+  { key: 'avg_watch_time', label: 'Ortalama İzlenme Süresi', placeholder: '65', suffix: '%' },
+  { key: 'total_content', label: 'Toplam İçerik Sayısı', placeholder: '48', suffix: '' },
+  { key: 'shares', label: 'Paylaşım / Kaydetme', placeholder: '120', suffix: '' },
+]
+
 export default function SocialAuditPage() {
   const { selectedModel } = useModel()
   const [accountName, setAccountName] = useState('')
@@ -17,6 +34,7 @@ export default function SocialAuditPage() {
   const [platforms, setPlatforms] = useState<string[]>(['YouTube', 'Instagram', 'TikTok'])
   const [bio, setBio] = useState('')
   const [metrics, setMetrics] = useState('')
+  const [metricValues, setMetricValues] = useState<Record<string, string>>({})
   const [recentPosts, setRecentPosts] = useState('')
   const [goal, setGoal] = useState('Kişisel markayı büyütmek ve ürün/hizmet satışına bağlamak')
   const [content, setContent] = useState('')
@@ -34,6 +52,13 @@ export default function SocialAuditPage() {
     )
   }
 
+  const metricsText = [
+    ...METRIC_FIELDS
+      .filter((field) => metricValues[field.key]?.trim())
+      .map((field) => `${field.label}: ${metricValues[field.key].trim()}${field.suffix}`),
+    metrics.trim(),
+  ].filter(Boolean).join('\n')
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!accountName.trim() || !niche.trim()) return
@@ -47,7 +72,7 @@ export default function SocialAuditPage() {
       const response = await apiFetch('/api/generate/social-audit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accountName, niche, platforms, bio, metrics, recentPosts, goal, model: selectedModel }),
+        body: JSON.stringify({ accountName, niche, platforms, bio, metrics: metricsText, recentPosts, goal, model: selectedModel }),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Analiz üretilemedi')
@@ -121,11 +146,30 @@ export default function SocialAuditPage() {
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-zinc-400">Metrikler</label>
+                <div className="mb-2 grid grid-cols-2 gap-2">
+                  {METRIC_FIELDS.map((field) => (
+                    <div key={field.key}>
+                      <label className="mb-1 block text-[11px] text-zinc-500">{field.label}</label>
+                      <div className="relative">
+                        <input
+                          inputMode="decimal"
+                          value={metricValues[field.key] ?? ''}
+                          onChange={(event) => setMetricValues((prev) => ({ ...prev, [field.key]: event.target.value }))}
+                          placeholder={field.placeholder}
+                          className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-yellow-400 focus:outline-none"
+                        />
+                        {field.suffix && (
+                          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500">{field.suffix}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
                 <textarea
                   value={metrics}
                   onChange={(event) => setMetrics(event.target.value)}
-                  rows={4}
-                  placeholder="Takipçi, izlenme, etkileşim, satış, trafik..."
+                  rows={3}
+                  placeholder="Yukarıdakiler dışında paylaşmak istediğin sayılar: satış, trafik, dönüşüm..."
                   className="w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-yellow-400 focus:outline-none"
                 />
               </div>

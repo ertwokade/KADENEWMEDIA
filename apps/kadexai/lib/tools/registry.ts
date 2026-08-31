@@ -85,12 +85,11 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('clickbait-detector', 'Clickbait Dedektörü', 'analysis', '/dashboard/clickbait-detector', 'alert-circle', 'Başlığın vaat ve yanıltıcılık riskini analiz eder.', [], false),
   tool('youtube-seo', 'YouTube SEO', 'analysis', '/dashboard/youtube-seo', 'search', 'Girilen video verilerini SEO açısından inceler.', ['brand.niche']),
   tool('retention-analysis', 'İzlenme Analizi', 'analysis', '/dashboard/retention-analysis', 'bar-chart', 'Girilen akış ve metriklerden izleyici tutma analizi.', ['brand.audience']),
-  tool('social-audit', 'Sosyal Medya Analizi', 'analysis', '/dashboard/social-audit', 'users', 'Girilen profil ve metrikleri denetler.', brandBasics),
+  tool('social-audit', 'Sosyal Medya Analizi', 'analysis', '/dashboard/social-audit', 'users', 'Hesap metriklerini, bio ve son içerikleri okuyup büyüme raporu çıkarır.', brandBasics),
   tool('trend-radar', 'Trend Radar', 'analysis', '/dashboard/trend-radar', 'radar', 'TikTok, Reels, Shorts, YouTube ve Google’da ölçülmüş canlı trend verisi.', [], false),
   tool('materyal', 'Materyal Kütüphanesi', 'analysis', '/dashboard/materyal', 'image-plus', 'Video ve fotoğraf materyallerini ara, izle ve indir.', [], false),
   tool('competitor', 'Rakip Analizi', 'analysis', '/dashboard/competitor', 'users', 'Kullanıcının sağladığı rakip bilgilerini analiz eder.', ['brand.niche']),
   tool('comment-analysis', 'Yorum Analizi', 'analysis', '/dashboard/comment-analysis', 'message-square', 'Yapıştırılan gerçek yorumları analiz eder.', [], false),
-  tool('analytics', 'Analitik', 'analysis', '/dashboard/analytics', 'bar-chart', 'Kullanıcının girdiği metriklerden performans özeti çıkarır.', ['brand.niche']),
   tool('faq', 'FAQ Üretici', 'analysis', '/dashboard/faq', 'bookmark', 'İçerikten soru ve cevaplar çıkarır.', ['brand.audience']),
   tool('quote-extractor', 'Alıntı Çıkarıcı', 'analysis', '/dashboard/quote-extractor', 'book-open', 'Verilen metinden kullanılabilir alıntılar çıkarır.', [], false),
 
