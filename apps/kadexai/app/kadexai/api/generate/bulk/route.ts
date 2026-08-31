@@ -4,6 +4,7 @@ import { BULK_SYSTEM_PROMPT, buildBulkPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
 import { requireApiUser } from '@/lib/auth/server'
+import { requireToolFeature } from '@/lib/payments/featureGuard'
 
 function normalizeBulkOutput(data: Record<string, unknown>, platforms: string[]) {
   if (Array.isArray(data.basliklar) || data.raw) return data
@@ -39,6 +40,10 @@ function normalizeBulkOutput(data: Record<string, unknown>, platforms: string[])
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
   if (guard) return guard
+
+  // Paket kısıtlaması sunucuda uygulanır; menüdeki kilit yalnızca işarettir.
+  const paket = await requireToolFeature('bulk')
+  if (paket) return paket
 
   try {
     const { topic, niche, platforms, count, model } = await req.json()

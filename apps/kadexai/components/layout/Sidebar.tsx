@@ -88,7 +88,7 @@ function buildNavItems(
         planKnown
         && !ownerAccess
         && tool.requiredFeature
-        && !planFeatures.includes(tool.requiredFeature),
+        && !tool.requiredFeature.some((f) => planFeatures.includes(f)),
       )
       return {
         id: tool.id,

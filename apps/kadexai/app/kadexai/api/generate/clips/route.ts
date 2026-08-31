@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { CLIP_EXTRACTION_SYSTEM_PROMPT, buildClipExtractionPrompt } from '@/lib/ai/prompts'
 import { generateContent } from '@/lib/ai/provider'
 import { requireApiUser } from '@/lib/auth/server'
+import { requireToolFeature } from '@/lib/payments/featureGuard'
 
 export const maxDuration = 120
 
@@ -23,6 +24,10 @@ interface GroqWord { word: string; start: number; end: number }
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
   if (guard) return guard
+
+  // Paket kısıtlaması sunucuda uygulanır; menüdeki kilit yalnızca işarettir.
+  const paket = await requireToolFeature('clip-generator')
+  if (paket) return paket
 
   try {
     const { transcript, words, videoDuration } = await req.json() as {

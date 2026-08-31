@@ -3,6 +3,7 @@ import { getRateLimitKey, rateLimit } from '@/lib/rateLimit'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
 import { getRequestProfileInstruction } from '@/lib/ai/profileContext'
 import { requireApiUser } from '@/lib/auth/server'
+import { requireToolFeature } from '@/lib/payments/featureGuard'
 
 export const dynamic = 'force-dynamic'
 
@@ -64,6 +65,10 @@ async function generateWithGemini(prompt: string) {
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
   if (guard) return guard
+
+  // Paket kısıtlaması sunucuda uygulanır; menüdeki kilit yalnızca işarettir.
+  const paket = await requireToolFeature('ai-thumbnail')
+  if (paket) return paket
 
   if (!(await hasAuthenticatedUser())) return NextResponse.json({ error: 'Oturum gerekli.' }, { status: 401 })
   const { allowed } = rateLimit(getRateLimitKey(req))

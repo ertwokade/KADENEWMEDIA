@@ -42,7 +42,7 @@ export interface ToolDefinition {
    * DİKKAT: Bu alan yalnızca arayüzde kilit gösterir. Gerçek kısıtlama
    * ilgili API ucunda canUse() ile yapılmalıdır; ikisi ayrı katmandır.
    */
-  requiredFeature?: string
+  requiredFeature?: string[]
 }
 
 /**
@@ -52,13 +52,17 @@ export interface ToolDefinition {
  * araçlarının hangi pakete ait olduğu bir fiyatlandırma kararı; uydurulmadı,
  * eşlenmeden bırakıldı ve herkese açık kalmaya devam ediyor.
  */
-const TOOL_FEATURE: Record<string, string> = {
-  'ai-thumbnail': 'image-basic',
-  'banana-studio': 'image-advanced',
-  'video-factory': 'video-factory',
-  subtitles: 'auto-captions',
-  'clip-generator': 'clip-generator',
-  bulk: 'bulk',
+const TOOL_FEATURE: Record<string, string[]> = {
+  // Listedeki ÖZELLİKLERDEN HERHANGİ BİRİ yeterlidir. Tek özellik yazmak
+  // hatalıydı: Pro ve Sınırsız paketlerde `image-basic` yok (`image-advanced`
+  // var), Başlangıç'ta ise `video-factory` yok (`video-factory-basic` var).
+  // Tek değerle kısıtlama açılsaydı ödeme yapan kullanıcılar araç kaybederdi.
+  'ai-thumbnail': ['image-basic', 'image-advanced'],
+  'banana-studio': ['image-advanced'],
+  'video-factory': ['video-factory-basic', 'video-factory'],
+  subtitles: ['auto-captions'],
+  'clip-generator': ['clip-generator'],
+  bulk: ['bulk'],
 }
 
 export const TOOL_CATEGORIES: Array<{ id: ToolCategoryId; label: string; description: string }> = [

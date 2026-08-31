@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generateContent } from '@/lib/ai/provider'
 import { extractJsonArray } from '@/lib/ai/json'
 import { requireApiUser } from '@/lib/auth/server'
+import { requireToolFeature } from '@/lib/payments/featureGuard'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { languageByCode } from '@/lib/subtitles/languages'
 import type { AIModel } from '@/types'
@@ -54,6 +55,10 @@ ${JSON.stringify(cues.map((c) => ({ i: c.index, t: c.text })))}
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
   if (guard) return guard
+
+  // Paket kısıtlaması sunucuda uygulanır; menüdeki kilit yalnızca işarettir.
+  const paket = await requireToolFeature('subtitles')
+  if (paket) return paket
 
   const limit = rateLimit(getRateLimitKey(req, 'subtitle-translate'), 10, 60_000)
   if (!limit.allowed) {

@@ -467,3 +467,49 @@ test('kullanıcı listesi ucu yalnızca hesap sahibine açık', async () => {
   assert.doesNotMatch(source, /\boutput\b/)
   assert.doesNotMatch(source, /input_data/)
 })
+
+test('paket kısıtlaması sunucuda uygulanır, sadece menüde değil', async () => {
+  // Menüdeki kilit ikonu bir güvenlik sınırı değil: kullanıcı adresi elle
+  // yazabilir ya da API'yi doğrudan çağırabilir. Kısıtlanan araçların uçları
+  // paket kontrolünü kendileri yapmalı.
+  const korunmasiGerekenler = [
+    ['../../app/kadexai/api/image/route.ts', /requireToolFeature\('ai-thumbnail'\)/],
+    ['../../app/kadexai/api/generate/bulk/route.ts', /requireToolFeature\('bulk'\)/],
+    ['../../app/kadexai/api/generate/clips/route.ts', /requireToolFeature\('clip-generator'\)/],
+    ['../../app/kadexai/api/transcribe/route.ts', /requireToolFeature\('clip-generator', 'subtitles'\)/],
+    ['../../app/kadexai/api/subtitles/translate/route.ts', /requireToolFeature\('subtitles'\)/],
+  ] as const
+
+  for (const [yol, desen] of korunmasiGerekenler) {
+    const source = await readFile(new URL(yol, import.meta.url), 'utf8')
+    assert.match(source, desen, `${yol} paket kontrolü yapmıyor`)
+    // Kontrol oturum doğrulamasından SONRA gelmeli; önce gelirse anonim
+    // istekte entitlement okunmaya çalışılır.
+    assert.ok(
+      source.indexOf('requireApiUser') < source.lastIndexOf('requireToolFeature'),
+      `${yol} paket kontrolünü oturumdan önce yapıyor`,
+    )
+  }
+
+  // Video ucu aynı kuralı kendi içinde uyguluyor.
+  const video = await readFile(new URL('../../app/kadexai/api/video/route.ts', import.meta.url), 'utf8')
+  assert.match(video, /userHasFeature\('video-factory'\)/)
+  assert.match(video, /status: 402/)
+})
+
+test('araç-paket eşlemesi ödeme yapan kullanıcıyı dışarıda bırakmaz', async () => {
+  const { TOOL_REGISTRY } = await import('../../lib/tools/registry')
+  const { getPricingSnapshot } = await import('../../lib/payments/pricingConfig')
+  const tierFeatures = getPricingSnapshot().tierFeatures
+
+  // En üst paket (sinirsiz) kısıtlanmış HİÇBİR araçtan mahrum kalmamalı.
+  // Tek özellik eşlemesi kullanıldığında Pro ve Sınırsız kullanıcılar AI
+  // Thumbnail'i kaybediyordu; bu test o hatayı bir daha geçirmez.
+  for (const tool of TOOL_REGISTRY) {
+    if (!tool.requiredFeature?.length) continue
+    assert.ok(
+      tool.requiredFeature.some((f) => tierFeatures.sinirsiz.includes(f)),
+      `${tool.id} en üst pakette bile kilitli kalıyor`,
+    )
+  }
+})
