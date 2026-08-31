@@ -3,6 +3,7 @@ import { getAvailableModels } from '@/lib/ai/modelRouter'
 import { isAllowedOwnerUser, isSettingsOwnerUser } from '@/lib/featureAccess'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
 import { getVercelGatewayToken } from '@/lib/ai/gatewayAuth'
+import { getCurrentPlan } from '@/lib/entitlement'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +16,11 @@ export async function GET(request: Request) {
   let operationsSync = false
   let ownerAccess = false
   let settingsAccess = false
+  // Menüde hangi araçların kilitli görüneceğini belirler. Sidebar bu ucu
+  // zaten çağırıyor; ayrı bir istek açmamak için buraya eklendi.
+  let planTier: string | null = null
+  let planLabel: string | null = null
+  let planFeatures: string[] = []
   const gatewayToken = await getVercelGatewayToken(request)
   const aiGateway = Boolean(gatewayToken)
   // Gateway modeli burada AYRICA eklenmez: getAvailableModels() onu bilerek
@@ -32,6 +38,19 @@ export async function GET(request: Request) {
       // kendi Satış Merkezi'ni ve Platform Yönetimi'ni menüde göremiyordu.
       ownerAccess = isAllowedOwnerUser(user) || isSettingsOwnerUser(user)
       settingsAccess = isSettingsOwnerUser(user)
+      if (user) {
+        try {
+          const plan = await getCurrentPlan()
+          planTier = plan.tier
+          planLabel = plan.label
+          planFeatures = plan.features
+        } catch {
+          // Paket okunamazsa hiçbir araç kilitlenmez: yanlışlıkla erişim
+          // kapatmaktansa açık bırakmak doğru taraf.
+          planFeatures = []
+          planTier = null
+        }
+      }
     } catch {
       operationsSync = false
     }
@@ -69,6 +88,11 @@ export async function GET(request: Request) {
     operationsSync,
     ownerAccess,
     settingsAccess,
+    planTier,
+    planLabel,
+    planFeatures,
+    // Paket okunamadıysa arayüz kilit göstermemeli.
+    planKnown: planTier !== null,
     autoRouting: true,
     availableModels,
   }, {

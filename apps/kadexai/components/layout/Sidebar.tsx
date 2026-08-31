@@ -12,7 +12,7 @@ import {
   MessageSquare, Mail, Radio, AlertCircle,
   Copy, BookMarked, Activity, Library, Radar, Captions,
   ChevronRight, Clapperboard, LayoutDashboard,
-  CircleDollarSign, ListChecks, LogOut, KeyRound,
+  CircleDollarSign, ListChecks, Lock, LogOut, KeyRound,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSidebar } from '@/lib/context/SidebarContext'
@@ -62,19 +62,42 @@ const iconMap = {
   'key-round': KeyRound,
 } as const
 
-function buildNavItems(ownerAccess: boolean, settingsAccess: boolean) {
+/**
+ * Kullanıcının paketinde olmayan araçlar menüden gizlenmez, kilitli gösterilir:
+ * ne kaçırdığını görmesi satışı besliyor. Tıklayınca Paketler'e gider.
+ *
+ * Bu yalnızca görsel bir işaret. Gerçek kısıtlama API ucunda yapılmalı;
+ * kilit ikonu bir güvenlik sınırı değildir.
+ */
+function buildNavItems(
+  ownerAccess: boolean,
+  settingsAccess: boolean,
+  planFeatures: string[],
+  planKnown: boolean,
+) {
   return TOOL_CATEGORIES.map((category) => ({
   category: category.label,
   items: TOOL_REGISTRY
     .filter((tool) => tool.category === category.id)
     .filter((tool) => ownerAccess || !tool.permissions.includes('owner'))
     .filter((tool) => settingsAccess || !tool.permissions.includes('settings-owner'))
-    .map((tool) => ({
-      id: tool.id,
-      label: tool.comingSoon ? `${tool.name} · Yakında` : tool.name,
-      href: tool.route,
-      icon: iconMap[tool.icon as keyof typeof iconMap] || LayoutDashboard,
-    })),
+    .map((tool) => {
+      // Paket okunamadıysa kilit gösterilmez: yanlışlıkla erişim kapatmaktansa
+      // açık göstermek doğru taraf.
+      const kilitli = Boolean(
+        planKnown
+        && !ownerAccess
+        && tool.requiredFeature
+        && !planFeatures.includes(tool.requiredFeature),
+      )
+      return {
+        id: tool.id,
+        label: tool.comingSoon ? `${tool.name} · Yakında` : tool.name,
+        href: kilitli ? '/dashboard/packages' : tool.route,
+        icon: iconMap[tool.icon as keyof typeof iconMap] || LayoutDashboard,
+        kilitli,
+      }
+    }),
   })).filter((group) => group.items.length > 0)
 }
 
@@ -114,6 +137,8 @@ export default function Sidebar() {
   const alanYolu = useWorkspaceHref()
   const [ownerAccess, setOwnerAccess] = useState(false)
   const [settingsAccess, setSettingsAccess] = useState(false)
+  const [planFeatures, setPlanFeatures] = useState<string[]>([])
+  const [planKnown, setPlanKnown] = useState(false)
   const [openCats, setOpenCats] = useState<Set<string>>(
     new Set(['PLATFORM'])
   )
@@ -129,7 +154,10 @@ export default function Sidebar() {
 
   const isSearching = search.trim().length > 0
   const q = search.toLowerCase()
-  const navItems = useMemo(() => buildNavItems(ownerAccess, settingsAccess), [ownerAccess, settingsAccess])
+  const navItems = useMemo(
+    () => buildNavItems(ownerAccess, settingsAccess, planFeatures, planKnown),
+    [ownerAccess, settingsAccess, planFeatures, planKnown],
+  )
 
   useEffect(() => {
     let active = true
@@ -139,11 +167,14 @@ export default function Sidebar() {
         if (!active) return
         setOwnerAccess(config?.ownerAccess === true)
         setSettingsAccess(config?.settingsAccess === true)
+        setPlanFeatures(Array.isArray(config?.planFeatures) ? config.planFeatures : [])
+        setPlanKnown(config?.planKnown === true)
       })
       .catch(() => {
         if (!active) return
         setOwnerAccess(false)
         setSettingsAccess(false)
+        setPlanKnown(false)
       })
     return () => { active = false }
   }, [])
@@ -324,11 +355,13 @@ export default function Sidebar() {
                             href={alanYolu(item.href)}
                             onClick={(event) => handleLinkClick(event, item.href)}
                             data-active={isActive}
+                            title={item.kilitli ? `${item.label} paketinde yok — Paketler'e git` : undefined}
                             className={cn(
                               'kade-sidebar-link group flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[13px] transition-all duration-150 border',
                               isActive
                                 ? `${accent.activeBg} font-semibold`
-                                : 'text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50 border-transparent'
+                                : 'text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50 border-transparent',
+                              item.kilitli && !isActive && 'opacity-60'
                             )}
                           >
                             <Icon className={cn(
@@ -336,7 +369,9 @@ export default function Sidebar() {
                               isActive ? accent.activeIcon : 'text-zinc-400 group-hover:text-zinc-600'
                             )} />
                             <span className="truncate">{item.label}</span>
-                            <NavLinkStatus isActive={isActive} dotClass={accent.dot} />
+                            {item.kilitli
+                              ? <Lock aria-label="Paketinde yok" className="ml-auto h-3 w-3 flex-shrink-0 text-zinc-400" />
+                              : <NavLinkStatus isActive={isActive} dotClass={accent.dot} />}
                           </Link>
                         </li>
                       )

@@ -34,6 +34,31 @@ export interface ToolDefinition {
   historyEnabled: boolean
   enabled: boolean
   comingSoon: boolean
+  /**
+   * Aracı açmak için gereken paket özelliği (entitlements.features).
+   * Tanımsızsa araç her kullanıcıya açıktır — bugünkü davranış budur ve
+   * eşlemesi net olmayan araçlar bilerek tanımsız bırakıldı.
+   *
+   * DİKKAT: Bu alan yalnızca arayüzde kilit gösterir. Gerçek kısıtlama
+   * ilgili API ucunda canUse() ile yapılmalıdır; ikisi ayrı katmandır.
+   */
+  requiredFeature?: string
+}
+
+/**
+ * Araç → paket özelliği eşlemesi.
+ *
+ * Yalnızca özellik adıyla birebir örtüşen araçlar eşlendi. Analiz ve metin
+ * araçlarının hangi pakete ait olduğu bir fiyatlandırma kararı; uydurulmadı,
+ * eşlenmeden bırakıldı ve herkese açık kalmaya devam ediyor.
+ */
+const TOOL_FEATURE: Record<string, string> = {
+  'ai-thumbnail': 'image-basic',
+  'banana-studio': 'image-advanced',
+  'video-factory': 'video-factory',
+  subtitles: 'auto-captions',
+  'clip-generator': 'clip-generator',
+  bulk: 'bulk',
 }
 
 export const TOOL_CATEGORIES: Array<{ id: ToolCategoryId; label: string; description: string }> = [
@@ -131,6 +156,7 @@ function tool(
     historyEnabled,
     enabled: status === 'active',
     comingSoon: status === 'coming-soon',
+    requiredFeature: TOOL_FEATURE[id],
   }
 }
 
