@@ -154,22 +154,19 @@
   --color-cyan-950: var(--kade-info-deep);
 
   /* KÖŞE DİLİ — tek karar, tek yer.
-     İşaretlemede 139 yerde rounded-lg / rounded-xl / rounded-2xl var; tema
-     ise yalnızca SAYDIĞI elemanları border-radius:0 yapıyordu. Sonuç: kuralı
-     yazılmış eleman köşeli, unutulmuş eleman yuvarlak — aynı sayfada iki dil.
-     Hangisinin kazandığı, birinin o satırı yazmayı hatırlamasına bağlıydı.
+     İşaretlemede 139 yerde rounded-lg / rounded-xl / rounded-2xl var. Bu
+     ölçek onların hepsini birden yönetiyor; tek tek !important kuralına
+     gerek kalmıyor. rounded-full DOKUNULMAZ.
 
-     Tasarımın zaten uzandığı dil KÖŞELİ (sert 5px 5px 0 gölgeler, çerçeveli
-     yüzeyler). O dil burada evrenselleştiriliyor; tek tek !important kuralına
-     gerek kalmıyor. rounded-full DOKUNULMAZ: çip ve rozetlerdeki hap biçim
-     kasıtlı. */
-  --radius-xs: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-  --radius-3xl: 0px;
+     Önceki sürüm hepsini 0px yapıyordu. "Karanlık altın" yönünde köşe
+     yumuşak: keskinlik, arayüzün yassı görünmesinin ana sebebiydi. */
+  --radius-xs: 6px;
+  --radius-sm: 9px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 22px;
+  --radius-3xl: 26px;
 }
 
 html,

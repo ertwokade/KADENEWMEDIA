@@ -28,8 +28,9 @@
   --kade-ink: #17130a;
   --kade-muted: rgba(23, 19, 10, .72);
   --kade-faint: rgba(23, 19, 10, .62);
-  --kade-line: rgba(23, 19, 10, .17);
-  --kade-line-strong: rgba(23, 19, 10, .34);
+  /* Açık temada da çizgi sıcak: nötr griyle krem zemin ölü görünüyordu. */
+  --kade-line: rgba(138, 90, 0, .18);
+  --kade-line-strong: rgba(138, 90, 0, .34);
   --kade-accent: #e0a81f;
   --kade-accent-strong: #8a5a00;
   --kade-accent-text: #8a5a00;
@@ -38,21 +39,33 @@
   --kade-pink: #ef8eb1;
   --kade-green: #91b586;
   --kade-shadow: 0 18px 50px rgba(23, 19, 10, .09);
+
+  /* Yönün ortak araçları: altın gradyan, hâle ve köşe ölçeği. */
+  --kade-gradient: linear-gradient(140deg, #ebc669, #e0a81f);
+  --kade-glow: rgba(224, 168, 31, .20);
+  --kade-glow-strong: rgba(224, 168, 31, .30);
+  --kade-r-card: 26px;
+  --kade-r-inner: 16px;
+  --kade-r-pill: 999px;
 }
 
 html[data-theme='dark'], html[data-theme-mode='dark'] {
-  --kade-bg: #0f1111;
-  --kade-surface: #151717;
-  --kade-surface-soft: #191b1b;
+  /* "Karanlık altın" yönü. Zemin bir tık daha derin: kartların yüzdüğü
+     hissi ancak zeminle yüzey arasında yeterli fark olunca oluşuyor. */
+  --kade-bg: #0b0c0c;
+  --kade-surface: #111313;
+  --kade-surface-soft: #161818;
   --kade-surface-raised: #191b1b;
-  --kade-ink: #ffffff;
-  --kade-muted: rgba(230, 232, 232, .78);
-  --kade-faint: rgba(230, 232, 232, .64);
-  --kade-line: rgba(230, 232, 232, .1);
-  --kade-line-strong: rgba(230, 232, 232, .26);
+  --kade-ink: #f6f4ee;
+  --kade-muted: rgba(246, 244, 238, .70);
+  --kade-faint: rgba(246, 244, 238, .46);
+  /* Çizgiler nötr gri DEĞİL, sıcak altın. İmza burada: aynı yerleşim
+     nötr gri çizgiyle jenerik, altın çizgiyle Kade oluyor. */
+  --kade-line: rgba(235, 198, 105, .13);
+  --kade-line-strong: rgba(235, 198, 105, .28);
   --kade-accent-strong: #ebc669;
   --kade-accent-text: #ebc669;
-  --kade-shadow: 0 24px 70px rgba(0, 0, 0, .5);
+  --kade-shadow: 0 24px 70px rgba(0, 0, 0, .55);
   color-scheme: dark;
 }
 
@@ -125,8 +138,11 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
   --kade-n-300: rgba(230, 232, 232, .86);
   --kade-n-400: rgba(230, 232, 232, .72);
   --kade-n-500: rgba(230, 232, 232, .54);
-  --kade-n-600: #3b3f40;
-  --kade-n-700: #272a2b;
+  /* Ramp de sıcak: araç sayfalarındaki 68 `border-zinc-700/50` bu değerden
+     besleniyor. Nötr gri kalsaydı kartların kenarı soğuk, kabuğunki sıcak
+     olurdu — aynı ekranda iki çizgi dili. */
+  --kade-n-600: #3c372c;
+  --kade-n-700: #292620;
   --kade-n-800: var(--kade-surface-soft);
   --kade-n-900: var(--kade-surface);
   --kade-n-950: var(--kade-bg);
@@ -168,8 +184,11 @@ html[data-theme='light'] .kade-sidebar {
   --kade-n-300: rgba(230, 232, 232, .86);
   --kade-n-400: rgba(230, 232, 232, .72);
   --kade-n-500: rgba(230, 232, 232, .54);
-  --kade-n-600: #3b3f40;
-  --kade-n-700: #272a2b;
+  /* Ramp de sıcak: araç sayfalarındaki 68 `border-zinc-700/50` bu değerden
+     besleniyor. Nötr gri kalsaydı kartların kenarı soğuk, kabuğunki sıcak
+     olurdu — aynı ekranda iki çizgi dili. */
+  --kade-n-600: #3c372c;
+  --kade-n-700: #292620;
   --kade-n-800: #191b1b;
   --kade-n-900: #151717;
   --kade-n-950: #11110f;
@@ -195,14 +214,39 @@ html[data-theme='light'] .kade-sidebar {
 
 .kade-panel, .kade-panel .kade-main { background: var(--kade-bg) !important; color: var(--kade-ink); }
 .kade-panel .kade-main { position: relative; isolation: isolate; }
+/* Zemin: 1px ızgara yerine yumuşak altın hâle. Izgara arayüzü yassı
+   gösteriyordu; hâle kartların üstünde yüzdüğü bir derinlik veriyor. */
 .kade-panel .kade-main::before {
   position: absolute; inset: 0; z-index: -1; pointer-events: none; content: '';
-  background: linear-gradient(var(--kade-line) 1px, transparent 1px), linear-gradient(90deg, var(--kade-line) 1px, transparent 1px), radial-gradient(circle at 74% 8%, color-mix(in srgb, var(--kade-accent) 17%, transparent), transparent 29rem);
-  background-size: 100% 176px, min(28vw, 390px) 100%, auto; opacity: .48;
+  background:
+    radial-gradient(60rem 40rem at 78% -8%, var(--kade-glow), transparent 60%),
+    radial-gradient(48rem 34rem at 6% 106%, var(--kade-glow), transparent 62%);
+  opacity: .75;
 }
 
-/* Sidebar: flat editorial rail, not a generic SaaS drawer. */
-.kade-panel aside.kade-sidebar { background: var(--kade-bg) !important; border-color: var(--kade-line) !important; box-shadow: none !important; color: var(--kade-ink) !important; }
+/* ═══════════════════════════════════════════════════════════════════
+   YÜZEN RAİL
+   Kenar çubuğu ekrana yapışık bir çekmece değil, zeminin üstünde yüzen
+   yuvarlak bir panel. DOM değişmedi; yalnızca konum ve biçim.
+   ═══════════════════════════════════════════════════════════════════ */
+.kade-panel aside.kade-sidebar {
+  color: var(--kade-ink) !important;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--kade-surface) 92%, transparent),
+    color-mix(in srgb, var(--kade-surface) 72%, transparent)) !important;
+  border: 1px solid var(--kade-line) !important;
+  box-shadow: var(--kade-shadow) !important;
+}
+@media (min-width: 1024px) {
+  .kade-panel aside.kade-sidebar {
+    top: 14px; left: 14px;
+    height: calc(100dvh - 28px);
+    width: 250px;
+    border-radius: var(--kade-r-card) !important;
+    overflow: hidden;
+  }
+  .kade-panel .kade-main { margin-left: 278px !important; }
+}
 .kade-panel .kade-sidebar-head, .kade-panel .kade-sidebar-bottom { border-color: var(--kade-line) !important; }
 .kade-panel .kade-sidebar-head { min-height: 73px; }
 .kade-panel .kade-brand { color: var(--kade-ink) !important; }
@@ -271,8 +315,11 @@ html[data-theme='light'] .kade-content-studio-hero {
   --kade-n-300: rgba(230, 232, 232, .86);
   --kade-n-400: rgba(230, 232, 232, .72);
   --kade-n-500: rgba(230, 232, 232, .54);
-  --kade-n-600: #3b3f40;
-  --kade-n-700: #272a2b;
+  /* Ramp de sıcak: araç sayfalarındaki 68 `border-zinc-700/50` bu değerden
+     besleniyor. Nötr gri kalsaydı kartların kenarı soğuk, kabuğunki sıcak
+     olurdu — aynı ekranda iki çizgi dili. */
+  --kade-n-600: #3c372c;
+  --kade-n-700: #292620;
   --kade-n-800: #191b1b;
   --kade-n-900: #151717;
   --kade-n-950: #0f1111;
@@ -315,49 +362,96 @@ html[data-theme='light'] .kade-content-studio-hero {
   .kade-panel .kade-main .lg\:flex-row > .flex-1.min-w-0 { padding: 0; border: 0; background: none; }
 }
 
-/* Çalışma alanı özeti */
+/* ═══════════════════════════════════════════════════════════════════
+   ÇALIŞMA ALANI ÖZETİ — "karanlık altın"
+   Kenardan kenara 1px ızgara yerine, zeminin üstünde yüzen yuvarlak
+   kartlar. Bölümler artık çizgiyle değil boşlukla ayrılıyor.
+   ═══════════════════════════════════════════════════════════════════ */
 .kade-home { color: var(--kade-ink); scroll-behavior: smooth; }
-.kade-home-wrap { max-width: none; padding: 0 !important; }
-.kade-home-wrap > .lg\:hidden { margin: 16px; }
+.kade-home-wrap { max-width: 1180px; margin: 0 auto; padding: clamp(18px, 2.4vw, 28px) clamp(16px, 2.6vw, 32px) 72px !important; }
+.kade-home-wrap > .lg\:hidden { margin: 0 0 16px; }
 
-.kade-workspace-head { margin: 0; padding: clamp(30px, 3.6vw, 52px) clamp(24px, 4.2vw, 72px) clamp(34px, 4vw, 56px); border-bottom: 1px solid var(--kade-line); }
+/* Ortak kart yüzeyi. Üst kenardaki ince altın parıltı yönün imzası. */
+.kade-workspace-head,
+.kade-home-section {
+  position: relative;
+  margin: 0 0 18px;
+  border: 1px solid var(--kade-line);
+  border-radius: var(--kade-r-card);
+  padding: clamp(24px, 3vw, 34px) clamp(20px, 2.8vw, 32px);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--kade-surface) 88%, transparent),
+    color-mix(in srgb, var(--kade-surface) 62%, transparent));
+  overflow: hidden;
+}
+.kade-workspace-head::before,
+.kade-home-section::before {
+  position: absolute; inset: 0 0 auto; height: 1px; content: '';
+  background: linear-gradient(90deg, transparent, var(--kade-line-strong) 22%, var(--kade-line-strong) 78%, transparent);
+}
 
-.kade-status-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--kade-line); border-left: 1px solid var(--kade-line); }
-.kade-status-cell { display: flex; min-height: 104px; flex-direction: column; justify-content: center; gap: 6px; border-right: 1px solid var(--kade-line); border-bottom: 1px solid var(--kade-line); padding: 18px 20px; background: color-mix(in srgb, var(--kade-surface) 70%, transparent); }
-.kade-status-label { color: var(--kade-muted); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
-.kade-status-value { display: flex; min-height: 30px; align-items: center; color: var(--kade-ink); font-size: clamp(20px, 2vw, 27px); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.045em; }
-.kade-status-note { color: var(--kade-muted); font-size: 10px; font-weight: 500; }
+.kade-status-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 22px; }
+.kade-status-cell {
+  display: flex; min-height: 96px; flex-direction: column; justify-content: center; gap: 5px;
+  border: 1px solid var(--kade-line); border-radius: var(--kade-r-inner);
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--kade-surface-soft) 60%, transparent);
+}
+.kade-status-label { color: var(--kade-faint); font-size: 9.5px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+/* Başlık ağırlığı 700'den 400'e: iri ve İNCE, yönün tipografik kararı. */
+.kade-status-value { display: flex; min-height: 32px; align-items: center; color: var(--kade-ink); font-size: clamp(21px, 2vw, 28px); font-weight: 400; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.kade-status-note { color: var(--kade-faint); font-size: 10.5px; font-weight: 500; }
 
-.kade-recent { margin-top: 28px; border-top: 1px solid var(--kade-line); }
-.kade-recent-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0 10px; }
-.kade-recent-head > span { color: var(--kade-muted); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
-.kade-recent-head > a { display: inline-flex; align-items: center; gap: 7px; color: var(--kade-muted); font-size: 10px; font-weight: 700; }
-.kade-recent-head > a:hover { color: var(--kade-ink); }
-.kade-recent-empty { padding: 4px 0 14px; color: var(--kade-muted); font-size: 12px; }
-.kade-recent-list { display: grid; gap: 0; border-top: 1px solid var(--kade-line); }
-.kade-recent-list > li > a, .kade-recent-list > li > span { display: grid; min-height: 44px; align-items: center; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 12px; border-bottom: 1px solid var(--kade-line); padding: 8px 0; color: var(--kade-muted); font-size: 12px; }
+.kade-recent { margin-top: 24px; }
+.kade-recent-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 0 10px; }
+.kade-recent-head > span { color: var(--kade-faint); font-size: 9.5px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+.kade-recent-head > a { display: inline-flex; align-items: center; gap: 7px; color: var(--kade-muted); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.kade-recent-head > a:hover { color: var(--kade-accent-text); }
+.kade-recent-empty { padding: 4px 0 14px; color: var(--kade-faint); font-size: 12.5px; }
+.kade-recent-list {
+  display: grid; gap: 0;
+  border: 1px solid var(--kade-line); border-radius: var(--kade-r-inner);
+  padding: 4px 16px;
+  background: color-mix(in srgb, var(--kade-surface-soft) 45%, transparent);
+}
+.kade-recent-list > li > a, .kade-recent-list > li > span { display: grid; min-height: 44px; align-items: center; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 12px; border-bottom: 1px solid var(--kade-line); padding: 8px 0; color: var(--kade-muted); font-size: 12.5px; }
+.kade-recent-list > li:last-child > a, .kade-recent-list > li:last-child > span { border-bottom: 0; }
 .kade-recent-list > li > a:hover { color: var(--kade-ink); }
 .kade-recent-tool { overflow: hidden; color: var(--kade-ink); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .kade-recent-state { font-size: 10px; font-weight: 600; }
 .kade-recent-time { min-width: 78px; text-align: right; font-size: 10px; font-variant-numeric: tabular-nums; }
 
-/* Flat route-like grids, matching the main site's inner pages. */
-.kade-home-section { margin: 0; padding: clamp(42px, 5vw, 72px) clamp(24px, 4.2vw, 72px); border-bottom: 1px solid var(--kade-line); }
-.kade-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
-.kade-section-heading > div > span { color: var(--kade-muted); font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
-.kade-section-heading > div > span::before { display: inline-block; width: 6px; height: 6px; margin-right: 10px; background: var(--kade-accent); content: ''; }
-.kade-section-heading h2 { margin-top: 7px; color: var(--kade-ink); font-size: clamp(24px, 3vw, 43px); font-weight: 700; letter-spacing: -.055em; }
-.kade-section-heading > a { display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; color: var(--kade-muted); font-size: 10px; font-weight: 700; }
-.kade-section-heading > a:hover { color: var(--kade-ink); }
-.kade-quick-grid { display: grid; gap: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--kade-line); border-left: 1px solid var(--kade-line); }
-.kade-quick-card { position: relative; display: grid; min-height: 180px; grid-template-columns: auto 1fr auto; grid-template-rows: auto 1fr auto auto; gap: 8px 12px; border: 0; border-right: 1px solid var(--kade-line); border-bottom: 1px solid var(--kade-line); padding: 20px; background: color-mix(in srgb, var(--kade-surface) 70%, transparent); box-shadow: none; }
-.kade-quick-card::before { position: absolute; inset: 0; border: 2px dotted transparent; pointer-events: none; content: ''; }
-.kade-quick-card:hover::before { border-color: var(--kade-ink); }
+.kade-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+.kade-section-heading > div > span { display: inline-flex; align-items: center; color: var(--kade-faint); font-size: 9.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.kade-section-heading > div > span::before { display: inline-block; width: 5px; height: 5px; margin-right: 9px; border-radius: 50%; background: var(--kade-accent); box-shadow: 0 0 10px var(--kade-glow-strong); content: ''; }
+/* İri + ince başlık. Alta doğru sönen degrade referansın imzasıydı. */
+.kade-section-heading h2 {
+  margin-top: 9px; font-size: clamp(26px, 3.1vw, 44px); font-weight: 300; letter-spacing: -.035em; line-height: 1.05;
+  background: linear-gradient(180deg, var(--kade-ink) 36%, color-mix(in srgb, var(--kade-ink) 42%, transparent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.kade-section-heading > a { display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent; color: var(--kade-muted); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.kade-section-heading > a:hover { color: var(--kade-accent-text); }
+
+.kade-quick-grid { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kade-quick-card {
+  position: relative; display: grid; min-height: 172px;
+  grid-template-columns: auto 1fr auto; grid-template-rows: auto 1fr auto auto; gap: 8px 12px;
+  border: 1px solid var(--kade-line); border-radius: var(--kade-r-inner);
+  padding: 20px;
+  background: color-mix(in srgb, var(--kade-surface-soft) 55%, transparent);
+  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.kade-quick-card:hover {
+  border-color: var(--kade-line-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .28);
+}
 .kade-quick-index { color: var(--kade-faint); font-size: 9px; font-weight: 700; letter-spacing: .14em; }
-.kade-quick-icon { display: grid; width: 38px; height: 38px; grid-column: 3; place-items: center; border: 1px solid var(--kade-line-strong); background: var(--kade-accent); color: var(--kade-on-accent); }
-.kade-quick-card strong { grid-column: 1 / -1; align-self: end; color: var(--kade-ink); font-size: 15px; font-weight: 700; letter-spacing: -.035em; }
-.kade-quick-card small { grid-column: 1 / 3; color: var(--kade-muted); font-size: 10px; line-height: 1.45; }
-.kade-quick-arrow { align-self: center; color: var(--kade-ink); }
+.kade-quick-icon { display: grid; width: 38px; height: 38px; grid-column: 3; place-items: center; border: 0; border-radius: 12px; background: var(--kade-gradient); color: var(--kade-on-accent); box-shadow: 0 8px 22px var(--kade-glow); }
+.kade-quick-card strong { grid-column: 1 / -1; align-self: end; color: var(--kade-ink); font-size: 15.5px; font-weight: 600; letter-spacing: -.02em; }
+.kade-quick-card small { grid-column: 1 / 3; color: var(--kade-faint); font-size: 10.5px; line-height: 1.5; }
+.kade-quick-arrow { align-self: center; color: var(--kade-muted); }
 
 @media (max-width: 1180px) {
   .kade-quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
