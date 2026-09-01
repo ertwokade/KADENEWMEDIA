@@ -321,3 +321,41 @@ Geniş ekranda yan yana, 900px altında alt alta.
 
 Eksik kalan tek şey başlıklarda 300 ağırlık: yerel font seti Montserrat
 400'den başlıyor, Light dosyası repoda yok. İstenirse eklenmeli.
+
+## Kanal Denetimi, asistan ve yerleşim (1 Eylül 2026, ikinci tur)
+
+**Teklif Al** sol menüden çıkıp Paketler sayfasının içine alındı; bir
+fiyatlandırma eylemi, AI araçlarının arasında durmamalıydı. Kayıt defterine
+`hiddenInNav` bayrağı eklendi: rota, sayfa başlığı ve geçmiş çözümü
+çalışmaya devam ediyor.
+
+**Montserrat Light (300)** eklendi. Dosya önce
+`apps/kadexai/public/fonts/` altına konmuştu ama o klasör sürüm kontrolünde
+değil — derleme sırasında `haoqi-clone`'dan kopyalanıyor. Bu yüzden ÜÇ
+dağıtım üst üste düştü. Kaynak dizine alınınca geçti.
+
+**Kanal Denetimi** eklendi. Sosyal Medya Analizi düzyazı rapor döndürüyor;
+bu araç aynı girdiden tek skor, puanlanan boyutlar, bu hafta yapılacak üç
+iş ve tarihli yol haritası üretiyor. Ayırt edici nokta: her hızlı kazanım
+çalıştırılabilir bir araca bağlanıyor ve modelin döndürdüğü araç kimlikleri
+sunucuda doğrulanıyor. Metrik verilmeyen boyut "veri yok" işaretleniyor,
+skora katılmıyor — model puan uydurmuyor. Canlıda denendi: 65/100,
+puanlanamayanlar listelendi, üç araç bağlantısı doğru rotalara gitti.
+
+**Çalışma alanı asistanı** eklendi. `/api/assistant` ucu vardı ama panelde
+kullanan yoktu. Her sayfadan ulaşılabilen yüzey; uca marka profili + son
+kullanılan araçlar bağlam olarak veriliyor, cevapta adı geçen araçlar
+bağlantıya dönüşüyor.
+
+Bu sırada iki gerçek arıza çıktı:
+1. Asistan ucu kendi model listesini tutuyordu ve `gemini-2.5-flash`
+   seçiyordu — o kimlik anahtarımıza kapalı, 404 dönüyor. Yani asistan (hem
+   yeni yüzey hem operasyon kitindeki CRM asistanı) hiç çalışmıyordu.
+2. Tek modele sabitlenmişti; sağlayıcı 503 dönünce yedek yolu yoktu.
+Her ikisi de ortak yönlendiriciye ('auto') bağlanarak çözüldü.
+
+**WhatsApp asistanı YAPILMADI.** Bugünkü sağlayıcı CallMeBot yalnızca mesaj
+gönderebiliyor, gelen mesaj alamıyor. Çift yönlü hat için WhatsApp Business
+API ya da Twilio gerekiyor: ücretli servis ve altyapı kararı, sahip onayı
+ister. Asistan kanaldan bağımsız yazıldı; sağlayıcı bağlanınca aynı uç
+kullanılabilir.
