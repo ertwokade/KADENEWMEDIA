@@ -86,8 +86,8 @@ const SHORTCUT_ACTIONS = [
   {id:"undo",     label:"Son işlemi geri al",  varsayilan:"ctrl+z", calistir:()=>undoLast()},
   {id:"backup",   label:"JSON yedek al",       varsayilan:"ctrl+b", calistir:()=>doBackup()},
   {id:"sentscan", label:"SentScan analiz et",  varsayilan:"ctrl+e", calistir:()=>{navigateTo("comments");runCommentAnalysis()}},
-  {id:"calendar", label:"Yayın takvimini aç",  varsayilan:"ctrl+t", calistir:()=>navigateTo("calendar")},
-  {id:"clients",  label:"Müşteri & teslim aç", varsayilan:"ctrl+m", calistir:()=>navigateTo("clients")},
+  {id:"calendar", label:"Yayın takvimini aç",  varsayilan:"alt+t",  calistir:()=>navigateTo("calendar")},
+  {id:"clients",  label:"Müşteri & teslim aç", varsayilan:"alt+m",  calistir:()=>navigateTo("clients")},
 ];
 
 /** Tarayıcının geri alamayacağımız kendi kısayolları. */
