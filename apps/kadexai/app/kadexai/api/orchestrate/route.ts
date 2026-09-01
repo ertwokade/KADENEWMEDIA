@@ -3,6 +3,7 @@ import { assertAuthenticatedUser } from '@/lib/auth/server'
 import { PIPELINES, runPipeline } from '@/lib/orchestration/runner'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
+import { notifyOperation } from '@/lib/notifications/operationFeed'
 import type { AIModel, Platform } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -62,6 +63,17 @@ export async function POST(request: NextRequest) {
       region: text(body.region, 60, 'Türkiye / Türkçe'),
       frequency: text(body.frequency, 60, 'haftada 3 içerik'),
       model: text(body.model, 40, 'auto') as AIModel,
+    })
+
+    // 'pipeline_completed' olayı tanımlıydı ama hiçbir yerden tetiklenmiyordu;
+    // akışlar bildirim akışında ve gün sonu özetinde hiç görünmüyordu.
+    const basarili = result.steps.filter((step) => step.status === 'ok').length
+    const toplam = result.steps.length
+    await notifyOperation({
+      kind: 'pipeline_completed',
+      title: `Akış tamamlandı · ${text(body.pipelineId, 60)}`,
+      detail: `${basarili}/${toplam} adım başarılı · niş: ${niche}`,
+      userId: user.id,
     })
 
     return NextResponse.json(result, { headers })

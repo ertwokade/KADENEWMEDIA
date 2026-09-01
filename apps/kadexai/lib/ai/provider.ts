@@ -452,7 +452,10 @@ async function generateWithByok(req: GenerateRequest, userId: string): Promise<G
     for (const candidate of [
       { provider: 'openai' as const, model: 'gpt4o' as const },
       { provider: 'anthropic' as const, model: 'claude' as const },
-      { provider: 'google' as const, model: 'gemini-flash' as const },
+      // 'gemini-flash' (gemini-2.5-flash) kimliği canlıda 500 döndürdüğü için
+      // model listesinden çıkarılmıştı; BYOK yedeğinde kalmıştı. Yalnız
+      // Google anahtarı olan kullanıcı ölü bir modele yönleniyordu.
+      { provider: 'google' as const, model: 'gemini-flash-latest' as const },
     ]) {
       const candidateKey = await getUserProviderKey(userId, candidate.provider)
       if (candidateKey) {

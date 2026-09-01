@@ -100,6 +100,7 @@ export async function proxy(request: NextRequest) {
     '/api/operations-report',
     '/api/subscriptions/sweep',
     '/api/notifications/daily-summary',
+    '/api/notifications/morning-briefing',
   ].includes(pathname)
   const cronSecret = process.env.CRON_SECRET?.trim()
   const hasCronAccess = Boolean(

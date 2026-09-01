@@ -159,6 +159,10 @@
       "schedule": "30 3 * * *"
     },
     {
+      "path": "/kadexai/api/notifications/morning-briefing",
+      "schedule": "0 5 * * *"
+    },
+    {
       "path": "/kadexai/api/notifications/daily-summary",
       "schedule": "0 20 * * *"
     }

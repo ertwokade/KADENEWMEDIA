@@ -155,3 +155,46 @@ export async function sendDailyOperationSummary(): Promise<DailySummary> {
   await sendWhatsAppMessage(lines.join('\n'))
   return { total: rows.length, notified, byKind, sent: true }
 }
+
+/**
+ * Gün başı brifingi.
+ *
+ * Gün sonu özeti "dün ne oldu"yu anlatır; bu ise "bugün ne bekliyor"u.
+ * İkisi aynı olsaydı sabah mesajı bir işe yaramazdı: sabah bakılacak şey
+ * biriken iş — cevaplanmamış teklifler, bitmek üzere olan abonelikler,
+ * onay bekleyen içerik adayları.
+ */
+export async function sendMorningOperationBriefing(): Promise<{ sent: boolean; satirlar: string[] }> {
+  const admin = createAdminClient()
+  const simdi = Date.now()
+  const dun = new Date(simdi - 86_400_000).toISOString()
+  const yediGun = new Date(simdi + 7 * 86_400_000).toISOString()
+
+  const [olaylar, teklifler, abonelikler, adaylar] = await Promise.all([
+    admin.from('operation_events').select('kind').gte('created_at', dun).limit(5_000),
+    admin.from('kadexai_quote_requests').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+    admin.from('entitlements').select('id', { count: 'exact', head: true })
+      .eq('status', 'active').lte('expires_at', yediGun).gte('expires_at', new Date(simdi).toISOString()),
+    admin.from('kade_trend_current').select('id', { count: 'exact', head: true })
+      .gte('last_seen', dun),
+  ])
+
+  const dunkuOlay = (olaylar.data ?? []).length
+  const gelir = (olaylar.data ?? []).filter((r) => r.kind === 'payment_completed').length
+  const yeniUye = (olaylar.data ?? []).filter((r) => r.kind === 'signup').length
+
+  const satirlar = [
+    `🌅 KadexAI gün başı — ${new Date().toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul' })}`,
+    '',
+    `Dün: ${dunkuOlay} işlem · ${yeniUye} yeni üye · ${gelir} ödeme`,
+    '',
+    'Bugün bekleyen:',
+    `📄 Cevaplanmamış teklif: ${teklifler.count ?? 0}`,
+    `⏳ 7 gün içinde bitecek abonelik: ${abonelikler.count ?? 0}`,
+    `🔎 Yeni içerik adayı: ${adaylar.count ?? 0}`,
+  ]
+
+  if (!whatsappConfiguration().configured) return { sent: false, satirlar }
+  await sendWhatsAppMessage(satirlar.join('\n'))
+  return { sent: true, satirlar }
+}
