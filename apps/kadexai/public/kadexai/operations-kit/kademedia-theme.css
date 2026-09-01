@@ -285,7 +285,19 @@ html.embedded .view.active {
 /* ═══════════════════════════════════════════════════════════════════
    NOTLAR — sayfa ağacı görünüme taşındı, araç çubuğu küçültüldü
    ═══════════════════════════════════════════════════════════════════ */
-html.embedded #pages { display: grid; align-items: start; grid-template-columns: 232px minmax(0, 1fr); gap: 20px; }
+/* html.embedded .view.active display:flex !important taşıdığı için Notlar'ın
+   iki sütunu ancak aynı ağırlıkta bir kuralla kurulabiliyor. */
+html.embedded #pages.view.active {
+  display: grid !important;
+  align-items: start;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 20px;
+}
+/* Ağaç solda tüm satırları kaplar; editör ve boş durum sağ sütunda kalır.
+   Aksi halde üç kardeş öğe ızgaraya sırayla dizilip alt alta düşüyordu. */
+html.embedded #pages > .pages-tree-slot { grid-column: 1; grid-row: 1 / -1; }
+html.embedded #pages > #pageEmpty,
+html.embedded #pages > #pageEditor { grid-column: 2; grid-row: 1; min-width: 0; }
 html.embedded .pages-tree-slot { position: sticky; top: 0; border: 1px solid var(--border);
   padding: 10px; background: var(--bg2); }
 html.embedded .pages-tree-slot .ptree-nav { display: block; padding: 0; border: 0; }
@@ -297,7 +309,10 @@ html.embedded .pages-tree-slot .ptree-nav { display: block; padding: 0; border: 
 .page-actions .ghost-btn i { width: 13px; height: 13px; }
 
 @media (max-width: 900px) {
-  html.embedded #pages { grid-template-columns: 1fr; }
+  html.embedded #pages.view.active { grid-template-columns: 1fr; }
+  html.embedded #pages > .pages-tree-slot,
+  html.embedded #pages > #pageEmpty,
+  html.embedded #pages > #pageEditor { grid-column: 1; grid-row: auto; }
   html.embedded .pages-tree-slot { position: static; }
   .cal-cell { min-height: 58px; padding: 6px 5px; }
 }
