@@ -35,6 +35,16 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
         setTimedOut(false)
         return
       }
+      // Kit gömülüyken kendi tema tercihini uygulamaz, panele sorar. Yükleme
+      // sırası ne olursa olsun doğru temayla açılsın diye istek anında
+      // cevaplanır; `loaded` efektini beklemek yarışa açıktı.
+      if (event.data?.type === 'kade:request-operations-theme') {
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: 'kade:set-operations-theme', theme },
+          window.location.origin,
+        )
+        return
+      }
       if (event.data?.type === 'kade:operations-view' && typeof event.data.view === 'string') {
         onViewChange?.(event.data.view)
         return
@@ -63,7 +73,7 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [activeView, onViewChange])
+  }, [activeView, onViewChange, theme])
 
   useEffect(() => {
     if (!hydrated || loaded) return

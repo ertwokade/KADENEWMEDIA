@@ -70,42 +70,55 @@ const defaultPromptTemplates = [
   {id:"tpl-5", name:"Kamera Arkası",    prompt:"Prodüksiyon ekibi sette çalışırken, kameralar ve ışıklar görünür, samimi belgesel stili, soft bokeh arka plan."},
 ];
 
-const radarSources = [
-  {icon:"🏆", title:"LM Arena",           desc:"Hangi AI modelinin su an dünyada birinci olduğunu gösteren bağımsız siralama.", url:"https://lmarena.ai",            color:"teal"},
-  {icon:"📊", title:"Artificial Analysis", desc:"Görsel/video modellerini kalite ve maliyet bazında karşılaştır.",              url:"https://artificialanalysis.ai", color:"indigo"},
-  {icon:"🧡", title:"Hacker News",         desc:"Teknolojideki en yeni gelişmelere buradan ulaşırsın.",                        url:"https://news.ycombinator.com",  color:"gold"},
-  {icon:"📦", title:"GitHub Trending",     desc:"O gün yayınlanan en iyi açık kaynak kütüphaneleri.",                         url:"https://github.com/trending",   color:"violet"},
-  {icon:"🤖", title:"Google AI Studio",    desc:"Gemini modellerini ücretsiz dene, API key al.",                              url:"https://aistudio.google.com",   color:"teal"},
-  {icon:"🚀", title:"Vercel",              desc:"Projeyi internete almak için en hızlı yol; Git push et, bağlantı hazır.",     url:"https://vercel.com",            color:"indigo"},
+
+
+
+/**
+ * Özelleştirilebilir kısayollar.
+ *
+ * Eskiden hem tuşlar hem tablo ayrı ayrı sabit yazılıydı; ikisi birbirini
+ * tekrar ediyordu ve tablo gerçeği yansıtmıyordu (kaldırılan Radar görünümü
+ * hâlâ listedeydi). Artık tek kaynak burası; kullanıcının değiştirdiği tuşlar
+ * state.shortcuts içinde saklanır.
+ */
+const SHORTCUT_ACTIONS = [
+  {id:"palette",  label:"Komut paleti",        varsayilan:"ctrl+k", calistir:()=>openCommandPalette()},
+  {id:"undo",     label:"Son işlemi geri al",  varsayilan:"ctrl+z", calistir:()=>undoLast()},
+  {id:"backup",   label:"JSON yedek al",       varsayilan:"ctrl+b", calistir:()=>doBackup()},
+  {id:"sentscan", label:"SentScan analiz et",  varsayilan:"ctrl+e", calistir:()=>{navigateTo("comments");runCommentAnalysis()}},
+  {id:"calendar", label:"Yayın takvimini aç",  varsayilan:"ctrl+t", calistir:()=>navigateTo("calendar")},
+  {id:"clients",  label:"Müşteri & teslim aç", varsayilan:"ctrl+m", calistir:()=>navigateTo("clients")},
 ];
 
-const modelMatrixData = [
-  {name:"Gemini 2.5 Pro",    use:"Karmasik kodlama, uzun baglam",    rank:"🥇"},
-  {name:"Claude Sonnet 4.5", use:"Kod yazma, mantik, yaraticilik",  rank:"🥇"},
-  {name:"GPT-4o",            use:"Genel sohbet, çok modlu görevler", rank:"🥈"},
-  {name:"Gemini Flash 2.5",  use:"Hizli yanıt, düsük maliyet",      rank:"⚡"},
-  {name:"Nano Banana Pro",   use:"YouTube kapak görseli üretimi",   rank:"🖼"},
-  {name:"Seadance 2.0",      use:"Sahne devam ettirme, video",      rank:"🎬"},
-];
+/** Tarayıcının geri alamayacağımız kendi kısayolları. */
+const KORUMALI_KOMBOLAR = new Set(["ctrl+w","ctrl+t","ctrl+n","ctrl+q","ctrl+r"]);
 
-const vibeStepsData = [
-  {title:"Platform seç",     desc:"Basit projeler için Google AI Studio; karmasik projeler için Cursor.",              tools:["Google AI Studio","Cursor","VS Code"]},
-  {title:"Tanımla",          desc:"Uygulamanın ne yapacağını madde madde veya ekran görüntüsü yapıştırarak AI'ya anlat.", tools:["Claude Opus 4.7","Gemini 2.5 Pro"]},
-  {title:"Tasarım al",       desc:"Google Stitch, Claude veya Figma'ya 'Bana bir arayüz çiz' de, çıkan kodu projeye ekle.", tools:["Google Stitch","Figma","Claude Design"]},
-  {title:"Veritabanı bağla", desc:"Kullanıcı verilerini tutmak için Supabase (2 projeye kadar ücretsiz) ya da Firebase.", tools:["Supabase","Firebase","MCP"]},
-  {title:"API ekle",         desc:"AI konuşturmak için Google AI Studio'dan API key al, ortam değişkenine kopyala.",  tools:["Gemini API","OpenAI API",".env"]},
-  {title:"Yayınla",          desc:"Projeyi GitHub'a push et, Vercel'e bağla. Birkaç dakikada canlı bağlantı hazır.", tools:["Vercel","Railway","GitHub"]},
-];
+/** Olaydan kanonik kombo üretir. Mac'te Cmd, Ctrl ile aynı sayılır. */
+function komboOf(e){
+  const p=[];
+  if(e.ctrlKey||e.metaKey)p.push("ctrl");
+  if(e.altKey)p.push("alt");
+  if(e.shiftKey)p.push("shift");
+  const k=String(e.key||"").toLocaleLowerCase("en-US");
+  if(["control","meta","alt","shift"].includes(k))return "";
+  p.push(k);
+  return p.join("+");
+}
 
-const shortcutsData = [
-  {keys:"Ctrl + K", action:"Komut paleti"},
-  {keys:"Ctrl + Z", action:"Son işlemi geri al"},
-  {keys:"1 – 7",    action:"Hizli görünüm geçişi"},
-  {keys:"Escape",   action:"Dialog / paleti kapat"},
-  {keys:"Ctrl + S", action:"Radar notu kaydet"},
-  {keys:"Ctrl + E", action:"SentScan analiz et"},
-  {keys:"Ctrl + B", action:"JSON yedek al"},
-];
+function komboEtiketi(kombo){
+  return String(kombo||"").split("+").map(x=>x==="ctrl"?"Ctrl":x==="alt"?"Alt":x==="shift"?"Shift":x.toUpperCase()).join(" + ");
+}
+
+/** Etkin kısayol eşlemesi: varsayılanlar + kullanıcının değiştirdikleri. */
+function aktifKisayollar(){
+  const ozel=isObj(state.shortcuts)?state.shortcuts:{};
+  const harita={};
+  for(const a of SHORTCUT_ACTIONS){
+    const kombo=str(ozel[a.id])||a.varsayilan;
+    harita[a.id]=kombo;
+  }
+  return harita;
+}
 
 const sampleComments = [
   {likes:421, text:"Bu format çok samimi olmuş, dusuk puanlı tur serisi kesinlikle devam etmeli!"},
@@ -224,7 +237,7 @@ const initialState = {
     {name:"Merve",  images:35,  videos:5,  spend:31},
   ],
   totalUsdSpent:170,
-  radarNotes:["WiFi sinyaliyle 3B hareket algilama: RuView GitHub reposunu incele.","Seadance 2.0 benchmark sonuclarina bak."],
+  clients:[],
   promptHistory:[],
   promptTemplates:null,
   analysisHistory:[],
@@ -392,7 +405,31 @@ function normalizeState(input,explicitEmptyArrays=new Set()){
   s.media=arr(s.media).map(normalizeMedia).filter(Boolean);
   s.videos=arr(s.videos).map(normalizeVideo).filter(Boolean);
   s.brainstorm=arr(s.brainstorm).map(normalizeBrainstorm).filter(Boolean);
-  s.radarNotes=arr(s.radarNotes).map(n=>str(n)).filter(Boolean);
+  // Kısayollar: yalnızca tanımlı eylem kimlikleri ve güvenli kombo biçimi.
+  {
+    const gelen=isObj(s.shortcuts)?s.shortcuts:{};
+    const temiz={};
+    for(const a of SHORTCUT_ACTIONS){
+      const k=str(gelen[a.id]).toLocaleLowerCase("en-US");
+      if(/^(ctrl\+)?(alt\+)?(shift\+)?[a-z0-9]$/.test(k)&&!KORUMALI_KOMBOLAR.has(k))temiz[a.id]=k;
+    }
+    s.shortcuts=temiz;
+  }
+
+  // Müşteri kayıtları: her alan tek tek doğrulanır, teslimler de öyle.
+  s.clients=arr(s.clients).map(c=>({
+    id:idOf(c?.id,"cli"),
+    name:str(c?.name).slice(0,80),
+    contact:str(c?.contact).slice(0,120),
+    note:str(c?.note).slice(0,400),
+    createdAt:str(c?.createdAt),
+    deliveries:arr(c?.deliveries).map(d=>({
+      id:idOf(d?.id,"dlv"),
+      title:str(d?.title).slice(0,120),
+      due:/^\d{4}-\d{2}-\d{2}$/.test(str(d?.due))?str(d?.due):"",
+      status:["pending","progress","done"].includes(str(d?.status))?str(d?.status):"pending",
+    })).filter(d=>d.title),
+  })).filter(c=>c.name);
   s.promptHistory=arr(s.promptHistory).map(p=>str(p)).filter(Boolean);
   s.analysisHistory=arr(s.analysisHistory).map(normalizeAnalysis).filter(Boolean);
   s.activityLog=arr(s.activityLog).map(normalizeLog).filter(Boolean);
@@ -561,7 +598,8 @@ function buildCleanInitial(){
   s.brainstorm=[];
   s.users=[{name:"Kadir",images:0,videos:0,spend:0}];
   s.totalUsdSpent=0;
-  s.radarNotes=[];
+  s.clients=[];
+  s.shortcuts={};
   s.promptHistory=[];
   s.analysisHistory=[];
   s.activityLog=[];
@@ -748,8 +786,9 @@ document.addEventListener("DOMContentLoaded",async()=>{
   bindSourceImport();
   bindCrm();
   bindBanana();
-  bindVibe();
-  bindRadar();
+  relocatePageTreeWhenEmbedded();
+  bindCalendar();
+  bindClients();
   bindSettings();
   bindKeyboardShortcuts();
   bindCommandPalette();
@@ -858,7 +897,16 @@ function reportOperation(message,reportType="info"){
 }
 
 // ── TEMA ─────────────────────────────────────────────────────────────
-function loadTheme(){ const s=storageGet("kade-theme")==="dark"?"dark":"light"; document.documentElement.setAttribute("data-theme",s); updateThemeBtn(s) }
+function loadTheme(){
+  // Panel içindeyken tema PANELE aittir. Kitin kendi yerel tercihi burada
+  // uygulanırsa panel koyuyken kit açık kalıyor ve operasyon sekmesi arayüzün
+  // geri kalanından kopuk görünüyordu. Gömülüyken panele sorulur.
+  if(document.documentElement.classList.contains("embedded")&&window.parent!==window){
+    try{ window.parent.postMessage({type:"kade:request-operations-theme"},location.origin) }catch{}
+    return;
+  }
+  const s=storageGet("kade-theme")==="dark"?"dark":"light"; document.documentElement.setAttribute("data-theme",s); updateThemeBtn(s)
+}
 function bindThemeToggle(){ document.getElementById("themeToggle").addEventListener("click",()=>{ const c=document.documentElement.getAttribute("data-theme")||"dark",n=c==="dark"?"light":"dark"; document.documentElement.setAttribute("data-theme",n); storageSet("kade-theme",n); updateThemeBtn(n); showToast(n==="dark"?"Karanlık mod":"Aydınlık mod","info") }) }
 function updateThemeBtn(t){ const b=document.getElementById("themeToggle"); if(b){const l=t==="dark"?"Açık temaya geç":"Koyu temaya geç";b.textContent=t==="dark"?"☀️":"🌙";b.setAttribute("aria-label",l);b.title=l} }
 
@@ -867,7 +915,7 @@ function toggleMobileMenu(){ const s=document.getElementById("sidebar"),o=docume
 function closeMobileMenu(){ document.getElementById("sidebar")?.classList.remove("mobile-open"); document.getElementById("mobileOverlay")?.classList.remove("visible") }
 
 // ── NAVİGASYON ───────────────────────────────────────────────────────
-const viewOrder=["dashboard","comments","crm","banana","vibe","radar","settings","pages"];
+const viewOrder=["dashboard","comments","crm","banana","calendar","clients","settings","pages"];
 
 function bindNavigation(){
   document.querySelectorAll(".nav-item[data-view]").forEach(btn=>{
@@ -928,7 +976,7 @@ function closeCommandPalette(e){ if(!e||e.target===document.getElementById("comm
 
 function buildCommandItems(query){
   const q=(query||"").toLocaleLowerCase("tr-TR");
-  const labels=["Özet","SentScan","Prodüksiyon CRM","Banana Studio","Vibe Coding","AI Radar","Ayarlar","Sayfalar"];
+  const labels=["Özet","SentScan","Prodüksiyon CRM","Banana Studio","Yayın Takvimi","Müşteri & Teslim","Ayarlar","Sayfalar"];
   const icons=["layout-dashboard","message-square-text","kanban-square","sparkles","code-2","radio-tower","settings","notebook-text"];
   const items=[
     ...viewOrder.map((v,i)=>({label:labels[i]||v,sub:document.getElementById(v)?.dataset.eyebrow||"",icon:icons[i],action:()=>navigateTo(v)})),
@@ -971,15 +1019,47 @@ function onCommandKey(e){
 // ── KLAVYE KISAYOLLARI ────────────────────────────────────────────────
 function bindKeyboardShortcuts(){
   document.addEventListener("keydown",e=>{
-    const typing=["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName);
-    if(e.key==="k"&&(e.ctrlKey||e.metaKey)){e.preventDefault();openCommandPalette();return}
-    if(e.key==="z"&&(e.ctrlKey||e.metaKey)&&!e.shiftKey){e.preventDefault();undoLast();return}
-    if(e.key==="b"&&(e.ctrlKey||e.metaKey)){e.preventDefault();doBackup();return}
-    if(e.key==="e"&&(e.ctrlKey||e.metaKey)){e.preventDefault();navigateTo("comments");runCommentAnalysis();return}
-    if(e.key==="s"&&(e.ctrlKey||e.metaKey)&&document.getElementById("radar")?.classList.contains("active")){e.preventDefault();const inp=document.getElementById("radarNoteInput");if(inp?.value.trim())document.getElementById("radarNoteForm")?.dispatchEvent(new Event("submit"));return}
+    const typing=["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)||e.target.isContentEditable;
+    // Kısayol yakalama modundayken (ayarlarda tuş atanıyor) hiçbir eylem çalışmaz.
+    if(kisayolYakalama){ return }
     if(e.key==="Escape"){document.getElementById("commandPalette").style.display="none";document.getElementById("productionDialog")?.close();return}
+    if(typing)return;
+    const kombo=komboOf(e);
+    if(kombo){
+      const harita=aktifKisayollar();
+      const eylem=SHORTCUT_ACTIONS.find(a=>harita[a.id]===kombo);
+      if(eylem){ e.preventDefault(); eylem.calistir(); return }
+    }
     if(!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){const idx=parseInt(e.key,10)-1;if(idx>=0&&idx<viewOrder.length)navigateTo(viewOrder[idx])}
   });
+}
+
+/** Ayarlarda tuş atanırken true olur; bu sırada kısayollar tetiklenmez. */
+let kisayolYakalama=false;
+
+/** Bir eyleme yeni tuş atar: sıradaki tuş kombinasyonunu yakalar. */
+function kisayolYakala(actionId,btn){
+  const eylem=SHORTCUT_ACTIONS.find(a=>a.id===actionId); if(!eylem)return;
+  kisayolYakalama=true;
+  const eskiMetin=btn.textContent;
+  btn.textContent="Tuşa bas…";
+  const bitir=()=>{ kisayolYakalama=false; btn.textContent=eskiMetin; window.removeEventListener("keydown",yakala,true) };
+  const yakala=e=>{
+    e.preventDefault(); e.stopPropagation();
+    if(e.key==="Escape"){ bitir(); return }
+    const kombo=komboOf(e);
+    if(!kombo)return;
+    if(KORUMALI_KOMBOLAR.has(kombo)){ showToast("Bu kombinasyon tarayıcıya ait, kullanılamaz","warning"); return }
+    const harita=aktifKisayollar();
+    const cakisan=SHORTCUT_ACTIONS.find(a=>a.id!==actionId&&harita[a.id]===kombo);
+    if(cakisan){ showToast(`Bu kısayol "${cakisan.label}" için kullanılıyor`,"warning"); return }
+    snapshotUndo();
+    state.shortcuts=isObj(state.shortcuts)?state.shortcuts:{};
+    state.shortcuts[actionId]=kombo;
+    saveState(); bitir(); renderSettingsView();
+    showToast(`${eylem.label}: ${komboEtiketi(kombo)}`,"success");
+  };
+  window.addEventListener("keydown",yakala,true);
 }
 
 // ── GLOBAL AKSİYONLAR ────────────────────────────────────────────────
@@ -1074,7 +1154,7 @@ function kpi(label,value,meta,color,icon,targetView=null){
 }
 
 // ── RENDER ALL ────────────────────────────────────────────────────────
-function renderAll(){ renderDashboard(); renderCrm(); renderBanana(); renderVibe(); renderRadar(); renderSettingsView(); renderSourceImport(); renderPageTree(); renderPageEditor(); refreshIcons() }
+function renderAll(){ renderDashboard(); renderCrm(); renderBanana(); renderCalendar(); renderClients(); renderSettingsView(); renderSourceImport(); renderPageTree(); renderPageEditor(); refreshIcons() }
 
 // ── DONUT SVG ────────────────────────────────────────────────────────
 function donutSvg(pct,color){
@@ -1309,8 +1389,8 @@ function analyzeTranscriptText(raw){
     {title:"Prodüksiyon CRM",color:"indigo",keywords:["notion","crm","prodüksiyon","produksiyon","bütçe","bütçe","görev","görev","envanter","kütüphane","kutuphane"],actions:["Kanban kartlarında çekim, yayın, görev ve bütçe bilgisini tek detay ekranında tut.","Genel görev, envanter ve doküman kütüphanesini aynı veri setine bağla."]},
     {title:"Banana görsel stüdyosu",color:"gold",keywords:["görsel","görsel","prompt","template","şablon","sablon","brainstorm","beyin fırtınası","kapak","referans"],actions:["Prompt iyileştirme, şablon kaydetme ve brainstorm akışını tek panelden çalıştır.","Referans etiketlerini prompt içinde kullanılabilir hale getir."]},
     {title:"Banana video stüdyosu",color:"violet",keywords:["video","seadance","cde","continue","devam ettir","saniye","kamera","referans video"],actions:["Video promptunu saniye, kamera ve referans bilgisiyle iyileştir.","Devam ettir akışında önceki promptu ve seçilen videoyu birlikte kullan."]},
-    {title:"Vibe Coding rehberi",color:"coral",keywords:["ai studio","cursor","codex","claude","supabase","firebase","vercel","railway","deployment","api key"],actions:["Brief oluşturucuda kullanıcı, yetki, veri tabanı ve deploy alanlarını düzenli üret.","Araç seçimini proje karmaşıklığına göre açık bir matrise bağla."]},
-    {title:"AI kaynak radarı",color:"teal",keywords:["lm arena","hacker news","github trending","artificial analysis","model","haber","kaynak"],actions:["Günlük kaynakları kartlarla takip et ve hızlı not eklemeyi destekle.","Model seçim matrisini görsel, video, kod ve genel kullanım için ayır."]},
+    {title:"Müşteri & teslim takibi",color:"coral",keywords:["müşteri","musteri","teslim","termin","fatura","sözleşme","sozlesme","brief","iş","teklif"],actions:["Müşteri kartı aç ve teslimleri termine bağla."]},
+    {title:"Yayın takvimi",color:"teal",keywords:["takvim","tarih","çekim","cekim","yayın","yayin","plan","program","hafta","ay"],actions:["Çekim ve yayın tarihlerini takvimde gör."]},
   ];
   const modules=moduleDefs.map(def=>{
     const hits=def.keywords.reduce((sum,k)=>sum+countTerm(lower,k),0);
@@ -1740,23 +1820,214 @@ function createBrainstorm(cur,count){
 function enhanceImagePrompt(raw){ const refs=state.references.map(r=>r.tag).join(", ");return`${raw.trim()}\n\n— Sistem: sinematik aydınlatma, ultra-gerçekçi doku, sığ alan derinliği, profesyonel YouTube kapak kompozisyonu. Referanslar: ${refs||"@ana-kişi"}. Stil: edgy editorial, vibrant renk paleti.` }
 function enhanceVideoPrompt(raw){ return`${raw.trim()}\n\n[Sistem: kamera=dinamik el kamerası, ışık=dramatik kontrast, fps=24, gerçekçilik=yüksek]` }
 
-// ── VİBE CODİNG ──────────────────────────────────────────────────────
-function bindVibe(){
-  document.getElementById("briefForm").addEventListener("submit",e=>{ e.preventDefault();const idea=document.getElementById("briefIdea").value,users=document.getElementById("briefUsers").value,can=document.getElementById("briefCan").value,cannot=document.getElementById("briefCannot").value;document.getElementById("briefOutput").textContent=`# Uygulama Brief'i — ${idea}\n\n## Hedef\n${idea}\n\n## Kullanicilar\n${users}\n\n## Yapabilecekler\n${can}\n\n## Kisitlamalar\n${cannot}\n\n## Önerilen Stack\n- Platform : Cursor + Claude Sonnet 4.5 / Gemini 2.5 Pro\n- Veritabanı: Supabase veya Firebase\n- UI        : Vanilla HTML/CSS + localStorage\n- AI        : Google AI Studio API (Gemini Flash 2.5)\n- Deploy    : Vercel veya Railway\n\n## Cursor'a Yapıştırılacak Prompt\n"${idea}" uygulaması yaz.\nKullanicilar: ${users}\nYapabilsin : ${can.replace(/\n/g,", ")}\nYapamasin  : ${cannot.replace(/\n/g,", ")}` });
-  document.getElementById("copyBrief").addEventListener("click",()=>{ navigator.clipboard.writeText(document.getElementById("briefOutput").textContent).then(()=>{ const btn=document.getElementById("copyBrief");btn.innerHTML='<i data-lucide="check"></i>Kopyalandi!';refreshIcons();setTimeout(()=>{btn.innerHTML='<i data-lucide="copy"></i>Kopyala';refreshIcons()},2000) }) });
-}
-function renderVibe(){ document.getElementById("vibeSteps").innerHTML=vibeStepsData.map((s,i)=>`<div class="vibe-step"><div class="vibe-num">${i+1}</div><div class="vibe-content"><h3>${esc(s.title)}</h3><p>${esc(s.desc)}</p><div class="vibe-tools">${s.tools.map(t=>`<span class="vibe-tool-tag">${esc(t)}</span>`).join("")}</div></div></div>`).join("") }
+// ── YAYIN TAKVİMİ ────────────────────────────────────────────────────
+// CRM panosu işleri AŞAMAYA göre dizer ("hangi iş nerede kaldı"). Burası
+// TARİHE göre dizer ("bu hafta ne çekiliyor, ne yayınlanıyor"). Aynı veriyi
+// (state.productions) kullanır, ikinci bir kayıt tutmaz.
+let calendarCursor = new Date();
+let calendarSelected = null;
 
-// ── AI RADAR ─────────────────────────────────────────────────────────
-function bindRadar(){
-  document.getElementById("radarNoteForm").addEventListener("submit",e=>{ e.preventDefault();const val=document.getElementById("radarNoteInput").value.trim();if(!val)return;snapshotUndo();state.radarNotes.unshift(val);document.getElementById("radarNoteInput").value="";saveState();renderRadar();showToast("Not eklendi","success");logActivity("Radar notu eklendi","info") });
+function ymd(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` }
+
+/** Bir güne düşen çekim ve yayın işleri. */
+function calendarEntriesFor(key){
+  const out=[];
+  for(const p of arr(state.productions)){
+    if(p.shootDate===key) out.push({tur:"shoot",prod:p});
+    if(p.publishDate===key) out.push({tur:"publish",prod:p});
+  }
+  return out;
 }
-function renderRadar(){
-  document.getElementById("radarCards").innerHTML=radarSources.map(s=>`<div class="radar-card"><div class="radar-icon">${s.icon}</div><div class="radar-title">${esc(s.title)}</div><div class="radar-desc">${esc(s.desc)}</div><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" class="radar-link">Ac <i data-lucide="external-link" style="width:13px;height:13px"></i></a></div>`).join("");
-  document.getElementById("modelMatrix").innerHTML=modelMatrixData.map(m=>`<div class="model-row"><div class="model-name">${esc(m.name)}</div><div class="model-use">${esc(m.use)}</div><div style="font-size:18px">${m.rank}</div></div>`).join("");
-  document.getElementById("radarNotes").innerHTML=state.radarNotes.length?state.radarNotes.map((note,i)=>`<div class="note-row" style="display:flex;gap:8px;padding:10px 12px;border-radius:8px"><span style="color:var(--teal);flex:0 0 auto">→</span><span style="font-size:13px;flex:1">${esc(note)}</span><button onclick="deleteRadarNote(${i})" style="border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:18px;padding:0">×</button></div>`).join(""):`<div class="empty-state">İlk notunu ekle.</div>`;
+
+/**
+ * Gömülü modda sayfa ağacını Notlar görünümünün içine taşır.
+ *
+ * Ağaç kitin kenar çubuğunda duruyor; panel içinde o çubuk gizlendiği için
+ * notlar arasında geçiş yapmak imkânsızdı. Aynı DOM düğümü taşınır, böylece
+ * mevcut render ve olay bağlantıları olduğu gibi çalışmaya devam eder.
+ */
+function relocatePageTreeWhenEmbedded(){
+  if(!document.documentElement.classList.contains("embedded"))return;
+  const agac=document.getElementById("pagesNavTree");
+  const yuva=document.getElementById("pagesTreeSlot");
+  if(agac&&yuva&&agac.parentElement!==yuva)yuva.appendChild(agac);
 }
-function deleteRadarNote(i){ snapshotUndo();state.radarNotes.splice(i,1);saveState();renderRadar();showToast("Not silindi","warning") }
+
+function bindCalendar(){
+  document.getElementById("calPrev")?.addEventListener("click",()=>{ calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()-1,1); renderCalendar() });
+  document.getElementById("calNext")?.addEventListener("click",()=>{ calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+1,1); renderCalendar() });
+  document.getElementById("calToday")?.addEventListener("click",()=>{ calendarCursor=new Date(); calendarSelected=ymd(new Date()); renderCalendar() });
+  document.getElementById("calendarGrid")?.addEventListener("click",e=>{
+    const cell=e.target.closest("[data-day]"); if(!cell)return;
+    calendarSelected=cell.dataset.day; renderCalendar();
+  });
+}
+
+function renderCalendar(){
+  const grid=document.getElementById("calendarGrid"); if(!grid)return;
+  const yil=calendarCursor.getFullYear(), ay=calendarCursor.getMonth();
+  const baslik=document.getElementById("calendarMonthTitle");
+  if(baslik)baslik.textContent=new Intl.DateTimeFormat("tr-TR",{month:"long",year:"numeric"}).format(calendarCursor);
+
+  const ilk=new Date(yil,ay,1);
+  // Hafta pazartesi başlar; getDay() pazarı 0 verdiği için kaydırılır.
+  const bosluk=(ilk.getDay()+6)%7;
+  const gunSayisi=new Date(yil,ay+1,0).getDate();
+  const bugun=ymd(new Date());
+
+  const basliklar=["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"]
+    .map(g=>`<div class="cal-head">${g}</div>`).join("");
+  const hucreler=[];
+  for(let i=0;i<bosluk;i++) hucreler.push('<div class="cal-cell cal-empty"></div>');
+  for(let g=1;g<=gunSayisi;g++){
+    const key=`${yil}-${String(ay+1).padStart(2,"0")}-${String(g).padStart(2,"0")}`;
+    const isler=calendarEntriesFor(key);
+    const noktalar=isler.slice(0,4).map(x=>`<i class="cal-dot cal-dot-${x.tur==="shoot"?"shoot":"publish"}"></i>`).join("");
+    const sinif=["cal-cell",key===bugun?"cal-today":"",key===calendarSelected?"cal-selected":"",isler.length?"cal-has":""].filter(Boolean).join(" ");
+    hucreler.push(`<div class="${sinif}" data-day="${key}" role="button" tabindex="0" aria-label="${g} ${isler.length?`· ${isler.length} iş`:""}"><span class="cal-num">${g}</span><span class="cal-dots">${noktalar}</span></div>`);
+  }
+  grid.innerHTML=basliklar+hucreler.join("");
+
+  // Ay içi özet
+  const ayAnahtari=`${yil}-${String(ay+1).padStart(2,"0")}`;
+  const ayIsleri=arr(state.productions).filter(p=>String(p.shootDate||"").startsWith(ayAnahtari)||String(p.publishDate||"").startsWith(ayAnahtari));
+  const cekim=ayIsleri.filter(p=>String(p.shootDate||"").startsWith(ayAnahtari)).length;
+  const yayin=ayIsleri.filter(p=>String(p.publishDate||"").startsWith(ayAnahtari)).length;
+  const tarihsiz=arr(state.productions).filter(p=>!p.shootDate&&!p.publishDate&&p.stage!=="published"&&p.stage!=="cancelled").length;
+  const kpi=document.getElementById("calendarKpis");
+  if(kpi)kpi.innerHTML=[
+    kpi_("Bu ay çekim",cekim,"Planlanan çekim günü","teal","clapperboard"),
+    kpi_("Bu ay yayın",yayin,"Planlanan yayın","teal","send"),
+    kpi_("Tarihi yok",tarihsiz,"Takvime girmemiş iş","teal","calendar-off"),
+  ].join("");
+
+  renderCalendarDay();
+}
+
+function kpi_(label,value,meta,color,icon){
+  return `<div class="kpi ${color}"><span class="kpi-icon"><i data-lucide="${icon}"></i></span><span class="label">${esc(label)}</span><span class="value">${esc(String(value))}</span><span class="meta">${esc(meta)}</span></div>`;
+}
+
+function renderCalendarDay(){
+  const liste=document.getElementById("calendarDayList"); if(!liste)return;
+  const baslik=document.getElementById("calendarDayTitle");
+  if(!calendarSelected){ if(baslik)baslik.textContent="Bir gün seç"; liste.innerHTML='<p class="empty-hint">Takvimden bir güne tıkla.</p>'; return }
+  const d=new Date(calendarSelected+"T00:00:00");
+  if(baslik)baslik.textContent=new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"long",weekday:"long"}).format(d);
+  const isler=calendarEntriesFor(calendarSelected);
+  liste.innerHTML=isler.length?isler.map(x=>`
+    <div class="cal-day-row">
+      <i class="cal-dot cal-dot-${x.tur==="shoot"?"shoot":"publish"}"></i>
+      <div class="cal-day-main"><strong>${esc(x.prod.title||"Adsız")}</strong><span>${x.tur==="shoot"?"Çekim":"Yayın"} · ${esc(x.prod.owner||"atanmamış")}</span></div>
+      <span class="cal-day-stage">${esc((stages.find(st=>st.id===x.prod.stage)||{}).label||x.prod.stage||"")}</span>
+    </div>`).join(""):'<p class="empty-hint">Bu güne planlanmış iş yok.</p>';
+  refreshIcons();
+}
+
+// ── MÜŞTERİ & TESLİM ─────────────────────────────────────────────────
+// Ajans tarafında eksik olan parça: kime ne teslim edildi, ne bekliyor.
+const TESLIM_DURUMLARI=[
+  {id:"pending",  label:"Bekliyor"},
+  {id:"progress", label:"Devam ediyor"},
+  {id:"done",     label:"Teslim edildi"},
+];
+
+function bindClients(){
+  document.getElementById("clientForm")?.addEventListener("submit",e=>{
+    e.preventDefault();
+    const ad=document.getElementById("clientName").value.trim();
+    if(!ad)return;
+    snapshotUndo();
+    state.clients=arr(state.clients);
+    state.clients.unshift({
+      id:uid("cli"), name:ad.slice(0,80),
+      contact:document.getElementById("clientContact").value.trim().slice(0,120),
+      note:document.getElementById("clientNote").value.trim().slice(0,400),
+      createdAt:new Date().toISOString(), deliveries:[],
+    });
+    document.getElementById("clientForm").reset();
+    saveState(); renderClients(); showToast("Müşteri eklendi","success");
+  });
+
+  document.getElementById("clientList")?.addEventListener("click",e=>{
+    const sil=e.target.closest("[data-client-delete]");
+    if(sil){ deleteClient(sil.dataset.clientDelete); return }
+    const ekle=e.target.closest("[data-delivery-add]");
+    if(ekle){ addDelivery(ekle.dataset.deliveryAdd); return }
+    const durum=e.target.closest("[data-delivery-cycle]");
+    if(durum){ cycleDelivery(durum.dataset.deliveryCycle, durum.dataset.clientId); return }
+  });
+}
+
+function findClient(id){ return arr(state.clients).find(c=>c.id===id) }
+
+function addDelivery(clientId){
+  const c=findClient(clientId); if(!c)return;
+  const baslik=prompt("Teslim edilecek iş:"); if(!baslik||!baslik.trim())return;
+  const tarih=prompt("Termin (YYYY-AA-GG, boş bırakılabilir):")||"";
+  snapshotUndo();
+  c.deliveries=arr(c.deliveries);
+  c.deliveries.push({id:uid("dlv"),title:baslik.trim().slice(0,120),due:/^\d{4}-\d{2}-\d{2}$/.test(tarih.trim())?tarih.trim():"",status:"pending"});
+  saveState(); renderClients(); showToast("Teslim eklendi","success");
+}
+
+function cycleDelivery(deliveryId, clientId){
+  const c=findClient(clientId); if(!c)return;
+  const d=arr(c.deliveries).find(x=>x.id===deliveryId); if(!d)return;
+  const i=TESLIM_DURUMLARI.findIndex(x=>x.id===d.status);
+  snapshotUndo();
+  d.status=TESLIM_DURUMLARI[(i+1)%TESLIM_DURUMLARI.length].id;
+  saveState(); renderClients();
+}
+
+function deleteClient(id){
+  const c=findClient(id); if(!c)return;
+  if(!confirm(`"${c.name}" ve teslimleri silinsin mi?`))return;
+  snapshotUndo();
+  state.clients=arr(state.clients).filter(x=>x.id!==id);
+  saveState(); renderClients(); showToast("Müşteri silindi","warning");
+}
+
+function renderClients(){
+  const liste=document.getElementById("clientList"); if(!liste)return;
+  const musteriler=arr(state.clients);
+  const bugun=ymd(new Date());
+  const tumTeslim=musteriler.flatMap(c=>arr(c.deliveries));
+  const bekleyen=tumTeslim.filter(d=>d.status!=="done").length;
+  const geciken=tumTeslim.filter(d=>d.status!=="done"&&d.due&&d.due<bugun).length;
+
+  const kpi=document.getElementById("clientKpis");
+  if(kpi)kpi.innerHTML=[
+    kpi_("Müşteri",musteriler.length,"Kayıtlı","teal","users"),
+    kpi_("Bekleyen teslim",bekleyen,"Tamamlanmamış","teal","clock"),
+    kpi_("Geciken",geciken,"Termini geçmiş","teal","alert-triangle"),
+  ].join("");
+
+  liste.innerHTML=musteriler.length?musteriler.map(c=>{
+    const teslimler=arr(c.deliveries);
+    const satirlar=teslimler.length?teslimler.map(d=>{
+      const durum=TESLIM_DURUMLARI.find(x=>x.id===d.status)||TESLIM_DURUMLARI[0];
+      const gec=d.status!=="done"&&d.due&&d.due<bugun;
+      return `<div class="dlv-row${gec?" dlv-late":""}">
+        <button class="dlv-status" data-delivery-cycle="${esc(d.id)}" data-client-id="${esc(c.id)}" title="Durumu değiştir">${esc(durum.label)}</button>
+        <span class="dlv-title">${esc(d.title)}</span>
+        <span class="dlv-due">${d.due?esc(d.due):"—"}</span>
+      </div>`;
+    }).join(""):'<p class="empty-hint">Henüz teslim yok.</p>';
+    return `<article class="client-card">
+      <div class="client-head">
+        <div><strong>${esc(c.name)}</strong>${c.contact?`<span class="client-contact">${esc(c.contact)}</span>`:""}</div>
+        <div class="client-actions">
+          <button class="ghost-btn" data-delivery-add="${esc(c.id)}"><i data-lucide="plus"></i>Teslim</button>
+          <button class="ghost-btn" data-client-delete="${esc(c.id)}" aria-label="Müşteriyi sil"><i data-lucide="trash-2"></i></button>
+        </div>
+      </div>
+      ${c.note?`<p class="client-note">${esc(c.note)}</p>`:""}
+      <div class="dlv-list">${satirlar}</div>
+    </article>`;
+  }).join(""):'<p class="empty-hint">Henüz müşteri eklenmemiş. Sağdaki formdan ekleyebilirsin.</p>';
+  refreshIcons();
+}
 
 // ── AYARLAR ───────────────────────────────────────────────────────────
 function bindSettings(){
@@ -1768,8 +2039,29 @@ function renderSettingsView(){
   const n=document.getElementById("setTeamName"),b=document.getElementById("setBudget"),m=document.getElementById("setMembers");
   if(n)n.value=s.teamName;if(b)b.value=s.monthlyBudget;if(m)m.value=s.members.join(", ");
   const tnEl=document.getElementById("appTeamName");if(tnEl)tnEl.textContent=s.teamName;
+  // Kısayol tablosu artık düzenlenebilir: her satırdaki düğme bir sonraki
+  // tuş kombinasyonunu yakalar. Tarayıcının kendi kısayolları geri
+  // alınamadığı için reddedilir, aksi halde kullanıcı kendini kilitliyor.
   const st=document.getElementById("shortcutsTable");
-  if(st)st.innerHTML=`<thead><tr><th>Kisayol</th><th>Aksiyon</th></tr></thead><tbody>${shortcutsData.map(s=>`<tr><td><kbd class="kbd">${esc(s.keys)}</kbd></td><td style="font-size:13px">${esc(s.action)}</td></tr>`).join("")}</tbody>`;
+  if(st){
+    const harita=aktifKisayollar();
+    st.innerHTML=`<thead><tr><th>Aksiyon</th><th>Kısayol</th><th></th></tr></thead><tbody>${
+      SHORTCUT_ACTIONS.map(a=>`<tr>
+        <td style="font-size:13px">${esc(a.label)}</td>
+        <td><kbd class="kbd">${esc(komboEtiketi(harita[a.id]))}</kbd></td>
+        <td style="text-align:right"><button class="ghost-btn" data-shortcut-edit="${esc(a.id)}">Değiştir</button></td>
+      </tr>`).join("")
+    }<tr><td style="font-size:13px">Görünüm geçişi</td><td><kbd class="kbd">1 – 8</kbd></td><td style="text-align:right;color:var(--ink3);font-size:11px">sabit</td></tr>
+      <tr><td style="font-size:13px">Dialog / paleti kapat</td><td><kbd class="kbd">Escape</kbd></td><td style="text-align:right;color:var(--ink3);font-size:11px">sabit</td></tr>
+      </tbody>`;
+    if(!st.dataset.bound){
+      st.dataset.bound="1";
+      st.addEventListener("click",e=>{
+        const btn=e.target.closest("[data-shortcut-edit]"); if(!btn)return;
+        kisayolYakala(btn.dataset.shortcutEdit,btn);
+      });
+    }
+  }
   const fal=document.getElementById("fullActivityLog");
   if(fal){const logs=state.activityLog;fal.innerHTML=logs.length?`<div style="max-height:280px;overflow-y:auto">${logs.map(log=>`<div class="activity-item"><div class="activity-dot ${log.type}"></div><div style="flex:1"><div style="font-size:12px">${esc(log.message)}</div><div class="row-meta" style="font-size:11px">${fmt.dt(log.ts)}</div></div></div>`).join("")}</div>`:`<div class="empty-state">Henüz aksiyon logu yok.</div>`}
 }

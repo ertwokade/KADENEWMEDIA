@@ -45,9 +45,9 @@
       <button class="nav-item" data-view="crm"><i data-lucide="kanban-square"></i><span>Prodüksiyon CRM</span></button>
       <button class="nav-item" data-view="banana"><i data-lucide="sparkles"></i><span>Banana Studio</span></button>
 
-      <p class="nav-label">Rehber</p>
-      <button class="nav-item" data-view="vibe"><i data-lucide="code-2"></i><span>Vibe Coding</span></button>
-      <button class="nav-item" data-view="radar"><i data-lucide="radio-tower"></i><span>AI Radar</span></button>
+      <p class="nav-label">Planlama</p>
+      <button class="nav-item" data-view="calendar"><i data-lucide="calendar-days"></i><span>Yayın Takvimi</span></button>
+      <button class="nav-item" data-view="clients"><i data-lucide="handshake"></i><span>Müşteri &amp; Teslim</span></button>
 
       <p class="nav-label">Notlar</p>
       <button class="nav-item" data-view="pages"><i data-lucide="notebook-text"></i><span>Sayfalar</span></button>
@@ -386,37 +386,48 @@
       </div>
     </section>
 
-    <!-- ══════════════ VİBE CODİNG ══════════════ -->
-    <section class="view" id="vibe" data-title="Vibe Coding Rehberi" data-eyebrow="Yazılım Bilmeden Uygulama Geliştirme">
-      <div class="layout-two wide-left">
-        <article class="panel">
-          <div class="panel-head"><div><p class="eyebrow">Brief oluşturucu</p><h2>Uygulama taslağı</h2></div><div class="icon-area"><i data-lucide="file-code-2"></i></div></div>
-          <form id="briefForm" class="form-grid">
-            <label><span class="label-text">Uygulama fikri</span><input id="briefIdea" value="Prodüksiyon ekibi için bütçe ve görev takip sistemi"/></label>
-            <label><span class="label-text">Kullanıcılar</span><input id="briefUsers" value="Yönetici, prodüktör, kurgu ekibi"/></label>
-            <label><span class="label-text">Yapabilsin</span><textarea id="briefCan" rows="4">Prodüksiyon kartı açsın, görev atasın, harcama girsin.</textarea></label>
-            <label><span class="label-text">Yapamasın</span><textarea id="briefCannot" rows="3">Yetkisiz kullanıcı bütçe silemesin.</textarea></label>
-            <button class="primary-btn" type="submit"><i data-lucide="clipboard-check"></i>Brief Oluştur</button>
-          </form>
-        </article>
-        <article class="panel">
-          <div class="panel-head"><div><p class="eyebrow">Çıktı</p><h2>Kopyalanabilir brief</h2></div><div class="icon-area"><i data-lucide="clipboard"></i></div></div>
-          <pre id="briefOutput" class="brief-output">Brief oluşturmak için formu doldurun…</pre>
-          <div style="margin-top:10px;display:flex;justify-content:flex-end"><button class="ghost-btn" id="copyBrief"><i data-lucide="copy"></i>Kopyala</button></div>
-        </article>
-      </div>
-      <article class="panel"><div class="panel-head"><div><p class="eyebrow">Rehber</p><h2>Vibe Coding yol haritası</h2></div><div class="icon-area"><i data-lucide="workflow"></i></div></div><div id="vibeSteps" style="display:grid;gap:10px"></div></article>
+    <!-- ══════════════ YAYIN TAKVİMİ ══════════════ -->
+    <!-- CRM panosu aşamaya göre dizer; burası tarihe göre. İkisi ayrı soruyu
+         yanıtlar: "hangi iş nerede kaldı" ve "bu hafta ne çekiliyor". -->
+    <section class="view" id="calendar" data-title="Yayın Takvimi" data-eyebrow="Çekim ve Yayın Tarihleri">
+      <div class="layout-three" id="calendarKpis"></div>
+      <article class="panel">
+        <div class="panel-head">
+          <div><p class="eyebrow">Ay görünümü</p><h2 id="calendarMonthTitle">—</h2></div>
+          <div class="cal-nav">
+            <button class="ghost-btn" id="calPrev" aria-label="Önceki ay"><i data-lucide="chevron-left"></i></button>
+            <button class="ghost-btn" id="calToday">Bugün</button>
+            <button class="ghost-btn" id="calNext" aria-label="Sonraki ay"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+        <div class="cal-legend">
+          <span><i class="cal-dot cal-dot-shoot"></i>Çekim</span>
+          <span><i class="cal-dot cal-dot-publish"></i>Yayın</span>
+        </div>
+        <div class="cal-grid" id="calendarGrid"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-head"><div><p class="eyebrow">Seçili gün</p><h2 id="calendarDayTitle">Bir gün seç</h2></div><div class="icon-area"><i data-lucide="list-checks"></i></div></div>
+        <div id="calendarDayList" class="cal-day-list"></div>
+      </article>
     </section>
 
-    <!-- ══════════════ AI RADAR ══════════════ -->
-    <section class="view" id="radar" data-title="AI Radar" data-eyebrow="Günlük AI Kaynakları">
-      <div class="layout-three" id="radarCards"></div>
-      <div class="layout-two">
-        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Model seçimi</p><h2>Kullanım matrisi</h2></div><div class="icon-area"><i data-lucide="table-2"></i></div></div><div id="modelMatrix" class="model-matrix"></div></article>
+    <!-- ══════════════ MÜŞTERİ & TESLİM ══════════════ -->
+    <section class="view" id="clients" data-title="Müşteri &amp; Teslim" data-eyebrow="Kime Ne Teslim Edildi">
+      <div class="layout-three" id="clientKpis"></div>
+      <div class="layout-two wide-left">
         <article class="panel">
-          <div class="panel-head"><div><p class="eyebrow">Notlar</p><h2>Keşif defteri</h2></div><div class="icon-area"><i data-lucide="book-marked"></i></div></div>
-          <form id="radarNoteForm" class="inline-form" style="margin-bottom:14px"><input id="radarNoteInput" placeholder="Yeni not…" aria-label="Yeni radar notu"/><button class="primary-btn" type="submit" aria-label="Radar notu ekle"><i data-lucide="plus" aria-hidden="true"></i></button></form>
-          <div id="radarNotes" class="note-list"></div>
+          <div class="panel-head"><div><p class="eyebrow">Liste</p><h2>Müşteriler</h2></div><div class="icon-area"><i data-lucide="users"></i></div></div>
+          <div id="clientList" class="client-list"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Yeni kayıt</p><h2>Müşteri ekle</h2></div><div class="icon-area"><i data-lucide="user-plus"></i></div></div>
+          <form id="clientForm" class="form-grid">
+            <label><span class="label-text">Müşteri adı</span><input id="clientName" placeholder="Marka ya da kişi" required maxlength="80"/></label>
+            <label><span class="label-text">İletişim</span><input id="clientContact" placeholder="E-posta ya da telefon" maxlength="120"/></label>
+            <label><span class="label-text">Not</span><textarea id="clientNote" rows="3" maxlength="400" placeholder="Anlaşma kapsamı, özel istekler…"></textarea></label>
+            <button class="primary-btn" type="submit"><i data-lucide="plus"></i>Müşteri ekle</button>
+          </form>
         </article>
       </div>
     </section>
@@ -456,6 +467,10 @@
 
     <!-- ══════════════ PAGES ══════════════ -->
     <section class="view" id="pages" data-title="Sayfalar" data-eyebrow="Notion Tarzı Notlar">
+      <!-- Sayfa ağacı normalde kitin kenar çubuğunda duruyor; panel içinde o
+           çubuk gizlendiği için notlar arasında geçiş yapılamıyordu. Gömülü
+           modda ağaç buraya taşınır (aynı DOM düğümü, ikinci bir render yok). -->
+      <aside class="pages-tree-slot" id="pagesTreeSlot"></aside>
 
       <!-- Empty state -->
       <div id="pageEmpty" class="page-empty-state">
