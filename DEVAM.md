@@ -288,3 +288,33 @@ Değişken hiç tanımlı değilmiş — e-postayla sahiplik yolu bugüne kadar 
 Hesabın adresi `app_metadata.workspace_slug = 'thekademedia'` olarak
 sabitlendi: sahip listesine girince `workspaceSlugForUser` ona da `kade`
 vermek isteyecekti ve SSO hesabındaki `kade` ile çakışacaktı.
+
+## "Karanlık altın" tasarım yönü (1 Eylül 2026)
+
+Referans creato.digital/tr'nin dili: derin siyah zemin, yüzen yuvarlak
+kabuk, iri + ince başlık, kart içi ürün vinyeti. Renk tamamen Kade
+paletinde — mor/magenta gradyan yerine altın gradyan. Mor bilerek
+alınmadı: hem palete yabancı hem de her AI sitesinde var.
+
+Yön token katmanında yaşıyor; 49 araç sayfası ortak sınıfları kullandığı
+için hiçbirine tek tek dokunulmadan geçtiler.
+
+- Köşe ölçeği 0px → yumuşak ölçek. Arayüzün yassı görünmesinin ana sebebi.
+- Koyu zemin #0f1111 → #0b0c0c. Kartların yüzdüğü hissi ancak zeminle
+  yüzey arasında yeterli fark olunca oluşuyor.
+- Çizgiler nötr gri → SICAK altın. İmza burada. Tailwind nötr rampı da
+  ısıtıldı, yoksa kart kenarı soğuk kabuk kenarı sıcak kalıyordu.
+- Zemindeki 1px ızgara → yumuşak altın hâle.
+- Kenar çubuğu → yüzen yuvarlak rail. Üst çubuk → yüzen hap.
+- Birincil düğmeler düz dolgu → gradyan + hâle + hap biçim.
+
+Yol boyunca çıkanlar: uyarı şeridindeki düğme mürekkep rengine
+sabitlenmişti (koyu zeminde beyaz kutu); devre dışı düğmelerde gradyanın
+üstüne %50 opaklık çamur üretiyordu; koyu temada --kade-faint fazla soluk
+kalıp 44 öğeyi 4.5 eşiğinin altına düşürmüştü. Üçü de düzeltildi.
+
+Kontrast iki temada da temiz (kalan iki "düşük" ölçüm yanlış pozitif:
+degradeyle boyanan başlıklar color:transparent olduğu için betik ölçemiyor).
+
+Eksik kalan: kart içi vinyetler ve başlıklarda 300 ağırlık (yerel
+Montserrat 400'den başlıyor, 300 istenirse font dosyası eklenmeli).
