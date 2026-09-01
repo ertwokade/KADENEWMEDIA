@@ -183,15 +183,18 @@ kbd {
   font-family: var(--font-poppins), "Poppins", sans-serif !important;
 }
 
-/* Dashboard navigation: dark, calm contrast against the paper workspace. */
+/* Gezinme koyu bir ada olarak kalıyor ama renkleri artık yönden geliyor:
+   sabit #11110f ve nötr beyaz kenar, sıcak altın çizgi diliyle çakışıyordu. */
 .kade-panel .kade-sidebar {
-  background: #11110f !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 18px 0 55px rgba(17, 17, 15, 0.12);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--kade-surface) 94%, transparent),
+    color-mix(in srgb, var(--kade-surface) 74%, transparent)) !important;
+  border-color: var(--kade-line) !important;
+  box-shadow: var(--kade-shadow) !important;
 }
 
 .kade-panel .kade-sidebar [class*="border-zinc"] {
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--kade-line) !important;
 }
 
 .kade-panel .kade-sidebar-search {
@@ -205,7 +208,7 @@ kbd {
 }
 
 .kade-panel .kade-sidebar-search:focus {
-  background: rgba(255, 255, 255, 0.08) !important;
+  background: var(--kade-line) !important;
   border-color: color-mix(in srgb, var(--kade-accent) 55%, transparent) !important;
 }
 
@@ -224,7 +227,7 @@ kbd {
 
 .kade-panel .kade-sidebar a.kade-sidebar-link[data-active][href]:hover {
   background: rgba(255, 255, 255, 0.055) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--kade-line) !important;
   color: #fffdf5 !important;
 }
 
@@ -244,7 +247,7 @@ kbd {
 
 .kade-panel .kade-sidebar-footer {
   background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--kade-line) !important;
 }
 
 :root {

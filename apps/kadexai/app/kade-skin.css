@@ -923,3 +923,14 @@ html[data-theme='dark'] .kade-auth-success { border-color: #7ee2ac; background: 
   .kade-auth-hud { padding: 16px 18px; }
   .kade-auth-crosslink { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
+
+/* Mobil başlık düğmeleri sabit beyaz/siyah değerlerle yazılmıştı; koyu
+   temada iki parlak kutu olarak duruyordu. Token'a bağlandı. */
+.kade-mobile-btn {
+  border: 1px solid var(--kade-line);
+  background: color-mix(in srgb, var(--kade-surface) 80%, transparent);
+  color: var(--kade-ink);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .22);
+  transition: border-color .16s ease, background .16s ease;
+}
+.kade-mobile-btn:hover { border-color: var(--kade-line-strong); }
