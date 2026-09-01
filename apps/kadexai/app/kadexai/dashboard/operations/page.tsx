@@ -6,12 +6,14 @@ const validViews = new Set([
   'comments',
   'crm',
   'banana',
-  'vibe',
-  'radar',
+  'calendar',
+  'clients',
   'settings',
   'pages',
 ])
-const operationsKitVersion = '20260825a'
+// Kit statik dosya olarak servis ediliyor; sürüm damgası değişmezse
+// tarayıcı eski paketi kullanmaya devam ediyor.
+const operationsKitVersion = '20260901a'
 
 export default async function OperationsPage({
   searchParams,
