@@ -121,13 +121,26 @@ export default function WorkspaceStatus() {
         ))}
       </div>
 
-      <div className="kade-recent">
-        <div className="kade-recent-head">
-          <span>Son çalışmalar</span>
-          <Link href={alanYolu('/dashboard/history')}>
+      {/* Vinyet: solda ne olduğu, sağda ürünün kendi küçük maketi. Referansın
+          en güçlü aracı buydu ve sayfa doldurulmadan önce de dolu görünüyor. */}
+      <div className="kade-split">
+        <div className="kade-split-copy">
+          <span className="kade-eyebrow">Son çalışmalar</span>
+          <h3 className="kade-split-title">Ürettiklerin tek akışta.</h3>
+          <p className="kade-split-lede">
+            Her çalışma kaydediliyor: hangi araç, ne zaman, sonuç ne oldu.
+            Satıra tıklayınca aynı araca dönersin.
+          </p>
+          <Link className="kade-split-link" href={alanYolu('/dashboard/history')}>
             Tüm geçmiş <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
+
+        <div className="kade-vignette">
+          <div className="kade-vignette-head">
+            <span>Geçmiş</span>
+            <i className="kade-vignette-dots" aria-hidden="true"><i /><i /><i /></i>
+          </div>
         {loading && <p className="kade-recent-empty">Yükleniyor…</p>}
         {!loading && (!runs || runs.length === 0) && (
           <p className="kade-recent-empty">Henüz bir araç çalıştırmadın. Aşağıdan başlayabilirsin.</p>
@@ -157,6 +170,7 @@ export default function WorkspaceStatus() {
             })}
           </ul>
         )}
+        </div>
       </div>
     </>
   )

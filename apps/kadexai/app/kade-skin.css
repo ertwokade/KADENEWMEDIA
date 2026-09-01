@@ -427,6 +427,49 @@ html[data-theme='light'] .kade-content-studio-hero {
 .kade-status-note { color: var(--kade-faint); font-size: 10.5px; font-weight: 500; }
 
 .kade-recent { margin-top: 24px; }
+
+/* ── VİNYET ──────────────────────────────────────────────────────────
+   Solda ne olduğu, sağda ürünün kendi küçük maketi. Referansın en güçlü
+   aracı; sayfa doldurulmadan önce de dolu görünmesini sağlıyor. */
+.kade-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .96fr); gap: 28px; align-items: center; margin-top: 26px; }
+.kade-split-copy { min-width: 0; }
+.kade-eyebrow { display: inline-flex; align-items: center; color: var(--kade-faint); font-size: 9.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.kade-eyebrow::before { display: inline-block; width: 5px; height: 5px; margin-right: 9px; border-radius: 50%; background: var(--kade-accent); box-shadow: 0 0 10px var(--kade-glow-strong); content: ''; }
+.kade-split-title {
+  margin: 10px 0 0; font-size: clamp(21px, 2.3vw, 30px); font-weight: 300; letter-spacing: -.035em; line-height: 1.12;
+  background: linear-gradient(180deg, var(--kade-ink) 38%, color-mix(in srgb, var(--kade-ink) 44%, transparent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.kade-split-lede { max-width: 46ch; margin: 12px 0 0; color: var(--kade-muted); font-size: 13.5px; line-height: 1.6; }
+.kade-split-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 18px; color: var(--kade-muted); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.kade-split-link:hover { color: var(--kade-accent-text); }
+
+.kade-vignette {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--kade-line); border-radius: 20px;
+  padding: 16px 18px;
+  background: linear-gradient(160deg,
+    color-mix(in srgb, var(--kade-surface-soft) 92%, transparent),
+    color-mix(in srgb, var(--kade-surface) 74%, transparent));
+}
+/* Köşedeki yumuşak altın ışık — kartın "canlı" hissi buradan geliyor. */
+.kade-vignette::after {
+  position: absolute; right: -28%; top: -52%; width: 70%; height: 180%;
+  border-radius: 50%; pointer-events: none; content: '';
+  background: radial-gradient(circle, var(--kade-glow), transparent 68%);
+}
+.kade-vignette-head { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.kade-vignette-head > span { color: var(--kade-faint); font-size: 9.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.kade-vignette-dots { display: flex; gap: 5px; }
+.kade-vignette-dots i { width: 7px; height: 7px; border-radius: 50%; background: color-mix(in srgb, var(--kade-ink) 16%, transparent); }
+.kade-vignette-dots i:first-child { background: var(--kade-accent); }
+/* Vinyetin içindeki liste kendi çerçevesini taşımaz; çerçeve vinyetin. */
+.kade-vignette .kade-recent-list { position: relative; z-index: 1; border: 0; border-radius: 0; padding: 0; background: transparent; }
+.kade-vignette .kade-recent-empty { position: relative; z-index: 1; }
+
+@media (max-width: 900px) {
+  .kade-split { grid-template-columns: 1fr; gap: 20px; }
+}
 .kade-recent-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 0 10px; }
 .kade-recent-head > span { color: var(--kade-faint); font-size: 9.5px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
 .kade-recent-head > a { display: inline-flex; align-items: center; gap: 7px; color: var(--kade-muted); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
