@@ -9,6 +9,9 @@ import { PUBLIC_APP_URL, withBasePath } from '@/lib/appConfig'
 
 const montserrat = localFont({
   src: [
+    // 300 (Light) "karanlık altın" yönü için eklendi: iri + ince başlıklar
+    // 400 ile istenen havayı vermiyordu.
+    { path: '../public/fonts/kade/montserrat-300.ttf', weight: '300', style: 'normal' },
     { path: '../public/fonts/kade/montserrat-400.ttf', weight: '400', style: 'normal' },
     { path: '../public/fonts/kade/montserrat-500.ttf', weight: '500', style: 'normal' },
     { path: '../public/fonts/kade/montserrat-600.ttf', weight: '600', style: 'normal' },

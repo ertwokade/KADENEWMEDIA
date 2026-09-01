@@ -79,6 +79,7 @@ function buildNavItems(
   category: category.label,
   items: TOOL_REGISTRY
     .filter((tool) => tool.category === category.id)
+    .filter((tool) => !tool.hiddenInNav)
     .filter((tool) => ownerAccess || !tool.permissions.includes('owner'))
     .filter((tool) => settingsAccess || !tool.permissions.includes('settings-owner'))
     .map((tool) => {

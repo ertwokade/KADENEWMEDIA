@@ -43,6 +43,12 @@ export interface ToolDefinition {
    * ilgili API ucunda canUse() ile yapılmalıdır; ikisi ayrı katmandır.
    */
   requiredFeature?: string[]
+  /**
+   * Sol menüde görünmez ama rota, başlık ve geçmiş çözümü çalışmaya devam
+   * eder. Bir sayfa gezinmenin kendisinde değil, başka bir sayfanın içinden
+   * ulaşılan bir eylem olduğunda kullanılır.
+   */
+  hiddenInNav?: boolean
 }
 
 /**
@@ -82,7 +88,9 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('overview', 'Genel Bakış', 'platform', '/dashboard', 'layout-dashboard', 'Araçlara ve çalışma alanına genel bakış.', [], false),
   tool('packages', 'Paketler', 'platform', '/dashboard/packages', 'circle-dollar', 'Abonelik paketleri ve satın alma.', [], false),
   tool('api-keys', 'Kendi API Anahtarların', 'platform', '/dashboard/api-keys', 'key-round', 'BYOK sağlayıcı anahtarlarını şifreli olarak yönet.', [], false),
-  tool('quote', 'Teklif Al', 'platform', '/dashboard/quote', 'file-text', 'İhtiyacına özel paket ve fiyat talep et.', [], false),
+  // Teklif Al bir fiyatlandırma eylemi; yeri AI araçlarının arasındaki
+  // gezinme değil, Paketler sayfasının içi. Rota duruyor, menüden çıktı.
+  { ...tool('quote', 'Teklif Al', 'platform', '/dashboard/quote', 'file-text', 'İhtiyacına özel paket ve fiyat talep et.', [], false), hiddenInNav: true },
   tool('orchestrate', 'Akışlar', 'platform', '/dashboard/orchestrate', 'git-branch', 'Araçları zincirleyerek uçtan uca çalıştır.', [], false),
   tool('operations', 'Operasyon Merkezi', 'operations', '/dashboard/operations?view=dashboard', 'layout-dashboard', 'Bütçe, görev ve üretim özeti.', [], false),
   tool('sentscan', 'SentScan', 'operations', '/dashboard/operations?view=comments', 'message-square', 'Yorum ve transkript analizi.', [], false),
