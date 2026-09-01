@@ -18,11 +18,10 @@ export const dynamic = 'force-dynamic'
  * model listesi bir daha iki yerde ayrı ayrı tutulmuyor.
  */
 function selectOperationsModel(): AIModel | null {
-  const kullanilabilir = getAvailableModels()
-  if (kullanilabilir.length === 0) return null
-  // Hızlı ve ucuz olanı öne al; yoksa listedeki ilk çalışan model.
-  const tercih: AIModel[] = ['gemini-flash-latest', 'groq-llama-70b', 'gemini-lite-latest', 'openrouter-free', 'gpt4o']
-  return tercih.find((m) => kullanilabilir.includes(m)) ?? kullanilabilir[0]
+  // Tek bir modele sabitlemek yerine 'auto': yönlendirici aday zincirini
+  // sırayla dener. Sabit model seçildiğinde sağlayıcı bir kez 503 dönünce
+  // asistan hiç cevap veremiyordu; yedek yolu yoktu.
+  return getAvailableModels().length > 0 ? 'auto' : null
 }
 
 export async function POST(req: NextRequest) {
