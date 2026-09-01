@@ -122,6 +122,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('clickbait-detector', 'Clickbait Dedektörü', 'analysis', '/dashboard/clickbait-detector', 'alert-circle', 'Başlığın vaat ve yanıltıcılık riskini analiz eder.', [], false),
   tool('youtube-seo', 'YouTube SEO', 'analysis', '/dashboard/youtube-seo', 'search', 'Girilen video verilerini SEO açısından inceler.', ['brand.niche']),
   tool('retention-analysis', 'İzlenme Analizi', 'analysis', '/dashboard/retention-analysis', 'bar-chart', 'Girilen akış ve metriklerden izleyici tutma analizi.', ['brand.audience']),
+  tool('channel-audit', 'Kanal Denetimi', 'analysis', '/dashboard/channel-audit', 'bar-chart', 'Tek skor, bu hafta yapılacak işler ve tarihli yol haritası.', brandBasics),
   tool('social-audit', 'Sosyal Medya Analizi', 'analysis', '/dashboard/social-audit', 'users', 'Hesap metriklerini, bio ve son içerikleri okuyup büyüme raporu çıkarır.', brandBasics),
   tool('trend-radar', 'Trend Radar', 'analysis', '/dashboard/trend-radar', 'radar', 'TikTok, Reels, Shorts, YouTube ve Google’da ölçülmüş canlı trend verisi.', [], false),
   tool('materyal', 'Materyal Kütüphanesi', 'analysis', '/dashboard/materyal', 'image-plus', 'Video ve fotoğraf materyallerini ara, izle ve indir.', [], false),

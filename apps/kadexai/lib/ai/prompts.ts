@@ -947,3 +947,68 @@ ${content}
 Bu içeriği ${target} için tamamen yeniden yaz. Platform kültürüne uygun, native içerik olsun. Emoji ve formatlamayı platforma göre ayarla.`
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// KANAL DENETİMİ
+// ═══════════════════════════════════════════════════════════════════════════
+export const CHANNEL_AUDIT_SYSTEM_PROMPT = `Sen kanal büyüme denetçisisin.
+Yalnızca kullanıcının verdiği kanıtlara dayanırsın; veri yoksa puan uydurmaz,
+o boyutu "veri yok" olarak işaretlersin.
+
+Çıktın bir RAPOR DEĞİL, bir İŞ LİSTESİDİR. Her madde bugün yapılabilecek somut
+bir iş olmalı. "Etkileşimi artırın" gibi genel cümleler yasak; "ilk 3 saniyede
+soru soran bir hook ekle" gibi uygulanabilir olmalı.
+
+Yalnızca geçerli JSON döndür, başka hiçbir metin yazma.`
+
+/**
+ * Denetimin çıktısındaki her iş bir araca bağlanır; kullanıcı okuyup bırakmak
+ * yerine tıklayıp çalıştırabilsin. Model yalnızca verilen kimliklerden
+ * seçebilir, sunucu ayrıca doğrular.
+ */
+export function buildChannelAuditPrompt(input: {
+  accountName: string
+  niche: string
+  platforms: string[]
+  bio: string
+  metrics: string
+  recentPosts: string
+  goal: string
+  toolIds: string[]
+}): string {
+  return `Hesap: ${input.accountName}
+Niş: ${input.niche}
+Platformlar: ${input.platforms.join(', ') || 'belirtilmedi'}
+Bio: ${input.bio || 'belirtilmedi'}
+Metrikler:
+${input.metrics || 'belirtilmedi'}
+Son içerikler:
+${input.recentPosts || 'belirtilmedi'}
+Hedef: ${input.goal || 'büyüme'}
+
+Kullanılabilir araç kimlikleri (arac alanında YALNIZCA bunlardan biri olabilir,
+uygun araç yoksa null yaz): ${input.toolIds.join(', ')}
+
+JSON:
+{
+  "saglik_skoru": 0-100,
+  "skor_gerekcesi": "tek cümle",
+  "veri_eksigi": ["puanlanamayan boyutlar için eksik veri"],
+  "boyutlar": [
+    { "ad": "", "puan": 0-100, "durum": "iyi|orta|zayif|veri_yok", "yorum": "tek cümle" }
+  ],
+  "hizli_kazanimlar": [
+    { "baslik": "bu hafta yapılacak somut iş", "neden": "tek cümle", "arac": "arac_kimligi ya da null" }
+  ],
+  "yol_haritasi": [
+    { "donem": "1. ay", "hedef": "", "isler": ["", ""] }
+  ]
+}
+
+Kurallar:
+- boyutlar en az 4, en çok 6 madde.
+- hizli_kazanimlar TAM 3 madde.
+- yol_haritasi 3 dönem (1. ay, 2-3. ay, 4-6. ay).
+- Metrik verilmediyse ilgili boyut "veri_yok" ve puanı 0 olsun; skor
+  hesaplanırken bu boyutlar sayılmasın, skor_gerekcesi bunu söylesin.`
+}
