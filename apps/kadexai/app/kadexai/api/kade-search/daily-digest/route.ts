@@ -31,7 +31,7 @@ async function deliver(req: NextRequest) {
   let claimId: string | null = null
   const startedMs = Date.now()
   try {
-    const trends = selectDailyDigestTrends(await dailyDigestCandidates(), 10)
+    const trends = selectDailyDigestTrends(await dailyDigestCandidates(), 20)
     const dayKey = dailyDigestKey()
     const claim = await claimDailyDigest(dayKey)
     claimId = claim.id

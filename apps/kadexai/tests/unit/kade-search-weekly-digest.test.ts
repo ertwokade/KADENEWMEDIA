@@ -71,9 +71,14 @@ test('günlük seçki çeşitlendirilmiş seçim bağlantıları üretir', () =>
     dashboardUrl: 'https://kadenewmedia.com/kadexai/dashboard/kade-search',
   })
   assert.match(message, /KadexAI · Günlük İçerik Seçimin/)
-  assert.match(message, /incele/i)
-  assert.match(message, /trend=tiktok%3Avideo%3Aabc/)
-  assert.match(message, /trend=youtube%3Atopic%3Adef/)
+  // Başlıklar listelenir ve onay merkezine tek bir bağlantı verilir.
+  // Önceden her öğeye ayrı bir derin bağlantı konuyordu; bağlantı ~110
+  // karakter tuttuğu için mesaj 1780 sınırına 3-4 öğede dayanıyor, geri kalan
+  // adaylar hiç iletilmiyordu. Bağlantı sona taşındı.
+  assert.match(message, /1\. \*A\*/)
+  assert.match(message, /2\. \*B\*/)
+  assert.match(message, /dashboard\/kade-search/)
+  assert.doesNotMatch(message, /trend=/)
   assert.ok(message.length <= 1800)
 })
 

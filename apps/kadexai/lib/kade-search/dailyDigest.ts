@@ -1,5 +1,6 @@
 import type { CurrentTrendRow } from './types'
 import { selectWeeklyDigestTrends } from './weeklyDigest'
+import { ayiklanmisTrendler } from './relevance'
 
 const PLATFORM_LABELS: Record<string, string> = {
   tiktok: 'TikTok',
@@ -9,6 +10,15 @@ const PLATFORM_LABELS: Record<string, string> = {
   google: 'Google',
   reddit: 'Reddit',
   music: 'Müzik',
+}
+
+/** Tek satırlık öğede yer kaplamasın diye aşama kısa bir işaretle gösterilir. */
+const STAGE_MARKS: Record<string, string> = {
+  emerging: '✦',
+  rising: '↑',
+  peak: '●',
+  plateau: '→',
+  declining: '↓',
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -45,8 +55,16 @@ export function dailyDigestKey(now = new Date()) {
   return dateKey(now)
 }
 
-export function selectDailyDigestTrends(rows: CurrentTrendRow[], limit = 8) {
-  return selectWeeklyDigestTrends(rows, limit)
+/**
+ * Günlük özete girecek satırlar.
+ *
+ * Önce alakasız kayıtlar ayıklanır (şarkı klipleri, dizi bölümleri, yabancı
+ * dildeki shorts'lar) ve Türkçe olanlar öne alınır; ardından platform/kategori
+ * çeşitliliğine göre seçim yapılır. Ayıklama olmadan liste YouTube TR trend
+ * sayfasının kopyasına dönüyordu.
+ */
+export function selectDailyDigestTrends(rows: CurrentTrendRow[], limit = 20) {
+  return selectWeeklyDigestTrends(ayiklanmisTrendler(rows), limit)
 }
 
 export function formatDailyDigest(
@@ -62,23 +80,24 @@ export function formatDailyDigest(
     '*KadexAI · Günlük İçerik Seçimin*',
     date,
     '',
-    'Adayları KadeSearch Onay Merkezi’nde incele. Onayladığın içerik için çekime hazır üretim paketi hazırlanacak.',
+    'Onayladığın içerik için çekime hazır üretim paketi hazırlanır.',
     '',
   ]
-  const footer = ['', `Tüm adaylar: ${dashboardUrl}`]
+  const footer = ['', `Onaylamak için: ${dashboardUrl}`]
 
   if (!rows.length) {
     return [...header, 'Bugün yeni bir içerik adayı bulunamadı.', ...footer].join('\n').slice(0, 1800)
   }
 
+  // Her satıra ayrı bir onay bağlantısı konuyordu; bağlantı ~110 karakter
+  // tuttuğu için mesaj 1780 sınırına 3-4 öğede dayanıyor ve döngü kırılıyordu.
+  // Bağlantı sona tek sefer taşındı, öğeler iki satıra indi; böylece 20 öğe
+  // rahatça sığıyor.
   const lines = [...header]
   for (const [index, trend] of rows.entries()) {
-    const selectionUrl = `${dashboardUrl}?trend=${encodeURIComponent(trend.id)}`
+    const mark = STAGE_MARKS[trend.stage ?? ''] ?? '·'
     const item = [
-      `${index + 1}. *${clean(trend.title, 58)}*`,
-      `${PLATFORM_LABELS[trend.platform] ?? trend.platform} · ${STAGE_LABELS[trend.stage ?? ''] ?? 'İzlemede'} · skor ${Math.round(trend.score ?? 0)}`,
-      `İncele / onayla: ${selectionUrl}`,
-      '',
+      `${index + 1}. *${clean(trend.title, 46)}* — ${PLATFORM_LABELS[trend.platform] ?? trend.platform} ${mark}${Math.round(trend.score ?? 0)}`,
     ]
     if ([...lines, ...item, ...footer].join('\n').length > 1780) break
     lines.push(...item)
