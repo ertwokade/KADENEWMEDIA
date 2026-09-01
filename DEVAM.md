@@ -316,5 +316,8 @@ kalıp 44 öğeyi 4.5 eşiğinin altına düşürmüştü. Üçü de düzeltildi
 Kontrast iki temada da temiz (kalan iki "düşük" ölçüm yanlış pozitif:
 degradeyle boyanan başlıklar color:transparent olduğu için betik ölçemiyor).
 
-Eksik kalan: kart içi vinyetler ve başlıklarda 300 ağırlık (yerel
-Montserrat 400'den başlıyor, 300 istenirse font dosyası eklenmeli).
+Kart içi vinyet de eklendi: solda ne olduğu, sağda ürünün küçük maketi.
+Geniş ekranda yan yana, 900px altında alt alta.
+
+Eksik kalan tek şey başlıklarda 300 ağırlık: yerel font seti Montserrat
+400'den başlıyor, Light dosyası repoda yok. İstenirse eklenmeli.
