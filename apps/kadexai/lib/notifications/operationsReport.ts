@@ -3,8 +3,8 @@ const VIEW_LABELS: Record<string, string> = {
   comments: 'SentScan',
   crm: 'Prodüksiyon CRM',
   banana: 'Banana Studio',
-  vibe: 'Vibe Coding',
-  radar: 'AI Radar',
+  calendar: 'Yayın Takvimi',
+  clients: 'Müşteri & Teslim',
   settings: 'Operasyon Ayarları',
   pages: 'Notlar',
 }

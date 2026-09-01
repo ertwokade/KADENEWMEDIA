@@ -22,13 +22,13 @@ const viewMeta: Record<string, { title: string; description: string }> = {
     title: 'Banana Studio',
     description: 'Görsel ve video üretim stüdyosu',
   },
-  vibe: {
-    title: 'Vibe Coding',
-    description: 'Yazılım bilmeden uygulama geliştirme rehberi',
+  calendar: {
+    title: 'Yayın Takvimi',
+    description: 'Çekim ve yayın tarihleri ay görünümünde',
   },
-  radar: {
-    title: 'AI Radar',
-    description: 'Günlük AI kaynakları, modeller ve notlar',
+  clients: {
+    title: 'Müşteri & Teslim',
+    description: 'Müşteri kayıtları, teslimler ve terminler',
   },
   settings: {
     title: 'Operasyon Ayarları',
