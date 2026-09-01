@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { MANUAL_MODEL_STORAGE_KEY, ModelProvider, useModel } from '@/lib/context/ModelContext'
 import { SidebarProvider } from '@/lib/context/SidebarContext'
 import { ProfileProvider, useProfile } from '@/lib/context/ProfileContext'
+import WorkspaceAssistant from '@/components/assistant/WorkspaceAssistant'
 import { SELECTABLE_MODELS } from '@/lib/ai/models'
 import type { AIModel } from '@/types'
 import Sidebar from '@/components/layout/Sidebar'
@@ -45,6 +46,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
               {children}
             </main>
           </div>
+          <WorkspaceAssistant />
           <AnalyticsConsent />
         </SidebarProvider>
       </ModelProvider>
