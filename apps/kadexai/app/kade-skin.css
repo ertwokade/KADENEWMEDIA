@@ -57,8 +57,8 @@ html[data-theme='dark'], html[data-theme-mode='dark'] {
   --kade-surface-soft: #161818;
   --kade-surface-raised: #191b1b;
   --kade-ink: #f6f4ee;
-  --kade-muted: rgba(246, 244, 238, .70);
-  --kade-faint: rgba(246, 244, 238, .46);
+  --kade-muted: rgba(246, 244, 238, .74);
+  --kade-faint: rgba(246, 244, 238, .58);
   /* Çizgiler nötr gri DEĞİL, sıcak altın. İmza burada: aynı yerleşim
      nötr gri çizgiyle jenerik, altın çizgiyle Kade oluyor. */
   --kade-line: rgba(235, 198, 105, .13);
