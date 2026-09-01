@@ -91,7 +91,7 @@ const SHORTCUT_ACTIONS = [
 ];
 
 /** Tarayıcının geri alamayacağımız kendi kısayolları. */
-const KORUMALI_KOMBOLAR = new Set(["ctrl+w","ctrl+t","ctrl+n","ctrl+q","ctrl+r"]);
+const KORUMALI_KOMBOLAR = new Set(["ctrl+w","ctrl+t","ctrl+n","ctrl+q","ctrl+r","ctrl+j","ctrl+p"]);
 
 /** Olaydan kanonik kombo üretir. Mac'te Cmd, Ctrl ile aynı sayılır. */
 function komboOf(e){
