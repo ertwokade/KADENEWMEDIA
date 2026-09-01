@@ -333,8 +333,8 @@ html[data-theme='light'] .kade-content-studio-hero {
 .kade-panel input, .kade-panel textarea, .kade-panel select { border-color: var(--kade-line-strong) !important; background: var(--kade-surface) !important; color: var(--kade-ink) !important; box-shadow: none !important; }
 .kade-panel input::placeholder, .kade-panel textarea::placeholder { color: var(--kade-faint) !important; }
 .kade-panel input:focus, .kade-panel textarea:focus, .kade-panel select:focus { border-color: var(--kade-ink) !important; box-shadow: 4px 4px 0 var(--kade-accent) !important; }
-.kade-panel .bg-\[\#f2c322\] { background: var(--kade-accent) !important; color: var(--kade-on-accent) !important; box-shadow: none !important; }
-.kade-panel .bg-\[\#f2c322\]:hover { background: var(--kade-ink) !important; color: var(--kade-bg) !important; }
+/* Birincil düğme kuralı tek yerde (aşağıdaki vurgu köprüsünde) toplandı;
+   burada ayrıca tanımlanması iki farklı hover davranışı üretiyordu. */
 /* İçerik genişliği: 1480px'te form solda küçük kalıp sağda geniş bir boşluk
    oluşuyordu. Okunur bir tavana çekildi. */
 .kade-panel .kade-main .overflow-y-auto > .gap-5 { width: min(100%, 1180px); margin-inline: auto; }
@@ -478,13 +478,20 @@ html[data-theme='light'] .kade-content-studio-hero {
    marka rengi bir daha değişirse yine tek dosya güncellenir.
 =========================================================================== */
 .kade-panel .bg-\[\#f2c322\] {
-  background: var(--kade-accent) !important;
+  /* Referansın imzası: düz dolgu değil gradyan + hâle + hap biçim. */
+  background: var(--kade-gradient) !important;
   color: var(--kade-on-accent) !important;
+  border: 0 !important;
+  border-radius: var(--kade-r-pill) !important;
+  box-shadow: 0 10px 26px var(--kade-glow) !important;
+  transition: transform .16s ease, box-shadow .16s ease !important;
 }
-/* Hover: ayrı bir sarı (#ffda3f) yerine markanın kendi güçlü tonu. */
+.kade-panel .bg-\[\#f2c322\]:hover,
 .kade-panel .hover\:bg-\[\#ffda3f\]:hover {
-  background: var(--kade-accent-strong) !important;
-  color: var(--kade-bg) !important;
+  background: var(--kade-gradient) !important;
+  color: var(--kade-on-accent) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px var(--kade-glow-strong) !important;
 }
 
 .kade-panel .focus\:border-\[\#f2c322\]:focus,
@@ -934,3 +941,15 @@ html[data-theme='dark'] .kade-auth-success { border-color: #7ee2ac; background: 
   transition: border-color .16s ease, background .16s ease;
 }
 .kade-mobile-btn:hover { border-color: var(--kade-line-strong); }
+
+
+/* amber-* yardımcı sınıfları uyarı/birincil karışık kullanılıyor; panelde
+   marka vurgusuna bağlanıyor ki beyaza yakın parlak kutular kalmasın. */
+.kade-panel .bg-amber-400,
+.kade-panel .bg-amber-500 {
+  background: var(--kade-gradient) !important;
+  color: var(--kade-on-accent) !important;
+  border-radius: var(--kade-r-pill) !important;
+  box-shadow: 0 8px 20px var(--kade-glow) !important;
+}
+.kade-panel .hover\:bg-amber-300:hover { background: var(--kade-gradient) !important; box-shadow: 0 12px 28px var(--kade-glow-strong) !important; }
