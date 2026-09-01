@@ -1,21 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateContent } from '@/lib/ai/provider'
 import { SELECTABLE_MODELS } from '@/lib/ai/models'
+import { getAvailableModels } from '@/lib/ai/modelRouter'
 import { AIModel } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
 
 export const dynamic = 'force-dynamic'
 
-function hasEnv(name: string) {
-  return Boolean(process.env[name]?.trim())
-}
 
+/**
+ * Asistanın modeli.
+ *
+ * Buradaki liste elle yazılmıştı ve `gemini-flash` (gemini-2.5-flash) ile
+ * başlıyordu; o kimlik anahtarımıza kapalı ve canlıda 404 dönüyor — yani
+ * GEMINI_API_KEY tanımlı olan her kurulumda asistan hiç çalışmıyordu.
+ * Artık ortak yönlendiricinin ÖLÇÜLEREK doğrulanmış listesi kullanılıyor;
+ * model listesi bir daha iki yerde ayrı ayrı tutulmuyor.
+ */
 function selectOperationsModel(): AIModel | null {
-  if (hasEnv('GEMINI_API_KEY')) return 'gemini-flash'
-  if (hasEnv('GROQ_API_KEY')) return 'groq-llama-70b'
-  if (hasEnv('OPENROUTER_API_KEY')) return 'openrouter-free'
-  if (hasEnv('OPENAI_API_KEY')) return 'gpt4o'
-  return null
+  const kullanilabilir = getAvailableModels()
+  if (kullanilabilir.length === 0) return null
+  // Hızlı ve ucuz olanı öne al; yoksa listedeki ilk çalışan model.
+  const tercih: AIModel[] = ['gemini-flash-latest', 'groq-llama-70b', 'gemini-lite-latest', 'openrouter-free', 'gpt4o']
+  return tercih.find((m) => kullanilabilir.includes(m)) ?? kullanilabilir[0]
 }
 
 export async function POST(req: NextRequest) {
