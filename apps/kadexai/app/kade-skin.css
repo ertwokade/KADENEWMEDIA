@@ -288,7 +288,14 @@ html[data-theme='light'] .kade-sidebar {
 .kade-panel .kade-model-menu { width: min(92vw, 520px); max-height: min(72vh, 620px); border-color: var(--kade-line-strong) !important; background: var(--kade-surface-raised) !important; box-shadow: 10px 10px 0 var(--kade-ink) !important; }
 .kade-panel .kade-requirement-banner { min-height: 42px; border-color: var(--kade-line) !important; background: color-mix(in srgb, var(--kade-accent) 20%, var(--kade-bg)) !important; color: var(--kade-ink) !important; }
 .kade-panel .kade-requirement-banner svg { color: var(--kade-ink) !important; }
-.kade-panel .kade-requirement-banner a { background: var(--kade-ink) !important; color: var(--kade-bg) !important; }
+/* Uyarı şeridindeki eylem düğmesi mürekkep rengine sabitlenmişti; koyu
+   zeminde neredeyse beyaz bir kutu oluyordu. Marka gradyanına bağlandı. */
+.kade-panel .kade-requirement-banner a {
+  background: var(--kade-gradient) !important;
+  color: var(--kade-on-accent) !important;
+  border-radius: var(--kade-r-pill) !important;
+  box-shadow: 0 8px 20px var(--kade-glow) !important;
+}
 .kade-panel .kade-requirement-banner--ready { background: color-mix(in srgb, var(--kade-green) 25%, var(--kade-bg)) !important; }
 
 /* Existing tool pages inherit the same paper-and-hairline system. */
@@ -953,3 +960,17 @@ html[data-theme='dark'] .kade-auth-success { border-color: #7ee2ac; background: 
   box-shadow: 0 8px 20px var(--kade-glow) !important;
 }
 .kade-panel .hover\:bg-amber-300:hover { background: var(--kade-gradient) !important; box-shadow: 0 12px 28px var(--kade-glow-strong) !important; }
+
+
+/* Devre dışı düğme: gradyanın üstüne %50 opaklık çamurlu bir renk üretiyor.
+   Devre dışıyken düz ve sessiz bir yüzeye düşsün. */
+.kade-panel button:disabled,
+.kade-panel button[disabled] {
+  background: color-mix(in srgb, var(--kade-surface-soft) 80%, transparent) !important;
+  background-image: none !important;
+  color: var(--kade-faint) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  cursor: not-allowed;
+}
