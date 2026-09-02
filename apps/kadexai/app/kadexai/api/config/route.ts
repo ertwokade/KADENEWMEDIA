@@ -83,7 +83,9 @@ export async function GET(request: Request) {
     video: configured('KADE_FASTAPI_BASE_URL'),
     // Transkripsiyon Groq Whisper ile yapılıyor; anahtar yoksa Klip Üretici,
     // Altyazı ve Dublaj tıklanınca 503 alıyordu — arayüz önceden uyarabilsin.
-    transcribe: configured('GROQ_API_KEY'),
+    // Gemini de sesi çözebiliyor; yalnızca Groq'a bakmak, Groq tanımsızken
+    // Altyazı ve Dublaj'ı gereksiz yere "yapılandırılmamış" gösteriyordu.
+    transcribe: configured('GROQ_API_KEY') || configured('GEMINI_API_KEY'),
     youtube: configured('YOUTUBE_API_KEY'),
     operationsSync,
     ownerAccess,

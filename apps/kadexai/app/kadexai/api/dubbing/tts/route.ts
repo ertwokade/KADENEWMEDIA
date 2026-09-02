@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireApiUser } from '@/lib/auth/server'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
+import { geminiSeslendir, geminiSeslendirmeKullanilabilir } from '@/lib/ai/geminiSpeech'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -34,8 +35,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Çok fazla istek.' }, { status: 429, headers: rateLimitHeaders(limit) })
   }
 
-  if (!process.env.OPENAI_API_KEY?.trim()) {
-    return NextResponse.json({ error: 'Ses sağlayıcısı (OPENAI_API_KEY) yapılandırılmamış.' }, { status: 503 })
+  // OpenAI yoksa Gemini'ye düşülür. Eskiden burada doğrudan 503 dönülüyordu
+  // ve canlıda OPENAI_API_KEY tanımlı olmadığı için Dublaj hiç çalışmıyordu.
+  const openaiVar = Boolean(process.env.OPENAI_API_KEY?.trim())
+  if (!openaiVar && !geminiSeslendirmeKullanilabilir()) {
+    return NextResponse.json({ error: 'Ses sağlayıcısı yapılandırılmamış.' }, { status: 503 })
   }
 
   let body: DubBody
@@ -62,6 +66,30 @@ export async function POST(req: NextRequest) {
   if (!VOICES.includes(voice)) return NextResponse.json({ error: 'Geçersiz ses seçimi.' }, { status: 400 })
   const model = body.model === 'tts-1-hd' ? 'tts-1-hd' : 'tts-1'
   const speed = Math.min(Math.max(Number(body.speed) || 1, 0.75), 1.4)
+
+  if (!openaiVar) {
+    const sonuclar: Array<{ index: number; audio: string; hata?: string }> = []
+    for (let i = 0; i < segments.length; i += CONCURRENCY) {
+      const dilim = segments.slice(i, i + CONCURRENCY)
+      const parca = await Promise.all(
+        dilim.map(async (segment) => {
+          try {
+            return { index: segment.index, audio: await geminiSeslendir(segment.text, voice) }
+          } catch (e) {
+            return { index: segment.index, audio: '', hata: e instanceof Error ? e.message : 'Seslendirilemedi' }
+          }
+        }),
+      )
+      sonuclar.push(...parca)
+    }
+    return NextResponse.json({
+      parcalar: sonuclar,
+      // Gemini ham PCM veriyor, WAV kabına alınıyor; istemci mime'ı kullanıyor.
+      mime: 'audio/wav',
+      saglayici: 'gemini',
+      basarisiz: sonuclar.filter((r) => !r.audio).length,
+    })
+  }
 
   try {
     const OpenAI = (await import('openai')).default

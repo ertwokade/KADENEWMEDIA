@@ -63,11 +63,28 @@ type Plan = {
   expiresAt: string | null
 }
 
-/** Sahip olunan paket, karttaki paketle aynı mı? Dönem ve API dahil olma
- *  durumu da eşleşmeli: aynı kademenin aylık ve yıllık hâli ayrı ürün. */
+/** Sahip olunan paket, karttaki paketle birebir aynı mı? Aynı kademenin
+ *  aylık ve yıllık hâli ayrı ürün olduğu için dönem de eşleşmeli. */
 function sendeVar(plan: Plan | null, pkg: Pkg): boolean {
   if (!plan || plan.tier === 'free') return false
   return plan.tier === pkg.tier && plan.period === pkg.period && plan.apiIncluded === pkg.apiIncluded
+}
+
+/** Kademe tutuyor ama dönem/API seçimi tutmuyor: kart "senin paketin"
+ *  değil ama kullanıcı zaten bu kademede — satın al demek yanıltıcı olur. */
+function ayniKademe(plan: Plan | null, pkg: Pkg): boolean {
+  if (!plan || plan.tier === 'free') return false
+  return plan.tier === pkg.tier && !sendeVar(plan, pkg)
+}
+
+/** Sahip yetkisi 2099 gibi uzak bir tarihle geliyor; bunu tarih olarak
+ *  yazmak "2099'e kadar" gibi saçma bir bilgi üretiyordu. */
+function bitisMetni(iso: string | null): string | null {
+  if (!iso) return null
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return null
+  if (d.getFullYear() >= 2090) return 'süresiz'
+  return `${d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}'e kadar`
 }
 
 export default function PackagesPage() {
@@ -213,12 +230,35 @@ export default function PackagesPage() {
         </div>
 
         {error && <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</div>}
+        {/* Sayfa yalnızca satış listesiydi; şu an neye sahip olduğun hiçbir
+            yerde yazmıyordu. Karar vermeden önce görülmesi gereken ilk şey bu. */}
+        {!loading && plan && (
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[color:var(--kade-accent)]/35 bg-[color:var(--kade-a-50)] px-5 py-4">
+            <div>
+              <p className="kade-eyebrow">Şu anki paketin</p>
+              <p className="mt-1.5 text-lg font-medium text-zinc-100">
+                {plan.tier === 'free' ? 'Ücretsiz' : plan.label || plan.tier}
+                {plan.period && plan.tier !== 'free' && (
+                  <span className="text-sm font-normal text-zinc-500">
+                    {' · '}{plan.period === 'yearly' ? 'yıllık' : 'aylık'}
+                  </span>
+                )}
+              </p>
+            </div>
+            <div className="text-right text-xs text-zinc-500">
+              {bitisMetni(plan.expiresAt) && <p>{bitisMetni(plan.expiresAt)}</p>}
+              <p>{plan.features.length} özellik açık</p>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <p className="text-sm text-zinc-500">Yükleniyor…</p>
         ) : (
           <div className="grid gap-4 md:grid-cols-3">
             {visible.map((pkg) => {
               const senin = sendeVar(plan, pkg)
+              const kademede = ayniKademe(plan, pkg)
               const sahipOlunanOzellikler = new Set(plan?.features ?? [])
               return (
               <div
@@ -234,7 +274,9 @@ export default function PackagesPage() {
                   <h3 className="text-lg font-semibold text-zinc-100">{pkg.tierLabel || pkg.name}</h3>
                   {senin
                     ? <span className="rounded-full bg-[color:var(--kade-accent)] px-2 py-0.5 text-xs font-semibold text-[color:var(--kade-on-accent)]">Senin paketin</span>
-                    : pkg.tier === 'pro' && <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs text-violet-300">En popüler</span>}
+                    : kademede
+                      ? <span className="rounded-full border border-[color:var(--kade-accent)]/40 px-2 py-0.5 text-xs text-[color:var(--kade-accent-text)]">Bu kademedesin</span>
+                      : pkg.tier === 'pro' && <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs text-violet-300">En popüler</span>}
                 </div>
                 <div className="mb-4">
                   <span className="text-3xl font-bold text-zinc-100">{formatPrice(pkg.amountMinor)}</span>
@@ -259,10 +301,8 @@ export default function PackagesPage() {
                 {senin ? (
                   <div className="rounded-lg border border-[color:var(--kade-accent)]/40 px-4 py-2.5 text-center text-sm font-medium text-[color:var(--kade-accent-text)]">
                     Kullanımda
-                    {plan?.expiresAt && (
-                      <span className="ml-1 font-normal text-zinc-500">
-                        · {new Date(plan.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}&apos;e kadar
-                      </span>
+                    {bitisMetni(plan?.expiresAt ?? null) && (
+                      <span className="ml-1 font-normal text-zinc-500">· {bitisMetni(plan?.expiresAt ?? null)}</span>
                     )}
                   </div>
                 ) : (

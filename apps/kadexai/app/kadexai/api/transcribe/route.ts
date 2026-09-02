@@ -3,6 +3,7 @@ import { getRateLimitKey, rateLimit } from '@/lib/rateLimit'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
 import { requireApiUser } from '@/lib/auth/server'
 import { requireToolFeature } from '@/lib/payments/featureGuard'
+import { geminiTranscribe, geminiTranscribeKullanilabilir } from '@/lib/ai/geminiTranscribe'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,7 +34,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const apiKey = process.env.GROQ_API_KEY?.trim()
-    if (!apiKey) {
+    // Groq yoksa Gemini'ye düşülür. Eskiden burada doğrudan 503 dönülüyordu
+    // ve canlıda GROQ_API_KEY tanımlı olmadığı için Altyazı Stüdyosu ile
+    // Dublaj hiç çalışmıyordu.
+    if (!apiKey && !geminiTranscribeKullanilabilir()) {
       return NextResponse.json({ error: 'Transkripsiyon sağlayıcısı yapılandırılmamış.' }, { status: 503 })
     }
 
@@ -51,6 +55,14 @@ export async function POST(req: NextRequest) {
     }
     if (!(await hasSupportedSignature(file))) {
       return NextResponse.json({ error: 'Dosya içeriği desteklenen ses veya video biçimiyle eşleşmiyor.' }, { status: 415 })
+    }
+
+    if (!apiKey) {
+      const sonuc = await geminiTranscribe(file)
+      if (!sonuc.words.length) {
+        return NextResponse.json({ error: 'Ses içinde konuşma bulunamadı.' }, { status: 422 })
+      }
+      return NextResponse.json({ ...sonuc, saglayici: 'gemini' })
     }
 
     const outgoing = new FormData()
