@@ -19,7 +19,13 @@ export type CozumSonucu = { text: string; words: CozulmusKelime[]; language: str
 
 type Bolum = { start: number; end: number; text: string }
 
-const MODEL = 'gemini-2.5-flash'
+/**
+ * Sürüm numarası yazan kimlikler zamanla kapatılıyor: canlıda
+ * `gemini-2.5-flash` "no longer available to new users" diyerek 404 döndü.
+ * Google'ın takma adları (`-latest`) hep yaşayan sürüme işaret ediyor;
+ * yine de bir tanesi düşerse diye zincir var.
+ */
+const MODELLER = ['gemini-flash-latest', 'gemini-flash-lite-latest']
 
 const TALIMAT = `Sen bir ses çözümleme aracısın. Verilen sesi olduğu gibi yaz.
 Yanıtı YALNIZCA şu biçimde bir JSON nesnesi olarak ver, başka hiçbir şey yazma:
@@ -69,14 +75,27 @@ export async function geminiTranscribe(dosya: File): Promise<CozumSonucu> {
   if (!anahtar) throw new Error('Gemini anahtarı tanımlı değil.')
 
   const veri = Buffer.from(await dosya.arrayBuffer()).toString('base64')
-  const model = new GoogleGenerativeAI(anahtar).getGenerativeModel({ model: MODEL })
+  const istemci = new GoogleGenerativeAI(anahtar)
 
-  const yanit = await model.generateContent([
-    { inlineData: { mimeType: dosya.type || 'audio/webm', data: veri } },
-    { text: TALIMAT },
-  ])
+  let ham = ''
+  let sonHata: unknown = null
+  for (const ad of MODELLER) {
+    try {
+      const yanit = await istemci.getGenerativeModel({ model: ad }).generateContent([
+        { inlineData: { mimeType: dosya.type || 'audio/webm', data: veri } },
+        { text: TALIMAT },
+      ])
+      ham = yanit.response.text()
+      break
+    } catch (e) {
+      sonHata = e
+    }
+  }
+  if (!ham) {
+    throw new Error(sonHata instanceof Error ? sonHata.message : 'Ses çözümlenemedi.')
+  }
 
-  const cozum = jsonAyikla(yanit.response.text()) as
+  const cozum = jsonAyikla(ham) as
     | { dil?: unknown; bolumler?: unknown }
     | null
   if (!cozum) throw new Error('Ses çözümlenemedi.')

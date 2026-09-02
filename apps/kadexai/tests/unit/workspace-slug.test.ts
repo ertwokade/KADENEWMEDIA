@@ -150,3 +150,20 @@ test('araç adı olmayan çağrı bildirimde "unknown" göstermez', async () => 
   const akis = await readFile(new URL('../../lib/orchestration/runner.ts', import.meta.url), 'utf8')
   assert.match(akis, /toolId: step\.toolId/)
 })
+
+test('Gemini yardımcıları sürüm numaralı model kimliği kullanmaz', async () => {
+  // Sürüm yazan kimlikler kapatılıyor: canlıda gemini-2.5-flash
+  // "no longer available to new users" diyerek 404 döndü ve asistanın
+  // ses çözümlemesi hiç çalışmadı. Takma adlar (-latest) yaşayan sürüme
+  // işaret ediyor.
+  for (const dosya of ['geminiTranscribe.ts', 'geminiSpeech.ts']) {
+    const kaynak = await readFile(new URL(`../../lib/ai/${dosya}`, import.meta.url), 'utf8')
+    const kimlikler = [...kaynak.matchAll(/'(gemini-[a-z0-9.\-]+)'/g)].map((m) => m[1])
+    for (const kimlik of kimlikler) {
+      assert.ok(
+        kimlik.includes('latest') || kimlik.includes('preview'),
+        `${dosya}: "${kimlik}" sürüme sabit; -latest takma adı kullan`,
+      )
+    }
+  }
+})
