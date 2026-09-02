@@ -101,3 +101,19 @@ test('proxy erişimi slug ile değil oturumla verir', async () => {
   // Sahiplik kontrolleri hâlâ oturuma bakıyor olmalı.
   assert.match(proxySource, /isAdminRoute && !isAllowedOwnerUser\(user\)/)
 })
+
+test('alan ayrıştırması ana sitenin köküne karışmaz', async () => {
+  const proxySource = await readFile(new URL('../../proxy.ts', import.meta.url), 'utf8')
+
+  // Ana site aynı origin'in kökünde duruyor (/hizmetler, /paketler …) ve bu
+  // yolların ilk parçası da geçerli bir slug biçiminde. Kökte ayrıştırılırsa
+  // ana sitenin BÜTÜN rotaları çalışma alanı adresi sanılıp panele yeniden
+  // yazılıyor ve site boş görünüyordu.
+  assert.match(proxySource, /hamYol\.startsWith\(`\$\{APP_BASE_PATH\}\/`\)/)
+  assert.match(proxySource, /kadexaiAltinda\s*\n?\s*\?\s*splitWorkspacePath/)
+
+  // Kökteki bir yol slug gibi görünse bile ayrıştırma yapılmamalı; bunu
+  // splitWorkspacePath'in kendisi bilemez, çağıran taraf karar verir.
+  const { splitWorkspacePath: bol } = await import('../../lib/workspace/slug')
+  assert.equal(bol('/hizmetler').slug, 'hizmetler')
+})

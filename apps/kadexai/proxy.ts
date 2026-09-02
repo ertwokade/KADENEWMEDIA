@@ -9,7 +9,7 @@ import {
   isSettingsOwnerUser,
   isSettingsOwnerOnlyRoute,
 } from '@/lib/featureAccess'
-import { stripBasePath, withBasePath } from '@/lib/appConfig'
+import { APP_BASE_PATH, stripBasePath, withBasePath } from '@/lib/appConfig'
 import { splitWorkspacePath, workspaceSlugForUser } from '@/lib/workspace/slug'
 import {
   countedDistributedRateLimit,
@@ -73,9 +73,17 @@ export async function proxy(request: NextRequest) {
   // Panel her kullanıcı için kendi adresinde açılır: /kadexai/<slug>/dashboard
   // Alan bölümü buradan ayrılır ve geri kalan mantık eskisi gibi çalışır.
   // Bu bir ADRES çözümüdür; yetki kararı aşağıda oturumdan verilir.
-  const { slug: urlSlug, kalan: pathname } = splitWorkspacePath(
-    stripBasePath(request.nextUrl.pathname)
-  )
+  //
+  // Ayrıştırma YALNIZCA /kadexai altında yapılır. Ana site aynı origin'in
+  // kökünde duruyor (/hizmetler, /paketler, /iletisim …) ve bu yolların ilk
+  // parçası da geçerli bir slug biçiminde; kökte ayrıştırınca ana sitenin
+  // bütün rotaları çalışma alanı adresi sanılıp panele yeniden yazılıyordu.
+  const hamYol = request.nextUrl.pathname
+  const kadexaiAltinda =
+    !APP_BASE_PATH || hamYol === APP_BASE_PATH || hamYol.startsWith(`${APP_BASE_PATH}/`)
+  const { slug: urlSlug, kalan: pathname } = kadexaiAltinda
+    ? splitWorkspacePath(stripBasePath(hamYol))
+    : { slug: null as string | null, kalan: stripBasePath(hamYol) }
   const isApi = pathname.startsWith('/api/')
   const isAuthPage = pathname.startsWith('/auth') || pathname === '/login'
   const isDashboard = pathname.startsWith('/dashboard') || pathname === '/onboarding'
