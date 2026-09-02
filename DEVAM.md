@@ -359,3 +359,31 @@ gönderebiliyor, gelen mesaj alamıyor. Çift yönlü hat için WhatsApp Busines
 API ya da Twilio gerekiyor: ücretli servis ve altyapı kararı, sahip onayı
 ister. Asistan kanaldan bağımsız yazıldı; sağlayıcı bağlanınca aynı uç
 kullanılabilir.
+
+## İçerik tarama ve bildirimler (1 Eylül 2026, üçüncü tur)
+
+**"3 tane iletiyor" kısmı kodda zaten çözülmüştü.** Ölçüldü: 80 aday
+geliyor, seçim 20 döndürüyor, 20 öğe mesajda 1454 karakter tutuyor
+(sınır 1780). Asıl şikayet kaliteydi ve dört ayrı hatadan geliyordu:
+
+1. Eleme ve dil tespiti `normalized` sütununa bakıyordu; o sütun küçük
+   harfe indirilmiş ve Türkçe harfleri soyulmuş ("bölüm" → "bolum"). Yani
+   `/[çğıöşü]/` HİÇ eşleşmiyor, dizi deseni hiç tutmuyordu.
+2. Yabancı dil oranı hashtag'lerle seyreliyordu; Devanagari bir başlık
+   İngilizce hashtag'ler sayesinde eşiğin altında kalıyordu.
+3. Müzik yalnızca İngilizce işaretlerden yakalanıyordu. "Mabel Matiz - Ha
+   Leylim" hiçbir işaret taşımıyor ama kategorisi `muzik`.
+4. Türkçe önceliklendirmesi yapıldıktan hemen sonra skora göre yeniden
+   sıralanıp siliniyordu.
+
+Canlı veriyle ölçüm (80 satır): elenen 2 → 15, Türkçe algılanan 10 → 35,
+listenin başı dizi bölümü yerine uyarlanabilir içerik fikri. Testler
+canlıdan alınmış gerçek başlıklarla yazıldı.
+
+**Bildirimler.** Her AI çalıştırması zaten bildirim atıyordu (provider.ts
+tek geçiş kapısı), gün başı 05:00 / gün sonu 20:00 cron'ları kuruluydu.
+Kapatılan iki boşluk: yeni kayıt bildirimi (auth callback, hesap yaşı bir
+dakikadan küçükse) ve asistan çağrılarının "unknown" olarak kaydedilmesi.
+
+**WhatsApp çift yönlü hat YAPILMADI** — ücretli sağlayıcı gerektiriyor,
+kullanıcı "paralı olan dışında hepsini yap" dedi.
