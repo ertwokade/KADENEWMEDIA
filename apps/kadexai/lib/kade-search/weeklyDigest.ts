@@ -60,8 +60,14 @@ export function weeklyDigestKey(now = new Date()) {
 }
 
 /** Aynı platform/kategorinin listeyi ele geçirmesini önleyerek gönderilecek seçkiyi oluşturur. */
-export function selectWeeklyDigestTrends(rows: CurrentTrendRow[], limit = 4) {
-  const ordered = [...rows].sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+/**
+ * @param siraliGirdi Girdi zaten anlamlı bir sırada geldiyse true verilir ve
+ *   skora göre YENİDEN SIRALANMAZ. Günlük özet Türkçe içerikleri öne alıp
+ *   bu fonksiyona veriyordu; buradaki koşulsuz skor sıralaması o çalışmayı
+ *   siliyor ve Türkçe önceliği hiç uygulanmıyordu.
+ */
+export function selectWeeklyDigestTrends(rows: CurrentTrendRow[], limit = 4, siraliGirdi = false) {
+  const ordered = siraliGirdi ? [...rows] : [...rows].sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
   const selected: CurrentTrendRow[] = []
   const titles = new Set<string>()
   const platforms = new Set<string>()

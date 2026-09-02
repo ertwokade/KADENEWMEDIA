@@ -64,7 +64,8 @@ export function dailyDigestKey(now = new Date()) {
  * sayfasının kopyasına dönüyordu.
  */
 export function selectDailyDigestTrends(rows: CurrentTrendRow[], limit = 20) {
-  return selectWeeklyDigestTrends(ayiklanmisTrendler(rows), limit)
+  // ayiklanmisTrendler Türkçe olanları öne alıyor; bu sıra korunmalı.
+  return selectWeeklyDigestTrends(ayiklanmisTrendler(rows), limit, true)
 }
 
 export function formatDailyDigest(
