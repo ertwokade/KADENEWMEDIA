@@ -172,6 +172,8 @@ export async function runPipeline(userId: string, input: OrchestrationInput): Pr
           systemPrompt: built.system,
           model: input.model,
           maxTokens: step.maxTokens,
+          // HTTP isteği yok; kimlik verilmezse araç adı "unknown" kalıyordu.
+          toolId: step.toolId,
         }),
         step.timeoutMs,
       )

@@ -9,6 +9,7 @@ import { getActiveEntitlement } from '@/lib/payments/access'
 import { getUserProviderKey, type UserKeyProvider } from '@/lib/ai/userProviderKeys'
 import { recordAiUsage, getUserUsageSummary } from '@/lib/usage/ledger'
 import { notifyOperation } from '@/lib/notifications/operationFeed'
+import { getToolById } from '@/lib/tools/registry'
 import { isTokenQuotaEnforced, FREE_TIER, type LimitTier } from '@/lib/payments/limits'
 
 function hasEnv(name: string) {
@@ -568,21 +569,33 @@ function preferExplicitlyKeyedProviders(models: GenerateRequest['model'][]): Gen
 
 
 /**
- * İstek yolundan araç adını çıkarır: `/kadexai/api/generate/title` → `title`.
- * Kullanım defterine hangi aracın harcadığını yazmak için; rotalara dokunmadan.
+ * Araç kimliğini bulur.
+ *
+ * Öncelik açıkça verilen `toolId`de: akışlar (orchestrate) generateContent'i
+ * HTTP isteği olmadan çağırıyor, yol bulunamıyor ve kimlik "unknown" kalıyordu.
+ * WhatsApp bildirimleri de "unknown" başlığıyla geliyordu.
+ *
+ * Yol varsa oradan çıkarılır: `/kadexai/api/generate/title` → `title`.
  */
-function toolNameFromRequest(request?: Request): string {
-  if (!request) return 'unknown'
+function toolNameFromRequest(request?: Request, toolId?: string): string {
+  const acik = toolId?.trim()
+  if (acik) return acik
+  if (!request) return 'bilinmeyen-arac'
   try {
     const segments = new URL(request.url).pathname.split('/').filter(Boolean)
     const generateIndex = segments.indexOf('generate')
     if (generateIndex >= 0 && segments[generateIndex + 1]) return segments.slice(generateIndex + 1).join('/')
     const apiIndex = segments.indexOf('api')
     if (apiIndex >= 0 && segments[apiIndex + 1]) return segments.slice(apiIndex + 1).join('/')
-    return segments.at(-1) || 'unknown'
+    return segments.at(-1) || 'bilinmeyen-arac'
   } catch {
-    return 'unknown'
+    return 'bilinmeyen-arac'
   }
+}
+
+/** Bildirimde teknik kimlik değil aracın görünen adı yazsın. */
+function toolDisplayName(toolId: string): string {
+  return getToolById(toolId)?.name ?? (toolId === 'bilinmeyen-arac' ? 'AI üretimi' : toolId)
 }
 
 /**
@@ -609,10 +622,10 @@ export async function generateContent(req: GenerateRequest, request?: Request): 
 
   if (user) {
     const config = getModelConfig(result.model)
-    const tool = toolNameFromRequest(request)
+    const tool = toolNameFromRequest(request, req.toolId)
     void notifyOperation({
       kind: 'tool_used',
-      title: tool,
+      title: toolDisplayName(tool),
       detail: `${result.model}${result.tokensUsed ? ` · ${result.tokensUsed} token` : ''}`,
       userId: user.id,
     })

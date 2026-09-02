@@ -137,3 +137,16 @@ test('app/kadexai altındaki her gerçek rota rezerve', async () => {
     )
   }
 })
+
+test('araç adı olmayan çağrı bildirimde "unknown" göstermez', async () => {
+  // Akışlar generateContent'i HTTP isteği olmadan çağırıyor; kimlik
+  // çıkarılamayınca araç adı "unknown" kalıyor ve WhatsApp bildirimi
+  // "unknown" başlığıyla geliyordu.
+  const kaynak = await readFile(new URL('../../lib/ai/provider.ts', import.meta.url), 'utf8')
+  assert.ok(!/return 'unknown'/.test(kaynak), 'provider.ts hâlâ "unknown" döndürüyor')
+  assert.match(kaynak, /toolNameFromRequest\(request, req\.toolId\)/)
+  assert.match(kaynak, /title: toolDisplayName\(tool\)/)
+
+  const akis = await readFile(new URL('../../lib/orchestration/runner.ts', import.meta.url), 'utf8')
+  assert.match(akis, /toolId: step\.toolId/)
+})

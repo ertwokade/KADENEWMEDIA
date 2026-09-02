@@ -48,6 +48,12 @@ export interface GenerateRequest {
   model: AIModel
   systemPrompt?: string
   maxTokens?: number
+  /**
+   * Aracın kayıt defterindeki kimliği. Normalde istek yolundan çıkarılır;
+   * ancak akışlar gibi HTTP isteği taşımayan çağrılarda yol yok ve araç adı
+   * "unknown" olarak kaydediliyordu — bildirimler de öyle geliyordu.
+   */
+  toolId?: string
 }
 
 export interface GenerateResult {

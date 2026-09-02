@@ -53,7 +53,7 @@ export async function recordAiUsage(input: UsageEventInput): Promise<void> {
     const admin = createAdminClient()
     await admin.from('ai_usage_events').insert({
       user_id: input.userId,
-      tool: input.tool || 'unknown',
+      tool: input.tool || 'bilinmeyen-arac',
       model: input.model,
       provider: input.provider || null,
       tier: input.tier && input.tier !== FREE_TIER ? input.tier : null,
