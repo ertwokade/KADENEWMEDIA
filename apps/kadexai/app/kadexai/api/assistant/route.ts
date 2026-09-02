@@ -50,7 +50,9 @@ export async function POST(req: NextRequest) {
         'Aşağıdaki ekip verisine dayanarak kısa, net ve uygulanabilir cevap ver. ' +
         'Veri yoksa genel öneride bulun.\n\n--- EKIP VERISI ---\n' + context,
       prompt: question,
-    })
+      // İstek geçilmezse bildirim ve maliyet dökümü aracı "unknown" olarak
+      // kaydediyordu; asistan çalıştırmaları kendi adıyla görünsün.
+    }, req)
 
     return NextResponse.json({ answer: result.content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {

@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { appRoutes, withBasePath } from '@/lib/appConfig'
 import { mapGoogleOAuthError } from '@/lib/auth/oauth'
 import { supabaseCookieOptions } from '@/lib/supabase/cookieOptions'
+import { notifyOperation } from '@/lib/notifications/operationFeed'
 
 function safeNext(value: string | null) {
   if (!value) return appRoutes.dashboard
@@ -56,6 +57,29 @@ export async function GET(request: NextRequest) {
       }
     )
     const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+    // Yeni kayıt bildirimi. Kayıt Supabase tarafında olduğu için uygulamanın
+    // haberi olmuyordu; sahip, kullanıcı listesini açana kadar kimsenin
+    // katıldığını görmüyordu. Oturum açılışının kayıt mı yoksa tekrar giriş
+    // mi olduğu created_at ile anlaşılır: aradaki fark birkaç saniyeyse
+    // hesap bu istekle oluşmuştur.
+    if (!error) {
+      try {
+        const { data } = await supabase.auth.getUser()
+        const hesap = data.user
+        const yasMs = hesap?.created_at ? Date.now() - new Date(hesap.created_at).getTime() : Infinity
+        if (hesap && yasMs < 60_000) {
+          void notifyOperation({
+            kind: 'signup',
+            title: 'Yeni kayıt',
+            detail: hesap.email ?? hesap.id,
+            userId: hesap.id,
+          })
+        }
+      } catch {
+        // Bildirim gönderilemezse giriş akışı etkilenmemeli.
+      }
+    }
     if (error) {
       const loginUrl = new URL(`${origin}${withBasePath(appRoutes.login)}`)
       loginUrl.searchParams.set('auth_error', 'Oturum bağlantısı geçersiz veya süresi dolmuş.')
