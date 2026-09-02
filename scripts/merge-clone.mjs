@@ -65,6 +65,14 @@ async function copyAssets(dir) {
   }
 }
 
+/* Klon kabuğu, generate-static-routes.mjs'in ürettiği kabuğun ÜZERİNE yazılıyor.
+   İki kaynak robots etiketinde ayrışabiliyor ve üretilen dosyadaki `noindex`
+   niyeti sessizce kayboluyordu: /fiyat-hesaplama ve /referans-programi
+   canlıda "index, follow" ile duruyordu, oysa ikisi de noindex işaretliydi.
+   Kopyalamadan ÖNCE hedefteki robots değeri okunup kopyanın üstüne
+   yazılıyor — içerik klondan, indeksleme kararı tek kaynaktan. */
+const ROBOTS = /<meta name="robots" content="([^"]*)"\s*\/?>/i
+
 async function copyPage(route) {
   const from = join(source, route, 'index.html')
   if (!await stat(from).catch(() => null)) {
@@ -72,8 +80,21 @@ async function copyPage(route) {
     return
   }
   const to = join(dist, route, 'index.html')
+
+  const uretilen = await readFile(to, 'utf8').catch(() => null)
+  const karar = uretilen?.match(ROBOTS)?.[1] ?? null
+
   await mkdir(dirname(to), { recursive: true })
-  await cp(from, to)
+
+  if (karar) {
+    const klon = await readFile(from, 'utf8')
+    const duzeltilmis = klon.replace(ROBOTS, `<meta name="robots" content="${karar}" />`)
+    if (duzeltilmis !== klon) console.log(`  robots korundu: /${route} → ${karar}`)
+    await writeFile(to, duzeltilmis)
+  } else {
+    await cp(from, to)
+  }
+
   pages += 1
 }
 

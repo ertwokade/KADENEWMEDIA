@@ -14,6 +14,13 @@ const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
 const template = await readFile(join(DIST, 'app.html'), 'utf8')
 
 const routes = [
+  // Hata ve bakım kabukları listede yoktu: ana sayfa şablonunu miras alıyor,
+  // yani "Kade New Media | New Media…" başlığıyla ve `index, follow` ile
+  // yayınlanıyorlardı. Arama motoru 401/403/429 sayfalarını indeksleyebilirdi.
+  ['/401', 'Yetkisiz erişim | Kade Media', 'Bu sayfayı görüntülemek için giriş yapmanız gerekiyor.', true],
+  ['/403', 'Erişim engellendi | Kade Media', 'Bu sayfaya erişim yetkiniz bulunmuyor.', true],
+  ['/429', 'Çok fazla istek | Kade Media', 'Kısa sürede çok fazla istek gönderildi. Biraz bekleyip tekrar deneyin.', true],
+  ['/bakim', 'Bakım çalışması | Kade Media', 'Site kısa süreli bakımda. Birazdan tekrar deneyin.', true],
   // Bu React çıktısı build sırasında geçici bir SEO/fallback sayfası üretir.
   // Döngünün sonunda `/` için fiziksel dist/index.html, Haoqi snapshot'ıyla
   // değiştirilir. Böylece Vercel'in statik dosya önceliğine bağımlı kalınmaz.
