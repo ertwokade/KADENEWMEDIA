@@ -7,6 +7,7 @@ import {
   PackageCheck, RefreshCw, Sparkles, ThumbsDown, Undo2,
 } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
+import SourcesPanel from '@/components/kade-search/SourcesPanel'
 import { apiFetch } from '@/lib/client/api'
 import { cn } from '@/lib/utils'
 
@@ -182,6 +183,8 @@ export default function KadeSearchApprovalPage() {
               </button>
             </div>
           </div>
+
+          <SourcesPanel />
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[

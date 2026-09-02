@@ -214,7 +214,18 @@ export default function SettingsPage() {
   const storageReady = isConfigured('NEXT_PUBLIC_SUPABASE_URL') && isConfigured('NEXT_PUBLIC_SUPABASE_ANON_KEY')
   const capabilityCount = [textGenerationReady, imageGenerationReady, storageReady].filter(Boolean).length
   const visibleCapabilityCount = envLoaded || isElectron ? capabilityCount : 0
+  const [aktifSekme, setAktifSekme] = useState('marka')
   const canManageInfrastructure = isElectron || settingsAccess
+
+  // Ayarlar tek uzun sayfaydı: marka briefi, profil alanları, tercihler,
+  // sağlayıcı sağlığı, .env yönergeleri ve veritabanı şeması art arda
+  // sıralanıyordu. Bunlar farklı işler ve farklı zamanlarda açılıyor;
+  // göreve göre ayrıldı.
+  const SEKMELER = ([
+    { id: 'marka', etiket: 'Marka ve hafıza', aciklama: 'Şirket briefi, profil ve üretim tercihleri' },
+    canManageInfrastructure && { id: 'saglayici', etiket: 'Sağlayıcılar', aciklama: 'Hangi AI sağlayıcıları bağlı, hangi model nereye gidiyor' },
+    canManageInfrastructure && { id: 'altyapi', etiket: 'Altyapı', aciklama: 'Anahtar yapılandırması ve veritabanı şeması' },
+  ].filter(Boolean) as Array<{ id: string; etiket: string; aciklama: string }>)
 
   return (
     <div className="flex flex-col h-full">
@@ -222,9 +233,35 @@ export default function SettingsPage() {
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-2xl mx-auto space-y-5">
 
-          <AccountSettingsPanel />
+          {SEKMELER.length > 1 && (
+            <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Ayar bölümleri">
+              {SEKMELER.map((sekme) => (
+                <button
+                  key={sekme.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={aktifSekme === sekme.id}
+                  onClick={() => setAktifSekme(sekme.id)}
+                  className={cn(
+                    'rounded-full border px-4 py-2 text-xs font-semibold transition-colors',
+                    aktifSekme === sekme.id
+                      ? 'border-[color:var(--kade-a-200)] bg-[color:var(--kade-a-50)] text-[color:var(--kade-a-600)]'
+                      : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:text-zinc-200',
+                  )}
+                >
+                  {sekme.etiket}
+                </button>
+              ))}
+            </div>
+          )}
 
-          {canManageInfrastructure && <>
+          <p className="text-xs text-zinc-500">
+            {SEKMELER.find((x) => x.id === aktifSekme)?.aciklama}
+          </p>
+
+          {aktifSekme === 'marka' && <AccountSettingsPanel />}
+
+          {canManageInfrastructure && aktifSekme === 'saglayici' && <>
           {/* Status overview */}
           <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-5 flex items-center justify-between">
             <div>
