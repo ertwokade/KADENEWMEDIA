@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Mic, Square, Volume2 } from 'lucide-react'
 import KadeOrb from '@/components/assistant/KadeOrb'
 import {
   AdimDurumu,
@@ -87,8 +87,15 @@ export default function OnizlemeIcerik() {
             <p className="kade-eyebrow mb-3">Asistan paneli</p>
             <div className="kade-assistant" style={{ position: 'static', width: '100%' }}>
               <header className="kade-assistant-head">
-                <span className="kade-eyebrow">Asistan</span>
-                <p>Markanı ve son çalışmalarını biliyor.</p>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <span className="kade-eyebrow">Asistan</span>
+                    <p>Markanı ve son çalışmalarını biliyor.</p>
+                  </div>
+                  <button type="button" className="kade-assistant-ses-anahtar" aria-label="Sesli cevap">
+                    <Volume2 className="h-4 w-4" />
+                  </button>
+                </div>
               </header>
 
               <div className="kade-assistant-akis">
@@ -121,6 +128,7 @@ export default function OnizlemeIcerik() {
                 {dusunuyor && gorunur && (
                   <div className="kade-assistant-dusunuyor">
                     <KadeOrb size={64} />
+                    <p className="kade-assistant-dinliyor">Dinliyorum… bitince tekrar bas.</p>
                   </div>
                 )}
 
@@ -140,7 +148,10 @@ export default function OnizlemeIcerik() {
               </div>
 
               <form className="kade-assistant-form" onSubmit={(e) => e.preventDefault()}>
-                <input placeholder="Bir şey sor…" aria-label="Asistana soru" />
+                <button type="button" className={dusunuyor ? 'kade-assistant-mikrofon kade-assistant-mikrofon-aktif' : 'kade-assistant-mikrofon'} aria-label="Konuşarak sor">
+                  {dusunuyor ? <Square className="h-3.5 w-3.5" /> : <Mic className="h-4 w-4" />}
+                </button>
+                <input placeholder={dusunuyor ? 'Dinliyorum…' : 'Bir şey sor…'} aria-label="Asistana soru" />
                 <button type="submit" aria-label="Gönder"><ArrowRight className="h-4 w-4" /></button>
               </form>
             </div>

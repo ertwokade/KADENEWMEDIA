@@ -2,13 +2,15 @@
 
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, MessageCircle, X } from 'lucide-react'
+import { ArrowRight, MessageCircle, Mic, Square, Volume2, VolumeX, X } from 'lucide-react'
 import { apiFetch } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
 import { useProfile } from '@/lib/context/ProfileContext'
 import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 import { TOOL_REGISTRY, getToolById } from '@/lib/tools/registry'
+import { cn } from '@/lib/utils'
 import KadeOrb from './KadeOrb'
+import { kayitBaslat, sesKaydiDesteklenir, type KayitOturumu } from '@/lib/client/voice'
 import {
   AdimDurumu,
   ToolInvocation,
@@ -56,6 +58,20 @@ export default function WorkspaceAssistant() {
   const [yukleniyor, setYukleniyor] = useState(false)
   const [hata, setHata] = useState('')
   const [adimlar, setAdimlar] = useState<Adim[]>([])
+  // Sesli kullanım: konuş → yazıya çevrilir → cevap gelir → sesli okunur.
+  const [kayitta, setKayitta] = useState(false)
+  const [sesliCevap, setSesliCevap] = useState(true)
+  const [sesDestegi, setSesDestegi] = useState(false)
+  const oturumRef = useRef<KayitOturumu | null>(null)
+  const sesRef = useRef<HTMLAudioElement | null>(null)
+
+  useEffect(() => { setSesDestegi(sesKaydiDesteklenir()) }, [])
+
+  // Panel kapanınca ya da bileşen sökülünce mikrofon ve ses açık kalmasın.
+  useEffect(() => () => {
+    oturumRef.current?.iptal()
+    sesRef.current?.pause()
+  }, [])
   const sonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -115,14 +131,77 @@ export default function WorkspaceAssistant() {
     return parcalar.join('\n') || 'Kullanıcı henüz marka profilini doldurmadı.'
   }
 
+  /** Cevabı sesli okur. Başarısız olursa sessizce geçilir: metin zaten ekranda. */
+  const sesliOku = async (metin: string) => {
+    try {
+      const r = await apiFetch('/api/assistant/speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ metin }),
+      })
+      if (!r.ok) return
+      const d = await r.json()
+      if (!d.ses) return
+      sesRef.current?.pause()
+      const ses = new Audio(`data:${d.mime || 'audio/wav'};base64,${d.ses}`)
+      sesRef.current = ses
+      await ses.play()
+    } catch {
+      // Otomatik oynatma engellenmiş olabilir; cevap metin olarak duruyor.
+    }
+  }
+
+  const mikrofonaBas = async () => {
+    if (yukleniyor) return
+    setHata('')
+    if (kayitta) {
+      const oturum = oturumRef.current
+      oturumRef.current = null
+      setKayitta(false)
+      if (!oturum) return
+      const kayit = await oturum.durdur()
+      if (kayit.size < 1200) { setHata('Kayıt çok kısa.'); return }
+
+      setYukleniyor(true)
+      setAdimlar([{ ad: 'Söylediğin yazıya çevriliyor', durum: 'calisiyor' }])
+      try {
+        const form = new FormData()
+        form.append('file', kayit, 'kayit.webm')
+        const r = await apiFetch('/api/assistant/voice', { method: 'POST', body: form }, 120_000)
+        const d = await r.json()
+        if (!r.ok) throw new Error(d.error || 'Ses çözümlenemedi.')
+        adimYaz('Söylediğin yazıya çevrildi', 'bitti', d.metin)
+        await sor(d.metin, true)
+      } catch (err) {
+        adimYaz('Ses çözümlenemedi', 'hata', err instanceof Error ? err.message : undefined)
+        setHata(err instanceof Error ? err.message : 'Ses çözümlenemedi.')
+        setYukleniyor(false)
+      }
+      return
+    }
+
+    try {
+      oturumRef.current = await kayitBaslat()
+      setKayitta(true)
+    } catch {
+      setHata('Mikrofona erişilemedi. Tarayıcı iznini kontrol et.')
+    }
+  }
+
   const gonder = async (e: FormEvent) => {
     e.preventDefault()
     const q = soru.trim()
     if (!q || yukleniyor) return
     setSoru('')
     setHata('')
+    setAdimlar([])
+    await sor(q, false)
+  }
+
+  /** Soruyu gönderir. `sesli` ise cevap ayrıca okunur. */
+  const sor = async (q: string, sesli: boolean) => {
     setMesajlar((m) => [...m, { rol: 'sen', metin: q }])
-    setAdimlar([{ ad: 'Marka profili okunuyor', durum: 'calisiyor' }])
+    setAdimlar((a) => [...a, { ad: 'Marka profili okunuyor', durum: 'calisiyor' }])
     setYukleniyor(true)
     try {
       const baglam = await baglamKur()
@@ -136,6 +215,7 @@ export default function WorkspaceAssistant() {
       if (!r.ok || d.error) throw new Error(d.error || 'Cevap alınamadı')
       adimYaz('Asistan yanıtladı', 'bitti', d.model ? `Model: ${d.model}` : undefined)
       setMesajlar((m) => [...m, { rol: 'asistan', metin: d.answer, araclar: gecenAraclar(d.answer) }])
+      if (sesli && sesliCevap) void sesliOku(d.answer)
     } catch (err) {
       adimYaz('Asistan yanıtlayamadı', 'hata', err instanceof Error ? err.message : undefined)
       setHata(err instanceof Error ? err.message : 'Hata oluştu')
@@ -158,8 +238,27 @@ export default function WorkspaceAssistant() {
       {acik && (
         <section className="kade-assistant" role="dialog" aria-label="Çalışma alanı asistanı">
           <header className="kade-assistant-head">
-            <span className="kade-eyebrow">Asistan</span>
-            <p>Markanı ve son çalışmalarını biliyor.</p>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <span className="kade-eyebrow">Asistan</span>
+                <p>Markanı ve son çalışmalarını biliyor.</p>
+              </div>
+              {sesDestegi && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSesliCevap((v) => !v)
+                    if (sesliCevap) sesRef.current?.pause()
+                  }}
+                  aria-pressed={sesliCevap}
+                  aria-label={sesliCevap ? 'Sesli cevabı kapat' : 'Sesli cevabı aç'}
+                  title={sesliCevap ? 'Sesli cevap açık' : 'Sesli cevap kapalı'}
+                  className="kade-assistant-ses-anahtar"
+                >
+                  {sesliCevap ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                </button>
+              )}
+            </div>
           </header>
 
           <div className="kade-assistant-akis">
@@ -168,6 +267,7 @@ export default function WorkspaceAssistant() {
                 <p>Bugün ne yayınlamalıyım?</p>
                 <p>Bu başlık tutar mı?</p>
                 <p>Hangi araçla başlamalıyım?</p>
+                {sesDestegi && <p className="kade-assistant-ipucu">Mikrofona basıp konuşabilirsin.</p>}
               </div>
             )}
             {mesajlar.map((m, i) => (
@@ -204,9 +304,10 @@ export default function WorkspaceAssistant() {
                 ))}
               </div>
             )}
-            {yukleniyor && (
+            {(yukleniyor || kayitta) && (
               <div className="kade-assistant-dusunuyor">
                 <KadeOrb size={64} />
+                {kayitta && <p className="kade-assistant-dinliyor">Dinliyorum… bitince tekrar bas.</p>}
               </div>
             )}
             {hata && <p className="kade-assistant-hata">{hata}</p>}
@@ -214,10 +315,21 @@ export default function WorkspaceAssistant() {
           </div>
 
           <form onSubmit={gonder} className="kade-assistant-form">
+            {sesDestegi && (
+              <button
+                type="button"
+                onClick={() => void mikrofonaBas()}
+                disabled={yukleniyor}
+                aria-label={kayitta ? 'Kaydı bitir ve gönder' : 'Konuşarak sor'}
+                className={cn('kade-assistant-mikrofon', kayitta && 'kade-assistant-mikrofon-aktif')}
+              >
+                {kayitta ? <Square className="h-3.5 w-3.5" /> : <Mic className="h-4 w-4" />}
+              </button>
+            )}
             <input
               value={soru}
               onChange={(e) => setSoru(e.target.value)}
-              placeholder="Bir şey sor…"
+              placeholder={kayitta ? 'Dinliyorum…' : 'Bir şey sor…'}
               aria-label="Asistana soru"
               maxLength={500}
             />
