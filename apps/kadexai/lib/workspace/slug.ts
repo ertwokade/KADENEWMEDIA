@@ -18,7 +18,7 @@ export const OWNER_WORKSPACE_SLUG = 'kade'
 const RESERVED_SLUGS = new Set([
   // app/kadexai altındaki gerçek rotalar
   'api', 'auth', 'dashboard', 'legal', 'login', 'logout', 'onboarding',
-  'reset-password', 'robots.txt', 'sitemap.xml', 'favicon.ico',
+  'onizleme', 'reset-password', 'robots.txt', 'sitemap.xml', 'favicon.ico',
   // public/kadexai altındaki statik üst düzey klasörler
   'brand', 'downloads', 'ffmpeg', 'icons', 'manifest.json', 'operations-kit',
   'sw.js', 'next.svg', 'vercel.svg', 'file.svg', 'globe.svg', 'window.svg',

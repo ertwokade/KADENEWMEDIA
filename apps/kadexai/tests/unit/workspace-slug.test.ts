@@ -117,3 +117,23 @@ test('alan ayrıştırması ana sitenin köküne karışmaz', async () => {
   const { splitWorkspacePath: bol } = await import('../../lib/workspace/slug')
   assert.equal(bol('/hizmetler').slug, 'hizmetler')
 })
+
+test('app/kadexai altındaki her gerçek rota rezerve', async () => {
+  // Rezerve listesine eklenmeyen bir rota klasörü, çalışma alanı slug'ı
+  // sanılıp panele yeniden yazılıyor ve sayfa açılmıyor. Liste elle
+  // tutulduğu için yeni rota eklendiğinde unutulması kolaydı; test onu
+  // dosya sisteminden okuyup karşılaştırıyor.
+  const { readdir } = await import('node:fs/promises')
+  const dizin = new URL('../../app/kadexai/', import.meta.url)
+  const girisler = await readdir(dizin, { withFileTypes: true })
+  const rotalar = girisler.filter((g) => g.isDirectory()).map((g) => g.name)
+
+  assert.ok(rotalar.length > 0, 'rota bulunamadı — test yolu yanlış')
+  for (const rota of rotalar) {
+    assert.equal(
+      isValidWorkspaceSlug(rota),
+      false,
+      `"${rota}" gerçek bir rota ama slug olarak kabul ediliyor; RESERVED_SLUGS'a ekle`,
+    )
+  }
+})

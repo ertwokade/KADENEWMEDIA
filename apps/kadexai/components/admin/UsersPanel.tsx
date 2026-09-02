@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Crown, Search } from 'lucide-react'
+import { AlertTriangle, Crown, Loader2, Search, X } from 'lucide-react'
 import { apiPath } from '@/lib/appConfig'
 import { cn } from '@/lib/utils'
 
@@ -65,6 +65,14 @@ export default function UsersPanel() {
   const [kirpildi, setKirpildi] = useState(false)
   const [arama, setArama] = useState('')
   const [suzgec, setSuzgec] = useState<'tumu' | 'odeyen' | 'ucretsiz'>('tumu')
+  // Liste yalnızca okunabiliyordu: kimin ne paketi olduğu görünüyor ama
+  // buradan değiştirilemiyordu.
+  const [duzenlenen, setDuzenlenen] = useState<Kullanici | null>(null)
+  const [islemde, setIslemde] = useState(false)
+  const [islemHatasi, setIslemHatasi] = useState('')
+  const [tier, setTier] = useState<'baslangic' | 'pro' | 'sinirsiz'>('pro')
+  const [donem, setDonem] = useState<'monthly' | 'yearly'>('monthly')
+  const [ay, setAy] = useState(1)
 
   useEffect(() => {
     let alive = true
@@ -93,6 +101,38 @@ export default function UsersPanel() {
       return `${k.eposta} ${k.ad} ${k.alan ?? ''}`.toLocaleLowerCase('tr-TR').includes(q)
     })
   }, [kullanicilar, arama, suzgec])
+
+  async function paketiUygula(islem: 'ver' | 'kaldir') {
+    if (!duzenlenen) return
+    setIslemde(true)
+    setIslemHatasi('')
+    try {
+      const r = await fetch(apiPath('/api/admin/users'), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: duzenlenen.userId, islem, tier, donem, ay }),
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error || 'Paket güncellenemedi.')
+      setKullanicilar((liste) =>
+        (liste ?? []).map((k) =>
+          k.userId === duzenlenen.userId
+            ? {
+                ...k,
+                paket: d.paket ?? 'Ücretsiz',
+                paketTier: d.paketTier ?? null,
+                paketBitis: d.paketBitis ?? null,
+              }
+            : k,
+        ),
+      )
+      setDuzenlenen(null)
+    } catch (e) {
+      setIslemHatasi(e instanceof Error ? e.message : 'Hata')
+    } finally {
+      setIslemde(false)
+    }
+  }
 
   const ozet = useMemo(() => {
     const t = kullanicilar ?? []
@@ -177,6 +217,7 @@ export default function UsersPanel() {
               <th className="p-3 font-bold text-right">Çalışma</th>
               <th className="p-3 font-bold">Son işlem</th>
               <th className="p-3 font-bold">Kayıt</th>
+              <th className="p-3 font-bold text-right">Paket işlemi</th>
             </tr>
           </thead>
           <tbody>
@@ -198,11 +239,28 @@ export default function UsersPanel() {
                 <td className="p-3 text-right tabular-nums text-zinc-300">{k.calisma}</td>
                 <td className="p-3 text-xs text-zinc-400">{gorece(k.sonCalisma)}</td>
                 <td className="p-3 text-xs text-zinc-400">{tarih(k.kayit)}</td>
+                <td className="p-3 text-right">
+                  {k.sahip ? (
+                    <span className="text-[11px] text-zinc-500">kod tarafından</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDuzenlenen(k)
+                        setIslemHatasi('')
+                        setTier((k.paketTier as 'baslangic' | 'pro' | 'sinirsiz') || 'pro')
+                      }}
+                      className="border border-[color:var(--kade-a-200)] bg-[color:var(--kade-a-50)] px-3 py-1.5 text-xs font-semibold text-[color:var(--kade-a-600)]"
+                    >
+                      Değiştir
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
             {gosterilen.length === 0 && (
               <tr>
-                <td colSpan={6} className="p-6 text-center text-sm text-zinc-500">
+                <td colSpan={7} className="p-6 text-center text-sm text-zinc-500">
                   Bu süzgeçle eşleşen kullanıcı yok.
                 </td>
               </tr>
@@ -210,6 +268,112 @@ export default function UsersPanel() {
           </tbody>
         </table>
       </div>
+
+      {duzenlenen && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Paket değiştir"
+          onClick={() => !islemde && setDuzenlenen(null)}
+        >
+          <div
+            className="w-full max-w-md space-y-4 border border-zinc-700 bg-zinc-900 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="kade-eyebrow">Paket değiştir</p>
+                <p className="mt-2 font-medium text-zinc-100">{duzenlenen.ad}</p>
+                <p className="text-xs text-zinc-500">{duzenlenen.eposta}</p>
+              </div>
+              <button type="button" onClick={() => setDuzenlenen(null)} aria-label="Kapat" className="text-zinc-500 hover:text-zinc-200">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-zinc-400">Paket</label>
+                <div className="flex gap-1.5">
+                  {([['baslangic', 'Başlangıç'], ['pro', 'Pro'], ['sinirsiz', 'Sınırsız']] as const).map(([id, etiket]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setTier(id)}
+                      className={cn(
+                        'flex-1 border px-3 py-2 text-xs font-semibold transition-colors',
+                        tier === id
+                          ? 'border-[color:var(--kade-a-200)] bg-[color:var(--kade-a-50)] text-[color:var(--kade-a-600)]'
+                          : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:text-zinc-200',
+                      )}
+                    >
+                      {etiket}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-zinc-400">Dönem</label>
+                  <select
+                    value={donem}
+                    onChange={(e) => setDonem(e.target.value as 'monthly' | 'yearly')}
+                    className="w-full border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 focus:border-[color:var(--kade-a-500)] focus:outline-none"
+                  >
+                    <option value="monthly">Aylık</option>
+                    <option value="yearly">Yıllık</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-zinc-400">Süre (ay)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={36}
+                    value={ay}
+                    onChange={(e) => setAy(Math.min(36, Math.max(1, Number(e.target.value) || 1)))}
+                    className="w-full border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm tabular-nums text-zinc-100 focus:border-[color:var(--kade-a-500)] focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {islemHatasi && (
+              <p className="border border-[color:var(--kade-err-400)]/30 bg-[color:var(--kade-err-400)]/10 p-2.5 text-xs text-[color:var(--kade-err-400)]">
+                {islemHatasi}
+              </p>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={islemde}
+                onClick={() => void paketiUygula('ver')}
+                className="inline-flex flex-1 items-center justify-center gap-2 bg-[image:var(--kade-gradient)] px-4 py-2.5 text-sm font-semibold text-[color:var(--kade-on-accent)] disabled:opacity-50"
+              >
+                {islemde && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Paketi ver
+              </button>
+              {duzenlenen.paketTier && (
+                <button
+                  type="button"
+                  disabled={islemde}
+                  onClick={() => void paketiUygula('kaldir')}
+                  className="border border-[color:var(--kade-err-400)]/30 px-4 py-2.5 text-sm text-[color:var(--kade-err-400)] disabled:opacity-50"
+                >
+                  Paketi kaldır
+                </button>
+              )}
+            </div>
+
+            <p className="text-[11px] leading-5 text-zinc-500">
+              Elle verilen paket satın alınanla aynı biçimde yazılır; kullanıcı aynı
+              özelliklere kavuşur. İşlem denetim kaydına düşer.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

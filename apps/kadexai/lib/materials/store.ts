@@ -110,6 +110,24 @@ export async function queryMaterials(filters: MaterialFilters) {
   return data ?? []
 }
 
+/**
+ * Tek materyali kimliğiyle getirir.
+ *
+ * İndirme ucu buna dayanıyor: indirilecek adres istekten DEĞİL havuzdan
+ * okunuyor. İstemciden gelen adrese güvenilseydi uç, sunucunun ağından
+ * herhangi bir yere istek attırmak için kullanılabilirdi.
+ */
+export async function getMaterialById(id: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('kade_materials')
+    .select('id, title, kind, media_url')
+    .eq('id', id)
+    .maybeSingle()
+  if (error) throw new Error(error.message)
+  return data ?? null
+}
+
 export async function materialStats() {
   const supabase = await createClient()
   const [{ count: toplam }, { data: sonKosu }] = await Promise.all([

@@ -2,12 +2,21 @@
 
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Loader2, MessageCircle, X } from 'lucide-react'
+import { ArrowRight, MessageCircle, X } from 'lucide-react'
 import { apiFetch } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
 import { useProfile } from '@/lib/context/ProfileContext'
 import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 import { TOOL_REGISTRY, getToolById } from '@/lib/tools/registry'
+import KadeOrb from './KadeOrb'
+import {
+  AdimDurumu,
+  ToolInvocation,
+  ToolInvocationContentCollapsible,
+  ToolInvocationHeader,
+  ToolInvocationName,
+  ToolInvocationRawData,
+} from '@/components/ui/tool-invocation'
 
 /**
  * Çalışma alanı asistanı.
@@ -23,6 +32,10 @@ import { TOOL_REGISTRY, getToolById } from '@/lib/tools/registry'
  */
 
 type Mesaj = { rol: 'sen' | 'asistan'; metin: string; araclar?: string[] }
+
+/** Cevap gelmeden önce yapılan işler. Eskiden görünmezdi: kullanıcı yalnızca
+ *  "Düşünüyor…" görüp asistanın neyi bildiğini bilmiyordu. */
+type Adim = { ad: string; durum: AdimDurumu; veri?: string }
 
 /** Cevapta adı geçen araçları bulur; kullanıcı okuyup bırakmak yerine açsın. */
 function gecenAraclar(cevap: string): string[] {
@@ -42,13 +55,24 @@ export default function WorkspaceAssistant() {
   const [mesajlar, setMesajlar] = useState<Mesaj[]>([])
   const [yukleniyor, setYukleniyor] = useState(false)
   const [hata, setHata] = useState('')
+  const [adimlar, setAdimlar] = useState<Adim[]>([])
   const sonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     sonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [mesajlar, yukleniyor])
+  }, [mesajlar, yukleniyor, adimlar])
 
   /** Marka profili + son çalışmalar: cevabın genel olmamasını sağlayan bağlam. */
+  const adimYaz = (ad: string, durum: AdimDurumu, veri?: string) =>
+    setAdimlar((a) => {
+      const i = a.findIndex((x) => x.ad === ad)
+      const yeni = { ad, durum, veri }
+      if (i === -1) return [...a, yeni]
+      const kopya = [...a]
+      kopya[i] = yeni
+      return kopya
+    })
+
   const baglamKur = async (): Promise<string> => {
     const marka = account?.brand
     const parcalar = [
@@ -59,6 +83,13 @@ export default function WorkspaceAssistant() {
       marka?.description ? `Açıklama: ${marka.description}` : '',
     ].filter(Boolean)
 
+    adimYaz(
+      'Marka profili okundu',
+      parcalar.length ? 'bitti' : 'hata',
+      parcalar.length ? parcalar.join('\n') : 'Marka profili boş — cevap genel kalabilir.',
+    )
+
+    adimYaz('Son çalışmalar okunuyor', 'calisiyor')
     try {
       const r = await fetch(apiPath('/api/history?limit=8'))
       if (r.ok) {
@@ -66,10 +97,19 @@ export default function WorkspaceAssistant() {
         const adlar = ((d.history ?? []) as Array<{ tool: string }>)
           .map((h) => getToolById(h.tool)?.name)
           .filter(Boolean)
-        if (adlar.length) parcalar.push(`Son kullandığı araçlar: ${[...new Set(adlar)].join(', ')}`)
+        const tekil = [...new Set(adlar)]
+        if (tekil.length) parcalar.push(`Son kullandığı araçlar: ${tekil.join(', ')}`)
+        adimYaz(
+          'Son çalışmalar okundu',
+          'bitti',
+          tekil.length ? tekil.join(', ') : 'Henüz kayıtlı çalışma yok.',
+        )
+      } else {
+        adimYaz('Son çalışmalar okunamadı', 'hata', `Sunucu ${r.status} döndü.`)
       }
     } catch {
       // Geçmiş okunamazsa asistan yine çalışsın, yalnızca bağlamı daha dar olur.
+      adimYaz('Son çalışmalar okunamadı', 'hata', 'Ağ hatası — bağlam dar kaldı.')
     }
 
     return parcalar.join('\n') || 'Kullanıcı henüz marka profilini doldurmadı.'
@@ -82,9 +122,11 @@ export default function WorkspaceAssistant() {
     setSoru('')
     setHata('')
     setMesajlar((m) => [...m, { rol: 'sen', metin: q }])
+    setAdimlar([{ ad: 'Marka profili okunuyor', durum: 'calisiyor' }])
     setYukleniyor(true)
     try {
       const baglam = await baglamKur()
+      adimYaz('Asistan yanıtlıyor', 'calisiyor')
       const r = await apiFetch('/api/assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,8 +134,10 @@ export default function WorkspaceAssistant() {
       })
       const d = await r.json()
       if (!r.ok || d.error) throw new Error(d.error || 'Cevap alınamadı')
+      adimYaz('Asistan yanıtladı', 'bitti', d.model ? `Model: ${d.model}` : undefined)
       setMesajlar((m) => [...m, { rol: 'asistan', metin: d.answer, araclar: gecenAraclar(d.answer) }])
     } catch (err) {
+      adimYaz('Asistan yanıtlayamadı', 'hata', err instanceof Error ? err.message : undefined)
       setHata(err instanceof Error ? err.message : 'Hata oluştu')
     } finally {
       setYukleniyor(false)
@@ -144,9 +188,25 @@ export default function WorkspaceAssistant() {
                 )}
               </div>
             ))}
+            {adimlar.length > 0 && (
+              <div className="kade-assistant-adimlar">
+                {adimlar.map((a) => (
+                  <ToolInvocation key={a.ad}>
+                    <ToolInvocationHeader>
+                      <ToolInvocationName name={a.ad} durum={a.durum} />
+                    </ToolInvocationHeader>
+                    {a.veri && (
+                      <ToolInvocationContentCollapsible>
+                        <ToolInvocationRawData data={a.veri} title="Ne okundu" />
+                      </ToolInvocationContentCollapsible>
+                    )}
+                  </ToolInvocation>
+                ))}
+              </div>
+            )}
             {yukleniyor && (
-              <div className="kade-assistant-mesaj kade-assistant-asistan">
-                <p className="flex items-center gap-2"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Düşünüyor…</p>
+              <div className="kade-assistant-dusunuyor">
+                <KadeOrb size={64} />
               </div>
             )}
             {hata && <p className="kade-assistant-hata">{hata}</p>}

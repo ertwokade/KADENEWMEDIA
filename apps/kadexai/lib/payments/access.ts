@@ -63,6 +63,28 @@ export async function getActiveEntitlement(): Promise<ActiveEntitlement | null> 
   return null
 }
 
+/**
+ * Kendi sağlayıcı anahtarını girebilir mi?
+ *
+ * Eskiden tek şart `api_included === false` idi: yani API'yi pakete dahil
+ * ETMEYEN "Kendi Anahtarın" paketi. Sahibin yetkisi ise en üst paket olduğu
+ * için `api_included: true` dönüyordu — her pakete sahip olan tek kişi,
+ * BYOK ekranında yazı bile yazamıyordu (input `disabled` kalıyordu).
+ *
+ * Kendi anahtarını kullanmak bir kısıt değil, bir yetenek: API dahil paketi
+ * olan da kendi anahtarını girip kendi kotasından harcamak isteyebilir.
+ * Bu yüzden sahip her zaman, diğerleri ise etkin bir yetkisi olduğunda açık.
+ */
+export async function canUseOwnProviderKeys(): Promise<boolean> {
+  const supabase = await createClient()
+  const { data: userData } = await supabase.auth.getUser()
+  const user = userData?.user
+  if (user && (isAllowedOwnerUser(user) || isSettingsOwnerUser(user))) return true
+
+  const ent = await getActiveEntitlement()
+  return Boolean(ent)
+}
+
 export async function userHasFeature(feature: string): Promise<boolean> {
   const ent = await getActiveEntitlement()
   return Boolean(ent?.features?.includes(feature))

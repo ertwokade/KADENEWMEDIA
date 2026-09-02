@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { assertAuthenticatedUser } from '@/lib/auth/server'
-import { getActiveEntitlement } from '@/lib/payments/access'
+import { canUseOwnProviderKeys } from '@/lib/payments/access'
 import {
   deleteUserProviderKey,
   isUserKeyProvider,
@@ -24,14 +24,11 @@ export async function GET(request: NextRequest) {
   try {
     const user = await assertAuthenticatedUser()
     if (!user) return NextResponse.json({ error: 'Oturum gerekli.' }, { status: 401, headers: values })
-    const [keys, entitlement] = await Promise.all([
+    const [keys, byokPlan] = await Promise.all([
       listUserProviderKeyStatus(user.id),
-      getActiveEntitlement(),
+      canUseOwnProviderKeys(),
     ])
-    return NextResponse.json({
-      keys,
-      byokPlan: Boolean(entitlement && entitlement.api_included === false),
-    }, { headers: values })
+    return NextResponse.json({ keys, byokPlan }, { headers: values })
   } catch (error) {
     captureApiError(error, '/api/provider-keys#get')
     return NextResponse.json({ error: 'API anahtarı durumu okunamadı.' }, { status: 503, headers: values })
@@ -44,9 +41,8 @@ export async function PUT(request: NextRequest) {
   try {
     const user = await assertAuthenticatedUser()
     if (!user) return NextResponse.json({ error: 'Oturum gerekli.' }, { status: 401, headers: values })
-    const entitlement = await getActiveEntitlement()
-    if (!entitlement || entitlement.api_included !== false) {
-      return NextResponse.json({ error: 'Bu alan yalnızca Kendi Anahtarın paketlerinde kullanılabilir.' }, { status: 403, headers: values })
+    if (!(await canUseOwnProviderKeys())) {
+      return NextResponse.json({ error: 'Kendi anahtarını girmek için etkin bir paket gerekli.' }, { status: 403, headers: values })
     }
     const body = await request.json() as { provider?: unknown; key?: unknown }
     if (!isUserKeyProvider(body.provider) || typeof body.key !== 'string') {

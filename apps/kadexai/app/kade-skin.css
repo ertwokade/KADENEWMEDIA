@@ -1095,3 +1095,37 @@ html[data-theme='dark'] .kade-auth-success { border-color: #7ee2ac; background: 
 .kade-assistant-form button:disabled { background: var(--kade-surface-soft); color: var(--kade-faint); cursor: not-allowed; }
 
 @media print { .kade-assistant, .kade-assistant-fab { display: none; } }
+
+/* Asistan küresi: shader spektral çalışıyor, grileştirip altına boyuyoruz.
+   Tuval zorunlu olarak siyah zeminli; açık temada delik gibi durmasın diye
+   panelin başka yerlerinde de kullanılan "koyu ada" gibi çerçeveleniyor. */
+.kade-orb {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  border-radius: 50%;
+  flex: none;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--kade-accent) 30%, transparent),
+    0 10px 26px -10px var(--kade-glow);
+}
+.kade-orb-canvas {
+  display: block;
+  border-radius: 50% !important;
+  background: #080906 !important;
+  filter: grayscale(1) contrast(1.15);
+}
+.kade-orb-tint {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--kade-accent);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kade-orb-canvas { filter: grayscale(1) contrast(1.15) brightness(.8); }
+}
+
+.kade-assistant-adimlar { display: grid; gap: 6px; margin: 4px 0; }
+.kade-assistant-dusunuyor { display: flex; justify-content: center; padding: 10px 0 6px; }

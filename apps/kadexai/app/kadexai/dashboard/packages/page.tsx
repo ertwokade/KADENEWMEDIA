@@ -54,6 +54,22 @@ function formatPrice(minor: number) {
   return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(minor / 100)
 }
 
+type Plan = {
+  tier: string
+  label?: string
+  period: string | null
+  apiIncluded: boolean
+  features: string[]
+  expiresAt: string | null
+}
+
+/** Sahip olunan paket, karttaki paketle aynı mı? Dönem ve API dahil olma
+ *  durumu da eşleşmeli: aynı kademenin aylık ve yıllık hâli ayrı ürün. */
+function sendeVar(plan: Plan | null, pkg: Pkg): boolean {
+  if (!plan || plan.tier === 'free') return false
+  return plan.tier === pkg.tier && plan.period === pkg.period && plan.apiIncluded === pkg.apiIncluded
+}
+
 export default function PackagesPage() {
   const [packages, setPackages] = useState<Pkg[]>([])
   const [period, setPeriod] = useState<Period>('monthly')
@@ -66,17 +82,22 @@ export default function PackagesPage() {
   // yayınlayana kadar bu liste boştur ve satın alma akışı değişmez.
   const [legalDocuments, setLegalDocuments] = useState<Array<{ slug: string; title: string }>>([])
   const [acceptedLegal, setAcceptedLegal] = useState<string[]>([])
+  // Sayfa yalnızca satış listesiydi: hangi paketin senin olduğunu, neyin
+  // zaten açık olduğunu göstermiyordu. Etkin yetki buradan okunuyor.
+  const [plan, setPlan] = useState<Plan | null>(null)
 
   useEffect(() => {
     Promise.all([
       apiFetch(apiPath('/api/packages')).then((r) => r.json()),
       apiFetch(apiPath('/api/payments/offers')).then((r) => r.ok ? r.json() : { offers: [] }),
       apiFetch(apiPath('/api/legal')).then((r) => r.ok ? r.json() : { checkoutDocuments: [] }),
+      apiFetch(apiPath('/api/usage')).then((r) => r.ok ? r.json() : null),
     ])
-      .then(([packageData, offerData, legalData]) => {
+      .then(([packageData, offerData, legalData, usageData]) => {
         setPackages(packageData.packages || [])
         setOffers(offerData.offers || [])
         setLegalDocuments(legalData.checkoutDocuments || [])
+        setPlan(usageData?.plan ?? null)
         captureAnalytics('package_viewed')
         if (offerData.offers?.length) captureAnalytics('custom_offer_viewed', { count: offerData.offers.length })
       })
@@ -196,41 +217,69 @@ export default function PackagesPage() {
           <p className="text-sm text-zinc-500">Yükleniyor…</p>
         ) : (
           <div className="grid gap-4 md:grid-cols-3">
-            {visible.map((pkg) => (
+            {visible.map((pkg) => {
+              const senin = sendeVar(plan, pkg)
+              const sahipOlunanOzellikler = new Set(plan?.features ?? [])
+              return (
               <div
                 key={pkg.id}
                 className={cn(
                   'flex flex-col rounded-2xl border p-6',
-                  pkg.tier === 'pro' ? 'border-violet-500/50 bg-violet-500/5' : 'border-zinc-800 bg-zinc-900/50',
+                  senin
+                    ? 'border-[color:var(--kade-accent)] bg-[color:var(--kade-a-50)]'
+                    : pkg.tier === 'pro' ? 'border-violet-500/50 bg-violet-500/5' : 'border-zinc-800 bg-zinc-900/50',
                 )}
               >
-                <div className="mb-1 flex items-center justify-between">
+                <div className="mb-1 flex items-center justify-between gap-2">
                   <h3 className="text-lg font-semibold text-zinc-100">{pkg.tierLabel || pkg.name}</h3>
-                  {pkg.tier === 'pro' && <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs text-violet-300">En popüler</span>}
+                  {senin
+                    ? <span className="rounded-full bg-[color:var(--kade-accent)] px-2 py-0.5 text-xs font-semibold text-[color:var(--kade-on-accent)]">Senin paketin</span>
+                    : pkg.tier === 'pro' && <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs text-violet-300">En popüler</span>}
                 </div>
                 <div className="mb-4">
                   <span className="text-3xl font-bold text-zinc-100">{formatPrice(pkg.amountMinor)}</span>
                   <span className="text-sm text-zinc-500"> / {PERIOD_LABEL[pkg.period].toLowerCase()}</span>
                 </div>
                 <ul className="mb-6 flex-1 space-y-2 text-sm text-zinc-300">
-                  {pkg.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2">
-                      <span className="text-emerald-400">✓</span> {FEATURE_LABEL[f] ?? f}
-                    </li>
-                  ))}
+                  {pkg.features.map((f) => {
+                    // Zaten açık olan özellik: hangi paketi alırsan neyi
+                    // kaybetmeyeceğini görmek satın alma kararını kolaylaştırıyor.
+                    const acik = sahipOlunanOzellikler.has(f)
+                    return (
+                      <li key={f} className="flex items-center gap-2">
+                        <span className={acik ? 'text-[color:var(--kade-accent)]' : 'text-emerald-400'}>✓</span>
+                        <span>{FEATURE_LABEL[f] ?? f}</span>
+                        {acik && !senin && (
+                          <span className="ml-auto text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--kade-accent-text)]">açık</span>
+                        )}
+                      </li>
+                    )
+                  })}
                 </ul>
-                <button
-                  onClick={() => buy(pkg)}
-                  disabled={buying === pkg.id || !legalReady}
-                  className={cn(
-                    'rounded-lg px-4 py-2.5 text-sm font-medium transition disabled:opacity-50',
-                    pkg.tier === 'pro' ? 'bg-violet-500 text-white hover:bg-violet-400' : 'bg-zinc-100 text-zinc-900 hover:bg-white',
-                  )}
-                >
-                  {buying === pkg.id ? 'Yönlendiriliyor…' : 'Satın al'}
-                </button>
+                {senin ? (
+                  <div className="rounded-lg border border-[color:var(--kade-accent)]/40 px-4 py-2.5 text-center text-sm font-medium text-[color:var(--kade-accent-text)]">
+                    Kullanımda
+                    {plan?.expiresAt && (
+                      <span className="ml-1 font-normal text-zinc-500">
+                        · {new Date(plan.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}&apos;e kadar
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => buy(pkg)}
+                    disabled={buying === pkg.id || !legalReady}
+                    className={cn(
+                      'rounded-lg px-4 py-2.5 text-sm font-medium transition disabled:opacity-50',
+                      pkg.tier === 'pro' ? 'bg-violet-500 text-white hover:bg-violet-400' : 'bg-zinc-100 text-zinc-900 hover:bg-white',
+                    )}
+                  >
+                    {buying === pkg.id ? 'Yönlendiriliyor…' : 'Satın al'}
+                  </button>
+                )}
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
 

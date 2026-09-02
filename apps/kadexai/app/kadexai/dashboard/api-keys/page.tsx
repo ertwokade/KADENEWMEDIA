@@ -102,11 +102,11 @@ export default function ApiKeysPage() {
             <div className="flex items-start gap-3">
               {byokPlan ? <ShieldCheck className="mt-0.5 h-5 w-5 text-emerald-400" /> : <KeyRound className="mt-0.5 h-5 w-5 text-amber-400" />}
               <div>
-                <h2 className="text-sm font-semibold text-zinc-100">{byokPlan ? 'Kendi Anahtarın paketi etkin' : 'BYOK paketi gerekli'}</h2>
+                <h2 className="text-sm font-semibold text-zinc-100">{byokPlan ? 'Kendi anahtarını kullanabilirsin' : 'Etkin paket gerekli'}</h2>
                 <p className="mt-1 text-xs leading-5 text-zinc-400">
                   {byokPlan
-                    ? 'Anahtarlar AES-256-GCM ile şifrelenir; kaydedilen değer tarayıcıya bir daha gönderilmez.'
-                    : 'Anahtar ekleme, API hariç “Kendi Anahtarın” paketi etkin olduğunda açılır.'}
+                    ? 'Anahtarlar AES-256-GCM ile şifrelenir; kaydedilen değer tarayıcıya bir daha gönderilmez. Kendi anahtarını girersen o sağlayıcının çağrıları senin kotandan harcanır, paket kotan tükenmez.'
+                    : 'Kendi anahtarını girebilmek için etkin bir paket gerekli. Paketler sayfasından bir paket seçebilirsin.'}
                 </p>
               </div>
             </div>

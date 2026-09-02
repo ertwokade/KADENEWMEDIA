@@ -125,16 +125,16 @@ export default function MateryalPage() {
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[220px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--kade-faint)]" />
             <input
               value={arama}
               onChange={(e) => setArama(e.target.value)}
               placeholder="Başlıkta ara"
-              className="w-full pl-9 pr-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-sm outline-none focus:border-[var(--accent)]"
+              className="w-full pl-9 pr-3 py-2 rounded-lg bg-[var(--kade-surface-soft)] border border-[var(--kade-line)] text-sm outline-none focus:border-[var(--kade-accent)]"
             />
           </div>
 
-          <div className="flex items-center gap-1 rounded-lg border border-[var(--border)] p-1">
+          <div className="flex items-center gap-1 rounded-lg border border-[var(--kade-line)] p-1">
             {KINDS.map((k) => (
               <button
                 key={k.key || 'tum'}
@@ -142,7 +142,7 @@ export default function MateryalPage() {
                 onClick={() => setTur(k.key)}
                 className={cn(
                   'px-3 py-1.5 text-xs rounded-md transition-colors',
-                  tur === k.key ? 'bg-[var(--accent)] text-black' : 'text-[var(--muted)] hover:text-[var(--fg)]'
+                  tur === k.key ? 'bg-[var(--kade-accent)] text-black' : 'text-[var(--kade-faint)] hover:text-[var(--kade-ink)]'
                 )}
               >
                 {k.label}
@@ -153,7 +153,7 @@ export default function MateryalPage() {
           <select
             value={sirala}
             onChange={(e) => setSirala(e.target.value)}
-            className="px-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)] text-sm outline-none"
+            className="px-3 py-2 rounded-lg bg-[var(--kade-surface-soft)] border border-[var(--kade-line)] text-sm outline-none"
           >
             {SORTS.map((s) => (
               <option key={s.key} value={s.key}>{s.label}</option>
@@ -164,19 +164,19 @@ export default function MateryalPage() {
             type="button"
             onClick={topla}
             disabled={toplaniyor}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent)] text-black text-sm font-semibold disabled:opacity-60"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--kade-accent)] text-black text-sm font-semibold disabled:opacity-60"
           >
             {toplaniyor ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             Kütüphaneyi tazele
           </button>
         </div>
 
-        <p className="text-xs text-[var(--muted)]">
+        <p className="text-xs text-[var(--kade-faint)]">
           Havuzda {toplam.toLocaleString('tr-TR')} materyal · {ozet}
         </p>
 
         {toplamaOzeti && (
-          <p className="text-xs text-[var(--muted)] border-l-2 border-[var(--accent)] pl-3">{toplamaOzeti}</p>
+          <p className="text-xs text-[var(--kade-faint)] border-l-2 border-[var(--kade-accent)] pl-3">{toplamaOzeti}</p>
         )}
 
         {hata && (
@@ -184,13 +184,13 @@ export default function MateryalPage() {
         )}
 
         {yukleniyor ? (
-          <div className="flex items-center justify-center py-20 text-[var(--muted)]">
+          <div className="flex items-center justify-center py-20 text-[var(--kade-faint)]">
             <Loader2 className="w-5 h-5 animate-spin" />
           </div>
         ) : materyaller.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-[var(--border)] px-6 py-16 text-center">
-            <p className="text-sm text-[var(--muted)]">
-              Havuz boş. &quot;Kaynağı tara&quot; ile arsivhub arşivini içeri alabilirsin.
+          <div className="rounded-xl border border-dashed border-[var(--kade-line)] px-6 py-16 text-center">
+            <p className="text-sm text-[var(--kade-faint)]">
+              Havuz boş. &quot;Kütüphaneyi tazele&quot; ile kaynak arşivini içeri alabilirsin.
             </p>
           </div>
         ) : (
@@ -198,7 +198,7 @@ export default function MateryalPage() {
             {materyaller.map((m) => (
               <div
                 key={m.id}
-                className="group rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--surface)] transition-colors hover:border-[var(--accent)]"
+                className="group rounded-xl overflow-hidden border border-[var(--kade-line)] bg-[var(--kade-surface-soft)] transition-colors hover:border-[var(--kade-accent)]"
               >
                 <button
                   type="button"
@@ -216,7 +216,7 @@ export default function MateryalPage() {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full grid place-items-center text-[var(--muted)]">
+                    <div className="w-full h-full grid place-items-center text-[var(--kade-faint)]">
                       {m.kind === 'video' ? <Video className="w-6 h-6" /> : <ImageIcon className="w-6 h-6" />}
                     </div>
                   )}
@@ -231,7 +231,7 @@ export default function MateryalPage() {
                 </button>
                 <div className="p-3 space-y-1.5">
                   <p className="text-sm font-medium line-clamp-2">{m.title}</p>
-                  <div className="flex items-center gap-3 text-[11px] text-[var(--muted)]">
+                  <div className="flex items-center gap-3 text-[11px] text-[var(--kade-faint)]">
                     <span className="inline-flex items-center gap-1">
                       {m.kind === 'video' ? <Video className="w-3 h-3" /> : <ImageIcon className="w-3 h-3" />}
                       {m.kind === 'video' ? 'Video' : 'Fotoğraf'}
@@ -251,9 +251,8 @@ export default function MateryalPage() {
                   </div>
                   {m.media_url && (
                     <a
-                      href={m.media_url}
-                      download
-                      className="inline-flex items-center gap-1.5 mt-1 text-[11px] font-semibold text-[var(--muted)] hover:text-[var(--fg)]"
+                      href={apiPath(`/api/materials/download?id=${encodeURIComponent(m.id)}`)}
+                      className="inline-flex items-center gap-1.5 mt-1 text-[11px] font-semibold text-[var(--kade-faint)] hover:text-[var(--kade-ink)]"
                     >
                       <Download className="w-3.5 h-3.5" />
                       İndir
@@ -292,9 +291,8 @@ export default function MateryalPage() {
               <p className="text-sm text-white/90">{acik.title}</p>
               {acik.media_url && (
                 <a
-                  href={acik.media_url}
-                  download
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent)] text-black text-xs font-semibold"
+                  href={apiPath(`/api/materials/download?id=${encodeURIComponent(acik.id)}`)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--kade-accent)] text-black text-xs font-semibold"
                 >
                   <Download className="w-3.5 h-3.5" /> İndir
                 </a>
