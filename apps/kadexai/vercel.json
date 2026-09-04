@@ -63,6 +63,16 @@
   ],
   "redirects": [
     {
+      "source": "/kadexai",
+      "destination": "https://kadexai.kadenewmedia.com/kadexai",
+      "permanent": false
+    },
+    {
+      "source": "/kadexai/:path*",
+      "destination": "https://kadexai.kadenewmedia.com/kadexai/:path*",
+      "permanent": false
+    },
+    {
       "source": "/kadeai/:path*",
       "destination": "/kadexai/:path*",
       "permanent": true
