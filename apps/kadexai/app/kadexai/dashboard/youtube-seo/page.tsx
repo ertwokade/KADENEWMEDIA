@@ -45,7 +45,7 @@ export default function YoutubeSeoPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="YouTube SEO Analizi" description="Başlık, açıklama ve etiketlerini optimize et" />
+      <TopBar title="YouTube SEO" description="Başlık, açıklama ve etiketlerini optimize et" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80 space-y-4">

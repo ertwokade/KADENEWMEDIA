@@ -33,6 +33,19 @@ export default function CalendarPage() {
   const [syncError, setSyncError] = useState('')
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const title = params.get('title')
+    const platform = params.get('platform')
+    if (!title) return
+    setNewEntry((current) => ({
+      ...current,
+      title,
+      platform: platforms.includes(platform as Platform) ? platform as Platform : current.platform,
+    }))
+    setShowForm(true)
+  }, [])
+
+  useEffect(() => {
     fetch(apiPath('/api/calendar'), { cache: 'no-store' })
       .then(async (response) => ({ response, data: await response.json() }))
       .then(({ response, data }) => {
@@ -44,7 +57,14 @@ export default function CalendarPage() {
           platform: String(entry.platform || 'youtube') as Platform,
           status: (['taslak', 'hazır', 'yayında'].includes(String(entry.status)) ? entry.status : 'taslak') as CalendarEntry['status'],
         })) : []
-        setEntries(cloudEntries)
+        let localEntries: CalendarEntry[] = []
+        try {
+          const stored = JSON.parse(localStorage.getItem(CALENDAR_STORAGE_KEY) || '[]')
+          if (Array.isArray(stored)) localEntries = stored
+        } catch { localStorage.removeItem(CALENDAR_STORAGE_KEY) }
+        const signature = (entry: CalendarEntry) => `${entry.date}|${entry.platform}|${entry.title}`
+        const cloudSignatures = new Set(cloudEntries.map(signature))
+        setEntries([...cloudEntries, ...localEntries.filter((entry) => !cloudSignatures.has(signature(entry)))])
       })
       .catch(() => {
         try {

@@ -12,7 +12,7 @@ export function getPlatformLabel(platform: Platform): string {
     youtube: 'YouTube',
     instagram: 'Instagram',
     tiktok: 'TikTok',
-    x: 'X / Twitter',
+    x: 'X (Twitter)',
     linkedin: 'LinkedIn',
     pinterest: 'Pinterest',
   }

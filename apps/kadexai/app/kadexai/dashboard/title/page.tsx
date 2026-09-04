@@ -2,12 +2,14 @@
 
 import { apiFetch } from '@/lib/client/api'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
 import { Platform, ContentTone, AIModel } from '@/types'
 import { collectSettledResults, getPlatformLabel, getModelLabel, getModelColor, cn } from '@/lib/utils'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 
 const platforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin', 'pinterest']
 const tones: ContentTone[] = ['bilgilendirici', 'eğlenceli', 'ilham verici', 'dikkat çekici', 'samimi']
@@ -15,6 +17,7 @@ const tones: ContentTone[] = ['bilgilendirici', 'eğlenceli', 'ilham verici', 'd
 interface PlatformResult { platform: Platform; titles: string[]; model: AIModel }
 
 export default function TitlePage() {
+  const workspaceHref = useWorkspaceHref()
   const { selectedModel, compareModels } = useModel()
   const [topic, setTopic]           = useState('')
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['youtube'])
@@ -153,10 +156,15 @@ export default function TitlePage() {
                       <span className="text-zinc-600 text-xs">{r.titles.length} başlık</span>
                     </div>
                     {r.titles.map((title, i) => (
-                      <div key={i} className="flex items-start gap-3 rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4">
+                      <div key={i} className="flex flex-wrap items-start gap-3 rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4">
                         <span className="text-zinc-600 text-xs mt-0.5 w-4 flex-shrink-0">{i + 1}</span>
                         <p className="flex-1 text-zinc-200 text-sm leading-relaxed">{title}</p>
                         <CopyButton text={title} />
+                        <div className="ml-7 flex w-full flex-wrap gap-2 text-[11px]">
+                          <Link prefetch={false} href={workspaceHref(`/dashboard/viral-score?title=${encodeURIComponent(title)}&platform=${r.platform}`)} className="text-violet-400 hover:text-violet-300">Viral skoru ölç →</Link>
+                          <Link prefetch={false} href={workspaceHref(`/dashboard/ai-thumbnail?title=${encodeURIComponent(title)}&topic=${encodeURIComponent(topic)}`)} className="text-violet-400 hover:text-violet-300">Thumbnail üret →</Link>
+                          <Link prefetch={false} href={workspaceHref(`/dashboard/calendar?title=${encodeURIComponent(title)}&platform=${r.platform}`)} className="text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
+                        </div>
                       </div>
                     ))}
                   </div>

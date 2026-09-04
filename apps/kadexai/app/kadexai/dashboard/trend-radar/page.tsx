@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Activity, AlertTriangle, BarChart2, Bell, Eye, Lightbulb, Loader2,
-  MessageCircle, Radio, Search, Send, Sprout, Trash2, X,
+  Download, MessageCircle, Radio, Search, Send, Sprout, Trash2, X,
 } from 'lucide-react'
 import { apiFetch } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
@@ -27,6 +27,16 @@ const TABS: Array<{ key: TabKey; label: string; icon: typeof Radio }> = [
 
 const PLATFORMS = ['tiktok', 'instagram', 'youtube_shorts', 'youtube', 'google', 'reddit', 'music']
 const KINDS = ['hashtag', 'sound', 'video', 'creator', 'topic', 'keyword']
+const COUNTRIES = [
+  { value: 'TR', label: 'Türkiye' }, { value: 'US', label: 'ABD' },
+  { value: 'GB', label: 'Birleşik Krallık' }, { value: 'DE', label: 'Almanya' },
+  { value: 'FR', label: 'Fransa' }, { value: 'ES', label: 'İspanya' },
+]
+const LANGUAGES = [
+  { value: 'tr', label: 'Türkçe' }, { value: 'en', label: 'İngilizce' },
+  { value: 'de', label: 'Almanca' }, { value: 'fr', label: 'Fransızca' },
+  { value: 'es', label: 'İspanyolca' },
+]
 const SORTS: Array<{ key: string; label: string }> = [
   { key: 'score', label: 'Skor' },
   { key: 'velocity', label: 'Hız' },
@@ -39,6 +49,8 @@ interface StatsResponse {
   snapshots: number
   links: number
   alerts: number
+  /** Uc, Supabase yapilandirilmadigi icin bos liste dondurduyse true. */
+  localFallback?: boolean
   lastRun: { started_at: string; status: string; items_found: number; items_new: number } | null
   byPlatform: Array<{ value: string; count: number }>
   byStage: Array<{ value: string; count: number }>
@@ -102,6 +114,8 @@ export default function TrendRadarPage() {
   const [error, setError] = useState('')
 
   const [platform, setPlatform] = useState('all')
+  const [country, setCountry] = useState('TR')
+  const [language, setLanguage] = useState('tr')
   const [category, setCategory] = useState('all')
   const [kind, setKind] = useState('all')
   const [stage, setStage] = useState('all')
@@ -119,6 +133,7 @@ export default function TrendRadarPage() {
   const [watchTerm, setWatchTerm] = useState('')
   const [detail, setDetail] = useState<TrendDetail | null>(null)
   const [canCollect, setCanCollect] = useState(false)
+  const [dbMissing, setDbMissing] = useState(false)
   const [digestSending, setDigestSending] = useState(false)
   const [digestStatus, setDigestStatus] = useState('')
   const [selectionSending, setSelectionSending] = useState(false)
@@ -133,8 +148,10 @@ export default function TrendRadarPage() {
     try {
       const res = await apiFetch('/api/kade-search/stats')
       const json = await res.json()
-      if (res.ok) setStats(json)
-      else setError(json.error || 'Durum bilgisi alınamadı')
+      if (res.ok) {
+        setStats(json)
+        setDbMissing(json.localFallback === true)
+      } else setError(json.error || 'Durum bilgisi alınamadı')
     } catch {
       setError('Durum bilgisi alınamadı')
     }
@@ -156,6 +173,8 @@ export default function TrendRadarPage() {
     try {
       const params = new URLSearchParams()
       if (platform !== 'all') params.set('platform', platform)
+      if (country !== 'all') params.set('country', country)
+      if (language !== 'all') params.set('language', language)
       if (category !== 'all') params.set('category', category)
       if (kind !== 'all') params.set('kind', kind)
       if (stage !== 'all') params.set('stage', stage)
@@ -166,18 +185,28 @@ export default function TrendRadarPage() {
 
       const url =
         tab === 'trendler' ? `/api/kade-search/trends?${params}`
-        : tab === 'radar' ? `/api/kade-search/radar?since=${since}&limit=40`
+        : tab === 'radar' ? `/api/kade-search/radar?${new URLSearchParams({
+            since,
+            limit: '40',
+            ...(country !== 'all' ? { country } : {}),
+            ...(language !== 'all' ? { language } : {}),
+          })}`
         : tab === 'nabiz' ? '/api/kade-search/pulse?limit=4'
         : tab === 'fikirler' ? `/api/kade-search/ideas?${new URLSearchParams({
             limit: '12',
             ...(category !== 'all' ? { category } : {}),
             ...(platform !== 'all' ? { platform } : {}),
+            ...(country !== 'all' ? { country } : {}),
+            ...(language !== 'all' ? { language } : {}),
           })}`
         : '/api/kade-search/alerts?limit=60'
 
       const res = await apiFetch(url)
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Veri alınamadı')
+      /* Uclar yapilandirma eksikken 200 + bos liste donuyor; bunu "kayit yok"
+         diye gostermek yanlis, ayirt edilebilir olmasi gerekiyor. */
+      if (json.localFallback === true) setDbMissing(true)
 
       if (tab === 'trendler' || tab === 'radar') setTrends(json.trendler ?? [])
       else if (tab === 'nabiz') setPulse(json.nabiz ?? [])
@@ -188,7 +217,7 @@ export default function TrendRadarPage() {
     } finally {
       setLoading(false)
     }
-  }, [tab, platform, category, kind, stage, sort, since, search])
+  }, [tab, platform, country, language, category, kind, stage, sort, since, search])
 
   useEffect(() => {
     void loadStats()
@@ -277,6 +306,32 @@ export default function TrendRadarPage() {
       setSelectionSending(false)
     }
   }
+
+  const exportTrends = () => {
+    if (!trends.length) return
+    const fields: Array<[string, (trend: CurrentTrendRow) => unknown]> = [
+      ['Başlık', (trend) => trend.title], ['Platform', (trend) => platformLabel(trend.platform)],
+      ['Ülke', (trend) => trend.country], ['Dil', (trend) => trend.language],
+      ['Kategori', (trend) => trend.category], ['Tür', (trend) => trend.kind],
+      ['Skor', (trend) => trend.score], ['Hız', (trend) => trend.velocity],
+      ['Aşama', (trend) => trend.stage], ['Görüntülenme', (trend) => trend.views],
+      ['Beğeni', (trend) => trend.likes], ['İlk görülme', (trend) => trend.first_seen],
+      ['Son görülme', (trend) => trend.last_seen], ['Kaynak', (trend) => trend.url],
+    ]
+    const cell = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`
+    const csv = [fields.map(([label]) => cell(label)), ...trends.map((trend) => fields.map(([, read]) => cell(read(trend))))]
+      .map((row) => row.join(','))
+      .join('\n')
+    const url = URL.createObjectURL(new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' }))
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = `trend-radar-${new Date().toISOString().slice(0, 10)}.csv`
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const unconfiguredSources = (stats?.kaynaklar ?? []).filter((k) => !k.configured)
+  const neverCollected = Boolean(stats) && !dbMissing && stats!.trends === 0 && !stats!.lastRun
 
   const isEmpty =
     !loading &&
@@ -371,6 +426,22 @@ export default function TrendRadarPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-zinc-400">Ülke</label>
+                    <select value={country} onChange={(e) => setCountry(e.target.value)} className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-2 text-xs text-zinc-100 focus:border-[#f2c322] focus:outline-none">
+                      <option value="all">Tüm ülkeler</option>
+                      {COUNTRIES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-zinc-400">Dil</label>
+                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-2 text-xs text-zinc-100 focus:border-[#f2c322] focus:outline-none">
+                      <option value="all">Tüm diller</option>
+                      {LANGUAGES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
+                    </select>
+                  </div>
+                </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-zinc-400">Kategori</label>
                   <select
@@ -538,7 +609,56 @@ export default function TrendRadarPage() {
                   {label}
                 </button>
               ))}
+              {(tab === 'trendler' || tab === 'radar') && trends.length > 0 && (
+                <button
+                  type="button"
+                  onClick={exportTrends}
+                  className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:border-[#f2c322]/50 hover:text-zinc-200"
+                >
+                  <Download className="h-3.5 w-3.5" /> CSV dışa aktar
+                </button>
+              )}
             </div>
+
+            {dbMissing && (
+              <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-300">
+                <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <div className="space-y-1">
+                  <p className="font-semibold">Trend veritabanı bağlı değil.</p>
+                  <p className="text-xs leading-relaxed text-amber-200/80">
+                    Uçlar boş liste döndürüyor, bu yüzden bu ekranda hiçbir zaman veri
+                    görünmez. Uygulamanın çalıştığı ortamda{' '}
+                    <code className="rounded bg-amber-500/15 px-1">NEXT_PUBLIC_SUPABASE_URL</code>{' '}
+                    ve{' '}
+                    <code className="rounded bg-amber-500/15 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>{' '}
+                    tanımlı olmalı.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {neverCollected && (
+              <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-sky-500/25 bg-sky-500/10 p-4 text-sm text-sky-300">
+                <Radio className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <div className="space-y-1">
+                  <p className="font-semibold">Henüz hiç toplama çalışmadı.</p>
+                  <p className="text-xs leading-relaxed text-sky-200/80">
+                    Veritabanı bağlı ama içi boş: radar ancak toplama çalıştıktan sonra
+                    dolar. Zamanlanmış iş her gün 05:00’te tek bir kaynağı tarar.
+                    {canCollect
+                      ? ' Beklemek istemiyorsan soldaki toplama panelinden hemen başlatabilirsin.'
+                      : ' Toplamayı yalnızca hesap sahibi başlatabilir.'}
+                  </p>
+                  {unconfiguredSources.length > 0 && (
+                    <p className="text-xs leading-relaxed text-sky-200/60">
+                      Anahtarı tanımlı olmayan kaynaklar:{' '}
+                      {unconfiguredSources.map((k) => k.label).join(', ')} — bunlar ya hiç
+                      veri getirmez ya da tahmin modunda çalışır.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {error && (
               <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
@@ -557,8 +677,10 @@ export default function TrendRadarPage() {
             {isEmpty && !error && (
               <div className="flex h-64 flex-col items-center justify-center gap-2 text-center text-sm text-zinc-600">
                 <Radio className="h-8 w-8 text-zinc-700" />
-                <p>Bu filtrelerde kayıt yok.</p>
-                {canCollect && <p className="text-xs">Soldaki panelden bir toplama başlat.</p>}
+                <p>{dbMissing || neverCollected ? 'Gösterilecek veri yok.' : 'Bu filtrelerde kayıt yok.'}</p>
+                {!dbMissing && !neverCollected && canCollect && (
+                  <p className="text-xs">Soldaki panelden bir toplama başlat.</p>
+                )}
               </div>
             )}
 

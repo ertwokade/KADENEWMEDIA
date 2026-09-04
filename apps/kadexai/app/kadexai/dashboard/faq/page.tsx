@@ -29,6 +29,10 @@ const platformLabels: Record<Platform, string> = {
   instagram: 'Instagram',
 }
 
+function faqCategory(value: unknown) {
+  return typeof value === 'string' ? value.toLocaleLowerCase('tr-TR').replace('kullanım', 'kullanim') : 'genel'
+}
+
 export default function FAQPage() {
   const { selectedModel } = useModel()
   const [content, setContent] = useState('')
@@ -70,7 +74,7 @@ export default function FAQPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="SSS Üretici" description="İçeriğin için sık sorulan sorular oluştur" />
+      <TopBar title="FAQ Üretici" description="İçeriğin için sık sorulan sorular oluştur" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:h-full lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80">
@@ -120,8 +124,8 @@ export default function FAQPage() {
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <p className="text-zinc-100 text-sm font-semibold leading-snug">{faq.soru}</p>
                       <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium flex-shrink-0',
-                        categoryColors[faq.kategori?.toLowerCase()] || categoryColors.default)}>
-                        {faq.kategori}
+                        categoryColors[faqCategory(faq.kategori)] || categoryColors.default)}>
+                        {typeof faq.kategori === 'string' ? faq.kategori : 'Genel'}
                       </span>
                     </div>
                     <p className="text-zinc-400 text-xs leading-relaxed">{faq.cevap}</p>

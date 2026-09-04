@@ -23,8 +23,8 @@ const viewMeta: Record<string, { title: string; description: string }> = {
     description: 'Görsel ve video üretim stüdyosu',
   },
   calendar: {
-    title: 'Yayın Takvimi',
-    description: 'Çekim ve yayın tarihleri ay görünümünde',
+    title: 'Prodüksiyon Takvimi',
+    description: 'Prodüksiyon kartlarının çekim ve yayın tarihleri',
   },
   clients: {
     title: 'Müşteri & Teslim',

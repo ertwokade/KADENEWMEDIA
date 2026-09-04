@@ -16,10 +16,12 @@ export async function GET(req: NextRequest) {
       limit: Math.min(Number(p.get('limit') ?? 10), 40),
       category: p.get('category') ?? undefined,
       platform: p.get('platform') ?? undefined,
+      country: p.get('country') ?? 'TR',
+      language: p.get('language') ?? undefined,
       stage: p.get('stage') ?? undefined,
       format: p.get('format') ?? undefined,
       minScore: p.get('minScore') ? Number(p.get('minScore')) : undefined,
-    })
+    }, req)
     return NextResponse.json({ adet: ideas.length, fikirler: ideas })
   } catch (e) {
     return failure(e, 'İçerik fikirleri üretilemedi.')

@@ -36,6 +36,7 @@ interface CustomOffer {
 const PERIOD_LABEL: Record<Period, string> = { weekly: 'Haftalık', monthly: 'Aylık', yearly: 'Yıllık' }
 const FEATURE_LABEL: Record<string, string> = {
   'content-generation': 'İçerik üretimi',
+  'trend-radar': 'Trend Radar ve erken sinyaller',
   'image-basic': 'Temel görsel üretimi',
   'image-advanced': 'Gelişmiş görsel üretimi',
   'video-factory-basic': 'Video Fabrikası (temel)',

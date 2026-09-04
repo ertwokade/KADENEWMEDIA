@@ -70,7 +70,7 @@ export function geminiTranscribeKullanilabilir(): boolean {
   return Boolean(process.env.GEMINI_API_KEY?.trim())
 }
 
-export async function geminiTranscribe(dosya: File): Promise<CozumSonucu> {
+export async function geminiTranscribe(dosya: File, vocabulary: string[] = []): Promise<CozumSonucu> {
   const anahtar = process.env.GEMINI_API_KEY?.trim()
   if (!anahtar) throw new Error('Gemini anahtarı tanımlı değil.')
 
@@ -83,7 +83,7 @@ export async function geminiTranscribe(dosya: File): Promise<CozumSonucu> {
     try {
       const yanit = await istemci.getGenerativeModel({ model: ad }).generateContent([
         { inlineData: { mimeType: dosya.type || 'audio/webm', data: veri } },
-        { text: TALIMAT },
+        { text: `${TALIMAT}\n- Özel isim sözlüğü: ${vocabulary.join(', ') || 'yok'}. Yalnız sesle eşleştiğinde bu yazımı aynen kullan; seste yoksa ekleme.` },
       ])
       ham = yanit.response.text()
       break

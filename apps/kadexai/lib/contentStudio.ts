@@ -5,6 +5,7 @@ export interface ContentStudioPackage {
   linkedIn: string
   newsletter: { subject: string; body: string }
   captions: { instagram: string; tiktok: string; youtube: string }
+  shortVideos: { reels: string; tiktok: string; shorts: string }
   summary: string[]
   quotes: string[]
   evidence: Array<{ claim: string; evidence: string }>
@@ -63,6 +64,9 @@ export function normalizeContentStudioPackage(value: unknown, fallbackTitle: str
   const captions = raw.captions && typeof raw.captions === 'object' && !Array.isArray(raw.captions)
     ? raw.captions as Record<string, unknown>
     : {}
+  const shortVideos = raw.shortVideos && typeof raw.shortVideos === 'object' && !Array.isArray(raw.shortVideos)
+    ? raw.shortVideos as Record<string, unknown>
+    : {}
   const evidence = (Array.isArray(raw.evidence) ? raw.evidence : []).flatMap((item) => {
     if (!item || typeof item !== 'object' || Array.isArray(item)) return []
     const row = item as Record<string, unknown>
@@ -84,6 +88,11 @@ export function normalizeContentStudioPackage(value: unknown, fallbackTitle: str
       instagram: cleanLong(captions.instagram, 2200),
       tiktok: cleanLong(captions.tiktok, 2200),
       youtube: cleanLong(captions.youtube, 5000),
+    },
+    shortVideos: {
+      reels: cleanLong(shortVideos.reels, 4000),
+      tiktok: cleanLong(shortVideos.tiktok, 4000),
+      shorts: cleanLong(shortVideos.shorts, 4000),
     },
     summary: cleanList(raw.summary, 8, 500),
     quotes: cleanList(raw.quotes, 8, 500),
@@ -134,6 +143,11 @@ JSON ŞEMASI:
     "instagram": "Instagram açıklaması ve en fazla 8 ilgili hashtag",
     "tiktok": "TikTok açıklaması ve en fazla 6 ilgili hashtag",
     "youtube": "YouTube açıklaması ve CTA"
+  },
+  "shortVideos": {
+    "reels": "30-45 saniyelik Reels: hook, sahne sahne çekim notu, konuşma metni ve CTA",
+    "tiktok": "30-45 saniyelik TikTok: hook, sahne sahne çekim notu, konuşma metni ve CTA",
+    "shorts": "30-45 saniyelik YouTube Shorts: hook, sahne sahne çekim notu, konuşma metni ve CTA"
   },
   "summary": ["özet madde 1", "özet madde 2"],
   "quotes": ["kaynaktan birebir alıntı 1", "kaynaktan birebir alıntı 2"],

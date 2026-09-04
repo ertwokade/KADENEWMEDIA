@@ -121,7 +121,7 @@ export async function getMaterialById(id: string) {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('kade_materials')
-    .select('id, title, kind, media_url')
+    .select('id, title, kind, media_url, thumbnail')
     .eq('id', id)
     .maybeSingle()
   if (error) throw new Error(error.message)

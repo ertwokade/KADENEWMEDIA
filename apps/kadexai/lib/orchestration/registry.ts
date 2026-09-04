@@ -42,7 +42,32 @@ const CONTENT_SPRINT: Pipeline = {
   ],
 }
 
-export const PIPELINES: readonly Pipeline[] = [CONTENT_SPRINT]
+const TREND_TO_POST: Pipeline = {
+  id: 'trend-to-post',
+  label: 'Trendden Yayına',
+  description: 'Trend tespiti → içerik planı → başlık → hashtag zinciri.',
+  requiresFeature: 'content-generation',
+  steps: [
+    { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 30_000, maxTokens: 1_600 },
+    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 2_000 },
+    { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
+    { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 20_000, maxTokens: 800 },
+  ],
+}
+
+const COMPETITOR_GAP: Pipeline = {
+  id: 'competitor-gap',
+  label: 'Rakip Açığı',
+  description: 'Rakip analizi → içerik planı → başlık zinciri.',
+  requiresFeature: 'content-generation',
+  steps: [
+    { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 30_000, maxTokens: 1_600 },
+    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 2_000 },
+    { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
+  ],
+}
+
+export const PIPELINES: readonly Pipeline[] = [CONTENT_SPRINT, TREND_TO_POST, COMPETITOR_GAP]
 
 /** Tüm pipeline'lar için toplam adım tavanı — kaçak zincirlemeye karşı. */
 export const MAX_STEPS_PER_RUN = 8

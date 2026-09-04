@@ -101,7 +101,7 @@ function structuredMock(request: GenerateRequest): JsonValue | null {
       },
       icerik_firsatlari: [{ fikir: 'Konuyu örneklerle derinleştiren devam videosu', kaynak_yorum: 'Bu konuyu daha detaylı anlat.', potansiyel: 'yüksek' }],
       topluluk_sagligi: { puan: 84, yorum: 'Topluluk yapıcı ve ilgili.' },
-      yanit_oncelikleri: [{ yorum_ozeti: 'Kaynak talebi', neden_onemli: 'Güveni artırır', yanit_tonu: 'yardımcı ve net' }],
+      yanit_oncelikleri: [{ yorum_ozeti: 'Kaynak talebi', neden_onemli: 'Güveni artırır', yanit_tonu: 'yardımcı ve net', yanit_taslagi: 'Elbette! Kullandığım kaynakları açıklamaya ve sabit yoruma ekliyorum.' }],
       genel_oneriler: ['Kaynak bağlantılarını sabit yorumda paylaş.', 'Devam içeriğini yorumlardan besle.'],
     }
   }

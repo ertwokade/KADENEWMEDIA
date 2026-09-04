@@ -36,6 +36,7 @@ export default function TrendCard({
   const velocity = trend.velocity ?? 0
   const volume = trend.views || trend.posts || trend.followers || 0
   const isInferred = Boolean(trend.inferred)
+  const hasMeasuredVelocity = trend.snapshot_count >= 2 && trend.breakdown?.hizOlculdu !== false
 
   return (
     <article className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4 transition-colors hover:border-zinc-600">
@@ -95,14 +96,16 @@ export default function TrendCard({
           </div>
 
           <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-zinc-500">
-            <span>
-              Büyüme{' '}
-              <b className={velocity >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-                {velocity >= 0 ? '+' : ''}
-                {Math.round(velocity * 100)}%
-              </b>
-              <span className="text-zinc-600"> / gün</span>
-            </span>
+            {hasMeasuredVelocity ? (
+              <span>
+                Büyüme{' '}
+                <b className={velocity >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                  {velocity >= 0 ? '+' : ''}
+                  {Math.round(velocity * 100)}%
+                </b>
+                <span className="text-zinc-600"> / gün</span>
+              </span>
+            ) : <span className="text-amber-400">Hız için 2. ölçüm bekleniyor</span>}
             <span>
               Hacim <b className="text-zinc-300">{fmtCount(volume)}</b>
             </span>

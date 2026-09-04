@@ -83,6 +83,7 @@ export default function KadeSearchApprovalPage() {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [notes, setNotes] = useState<Record<string, string>>({})
+  const [dbMissing, setDbMissing] = useState(false)
 
   const load = useCallback(async (manual = false) => {
     manual ? setRefreshing(true) : setLoading(true)
@@ -96,6 +97,9 @@ export default function KadeSearchApprovalPage() {
       if (!ideaRes.ok) throw new Error(ideaJson.error || 'Güncel içerik adayları alınamadı.')
       if (!approvalRes.ok) throw new Error(approvalJson.error || 'Onay kayıtları alınamadı.')
       const nextApprovals = (approvalJson.approvals ?? []) as Approval[]
+      /* Uc, Supabase yapilandirilmadiginda 200 + bos liste donuyor. Bunu
+         "aday yok" diye gostermek kullaniciyi yaniltiyordu. */
+      setDbMissing(ideaJson.localFallback === true)
       setIdeas(ideaJson.fikirler ?? [])
       setApprovals(nextApprovals)
       setNotes(Object.fromEntries(nextApprovals.map((row) => [row.trend_id, row.notes ?? ''])))
@@ -204,9 +208,25 @@ export default function KadeSearchApprovalPage() {
 
           {notice && <div role="status" className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">{notice}</div>}
           {error && <div role="alert" className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</div>}
+          {dbMissing && (
+            <div role="alert" className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+              <p className="font-semibold">Trend veritabanı bağlı değil.</p>
+              <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
+                Aday listesi boş dönüyor. Uygulamanın çalıştığı ortamda{' '}
+                <code className="rounded bg-amber-500/15 px-1">NEXT_PUBLIC_SUPABASE_URL</code> ve{' '}
+                <code className="rounded bg-amber-500/15 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> tanımlı olmalı.
+              </p>
+            </div>
+          )}
 
           {loading ? <div className="grid min-h-60 place-items-center"><Loader2 className="h-7 w-7 animate-spin text-emerald-400" /></div> : rows.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">Bu filtrede içerik bulunmuyor.</div>
+            <div className="rounded-2xl border border-dashed border-zinc-800 p-12 text-center text-sm text-zinc-500">
+              {dbMissing
+                ? 'Veritabanı bağlı olmadığı için aday üretilemiyor.'
+                : ideas.length === 0 && approvals.length === 0
+                  ? 'Henüz aday yok — Trend Radar’da toplama çalıştıktan sonra adaylar burada belirir.'
+                  : 'Bu filtrede içerik bulunmuyor.'}
+            </div>
           ) : (
             <div className="grid gap-4 xl:grid-cols-2">
               {rows.map(({ idea, approval }) => {

@@ -5,6 +5,7 @@ import { FormEvent, useState } from 'react'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
+import ModelOutput from '@/components/ui/ModelOutput'
 import { useModel } from '@/lib/context/ModelContext'
 import { cn } from '@/lib/utils'
 
@@ -87,7 +88,7 @@ export default function SocialAuditPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <TopBar title="Kişisel Sosyal Medya Analizcisi" description="YouTube, Instagram ve TikTok hesabı için büyüme raporu çıkar" />
+      <TopBar title="Sosyal Medya Analizi" description="YouTube, Instagram ve TikTok hesabı için büyüme raporu çıkar" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80 space-y-4">
@@ -219,7 +220,7 @@ export default function SocialAuditPage() {
                   <p className="text-xs font-semibold text-yellow-300">Sosyal medya raporu</p>
                   <CopyButton text={content} />
                 </div>
-                <pre className="whitespace-pre-wrap text-sm leading-7 text-zinc-200">{content}</pre>
+                <ModelOutput content={content} />
               </div>
               </div>
             )}

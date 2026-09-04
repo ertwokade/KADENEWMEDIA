@@ -5,7 +5,7 @@ import {
 import DashboardMobileHeader from '@/components/dashboard/DashboardMobileHeader'
 import WorkspaceStatus from '@/components/dashboard/WorkspaceStatus'
 import { getAuthenticatedUser } from '@/lib/auth/server'
-import { isAllowedOwnerEmail, isAllowedOwnerUser } from '@/lib/featureAccess'
+import { isAllowedOwnerEmail } from '@/lib/featureAccess'
 import { workspaceHref, workspaceSlugForUser } from '@/lib/workspace/slug'
 
 /**

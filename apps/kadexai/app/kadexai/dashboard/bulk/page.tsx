@@ -24,7 +24,7 @@ const platformLabels: Record<Platform, string> = {
   instagram: 'Instagram',
   tiktok: 'TikTok',
   linkedin: 'LinkedIn',
-  twitter: 'Twitter/X',
+  twitter: 'X (Twitter)',
 }
 
 export default function BulkPage() {
@@ -105,9 +105,9 @@ export default function BulkPage() {
               </div>
               <div>
                 <label className="block text-zinc-400 text-xs font-medium mb-1.5">Başlık Sayısı: <span className="text-violet-400">{count}</span></label>
-                <input type="range" min={3} max={10} value={count} onChange={(e) => setCount(Number(e.target.value))}
+                <input type="range" min={3} max={50} value={count} onChange={(e) => setCount(Number(e.target.value))}
                   className="w-full accent-violet-500" />
-                <div className="flex justify-between text-zinc-600 text-xs mt-0.5"><span>3</span><span>10</span></div>
+                <div className="flex justify-between text-zinc-600 text-xs mt-0.5"><span>3</span><span>50</span></div>
               </div>
               <button type="submit" disabled={loading || !topic.trim() || platforms.length === 0}
                 className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">

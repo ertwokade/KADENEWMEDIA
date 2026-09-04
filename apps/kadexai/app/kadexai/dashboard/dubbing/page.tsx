@@ -168,6 +168,11 @@ export default function DubbingPage() {
       }
 
       if (!parts.length) throw new Error('Hiçbir bölüm seslendirilemedi.')
+      const completedIndexes = new Set(parts.map((part) => part.index))
+      const missingCount = translated.filter((cue) => !completedIndexes.has(cue.index)).length
+      if (missingCount > 0) {
+        throw new Error(`Dublaj tamamlanmadı: ${missingCount}/${translated.length} bölüm seslendirilemedi. Eksik sesli dosya oluşturulmadı; lütfen yeniden dene.`)
+      }
 
       setPhase('mix')
       setDetail('Ses parçaları zaman çizgisine yerleştiriliyor...')

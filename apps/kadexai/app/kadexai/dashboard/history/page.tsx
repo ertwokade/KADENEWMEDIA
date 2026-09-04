@@ -7,9 +7,11 @@ import { ChevronDown, History, RotateCcw, Search, Trash2 } from 'lucide-react'
 import { getModelLabel, getModelColor, cn } from '@/lib/utils'
 import { apiFetch, LOCAL_HISTORY_KEY, LocalHistoryEntry } from '@/lib/client/api'
 import { AIModel } from '@/types'
-import { apiPath } from '@/lib/appConfig'
+import { apiPath, withBasePath } from '@/lib/appConfig'
 import { PROFILE_STORAGE_KEY } from '@/lib/profile/types'
 import { getToolById } from '@/lib/tools/registry'
+import ModelOutput from '@/components/ui/ModelOutput'
+import Link from 'next/link'
 
 interface HistoryEntry {
   id: string
@@ -27,15 +29,26 @@ interface HistoryEntry {
  *  kaldırılmış eski araçların geçmişte kalan id'leri karşılanıyor. */
 const LEGACY_TOOL_LABELS: Record<string, string> = {
   clips: 'Klip Analizi',
-  performance: 'Performans Tahmini',
+  performance: 'Viral Skor · Performans Tahmini',
   analytics: 'Analitik',
-  trends: 'Trend Radarı',
+  trends: 'Trend Radar',
   thread: 'Thread Yazarı',
   bulk: 'Toplu Üretim',
 }
 
 function toolLabel(id: string) {
   return getToolById(id)?.name ?? LEGACY_TOOL_LABELS[id] ?? id
+}
+
+const LEGACY_TOOL_ROUTES: Record<string, string> = {
+  performance: '/dashboard/viral-score',
+  trends: '/dashboard/trend-radar',
+  analytics: '/dashboard/social-audit',
+  clips: '/dashboard/clip-generator',
+}
+
+function toolRoute(id: string) {
+  return getToolById(id)?.route ?? LEGACY_TOOL_ROUTES[id]
 }
 
 export default function HistoryPage() {
@@ -195,6 +208,11 @@ export default function HistoryPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   {entry.output && <CopyButton text={entry.output} />}
+                  {toolRoute(entry.tool) && (
+                    <Link href={withBasePath(toolRoute(entry.tool))} title={`${toolLabel(entry.tool)} aracını aç`} className="text-zinc-600 transition-colors hover:text-violet-300">
+                      <RotateCcw className="h-4 w-4" />
+                    </Link>
+                  )}
                   <button title="Aynı girdilerle yeniden çalıştır" disabled={rerunning === entry.id} onClick={() => handleRerun(entry)} className="text-zinc-600 transition-colors hover:text-amber-300 disabled:animate-pulse"><RotateCcw className="h-4 w-4" /></button>
                   <button onClick={() => handleDelete(entry.id)}
                     className="text-zinc-600 hover:text-red-400 transition-colors">
@@ -202,9 +220,9 @@ export default function HistoryPage() {
                   </button>
                 </div>
               </div>
-              <p className={`text-sm leading-relaxed whitespace-pre-wrap ${(entry.status || 'completed') === 'failed' ? 'text-red-300' : 'text-zinc-400'} ${expanded === entry.id ? '' : 'line-clamp-3'}`}>
-                {entry.output || entry.error_message || 'Çalıştırma tamamlanamadı.'}
-              </p>
+              <div className={cn((entry.status || 'completed') === 'failed' ? 'text-red-300' : 'text-zinc-400', expanded === entry.id ? '' : 'max-h-24 overflow-hidden')}>
+                <ModelOutput content={entry.output || entry.error_message || 'Çalıştırma tamamlanamadı.'} />
+              </div>
               {entry.input_data && Object.keys(entry.input_data).length > 0 && (
                 <div className="flex gap-2 flex-wrap">
                   {Object.entries(entry.input_data).slice(0, 3).map(([k, v]) => (

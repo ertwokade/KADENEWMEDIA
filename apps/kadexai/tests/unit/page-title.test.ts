@@ -13,6 +13,6 @@ test('KadexAI dashboard routes use the active tool name', () => {
 
 test('KadexAI operation routes use the active operation view', () => {
   assert.equal(resolveKadePageTitle('/kadexai/dashboard/operations', '?view=banana'), 'Banana Studio | KadexAI')
-  assert.equal(resolveKadePageTitle('/kadexai/dashboard/operations', '?view=calendar'), 'Yayın Takvimi | KadexAI')
+  assert.equal(resolveKadePageTitle('/kadexai/dashboard/operations', '?view=calendar'), 'Prodüksiyon Takvimi | KadexAI')
   assert.equal(resolveKadePageTitle('/kadexai/dashboard/operations', '?view=clients'), 'Müşteri & Teslim | KadexAI')
 })

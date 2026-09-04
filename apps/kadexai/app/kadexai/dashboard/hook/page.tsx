@@ -29,6 +29,16 @@ const tipColors: Record<string, string> = {
   genel: 'bg-zinc-500/15 text-zinc-300 border-zinc-500/25',
 }
 
+function hookType(value: unknown) {
+  const normalized = typeof value === 'string' ? value.trim().toLocaleLowerCase('tr-TR') : 'genel'
+  if (normalized === 'istatistik' || normalized === 'ıstatistik') return 'istatistik'
+  return tipColors[normalized] ? normalized : 'genel'
+}
+
+const hookTypeLabels: Record<string, string> = {
+  merak: 'Merak', soru: 'Soru', şok: 'Şok', istatistik: 'İstatistik', hikaye: 'Hikâye', genel: 'Genel',
+}
+
 export default function HookPage() {
   const { selectedModel } = useModel()
   const [topic, setTopic]       = useState('')
@@ -128,8 +138,8 @@ export default function HookPage() {
                         <div key={i} className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4 space-y-2">
                           <div className="flex items-start justify-between gap-3">
                             <p className="text-zinc-100 text-sm leading-relaxed font-medium flex-1">{item.hook}</p>
-                            <span className={cn('flex-shrink-0 text-xs px-2 py-0.5 rounded-md border capitalize', tipColors[item.tip] || tipColors.genel)}>
-                              {item.tip}
+                            <span className={cn('flex-shrink-0 text-xs px-2 py-0.5 rounded-md border', tipColors[hookType(item.tip)] || tipColors.genel)}>
+                              {hookTypeLabels[hookType(item.tip)]}
                             </span>
                           </div>
                           <p className="text-zinc-500 text-xs">{item.neden}</p>

@@ -24,7 +24,7 @@ import { cn, copyToClipboard } from '@/lib/utils'
 import type { ContentStudioPackage } from '@/lib/contentStudio'
 
 type View = 'studio' | 'library' | 'voice'
-type OutputTab = 'thread' | 'linkedin' | 'newsletter' | 'captions' | 'summary' | 'quotes' | 'evidence'
+type OutputTab = 'short-video' | 'thread' | 'linkedin' | 'newsletter' | 'captions' | 'summary' | 'quotes' | 'evidence'
 
 interface Run {
   id: string
@@ -42,6 +42,7 @@ interface Voice {
 }
 
 const outputTabs: Array<{ id: OutputTab; label: string }> = [
+  { id: 'short-video', label: 'Kısa video' },
   { id: 'thread', label: 'X / Threads' },
   { id: 'linkedin', label: 'LinkedIn' },
   { id: 'newsletter', label: 'Bülten' },
@@ -52,6 +53,11 @@ const outputTabs: Array<{ id: OutputTab; label: string }> = [
 ]
 
 function packageText(content: ContentStudioPackage, tab: OutputTab) {
+  if (tab === 'short-video') return [
+    `INSTAGRAM REELS\n${content.shortVideos?.reels || ''}`,
+    `TIKTOK\n${content.shortVideos?.tiktok || ''}`,
+    `YOUTUBE SHORTS\n${content.shortVideos?.shorts || ''}`,
+  ].join('\n\n')
   if (tab === 'thread') return content.thread.map((item, index) => `${index + 1}/${content.thread.length}\n${item}`).join('\n\n')
   if (tab === 'linkedin') return content.linkedIn
   if (tab === 'newsletter') return `${content.newsletter.subject}\n\n${content.newsletter.body}`.trim()
@@ -69,7 +75,7 @@ export default function ContentStudioPage() {
   const params = useSearchParams()
   const { selectedModel } = useModel()
   const [view, setView] = useState<View>('studio')
-  const [outputTab, setOutputTab] = useState<OutputTab>('thread')
+  const [outputTab, setOutputTab] = useState<OutputTab>('short-video')
   const [runs, setRuns] = useState<Run[]>([])
   const [selectedRun, setSelectedRun] = useState<Run | null>(null)
   const [voice, setVoice] = useState<Voice | null>(null)
@@ -172,7 +178,7 @@ export default function ContentStudioPage() {
       const run = data.run as Run
       setRuns((current) => [run, ...current.filter((item) => item.id !== run.id)])
       setSelectedRun(run)
-      setOutputTab('thread')
+      setOutputTab('short-video')
       setNotice('İçerik paketi hazır ve kitaplığa kaydedildi.')
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'İçerik paketi oluşturulamadı.')
@@ -203,7 +209,7 @@ export default function ContentStudioPage() {
 
   const openRun = (run: Run) => {
     setSelectedRun(run)
-    setOutputTab('thread')
+    setOutputTab('short-video')
     setView('studio')
     window.history.replaceState(window.history.state, '', withBasePath(`/dashboard/content-studio?run=${run.id}`))
   }
@@ -218,7 +224,7 @@ export default function ContentStudioPage() {
               <div>
                 <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[.16em] text-violet-300"><Sparkles className="h-4 w-4" /> Kaynak bağlı üretim</p>
                 <h1 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">Bir kayıt girer. Bir haftalık içerik çıkar.</h1>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">Dökümde söylenmeyeni uydurmadan X dizisi, LinkedIn gönderisi, bülten, platform açıklamaları, özet ve gerçek alıntılar üretir.</p>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">Dökümde söylenmeyeni uydurmadan Reels, TikTok ve Shorts senaryoları; X dizisi, LinkedIn gönderisi, bülten, platform açıklamaları, özet ve gerçek alıntılar üretir.</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Link href={withBasePath('/dashboard/kade-search')} className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 hover:border-violet-500/50 hover:text-white"><Search className="h-4 w-4" /> KadeSearch’ten konu seç</Link>
@@ -249,12 +255,12 @@ export default function ContentStudioPage() {
                 <label className="block"><span className="mb-1.5 block text-xs font-medium text-zinc-400">Metin veya döküm</span><textarea value={sourceText} onChange={(event) => setSourceText(event.target.value)} minLength={120} maxLength={16000} rows={10} placeholder="Kaynak metni ya da video/podcast dökümünü buraya yapıştır…" className="w-full resize-y rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm leading-6 text-zinc-200 outline-none placeholder:text-zinc-700 focus:border-violet-500/70" /><span className="mt-1 block text-right text-[10px] text-zinc-600">{sourceText.length.toLocaleString('tr-TR')} / 16.000</span></label>
                 <label className={cn('flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-700 px-4 py-4 text-xs font-medium text-zinc-400 transition hover:border-violet-500/60 hover:text-violet-300', transcribing && 'pointer-events-none opacity-60')}><input type="file" accept="audio/mpeg,audio/mp4,audio/wav,audio/webm,audio/ogg,video/mp4,video/webm" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadAndTranscribe(file) }} />{transcribing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {transcribing ? 'Döküm çıkarılıyor…' : 'Ses veya video yükle · 25 MB'}</label>
                 <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3"><div className="flex items-center justify-between"><span className="text-xs font-medium text-zinc-400">Marka sesi</span><button type="button" onClick={() => setView('voice')} className="text-[11px] font-medium text-violet-300 hover:text-violet-200">Düzenle →</button></div><p className="mt-1 text-xs leading-5 text-zinc-600">{voice?.samples?.length ? `${voice.samples.length} örnek · ses gücü %${voice.strength}` : 'Örnek yok; doğal profesyonel ton kullanılır.'}</p></div>
-                <button type="submit" disabled={generating || sourceText.trim().length < 120} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-50">{generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} {generating ? '7 format hazırlanıyor…' : 'Haftalık paket oluştur'}</button>
+                <button type="submit" disabled={generating || sourceText.trim().length < 120} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-violet-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-50">{generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} {generating ? '10 format hazırlanıyor…' : 'Haftalık paket oluştur'}</button>
                 <p className="text-center text-[10px] leading-4 text-zinc-600">Gerçek kullanım token defterine kaydedilir. Kaynakta olmayan iddialar yasaktır.</p>
               </form>
 
               <div className="min-w-0 rounded-2xl border border-zinc-800 bg-zinc-900/75 p-5">
-                {generating ? <div className="grid min-h-[520px] place-items-center text-center"><div><Loader2 className="mx-auto h-8 w-8 animate-spin text-violet-400" /><p className="mt-4 text-sm font-medium text-zinc-300">Kaynak okunuyor ve marka sesine uyarlanıyor</p><p className="mt-1 text-xs text-zinc-600">Döküm → kaynak kontrolü → 7 yayın formatı → kitaplık</p></div></div> : selectedRun ? (
+                {generating ? <div className="grid min-h-[520px] place-items-center text-center"><div><Loader2 className="mx-auto h-8 w-8 animate-spin text-violet-400" /><p className="mt-4 text-sm font-medium text-zinc-300">Kaynak okunuyor ve marka sesine uyarlanıyor</p><p className="mt-1 text-xs text-zinc-600">Döküm → kaynak kontrolü → 3 kısa video + 7 yayın formatı → kitaplık</p></div></div> : selectedRun ? (
                   <div className="space-y-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Hazır · kitaplığa kaydedildi</p><h2 className="mt-1 text-xl font-semibold text-white">{selectedRun.output.title}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">{selectedRun.output.sourceSummary}</p></div><div className="flex shrink-0 gap-2"><button onClick={() => void copyActive()} className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800">{copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />} {copied ? 'Kopyalandı' : 'Kopyala'}</button><button onClick={() => void sendWhatsApp(selectedRun)} disabled={sending} className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-300 disabled:opacity-50">{sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />} WhatsApp</button></div></div>
                     {selectedRun.source_url && <a href={selectedRun.source_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-xs text-violet-300 hover:text-violet-200"><ExternalLink className="h-3.5 w-3.5" /> Kaynağı aç</a>}

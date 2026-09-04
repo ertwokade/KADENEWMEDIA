@@ -5,6 +5,7 @@ import { FormEvent, useState } from 'react'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
+import ModelOutput from '@/components/ui/ModelOutput'
 import { useModel } from '@/lib/context/ModelContext'
 import { cn } from '@/lib/utils'
 
@@ -144,7 +145,7 @@ export default function TextGeneratorPage() {
                   <p className="text-xs font-semibold text-yellow-300">Hazır metin</p>
                   <CopyButton text={content} />
                 </div>
-                <pre className="whitespace-pre-wrap text-sm leading-7 text-zinc-200">{content}</pre>
+                <ModelOutput content={content} />
               </div>
             )}
             {!content && !loading && !error && (

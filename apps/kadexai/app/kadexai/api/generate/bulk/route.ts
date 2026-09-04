@@ -37,6 +37,37 @@ function normalizeBulkOutput(data: Record<string, unknown>, platforms: string[])
   }
 }
 
+function mergeBulkOutputs(outputs: Record<string, unknown>[], platforms: string[], limit: number) {
+  const strings = (value: unknown) => Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+    : []
+  const unique = (values: string[]) => [...new Set(values)].slice(0, limit)
+  const captions = Object.fromEntries(platforms.map((platform) => [
+    platform,
+    unique(outputs.flatMap((output) => {
+      const map = output.captions
+      return map && typeof map === 'object' && !Array.isArray(map)
+        ? strings((map as Record<string, unknown>)[platform])
+        : []
+    })),
+  ]))
+  const hashtagSets = outputs
+    .flatMap((output) => Array.isArray(output.hashtag_setleri) ? output.hashtag_setleri : [])
+    .filter((set): set is string[] => Array.isArray(set) && set.every((tag) => typeof tag === 'string'))
+    .filter((set, index, all) => all.findIndex((candidate) => candidate.join('\u0000') === set.join('\u0000')) === index)
+    .slice(0, limit)
+  const raw = outputs.map((output) => typeof output.raw === 'string' ? output.raw : '').filter(Boolean).join('\n\n')
+
+  return {
+    basliklar: unique(outputs.flatMap((output) => strings(output.basliklar))),
+    hooklar: unique(outputs.flatMap((output) => strings(output.hooklar))),
+    captions,
+    hashtag_setleri: hashtagSets,
+    kisa_fikirler: unique(outputs.flatMap((output) => strings(output.kisa_fikirler))),
+    ...(raw ? { raw } : {}),
+  }
+}
+
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
   if (guard) return guard
@@ -47,10 +78,28 @@ export async function POST(req: NextRequest) {
 
   try {
     const { topic, niche, platforms, count, model } = await req.json()
-    if (!topic || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
-    const result = await generateContent({ prompt: buildBulkPrompt(topic, niche || '', platforms || ['instagram','youtube','tiktok'], count || 5), model: model as AIModel, systemPrompt: BULK_SYSTEM_PROMPT, maxTokens: 4000 }, req)
-    const selectedPlatforms = Array.isArray(platforms) && platforms.length > 0 ? platforms : ['instagram', 'youtube', 'tiktok']
-    const data = normalizeBulkOutput(parseStructuredOutput(result.content), selectedPlatforms)
-    return NextResponse.json({ data, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
+    if (typeof topic !== 'string' || !topic.trim() || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
+    const allowedPlatforms = new Set(['youtube', 'instagram', 'tiktok', 'linkedin', 'twitter'])
+    const selectedPlatforms = Array.isArray(platforms)
+      ? platforms.filter((platform): platform is string => typeof platform === 'string' && allowedPlatforms.has(platform))
+      : []
+    if (selectedPlatforms.length === 0) selectedPlatforms.push('instagram', 'youtube', 'tiktok')
+    const requestedCount = Math.min(50, Math.max(3, Number.isFinite(Number(count)) ? Math.round(Number(count)) : 5))
+    const batchSizes = Array.from({ length: Math.ceil(requestedCount / 10) }, (_, index) => Math.min(10, requestedCount - index * 10))
+    const results = await Promise.all(batchSizes.map((batchSize, index) => generateContent({
+      prompt: buildBulkPrompt(topic.trim().slice(0, 500), typeof niche === 'string' ? niche.slice(0, 200) : '', selectedPlatforms, batchSize, `${index + 1}/${batchSizes.length}`),
+      model: model as AIModel,
+      systemPrompt: BULK_SYSTEM_PROMPT,
+      maxTokens: 4000,
+      toolId: 'bulk',
+    }, req)))
+    const outputs = results.map((result) => normalizeBulkOutput(parseStructuredOutput(result.content), selectedPlatforms))
+    const data = mergeBulkOutputs(outputs, selectedPlatforms, requestedCount)
+    return NextResponse.json({
+      data,
+      model: results[0]?.model,
+      routingReason: results.map((result) => result.routingReason).filter(Boolean).join(' · '),
+      tokensUsed: results.reduce((sum, result) => sum + (result.tokensUsed || 0), 0),
+    })
   } catch (e) { return NextResponse.json({ error: e instanceof Error ? e.message : 'Sunucu hatası' }, { status: 500 }) }
 }

@@ -297,7 +297,7 @@
           <button class="tab-btn" data-banana-tab="video">🎬 Video</button>
           <button class="tab-btn" data-banana-tab="admin">📊 Admin</button>
         </div>
-        <span class="cost-chip" id="bananaCost">$0.00</span>
+        <span class="cost-chip" id="bananaCost">Sağlayıcı maliyeti: USD 0.00</span>
       </div>
 
       <!-- Görsel -->
@@ -440,6 +440,7 @@
           <form id="settingsForm" class="form-grid">
             <label><span class="label-text">Ekip adı</span><input id="setTeamName" placeholder="Ork Digital"/></label>
             <label><span class="label-text">Aylık bütçe (₺)</span><input id="setBudget" type="number" min="0" placeholder="650000"/></label>
+            <label><span class="label-text">USD/TRY kuru</span><input id="setUsdTryRate" type="number" min="0" step="0.01" placeholder="Örn. 42,50"/><small>Görsel/video sağlayıcı maliyetlerini TL karşılığıyla göstermek için kullanılır.</small></label>
             <label><span class="label-text">Ekip üyeleri (virgülle ayır)</span><input id="setMembers" placeholder="Kadir, Emir, Emre, Çağrı, Berkin, Merve"/></label>
             <button class="primary-btn" type="submit"><i data-lucide="save"></i>Kaydet</button>
           </form>

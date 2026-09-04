@@ -73,16 +73,6 @@ function computeAcceleration(snaps: SnapshotRow[]) {
   return clamp(v2 - v1, -3, 3)
 }
 
-/** Tek olcum varsa: yayin tarihine gore tahmini hiz. */
-function estimateVelocity(trend: Pick<TrendRow, 'published_at'>, snap: SnapshotRow) {
-  if (!trend.published_at) return 0.15
-  const ageH = Math.max(hoursBetween(trend.published_at, new Date()), 1)
-  const views = primaryVolume(snap)
-  const perDay = views / (ageH / 24)
-  // 1M/gun ~ cok hizli, 10K/gun ~ yavas
-  return clamp(Math.log10(perDay + 1) / 6.5, 0, 1.4)
-}
-
 export function computeEngagement(snap: SnapshotRow) {
   const views = snap.views || 0
   if (views < 50) {
@@ -118,7 +108,7 @@ function determineStage(input: {
   if (velocity >= EMERGE) return 'rising'
   if (velocity > 0.08 && volume >= 0.72) return 'peak'
   if (velocity > 0.08) return 'rising'
-  if (snapCount <= 1) return volume >= 0.72 ? 'peak' : 'rising'
+  if (snapCount <= 1) return freshness >= 0.25 ? 'emerging' : 'plateau'
   if (acceleration < -0.2) return 'declining'
   return 'plateau'
 }
@@ -136,9 +126,9 @@ export function scoreTrend(trend: TrendRow, snaps: SnapshotRow[], linkCount = 0)
   const inferred = Boolean(trend.inferred)
 
   const volume_score = logNorm(primaryVolume(last), 5e8)
-  let velocity = computeVelocity(snaps)
-  const estimated = velocity === null
-  if (velocity === null) velocity = estimateVelocity(trend, last)
+  const measuredVelocity = computeVelocity(snaps)
+  const velocityMeasured = measuredVelocity !== null
+  let velocity = measuredVelocity ?? 0
   // Olculemeyen hiz sinirlanir - tahmin kaydi "gunde %1000 buyuyor" diyemez
   if (inferred) velocity = clamp(velocity, -0.2, 0.3)
   const acceleration = computeAcceleration(snaps)
@@ -152,13 +142,14 @@ export function scoreTrend(trend: TrendRow, snaps: SnapshotRow[], linkCount = 0)
   // Cok kucuk hacimde yuzde degisimi gurultudur (200 -> 2000 arama "%1000 buyume" degildir).
   const volumeConfidence = clamp(Math.log10(primaryVolume(last) + 1) / 4, 0.3, 1)
 
+  const availableWeight = velocityMeasured ? 1 : 1 - W.velocity
   let score =
-    (W.volume * volume_score +
-      W.velocity * velocityNorm * volumeConfidence +
+    ((W.volume * volume_score +
+      (velocityMeasured ? W.velocity * velocityNorm * volumeConfidence : 0) +
       W.engagement * engagement +
       W.rank * rank_score +
       W.crossPlatform * cross_score +
-      W.freshness * freshness) *
+      W.freshness * freshness) / availableWeight) *
     100
 
   // Ivme bonusu/cezasi
@@ -192,12 +183,13 @@ export function scoreTrend(trend: TrendRow, snaps: SnapshotRow[], linkCount = 0)
     stage,
     breakdown: {
       hacim: Math.round(W.volume * volume_score * 100),
-      hiz: Math.round(W.velocity * velocityNorm * volumeConfidence * 100),
+      hiz: velocityMeasured ? Math.round(W.velocity * velocityNorm * volumeConfidence * 100) : 0,
       etkilesim: Math.round(W.engagement * engagement * 100),
       siralama: Math.round(W.rank * rank_score * 100),
       caprazPlatform: Math.round(W.crossPlatform * cross_score * 100),
       tazelik: Math.round(W.freshness * freshness * 100),
-      hizTahmini: estimated,
+      hizTahmini: false,
+      hizOlculdu: velocityMeasured,
       olcumSayisi: snaps.length,
       cikarim: inferred,
     },

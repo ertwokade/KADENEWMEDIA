@@ -2,11 +2,14 @@
 
 import { apiFetch } from '@/lib/client/api'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { CalendarPlus } from 'lucide-react'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
-import { cn } from '@/lib/utils'
+import { cn, getPlatformLabel } from '@/lib/utils'
 import RawModelOutput from '@/components/ui/RawModelOutput'
+import { Platform } from '@/types'
 
 interface DayPlan { gun: number; tarih_onerisi: string; icerik_turu: string; baslik: string; format: string; aciklama: string; ipucu: string }
 interface WeekTheme { hafta: number; tema: string; hedef: string }
@@ -21,6 +24,7 @@ const typeColors: Record<string, string> = {
 }
 
 export default function ContentPlanPage() {
+  const router = useRouter()
   const { selectedModel } = useModel()
   const [niche, setNiche] = useState('')
   const [platform, setPlatform] = useState('youtube')
@@ -30,6 +34,7 @@ export default function ContentPlanPage() {
   const [data, setData] = useState<Plan | null>(null)
   const [error, setError] = useState('')
   const [activeWeek, setActiveWeek] = useState(1)
+  const [calendarStatus, setCalendarStatus] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,6 +54,59 @@ export default function ContentPlanPage() {
 
   const weekDays = data?.gunler?.filter((d) => Math.ceil(d.gun / 7) === activeWeek) ?? []
 
+  const addPlanToCalendar = async () => {
+    if (!data?.gunler?.length) return
+    const validPlatforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin', 'pinterest']
+    const selectedPlatform = validPlatforms.includes(platform as Platform) ? platform as Platform : 'youtube'
+    const toDate = (offset: number) => {
+      const date = new Date()
+      date.setHours(12, 0, 0, 0)
+      date.setDate(date.getDate() + offset)
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+    }
+    const planned = data.gunler.filter((day) => day.baslik?.trim()).map((day, index) => ({
+      id: `local-plan-${Date.now()}-${index}`,
+      date: toDate(Math.max(0, Number(day.gun || index + 1) - 1)),
+      title: day.baslik.trim(),
+      platform: selectedPlatform,
+      status: 'taslak' as const,
+    }))
+    if (!planned.length) return
+
+    const storageKey = 'kade-content-calendar'
+    let existing: typeof planned = []
+    try {
+      const stored = JSON.parse(localStorage.getItem(storageKey) || '[]')
+      if (Array.isArray(stored)) existing = stored
+    } catch { localStorage.removeItem(storageKey) }
+    const signatures = new Set(existing.map((entry) => `${entry.date}|${entry.platform}|${entry.title}`))
+    const unique = planned.filter((entry) => !signatures.has(`${entry.date}|${entry.platform}|${entry.title}`))
+    localStorage.setItem(storageKey, JSON.stringify([...existing, ...unique]))
+    setCalendarStatus(`${unique.length} içerik takvime eklendi.`)
+
+    try {
+      const response = await apiFetch('/api/calendar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entries: unique.map((entry) => ({ title: entry.title, platform: entry.platform, publish_at: `${entry.date}T12:00:00` })) }),
+      })
+      if (response.ok) {
+        const result = await response.json()
+        const remote = Array.isArray(result.entries) ? result.entries : []
+        if (remote.length === unique.length) {
+          const remoteEntries = remote.map((entry: Record<string, unknown>) => ({
+            id: String(entry.id),
+            date: String(entry.publish_at || '').slice(0, 10),
+            title: String(entry.title || ''),
+            platform: String(entry.platform || selectedPlatform),
+            status: 'taslak' as const,
+          }))
+          localStorage.setItem(storageKey, JSON.stringify([...existing, ...remoteEntries]))
+        }
+      }
+    } catch { /* Yerel kayıt takvim sayfasında kullanılmaya devam eder. */ }
+  }
+
   return (
     <div className="flex flex-col h-full">
       <TopBar title="30 Günlük İçerik Planı" description="Niche ve platforma göre tam aylık içerik stratejisi" />
@@ -64,11 +122,11 @@ export default function ContentPlanPage() {
               <div>
                 <label className="block text-zinc-400 text-xs font-medium mb-1.5">Platform</label>
                 <div className="grid grid-cols-3 gap-1.5">
-                  {['youtube', 'instagram', 'tiktok', 'linkedin', 'x', 'pinterest'].map((p) => (
+                  {(['youtube', 'instagram', 'tiktok', 'linkedin', 'x', 'pinterest'] as Platform[]).map((p) => (
                     <button key={p} type="button" onClick={() => setPlatform(p)}
                       className={cn('py-1.5 rounded-lg text-xs capitalize transition-colors border',
                         platform === p ? 'bg-violet-500/20 text-violet-300 border-violet-500/40' : 'bg-zinc-800 text-zinc-500 border-zinc-700')}>
-                      {p}
+                      {getPlatformLabel(p)}
                     </button>
                   ))}
                 </div>
@@ -104,6 +162,15 @@ export default function ContentPlanPage() {
             {data && !loading && (
               <div className="space-y-4">
                 <RawModelOutput content={data.raw} />
+                <div className="flex flex-wrap items-center gap-3">
+                  <button type="button" onClick={addPlanToCalendar}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#f2c322] px-4 py-2 text-xs font-semibold text-zinc-950 transition-colors hover:bg-[#ffda3f]">
+                    <CalendarPlus className="h-4 w-4" />
+                    Planı İçerik Takvimi’ne Aktar
+                  </button>
+                  {calendarStatus && <span className="text-xs text-emerald-400">{calendarStatus}</span>}
+                  {calendarStatus && <button type="button" onClick={() => router.push('/kadexai/dashboard/calendar')} className="text-xs font-medium text-violet-300 hover:text-violet-200">Takvimi aç →</button>}
+                </div>
                 {data.strateji && (
                   <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4">
                     <p className="text-violet-400 text-xs font-semibold mb-1">Strateji</p>

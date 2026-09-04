@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { withBasePath } from '@/lib/appConfig'
 import { Download, Smartphone, X } from 'lucide-react'
 
@@ -17,6 +18,7 @@ function isStandalone() {
 }
 
 export default function MobileInstallPrompt() {
+  const pathname = usePathname()
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null)
   const [showIOSHint, setShowIOSHint] = useState(false)
   const [dismissed, setDismissed] = useState(true)
@@ -58,7 +60,8 @@ export default function MobileInstallPrompt() {
     close()
   }
 
-  if (dismissed || (!installEvent && !showIOSHint)) return null
+  // Araç formlarının üstünü örtme; kurulum önerisi yalnız panel girişinde görünür.
+  if (!pathname?.endsWith('/dashboard') || dismissed || (!installEvent && !showIOSHint)) return null
 
   return (
     <div className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-sm rounded-xl border border-zinc-700 bg-zinc-900 p-3 shadow-xl shadow-slate-900/10 md:hidden">

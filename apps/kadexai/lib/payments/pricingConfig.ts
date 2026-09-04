@@ -37,10 +37,10 @@ const DEFAULT_TIER_LABELS: Record<PlanTier, string> = {
 }
 
 const DEFAULT_TIER_FEATURES: Record<PlanTier, string[]> = {
-  baslangic: ['content-generation', 'image-basic', 'video-factory-basic'],
-  pro: ['content-generation', 'image-advanced', 'video-factory', 'auto-captions', 'clip-generator'],
+  baslangic: ['content-generation', 'trend-radar', 'image-basic', 'video-factory-basic'],
+  pro: ['content-generation', 'trend-radar', 'image-advanced', 'video-factory', 'auto-captions', 'clip-generator'],
   sinirsiz: [
-    'content-generation', 'image-advanced', 'video-factory', 'auto-captions',
+    'content-generation', 'trend-radar', 'image-advanced', 'video-factory', 'auto-captions',
     'clip-generator', 'auto-publish', 'bulk', 'priority-queue',
   ],
 }

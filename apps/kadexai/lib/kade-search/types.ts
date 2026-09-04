@@ -143,6 +143,7 @@ export interface TrendFilters {
   kind?: string
   category?: string
   country?: string
+  language?: string
   stage?: string
   format?: string
   q?: string
@@ -169,7 +170,7 @@ export interface Collector {
 export interface TrendAlert {
   id: number
   trend_id: string | null
-  type: 'breakout' | 'watchlist' | 'cross_platform' | 'new_format'
+  type: 'breakout' | 'watchlist' | 'cross_platform' | 'new_format' | 'source_health'
   message: string
   severity: string
   created_at: string

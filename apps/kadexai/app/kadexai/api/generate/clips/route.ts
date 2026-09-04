@@ -49,11 +49,13 @@ export async function POST(req: NextRequest) {
     const raw = result.content
 
     let clips: Omit<ClipSuggestion, 'words'>[] = []
+    let modelReturnedArray = false
     try {
       const match = raw.match(/\[[\s\S]*\]/)
       if (match) {
         const parsed: unknown = JSON.parse(match[0])
         if (Array.isArray(parsed)) {
+          modelReturnedArray = true
           clips = parsed.flatMap((item, index) => {
             if (!item || typeof item !== 'object') return []
             const value = item as Record<string, unknown>
@@ -79,8 +81,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'AI yanıtı JSON parse edilemedi. Tekrar dene.' }, { status: 500 })
     }
 
+    if (!modelReturnedArray) {
+      return NextResponse.json({ error: 'AI geçerli bir klip listesi döndürmedi. Lütfen yeniden dene.' }, { status: 502 })
+    }
     if (!clips.length) {
-      return NextResponse.json({ error: 'Hiç klip bulunamadı. Video yeterince uzun mu?' }, { status: 400 })
+      return NextResponse.json({ error: 'AI kullanılabilir bir zaman aralığı döndürmedi. Video süresini ve transkripti kontrol edip yeniden dene.' }, { status: 422 })
     }
 
     const clipsWithWords: ClipSuggestion[] = clips.map((clip) => ({

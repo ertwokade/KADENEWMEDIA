@@ -111,6 +111,9 @@ label{display:grid;gap:4px}
 .label-text{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3)}
 input,textarea,select{width:100%;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--ink);font-size:13px;font-family:inherit;outline:none;transition:var(--transition);min-height:38px}
 input:focus,textarea:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim)}
+input[type="file"]{padding:6px;color:var(--ink3);cursor:pointer}
+input[type="file"]::file-selector-button{margin-right:10px;padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--ink2);font:600 12px inherit;cursor:pointer;transition:var(--transition)}
+input[type="file"]::file-selector-button:hover{border-color:var(--teal);color:var(--teal)}
 textarea{resize:vertical}
 select{cursor:pointer}
 html[data-theme=light] input,html[data-theme=light] textarea,html[data-theme=light] select{background:#fff;color:var(--ink)}

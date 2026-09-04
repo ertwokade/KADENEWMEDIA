@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       model: model as AIModel,
       maxTokens: 2600,
       systemPrompt:
-        'Sen Kade Media için çalışan kıdemli Türkçe metin yazarı ve içerik stratejistisin. Net, satılabilir, doğal ve platforma uygun metinler yaz.',
+        'Sen Kade Media için çalışan kıdemli Türkçe metin yazarı ve içerik stratejistisin. Net, satılabilir, doğal ve platforma uygun metinler yaz. Doğrudan istenen çıktıyla başla; kendini tanıtma, kullanıcıya hitap etme veya "hazırladım" gibi sohbet girişi ekleme. Başlık ve listelerde temiz Markdown kullan.',
       prompt: `Amaç: ${goal}
 Format: ${format}
 Platform/Kanal: ${platform}

@@ -210,7 +210,7 @@ export default function MateryalPage() {
                     // Kaynak CDN'i Next image loader'inda tanimli olmadigi icin dogrudan img.
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={m.thumbnail}
+                      src={apiPath(`/api/materials/thumbnail?id=${encodeURIComponent(m.id)}`)}
                       alt={m.title}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

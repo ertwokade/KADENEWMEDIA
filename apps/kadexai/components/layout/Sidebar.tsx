@@ -354,6 +354,7 @@ export default function Sidebar() {
                         <li key={item.id}>
                           <Link
                             href={alanYolu(item.href)}
+                            prefetch={false}
                             onClick={(event) => handleLinkClick(event, item.href)}
                             data-active={isActive}
                             title={item.kilitli ? `${item.label} paketinde yok — Paketler'e git` : undefined}

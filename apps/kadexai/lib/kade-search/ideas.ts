@@ -5,13 +5,17 @@ import 'server-only'
  * Yuksek skorlu trendleri alir, kategori + format kaliplariyla birlestirip
  * cekime hazir brief uretir: kanca, kurgu iskeleti, hashtag seti, ses onerisi.
  *
- * Yapay zeka cagrisi YOKTUR: ciktinin tamami olculmus trend verisinden ve
- * taksonomiden turer, bu yuzden hizli ve tekrarlanabilirdir.
+ * Ölçülmüş trend verisi önce güvenli bir taslağa dönüşür; ardından tek bir
+ * toplu AI çağrısı kanca, kurgu ve CTA'yı trende özel hâle getirir. Sağlayıcı
+ * çalışmazsa kullanıcı boş kalmaz, doğrulanmış taslak döner.
  */
 import { createClient } from '@/lib/supabase/server'
+import { generateContent } from '@/lib/ai/provider'
+import { parseStructuredOutput } from '@/lib/ai/structured'
 import { CATEGORIES, FORMATS, STAGES, platformLabel } from './taxonomy'
-import { fmtCount, normalizeText } from './util'
+import { extractHashtags, fmtCount, normalizeText } from './util'
 import { queryTrends } from './store'
+import { ayiklanmisTrendler, turkceGorunuyor } from './relevance'
 import type { CurrentTrendRow, TrendFilters } from './types'
 
 const HOOKS: Record<string, string[]> = {
@@ -128,31 +132,113 @@ export interface ContentIdea {
   neden: string
 }
 
+function hashtag(value: unknown) {
+  const clean = normalizeText(String(value ?? '').replace(/^#/, ''))
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 4)
+    .join('')
+    .slice(0, 32)
+  return clean.length >= 2 ? `#${clean}` : ''
+}
+
+function textList(value: unknown, maxItems: number, maxLength: number) {
+  return Array.isArray(value)
+    ? value.map((item) => String(item).trim()).filter(Boolean).slice(0, maxItems).map((item) => item.slice(0, maxLength))
+    : []
+}
+
+async function personalizeIdeas(ideas: ContentIdea[], request?: Request) {
+  if (!ideas.length) return ideas
+  try {
+    const input = ideas.map((idea) => ({
+      trendId: idea.trendId,
+      baslik: idea.baslik.replace(/^\S+\s/, ''),
+      platform: idea.kaynak.platform,
+      kategori: idea.kategori,
+      asama: idea.kaynak.asama,
+      hacim: idea.kaynak.hacim,
+      format: idea.format.label,
+    }))
+    const result = await generateContent({
+      model: 'auto',
+      toolId: 'trend-radar',
+      maxTokens: 4000,
+      systemPrompt: `Sen Türkiye'deki içerik üreticileri için çalışan kıdemli kısa video stratejistisin.
+Her trend için birbirinden farklı, doğrudan çekilebilir bir fikir üret. Başlığı bir kalıba yapıştırma.
+Yabancı başlığı Türk kullanıcıya anlamlı bir açıya çeviremiyorsan o kayıt için fikir üretme.
+Hashtagleri yalnız konu ve içerikle doğrudan ilgili, küçük harfli ASCII biçiminde yaz.
+Paylaşım saati ve CTA'yı platforma ve fikre göre seç. Yanıt yalnızca geçerli JSON olsun.`,
+      prompt: `Aşağıdaki ölçülmüş trendleri içerik briefine dönüştür:
+${JSON.stringify(input)}
+
+JSON şeması:
+{"ideas":[{"trendId":"","kanca":"","alternatifKancalar":["",""],"kurgu":["0-3 sn: ...","3-10 sn: ...","10-30 sn: ..."],"cta":"","hashtagler":["#etiket"],"zorluk":{"level":"Düşük|Orta|Yüksek|Çok yüksek","note":""},"paylasimSaati":["19:00-21:00"],"neden":"Bu fikrin bu trende neden uyduğunu tek cümlede açıkla"}]}`,
+    }, request)
+    const parsed = parseStructuredOutput(result.content)
+    if (!Array.isArray(parsed.ideas)) return ideas
+    const byId = new Map(ideas.map((idea) => [idea.trendId, idea]))
+    for (const raw of parsed.ideas) {
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) continue
+      const item = raw as Record<string, unknown>
+      const current = byId.get(String(item.trendId || ''))
+      if (!current) continue
+      const kanca = typeof item.kanca === 'string' ? item.kanca.trim().slice(0, 500) : ''
+      const kurgu = textList(item.kurgu, 8, 300)
+      const tags = textList(item.hashtagler, 12, 80).map(hashtag).filter(Boolean)
+      const difficulty = item.zorluk && typeof item.zorluk === 'object' && !Array.isArray(item.zorluk)
+        ? item.zorluk as Record<string, unknown>
+        : null
+      if (kanca) current.kanca = kanca
+      const alternatives = textList(item.alternatifKancalar, 3, 500)
+      if (alternatives.length) current.alternatifKancalar = alternatives
+      if (kurgu.length >= 3) current.kurgu = kurgu
+      if (typeof item.cta === 'string' && item.cta.trim()) current.cta = item.cta.trim().slice(0, 240)
+      if (tags.length) current.hashtagler = [...new Set(tags)]
+      if (difficulty && typeof difficulty.level === 'string' && typeof difficulty.note === 'string') {
+        current.zorluk = { level: difficulty.level.slice(0, 40), note: difficulty.note.slice(0, 240) }
+      }
+      const times = textList(item.paylasimSaati, 3, 40).filter((time) => /^\d{2}:\d{2}(?:-\d{2}:\d{2})?$/.test(time))
+      if (times.length) current.paylasimSaati = times
+      if (typeof item.neden === 'string' && item.neden.trim()) current.neden = item.neden.trim().slice(0, 500)
+    }
+    return ideas
+  } catch {
+    return ideas
+  }
+}
+
 /**
  * Icerik fikirleri uretir.
  * Hashtag ve ses onerileri icin kategori bazli en yuksek skorlu gercek kayitlar
  * kullanilir; bu yuzden tek seferde toplu cekilir (fikir basina sorgu acilmaz).
  */
 export async function generateIdeas(
-  opts: TrendFilters & { format?: string } = {}
+  opts: TrendFilters & { format?: string } = {},
+  request?: Request,
 ): Promise<ContentIdea[]> {
   const supabase = await createClient()
-  const trends = await queryTrends({
-    limit: opts.limit ?? 15,
+  const queriedTrends = ayiklanmisTrendler(await queryTrends({
+    // Eski yanlış dil etiketli kayıtlar ayıklanınca istenen sayıya ulaşmak
+    // için daha geniş bir aday havuzu oku; kullanıcıya yine yalnız limiti dön.
+    limit: Math.min((opts.limit ?? 15) * 4, 100),
     category: opts.category,
     platform: opts.platform,
+    country: opts.country,
+    language: opts.language,
     stage: opts.stage,
     minScore: opts.minScore ?? 0,
     sort: opts.sort ?? 'score',
     sinceHours: opts.sinceHours ?? 24 * 14,
-  })
+  }))
+  const trends = (opts.language === 'tr' ? queriedTrends.filter(turkceGorunuyor) : queriedTrends).slice(0, opts.limit ?? 15)
   if (!trends.length) return []
 
   const categories = [...new Set(trends.map((t) => t.category).filter((c): c is string => Boolean(c)))]
 
   // Kategori -> populer hashtag'ler
   const hashtagsByCategory = new Map<string, string[]>()
-  const soundByCategory = new Map<string, { title: string; author: string | null; url: string | null; platform: string }>()
 
   if (categories.length) {
     const { data: tagRows } = await supabase
@@ -169,43 +255,21 @@ export async function generateIdeas(
       hashtagsByCategory.set(row.category, list)
     }
 
-    const { data: soundRows } = await supabase
-      .from('kade_trend_current')
-      .select('title, author, url, platform, category, score')
-      .eq('kind', 'sound')
-      .in('category', categories)
-      .order('score', { ascending: false, nullsFirst: false })
-      .limit(200)
-    for (const row of soundRows ?? []) {
-      if (!row.category || soundByCategory.has(row.category)) continue
-      soundByCategory.set(row.category, {
-        title: row.title,
-        author: row.author,
-        url: row.url,
-        platform: platformLabel(row.platform),
-      })
-    }
   }
 
   const suggestHashtags = (t: CurrentTrendRow) => {
     const tags = new Set<string>()
-    const base = normalizeText(t.title).replace(/[^a-z0-9]/g, '')
-    if (t.kind === 'hashtag') tags.add(t.title.replace(/^#/, ''))
-    else if (base.length > 2 && base.length < 25) tags.add(base)
-
-    const cat = t.category ? CATEGORIES[t.category] : undefined
-    if (cat) {
-      for (const kw of cat.keywords.slice(0, 4)) {
-        const tag = normalizeText(kw).replace(/[^a-z0-9]/g, '')
-        if (tag.length > 2 && tag.length < 20) tags.add(tag)
-      }
+    for (const found of extractHashtags(t.title)) tags.add(found)
+    const words = normalizeText(t.title).split(/[^a-z0-9]+/).filter((word) => word.length >= 3 && word.length <= 18)
+    for (const word of words.slice(0, 4)) tags.add(word)
+    const categoryTags = hashtagsByCategory.get(t.category ?? '') ?? []
+    for (const tag of categoryTags) {
+      if (words.some((word) => normalizeText(tag).includes(word))) tags.add(tag)
     }
-    for (const tag of hashtagsByCategory.get(t.category ?? '') ?? []) tags.add(tag)
-    for (const tag of ['kesfet', 'fyp', 'trend', 'viral']) tags.add(tag)
-    return [...tags].slice(0, 12).map((tag) => `#${tag}`)
+    return [...tags].map(hashtag).filter(Boolean).slice(0, 10)
   }
 
-  return trends.map((t, i) => {
+  const ideas = trends.map((t, i) => {
     const seed = seedOf(t.id) + i
     const cat = (t.category ? CATEGORIES[t.category] : undefined) ?? CATEGORIES.diger
     // Muzik kategorisindeki her sey (klip videosu dahil) ses mantigiyla ele alinir
@@ -245,7 +309,12 @@ export async function generateIdeas(
       kurgu: (t.duration_sec ?? 0) > 60 ? STRUCTURES.orta : STRUCTURES.kisa,
       cta: pick(CTA, seed + 3) ?? CTA[0],
       hashtagler: suggestHashtags(t),
-      sesOnerisi: soundByCategory.get(t.category ?? '') ?? null,
+      sesOnerisi: t.kind === 'sound' ? {
+        title: t.title,
+        author: t.author,
+        url: t.url,
+        platform: platformLabel(t.platform),
+      } : null,
       alternatifFormatlar: alt.map((f) => FORMATS[f]?.label).filter(Boolean),
       zorluk: difficultyOf(t.stage),
       paylasimSaati: POST_TIMES[t.platform] ?? POST_TIMES.tiktok,
@@ -254,6 +323,7 @@ export async function generateIdeas(
       }`.trim(),
     }
   })
+  return personalizeIdeas(ideas, request)
 }
 
 /** Kategori bazli hizli ozet: her kategoride su an ne calisiyor. */

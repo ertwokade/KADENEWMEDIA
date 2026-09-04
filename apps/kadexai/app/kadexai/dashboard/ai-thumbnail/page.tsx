@@ -1,7 +1,7 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import TopBar from '@/components/layout/TopBar'
 import { cn } from '@/lib/utils'
 import { Download, RefreshCw, Loader2, Image as ImageIcon, Upload, Type } from 'lucide-react'
@@ -42,6 +42,14 @@ function fillRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: n
 export default function AiThumbnailPage() {
   const [topic, setTopic]           = useState('')
   const [titleText, setTitleText]   = useState('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const incomingTopic = params.get('topic')
+    const incomingTitle = params.get('title')
+    if (incomingTopic) setTopic(incomingTopic)
+    if (incomingTitle) setTitleText(incomingTitle)
+  }, [])
   const [style, setStyle]           = useState('bold')
   const [ratio, setRatio]           = useState('16:9')
   const [extraPrompt, setExtraPrompt] = useState('')

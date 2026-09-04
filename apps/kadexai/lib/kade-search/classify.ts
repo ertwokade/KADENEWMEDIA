@@ -149,7 +149,9 @@ export function detectLanguage(item: RawTrendItem): string {
   const en = count(enWords)
   if (tr > en) return 'tr'
   if (en > tr) return 'en'
-  return item.country === 'TR' ? 'tr' : 'en'
+  // Ülke, içeriğin dilini kanıtlamaz. Belirsiz kaydı yanlış dil filtresine
+  // sokmak yerine açıkça "und" (undetermined) olarak işaretle.
+  return 'und'
 }
 
 /** Toplanan ham item'i tam siniflandirilmis hale getirir. */

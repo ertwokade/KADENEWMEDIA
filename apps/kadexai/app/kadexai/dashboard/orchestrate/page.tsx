@@ -10,6 +10,7 @@ import { FormEvent, useCallback, useEffect, useState } from 'react'
 import { CheckCircle2, Clock, Play, SkipForward, XCircle } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
 import { apiFetch } from '@/lib/client/api'
+import ModelOutput from '@/components/ui/ModelOutput'
 
 interface Pipeline {
   id: string
@@ -185,7 +186,7 @@ export default function OrchestratePage() {
                   </header>
                   {step.reason && <p className="mt-2 text-xs text-amber-300">{step.reason}</p>}
                   {step.output && (
-                    <pre className="mt-3 max-h-80 overflow-auto whitespace-pre-wrap rounded-lg bg-zinc-950 p-3 text-xs leading-5 text-zinc-300">{step.output}</pre>
+                    <ModelOutput content={step.output} className="mt-3 max-h-80 overflow-auto rounded-lg bg-zinc-950 p-3" />
                   )}
                 </article>
               ))}

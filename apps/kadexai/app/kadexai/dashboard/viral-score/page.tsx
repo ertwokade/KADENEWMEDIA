@@ -1,7 +1,7 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -162,6 +162,14 @@ export default function ViralScorePage() {
   const [results, setResults]       = useState<ModelResult[]>([])
   const [error, setError]           = useState('')
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const incomingTitle = params.get('title')
+    const incomingPlatform = params.get('platform')
+    if (incomingTitle) setTitle(incomingTitle)
+    if (incomingPlatform && platforms.includes(incomingPlatform as Platform)) setPlatform(incomingPlatform as Platform)
+  }, [])
+
   const forecastMode = Boolean(thumbnailDesc.trim() || niche.trim())
 
   const analyze = async (model: AIModel, subject: string = title): Promise<ModelResult> => {
@@ -185,12 +193,16 @@ export default function ViralScorePage() {
     const data = await res.json()
     if (!res.ok) throw new Error(data.error)
     const d = data.data ?? {}
+    const performanceScore = Number(d.genel_skor)
+    if (!Number.isFinite(performanceScore)) {
+      throw new Error('Model geçerli bir performans skoru döndürmedi. Lütfen yeniden dene.')
+    }
     // İki uç aynı bilgiyi farklı adlarla döndürüyor; kart tek biçim bekliyor.
     return {
       model: data.model || model,
       subject,
       analysis: {
-        toplam_puan: Number(d.genel_skor) || 0,
+        toplam_puan: Math.max(0, Math.min(100, Math.round(performanceScore))),
         kriterler: {},
         guclu_yonler: Array.isArray(d.guclu_yonler) ? d.guclu_yonler : [],
         iyilestirme_onerileri: [

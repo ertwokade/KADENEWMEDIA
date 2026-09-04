@@ -15,6 +15,13 @@ interface Template {
 }
 
 const kategoriler = ['Hook', 'CTA', 'Açıklama', 'Caption', 'DM', 'Diğer']
+const STARTER_TEMPLATES: Template[] = [
+  { id: 'local-starter-hook', kategori: 'Hook', baslik: 'Merak boşluğu', icerik: '[Hedef kitle] olarak [sonuç] istiyorsan, çoğu kişinin atladığı şu ayrıntıyı bilmelisin: [ayrıntı].', tarih: 'Başlangıç seti' },
+  { id: 'local-starter-cta', kategori: 'CTA', baslik: 'Yorum CTA’sı', icerik: 'Sen bu durumda hangi yöntemi kullanıyorsun? Tek kelimeyle yorumlara yaz; en iyi örnekleri bir sonraki içerikte paylaşacağım.', tarih: 'Başlangıç seti' },
+  { id: 'local-starter-description', kategori: 'Açıklama', baslik: 'Video açıklaması', icerik: '[Konu] hakkında uygulayabileceğin adımları bu videoda net örneklerle anlatıyorum.\n\nBölümler:\n00:00 Giriş\n[Zaman] [Bölüm]\n\nKaynaklar: [bağlantılar]', tarih: 'Başlangıç seti' },
+  { id: 'local-starter-caption', kategori: 'Caption', baslik: 'Problem → çözüm', icerik: '[Sorun] yüzünden [istenmeyen sonuç] yaşıyorsan bu üç adımı dene:\n1. [adım]\n2. [adım]\n3. [adım]\n\nKaydet ve uygularken geri dön.', tarih: 'Başlangıç seti' },
+  { id: 'local-starter-dm', kategori: 'DM', baslik: 'İş birliği ilk mesajı', icerik: 'Merhaba [isim], [özgün içerik/çalışma] yaklaşımını özellikle beğendim. [marka/proje] için iki tarafa da değer katacak kısa bir iş birliği fikrim var. Uygunsan ayrıntıları paylaşabilir miyim?', tarih: 'Başlangıç seti' },
+]
 
 export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([])
@@ -31,13 +38,20 @@ export default function TemplatesPage() {
       .then(async (response) => ({ response, data: await response.json() }))
       .then(({ response, data }) => {
         if (!response.ok) throw new Error('local')
-        const cloud = Array.isArray(data.templates) ? data.templates.map((template: Record<string, unknown>) => ({ id: String(template.id), kategori: String(template.category || 'Diğer'), baslik: String(template.title || ''), icerik: String(template.content || ''), tarih: new Date(String(template.created_at)).toLocaleDateString('tr-TR') })) : []
-        saveToStorage(cloud)
+        const cloud: Template[] = Array.isArray(data.templates) ? data.templates.map((template: Record<string, unknown>) => ({ id: String(template.id), kategori: String(template.category || 'Diğer'), baslik: String(template.title || ''), icerik: String(template.content || ''), tarih: new Date(String(template.created_at)).toLocaleDateString('tr-TR') })) : []
+        let local: Template[] = []
+        try {
+          const saved = JSON.parse(localStorage.getItem('contentai-templates') || '[]')
+          if (Array.isArray(saved)) local = saved.filter((template) => String(template?.id || '').startsWith('local-'))
+        } catch { /* bozuk yerel kayıt yok sayılır */ }
+        const merged = [...cloud, ...local.filter((item) => !cloud.some((saved) => saved.id === item.id))]
+        saveToStorage(merged.length ? merged : STARTER_TEMPLATES)
       })
       .catch(() => {
         try {
           const saved = JSON.parse(localStorage.getItem('contentai-templates') || '[]')
-          if (Array.isArray(saved)) setTemplates(saved)
+          if (Array.isArray(saved) && saved.length) setTemplates(saved)
+          else setTemplates(STARTER_TEMPLATES)
         } catch { localStorage.removeItem('contentai-templates') }
         setSyncError('Bulut şablonları yüklenemedi; yerel kayıtlar kullanılıyor.')
       })

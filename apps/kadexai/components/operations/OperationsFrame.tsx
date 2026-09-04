@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react'
+import { AlertTriangle, Loader2, RefreshCw, X } from 'lucide-react'
 import { AIModel } from '@/types'
 import { useTheme } from '@/lib/context/ThemeContext'
 import { apiPath } from '@/lib/appConfig'
@@ -98,6 +98,12 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
   }, [selectedModel, loaded])
 
   useEffect(() => {
+    if (!reportError) return
+    const timeout = window.setTimeout(() => setReportError(''), 8_000)
+    return () => window.clearTimeout(timeout)
+  }, [reportError])
+
+  useEffect(() => {
     if (!loaded) return
     iframeRef.current?.contentWindow?.postMessage(
       { type: 'kade:set-operations-theme', theme },
@@ -114,8 +120,11 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
   return (
     <div className="kade-operations-frame relative h-full w-full overflow-hidden" aria-busy={!loaded}>
       {reportError && (
-        <div role="alert" className="absolute left-1/2 top-3 z-30 w-[min(92%,32rem)] -translate-x-1/2 rounded-lg border border-red-500/40 bg-red-950/95 px-4 py-3 text-center text-xs font-medium text-red-100 shadow-xl">
-          {reportError}
+        <div role="alert" className="absolute left-1/2 top-3 z-30 flex w-[min(92%,32rem)] -translate-x-1/2 items-center gap-3 rounded-lg border border-red-500/40 bg-red-950/95 px-4 py-3 text-xs font-medium text-red-100 shadow-xl">
+          <span className="flex-1">{reportError}</span>
+          <button type="button" onClick={() => setReportError('')} aria-label="Bildirimi kapat" className="rounded p-1 text-red-200 hover:bg-red-900 hover:text-white">
+            <X className="h-3.5 w-3.5" />
+          </button>
         </div>
       )}
       {!loaded && !timedOut && (

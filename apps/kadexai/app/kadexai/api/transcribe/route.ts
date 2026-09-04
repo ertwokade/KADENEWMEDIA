@@ -4,6 +4,7 @@ import { hasAuthenticatedUser } from '@/lib/auth/server'
 import { requireApiUser } from '@/lib/auth/server'
 import { requireToolFeature } from '@/lib/payments/featureGuard'
 import { geminiTranscribe, geminiTranscribeKullanilabilir } from '@/lib/ai/geminiTranscribe'
+import { getRequestProfileVocabulary } from '@/lib/ai/profileContext'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,8 +58,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Dosya içeriği desteklenen ses veya video biçimiyle eşleşmiyor.' }, { status: 415 })
     }
 
+    const requestedVocabulary = typeof incoming.get('vocabulary') === 'string'
+      ? String(incoming.get('vocabulary')).split(',').map((item) => item.trim().slice(0, 80)).filter(Boolean).slice(0, 20)
+      : []
+    const vocabulary = [...new Set(['Kade Media', 'KadexAI', 'Kade New Media', ...await getRequestProfileVocabulary(), ...requestedVocabulary])]
+
     if (!apiKey) {
-      const sonuc = await geminiTranscribe(file)
+      const sonuc = await geminiTranscribe(file, vocabulary)
       if (!sonuc.words.length) {
         return NextResponse.json({ error: 'Ses içinde konuşma bulunamadı.' }, { status: 422 })
       }
@@ -71,6 +77,7 @@ export async function POST(req: NextRequest) {
     outgoing.append('model', 'whisper-large-v3-turbo')
     outgoing.append('response_format', 'verbose_json')
     outgoing.append('timestamp_granularities[]', 'word')
+    outgoing.append('prompt', `Özel isimler: ${vocabulary.join(', ')}`)
 
     const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
       method: 'POST',

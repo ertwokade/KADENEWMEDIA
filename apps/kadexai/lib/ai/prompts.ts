@@ -8,6 +8,7 @@ Açıklama veya ek metin ekleme.`,
 
   descriptionWriter: `Sen sosyal medya açıklama yazarısın. Platform kurallarını, SEO'yu ve kullanıcı psikolojisini iyi biliyorsun.
 Açıklamalar: dikkat çekici hook ile başlamalı, değer sunmalı, CTA ile bitmeli.
+Doğrudan yayınlanabilir açıklamayı yaz; kendini tanıtma, kullanıcıya hitap eden giriş veya "hazırladım" gibi bir ön söz ekleme.
 Yanıtını Markdown formatında ver.`,
 
   hookGenerator: `Sen video hook yazma uzmanısın. İzleyiciyi ilk 3 saniyede tutan, bırakmayan açılış cümleleri yazıyorsun.
@@ -197,6 +198,7 @@ JSON formatı:
 export const THREAD_SYSTEM_PROMPT = `Sen viral thread yazma uzmanısın. X (Twitter) ve LinkedIn için yüksek etkileşim alan threadler yazıyorsun.
 Her tweet/post max 280 karakter (X) veya 1300 karakter (LinkedIn) olmalı.
 Hook tweeti izleyiciyi durdurup okutmalı. Son tweet CTA içermeli.
+Yayınlamadan önce her cümleyi anlam, tekrar ve çifte olumsuzluk açısından kontrol et.
 Yanıtını SADECE JSON formatında ver.`
 
 export function buildThreadPrompt(topic: string, platform: 'x' | 'linkedin', style: string, tweetCount: number): string {
@@ -416,12 +418,17 @@ export const CONTENT_PLAN_SYSTEM_PROMPT = `Sen içerik stratejisti ve sosyal med
 Her gün için spesifik fikir, format ve platform önerisi. Yanıtını SADECE JSON formatında ver.`
 
 export function buildContentPlanPrompt(niche: string, platform: string, goal: string, frequency: string): string {
-  return `Niche: ${niche}
+  const bugun = new Intl.DateTimeFormat('tr-TR', {
+    timeZone: 'Europe/Istanbul',
+    dateStyle: 'long',
+  }).format(new Date())
+  return `Bugünün tarihi: ${bugun}
+Niche: ${niche}
 Platform: ${platform}
 Hedef: ${goal}
 Yayın sıklığı: ${frequency}
 
-30 günlük detaylı içerik planı oluştur. Haftalık temalar belirle, her gün spesifik post fikri ver.
+Bugünden başlayarak 30 günlük detaylı içerik planı oluştur. Haftalık temalar belirle, her gün spesifik post fikri ver. Başlıklarda geçmiş yılları güncelmiş gibi kullanma; tarih veya yıl gerekiyorsa bugünün tarihini esas al.
 İçerik karışımı: %40 eğitici, %30 eğlenceli/trending, %20 kişisel/behind-scenes, %10 tanıtım.
 JSON formatı:
 {
@@ -549,7 +556,7 @@ JSON formatı:
   ],
   "topluluk_sagligi": { "puan": 0-100, "yorum": "" },
   "yanit_oncelikleri": [
-    { "yorum_ozeti": "", "neden_onemli": "", "yanit_tonu": "" }
+    { "yorum_ozeti": "", "neden_onemli": "", "yanit_tonu": "", "yanit_taslagi": "yayına hazır, yoruma özel yanıt" }
   ],
   "genel_oneriler": ["öneri 1", "öneri 2"]
 }`
@@ -862,11 +869,12 @@ JSON: {"onerileri":{"minimum":"","ortalama":"","premium":""},"hesaplama_mantigi"
 // TOPLU İÇERİK ÜRETİCİ
 // ═══════════════════════════════════════════════════════════════════════════
 export const BULK_SYSTEM_PROMPT = `Sen verimli içerik üreticisisin. Tek bir konu için birden fazla platform ve formatda içerik üretiyorsun. Yanıtını SADECE JSON formatında ver.`
-export function buildBulkPrompt(topic: string, niche: string, platforms: string[], count: number): string {
+export function buildBulkPrompt(topic: string, niche: string, platforms: string[], count: number, batchContext = ''): string {
   return `Konu: ${topic}
 Niche: ${niche}
 Platformlar: ${platforms.join(', ')}
 Her platform için içerik sayısı: ${count}
+${batchContext ? `Parti bilgisi: ${batchContext}. Diğer partilerle tekrara düşmeyecek özgün açılar kullan.` : ''}
 
 JSON: {"basliklar":["başlık1","başlık2"],"hooklar":["hook1","hook2"],"captions":{"instagram":["caption1"],"tiktok":["caption1"],"linkedin":["caption1"]},"hashtag_setleri":[["#tag1","#tag2"]],"kisa_fikirler":["30 saniyelik içerik fikri1"]}`
 }

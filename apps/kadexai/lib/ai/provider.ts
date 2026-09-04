@@ -16,6 +16,22 @@ function hasEnv(name: string) {
   return Boolean(process.env[name]?.trim())
 }
 
+function normalizeGeneratedHashtags(content: string) {
+  return content.replace(/(^|[\s"'[(])#([\p{L}\p{N}_]+)/gu, (_match, prefix: string, tag: string) => {
+    const asciiTag = tag
+      .replace(/[ıİ]/g, 'i')
+      .replace(/[şŞ]/g, 's')
+      .replace(/[ğĞ]/g, 'g')
+      .replace(/[üÜ]/g, 'u')
+      .replace(/[öÖ]/g, 'o')
+      .replace(/[çÇ]/g, 'c')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+    return `${prefix}#${asciiTag}`
+  })
+}
+
 function fallbackModel(): GenerateRequest['model'] {
   return 'groq-llama-70b'
 }
@@ -618,7 +634,10 @@ export async function generateContent(req: GenerateRequest, request?: Request): 
     }
   }
 
-  const result = await runGeneration(req, request, user, entitlement)
+  const rawResult = await runGeneration(req, request, user, entitlement)
+  // Sağlayıcıdan bozuk kod noktası gelirse arayüzde � olarak görünmesin.
+  // Kaybolmuş karakter geri kurulamaz; görünmez bir artık bırakmak yerine temizlenir.
+  const result = { ...rawResult, content: normalizeGeneratedHashtags(rawResult.content.replace(/\uFFFD/g, '')) }
 
   if (user) {
     const config = getModelConfig(result.model)

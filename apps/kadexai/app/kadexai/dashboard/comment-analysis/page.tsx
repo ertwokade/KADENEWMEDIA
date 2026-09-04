@@ -5,9 +5,10 @@ import { useState } from 'react'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
+import CopyButton from '@/components/ui/CopyButton'
 import { cn } from '@/lib/utils'
 
-interface AnalysisData { ozet: { toplam_yorum: number; pozitif_oran: number; negatif_oran: number; notr_oran: number; genel_duygu: string }; duygu_analizi: { en_cok_hissedilen: string; pozitif_temalar: string[]; negatif_temalar: string[]; notr_sorular: string[] }; icerik_firsatlari: Array<{ fikir: string; kaynak_yorum: string; potansiyel: string }>; topluluk_sagligi: { puan: number; yorum: string }; yanit_oncelikleri: Array<{ yorum_ozeti: string; neden_onemli: string; yanit_tonu: string }>; genel_oneriler: string[] }
+interface AnalysisData { ozet: { toplam_yorum: number; pozitif_oran: number; negatif_oran: number; notr_oran: number; genel_duygu: string }; duygu_analizi: { en_cok_hissedilen: string; pozitif_temalar: string[]; negatif_temalar: string[]; notr_sorular: string[] }; icerik_firsatlari: Array<{ fikir: string; kaynak_yorum: string; potansiyel: string }>; topluluk_sagligi: { puan: number; yorum: string }; yanit_oncelikleri: Array<{ yorum_ozeti: string; neden_onemli: string; yanit_tonu: string; yanit_taslagi?: string }>; genel_oneriler: string[] }
 
 export default function CommentAnalysisPage() {
   const { selectedModel } = useModel()
@@ -116,6 +117,12 @@ export default function CommentAnalysisPage() {
                       <div key={i} className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
                         <p className="text-zinc-200 text-xs font-medium">{y.yorum_ozeti}</p>
                         <p className="text-zinc-500 text-xs mt-1">{y.neden_onemli} · Ton: <span className="text-amber-400">{y.yanit_tonu}</span></p>
+                        {y.yanit_taslagi && (
+                          <div className="mt-3 rounded-lg border border-zinc-700/60 bg-zinc-900/50 p-3">
+                            <p className="text-zinc-300 text-sm leading-relaxed">{y.yanit_taslagi}</p>
+                            <CopyButton text={y.yanit_taslagi} className="mt-2" />
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

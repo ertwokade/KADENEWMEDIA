@@ -227,6 +227,7 @@ export async function queryTrends(filters: TrendFilters = {}): Promise<CurrentTr
   }
   if (filters.category && filters.category !== 'all') q = q.eq('category', filters.category)
   if (filters.country && filters.country !== 'all') q = q.eq('country', filters.country)
+  if (filters.language && filters.language !== 'all') q = q.eq('language', filters.language)
   if (filters.stage && filters.stage !== 'all') q = q.eq('stage', filters.stage)
   if (filters.format && filters.format !== 'all') q = q.contains('formats', [filters.format])
   if (filters.q) {
@@ -432,6 +433,21 @@ export async function recentAlerts(limit = 50): Promise<Array<TrendAlert & { tit
   const { data: trends } = await supabase.from('kade_trends').select('id, title, platform, url').in('id', ids)
   const byId = new Map((trends ?? []).map((t) => [t.id, t]))
   return alerts.map((a) => ({ ...a, ...(a.trend_id ? byId.get(a.trend_id) : undefined) }))
+}
+
+/** Kaynak sağlığı uyarıları trend kimliği taşımaz; aynı uyarı listede yığılmasın. */
+export async function replaceSourceHealthAlert(message: string, severity = 'high') {
+  const db = createAdminClient()
+  await db.from('kade_trend_alerts').delete().eq('type', 'source_health').is('trend_id', null)
+  const { error } = await db.from('kade_trend_alerts').insert({
+    trend_id: null,
+    type: 'source_health',
+    message,
+    severity,
+    seen: false,
+    created_at: new Date().toISOString(),
+  })
+  if (error) throw new Error(`kaynak sağlığı uyarısı yazılamadı: ${error.message}`)
 }
 
 export async function statsSummary() {

@@ -6,6 +6,7 @@ import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
+import ModelOutput from '@/components/ui/ModelOutput'
 import { Platform } from '@/types'
 import { collectSettledResults, getPlatformLabel, cn } from '@/lib/utils'
 
@@ -14,7 +15,6 @@ const platforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin'
 const ageRanges = [
   { id: '13-17', label: '13–17' },
   { id: '18-24', label: '18–24' },
-  { id: '18-34', label: '18-34' },
   { id: '25-34', label: '25–34' },
   { id: '35-44', label: '35–44' },
   { id: '45+',   label: '45+' },
@@ -28,7 +28,7 @@ export default function DescriptionPage() {
   const [title, setTitle]               = useState('')
   const [summary, setSummary]           = useState('')
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>(['youtube'])
-  const [ageRange, setAgeRange]         = useState('18-34')
+  const [ageRange, setAgeRange]         = useState('25-34')
   const [extraAudience, setExtraAudience] = useState('')
   const [includeCTA, setIncludeCTA]     = useState(true)
   const [includeHashtags, setIncludeHashtags] = useState(false)
@@ -152,7 +152,7 @@ export default function DescriptionPage() {
                   <h3 className="text-zinc-200 font-semibold text-sm">{getPlatformLabel(r.platform)}</h3>
                   <CopyButton text={r.description} />
                 </div>
-                <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">{r.description}</p>
+                <ModelOutput content={r.description} />
               </div>
             ))}
             {!loading && results.length === 0 && !error && (

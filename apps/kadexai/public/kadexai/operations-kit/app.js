@@ -19,6 +19,10 @@ const fmt = {
   dt(ts){ try{ return new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(ts)) }catch{ return "" } },
   time(){ return new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}) },
 };
+function providerCost(value,suffix=""){
+  const usd=num(value,0),rate=num(state?.settings?.usdTryRate,0);
+  return rate>0?`${fmt.try.format(usd*rate)} (${fmt.usd.format(usd)}${suffix})`:`${fmt.usd.format(usd)}${suffix} · sağlayıcı USD`;
+}
 
 // ── SABİTLER ─────────────────────────────────────────────────────────
 const stages = [
@@ -138,7 +142,7 @@ const sampleComments = [
 
 // ── BAŞLANGIÇ VERİSİ ─────────────────────────────────────────────────
 const initialState = {
-  settings:{ teamName:"Kade Kit", monthlyBudget:650000, members:["Kadir","Emir","Emre","Çağrı","Berkin","Merve"] },
+  settings:{ teamName:"Kade Kit", monthlyBudget:650000, usdTryRate:0, members:["Kadir","Emir","Emre","Çağrı","Berkin","Merve"] },
   references:[
     {id:"ref-main",    tag:"@ana-kişi",    label:"Ana kişi",        tone:"indigo"},
     {id:"ref-second",  tag:"@ikinci-kişi", label:"Ikinci kişi",     tone:"teal"},
@@ -381,6 +385,7 @@ function normalizeState(input,explicitEmptyArrays=new Set()){
     ...settings,
     teamName:str(settings.teamName,base.settings.teamName),
     monthlyBudget:num(settings.monthlyBudget,base.settings.monthlyBudget),
+    usdTryRate:num(settings.usdTryRate,base.settings.usdTryRate),
     members:members.length?members:clone(base.settings.members),
   };
 
@@ -587,7 +592,7 @@ function saveState(){
 
 function buildCleanInitial(){
   const s=buildInitial();
-  s.settings={teamName:"Kade Media",monthlyBudget:0,members:["Kadir"]};
+  s.settings={teamName:"Kade Media",monthlyBudget:0,usdTryRate:0,members:["Kadir"]};
   s.references=[];
   s.productions=[];
   s.ideas=[];
@@ -1167,12 +1172,13 @@ function donutSvg(pct,color){
 // ── DASHBOARD ────────────────────────────────────────────────────────
 function renderDashboard(){
   const prods=filteredProductions(),spent=totalSpent(prods),active=prods.filter(p=>!["published","cancelled"].includes(p.stage)).length,open=openTasks(prods).length,pct=budgetPercent(spent);
+  const hasBudget=Number(state.settings.monthlyBudget)>0;
   const starterNotice=document.getElementById("starterNotice");
   if(starterNotice)starterNotice.style.display=state.productions.some(p=>p.id==="p-001")?"flex":"none";
   const isAllTime=activeFilter==="all";
   document.getElementById("dashKpis").innerHTML=[
-    kpi(isAllTime?"Bütçe Referansı":"Aylık Bütçe",fmt.try.format(state.settings.monthlyBudget),isAllTime?"Aylık limit":`${pct}% kullanıldı`,"teal","wallet","crm"),
-    kpi("Harcanan",fmt.try.format(spent),isAllTime?"Tüm kayıtlar":`${fmt.try.format(Math.max(state.settings.monthlyBudget-spent,0))} kaldı`,"gold","trending-up","crm"),
+    kpi(isAllTime?"Bütçe Referansı":"Aylık Bütçe",hasBudget?fmt.try.format(state.settings.monthlyBudget):"Tanımlı değil",hasBudget?(isAllTime?"Aylık limit":`${pct}% kullanıldı`):"Ayarlardan bütçe gir","teal","wallet","crm"),
+    kpi("Harcanan",fmt.try.format(spent),isAllTime?"Tüm kayıtlar":hasBudget?`${fmt.try.format(Math.max(state.settings.monthlyBudget-spent,0))} kaldı`:"Bütçe ile karşılaştırılamıyor","gold","trending-up","crm"),
     kpi("Aktif Üretim",active,`${state.ideas.length} fikir havuzda`,"indigo","clapperboard","crm"),
     kpi("Açık Görev",open,`${state.inventory.length} envanter`,"coral","list-checks","crm"),
   ].join("");
@@ -1181,6 +1187,10 @@ function renderDashboard(){
 
 function renderBudgetOverview(prods){
   const spent=totalSpent(prods),pct=budgetPercent(spent);
+  if(!(Number(state.settings.monthlyBudget)>0)){
+    document.getElementById("budgetOverview").innerHTML=`<div class="empty-state">Aylık bütçe tanımlı değil. ${fmt.try.format(spent)} harcama kaydı var; oran hesaplanmadı.<br><button type="button" class="ghost-btn" style="margin-top:12px" onclick="navigateTo('settings')">Bütçeyi tanımla</button></div>`;
+    return;
+  }
   let warning="";
   if(pct>=100)warning=`<div class="budget-warning danger">🔴 Bütçe aşımı! ${fmt.try.format(spent-state.settings.monthlyBudget)} fazla harcandı.</div>`;
   else if(pct>=90)warning=`<div class="budget-warning caution">⚠️ Dikkat: Bütçenin %${pct}'i kullanıldı.</div>`;
@@ -1198,7 +1208,7 @@ function renderUpcomingTasks(prods=state.productions){
 function renderRecentMedia(){
   const items=state.media.slice(-3).reverse();
   document.getElementById("recentMedia").innerHTML=items.length
-    ?items.map(m=>`<button type="button" class="media-tile dashboard-media-button" data-dashboard-nav="banana" aria-label="${esc(m.title)} üretimini Banana Studio'da aç"><img src="${safeImageUrl(m.src)}" alt="${esc(m.title)}" loading="lazy"/><span><strong style="font-size:13px">${esc(m.title)}</strong><span class="row-meta">${fmt.usd.format(m.cost)} · ${esc(m.model)}</span></span></button>`).join("")
+    ?items.map(m=>`<button type="button" class="media-tile dashboard-media-button" data-dashboard-nav="banana" aria-label="${esc(m.title)} üretimini Banana Studio'da aç"><img src="${safeImageUrl(m.src)}" alt="${esc(m.title)}" loading="lazy"/><span><strong style="font-size:13px">${esc(m.title)}</strong><span class="row-meta">${providerCost(m.cost)} · ${esc(m.model)}</span></span></button>`).join("")
     :`<div class="empty-state">Henüz görsel üretilmedi.</div>`;
 }
 
@@ -1243,7 +1253,7 @@ function answerAssistantLocal(question){
   else if(q.includes("görev")||q.includes("bekleyen")){ const tasks=upcomingTasksList(); ans=`Açık görev: ${tasks.length}. İlk sırada "${tasks[0]?.task.title||"—"}" (${tasks[0]?.task.assignee}, teslim: ${fmt.date(tasks[0]?.task.due)}).` }
   else if(q.includes("envanter kalemi")||q.includes("depo")){ const top=[...state.inventory].sort((a,b)=>b.qty-a.qty)[0]; ans=`Envanterde ${state.inventory.length} kalem. En çok: ${top?.name} (${top?.qty} adet).` }
   else if(q.includes("fikir"))ans=`Havuzda ${state.ideas.length} konsept var. En son: "${state.ideas[0]?.title}".`;
-  else if(q.includes("banana")||q.includes("görsel"))ans=`Banana Studio: ${fmt.usd.format(state.totalUsdSpent)} harcandı, ${state.media.length} görsel üretildi.`;
+  else if(q.includes("banana")||q.includes("görsel"))ans=`Banana Studio sağlayıcı kullanımı: ${providerCost(state.totalUsdSpent)}, ${state.media.length} görsel üretildi.`;
   document.getElementById("assistantAnswer").textContent=ans+"\n\n— Yerel hesaplama";
 }
 
@@ -1471,18 +1481,19 @@ function runCommentAnalysis(){ const raw=document.getElementById("commentsInput"
 
 function analyzeComments(raw){
   const comments=raw.split(/\n+/).map((line,i)=>{ const m=line.match(/^\s*\[(\d+)\]\s*(.+)$/); return{text:m?m[2].trim():line.trim(),likes:m?Number(m[1]):Math.max(1,80-i*4)} }).filter(c=>c.text.length>2);
-  const total=Math.max(comments.length,1);
-  const themes=themeDefinitions.map(td=>{ const hits=comments.filter(c=>containsAny(c.text,td.keywords)); return{...td,count:hits.length,percent:Math.round((hits.length/total)*100),examples:hits.slice(0,2)} }).filter(t=>t.count>0).sort((a,b)=>b.count-a.count);
+  const total=comments.length;
+  const themes=themeDefinitions.map(td=>{ const hits=comments.filter(c=>containsAny(c.text,td.keywords)); return{...td,count:hits.length,percent:total?Math.round((hits.length/total)*100):0,examples:hits.slice(0,2)} }).filter(t=>t.count>0).sort((a,b)=>b.count-a.count);
   const sentiment=comments.reduce((acc,c)=>{ const t=c.text.toLocaleLowerCase("tr-TR"); if(containsAny(t,positiveWords))acc.positive++; if(containsAny(t,negativeWords))acc.negative++; return acc },{positive:0,negative:0});
   const timestamps=comments.map(c=>({...c,stamps:[...c.text.matchAll(/\b\d{1,2}[:.]?\d{2}\b/g)].map(m=>m[0])})).filter(c=>c.stamps.length);
   const score=calcVideoScore(sentiment,total);
   return{total,themes,sentiment,timestamps,score,words:buildWordCloud(comments.map(c=>c.text).join(" ")),topComments:[...comments].sort((a,b)=>b.likes-a.likes).slice(0,8)};
 }
 
-function calcVideoScore(sentiment,total){ const posRate=sentiment.positive/Math.max(total,1),negRate=sentiment.negative/Math.max(total,1),raw=5+posRate*5-negRate*4; return Math.min(10,Math.max(1,parseFloat(raw.toFixed(1)))) }
+function calcVideoScore(sentiment,total){ if(!total)return null;const posRate=sentiment.positive/total,negRate=sentiment.negative/total,raw=5+posRate*5-negRate*4; return Math.min(10,Math.max(1,parseFloat(raw.toFixed(1)))) }
 
 function renderVideoScore(result){
   const el=document.getElementById("videoScore");if(!el)return;
+  if(result.score===null){el.innerHTML='<div class="empty-state">Puan ve duygu yorumu için en az bir gerçek yorum ekle.</div>';return}
   const score=result.score,color=score>=8?"teal":score>=6?"gold":"coral",label=score>=8?"Harika içerik! İzleyiciler çok memnun.":score>=6?"İyi içerik. Küçük iyileştirmeler etkili olur.":"Yoğun eleştiri var. Önerileri incele.";
   el.innerHTML=`<div style="display:flex;align-items:center;gap:20px;padding:8px 0"><div style="text-align:center"><div style="font-size:52px;font-weight:900;color:var(--${color});line-height:1">${score}</div><div style="font-size:12px;color:var(--ink3);margin-top:4px">/ 10 puan</div></div><div style="flex:1"><div class="progress" style="margin-bottom:10px"><span style="width:${score*10}%;background:var(--${color})"></span></div><div style="font-size:13px;line-height:1.6;color:var(--ink2)">${label}</div><div style="display:flex;gap:10px;margin-top:10px"><span class="pill teal">+${result.sentiment.positive} pozitif</span><span class="pill coral">-${result.sentiment.negative} negatif</span><span class="pill indigo">${result.total} yorum</span></div></div></div>`;
 }
@@ -1521,7 +1532,7 @@ function saveAnalysisSession(){
 
 function renderAnalysisHistory(){
   const el=document.getElementById("analysisHistory");if(!el)return;
-  el.innerHTML=state.analysisHistory.length?`<div style="display:grid;gap:10px">${state.analysisHistory.map(s=>`<div class="analysis-history-item"><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(s.videoUrl||"Manuel yorum seti")}</div><div class="row-meta">${fmt.dt(s.ts)} · ${s.total} yorum · <span class="pill teal">${s.score}/10</span></div></div><button type="button" class="ghost-btn" style="font-size:12px" onclick="loadAnalysisSession('${s.id}')">Yükle</button><button type="button" onclick="deleteAnalysisSession('${s.id}')" style="border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:18px;padding:0 4px">×</button></div>`).join("")}</div>`:`<div class="empty-state">Analiz kaydet butonuyla gecmise ekle.</div>`;
+  el.innerHTML=state.analysisHistory.length?`<div style="display:grid;gap:10px">${state.analysisHistory.map(s=>`<div class="analysis-history-item"><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(s.videoUrl||"Manuel yorum seti")}</div><div class="row-meta">${fmt.dt(s.ts)} · ${s.total} yorum · <span class="pill teal">${s.score}/10</span></div></div><button type="button" class="ghost-btn" style="font-size:12px" onclick="loadAnalysisSession('${s.id}')">Yükle</button><button type="button" onclick="deleteAnalysisSession('${s.id}')" style="border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:18px;padding:0 4px">×</button></div>`).join("")}</div>`:`<div class="empty-state">Analizi Kaydet düğmesiyle geçmişe ekle.</div>`;
 }
 
 function loadAnalysisSession(id){
@@ -1731,7 +1742,7 @@ function renderGanttChart(){
 // ── BANANA STUDIO ─────────────────────────────────────────────────────
 function populateSelects(){
   const setOpts=(id,opts)=>{ const el=document.getElementById(id);if(!el)return;el.innerHTML=opts.map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join("") };
-  setOpts("imageModel",imageModels.map(m=>({value:m.id,label:`${m.name} ($${m.cost}/img)`})));
+  setOpts("imageModel",imageModels.map(m=>({value:m.id,label:`${m.name} (${providerCost(m.cost,"/görsel")})`})));
   setOpts("imageRatio",[{value:"16:9",label:"16:9 YouTube"},{value:"9:16",label:"9:16 Reels"},{value:"1:1",label:"1:1 Kare"},{value:"4:3",label:"4:3 Klasik"}]);
   setOpts("imageResolution",[{value:"1920x1080",label:"1920×1080 FHD"},{value:"2560x1440",label:"2560×1440 QHD"},{value:"3840x2160",label:"3840×2160 4K"}]);
   setOpts("videoModel",videoModels.map(m=>({value:m.id,label:`${m.name} ($${m.base}/10s)`})));
@@ -1745,13 +1756,13 @@ function bindBanana(){
   document.getElementById("enhanceImagePrompt").addEventListener("click",()=>{ const el=document.getElementById("imagePrompt");el.value=enhanceImagePrompt(el.value);showToast("Prompt iyilestirildi","info") });
   document.getElementById("enhanceVideoPrompt").addEventListener("click",()=>{ const el=document.getElementById("videoPrompt");el.value=enhanceVideoPrompt(el.value);showToast("Prompt iyilestirildi","info") });
   document.getElementById("saveTemplate").addEventListener("click",()=>{ const prompt=document.getElementById("imagePrompt").value.trim();if(!prompt){showToast("Önce bir prompt yaz","error");return}snapshotUndo();const name=prompt.slice(0,30)+(prompt.length>30?"…":"");if(!state.promptTemplates)state.promptTemplates=[];state.promptTemplates.push({id:uid("tpl"),name,prompt});saveState();renderPromptTemplates();showToast("Şablon kaydedildi","success") });
-  document.getElementById("imageForm").addEventListener("submit",async e=>{ e.preventDefault();const model=imageModels.find(m=>m.id===document.getElementById("imageModel").value)||imageModels[0],count=Number(document.getElementById("imageCount").value||1),prompt=document.getElementById("imagePrompt").value;if(!prompt.trim()){showToast("Önce prompt yaz","error");return}const srcs=(await generateImageSrcs(prompt,count,state.media.length)).filter(Boolean);if(!srcs.length){showToast("Görsel üretilemedi; kayıt oluşturulmadı.","error");return}snapshotUndo();const cost=model.cost*srcs.length;for(const src of srcs)state.media.push({id:uid("img"),title:`Görsel ${state.media.length+1}`,prompt,model:model.name,cost:model.cost,src});state.media=state.media.slice(-24);const user=state.users[0];if(user){user.images+=srcs.length;user.spend+=cost}state.totalUsdSpent=(state.totalUsdSpent||0)+cost;if(!state.promptHistory)state.promptHistory=[];state.promptHistory=[prompt,...state.promptHistory.filter(p=>p!==prompt)].slice(0,8);saveState();renderBanana();renderRecentMedia();showToast(`${srcs.length} görsel üretildi (${fmt.usd.format(cost)})`,"success");logActivity(`Banana: ${srcs.length} görsel üretildi`,"success") });
+  document.getElementById("imageForm").addEventListener("submit",async e=>{ e.preventDefault();const model=imageModels.find(m=>m.id===document.getElementById("imageModel").value)||imageModels[0],count=Number(document.getElementById("imageCount").value||1),prompt=document.getElementById("imagePrompt").value;if(!prompt.trim()){showToast("Önce prompt yaz","error");return}const srcs=(await generateImageSrcs(prompt,count,state.media.length)).filter(Boolean);if(!srcs.length){showToast("Görsel üretilemedi; kayıt oluşturulmadı.","error");return}snapshotUndo();const cost=model.cost*srcs.length;for(const src of srcs)state.media.push({id:uid("img"),title:`Görsel ${state.media.length+1}`,prompt,model:model.name,cost:model.cost,src});state.media=state.media.slice(-24);const user=state.users[0];if(user){user.images+=srcs.length;user.spend+=cost}state.totalUsdSpent=(state.totalUsdSpent||0)+cost;if(!state.promptHistory)state.promptHistory=[];state.promptHistory=[prompt,...state.promptHistory.filter(p=>p!==prompt)].slice(0,8);saveState();renderBanana();renderRecentMedia();showToast(`${srcs.length} görsel üretildi (${providerCost(cost)})`,"success");logActivity(`Banana: ${srcs.length} görsel üretildi`,"success") });
   document.getElementById("videoForm").addEventListener("submit",e=>{ e.preventDefault();showToast("Video üretim sağlayıcısı henüz bağlı değil.","info") });
   document.getElementById("continueVideo").addEventListener("click",()=>{ const el=document.getElementById("videoPrompt");el.value=`[DEVAM] ${el.value}`;el.focus() });
   document.getElementById("referenceForm").addEventListener("submit",e=>{ e.preventDefault();const tag=document.getElementById("referenceTag").value.trim();if(!tag)return;state.references.push({id:uid("ref"),tag:tag.startsWith("@")?tag:`@${tag}`,label:tag.replace("@",""),tone:"teal"});document.getElementById("referenceTag").value="";saveState();renderBanana();refreshIcons() });
 }
 
-function renderBanana(){ document.getElementById("bananaCost").textContent=`${fmt.usd.format(state.totalUsdSpent||0)} harcandı`;renderBananaReferences();renderPromptTemplates();renderBrainstorm();renderPromptHistory();renderImageGallery();renderVideoHistory();renderYoutubeRefs();renderAdminSpend();renderModelCosts();renderSpendingChart() }
+function renderBanana(){ document.getElementById("bananaCost").textContent=`Sağlayıcı maliyeti: ${providerCost(state.totalUsdSpent||0)}`;renderBananaReferences();renderPromptTemplates();renderBrainstorm();renderPromptHistory();renderImageGallery();renderVideoHistory();renderYoutubeRefs();renderAdminSpend();renderModelCosts();renderSpendingChart() }
 function renderBananaReferences(){ document.getElementById("referenceList").innerHTML=state.references.map(r=>`<div class="reference-row"><div class="avatar">${esc(r.label.slice(0,2).toUpperCase())}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(r.tag)}</div><div class="row-meta">${esc(r.label)}</div></div><span class="pill ${r.tone||"teal"}">Aktif</span></div>`).join("")||`<div class="empty-state">Referans ekle.</div>` }
 
 function renderPromptTemplates(){
@@ -1768,8 +1779,8 @@ function renderBrainstorm(){
   list.innerHTML=state.brainstorm.map((item,idx)=>`<button type="button" style="width:100%;padding:10px 14px;border:0;border-bottom:${idx<state.brainstorm.length-1?`1px solid var(--border)`:"none"};border-radius:${idx===0?`var(--radius) var(--radius) 0 0`:idx===state.brainstorm.length-1?`0 0 var(--radius) var(--radius)`:`0`};background:transparent;text-align:left;color:var(--ink2);font-size:13px;cursor:pointer;transition:var(--transition);display:flex;align-items:flex-start;gap:8px" onmouseover="this.style.background='var(--surface-hover)'" onmouseout="this.style.background='transparent'" onclick="document.getElementById('imagePrompt').value=this.dataset.prompt;showToast('Prompt yüklendi','info')" data-prompt="${esc(item.prompt)}"><span style="color:var(--teal);flex:0 0 auto;font-weight:700">→</span><span>${esc(item.prompt.slice(0,120))}${item.prompt.length>120?"…":""}</span></button>`).join("")
 }
 function renderPromptHistory(){ const el=document.getElementById("promptHistory");if(!el)return;const history=state.promptHistory||[];el.innerHTML=history.length?history.map((p,i)=>`<div class="prompt-history-item"><span class="prompt-history-text">${esc(p.slice(0,100))}${p.length>100?"…":""}</span><button class="prompt-history-use" onclick="document.getElementById('imagePrompt').value=(state.promptHistory||[])[${i}];showToast('Prompt yüklendi','info')">Kullan</button></div>`).join(""):`<div class="empty-state">Görsel üretince burada görünür.</div>` }
-function renderImageGallery(){ const items=state.media.slice(-9).reverse(),el=document.getElementById("imageGallery");el.innerHTML=items.length?items.map(m=>`<div class="image-tile"><img src="${safeImageUrl(m.src)}" alt="${esc(m.title)}" loading="lazy"/><div><div style="font-size:12px;font-weight:600">${esc(m.title)}</div><div class="row-meta" style="font-size:11px">${fmt.usd.format(m.cost)} · ${esc(m.model)}</div></div></div>`).join(""):`<div class="empty-state">Henüz görsel üretilmedi.</div>` }
-function renderVideoHistory(){ const items=state.videos.slice(-6).reverse(),el=document.getElementById("videoHistory");el.innerHTML=items.length?items.map(v=>`<div class="video-tile"><div class="video-thumb"><i data-lucide="play-circle"></i></div><div><div style="font-size:13px;font-weight:600">${esc(v.title)}</div><div class="row-meta" style="font-size:11px">${fmt.usd.format(v.cost)} · ${esc(v.model)} · ${v.dur}s</div></div></div>`).join(""):`<div class="empty-state">Video üretimi henüz bağlı değil.</div>` }
+function renderImageGallery(){ const items=state.media.slice(-9).reverse(),el=document.getElementById("imageGallery");el.innerHTML=items.length?items.map(m=>`<div class="image-tile"><img src="${safeImageUrl(m.src)}" alt="${esc(m.title)}" loading="lazy"/><div><div style="font-size:12px;font-weight:600">${esc(m.title)}</div><div class="row-meta" style="font-size:11px">${providerCost(m.cost)} · ${esc(m.model)}</div></div></div>`).join(""):`<div class="empty-state">Henüz görsel üretilmedi.</div>` }
+function renderVideoHistory(){ const items=state.videos.slice(-6).reverse(),el=document.getElementById("videoHistory");el.innerHTML=items.length?items.map(v=>`<div class="video-tile"><div class="video-thumb"><i data-lucide="play-circle"></i></div><div><div style="font-size:13px;font-weight:600">${esc(v.title)}</div><div class="row-meta" style="font-size:11px">${providerCost(v.cost)} · ${esc(v.model)} · ${v.dur}s</div></div></div>`).join(""):`<div class="empty-state">Video üretimi henüz bağlı değil.</div>` }
 const _ytRefs=[];
 let _ytSort="popular";
 function switchYtSort(sort,btn){
@@ -1786,9 +1797,9 @@ function renderYoutubeRefs(){
   list.innerHTML=sorted.length?sorted.map((r,index)=>`<div class="reference-row"><div style="font-size:20px">▶</div><div style="flex:1"><div class="row-title" style="font-size:13px">${esc(r.title)}</div><div class="row-meta">${fmt.date(r.date)} · ${(r.views/1000).toFixed(0)}K izlenme</div></div><button type="button" class="ghost-btn" style="font-size:12px" data-youtube-ref="${index}">Ref al</button></div>`).join(""):`<div class="empty-state">Henüz referans video eklenmedi.</div>`;
   list.querySelectorAll("[data-youtube-ref]").forEach(button=>button.addEventListener("click",()=>{const ref=sorted[Number(button.dataset.youtubeRef)];if(ref)document.getElementById("videoPrompt").value+=`[Ref: ${ref.title}]`}));
 }
-function renderAdminSpend(){ document.getElementById("adminSpend").innerHTML=`<table class="data-table"><thead><tr><th>Kullanıcı</th><th>Görsel</th><th>Video</th><th>Tahmini kullanım</th></tr></thead><tbody>${state.users.map(u=>`<tr><td style="font-weight:700">${esc(u.name)}</td><td><span class="pill indigo">${u.images}</span></td><td><span class="pill violet">${u.videos}</span></td><td><span class="cost-chip">${fmt.usd.format(u.spend)}</span></td></tr>`).join("")}</tbody></table><div style="margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--gold-dim)"><div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px">TAHMİNİ TOPLAM KULLANIM</div><div style="font-size:28px;font-weight:900;color:var(--gold)">${fmt.usd.format(state.totalUsdSpent||0)}</div></div>` }
-function renderModelCosts(){ document.getElementById("modelCosts").innerHTML=`<table class="data-table"><thead><tr><th>Model</th><th>Tip</th><th>Birim</th></tr></thead><tbody>${imageModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill teal">Görsel</span></td><td><span class="cost-chip">${fmt.usd.format(m.cost)}</span></td></tr>`).join("")}${videoModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill violet">Video</span></td><td><span class="cost-chip">${fmt.usd.format(m.base)}/10s</span></td></tr>`).join("")}</tbody></table>` }
-function renderSpendingChart(){ const el=document.getElementById("spendingChart");if(!el)return;const max=Math.max(...state.users.map(u=>u.spend),1),cls=["#00d4aa","#6c8ef5","#c77dff"];el.innerHTML=state.users.map((u,i)=>`<div class="bar-row"><div class="bar-label">${esc(u.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((u.spend/max)*100)}%;background:${cls[i%cls.length]}"></div></div><div class="bar-val">${fmt.usd.format(u.spend)}</div></div>`).join("") }
+function renderAdminSpend(){ document.getElementById("adminSpend").innerHTML=`<table class="data-table"><thead><tr><th>Kullanıcı</th><th>Görsel</th><th>Video</th><th>Tahmini sağlayıcı kullanımı</th></tr></thead><tbody>${state.users.map(u=>`<tr><td style="font-weight:700">${esc(u.name)}</td><td><span class="pill indigo">${u.images}</span></td><td><span class="pill violet">${u.videos}</span></td><td><span class="cost-chip">${providerCost(u.spend)}</span></td></tr>`).join("")}</tbody></table><div style="margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--gold-dim)"><div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px">TAHMİNİ TOPLAM SAĞLAYICI KULLANIMI</div><div style="font-size:28px;font-weight:900;color:var(--gold)">${providerCost(state.totalUsdSpent||0)}</div></div>` }
+function renderModelCosts(){ document.getElementById("modelCosts").innerHTML=`<table class="data-table"><thead><tr><th>Model</th><th>Tip</th><th>Birim</th></tr></thead><tbody>${imageModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill teal">Görsel</span></td><td><span class="cost-chip">${providerCost(m.cost,"/görsel")}</span></td></tr>`).join("")}${videoModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill violet">Video</span></td><td><span class="cost-chip">${providerCost(m.base,"/10 sn")}</span></td></tr>`).join("")}</tbody></table>` }
+function renderSpendingChart(){ const el=document.getElementById("spendingChart");if(!el)return;const max=Math.max(...state.users.map(u=>u.spend),1),cls=["#00d4aa","#6c8ef5","#c77dff"];el.innerHTML=state.users.map((u,i)=>`<div class="bar-row"><div class="bar-label">${esc(u.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((u.spend/max)*100)}%;background:${cls[i%cls.length]}"></div></div><div class="bar-val">${providerCost(u.spend)}</div></div>`).join("") }
 function createBrainstorm(cur,count){
   const n=Math.min(Number(count)||5,20);
   const base=[
@@ -2025,19 +2036,19 @@ function renderClients(){
       ${c.note?`<p class="client-note">${esc(c.note)}</p>`:""}
       <div class="dlv-list">${satirlar}</div>
     </article>`;
-  }).join(""):'<p class="empty-hint">Henüz müşteri eklenmemiş. Sağdaki formdan ekleyebilirsin.</p>';
+  }).join(""):'<p class="empty-hint">Henüz müşteri eklenmemiş. Bu ekrandaki müşteri formundan ekleyebilirsin.</p>';
   refreshIcons();
 }
 
 // ── AYARLAR ───────────────────────────────────────────────────────────
 function bindSettings(){
-  document.getElementById("settingsForm").addEventListener("submit",e=>{ e.preventDefault();snapshotUndo();const teamName=document.getElementById("setTeamName").value.trim(),budget=Number(document.getElementById("setBudget").value),membersRaw=document.getElementById("setMembers").value;if(teamName)state.settings.teamName=teamName;if(budget>0)state.settings.monthlyBudget=budget;if(membersRaw.trim())state.settings.members=membersRaw.split(",").map(m=>m.trim()).filter(Boolean);saveState();renderAll();document.getElementById("appTeamName").textContent=state.settings.teamName;showToast("Ayarlar kaydedildi","success");logActivity("Ayarlar güncellendi","info") });
+  document.getElementById("settingsForm").addEventListener("submit",e=>{ e.preventDefault();snapshotUndo();const teamName=document.getElementById("setTeamName").value.trim(),budget=Number(document.getElementById("setBudget").value),usdTryRate=Number(document.getElementById("setUsdTryRate").value),membersRaw=document.getElementById("setMembers").value;if(teamName)state.settings.teamName=teamName;if(budget>=0)state.settings.monthlyBudget=budget;if(Number.isFinite(usdTryRate)&&usdTryRate>=0)state.settings.usdTryRate=usdTryRate;if(membersRaw.trim())state.settings.members=membersRaw.split(",").map(m=>m.trim()).filter(Boolean);saveState();renderAll();document.getElementById("appTeamName").textContent=state.settings.teamName;showToast("Ayarlar kaydedildi","success");logActivity("Ayarlar güncellendi","info") });
 }
 
 function renderSettingsView(){
   const s=state.settings;
-  const n=document.getElementById("setTeamName"),b=document.getElementById("setBudget"),m=document.getElementById("setMembers");
-  if(n)n.value=s.teamName;if(b)b.value=s.monthlyBudget;if(m)m.value=s.members.join(", ");
+  const n=document.getElementById("setTeamName"),b=document.getElementById("setBudget"),r=document.getElementById("setUsdTryRate"),m=document.getElementById("setMembers");
+  if(n)n.value=s.teamName;if(b)b.value=s.monthlyBudget;if(r)r.value=s.usdTryRate||"";if(m)m.value=s.members.join(", ");
   const tnEl=document.getElementById("appTeamName");if(tnEl)tnEl.textContent=s.teamName;
   // Kısayol tablosu artık düzenlenebilir: her satırdaki düğme bir sonraki
   // tuş kombinasyonunu yakalar. Tarayıcının kendi kısayolları geri
@@ -3016,7 +3027,6 @@ Object.assign(window,{
   useTemplate,
   deleteTemplate,
   switchYtSort,
-  deleteRadarNote,
   restorePage,
   permanentDeletePage,
   addTblRow,

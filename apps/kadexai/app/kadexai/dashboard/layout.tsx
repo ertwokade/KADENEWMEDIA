@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import DashboardShell from '@/components/layout/DashboardShell'
 import { getAuthenticatedUser, hasAuthenticatedUser } from '@/lib/auth/server'
 import { appRoutes, withBasePath } from '@/lib/appConfig'
-import { isAllowedOwnerEmail, isAllowedOwnerUser } from '@/lib/featureAccess'
+import { isAllowedOwnerEmail } from '@/lib/featureAccess'
 import { WorkspaceProvider } from '@/lib/workspace/WorkspaceContext'
 import { workspaceSlugForUser } from '@/lib/workspace/slug'
 

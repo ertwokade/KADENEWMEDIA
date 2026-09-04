@@ -50,7 +50,7 @@ export default function BioLinkPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="Bağlantı Biyografisi" description="Her platform için optimize profil biyografisi ve link sayfası" />
+      <TopBar title="Bağlantı Bio" description="Her platform için optimize profil biyografisi ve link sayfası" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80 space-y-4">
