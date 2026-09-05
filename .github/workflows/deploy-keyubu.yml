@@ -1,0 +1,66 @@
+name: Deploy KadexAI to Keyubu
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/deploy-keyubu.yml"
+      - ".dockerignore"
+      - "apps/kadexai/**"
+      - "src/**"
+      - "scripts/**"
+      - "haoqi-clone/**"
+      - "public/**"
+      - "index.html"
+      - "package.json"
+      - "package-lock.json"
+      - "vite.config.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keyubu-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip keyubu]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: keyubu-production
+    env:
+      KEYUBU_HOST: ${{ secrets.KEYUBU_HOST }}
+      KEYUBU_USER: ${{ secrets.KEYUBU_USER }}
+      KEYUBU_SSH_KEY: ${{ secrets.KEYUBU_SSH_KEY }}
+      KEYUBU_KNOWN_HOSTS: ${{ secrets.KEYUBU_KNOWN_HOSTS }}
+
+    steps:
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEYUBU_SSH_KEY" > ~/.ssh/keyubu
+          printf '%s\n' "$KEYUBU_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/keyubu ~/.ssh/known_hosts
+
+      - name: Deploy exact Git commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/keyubu \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$KEYUBU_USER@$KEYUBU_HOST" \
+            "wsl.exe -d Ubuntu-24.04 -u root -- /srv/kade/bin/deploy-kadexai-release $GITHUB_SHA"
+
+      - name: Verify public endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error \
+            --retry 12 --retry-delay 5 --retry-all-errors \
+            https://kadexai.kadenewmedia.com/kadexai/api/health >/dev/null
+          echo "KadexAI production health check passed."

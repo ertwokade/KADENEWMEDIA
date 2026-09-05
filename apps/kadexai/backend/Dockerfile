@@ -14,7 +14,10 @@ RUN apt-get update \
 
 WORKDIR /app
 COPY requirements.txt ./
+# The Keyubu VDS has no CUDA GPU. Preinstall the official CPU wheel so
+# openai-whisper does not pull several gigabytes of NVIDIA libraries.
 RUN python -m pip install --upgrade pip \
+    && python -m pip install torch --index-url https://download.pytorch.org/whl/cpu \
     && python -m pip install -r requirements.txt
 
 COPY . .

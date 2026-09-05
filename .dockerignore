@@ -8,5 +8,8 @@ output
 test-results
 playwright-report
 .env
-apps/kadexai
 public/_next
+haoqi-clone-backup-*
+_to_delete
+apps/kadexai/.vercel
+**/*.tsbuildinfo
