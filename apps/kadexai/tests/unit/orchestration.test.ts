@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { MAX_STEPS_PER_RUN, PIPELINES, canInvoke, getPipeline, isEntryStep } from '../../lib/orchestration/registry'
+import { CUSTOM_STEP_CATALOG, MAX_STEPS_PER_RUN, PIPELINES, canInvoke, createCustomPipeline, getPipeline, isEntryStep } from '../../lib/orchestration/registry'
 
 test('bir adım yalnızca kendisinden SONRAKİ adımı tetikleyebilir', () => {
   assert.equal(canInvoke('content-sprint', 'trends', 'competitor'), true)
@@ -44,4 +44,14 @@ test('her akış paket özelliği talep eder (yetkisiz çalıştırma yok)', () 
   for (const pipeline of PIPELINES) {
     assert.ok(pipeline.requiresFeature, `${pipeline.id} özellik gerektirmiyor`)
   }
+})
+
+test('özel akış yalnız allowlist adımlarını, tekrarsız ve güvenli sınırda kabul eder', () => {
+  const custom = createCustomPipeline(['title', 'hashtag'])
+  assert.deepEqual(custom?.steps.map((step) => step.id), ['title', 'hashtag'])
+  assert.equal(custom?.requiresFeature, 'content-generation')
+  assert.equal(createCustomPipeline(['title']), undefined)
+  assert.equal(createCustomPipeline(['title', 'title']), undefined)
+  assert.equal(createCustomPipeline(['title', 'bilinmeyen']), undefined)
+  assert.ok(CUSTOM_STEP_CATALOG.length <= MAX_STEPS_PER_RUN)
 })

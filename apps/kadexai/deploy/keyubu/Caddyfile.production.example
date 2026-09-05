@@ -1,0 +1,10 @@
+kadexai.kadenewmedia.com {
+	encode zstd gzip
+	redir / /kadexai 302
+	reverse_proxy 127.0.0.1:3000
+}
+
+supabase.kadenewmedia.com {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8000
+}

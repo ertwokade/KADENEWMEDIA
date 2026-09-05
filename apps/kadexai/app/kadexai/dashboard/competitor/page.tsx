@@ -5,7 +5,9 @@ import { useState } from 'react'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
-import { cn } from '@/lib/utils'
+import { cn, getPlatformLabel } from '@/lib/utils'
+import { Database, Loader2 } from 'lucide-react'
+import type { Platform } from '@/types'
 
 interface Opportunity { firsat: string; nasil_kullan: string; oncelik: string }
 interface Analysis { rakip_profili: Record<string, unknown>; icerik_stratejisi: Record<string, unknown>; guclu_yonler: string[]; zayif_yonler: string[]; fırsatlar: Opportunity[]; farklilasma_stratejisi: string; hemen_uygulanabilir: string[] }
@@ -18,6 +20,35 @@ export default function CompetitorPage() {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<Analysis | null>(null)
   const [error, setError] = useState('')
+  const [importingMaterials, setImportingMaterials] = useState(false)
+  const [materialNotice, setMaterialNotice] = useState('')
+
+  const importMaterials = async () => {
+    const query = competitorInfo.trim().split(/\n/)[0]?.slice(0, 120)
+    if (!query) return
+    setImportingMaterials(true)
+    setMaterialNotice('')
+    try {
+      const response = await apiFetch(`/api/materials?q=${encodeURIComponent(query)}&sort=izlenme&limit=20`, { cache: 'no-store' })
+      const payload = await response.json()
+      if (!response.ok) throw new Error(payload.error || 'Materyal havuzu okunamadı.')
+      const materials = Array.isArray(payload.materyaller) ? payload.materyaller : []
+      if (!materials.length) {
+        setMaterialNotice('Bu adla eşleşen toplanmış rakip içeriği bulunamadı.')
+        return
+      }
+      const evidence = materials.map((item: Record<string, unknown>) => {
+        const views = Number(item.view_count)
+        return `- ${String(item.title || 'Başlıksız')} | ${Number.isFinite(views) ? `${views.toLocaleString('tr-TR')} görüntülenme` : 'görüntülenme yok'} | ${String(item.page_url || '')}`
+      }).join('\n')
+      setCompetitorInfo((current) => `${current}\n\nMateryal Kütüphanesi'nden toplanan kanıtlar (${materials.length}):\n${evidence}`.trim())
+      setMaterialNotice(`${materials.length} gerçek materyal kaydı rakip briefine eklendi.`)
+    } catch (reason) {
+      setMaterialNotice(reason instanceof Error ? reason.message : 'Materyal havuzu okunamadı.')
+    } finally {
+      setImportingMaterials(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,18 +73,18 @@ export default function CompetitorPage() {
           <div className="w-full flex-shrink-0 lg:w-80 space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Benim Niche'm</label>
+                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Benim nişim</label>
                 <input value={myNiche} onChange={(e) => setMyNiche(e.target.value)} placeholder="Teknoloji, finans..."
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
               </div>
               <div>
                 <label className="block text-zinc-400 text-xs font-medium mb-1.5">Platform</label>
                 <div className="grid grid-cols-3 gap-1.5">
-                  {['youtube', 'instagram', 'tiktok', 'linkedin'].map((p) => (
+                  {(['youtube', 'instagram', 'tiktok', 'linkedin'] as Platform[]).map((p) => (
                     <button key={p} type="button" onClick={() => setMyPlatform(p)}
-                      className={cn('py-1.5 rounded-lg text-xs capitalize border transition-colors',
+                      className={cn('py-1.5 rounded-lg text-xs border transition-colors',
                         myPlatform === p ? 'bg-violet-500/20 text-violet-300 border-violet-500/40' : 'bg-zinc-800 text-zinc-500 border-zinc-700')}>
-                      {p}
+                      {getPlatformLabel(p)}
                     </button>
                   ))}
                 </div>
@@ -63,6 +94,12 @@ export default function CompetitorPage() {
                 <textarea value={competitorInfo} onChange={(e) => setCompetitorInfo(e.target.value)} rows={6}
                   placeholder="Rakip kanal adı, URL, içerik tipi, abone sayısı, ne hakkında içerik yapıyor gibi bilgileri gir..."
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322] resize-none" />
+                <button type="button" onClick={importMaterials} disabled={importingMaterials || !competitorInfo.trim()}
+                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-3 py-2 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/15 disabled:opacity-40">
+                  {importingMaterials ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Database className="h-3.5 w-3.5" />}
+                  Havuzdaki gerçek eşleşmeleri ekle
+                </button>
+                {materialNotice && <p className="mt-2 text-[11px] leading-4 text-zinc-500">{materialNotice}</p>}
               </div>
               <button type="submit" disabled={loading || !competitorInfo.trim() || !myNiche.trim()}
                 className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 transition-colors">

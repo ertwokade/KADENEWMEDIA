@@ -8,9 +8,11 @@ import { getModelConfig } from '@/lib/ai/models'
 interface LoadingStateProps {
   model?: AIModel
   className?: string
+  label?: string
+  longRunning?: boolean
 }
 
-export default function LoadingState({ model, className }: LoadingStateProps) {
+export default function LoadingState({ model, className, label, longRunning = false }: LoadingStateProps) {
   const [elapsed, setElapsed] = useState(0)
   useEffect(() => {
     const startedAt = Date.now()
@@ -19,18 +21,20 @@ export default function LoadingState({ model, className }: LoadingStateProps) {
   }, [])
 
   const config = model ? getModelConfig(model) : null
-  const baseMessage = model === 'auto'
+  const baseMessage = label || (model === 'auto'
     ? 'Uygun model seçiliyor'
     : config
       ? `${config.shortLabel} çalışıyor`
-      : 'Model çalışıyor'
-  const detail = elapsed < 4
+      : 'Model çalışıyor')
+  const detail = longRunning && elapsed >= 45
+    ? 'İşlem birkaç dakika sürebilir; sayfayı açık tut'
+    : elapsed < 4
     ? 'İstek hazırlanıyor'
     : elapsed < 20
       ? 'Yanıt üretiliyor'
       : elapsed < 45
         ? 'Uzun yanıt işleniyor'
-        : 'İşlem sürüyor; sayfayı kapatma'
+        : 'İşlem sürüyor; sayfayı açık tut'
   const colorClass = config ? config.colorClass : 'text-violet-400'
 
   return (

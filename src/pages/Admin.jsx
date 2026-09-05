@@ -1085,25 +1085,38 @@ function ContentSection({ showToast }) {
   //           'no-page'   → hedef sayfa sitede yok, URL 404 dönüyor
   // Bu alan olmadan yönetici, hiçbir yere yansımayan ekranlarda içerik girip
   // "kaydedildi" bildirimi alıyordu.
+  //
+  // ŞU ANDA HİÇBİRİ 'live' DEĞİL — ve altı sekme yanlışlıkla 'no-page' idi.
+  // Buradaki rotaların tamamı haoqi-clone anlık görüntüsünden servis ediliyor
+  // (scripts/merge-clone.mjs). O sayfalar statik HTML; /api/content'i okuyan
+  // hiçbir script yüklemiyorlar, yani metin build sırasında sabitleniyor.
+  // 'no-page' işaretli altı sayfa ise sitede DURUYOR ve açılıyor; uyarı
+  // yöneticiye var olan sayfaları 404 diye gösteriyordu. İkisi de 'static':
+  // sayfa var, kayıt saklanıyor, ziyaretçi göremiyor.
+  //
+  // Bir sayfa CMS'e bağlandığında (blog ve portföy listelerinde olduğu gibi:
+  // haoqi-clone/kade-blog.js, haoqi-clone/kade-portfolio.js) o satır 'live'
+  // olmalı — durum değerini değiştirmeden önce sayfanın veriyi gerçekten
+  // okuduğunu doğrulayın.
   const tabs = [
-    { id: 'homepage', label: '✨ Ana Sayfa', desc: 'Ana sayfadaki tüm görünen içerikler', route: '/', status: 'live' },
+    { id: 'homepage', label: '✨ Ana Sayfa', desc: 'Ana sayfadaki tüm görünen içerikler', route: '/', status: 'static' },
     { id: 'hero', label: '🏠 Hero', desc: 'Anasayfa başlık ve açıklama', route: '/', status: 'static' },
     { id: 'stats', label: '📊 İstatistikler', desc: 'Sayaç verileri', route: '/', status: 'static' },
-    { id: 'services', label: '⚡ Hizmetler', desc: 'Hizmet kartları', route: '/hizmetler', status: 'live' },
-    { id: 'faq', label: '❓ SSS', desc: 'Sıkça sorulan sorular', route: '/sss', status: 'live' },
+    { id: 'services', label: '⚡ Hizmetler', desc: 'Hizmet kartları', route: '/hizmetler', status: 'static' },
+    { id: 'faq', label: '❓ SSS', desc: 'Sıkça sorulan sorular', route: '/sss', status: 'static' },
     { id: 'testimonials', label: '💬 Referanslar', desc: 'Müşteri yorumları', route: '/referanslar', status: 'static' },
-    { id: 'packages', label: '💰 Paketler', desc: 'Fiyatlandırma', route: '/paketler', status: 'live' },
-    { id: 'priceCalculator', label: '🧮 Fiyat Hesaplayıcı', desc: 'Fiyat hesaplama katsayıları', route: '/fiyat-hesaplama', status: 'no-page' },
-    { id: 'about', label: '👥 Hakkımızda', desc: 'Hikâye, istatistik ve ekip', route: '/hakkimizda', status: 'live' },
-    { id: 'footer', label: '🦶 Footer', desc: 'Alt bilgi, iletişim ve sosyal medya', route: '/iletisim', status: 'live' },
-    { id: 'careers', label: '💼 Kariyer', desc: 'İş ilanları', route: '/kariyer', status: 'live' },
-    { id: 'basin', label: '📰 Basın', desc: 'Basın sayfası içeriği', route: '/basin', status: 'no-page' },
-    { id: 'nedenBiz', label: '💡 Neden Biz', desc: 'Neden Biz sayfası içeriği', route: '/neden-biz', status: 'no-page' },
+    { id: 'packages', label: '💰 Paketler', desc: 'Fiyatlandırma', route: '/paketler', status: 'static' },
+    { id: 'priceCalculator', label: '🧮 Fiyat Hesaplayıcı', desc: 'Fiyat hesaplama katsayıları', route: '/fiyat-hesaplama', status: 'static' },
+    { id: 'about', label: '👥 Hakkımızda', desc: 'Hikâye, istatistik ve ekip', route: '/hakkimizda', status: 'static' },
+    { id: 'footer', label: '🦶 Footer', desc: 'Alt bilgi, iletişim ve sosyal medya', route: '/iletisim', status: 'static' },
+    { id: 'careers', label: '💼 Kariyer', desc: 'İş ilanları', route: '/kariyer', status: 'static' },
+    { id: 'basin', label: '📰 Basın', desc: 'Basın sayfası içeriği', route: '/basin', status: 'static' },
+    { id: 'nedenBiz', label: '💡 Neden Biz', desc: 'Neden Biz sayfası içeriği', route: '/neden-biz', status: 'static' },
     { id: 'tesekkur', label: '🙏 Teşekkür', desc: 'Teşekkür sayfası içeriği', route: '/tesekkur', status: 'static' },
-    { id: 'referralProgram', label: '🎁 Referans Programı', desc: 'Referans programı sayfası içeriği', route: '/referans-programi', status: 'no-page' },
-    { id: 'podcastWebinar', label: '🎙️ Podcast & Webinar', desc: 'Podcast & webinar sayfası içeriği', route: '/podcast-webinar', status: 'no-page' },
+    { id: 'referralProgram', label: '🎁 Referans Programı', desc: 'Referans programı sayfası içeriği', route: '/referans-programi', status: 'static' },
+    { id: 'podcastWebinar', label: '🎙️ Podcast & Webinar', desc: 'Podcast & webinar sayfası içeriği', route: '/podcast-webinar', status: 'static' },
     { id: 'caseStudies', label: '🏆 Başarı Hikayeleri', desc: 'Başarı hikayeleri sayfası içeriği', route: '/basari-hikayeleri', status: 'static' },
-    { id: 'newsletterArchive', label: '📧 Bülten Arşivi', desc: 'Bülten arşivi sayfası içeriği', route: '/bulten-arsivi', status: 'no-page' },
+    { id: 'newsletterArchive', label: '📧 Bülten Arşivi', desc: 'Bülten arşivi sayfası içeriği', route: '/bulten-arsivi', status: 'static' },
   ]
   const activeTabMeta = tabs.find((tab) => tab.id === activeTab)
 

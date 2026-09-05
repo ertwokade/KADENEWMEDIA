@@ -1,0 +1,10 @@
+kadexai.kadenewmedia.com {
+	encode zstd gzip
+	header Cache-Control "no-store"
+	respond "KadexAI veri aktarımı tamamlanıyor. Lütfen birkaç dakika sonra tekrar deneyin." 503
+}
+
+supabase.kadenewmedia.com {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8000
+}

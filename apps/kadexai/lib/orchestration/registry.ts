@@ -72,6 +72,34 @@ export const PIPELINES: readonly Pipeline[] = [CONTENT_SPRINT, TREND_TO_POST, CO
 /** Tüm pipeline'lar için toplam adım tavanı — kaçak zincirlemeye karşı. */
 export const MAX_STEPS_PER_RUN = 8
 
+/**
+ * Özel akışta seçilebilen adımların sunucu tarafı allowlist'i. İstemci yalnız
+ * bu kimlikleri sıralayabilir; prompt, araç kimliği, timeout veya token tavanı
+ * gönderemez.
+ */
+export const CUSTOM_STEP_CATALOG: readonly OrchestrationStep[] = [
+  { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 30_000, maxTokens: 1_600 },
+  { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 30_000, maxTokens: 1_600 },
+  { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 2_000 },
+  { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
+  { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 20_000, maxTokens: 800 },
+]
+
+export function createCustomPipeline(stepIds: unknown): Pipeline | undefined {
+  if (!Array.isArray(stepIds) || stepIds.length < 2 || stepIds.length > CUSTOM_STEP_CATALOG.length) return undefined
+  const ids = stepIds.map((id) => String(id))
+  if (new Set(ids).size !== ids.length) return undefined
+  const steps = ids.map((id) => CUSTOM_STEP_CATALOG.find((step) => step.id === id))
+  if (steps.some((step) => !step)) return undefined
+  return {
+    id: 'custom',
+    label: 'Özel Akış',
+    description: 'Seçtiğin güvenli araç adımlarını belirlediğin sırayla çalıştırır.',
+    requiresFeature: 'content-generation',
+    steps: steps as OrchestrationStep[],
+  }
+}
+
 export function getPipeline(id: string): Pipeline | undefined {
   return PIPELINES.find((pipeline) => pipeline.id === id)
 }

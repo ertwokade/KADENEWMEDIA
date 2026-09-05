@@ -3,6 +3,8 @@
 FROM node:22-alpine AS dependencies
 WORKDIR /repo
 
+# The production build contains both the legacy public site and the KadexAI
+# Next application. Keep their dependency trees separate, just as Vercel does.
 COPY package.json package-lock.json ./
 RUN npm ci
 
@@ -30,6 +32,8 @@ ENV NEXT_PUBLIC_BASE_PATH=$NEXT_PUBLIC_BASE_PATH \
     NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL \
     NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+# Match the existing Vercel build: generate the public site, stage it under
+# Next's public directory, then produce a standalone Next server.
 RUN npm run legacy:build \
     && node scripts/stage-static-into-next.mjs \
     && cd apps/kadexai \

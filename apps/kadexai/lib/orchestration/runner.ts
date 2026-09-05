@@ -18,7 +18,7 @@ import { tierOf } from '@/lib/payments/planRules'
 import { getUserUsageSummary } from '@/lib/usage/ledger'
 import { isTokenQuotaEnforced } from '@/lib/payments/limits'
 import { recordAuditEvent } from '@/lib/audit/server'
-import { MAX_STEPS_PER_RUN, canInvoke, getPipeline, isEntryStep, type OrchestrationStep } from './registry'
+import { MAX_STEPS_PER_RUN, canInvoke, createCustomPipeline, getPipeline, isEntryStep, type OrchestrationStep } from './registry'
 import type { AIModel, Platform } from '@/types'
 
 export * from './registry'
@@ -32,6 +32,7 @@ export interface OrchestrationInput {
   region: string
   frequency: string
   model: AIModel
+  customSteps?: string[]
 }
 
 export interface StepResult {
@@ -104,7 +105,9 @@ function buildStepPrompt(step: OrchestrationStep, input: OrchestrationInput, pre
  * uydurma çıktı üretilmez.
  */
 export async function runPipeline(userId: string, input: OrchestrationInput): Promise<OrchestrationResult> {
-  const pipeline = getPipeline(input.pipelineId)
+  const pipeline = input.pipelineId === 'custom'
+    ? createCustomPipeline(input.customSteps)
+    : getPipeline(input.pipelineId)
   if (!pipeline) throw new Error('Bilinmeyen akış.')
 
   // Pipeline seviyesinde yetki: paket bu özelliği içermiyorsa hiç başlatma.
@@ -134,9 +137,11 @@ export async function runPipeline(userId: string, input: OrchestrationInput): Pr
     // Least-privilege: ilk adım dışında her adım yalnız bir öncekinin
     // devamı olarak çalışabilir. Bu kontrol, registry sırası değişirse
     // zincirin sessizce yeniden bağlanmasını engeller.
-    const allowed = index === 0
-      ? isEntryStep(pipeline.id, step.id)
-      : canInvoke(pipeline.id, steps[index - 1].id, step.id)
+    const allowed = pipeline.id === 'custom'
+      ? index === 0 || steps[index - 1]?.id !== step.id
+      : index === 0
+        ? isEntryStep(pipeline.id, step.id)
+        : canInvoke(pipeline.id, steps[index - 1].id, step.id)
     if (!allowed) {
       results.push({ id: step.id, label: step.label, toolId: step.toolId, status: 'skipped', reason: 'Akış içinde bu adım tetiklenemez.', durationMs: 0 })
       stoppedEarly = true

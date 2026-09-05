@@ -5,10 +5,11 @@ import { useState } from 'react'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
-import { cn } from '@/lib/utils'
+import { cn, getPlatformLabel } from '@/lib/utils'
 import RawModelOutput from '@/components/ui/RawModelOutput'
+import type { Platform } from '@/types'
 
-const allPlatforms = ['instagram', 'tiktok', 'youtube', 'linkedin', 'x']
+const allPlatforms: Platform[] = ['instagram', 'tiktok', 'youtube', 'linkedin', 'x']
 type BioData = { platformlar: Record<string, Record<string, string>>; link_sayfasi: { baslik: string; aciklama: string; linkler: Array<{ baslik: string; aciklama: string }> }; raw?: string }
 
 export default function BioLinkPage() {
@@ -17,14 +18,14 @@ export default function BioLinkPage() {
   const [niche, setNiche] = useState('')
   const [highlights, setHighlights] = useState('')
   const [tone, setTone] = useState('samimi')
-  const [platforms, setPlatforms] = useState<string[]>(['instagram', 'youtube'])
+  const [platforms, setPlatforms] = useState<Platform[]>(['instagram', 'youtube'])
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<BioData | null>(null)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('instagram')
   const [copied, setCopied] = useState<string | null>(null)
 
-  const togglePlatform = (p: string) => setPlatforms(ps => ps.includes(p) ? ps.filter(x => x !== p) : [...ps, p])
+  const togglePlatform = (p: Platform) => setPlatforms(ps => ps.includes(p) ? ps.filter(x => x !== p) : [...ps, p])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,7 +62,7 @@ export default function BioLinkPage() {
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
               </div>
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niche</label>
+                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niş</label>
                 <input value={niche} onChange={(e) => setNiche(e.target.value)} placeholder="Teknoloji, yapay zeka, üretkenlik"
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
               </div>
@@ -88,9 +89,9 @@ export default function BioLinkPage() {
                 <div className="grid grid-cols-3 gap-1.5">
                   {allPlatforms.map((p) => (
                     <button key={p} type="button" onClick={() => togglePlatform(p)}
-                      className={cn('py-1.5 rounded-lg text-xs capitalize transition-colors border',
+                      className={cn('py-1.5 rounded-lg text-xs transition-colors border',
                         platforms.includes(p) ? 'bg-violet-500/20 text-violet-300 border-violet-500/40' : 'bg-zinc-800 text-zinc-500 border-zinc-700')}>
-                      {p}
+                      {getPlatformLabel(p)}
                     </button>
                   ))}
                 </div>
@@ -110,9 +111,9 @@ export default function BioLinkPage() {
                 <div className="flex gap-2 flex-wrap">
                   {Object.keys(data.platformlar || {}).map((p) => (
                     <button key={p} onClick={() => setActiveTab(p)}
-                      className={cn('px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-colors',
+                      className={cn('px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
                         activeTab === p ? 'bg-violet-500/20 text-violet-300' : 'bg-zinc-800 text-zinc-500 hover:text-zinc-300')}>
-                      {p}
+                      {allPlatforms.includes(p as Platform) ? getPlatformLabel(p as Platform) : p}
                     </button>
                   ))}
                   <button onClick={() => setActiveTab('link')}

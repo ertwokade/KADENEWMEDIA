@@ -304,17 +304,42 @@ test('Footer bileşeni admin içeriğini gerçekten okur', async () => {
 
 test('admin içerik sekmeleri public karşılığını bildirir', async () => {
   const source = await readRepo('src/pages/Admin.jsx')
-  // Hedef sayfası olmayan editörler 'no-page' ile işaretlenmeli ki yönetici
-  // hiçbir yere yansımayan bir ekranda "kaydedildi" bildirimiyle yanılmasın.
-  for (const tabId of ['basin', 'nedenBiz', 'referralProgram', 'podcastWebinar', 'newsletterArchive', 'priceCalculator']) {
-    const row = source.match(new RegExp(`\\{\\s*id:\\s*'${tabId}'[^}]*\\}`))
-    assert.ok(row, `sekme bulunamadı: ${tabId}`)
-    assert.match(row[0], /status:\s*'no-page'/, `${tabId} 'no-page' olarak işaretlenmeli`)
-  }
-  // Gerçekten canlı olan bölümler doğru işaretli olmalı.
-  for (const tabId of ['services', 'faq', 'packages', 'about', 'footer', 'careers']) {
-    const row = source.match(new RegExp(`\\{\\s*id:\\s*'${tabId}'[^}]*\\}`))
-    assert.match(row[0], /status:\s*'live'/, `${tabId} 'live' olmalı`)
+
+  // Bu test önce elle yazılmış iki liste tutuyordu ve ikisi de yanlıştı:
+  // altı sekme "sayfa sitede yok" diye işaretliydi ama o sayfaların hepsi
+  // açılıyor, altı sekme de "yayında" sayılıyordu ama o rotalar klondan
+  // servis edildiği için admin kaydını hiç okumuyor.
+  //
+  // Liste yerine gerçek kaynak okunuyor: merge-clone.mjs hangi rotaların
+  // klon anlık görüntüsünden geldiğini söylüyor. Klondan gelen bir sayfa
+  // statik HTML'dir ve /api/content'i okuyan bir script yüklemez; o yüzden
+  // o rotayı gösteren sekme 'static' olmak zorunda. Bir sayfa CMS'e
+  // bağlandığında (bkz. haoqi-clone/kade-blog.js) klon listesinden çıkar
+  // ya da veriyi okur; o zaman bu test de doğal olarak serbest kalır.
+  const mergeSource = await readRepo('scripts/merge-clone.mjs')
+  const pagesBlock = mergeSource.match(/const PAGES = \[([\s\S]*?)\]/)
+  assert.ok(pagesBlock, 'merge-clone.mjs içinde PAGES listesi bulunamadı')
+  const clonePages = new Set([...pagesBlock[1].matchAll(/'([^']+)'/g)].map((match) => match[1]))
+  assert.ok(clonePages.size > 10, 'klon sayfa listesi beklenenden kısa')
+
+  const tabRows = [...source.matchAll(/\{\s*id:\s*'([a-zA-Z]+)',[^}]*route:\s*'([^']*)'[^}]*status:\s*'([a-z-]+)'[^}]*\}/g)]
+  assert.ok(tabRows.length >= 15, 'admin sekme tablosu okunamadı')
+
+  for (const [, tabId, route, status] of tabRows) {
+    // Anasayfa da klon anlık görüntüsünden geliyor (merge-clone site.html'i yazıyor).
+    const cloneServed = route === '/' || clonePages.has(route.replace(/^\//, ''))
+    if (!cloneServed) continue
+
+    assert.notStrictEqual(
+      status,
+      'no-page',
+      `${tabId}: ${route} klondan servis ediliyor, yani sayfa sitede DURUYOR — 'no-page' uyarısı yöneticiyi yanıltır`,
+    )
+    assert.strictEqual(
+      status,
+      'static',
+      `${tabId}: ${route} klon anlık görüntüsünden geliyor ve admin kaydını okumuyor, 'static' olmalı`,
+    )
   }
 })
 

@@ -2,12 +2,14 @@
 
 import { apiFetch } from '@/lib/client/api'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
 import { Platform } from '@/types'
 import { getPlatformLabel, cn } from '@/lib/utils'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 
 const platforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin', 'pinterest']
 
@@ -19,6 +21,7 @@ interface HashtagGroups {
 }
 
 export default function HashtagPage() {
+  const workspaceHref = useWorkspaceHref()
   const { selectedModel } = useModel()
   const [topic, setTopic] = useState('')
   const [platform, setPlatform] = useState<Platform>('instagram')
@@ -58,13 +61,13 @@ export default function HashtagPage() {
         { key: 'yuksek', label: 'Yüksek Hacim (1M+)', color: 'text-red-400', tags: hashtags.yuksek || [] },
         { key: 'orta', label: 'Orta Hacim (100K-1M)', color: 'text-amber-400', tags: hashtags.orta || [] },
         { key: 'dusuk', label: 'Düşük Hacim (<100K)', color: 'text-emerald-400', tags: hashtags.dusuk || [] },
-        { key: 'niche', label: 'Niche', color: 'text-violet-400', tags: hashtags.niche || [] },
+        { key: 'niche', label: 'Niş', color: 'text-violet-400', tags: hashtags.niche || [] },
       ]
     : []
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="Hashtag AI" description="Platform ve niche'e özel hashtag stratejisi" />
+      <TopBar title="Hashtag AI" description="Platform ve nişe özel hashtag stratejisi" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:h-full lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80">
@@ -89,7 +92,7 @@ export default function HashtagPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niche</label>
+                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niş</label>
                 <input value={niche} onChange={(e) => setNiche(e.target.value)}
                   placeholder="Örn: fitness, sağlık, wellness"
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
@@ -113,7 +116,10 @@ export default function HashtagPage() {
               <>
                 <div className="flex items-center justify-between">
                   <h3 className="text-zinc-200 font-medium text-sm">Hashtag Seti</h3>
-                  <CopyButton text={allHashtags} />
+                  <div className="flex items-center gap-3">
+                    <CopyButton text={allHashtags} />
+                    <Link prefetch={false} href={workspaceHref(`/dashboard/title?topic=${encodeURIComponent(topic)}&keywords=${encodeURIComponent(allHashtags)}&platform=${platform}`)} className="text-xs text-violet-400 hover:text-violet-300">Başlık üret →</Link>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {groups.map((g) => g.tags.length > 0 && (
@@ -134,7 +140,7 @@ export default function HashtagPage() {
             )}
             {!loading && !hashtags && !error && (
               <div className="flex items-center justify-center h-64 text-zinc-600 text-sm">
-                Konuyu ve niche'i gir, hashtag üret butonuna tıkla
+                Konuyu ve nişi gir, hashtag üret butonuna tıkla
               </div>
             )}
           </div>

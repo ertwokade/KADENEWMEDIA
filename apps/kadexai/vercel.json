@@ -154,7 +154,7 @@
     },
     {
       "path": "/kadexai/api/kade-search/collect",
-      "schedule": "0 5 * * *"
+      "schedule": "17 */2 * * *"
     },
     {
       "path": "/kadexai/api/kade-search/daily-digest",

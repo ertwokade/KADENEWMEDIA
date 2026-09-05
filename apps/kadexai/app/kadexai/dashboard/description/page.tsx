@@ -2,6 +2,7 @@
 
 import { apiFetch } from '@/lib/client/api'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
@@ -9,6 +10,7 @@ import LoadingState from '@/components/ui/LoadingState'
 import ModelOutput from '@/components/ui/ModelOutput'
 import { Platform } from '@/types'
 import { collectSettledResults, getPlatformLabel, cn } from '@/lib/utils'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 
 const platforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin', 'pinterest']
 
@@ -24,6 +26,7 @@ const ageRanges = [
 interface PlatformDesc { platform: Platform; description: string }
 
 export default function DescriptionPage() {
+  const workspaceHref = useWorkspaceHref()
   const { selectedModel } = useModel()
   const [title, setTitle]               = useState('')
   const [summary, setSummary]           = useState('')
@@ -148,9 +151,12 @@ export default function DescriptionPage() {
             {loading && <LoadingState model={selectedModel} />}
             {results.map(r => (
               <div key={r.platform} className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-5 space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <h3 className="text-zinc-200 font-semibold text-sm">{getPlatformLabel(r.platform)}</h3>
-                  <CopyButton text={r.description} />
+                  <div className="flex items-center gap-3">
+                    <CopyButton text={r.description} />
+                    <Link prefetch={false} href={workspaceHref(`/dashboard/calendar?title=${encodeURIComponent(title)}&platform=${r.platform}`)} className="text-xs text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
+                  </div>
                 </div>
                 <ModelOutput content={r.description} />
               </div>

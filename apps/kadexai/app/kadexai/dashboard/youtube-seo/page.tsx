@@ -56,7 +56,7 @@ export default function YoutubeSeoPage() {
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
               </div>
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niche</label>
+                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niş</label>
                 <input value={niche} onChange={(e) => setNiche(e.target.value)} placeholder="Teknoloji, finans..."
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
               </div>

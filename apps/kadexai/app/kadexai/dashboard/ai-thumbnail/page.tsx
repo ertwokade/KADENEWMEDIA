@@ -3,6 +3,7 @@
 import { apiFetch } from '@/lib/client/api'
 import { useEffect, useState, useRef } from 'react'
 import TopBar from '@/components/layout/TopBar'
+import LoadingState from '@/components/ui/LoadingState'
 import { cn } from '@/lib/utils'
 import { Download, RefreshCw, Loader2, Image as ImageIcon, Upload, Type } from 'lucide-react'
 
@@ -59,8 +60,20 @@ export default function AiThumbnailPage() {
   const [sourceLabel, setSourceLabel] = useState('')
   const [sourceNote, setSourceNote] = useState('')
   const [error, setError]           = useState('')
+  const [providerNote, setProviderNote] = useState('Görsel sağlayıcısı kontrol ediliyor…')
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const photoInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    apiFetch('/api/config', { cache: 'no-store' })
+      .then(async (response) => ({ response, data: await response.json() }))
+      .then(({ response, data }) => {
+        if (!response.ok || !data.imageConfigured) setProviderNote('Görsel sağlayıcısı bağlı değil; Ayarlar › Altyapı bölümünü kontrol et.')
+        else if (data.imageFallbackAvailable) setProviderNote('Güvenli sunucu üretimi · ikinci sağlayıcı yedeği hazır')
+        else setProviderNote('Güvenli sunucu üretimi · tek sağlayıcı bağlı, otomatik yedek yok')
+      })
+      .catch(() => setProviderNote('Görsel sağlayıcısı durumu okunamadı.'))
+  }, [])
 
   const selectedRatio = ratios.find(r => r.id === ratio)!
   const selectedStyle = styles.find(s => s.id === style)!
@@ -197,7 +210,7 @@ export default function AiThumbnailPage() {
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80 space-y-4">
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <span className="text-emerald-400 text-xs font-medium">Güvenli sunucu üretimi · otomatik yedek</span>
+              <span className="text-emerald-400 text-xs font-medium">{providerNote}</span>
             </div>
 
             <div>
@@ -298,8 +311,7 @@ export default function AiThumbnailPage() {
 
             {loading && (
               <div className="flex flex-col items-center gap-3 text-center">
-                <Loader2 className="w-8 h-8 animate-spin text-violet-400" />
-                <p className="text-zinc-500 text-sm">Görsel üretiliyor... (~5-15 sn)</p>
+                <LoadingState label="Thumbnail görseli üretiliyor" longRunning />
                 <p className="text-zinc-700 text-xs">Arka plan, başlık ve fotoğraf güvenli biçimde birleştiriliyor</p>
               </div>
             )}

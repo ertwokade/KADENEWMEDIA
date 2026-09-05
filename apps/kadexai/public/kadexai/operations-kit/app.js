@@ -526,7 +526,7 @@ function normalizeMedia(m){
 
 function normalizeVideo(v){
   if(!isObj(v))return null;
-  return{id:idOf(v.id,"vid"),title:str(v.title,"Video"),prompt:str(v.prompt,""),model:str(v.model,""),cost:num(v.cost,0),dur:num(v.dur,0)};
+  return{id:idOf(v.id,"vid"),title:str(v.title,"Video"),prompt:str(v.prompt,""),model:str(v.model,""),cost:num(v.cost,0),dur:num(v.dur,0),src:str(v.src,"")};
 }
 
 function normalizeBrainstorm(b){
@@ -562,6 +562,8 @@ function normalizePage(p){
     inTrash:bool(p.inTrash),
     createdAt:num(p.createdAt,Date.now()),
     updatedAt:num(p.updatedAt,Date.now()),
+    relatedType:["production","client","idea","document"].includes(str(p.relatedType))?str(p.relatedType):"",
+    relatedId:str(p.relatedId,""),
     blocks:blocks.length?blocks:[{id:uid("b"),type:"paragraph",content:""}],
   };
 }
@@ -981,7 +983,7 @@ function closeCommandPalette(e){ if(!e||e.target===document.getElementById("comm
 
 function buildCommandItems(query){
   const q=(query||"").toLocaleLowerCase("tr-TR");
-  const labels=["Özet","SentScan","Prodüksiyon CRM","Banana Studio","Yayın Takvimi","Müşteri & Teslim","Ayarlar","Sayfalar"];
+  const labels=["Özet","SentScan","Prodüksiyon CRM","Banana Studio","Prodüksiyon Takvimi","Müşteri & Teslim","Ayarlar","Sayfalar"];
   const icons=["layout-dashboard","message-square-text","kanban-square","sparkles","code-2","radio-tower","settings","notebook-text"];
   const items=[
     ...viewOrder.map((v,i)=>({label:labels[i]||v,sub:document.getElementById(v)?.dataset.eyebrow||"",icon:icons[i],action:()=>navigateTo(v)})),
@@ -1757,7 +1759,26 @@ function bindBanana(){
   document.getElementById("enhanceVideoPrompt").addEventListener("click",()=>{ const el=document.getElementById("videoPrompt");el.value=enhanceVideoPrompt(el.value);showToast("Prompt iyilestirildi","info") });
   document.getElementById("saveTemplate").addEventListener("click",()=>{ const prompt=document.getElementById("imagePrompt").value.trim();if(!prompt){showToast("Önce bir prompt yaz","error");return}snapshotUndo();const name=prompt.slice(0,30)+(prompt.length>30?"…":"");if(!state.promptTemplates)state.promptTemplates=[];state.promptTemplates.push({id:uid("tpl"),name,prompt});saveState();renderPromptTemplates();showToast("Şablon kaydedildi","success") });
   document.getElementById("imageForm").addEventListener("submit",async e=>{ e.preventDefault();const model=imageModels.find(m=>m.id===document.getElementById("imageModel").value)||imageModels[0],count=Number(document.getElementById("imageCount").value||1),prompt=document.getElementById("imagePrompt").value;if(!prompt.trim()){showToast("Önce prompt yaz","error");return}const srcs=(await generateImageSrcs(prompt,count,state.media.length)).filter(Boolean);if(!srcs.length){showToast("Görsel üretilemedi; kayıt oluşturulmadı.","error");return}snapshotUndo();const cost=model.cost*srcs.length;for(const src of srcs)state.media.push({id:uid("img"),title:`Görsel ${state.media.length+1}`,prompt,model:model.name,cost:model.cost,src});state.media=state.media.slice(-24);const user=state.users[0];if(user){user.images+=srcs.length;user.spend+=cost}state.totalUsdSpent=(state.totalUsdSpent||0)+cost;if(!state.promptHistory)state.promptHistory=[];state.promptHistory=[prompt,...state.promptHistory.filter(p=>p!==prompt)].slice(0,8);saveState();renderBanana();renderRecentMedia();showToast(`${srcs.length} görsel üretildi (${providerCost(cost)})`,"success");logActivity(`Banana: ${srcs.length} görsel üretildi`,"success") });
-  document.getElementById("videoForm").addEventListener("submit",e=>{ e.preventDefault();showToast("Video üretim sağlayıcısı henüz bağlı değil.","info") });
+  document.getElementById("videoForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const prompt=document.getElementById("videoPrompt").value.trim(),button=document.getElementById("videoGenerateButton");
+    if(!prompt){showToast("Önce video promptu yaz.","error");return}
+    if(!API.features.video){showToast("Video sağlayıcısı bağlı değil. Ayarlar › Altyapı bölümünü kontrol et.","error");return}
+    const model=videoModels.find(m=>m.id===document.getElementById("videoModel").value)||videoModels[0],dur=Number(document.getElementById("videoDuration").value||10);
+    button.disabled=true;button.textContent="Video üretiliyor…";
+    try{
+      const response=await apiPost("/api/video",{subject:prompt.slice(0,300),script:prompt,language:"tr",aspect:"landscape"},290000);
+      const payload=response?.data||response,urls=arr(payload?.videos).map(v=>str(v)).filter(Boolean);
+      if(response?.error||!urls.length){showToast(response?.error||"Video sağlayıcısı boş yanıt döndürdü.","error");return}
+      snapshotUndo();
+      const unitCost=model.base*Math.max(dur,10)/10;
+      urls.forEach((src,index)=>state.videos.push({id:uid("vid"),title:`Video ${state.videos.length+index+1}`,prompt,model:model.name,cost:unitCost,dur,src}));
+      state.videos=state.videos.slice(-24);state.totalUsdSpent=(state.totalUsdSpent||0)+(unitCost*urls.length);
+      const user=state.users[0];if(user){user.videos+=urls.length;user.spend+=unitCost*urls.length}
+      saveState();renderBanana();showToast(`${urls.length} video üretildi (${providerCost(unitCost*urls.length)})`,"success");logActivity(`Banana: ${urls.length} video üretildi`,"success");
+    }catch(error){showToast(error?.name==="AbortError"?"Video üretimi zaman aşımına uğradı.":"Video bağlantı hatası.","error")}
+    finally{button.disabled=!API.features.video;button.innerHTML='<i data-lucide="play"></i>Oluştur';refreshIcons()}
+  });
   document.getElementById("continueVideo").addEventListener("click",()=>{ const el=document.getElementById("videoPrompt");el.value=`[DEVAM] ${el.value}`;el.focus() });
   document.getElementById("referenceForm").addEventListener("submit",e=>{ e.preventDefault();const tag=document.getElementById("referenceTag").value.trim();if(!tag)return;state.references.push({id:uid("ref"),tag:tag.startsWith("@")?tag:`@${tag}`,label:tag.replace("@",""),tone:"teal"});document.getElementById("referenceTag").value="";saveState();renderBanana();refreshIcons() });
 }
@@ -1780,7 +1801,7 @@ function renderBrainstorm(){
 }
 function renderPromptHistory(){ const el=document.getElementById("promptHistory");if(!el)return;const history=state.promptHistory||[];el.innerHTML=history.length?history.map((p,i)=>`<div class="prompt-history-item"><span class="prompt-history-text">${esc(p.slice(0,100))}${p.length>100?"…":""}</span><button class="prompt-history-use" onclick="document.getElementById('imagePrompt').value=(state.promptHistory||[])[${i}];showToast('Prompt yüklendi','info')">Kullan</button></div>`).join(""):`<div class="empty-state">Görsel üretince burada görünür.</div>` }
 function renderImageGallery(){ const items=state.media.slice(-9).reverse(),el=document.getElementById("imageGallery");el.innerHTML=items.length?items.map(m=>`<div class="image-tile"><img src="${safeImageUrl(m.src)}" alt="${esc(m.title)}" loading="lazy"/><div><div style="font-size:12px;font-weight:600">${esc(m.title)}</div><div class="row-meta" style="font-size:11px">${providerCost(m.cost)} · ${esc(m.model)}</div></div></div>`).join(""):`<div class="empty-state">Henüz görsel üretilmedi.</div>` }
-function renderVideoHistory(){ const items=state.videos.slice(-6).reverse(),el=document.getElementById("videoHistory");el.innerHTML=items.length?items.map(v=>`<div class="video-tile"><div class="video-thumb"><i data-lucide="play-circle"></i></div><div><div style="font-size:13px;font-weight:600">${esc(v.title)}</div><div class="row-meta" style="font-size:11px">${providerCost(v.cost)} · ${esc(v.model)} · ${v.dur}s</div></div></div>`).join(""):`<div class="empty-state">Video üretimi henüz bağlı değil.</div>` }
+function renderVideoHistory(){ const items=state.videos.slice(-6).reverse(),el=document.getElementById("videoHistory");el.innerHTML=items.length?items.map(v=>`<div class="video-tile">${v.src?`<video class="video-thumb" src="${esc(v.src)}" controls preload="metadata" aria-label="${esc(v.title)}"></video>`:`<div class="video-thumb"><i data-lucide="play-circle"></i></div>`}<div><div style="font-size:13px;font-weight:600">${esc(v.title)}</div><div class="row-meta" style="font-size:11px">${providerCost(v.cost)} · ${esc(v.model)} · ${v.dur}s</div></div></div>`).join(""):`<div class="empty-state">Henüz video üretilmedi.</div>` }
 const _ytRefs=[];
 let _ytSort="popular";
 function switchYtSort(sort,btn){
@@ -2182,7 +2203,7 @@ function newBlockObj(type,extra={}){
 }
 
 function newPageObj(parentId=null){
-  return{id:uid("pg"),title:"",icon:"📄",cover:null,parentId:parentId||null,isFavorite:false,inTrash:false,createdAt:Date.now(),updatedAt:Date.now(),blocks:[newBlockObj("paragraph")]};
+  return{id:uid("pg"),title:"",icon:"📄",cover:null,parentId:parentId||null,isFavorite:false,inTrash:false,createdAt:Date.now(),updatedAt:Date.now(),relatedType:"",relatedId:"",blocks:[newBlockObj("paragraph")]};
 }
 
 // ── Page CRUD ─────────────────────────────────────────────────────────────
@@ -2297,9 +2318,29 @@ function renderPageEditor(){
   const titleEl=document.getElementById("pageTitleEl");
   if(titleEl&&titleEl.textContent!==pg.title)titleEl.textContent=pg.title||"";
 
+  renderPageRelation(pg);
+
   renderBlocks();
   updateWordCount();
   refreshIcons();
+}
+
+function pageRelationItems(type){
+  if(type==="production")return(state.productions||[]).map(item=>({id:item.id,label:item.title||"Başlıksız prodüksiyon"}));
+  if(type==="client")return(state.clients||[]).map(item=>({id:item.id,label:item.name||"İsimsiz müşteri"}));
+  if(type==="idea")return(state.ideas||[]).map(item=>({id:item.id,label:item.title||"Başlıksız fikir"}));
+  if(type==="document")return(state.docs||[]).map(item=>({id:item.id,label:item.title||"İsimsiz doküman"}));
+  return[];
+}
+
+function renderPageRelation(pg){
+  const typeEl=document.getElementById("pageRelationType"),idEl=document.getElementById("pageRelationId");
+  if(!typeEl||!idEl)return;
+  typeEl.value=pg.relatedType||"";
+  const items=pageRelationItems(pg.relatedType);
+  idEl.style.display=pg.relatedType?"":"none";
+  idEl.innerHTML=`<option value="">Kayıt seç</option>${items.map(item=>`<option value="${esc(item.id)}"${item.id===pg.relatedId?" selected":""}>${esc(item.label)}</option>`).join("")}`;
+  if(pg.relatedId&&!items.some(item=>item.id===pg.relatedId)){pg.relatedId="";saveState()}
 }
 
 // ── Render Blocks ─────────────────────────────────────────────────────────
@@ -2936,6 +2977,14 @@ function bindPages(){
   document.getElementById("pageExportMdBtn")?.addEventListener("click",exportPageMarkdown);
   document.getElementById("pageDeleteBtn")?.addEventListener("click",()=>{ const pg=currentPage();if(pg&&confirm(`"${pg.title||"Sayfa"}" silinsin mi?`))deletePage(pg.id) });
   document.getElementById("pageIconBtn")?.addEventListener("click",function(){openPageIconEmoji(this)});
+  document.getElementById("pageRelationType")?.addEventListener("change",event=>{
+    const pg=currentPage();if(!pg)return;
+    pg.relatedType=event.target.value;pg.relatedId="";pg.updatedAt=Date.now();saveState();renderPageRelation(pg);
+  });
+  document.getElementById("pageRelationId")?.addEventListener("change",event=>{
+    const pg=currentPage();if(!pg)return;
+    pg.relatedId=event.target.value;pg.updatedAt=Date.now();saveState();showToast(pg.relatedId?"Not kayda bağlandı":"Not bağlantısı kaldırıldı","info");
+  });
 
   bindPageTitleEl();
 

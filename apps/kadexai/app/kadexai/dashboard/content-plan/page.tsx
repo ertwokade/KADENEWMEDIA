@@ -109,13 +109,13 @@ export default function ContentPlanPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="30 Günlük İçerik Planı" description="Niche ve platforma göre tam aylık içerik stratejisi" />
+      <TopBar title="30 Günlük Plan" description="Niş ve platforma göre tam aylık içerik stratejisi" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80 space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niche</label>
+                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niş</label>
                 <input value={niche} onChange={(e) => setNiche(e.target.value)} placeholder="Teknoloji, fitness, yemek..."
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
               </div>
@@ -219,7 +219,7 @@ export default function ContentPlanPage() {
               </div>
             )}
             {!data && !loading && !error && (
-              <div className="flex items-center justify-center h-64 text-zinc-600 text-sm">Niche ve platform gir, 30 günlük plan al</div>
+              <div className="flex items-center justify-center h-64 text-zinc-600 text-sm">Niş ve platform gir, 30 günlük plan al</div>
             )}
           </div>
         </div>

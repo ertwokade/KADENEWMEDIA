@@ -111,6 +111,17 @@
       (function () {
         var theme = 'dark';
         try {
+          /* Anasayfa snapshot'ı ziyaretçiyi bir kez açık temaya alıyor. Bu göç
+             yalnız snapshot'ta çalıştığı sürece, siteye önce bir React
+             rotasından (ör. /blog/:slug) giren ve işletim sistemi koyu olan
+             ziyaretçi koyu bir sayfa görüyor, sonra bir pazarlama sayfasına
+             geçtiğinde site kalıcı olarak krem oluyordu. İki giriş noktası da
+             aynı göçü uygulamalı. */
+          var migration = 'kade-light-default-2026-08-17';
+          if (window.localStorage.getItem(migration) !== '1') {
+            window.localStorage.setItem('theme', 'light');
+            window.localStorage.setItem(migration, '1');
+          }
           var stored = window.localStorage.getItem('theme')
             || window.localStorage.getItem('kade-theme-mode');
           var mode = stored === 'light' || stored === 'dark' ? stored : 'system';

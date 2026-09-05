@@ -52,7 +52,7 @@ export default function CollabMailPage() {
               {[
                 { key: 'senderName', label: 'Senin adın / marka adın', placeholder: 'Kade Studio' },
                 { key: 'senderChannel', label: 'Kanal / hesap', placeholder: '@kadestudio' },
-                { key: 'senderNiche', label: 'Niche', placeholder: 'teknoloji, yazılım' },
+                { key: 'senderNiche', label: 'Niş', placeholder: 'teknoloji, yazılım' },
                 { key: 'targetName', label: 'Hedef kişi / marka', placeholder: 'Notion, Samsung...' },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>

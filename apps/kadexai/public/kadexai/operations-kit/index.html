@@ -46,7 +46,7 @@
       <button class="nav-item" data-view="banana"><i data-lucide="sparkles"></i><span>Banana Studio</span></button>
 
       <p class="nav-label">Planlama</p>
-      <button class="nav-item" data-view="calendar"><i data-lucide="calendar-days"></i><span>Yayın Takvimi</span></button>
+      <button class="nav-item" data-view="calendar"><i data-lucide="calendar-days"></i><span>Prodüksiyon Takvimi</span></button>
       <button class="nav-item" data-view="clients"><i data-lucide="handshake"></i><span>Müşteri &amp; Teslim</span></button>
 
       <p class="nav-label">Notlar</p>
@@ -386,10 +386,13 @@
       </div>
     </section>
 
-    <!-- ══════════════ YAYIN TAKVİMİ ══════════════ -->
+    <!-- ══════════════ PRODÜKSİYON TAKVİMİ ══════════════ -->
     <!-- CRM panosu aşamaya göre dizer; burası tarihe göre. İkisi ayrı soruyu
          yanıtlar: "hangi iş nerede kaldı" ve "bu hafta ne çekiliyor". -->
-    <section class="view" id="calendar" data-title="Yayın Takvimi" data-eyebrow="Çekim ve Yayın Tarihleri">
+    <section class="view" id="calendar" data-title="Prodüksiyon Takvimi" data-eyebrow="Çekim ve Yayın Tarihleri">
+      <div class="starter-notice" style="display:flex;margin-bottom:16px">
+        <span><strong>Bu takvim prodüksiyon işlerini gösterir.</strong> Yayın metinleri ve içerik planları paneldeki İçerik Takvimi’nde tutulur.</span>
+      </div>
       <div class="layout-three" id="calendarKpis"></div>
       <article class="panel">
         <div class="panel-head">
@@ -507,6 +510,18 @@
           <div class="page-title-row">
             <button id="pageIconBtn" class="page-icon-btn" title="Emoji değiştir">📄</button>
             <div id="pageTitleEl" class="page-title-el" contenteditable="true" data-ph="Başlıksız"></div>
+          </div>
+
+          <div id="pageRelation" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px 58px">
+            <span class="row-meta">Bağlı kayıt</span>
+            <select id="pageRelationType" style="width:auto;min-width:140px;min-height:34px;padding:6px 28px 6px 10px;font-size:12px">
+              <option value="">Bağlantı yok</option>
+              <option value="production">Prodüksiyon</option>
+              <option value="client">Müşteri / brief</option>
+              <option value="idea">İçerik fikri</option>
+              <option value="document">Doküman</option>
+            </select>
+            <select id="pageRelationId" style="display:none;width:auto;min-width:200px;max-width:100%;min-height:34px;padding:6px 28px 6px 10px;font-size:12px"></select>
           </div>
 
           <!-- Blocks -->

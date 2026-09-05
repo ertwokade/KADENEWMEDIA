@@ -77,14 +77,14 @@ export default function IdeasPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="İçerik Fikirleri" description="Niche ve platforma göre viral içerik fikirleri üret" />
+      <TopBar title="İçerik Fikirleri" description="Niş ve platforma göre viral içerik fikirleri üret" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex min-h-full flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">
           {/* Form */}
           <div className="w-72 flex-shrink-0">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niche / Konu Alanı</label>
+                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niş / Konu Alanı</label>
                 <input value={niche} onChange={(e) => setNiche(e.target.value)}
                   placeholder="Örn: kişisel finans, fitness, yazılım, yemek"
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
@@ -193,7 +193,7 @@ export default function IdeasPage() {
 
             {!loading && ideas.length === 0 && !error && (
               <div className="flex items-center justify-center h-64 text-zinc-600 text-sm">
-                Niche'ini gir ve fikirler üret butonuna tıkla
+                Nişini gir ve fikirler üret butonuna tıkla
               </div>
             )}
           </div>

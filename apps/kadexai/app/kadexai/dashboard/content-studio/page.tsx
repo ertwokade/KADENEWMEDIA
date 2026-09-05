@@ -16,6 +16,7 @@ import {
   Loader2, MessageCircle, Mic2, RefreshCw, Scissors, Search, Sparkles, Upload,
 } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
+import LoadingState from '@/components/ui/LoadingState'
 import RawModelOutput from '@/components/ui/RawModelOutput'
 import { apiFetch } from '@/lib/client/api'
 import { useModel } from '@/lib/context/ModelContext'
@@ -246,7 +247,7 @@ export default function ContentStudioPage() {
           {notice && <div role="status" className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">{notice}</div>}
           {error && <div role="alert" className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</div>}
 
-          {loading ? <div className="grid min-h-72 place-items-center"><Loader2 className="h-7 w-7 animate-spin text-violet-400" /></div> : view === 'studio' ? (
+          {loading ? <div className="grid min-h-72 place-items-center"><LoadingState label="İçerik kitaplığı yükleniyor" /></div> : view === 'studio' ? (
             <div className="grid gap-5 xl:grid-cols-[390px_minmax(0,1fr)]">
               <form onSubmit={generate} className="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/75 p-5">
                 <div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-wider text-violet-300">01 · Kaynak</p><h2 className="mt-1 text-lg font-semibold text-white">Dinlediğimiz kayıt</h2></div><span className="rounded-full border border-zinc-700 px-2.5 py-1 text-[10px] text-zinc-500">1 AI çalıştırması</span></div>
@@ -260,7 +261,7 @@ export default function ContentStudioPage() {
               </form>
 
               <div className="min-w-0 rounded-2xl border border-zinc-800 bg-zinc-900/75 p-5">
-                {generating ? <div className="grid min-h-[520px] place-items-center text-center"><div><Loader2 className="mx-auto h-8 w-8 animate-spin text-violet-400" /><p className="mt-4 text-sm font-medium text-zinc-300">Kaynak okunuyor ve marka sesine uyarlanıyor</p><p className="mt-1 text-xs text-zinc-600">Döküm → kaynak kontrolü → 3 kısa video + 7 yayın formatı → kitaplık</p></div></div> : selectedRun ? (
+                {generating ? <div className="grid min-h-[520px] place-items-center"><div className="text-center"><LoadingState model={selectedModel} label="Haftalık içerik paketi hazırlanıyor" longRunning className="justify-center" /><p className="mt-1 text-xs text-zinc-600">Kaynak kontrolü → 3 kısa video + 7 yayın formatı → kitaplık</p></div></div> : selectedRun ? (
                   <div className="space-y-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Hazır · kitaplığa kaydedildi</p><h2 className="mt-1 text-xl font-semibold text-white">{selectedRun.output.title}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">{selectedRun.output.sourceSummary}</p></div><div className="flex shrink-0 gap-2"><button onClick={() => void copyActive()} className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800">{copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />} {copied ? 'Kopyalandı' : 'Kopyala'}</button><button onClick={() => void sendWhatsApp(selectedRun)} disabled={sending} className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-300 disabled:opacity-50">{sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />} WhatsApp</button></div></div>
                     {selectedRun.source_url && <a href={selectedRun.source_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-xs text-violet-300 hover:text-violet-200"><ExternalLink className="h-3.5 w-3.5" /> Kaynağı aç</a>}

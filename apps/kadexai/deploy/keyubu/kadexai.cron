@@ -1,0 +1,12 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+CRON_TZ=UTC
+
+20 2 * * * root /srv/kade/bin/backup-selfhosted-supabase
+0 4 * * * root /srv/kade/bin/run-cron-job materials-sync /kadexai/api/materials/sync
+17 */2 * * * root /srv/kade/bin/run-cron-job trend-collect /kadexai/api/kade-search/collect
+0 6 * * * root /srv/kade/bin/run-cron-job daily-digest /kadexai/api/kade-search/daily-digest
+0 7 * * 1 root /srv/kade/bin/run-cron-job weekly-site /kadexai/api/reports/weekly-site
+30 3 * * * root /srv/kade/bin/run-cron-job subscription-sweep /kadexai/api/subscriptions/sweep
+0 5 * * * root /srv/kade/bin/run-cron-job morning-briefing /kadexai/api/notifications/morning-briefing
+0 20 * * * root /srv/kade/bin/run-cron-job daily-summary /kadexai/api/notifications/daily-summary

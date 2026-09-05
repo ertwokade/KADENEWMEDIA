@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { collectSource, finalizeCollection, isSourceId } from '@/lib/kade-search/collect'
 import { SOURCE_ORDER } from '@/lib/kade-search/collectors'
 import { replaceSourceHealthAlert } from '@/lib/kade-search/store'
+import { sendWhatsAppMessage, whatsappConfiguration } from '@/lib/notifications/whatsapp'
 import { failure, requireCollectorAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
@@ -66,25 +67,36 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Vercel Cron yalnız GET gönderir. Her gün tek bir kaynağı döngüsel tarayıp
- * ardından skorları yenilemek, altı ağır toplayıcıyı tek isteğe sıkıştırmadan
- * haftanın tamamında güncel bir radar üretir.
+ * Vercel Cron yalnız GET gönderir. Cron iki saatte bir çalışır ve kaynakları
+ * döngüsel tarar; böylece her kaynak günde iki kez yeniden ölçülür. Altı ağır
+ * toplayıcıyı tek isteğe sıkıştırmadan hız hesabına gerçek ikinci veri noktası
+ * sağlanır.
  */
 export async function GET(req: NextRequest) {
   const guard = await requireCollectorAccess(req)
   if (guard) return guard
 
   try {
-    const mondayFirstIndex = ((new Date().getUTCDay() || 7) - 1) % SOURCE_ORDER.length
-    const source = SOURCE_ORDER[mondayFirstIndex]
+    const twoHourBucket = Math.floor(Date.now() / (2 * 60 * 60 * 1000))
+    const source = SOURCE_ORDER[twoHourBucket % SOURCE_ORDER.length]
     const result = await collectSource({ source, countries: ['TR'], limit: 50, period: 7 })
+    let bildirim: 'gonderildi' | 'yapilandirilmamis' | 'basarisiz' | 'gereksiz' = 'gereksiz'
     if (result.found === 0) {
-      await replaceSourceHealthAlert(
-        `${result.label} zamanlanmış toplaması sıfır kayıtla tamamlandı.${result.errors.length ? ` Hatalar: ${result.errors.join(' · ')}` : ''}`
-      )
+      const message = `${result.label} zamanlanmış toplaması sıfır kayıtla tamamlandı.${result.errors.length ? ` Hatalar: ${result.errors.join(' · ')}` : ''}`
+      await replaceSourceHealthAlert(message)
+      if (whatsappConfiguration().configured) {
+        try {
+          await sendWhatsAppMessage(`⚠️ KadexAI kaynak uyarısı\n${message}`)
+          bildirim = 'gonderildi'
+        } catch {
+          bildirim = 'basarisiz'
+        }
+      } else {
+        bildirim = 'yapilandirilmamis'
+      }
     }
     const ozet = await finalizeCollection()
-    return NextResponse.json({ source, sonuc: result, ozet })
+    return NextResponse.json({ source, sonuc: result, ozet, bildirim })
   } catch (e) {
     return failure(e, 'Zamanlanmış toplama tamamlanamadı.')
   }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { assertAuthenticatedUser } from '@/lib/auth/server'
-import { PIPELINES, runPipeline } from '@/lib/orchestration/runner'
+import { CUSTOM_STEP_CATALOG, PIPELINES, runPipeline } from '@/lib/orchestration/runner'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
 import { notifyOperation } from '@/lib/notifications/operationFeed'
@@ -15,7 +15,7 @@ function text(value: unknown, max: number, fallback = '') {
   return parsed || fallback
 }
 
-/** Kullanılabilir akışlar — istemci adım listesini göremez, yalnız kimlik ve etiket. */
+/** Kullanılabilir hazır akışlar ve özel akış için güvenli adım kataloğu. */
 export async function GET(request: NextRequest) {
   const limit = rateLimit(getRateLimitKey(request, 'orchestrate-read'), 30, 60_000)
   const headers = { ...rateLimitHeaders(limit), 'Cache-Control': 'private, no-store' }
@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
       description: pipeline.description,
       steps: pipeline.steps.map((step) => ({ id: step.id, label: step.label })),
     })),
+    customizableSteps: CUSTOM_STEP_CATALOG.map((step) => ({ id: step.id, label: step.label })),
   }, { headers })
 }
 
@@ -54,7 +55,8 @@ export async function POST(request: NextRequest) {
     if (!PLATFORMS.includes(platform)) return NextResponse.json({ error: 'Geçersiz platform.' }, { status: 400, headers })
 
     const result = await runPipeline(user.id, {
-      // Akış kimliği dışında hiçbir yapısal bilgi istemciden alınmaz.
+      // Hazır akışta yalnız kimlik alınır; özel akış adımları aşağıda sunucu
+      // allowlist'ine karşı yeniden kurulup doğrulanır.
       pipelineId: text(body.pipelineId, 60),
       niche,
       platform,
@@ -63,6 +65,9 @@ export async function POST(request: NextRequest) {
       region: text(body.region, 60, 'Türkiye / Türkçe'),
       frequency: text(body.frequency, 60, 'haftada 3 içerik'),
       model: text(body.model, 40, 'auto') as AIModel,
+      customSteps: Array.isArray(body.customSteps)
+        ? body.customSteps.map((step) => text(step, 40)).filter(Boolean).slice(0, CUSTOM_STEP_CATALOG.length)
+        : undefined,
     })
 
     // 'pipeline_completed' olayı tanımlıydı ama hiçbir yerden tetiklenmiyordu;

@@ -2,12 +2,14 @@
 
 import { FormEvent, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Loader2 } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
+import LoadingState from '@/components/ui/LoadingState'
 import { apiFetch } from '@/lib/client/api'
 import { useModel } from '@/lib/context/ModelContext'
 import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
-import { cn } from '@/lib/utils'
+import { cn, getPlatformLabel } from '@/lib/utils'
+import type { Platform } from '@/types'
 
 /**
  * Kanal Denetimi.
@@ -30,7 +32,7 @@ type Denetim = {
   yolHaritasi: Donem[]
 }
 
-const PLATFORMLAR = ['YouTube', 'Instagram', 'TikTok', 'LinkedIn', 'X']
+const PLATFORMLAR: Platform[] = ['youtube', 'instagram', 'tiktok', 'linkedin', 'x']
 
 const DURUM_RENK: Record<string, string> = {
   iyi: 'text-[color:var(--kade-ok-400)]',
@@ -49,7 +51,7 @@ export default function ChannelAuditPage() {
   const alanYolu = useWorkspaceHref()
   const [accountName, setAccountName] = useState('')
   const [niche, setNiche] = useState('')
-  const [platforms, setPlatforms] = useState<string[]>(['YouTube'])
+  const [platforms, setPlatforms] = useState<Platform[]>(['youtube'])
   const [bio, setBio] = useState('')
   const [metrics, setMetrics] = useState('')
   const [recentPosts, setRecentPosts] = useState('')
@@ -58,7 +60,7 @@ export default function ChannelAuditPage() {
   const [error, setError] = useState('')
   const [denetim, setDenetim] = useState<Denetim | null>(null)
 
-  const platformSec = (p: string) =>
+  const platformSec = (p: Platform) =>
     setPlatforms((c) => (c.includes(p) ? c.filter((x) => x !== p) : [...c, p]))
 
   const gonder = async (e: FormEvent) => {
@@ -105,7 +107,7 @@ export default function ChannelAuditPage() {
                         platforms.includes(p)
                           ? 'border-[color:var(--kade-a-200)] bg-[color:var(--kade-a-50)] text-[color:var(--kade-a-600)]'
                           : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:text-zinc-200')}>
-                      {p}
+                      {getPlatformLabel(p)}
                     </button>
                   ))}
                 </div>
@@ -138,8 +140,8 @@ export default function ChannelAuditPage() {
           <div className="min-w-0 flex-1 space-y-5">
             {error && <div className="rounded-xl border border-[color:var(--kade-err-400)]/30 bg-[color:var(--kade-err-400)]/10 p-4 text-sm text-[color:var(--kade-err-400)]">{error}</div>}
             {loading && (
-              <div className="flex h-64 items-center justify-center gap-2 text-sm text-zinc-500">
-                <Loader2 className="h-4 w-4 animate-spin" /> Kanal denetleniyor…
+              <div className="flex h-64 items-center justify-center">
+                <LoadingState model={selectedModel} label="Kanal denetimi hazırlanıyor" longRunning />
               </div>
             )}
 

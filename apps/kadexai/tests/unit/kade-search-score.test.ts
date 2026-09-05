@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { detectLanguage } from '../../lib/kade-search/classify'
+import { classifyCategory, detectLanguage } from '../../lib/kade-search/classify'
 import { scoreTrend } from '../../lib/kade-search/score'
 import type { RawTrendItem, SnapshotRow, TrendRow } from '../../lib/kade-search/types'
 
@@ -24,4 +24,11 @@ test('tek ölçüm sahte hız veya hız puanı üretmez', () => {
   assert.equal(score.breakdown.hizOlculdu, false)
   assert.equal(score.breakdown.hiz, 0)
   assert.notEqual(score.stage, 'peak')
+})
+
+test('birbirine yakın kategori sinyallerinde kesin kategori uydurmaz', () => {
+  const category = classifyCategory({ platform: 'google', kind: 'topic', title: 'fitness teknoloji' })
+  assert.equal(category.category, 'diger')
+  assert.ok(category.confidence < 0.5)
+  assert.ok(category.subcategories.length >= 2)
 })

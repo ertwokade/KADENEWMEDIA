@@ -1,7 +1,7 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
@@ -26,6 +26,17 @@ export default function TitlePage() {
   const [loading, setLoading]       = useState(false)
   const [results, setResults]       = useState<PlatformResult[]>([])
   const [error, setError]           = useState('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const incomingTopic = params.get('topic') || localStorage.getItem('contentai_idea_topic')
+    const incomingKeywords = params.get('keywords')
+    const incomingPlatform = params.get('platform') as Platform | null
+    if (incomingTopic) setTopic(incomingTopic)
+    if (incomingKeywords) setKeywords(incomingKeywords)
+    if (incomingPlatform && platforms.includes(incomingPlatform)) setSelectedPlatforms([incomingPlatform])
+    localStorage.removeItem('contentai_idea_topic')
+  }, [])
 
   const togglePlatform = (p: Platform) =>
     setSelectedPlatforms(prev => prev.includes(p) ? (prev.length > 1 ? prev.filter(x => x !== p) : prev) : [...prev, p])

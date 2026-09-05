@@ -106,10 +106,23 @@ export function classifyCategory(item: RawTrendItem) {
 
   const top = results[0]
   const total = results.reduce((s, r) => s + r.score, 0)
+  const confidence = Math.min(1, top.score / Math.max(total, 1) + Math.min(top.score / 12, 0.5))
+  const second = results[1]
+  // Birbirine yakın iki sinyalde ilk sıradakini kesin kategori gibi yazmak
+  // yanlış güven üretir. Belirsiz kayıt filtrelerden kaybolmasın diye "diğer"
+  // altında tutulur; güçlü adaylar alt kategori olarak korunur.
+  if (second && top.score < second.score * 1.35) {
+    return {
+      category: 'diger',
+      subcategories: results.slice(0, 3).map((r) => r.key),
+      confidence: Math.min(confidence, 0.49),
+      matched: top.hits.slice(0, 6),
+    }
+  }
   return {
     category: top.key,
     subcategories: results.slice(1, 4).filter((r) => r.score >= top.score * 0.4).map((r) => r.key),
-    confidence: Math.min(1, top.score / Math.max(total, 1) + Math.min(top.score / 12, 0.5)),
+    confidence,
     matched: top.hits.slice(0, 6),
   }
 }

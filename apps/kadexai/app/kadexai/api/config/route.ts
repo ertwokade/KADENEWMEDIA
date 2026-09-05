@@ -67,7 +67,9 @@ export async function GET(request: Request) {
           : aiGateway
             ? 'vercel'
             : 'none')
-  const imageConfigured = configured('GEMINI_API_KEY') || configured('OPENAI_API_KEY')
+  const geminiImageConfigured = configured('GEMINI_API_KEY')
+  const openaiImageConfigured = configured('OPENAI_API_KEY')
+  const imageConfigured = geminiImageConfigured || openaiImageConfigured
 
   return Response.json({
     provider,
@@ -75,8 +77,10 @@ export async function GET(request: Request) {
     aiGateway,
     image: imageConfigured,
     imageConfigured,
-    imageFallbackAvailable: false,
-    imageProvider: imageConfigured ? 'configured' : 'none',
+    imageFallbackAvailable: geminiImageConfigured && openaiImageConfigured,
+    imageProvider: imageConfigured
+      ? [geminiImageConfigured ? 'gemini' : '', openaiImageConfigured ? 'openai' : ''].filter(Boolean).join('+')
+      : 'none',
     // Video ve dublaj ayrı FastAPI servisinde koşuyor. Bu bayrak eskiden
     // SABİT false'tu, yani arayüz servis ayakta olsa bile bilemiyordu;
     // artık servis adresinin tanımlı olup olmadığını yansıtıyor.

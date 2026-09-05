@@ -103,6 +103,7 @@ export default function PackagesPage() {
   // Sayfa yalnızca satış listesiydi: hangi paketin senin olduğunu, neyin
   // zaten açık olduğunu göstermiyordu. Etkin yetki buradan okunuyor.
   const [plan, setPlan] = useState<Plan | null>(null)
+  const [videoAvailable, setVideoAvailable] = useState<boolean | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -110,12 +111,14 @@ export default function PackagesPage() {
       apiFetch(apiPath('/api/payments/offers')).then((r) => r.ok ? r.json() : { offers: [] }),
       apiFetch(apiPath('/api/legal')).then((r) => r.ok ? r.json() : { checkoutDocuments: [] }),
       apiFetch(apiPath('/api/usage')).then((r) => r.ok ? r.json() : null),
+      apiFetch(apiPath('/api/config'), { cache: 'no-store' }).then((r) => r.ok ? r.json() : null),
     ])
-      .then(([packageData, offerData, legalData, usageData]) => {
+      .then(([packageData, offerData, legalData, usageData, configData]) => {
         setPackages(packageData.packages || [])
         setOffers(offerData.offers || [])
         setLegalDocuments(legalData.checkoutDocuments || [])
         setPlan(usageData?.plan ?? null)
+        setVideoAvailable(typeof configData?.video === 'boolean' ? configData.video : null)
         captureAnalytics('package_viewed')
         if (offerData.offers?.length) captureAnalytics('custom_offer_viewed', { count: offerData.offers.length })
       })
@@ -231,6 +234,11 @@ export default function PackagesPage() {
         </div>
 
         {error && <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm text-red-300">{error}</div>}
+        {videoAvailable === false && (
+          <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            Video Fabrikası paket yetkisine dahildir; ancak bu kurulumda medya servisi henüz bağlı değildir. Servis etkinleşmeden video üretimi kullanılamaz.
+          </div>
+        )}
         {/* Sayfa yalnızca satış listesiydi; şu an neye sahip olduğun hiçbir
             yerde yazmıyordu. Karar vermeden önce görülmesi gereken ilk şey bu. */}
         {!loading && plan && (
@@ -291,7 +299,12 @@ export default function PackagesPage() {
                     return (
                       <li key={f} className="flex items-center gap-2">
                         <span className={acik ? 'text-[color:var(--kade-accent)]' : 'text-emerald-400'}>✓</span>
-                        <span>{FEATURE_LABEL[f] ?? f}</span>
+                        <span>
+                          {FEATURE_LABEL[f] ?? f}
+                          {videoAvailable === false && (f === 'video-factory' || f === 'video-factory-basic') && (
+                            <span className="ml-1 text-xs text-amber-400">· servis bekleniyor</span>
+                          )}
+                        </span>
                         {acik && !senin && (
                           <span className="ml-auto text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--kade-accent-text)]">açık</span>
                         )}

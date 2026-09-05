@@ -318,7 +318,7 @@ export async function generateIdeas(
       alternatifFormatlar: alt.map((f) => FORMATS[f]?.label).filter(Boolean),
       zorluk: difficultyOf(t.stage),
       paylasimSaati: POST_TIMES[t.platform] ?? POST_TIMES.tiktok,
-      neden: `${stage.desc}. ${t.velocity != null ? `Günlük büyüme ~%${Math.round(t.velocity * 100)}.` : ''} ${
+      neden: `${stage.desc}. ${t.snapshot_count >= 2 && t.breakdown?.hizOlculdu !== false ? `Günlük büyüme ~%${Math.round((t.velocity ?? 0) * 100)}.` : 'Hız için ikinci ölçüm bekleniyor.'} ${
         t.link_count ? `${t.link_count} platformda karşılığı var.` : ''
       }`.trim(),
     }

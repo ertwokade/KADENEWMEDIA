@@ -2,11 +2,13 @@
 
 import { apiFetch } from '@/lib/client/api'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
 import { cn, collectSettledResults } from '@/lib/utils'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 
 type HookFormat = 'reels' | 'shorts' | 'tiktok' | 'youtube'
 
@@ -40,6 +42,7 @@ const hookTypeLabels: Record<string, string> = {
 }
 
 export default function HookPage() {
+  const workspaceHref = useWorkspaceHref()
   const { selectedModel } = useModel()
   const [topic, setTopic]       = useState('')
   const [selectedFormats, setSelectedFormats] = useState<HookFormat[]>(['reels'])
@@ -107,7 +110,7 @@ export default function HookPage() {
               </div>
 
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niche</label>
+                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Niş</label>
                 <input value={niche} onChange={e => setNiche(e.target.value)}
                   placeholder="Örn: teknoloji, fitness, yemek"
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
@@ -143,7 +146,12 @@ export default function HookPage() {
                             </span>
                           </div>
                           <p className="text-zinc-500 text-xs">{item.neden}</p>
-                          <CopyButton text={item.hook} />
+                          <div className="flex flex-wrap items-center gap-3 text-[11px]">
+                            <CopyButton text={item.hook} />
+                            <Link prefetch={false} href={workspaceHref(`/dashboard/viral-score?title=${encodeURIComponent(item.hook)}`)} className="text-violet-400 hover:text-violet-300">Viral skoru ölç →</Link>
+                            <Link prefetch={false} href={workspaceHref(`/dashboard/ai-thumbnail?title=${encodeURIComponent(item.hook)}&topic=${encodeURIComponent(topic)}`)} className="text-violet-400 hover:text-violet-300">Thumbnail üret →</Link>
+                            <Link prefetch={false} href={workspaceHref(`/dashboard/calendar?title=${encodeURIComponent(item.hook)}`)} className="text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
+                          </div>
                         </div>
                       ))}
                     </div>

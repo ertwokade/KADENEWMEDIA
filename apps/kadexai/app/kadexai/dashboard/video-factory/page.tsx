@@ -5,6 +5,7 @@ import { apiFetch } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
 import TopBar from '@/components/layout/TopBar'
 import CapabilityNotice from '@/components/ui/CapabilityNotice'
+import LoadingState from '@/components/ui/LoadingState'
 import { cn } from '@/lib/utils'
 
 type Aspect = 'portrait' | 'landscape'
@@ -138,6 +139,13 @@ export default function VideoFactoryPage() {
           >
             {loading ? 'Video üretiliyor… (birkaç dakika sürebilir)' : 'Video üret'}
           </button>
+          {loading && (
+            <LoadingState
+              label="Video üretim motoru çalışıyor"
+              longRunning
+              className="justify-center rounded-xl border border-violet-500/20 bg-violet-500/5"
+            />
+          )}
         </div>
 
         {result && (

@@ -5,7 +5,8 @@ import { useState } from 'react'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
-import { cn } from '@/lib/utils'
+import { cn, getPlatformLabel } from '@/lib/utils'
+import type { Platform } from '@/types'
 
 interface Slide { no: number; tip: string; baslik: string; metin: string; emoji: string; gorsel_oner: string }
 interface Carousel { baslik: string; slayts: Slide[]; caption: string; hashtags: string[] }
@@ -63,11 +64,11 @@ export default function CarouselPage() {
               <div>
                 <label className="block text-zinc-400 text-xs font-medium mb-1.5">Platform</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {['instagram', 'linkedin'].map((p) => (
+                  {(['instagram', 'linkedin'] as Platform[]).map((p) => (
                     <button key={p} type="button" onClick={() => setPlatform(p)}
-                      className={cn('py-2 rounded-lg text-xs font-medium capitalize transition-colors border',
+                      className={cn('py-2 rounded-lg text-xs font-medium transition-colors border',
                         platform === p ? 'bg-violet-500/20 text-violet-300 border-violet-500/40' : 'bg-zinc-800 text-zinc-400 border-zinc-700')}>
-                      {p}
+                      {getPlatformLabel(p)}
                     </button>
                   ))}
                 </div>

@@ -137,6 +137,20 @@ const TEXT_PROVIDER_KEYS = [
   'GEMINI_API_KEY',
 ] as const
 
+const INFRA_DEFS = [
+  { id: 'NEXT_PUBLIC_SUPABASE_URL', label: 'Supabase proje adresi', use: 'Oturum, geçmiş, şablon ve takvim bulut eşitlemesi' },
+  { id: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', label: 'Supabase anonim anahtarı', use: 'RLS korumalı istemci ve sunucu erişimi' },
+  { id: 'YOUTUBE_API_KEY', label: 'YouTube Data API', use: 'Trend toplama, materyal eşitleme ve yorum okuma' },
+  { id: 'GOOGLE_OAUTH_CLIENT_ID', label: 'Google OAuth istemcisi', use: 'YouTube kanalını bağlama ve altyazı yükleme' },
+  { id: 'GOOGLE_OAUTH_CLIENT_SECRET', label: 'Google OAuth sırrı', use: 'YouTube kanal bağlantısının sunucu tarafı' },
+  { id: 'TOKEN_ENCRYPTION_KEY', label: 'Bağlantı şifreleme anahtarı', use: 'YouTube yenileme belirtecini güvenli saklama' },
+  { id: 'TIKTOK_COOKIE', label: 'TikTok oturumu', use: 'TikTok trend ve materyal toplama' },
+  { id: 'INSTAGRAM_SESSION_ID', label: 'Instagram oturumu', use: 'Instagram trend ve materyal toplama' },
+  { id: 'KADE_FASTAPI_BASE_URL', label: 'Medya işlem motoru', use: 'Video Fabrikası, klip ve dublaj işlemleri' },
+  { id: 'KADE_BACKEND_TOKEN', label: 'Medya motoru erişim belirteci', use: 'FastAPI isteklerinin kimlik doğrulaması' },
+  { id: 'WHATSAPP', label: 'WhatsApp bildirimi', use: 'Operasyon raporları ve trend seçkileri' },
+] as const
+
 export default function SettingsPage() {
   const [isElectron, setIsElectron] = useState(false)
   const [config, setConfig]         = useState<Record<string, string>>({})
@@ -159,6 +173,15 @@ export default function SettingsPage() {
     GEMINI_API_KEY: false,
     NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    YOUTUBE_API_KEY: false,
+    GOOGLE_OAUTH_CLIENT_ID: false,
+    GOOGLE_OAUTH_CLIENT_SECRET: false,
+    TOKEN_ENCRYPTION_KEY: false,
+    TIKTOK_COOKIE: false,
+    INSTAGRAM_SESSION_ID: false,
+    KADE_FASTAPI_BASE_URL: false,
+    KADE_BACKEND_TOKEN: false,
+    WHATSAPP: false,
   })
 
   useEffect(() => {
@@ -406,6 +429,39 @@ export default function SettingsPage() {
             </>
           )}
           </>}
+
+          {canManageInfrastructure && aktifSekme === 'altyapi' && (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
+                <h2 className="text-sm font-semibold text-cyan-200">Servis ve veri kaynağı durumu</h2>
+                <p className="mt-1 text-xs leading-relaxed text-zinc-400">
+                  Bu ekran yalnızca değişkenin yapılandırılıp yapılandırılmadığını gösterir; anahtar değerleri tarayıcıya gönderilmez.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {INFRA_DEFS.map((item) => {
+                  const configured = isConfigured(item.id)
+                  return (
+                    <div key={item.id} className={cn('rounded-xl border p-4', configured ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-red-500/20 bg-red-500/5')}>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {configured ? <CheckCircle className="h-4 w-4 text-emerald-400" /> : <XCircle className="h-4 w-4 text-red-400" />}
+                        <strong className="text-sm text-zinc-200">{item.label}</strong>
+                        <span className={cn('ml-auto text-xs font-medium', configured ? 'text-emerald-400' : 'text-red-300')}>{configured ? 'Yapılandırıldı' : 'Eksik'}</span>
+                      </div>
+                      <p className="mt-1 text-xs text-zinc-400">{item.use}</p>
+                      <code className="mt-2 inline-block rounded bg-zinc-950 px-2 py-1 text-[11px] text-zinc-500">{item.id}</code>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/30 p-4 space-y-2">
+                <h3 className="text-zinc-300 font-medium text-sm">Supabase DB Schema</h3>
+                <pre className="bg-zinc-900 rounded-lg p-3 text-xs text-zinc-400 overflow-x-auto">{`-- supabase/schema.sql dosyasını\n-- Supabase Dashboard > SQL Editor'da çalıştır`}</pre>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

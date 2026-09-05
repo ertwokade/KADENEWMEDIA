@@ -12,11 +12,10 @@ import './Blog.css'
 function formatDate(post, lang) {
   const raw = post.date || post.publishAt || post.createdAt
   if (!raw) return ''
-  try {
-    return new Date(raw).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })
-  } catch {
-    return ''
-  }
+  // Panelden gelen date alanı serbest metin ("26 Ağu 2026"); ayrıştırılamıyorsa olduğu gibi göster.
+  const parsed = new Date(raw)
+  if (Number.isNaN(parsed.getTime())) return String(raw)
+  return parsed.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
 export default function Blog() {

@@ -2,12 +2,12 @@
 
 /*
  * Sayfa planı: akış seçimi → girdi formu → çalıştır → adım adım sonuç.
- * Adım sırası sunucuda sabittir; bu ekran yalnızca girdi toplar ve sonucu
- * gösterir (least-privilege, bkz. lib/orchestration/registry.ts).
+ * Hazır akışların yanı sıra kullanıcı, sunucunun izin verdiği adımlarla kendi
+ * zincirini kurabilir. Prompt ve güvenlik sınırları yine sunucuda kalır.
  */
 
 import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { CheckCircle2, Clock, Play, SkipForward, XCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, CheckCircle2, Clock, Play, Plus, SkipForward, Trash2, XCircle } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
 import { apiFetch } from '@/lib/client/api'
 import ModelOutput from '@/components/ui/ModelOutput'
@@ -50,6 +50,9 @@ const input = 'w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 
 export default function OrchestratePage() {
   const [pipelines, setPipelines] = useState<Pipeline[]>([])
   const [selected, setSelected] = useState('')
+  const [customizableSteps, setCustomizableSteps] = useState<Array<{ id: string; label: string }>>([])
+  const [customSteps, setCustomSteps] = useState<string[]>(['trends', 'content-plan', 'title'])
+  const [customPicker, setCustomPicker] = useState('')
   const [platform, setPlatform] = useState('instagram')
   const [running, setRunning] = useState(false)
   const [steps, setSteps] = useState<StepResult[]>([])
@@ -63,6 +66,7 @@ export default function OrchestratePage() {
       if (!response.ok) throw new Error(data.error || 'Akışlar okunamadı.')
       setPipelines(data.pipelines || [])
       setSelected(data.pipelines?.[0]?.id || '')
+      setCustomizableSteps(data.customizableSteps || [])
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Akışlar okunamadı.')
     }
@@ -88,6 +92,7 @@ export default function OrchestratePage() {
           goal: form.get('goal'),
           competitor: form.get('competitor'),
           frequency: form.get('frequency'),
+          customSteps: selected === 'custom' ? customSteps : undefined,
         }),
       })
       const data = await response.json()
@@ -102,6 +107,16 @@ export default function OrchestratePage() {
   }
 
   const active = pipelines.find((pipeline) => pipeline.id === selected)
+  const customLabel = (id: string) => customizableSteps.find((step) => step.id === id)?.label || id
+  const moveCustomStep = (index: number, direction: -1 | 1) => {
+    setCustomSteps((current) => {
+      const target = index + direction
+      if (target < 0 || target >= current.length) return current
+      const next = [...current]
+      ;[next[index], next[target]] = [next[target], next[index]]
+      return next
+    })
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -116,6 +131,7 @@ export default function OrchestratePage() {
               <span className="mb-1.5 block text-xs font-medium text-zinc-400">Akış</span>
               <select value={selected} onChange={(event) => setSelected(event.target.value)} className={input}>
                 {pipelines.map((pipeline) => <option key={pipeline.id} value={pipeline.id}>{pipeline.label}</option>)}
+                <option value="custom">Özel Akış</option>
               </select>
             </label>
 
@@ -127,6 +143,36 @@ export default function OrchestratePage() {
                     <li key={step.id} className="rounded-full bg-zinc-800 px-2.5 py-1 text-[11px] text-zinc-300">{index + 1}. {step.label}</li>
                   ))}
                 </ol>
+              </div>
+            )}
+
+            {selected === 'custom' && (
+              <div className="rounded-lg border border-violet-500/25 bg-violet-500/5 p-3">
+                <p className="text-xs text-zinc-400">En az iki adım seç; oklarla çalışma sırasını değiştir.</p>
+                <ol className="mt-3 space-y-2">
+                  {customSteps.map((stepId, index) => (
+                    <li key={stepId} className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-xs text-zinc-200">
+                      <span className="w-5 text-zinc-600">{index + 1}.</span>
+                      <span className="flex-1">{customLabel(stepId)}</span>
+                      <button type="button" onClick={() => moveCustomStep(index, -1)} disabled={index === 0} aria-label={`${customLabel(stepId)} adımını yukarı taşı`} className="rounded p-1 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200 disabled:opacity-20"><ArrowUp className="h-3.5 w-3.5" /></button>
+                      <button type="button" onClick={() => moveCustomStep(index, 1)} disabled={index === customSteps.length - 1} aria-label={`${customLabel(stepId)} adımını aşağı taşı`} className="rounded p-1 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200 disabled:opacity-20"><ArrowDown className="h-3.5 w-3.5" /></button>
+                      <button type="button" onClick={() => setCustomSteps((current) => current.filter((id) => id !== stepId))} disabled={customSteps.length <= 2} aria-label={`${customLabel(stepId)} adımını kaldır`} className="rounded p-1 text-red-400/70 hover:bg-red-500/10 disabled:opacity-20"><Trash2 className="h-3.5 w-3.5" /></button>
+                    </li>
+                  ))}
+                </ol>
+                {customizableSteps.some((step) => !customSteps.includes(step.id)) && (
+                  <label className="mt-3 flex items-center gap-2">
+                    <select value={customPicker} onChange={(event) => setCustomPicker(event.target.value)} className={input}>
+                      <option value="">Adım ekle…</option>
+                      {customizableSteps.filter((step) => !customSteps.includes(step.id)).map((step) => <option key={step.id} value={step.id}>{step.label}</option>)}
+                    </select>
+                    <button type="button" onClick={() => {
+                      if (!customPicker) return
+                      setCustomSteps((current) => [...current, customPicker])
+                      setCustomPicker('')
+                    }} className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-zinc-700 px-3 py-2.5 text-xs text-zinc-300 hover:bg-zinc-800"><Plus className="h-3.5 w-3.5" /> Ekle</button>
+                  </label>
+                )}
               </div>
             )}
 
@@ -156,7 +202,7 @@ export default function OrchestratePage() {
               <textarea name="competitor" maxLength={400} rows={2} placeholder="Rakip hesap, konumlandırma veya içerik örnekleri" className={input} />
             </label>
 
-            <button disabled={running || !selected} className="inline-flex items-center gap-2 rounded-lg bg-violet-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-400 disabled:opacity-50">
+            <button disabled={running || !selected || (selected === 'custom' && customSteps.length < 2)} className="inline-flex items-center gap-2 rounded-lg bg-violet-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-violet-400 disabled:opacity-50">
               <Play className="h-4 w-4" /> {running ? 'Akış çalışıyor…' : 'Akışı çalıştır'}
             </button>
             <p className="text-xs text-zinc-500">

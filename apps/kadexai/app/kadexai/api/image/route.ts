@@ -62,6 +62,18 @@ async function generateWithGemini(prompt: string) {
     : { error: 'Görsel dönmedi.' }
 }
 
+type ImageResult = { image: string } | { error: string } | null
+
+async function tryImageProvider(provider: 'gemini' | 'openai', prompt: string, width: number, height: number): Promise<ImageResult> {
+  try {
+    return provider === 'openai'
+      ? await generateWithOpenAI(prompt, width, height)
+      : await generateWithGemini(prompt)
+  } catch {
+    return { error: `${provider === 'openai' ? 'OpenAI' : 'Gemini'} görsel sağlayıcısına bağlanılamadı.` }
+  }
+}
+
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
   if (guard) return guard
@@ -83,16 +95,24 @@ export async function POST(req: NextRequest) {
     const profileContext = await getRequestProfileInstruction()
     const prompt = `${requestedPrompt}\nİstenen kompozisyon oranı: ${ratio}.${profileContext}`
 
-    const result = process.env.OPERATIONS_IMAGE_PROVIDER === 'openai'
-      ? await generateWithOpenAI(prompt, width, height)
-      : await generateWithGemini(prompt) || await generateWithOpenAI(prompt, width, height)
+    const preferred = process.env.OPERATIONS_IMAGE_PROVIDER === 'openai' ? 'openai' : 'gemini'
+    const fallback = preferred === 'openai' ? 'gemini' : 'openai'
+    const first = await tryImageProvider(preferred, prompt, width, height)
+    const firstSucceeded = Boolean(first && 'image' in first)
+    const second = firstSucceeded ? null : await tryImageProvider(fallback, prompt, width, height)
+    const result = firstSucceeded ? first : second
+    const provider = firstSucceeded ? preferred : second && 'image' in second ? fallback : null
 
     if (!result || 'error' in result) {
       return NextResponse.json({
-        error: result && 'error' in result ? result.error : 'Görsel sağlayıcısı yapılandırılmamış. Ayarlar bölümünde Gemini veya OpenAI durumunu kontrol et.',
+        error: result && 'error' in result
+          ? result.error
+          : first && 'error' in first
+            ? first.error
+            : 'Görsel sağlayıcısı yapılandırılmamış. Ayarlar bölümünde Gemini veya OpenAI durumunu kontrol et.',
       }, { status: 503 })
     }
-    return NextResponse.json({ ...result, provider: process.env.OPERATIONS_IMAGE_PROVIDER || 'gemini' })
+    return NextResponse.json({ ...result, provider, fallback: provider !== preferred })
   } catch {
     return NextResponse.json({ error: 'Görsel isteği tamamlanamadı.' }, { status: 500 })
   }
