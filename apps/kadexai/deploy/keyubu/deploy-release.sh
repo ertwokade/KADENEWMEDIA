@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ "${1:-}" == "--preflight" ]]; then
+  test -f /srv/kade/secrets/kadexai.env
+  test -d "$(readlink -f /srv/kade/current)"
+  docker info >/dev/null
+  curl --fail --silent --show-error http://127.0.0.1:3000/kadexai/api/health >/dev/null
+  echo "PREFLIGHT=ok"
+  exit 0
+fi
+
 commit_sha="${1:-}"
 if [[ ! "$commit_sha" =~ ^[0-9a-f]{40}$ ]]; then
   echo "Usage: $0 FULL_GITHUB_COMMIT_SHA" >&2

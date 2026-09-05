@@ -16,6 +16,12 @@ on:
       - "package-lock.json"
       - "vite.config.*"
   workflow_dispatch:
+    inputs:
+      preflight_only:
+        description: "Test GitHub-to-Keyubu access without deploying"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -47,6 +53,7 @@ jobs:
           chmod 600 ~/.ssh/keyubu ~/.ssh/known_hosts
 
       - name: Deploy exact Git commit
+        if: github.event_name != 'workflow_dispatch' || inputs.preflight_only != true
         shell: bash
         run: |
           set -euo pipefail
@@ -55,6 +62,17 @@ jobs:
             -o StrictHostKeyChecking=yes \
             "$KEYUBU_USER@$KEYUBU_HOST" \
             "wsl.exe -d Ubuntu-24.04 -u root -- /srv/kade/bin/deploy-kadexai-release $GITHUB_SHA"
+
+      - name: Verify server connection
+        if: github.event_name == 'workflow_dispatch' && inputs.preflight_only == true
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/keyubu \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$KEYUBU_USER@$KEYUBU_HOST" \
+            "wsl.exe -d Ubuntu-24.04 -u root -- /srv/kade/bin/deploy-kadexai-release --preflight"
 
       - name: Verify public endpoint
         shell: bash
