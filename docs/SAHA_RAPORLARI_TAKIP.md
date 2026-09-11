@@ -1,8 +1,8 @@
 # Saha raporları — düzeltme takibi
 
-Güncelleme: 2026-09-10. Toplam 113 numaralı bulgu: admin 26, genel site 14, KadexAI 73. Tekrarlar ve olumlu gözlemler de özgün numarasıyla korunur; 113 ayrı hata olduğu anlamına gelmez.
+Güncelleme: 2026-09-11. Toplam 113 numaralı bulgu: admin 26, genel site 14, KadexAI 73. Tekrarlar ve olumlu gözlemler de özgün numarasıyla korunur; 113 ayrı hata olduğu anlamına gelmez.
 
-Bu dosya tamamlanan düzeltme gruplarının durumudur. Tüm raporlar tamamlanmış değildir. Kod değişiklikleri yereldir; commit/push ve kod dağıtımı yapılmadı. İstisna: kullanıcının ayrıca istediği CallMeBot onarımı kapsamında eksik iki canlı bildirim ayarı geri yüklendi, web aynı imajla yeniden başlatıldı ve tek test mesajı kuyruğa alındı. Ayrıntılar `ENTEGRASYON_INCELEMESI.md` içindedir. Rapor içindeki 100 yeni özellik fikri bu hata listesine dahil değil.
+Bu dosya tamamlanan düzeltme gruplarının durumudur. Kod değişiklikleri `9196dac` commit'iyle `origin/main` dalına gönderildi. GitHub Actions'ın Keyubu dağıtımı `34569553489` numaralı çalışmada başarıyla tamamlandı; sağlık ucu HTTP 200 döndü, genel KadexAI rotaları açıldı ve korumalı dashboard oturumsuz isteği giriş sayfasına yönlendirdi. Ana site Vercel'de kalıyor; bu commit için Vercel Git entegrasyonu dağıtım başlatmadı ve bağlı üretim projesi yerel CLI oturumundan farklı bir Vercel hesabında. Kullanıcının ayrıca istediği CallMeBot onarımı kapsamında eksik iki canlı bildirim ayarı geri yüklendi, web aynı imajla yeniden başlatıldı ve tek test mesajı kuyruğa alındı. Ayrıntılar `ENTEGRASYON_INCELEMESI.md` içindedir. Rapor içindeki 100 yeni özellik fikri bu hata listesine dahil değil.
 
 ## Güvenlik ve kapsam
 
@@ -16,7 +16,7 @@ Gerçek müşteri kayıtları, admin hesapları, seed verileri, domain ve üreti
 - KadexAI TypeScript, değişen kodların ESLint kontrolü, legacy ve KadexAI üretim build başarılı.
 - Gerçek AI sağlayıcıları ve canlı medya üretimi henüz uçtan uca denenmedi.
 
-9 Eylül ek grubu: Yorum Analizi'nde eksik taslak açıkça gösteriliyor; kullanıcı isteğiyle taslak üretilebiliyor, düzenlenip güncel metin kopyalanabiliyor. Taslak yorum özetine dayanıyor ve otomatik yayınlanmıyor. Aynı yetkili/plan kontrollü üretim rotası kullanıldı; girdi sınırları, hız sınırı, geçersiz çıktı ve güvenli hata yanıtları test edildi. Eksik oran/puanlar artık sıfır değil `null`/Belirtilmedi; gerçek sıfır korunuyor. Geç dönen taslak yeni analiz kartını değiştirmiyor. Genel öneriler görünür, mobil özet iki sütun. Altı API birim ve altı masaüstü/mobil testi geçti; ekran görüntüleri incelendi. KadexAI tip/lint/üretim derlemesi başarılı; dağıtım yapılmadı.
+9 Eylül ek grubu: Yorum Analizi'nde eksik taslak açıkça gösteriliyor; kullanıcı isteğiyle taslak üretilebiliyor, düzenlenip güncel metin kopyalanabiliyor. Taslak yorum özetine dayanıyor ve otomatik yayınlanmıyor. Aynı yetkili/plan kontrollü üretim rotası kullanıldı; girdi sınırları, hız sınırı, geçersiz çıktı ve güvenli hata yanıtları test edildi. Eksik oran/puanlar artık sıfır değil `null`/Belirtilmedi; gerçek sıfır korunuyor. Geç dönen taslak yeni analiz kartını değiştirmiyor. Genel öneriler görünür, mobil özet iki sütun. Altı API birim ve altı masaüstü/mobil testi geçti; ekran görüntüleri incelendi. KadexAI tip/lint/üretim derlemesi başarılı; 11 Eylül Keyubu dağıtımına dahil edildi.
 
 8 Eylül ek grubu: zorunlu açık tema göçü kaldırıldı; snapshot, React ve statik sayfalar ortak tercihle sistem temasını izliyor. Referanslar CMS yorumlarını gösteriyor; Neden Biz yalnız dar kapsamlı, özel alanları dışlamış istatistik izdüşümünü okuyor. Materyal önizlemesi/klavye odağı, sayfalama, hata-boş ayrımı ve toplamada kısmi başarı düzeltildi. Akış adımlarında çıktı doğrulaması ve etiketli bağlam, Radar’da 20 farklı kurgu şablonu, Türkçe açıklamalar ve yinelenen uyarı düzeltmeleri eklendi. Mobil kurulum önerisi asistan düğmesiyle çakışıyordu; sabit bindirme yerine Genel Bakış sayfasının akışına alındı.
 
@@ -33,7 +33,7 @@ Gerçek müşteri kayıtları, admin hesapları, seed verileri, domain ve üreti
 1. YouTube OAuth, diğer AI sağlayıcı anahtarları, GA4 erişimi ve kanal yetkilendirmesi kullanıcıya ait gerçek hesap/anahtar ister; değer uydurulmadı.
 2. Gerçek partner, proje, basın, admin e-postası ve CRM aşamaları işletme verisidir; mevcut kayıtlar tahmin edilerek değiştirilmedi veya silinmedi.
 3. Gerçek AI/video/ses kalitesi ve zamanlanmış bildirim teslimi sağlayıcılarla canlı uçtan uca denenmelidir.
-4. Kod yerelde tamamlandı; GitHub push, Vercel/Keyubu dağıtımı ve dağıtım sonrası üretim testi bu çalışmada yapılmadı.
+4. Kod GitHub'a gönderildi ve KadexAI Keyubu'ya dağıtılıp temel canlı sağlık/rota testlerinden geçti. Ana sitenin `kadeertwo` hesabındaki Vercel üretim projesi bu commit için otomatik dağıtım başlatmadı; mevcut yerel Vercel oturumu farklı hesaba ait olduğu için yanlış projeye manuel dağıtım yapılmadı.
 
 7 Eylül ek grubu: CRM iki görünümde test işareti filtresi (silme/sınıflandırma yapmaz), Türkçe hizmet etiketleri ve kısmi toplu silme hatası; bülten `id/created_at` uyumluluğu; statik teklif formunda paket ön seçimi; hesaplar arası geçmiş önbellek görünürlüğü ve doğru silme sonucu; Radar CSV formül koruması ve ölçülmemiş hız; sessiz izleme listesi hataları ve filtre aktarımı düzeltildi. `edit-section` yaklaşımıyla mevcut bölümler ve tema korundu. Tarayıcı becerisi için gereken MCP olmadığından yerel Playwright CLI kullanıldı; CRM ve Radar ekran görüntüleri incelendi.
 
