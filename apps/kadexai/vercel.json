@@ -142,39 +142,5 @@
         }
       ]
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/reminders?action=check",
-      "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/kadexai/api/materials/sync",
-      "schedule": "0 4 * * *"
-    },
-    {
-      "path": "/kadexai/api/kade-search/collect",
-      "schedule": "17 */2 * * *"
-    },
-    {
-      "path": "/kadexai/api/kade-search/daily-digest",
-      "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/kadexai/api/reports/weekly-site",
-      "schedule": "0 7 * * 1"
-    },
-    {
-      "path": "/kadexai/api/subscriptions/sweep",
-      "schedule": "30 3 * * *"
-    },
-    {
-      "path": "/kadexai/api/notifications/morning-briefing",
-      "schedule": "0 5 * * *"
-    },
-    {
-      "path": "/kadexai/api/notifications/daily-summary",
-      "schedule": "0 20 * * *"
-    }
   ]
 }
