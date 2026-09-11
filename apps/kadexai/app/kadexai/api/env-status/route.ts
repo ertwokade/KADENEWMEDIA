@@ -2,6 +2,9 @@ import { getAuthenticatedUser } from '@/lib/auth/server'
 import { isSettingsOwnerUser } from '@/lib/featureAccess'
 import { getVercelGatewayToken, VERCEL_GATEWAY_STATUS_KEY } from '@/lib/ai/gatewayAuth'
 import { whatsappConfiguration } from '@/lib/notifications/whatsappConfig'
+import { telegramConfiguration } from '@/lib/notifications/telegramConfig'
+import { getAvailableModels } from '@/lib/ai/modelRouter'
+import { isIntegrationEnabled } from '@/lib/ai/runtimeAvailability'
 
 const COMMON_ENV_KEYS = [
   'AI_GATEWAY_API_KEY',
@@ -18,7 +21,7 @@ const COMMON_ENV_KEYS = [
   'YOUTUBE_API_KEY',
   'GOOGLE_OAUTH_CLIENT_ID',
   'GOOGLE_OAUTH_CLIENT_SECRET',
-  'TOKEN_ENCRYPTION_KEY',
+  'KADE_TOKEN_ENCRYPTION_KEY',
   'TIKTOK_COOKIE',
   'INSTAGRAM_SESSION_ID',
   'KADE_FASTAPI_BASE_URL',
@@ -38,9 +41,12 @@ export async function GET(request: Request) {
     COMMON_ENV_KEYS.map((key) => [key, Boolean(process.env[key]?.trim())])
   )
   status[VERCEL_GATEWAY_STATUS_KEY] = Boolean(await getVercelGatewayToken(request))
+  status.AI_AVAILABLE_MODELS = getAvailableModels().length > 1
+  status.YOUTUBE_AVAILABLE = status.YOUTUBE_API_KEY && isIntegrationEnabled('youtube')
   // Değer DEĞİL, yalnızca yapılandırılmış olup olmadığı. Bildirim gitmediğinde
   // sebebini dışarıdan görebilmek için.
   status.WHATSAPP = whatsappConfiguration().configured
+  status.TELEGRAM = telegramConfiguration().configured
 
   return Response.json(status, {
     headers: {

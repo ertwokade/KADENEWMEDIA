@@ -211,7 +211,7 @@ function audioExtraction(mode: 'complete' | 'timeout' | 'play-error') {
     MediaRecorder: class {
       static isTypeSupported() { return true }
       state = 'inactive'
-      ondataavailable = (_event: { data: Blob }) => {}
+      ondataavailable = (_event: { data: Blob }) => { void _event }
       onstop = () => {}
       start() { this.state = 'recording'; this.ondataavailable({ data: new Blob(['audio']) }) }
       stop() { this.state = 'inactive'; this.onstop() }

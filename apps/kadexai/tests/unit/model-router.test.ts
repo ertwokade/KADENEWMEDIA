@@ -112,3 +112,24 @@ test('ekonomik Gateway modeli Vercel kataloğundaki geçerli kimliği kullanır'
   assert.equal(model.gatewayModel, 'alibaba/qwen3.5-flash')
   assert.match(model.label, /Qwen 3\.5 Flash/)
 })
+
+test('yetki testi başarısız sağlayıcılar anahtarları silinmeden gizlenir', () => {
+  const previousDisabled = process.env.KADE_DISABLED_AI_PROVIDERS
+  const previousGroq = process.env.GROQ_API_KEY
+  const previousGemini = process.env.GEMINI_API_KEY
+  process.env.KADE_DISABLED_AI_PROVIDERS = ' groq, openai '
+  process.env.GROQ_API_KEY = 'eski-groq-anahtari'
+  process.env.GEMINI_API_KEY = 'gecerli-gemini-anahtari'
+  try {
+    const models = getAvailableModels()
+    assert.equal(models.some((model) => model.startsWith('groq-')), false)
+    assert.equal(models.includes('gemini-flash-latest'), true)
+  } finally {
+    if (previousDisabled === undefined) delete process.env.KADE_DISABLED_AI_PROVIDERS
+    else process.env.KADE_DISABLED_AI_PROVIDERS = previousDisabled
+    if (previousGroq === undefined) delete process.env.GROQ_API_KEY
+    else process.env.GROQ_API_KEY = previousGroq
+    if (previousGemini === undefined) delete process.env.GEMINI_API_KEY
+    else process.env.GEMINI_API_KEY = previousGemini
+  }
+})

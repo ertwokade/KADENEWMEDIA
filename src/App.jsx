@@ -231,7 +231,7 @@ function App() {
     trackPageviewApi(location.pathname, document.referrer)
 
     // Send page view to Google Analytics 4
-    const gaId = import.meta.env.VITE_GA_ID || 'G-R893K1VE79'
+    const gaId = import.meta.env.VITE_GA_ID || ''
     if (gaId && typeof window.gtag === 'function') {
       window.gtag('config', gaId, {
         page_path: location.pathname,

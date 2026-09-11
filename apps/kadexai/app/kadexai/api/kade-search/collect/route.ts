@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { collectSource, finalizeCollection, isSourceId } from '@/lib/kade-search/collect'
 import { SOURCE_ORDER } from '@/lib/kade-search/collectors'
 import { replaceSourceHealthAlert } from '@/lib/kade-search/store'
-import { sendWhatsAppMessage, whatsappConfiguration } from '@/lib/notifications/whatsapp'
+import { adminNotificationConfiguration, sendAdminNotification } from '@/lib/notifications/adminDelivery'
 import { failure, requireCollectorAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
@@ -84,9 +84,9 @@ export async function GET(req: NextRequest) {
     if (result.found === 0) {
       const message = `${result.label} zamanlanmış toplaması sıfır kayıtla tamamlandı.${result.errors.length ? ` Hatalar: ${result.errors.join(' · ')}` : ''}`
       await replaceSourceHealthAlert(message)
-      if (whatsappConfiguration().configured) {
+      if (adminNotificationConfiguration().configured) {
         try {
-          await sendWhatsAppMessage(`⚠️ KadexAI kaynak uyarısı\n${message}`)
+          await sendAdminNotification(`⚠️ KadexAI kaynak uyarısı\n${message}`)
           bildirim = 'gonderildi'
         } catch {
           bildirim = 'basarisiz'

@@ -1,5 +1,6 @@
 import { AIModel } from '@/types'
 import { hasVercelGatewayRuntime } from '@/lib/ai/gatewayAuth'
+import { isPlatformProviderEnabled } from '@/lib/ai/runtimeAvailability'
 
 export interface ModelRoutingInput {
   prompt: string
@@ -103,10 +104,6 @@ const MODEL_PREFERENCES: Record<ModelTask, AIModel[]> = {
   ],
 }
 
-function configured(name: string) {
-  return Boolean(process.env[name]?.trim())
-}
-
 export function getAvailableModels(): AIModel[] {
   const models: AIModel[] = ['auto']
 
@@ -116,11 +113,11 @@ export function getAvailableModels(): AIModel[] {
   // sırasında denendiği için her isteğe saniyeler ekliyordu.
   // Artık açık bir anahtar şart: kimlik çözülüyor olması kullanılabilir
   // olduğunu KANITLAMAZ.
-  if (hasVercelGatewayRuntime() && configured('AI_GATEWAY_API_KEY')) {
+  if (hasVercelGatewayRuntime() && isPlatformProviderEnabled('vercel')) {
     models.push('vercel-qwen-flash')
   }
 
-  if (configured('GROQ_API_KEY')) {
+  if (isPlatformProviderEnabled('groq')) {
     models.push(
       'groq-llama-70b',
       'groq-llama4',
@@ -131,10 +128,10 @@ export function getAvailableModels(): AIModel[] {
       'groq-compound-mini'
     )
   }
-  if (configured('CEREBRAS_API_KEY')) {
+  if (isPlatformProviderEnabled('cerebras')) {
     models.push('cerebras-glm-4-7', 'cerebras-gpt-oss-120b')
   }
-  if (configured('OPENROUTER_API_KEY')) {
+  if (isPlatformProviderEnabled('openrouter')) {
     models.push(
       'openrouter-free',
       'openrouter-glm-free',
@@ -144,7 +141,7 @@ export function getAvailableModels(): AIModel[] {
       models.push('openrouter-deepseek-r1', 'openrouter-llama4', 'openrouter-qwen3-235b')
     }
   }
-  if (configured('GEMINI_API_KEY')) {
+  if (isPlatformProviderEnabled('google')) {
     // gemini-flash (gemini-2.5-flash), gemini-flash-lite (gemini-2.5-flash-lite)
     // ve gemini (Pro) canlıda 500 "[GoogleGenerativeAI Error]" döndürüyor —
     // bu sürüm adları anahtarımıza açık değil. Listede durdukları için hem
@@ -157,7 +154,7 @@ export function getAvailableModels(): AIModel[] {
       'gemini-3-1-lite'
     )
   }
-  if (configured('MISTRAL_API_KEY')) {
+  if (isPlatformProviderEnabled('mistral')) {
     models.push(
       'mistral-nemo',
       'mistral-small',
@@ -167,8 +164,8 @@ export function getAvailableModels(): AIModel[] {
       'mistral-devstral'
     )
   }
-  if (configured('ANTHROPIC_API_KEY')) models.push('claude')
-  if (configured('OPENAI_API_KEY')) models.push('gpt4o')
+  if (isPlatformProviderEnabled('anthropic')) models.push('claude')
+  if (isPlatformProviderEnabled('openai')) models.push('gpt4o')
 
   return [...new Set(models)]
 }

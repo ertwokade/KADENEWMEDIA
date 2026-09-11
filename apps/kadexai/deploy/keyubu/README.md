@@ -37,6 +37,10 @@ The separately pinned self-hosted Supabase stack lives in `/srv/supabase`.
 Its API gateway and PostgreSQL pooler bind only to WSL localhost; Windows
 Caddy is the only public entry point. Daily encrypted database backups are
 retained for 14 days under `/srv/kade/backups/selfhosted-supabase`.
+Every Sunday the newest archive is decrypted and restored into a disposable
+database in the existing PostgreSQL container. Its application table inventory
+must match production; the temporary database is then force-dropped. Production
+tables are never used as the restore target.
 
 Production endpoints:
 
@@ -50,6 +54,7 @@ Operational checks:
 /srv/kade/bin/healthcheck-supabase
 /srv/kade/bin/compare-supabase-counts
 /srv/kade/bin/backup-selfhosted-supabase
+/srv/kade/bin/verify-selfhosted-supabase-backup
 ```
 
 `migrate-managed-to-selfhosted` automatically performs a full restore on an

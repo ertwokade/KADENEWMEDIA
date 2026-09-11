@@ -678,7 +678,12 @@ async function runGeneration(
     return generateWithByok(enrichedRequest, user.id)
   }
 
-  if (enrichedRequest.model !== 'auto') return generateWithResolvedModel(enrichedRequest, gatewayToken)
+  if (enrichedRequest.model !== 'auto') {
+    if (!getAvailableModels().includes(enrichedRequest.model)) {
+      throw new Error('Seçilen AI sağlayıcısı şu anda kullanılamıyor. Otomatik modeli veya yapılandırılmış başka bir modeli seç.')
+    }
+    return generateWithResolvedModel(enrichedRequest, gatewayToken)
+  }
 
   // Not: gateway modeli burada AYRICA eklenmez. Eskiden ekleniyordu ve
   // getAvailableModels()'in kasıtlı elemesini geçersiz kılıyordu; faturası

@@ -1,11 +1,11 @@
 import 'server-only'
 
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendWhatsAppMessage, whatsappConfiguration } from './whatsapp'
+import { adminNotificationConfiguration, sendAdminNotification } from './adminDelivery'
 import { notificationHourlyBudget } from './whatsappConfig'
 
 /**
- * İşlem akışı ve WhatsApp bildirimi.
+ * İşlem akışı ve yönetim bildirimi.
  *
  * Akış: olay ÖNCE deftere yazılır, sonra anlık bildirim denenir. Böylece
  * gönderim başarısız olsa da (sağlayıcı sınırı, ağ hatası) olay kaybolmaz ve
@@ -84,7 +84,7 @@ export async function notifyOperation(input: OperationInput): Promise<void> {
     if (mutedKinds().has(input.kind)) return
     const budget = hourlyBudget()
     if (budget === 0) return
-    if (!whatsappConfiguration().configured) return
+    if (!adminNotificationConfiguration().configured) return
 
     // Bütçe DENEMEYİ sayar, başarıyı değil.
     //
@@ -105,7 +105,7 @@ export async function notifyOperation(input: OperationInput): Promise<void> {
     if (input.detail) lines.push(input.detail)
     lines.push(new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' }))
 
-    await sendWhatsAppMessage(lines.join('\n'))
+    await sendAdminNotification(lines.join('\n'))
     await admin.from('operation_events').update({ notified_at: new Date().toISOString() }).eq('id', data.id)
   } catch {
     console.error('[notifications] operation_notification_failed')
@@ -118,6 +118,7 @@ export interface DailySummary {
   notified: number
   byKind: Array<{ kind: string; count: number }>
   sent: boolean
+  channels?: string[]
 }
 
 /** Gün sonu özeti: son 24 saatteki tüm işlemler tek mesajda. */
@@ -142,7 +143,7 @@ export async function sendDailyOperationSummary(): Promise<DailySummary> {
     .map(([kind, count]) => ({ kind, count }))
     .sort((a, b) => b.count - a.count)
 
-  if (rows.length === 0 || !whatsappConfiguration().configured) {
+  if (rows.length === 0 || !adminNotificationConfiguration().configured) {
     return { total: rows.length, notified, byKind, sent: false }
   }
 
@@ -156,8 +157,8 @@ export async function sendDailyOperationSummary(): Promise<DailySummary> {
     lines.push('', `${rows.length - notified} işlem için kuyruğa alma onayı yok (ayar, sessize alma, sınır veya gönderim hatası olabilir).`)
   }
 
-  await sendWhatsAppMessage(lines.join('\n'))
-  return { total: rows.length, notified, byKind, sent: true }
+  const delivery = await sendAdminNotification(lines.join('\n'))
+  return { total: rows.length, notified, byKind, sent: true, channels: delivery.channels }
 }
 
 /**
@@ -168,7 +169,7 @@ export async function sendDailyOperationSummary(): Promise<DailySummary> {
  * biriken iş — cevaplanmamış teklifler, bitmek üzere olan abonelikler,
  * onay bekleyen içerik adayları.
  */
-export async function sendMorningOperationBriefing(): Promise<{ sent: boolean; satirlar: string[] }> {
+export async function sendMorningOperationBriefing(): Promise<{ sent: boolean; satirlar: string[]; channels?: string[] }> {
   const admin = createAdminClient()
   const simdi = Date.now()
   const dun = new Date(simdi - 86_400_000).toISOString()
@@ -198,7 +199,7 @@ export async function sendMorningOperationBriefing(): Promise<{ sent: boolean; s
     `🔎 Yeni içerik adayı: ${adaylar.count ?? 0}`,
   ]
 
-  if (!whatsappConfiguration().configured) return { sent: false, satirlar }
-  await sendWhatsAppMessage(satirlar.join('\n'))
-  return { sent: true, satirlar }
+  if (!adminNotificationConfiguration().configured) return { sent: false, satirlar }
+  const delivery = await sendAdminNotification(satirlar.join('\n'))
+  return { sent: true, satirlar, channels: delivery.channels }
 }

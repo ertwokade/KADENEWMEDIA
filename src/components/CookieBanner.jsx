@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import './CookieBanner.css'
 
-const GA_ID = import.meta.env.VITE_GA_ID || 'G-R893K1VE79'
+const GA_ID = import.meta.env.VITE_GA_ID || ''
 
 function loadAnalytics() {
   if (!GA_ID || document.querySelector('script[data-kade-analytics]')) return

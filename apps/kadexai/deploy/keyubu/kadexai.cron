@@ -3,6 +3,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 CRON_TZ=UTC
 
 20 2 * * * root /srv/kade/bin/backup-selfhosted-supabase
+50 2 * * 0 root /srv/kade/bin/verify-selfhosted-supabase-backup
 0 4 * * * root /srv/kade/bin/run-cron-job materials-sync /kadexai/api/materials/sync
 17 */2 * * * root /srv/kade/bin/run-cron-job trend-collect /kadexai/api/kade-search/collect
 0 6 * * * root /srv/kade/bin/run-cron-job daily-digest /kadexai/api/kade-search/daily-digest

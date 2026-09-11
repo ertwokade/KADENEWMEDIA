@@ -4,6 +4,8 @@ import { isAllowedOwnerUser, isSettingsOwnerUser } from '@/lib/featureAccess'
 import { hasAuthenticatedUser } from '@/lib/auth/server'
 import { getVercelGatewayToken } from '@/lib/ai/gatewayAuth'
 import { getCurrentPlan } from '@/lib/entitlement'
+import { getModelConfig } from '@/lib/ai/models'
+import { isIntegrationEnabled } from '@/lib/ai/runtimeAvailability'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,6 +30,11 @@ export async function GET(request: Request) {
   // istek 500 dönüyor). Buradaki kopya eleme kuralını geçersiz kılıyor,
   // seçicide yanıt veremeyen bir model gösteriyordu.
   const availableModels = getAvailableModels()
+  const availableProviders = new Set(
+    availableModels
+      .filter((model) => model !== 'auto')
+      .map((model) => getModelConfig(model).provider)
+  )
   if (configured('NEXT_PUBLIC_SUPABASE_URL') && configured('NEXT_PUBLIC_SUPABASE_ANON_KEY')) {
     try {
       const supabase = await createClient()
@@ -56,24 +63,30 @@ export async function GET(request: Request) {
     }
   }
 
-  const provider =
-    process.env.OPERATIONS_AI_PROVIDER ||
-    (configured('GEMINI_API_KEY')
+  const requestedOperationsProvider = process.env.OPERATIONS_AI_PROVIDER?.trim().toLowerCase()
+  const requestedOperationsProviderAvailable =
+    (requestedOperationsProvider === 'gemini' && availableProviders.has('google')) ||
+    (requestedOperationsProvider === 'openai' && availableProviders.has('openai')) ||
+    (requestedOperationsProvider === 'qwen' && (availableProviders.has('openrouter') || configured('QWEN_API_KEY'))) ||
+    (requestedOperationsProvider === 'vercel' && availableProviders.has('vercel'))
+  const provider = requestedOperationsProviderAvailable
+    ? requestedOperationsProvider
+    : (availableProviders.has('google')
       ? 'gemini'
-      : configured('OPENAI_API_KEY')
+      : availableProviders.has('openai')
         ? 'openai'
-        : configured('OPENROUTER_API_KEY') || configured('QWEN_API_KEY')
+        : availableProviders.has('openrouter') || configured('QWEN_API_KEY')
           ? 'qwen'
-          : aiGateway
+          : availableProviders.has('vercel')
             ? 'vercel'
             : 'none')
-  const geminiImageConfigured = configured('GEMINI_API_KEY')
-  const openaiImageConfigured = configured('OPENAI_API_KEY')
+  const geminiImageConfigured = availableProviders.has('google')
+  const openaiImageConfigured = availableProviders.has('openai')
   const imageConfigured = geminiImageConfigured || openaiImageConfigured
 
   return Response.json({
     provider,
-    assistant: aiGateway || configured('GEMINI_API_KEY') || configured('OPENAI_API_KEY') || configured('OPENROUTER_API_KEY') || configured('QWEN_API_KEY') || configured('GROQ_API_KEY'),
+    assistant: availableModels.length > 1 || configured('QWEN_API_KEY'),
     aiGateway,
     image: imageConfigured,
     imageConfigured,
@@ -89,8 +102,8 @@ export async function GET(request: Request) {
     // Altyazı ve Dublaj tıklanınca 503 alıyordu — arayüz önceden uyarabilsin.
     // Gemini de sesi çözebiliyor; yalnızca Groq'a bakmak, Groq tanımsızken
     // Altyazı ve Dublaj'ı gereksiz yere "yapılandırılmamış" gösteriyordu.
-    transcribe: configured('GROQ_API_KEY') || configured('GEMINI_API_KEY'),
-    youtube: configured('YOUTUBE_API_KEY'),
+    transcribe: availableProviders.has('groq') || availableProviders.has('google'),
+    youtube: configured('YOUTUBE_API_KEY') && isIntegrationEnabled('youtube'),
     operationsSync,
     ownerAccess,
     settingsAccess,

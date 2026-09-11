@@ -1,6 +1,6 @@
 # Entegrasyon incelemesi ve bildirim onarımı
 
-Güncelleme: 6 Eylül 2026. Bu notlar kaynak incelemesini, yerel kod değişikliklerini ve canlı yapılandırma onarımını ayrı tutar.
+Güncelleme: 11 Eylül 2026. Bu notlar kaynak incelemesini, yerel kod değişikliklerini ve canlı yapılandırma onarımını ayrı tutar.
 
 ## AutoSocial
 
@@ -39,7 +39,7 @@ Güncelleme: 6 Eylül 2026. Bu notlar kaynak incelemesini, yerel kod değişikli
 - Mevcut numaraya **tek** test mesajı gönderildi: sağlayıcı HTTP 200 + `Message queued` verdi. Bu telefona teslim/okunma kanıtı değildir.
 - Halka açık sağlık ucu onarım sonrası `status: ok` döndü. Ayarlar release klasörü dışında kaldığından sonraki normal GitHub dağıtımı bunları aynı env_file üzerinden okuyacak.
 
-Yerel ek güvenlik düzeltmeleri (henüz canlıda değil): ağ yanıtı kaybolduğunda mükerrer gönderimi önlemek için otomatik tekrar kaldırıldı; yönlendirme takibi kapatıldı; sağlayıcı gövdesi/anahtarlı URL hata yanıtına taşınmıyor; boş saatlik limit yanlışlıkla bildirimleri kapatmıyor; log yazma ve gönderim başarısızlıkları anahtarsız sabit hata koduyla kaydediliyor. Gün sonu mesajı artık tüm gönderilmeyen olayları yanlışlıkla “saatlik tavan” diye açıklamıyor.
+Ek güvenlik düzeltmeleri: ağ yanıtı kaybolduğunda mükerrer gönderimi önlemek için otomatik tekrar kaldırıldı; yönlendirme takibi kapatıldı; sağlayıcı gövdesi/anahtarlı URL hata yanıtına taşınmıyor; boş saatlik limit yanlışlıkla bildirimleri kapatmıyor; log yazma ve gönderim başarısızlıkları anahtarsız sabit hata koduyla kaydediliyor. Gün sonu mesajı artık tüm gönderilmeyen olayları yanlışlıkla “saatlik tavan” diye açıklamıyor.
 
 ## Telegram değerlendirmesi
 
@@ -47,11 +47,17 @@ Resmî kaynak: https://core.telegram.org/bots/api#sendmessage
 
 Yönetim bildirimleri için Telegram'a doğrudan Bot API ile bağlanan ikinci kanal uygun bir seçenek: yapılandırılmış yanıtlar, mesaj kimliği ve hız sınırında `retry_after` bilgisi var. Bu, hataları izlemeyi kolaylaştırır; kesintisizlik garantisi değildir. CallMeBot'un ücretsiz API belgesi kişisel kullanım kapsamını belirtiyor: https://www.callmebot.com/blog/free-api-whatsapp-messages/
 
-Mevcut WhatsApp çalışır durumda bırakıldı. Telegram botu henüz yazılmadı/oluşturulmadı ve canlıda Telegram token/chat ID yok. Kurulacaksa sahibi belli bir bot, izinli chat ID listesi, sunucuda saklanan token, kuyruk/dedup ve hataları gösteren durum ekranıyla kurulmalı. Genel müşteri verisi veya yönetici komutu tüm Telegram kullanıcılarına açılmamalı.
+Mevcut WhatsApp çalışır durumda bırakıldı. Telegram teslim katmanı sıfırdan eklendi: yalnız sunucu tarafında token kullanıyor, izinli hedef listesini doğruluyor/tekilleştiriyor, hedefleri maskeleyerek raporluyor, belirsiz ağ sonucunda otomatik tekrar yapmıyor, 429 `retry_after` bilgisini güvenli biçimde döndürüyor ve birden fazla hedefte kısmi başarıyı ayırıyor. Operasyon bildirimleri yapılandırılmış WhatsApp ve Telegram kanallarına ortak dağıtılıyor; sahip hesabına kanala göre güvenli test ucu eklendi. Canlıda bot token/chat ID henüz yok, dolayısıyla Telegram teslimi yapılandırılana kadar WhatsApp tek başına çalışmayı sürdürüyor.
+
+## AI, YouTube ve yedek doğrulaması
+
+- 11 Eylül'de üretim konteynerindeki sağlayıcılar salt-okunur kimlik uçlarıyla kontrol edildi. Gemini HTTP 200 verdi. Groq, Cerebras, OpenRouter, Mistral, Anthropic ve OpenAI anahtarları 401/403 yetki hatası verdi; YouTube API anahtarı 403 döndürdü. Değerler yazdırılmadı veya silinmedi.
+- Yetki testi başarısız platform sağlayıcıları ortam allow/deny katmanıyla kullanım dışı bırakıldı. Çalışmayan modeller seçicide görünmüyor ve otomatik yönlendirmede denenmiyor; anahtar yenilendiğinde bayrak kaldırılarak geri açılabilir. YouTube veri bağlantısı da anahtar düzelene kadar kapalı gösteriliyor. Google OAuth istemcisi mevcut, fakat gerçek kanal bağlantısı hesap sahibinin Google onayını gerektiriyor.
+- Şifreli Supabase yedeği günlük çalışıyor. 11 Eylül arşivi ayrı/geçici PostgreSQL veritabanına gerçekten geri yüklendi; üretimle 123 tablo eşleşti ve geçici veritabanı temizlendi. Bu geri-dönüş doğrulaması her pazar cron ile otomatik çalışacak.
 
 ## Doğrulama
 
-- KadexAI: 180 birim testi geçti; TypeScript, değişen dosyaların ESLint kontrolü ve üretim derlemesi başarılı.
+- KadexAI: 258 birim testi geçti; TypeScript ve ESLint başarılı (önceden var olan tek test uyarısı dışında).
 - Yeni tarayıcı regresyonları: 4 geçti (AutoSocial ve Radar, 1440px masaüstü/390px mobil). Bütün veri API'leri mock; video yüklenmediği ve gerçek paylaşım yapılmadığı doğrulandı.
 - Görseller incelendi; mevcut site tema sistemi korundu. `edit-section` yaklaşımı değişiklikleri mevcut İçerik Stüdyosu/Radar bölümlerinde sınırlandırdı.
 - Genel raporların tüm maddeleri henüz bitmedi; güncel liste `SAHA_RAPORLARI_TAKIP.md` içindedir.

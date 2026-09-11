@@ -10,7 +10,7 @@ import {
   formatDailyDigest,
   selectDailyDigestTrends,
 } from '@/lib/kade-search/dailyDigest'
-import { sendWhatsAppMessage, whatsappConfiguration } from '@/lib/notifications/whatsapp'
+import { adminNotificationConfiguration, sendAdminNotification } from '@/lib/notifications/adminDelivery'
 import { failure, requireCollectorAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
@@ -20,10 +20,10 @@ async function deliver(req: NextRequest) {
   const guard = await requireCollectorAccess(req)
   if (guard) return guard
 
-  const whatsApp = whatsappConfiguration()
-  if (!whatsApp.configured) {
+  const notifications = adminNotificationConfiguration()
+  if (!notifications.configured) {
     return NextResponse.json(
-      { error: 'WhatsApp günlük özeti yapılandırılmamış.', missing: whatsApp.missing },
+      { error: 'Yönetim bildirimi yapılandırılmamış.' },
       { status: 503 },
     )
   }
@@ -43,12 +43,12 @@ async function deliver(req: NextRequest) {
     const message = formatDailyDigest(trends, {
       dashboardUrl: `${siteUrl}/kadexai/dashboard/kade-search`,
     })
-    const delivery = await sendWhatsAppMessage(message)
+    const delivery = await sendAdminNotification(message)
     await completeDailyDigest(claim.id, trends.length, startedMs)
-    return NextResponse.json({ sent: true, day: dayKey, items: trends.length, provider: delivery.provider })
+    return NextResponse.json({ sent: true, day: dayKey, items: trends.length, provider: delivery.provider, channels: delivery.channels })
   } catch (e) {
     if (claimId) await releaseDailyDigest(claimId).catch(() => undefined)
-    return failure(e, 'Günlük WhatsApp özeti gönderilemedi.')
+    return failure(e, 'Günlük yönetim özeti gönderilemedi.')
   }
 }
 

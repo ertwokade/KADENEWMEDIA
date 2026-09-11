@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { failure, requireCollectorAccess } from '../kade-search/_guard'
 import { formatOperationsReport, normalizeOperationsReport } from '@/lib/notifications/operationsReport'
-import { sendWhatsAppMessage, whatsappConfiguration } from '@/lib/notifications/whatsapp'
+import { adminNotificationConfiguration, sendAdminNotification } from '@/lib/notifications/adminDelivery'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,10 +9,10 @@ export async function POST(request: Request) {
   const guard = await requireCollectorAccess(request)
   if (guard) return guard
 
-  const whatsApp = whatsappConfiguration()
-  if (!whatsApp.configured) {
+  const notifications = adminNotificationConfiguration()
+  if (!notifications.configured) {
     return NextResponse.json(
-      { error: 'WhatsApp operasyon raporu yapılandırılmamış.', missing: whatsApp.missing },
+      { error: 'Yönetim bildirimi yapılandırılmamış.' },
       { status: 503 },
     )
   }
@@ -22,9 +22,9 @@ export async function POST(request: Request) {
     if (!report.message) {
       return NextResponse.json({ error: 'Raporlanacak işlem bulunamadı.' }, { status: 400 })
     }
-    const delivery = await sendWhatsAppMessage(formatOperationsReport(report))
-    return NextResponse.json({ sent: true, provider: delivery.provider })
+    const delivery = await sendAdminNotification(formatOperationsReport(report))
+    return NextResponse.json({ sent: true, provider: delivery.provider, channels: delivery.channels })
   } catch (error) {
-    return failure(error, 'Operasyon raporu WhatsApp’a gönderilemedi.')
+    return failure(error, 'Operasyon raporu gönderilemedi.')
   }
 }

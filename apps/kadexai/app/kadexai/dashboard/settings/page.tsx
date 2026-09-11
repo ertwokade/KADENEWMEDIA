@@ -143,12 +143,13 @@ const INFRA_DEFS = [
   { id: 'YOUTUBE_API_KEY', label: 'YouTube Data API', use: 'Trend toplama, materyal eşitleme ve yorum okuma' },
   { id: 'GOOGLE_OAUTH_CLIENT_ID', label: 'Google OAuth istemcisi', use: 'YouTube kanalını bağlama ve altyazı yükleme' },
   { id: 'GOOGLE_OAUTH_CLIENT_SECRET', label: 'Google OAuth sırrı', use: 'YouTube kanal bağlantısının sunucu tarafı' },
-  { id: 'TOKEN_ENCRYPTION_KEY', label: 'Bağlantı şifreleme anahtarı', use: 'YouTube yenileme belirtecini güvenli saklama' },
+  { id: 'KADE_TOKEN_ENCRYPTION_KEY', label: 'Bağlantı şifreleme anahtarı', use: 'YouTube yenileme belirtecini güvenli saklama' },
   { id: 'TIKTOK_COOKIE', label: 'TikTok oturumu', use: 'TikTok trend ve materyal toplama' },
   { id: 'INSTAGRAM_SESSION_ID', label: 'Instagram oturumu', use: 'Instagram trend ve materyal toplama' },
   { id: 'KADE_FASTAPI_BASE_URL', label: 'Medya işlem motoru', use: 'Video Fabrikası, klip ve dublaj işlemleri' },
   { id: 'KADE_BACKEND_TOKEN', label: 'Medya motoru erişim belirteci', use: 'FastAPI isteklerinin kimlik doğrulaması' },
   { id: 'WHATSAPP', label: 'WhatsApp bildirimi', use: 'Operasyon raporları ve trend seçkileri' },
+  { id: 'TELEGRAM', label: 'Telegram bildirimi', use: 'İzinli sohbetlere operasyon raporları ve trend seçkileri' },
 ] as const
 
 export default function SettingsPage() {
@@ -176,12 +177,13 @@ export default function SettingsPage() {
     YOUTUBE_API_KEY: false,
     GOOGLE_OAUTH_CLIENT_ID: false,
     GOOGLE_OAUTH_CLIENT_SECRET: false,
-    TOKEN_ENCRYPTION_KEY: false,
+    KADE_TOKEN_ENCRYPTION_KEY: false,
     TIKTOK_COOKIE: false,
     INSTAGRAM_SESSION_ID: false,
     KADE_FASTAPI_BASE_URL: false,
     KADE_BACKEND_TOKEN: false,
     WHATSAPP: false,
+    TELEGRAM: false,
   })
 
   useEffect(() => {

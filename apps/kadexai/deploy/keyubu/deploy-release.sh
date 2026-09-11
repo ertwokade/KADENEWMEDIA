@@ -108,6 +108,15 @@ staging_directory=""
 switch_current "$release_directory"
 deploy_started=1
 
+# Operational helpers live outside the immutable release tree. Refresh them
+# from the exact deployed commit so backup/cron fixes do not stay stale.
+install -m 700 "$release_directory/$compose_relative/deploy-release.sh" /srv/kade/bin/deploy-kadexai-release
+install -m 700 "$release_directory/$compose_relative/run-cron-job.sh" /srv/kade/bin/run-cron-job
+install -m 700 "$release_directory/$compose_relative/backup-selfhosted-supabase.sh" /srv/kade/bin/backup-selfhosted-supabase
+install -m 700 "$release_directory/$compose_relative/verify-selfhosted-supabase-backup.sh" /srv/kade/bin/verify-selfhosted-supabase-backup
+install -m 700 "$release_directory/$compose_relative/healthcheck-supabase.sh" /srv/kade/bin/healthcheck-supabase
+install -m 644 "$release_directory/$compose_relative/kadexai.cron" /etc/cron.d/kadexai
+
 cd "$release_directory/$compose_relative"
 docker compose --env-file "$environment_file" up -d --wait --wait-timeout 240
 curl --fail --silent --show-error \

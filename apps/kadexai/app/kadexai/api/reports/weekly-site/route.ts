@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auditPublicSite, formatWeeklySiteReport, weeklySiteReportKey } from '@/lib/reports/weeklySiteReport'
 import { claimWeeklySiteReport, completeWeeklySiteReport, releaseWeeklySiteReport } from '@/lib/kade-search/store'
-import { sendWhatsAppMessage, whatsappConfiguration } from '@/lib/notifications/whatsapp'
+import { adminNotificationConfiguration, sendAdminNotification } from '@/lib/notifications/adminDelivery'
 import { failure, requireCollectorAccess } from '../../kade-search/_guard'
 
 export const dynamic = 'force-dynamic'
@@ -10,8 +10,8 @@ export const maxDuration = 60
 async function deliver(req: NextRequest) {
   const guard = await requireCollectorAccess(req)
   if (guard) return guard
-  const whatsApp = whatsappConfiguration()
-  if (!whatsApp.configured) return NextResponse.json({ error: 'WhatsApp raporu yapılandırılmamış.', missing: whatsApp.missing }, { status: 503 })
+  const notifications = adminNotificationConfiguration()
+  if (!notifications.configured) return NextResponse.json({ error: 'Yönetim bildirimi yapılandırılmamış.' }, { status: 503 })
 
   const started = Date.now()
   let claimId: string | null = null
@@ -22,9 +22,9 @@ async function deliver(req: NextRequest) {
     if (!claim.claimed) return NextResponse.json({ sent: false, duplicate: true, week: key })
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://kadenewmedia.com'
     const audit = await auditPublicSite(siteUrl)
-    const delivery = await sendWhatsAppMessage(formatWeeklySiteReport(audit, `${siteUrl}/kadexai/dashboard`))
+    const delivery = await sendAdminNotification(formatWeeklySiteReport(audit, `${siteUrl}/kadexai/dashboard`))
     await completeWeeklySiteReport(claim.id, audit.pages.length, started)
-    return NextResponse.json({ sent: true, provider: delivery.provider, audit })
+    return NextResponse.json({ sent: true, provider: delivery.provider, channels: delivery.channels, audit })
   } catch (error) {
     if (claimId) await releaseWeeklySiteReport(claimId).catch(() => undefined)
     return failure(error, 'Haftalık site raporu gönderilemedi.')
