@@ -318,8 +318,9 @@ function deepMerge(base,patch){
 function loadState(){
   try{
     const s=storageGet(STORE_KEY);
-    if(!s)return buildInitial();
+    if(!s)return buildCleanInitial();
     const saved=JSON.parse(s);
+    if(isUntouchedStarterState(saved))return buildCleanInitial();
     const explicitEmptyArrays=new Set(isObj(saved)?Object.keys(saved).filter(k=>Array.isArray(saved[k])&&!saved[k].length):[]);
     let merged=normalizeState(deepMerge(buildInitial(),saved),explicitEmptyArrays);
     // Migrate Orkun references
@@ -343,6 +344,25 @@ function buildInitial(){
   const s=clone(initialState);
   s.promptTemplates=clone(defaultPromptTemplates);
   return s;
+}
+
+function buildCleanInitial(){
+  const s=buildInitial();
+  s.settings={...s.settings,teamName:"Kade Media",monthlyBudget:0,members:["Kadir"]};
+  for(const key of ["references","productions","ideas","inventory","docs","media","videos","brainstorm","promptHistory","analysisHistory","activityLog","selectedTasks","recentPages"])s[key]=[];
+  s.users=[{name:"Kadir",images:0,videos:0,spend:0}];
+  s.totalUsdSpent=0;
+  s.pages=[{id:"pg-start",title:"Başlarken",icon:"K",cover:null,parentId:null,isFavorite:true,inTrash:false,createdAt:Date.now(),updatedAt:Date.now(),blocks:[
+    {id:"b-start-title",type:"heading1",content:"Kade çalışma alanı"},
+    {id:"b-start-text",type:"paragraph",content:"Prodüksiyonlarını, görevlerini ve notlarını buradan yönetebilirsin."},
+  ]}];
+  s.currentPageId="pg-start";
+  return s;
+}
+
+function isUntouchedStarterState(saved){
+  if(!isObj(saved)||saved.settings?.monthlyBudget!==650000||saved.totalUsdSpent!==170)return false;
+  return arr(saved.productions).map(item=>item?.id).sort().join(",")==="p-001,p-002,p-003,p-004,p-005"&&arr(saved.media).length===0&&arr(saved.videos).length===0;
 }
 
 function isObj(v){ return v&&typeof v==="object"&&!Array.isArray(v) }
@@ -493,7 +513,9 @@ function normalizeTemplate(t){
 
 function normalizeAnalysis(a){
   if(!isObj(a))return null;
-  return{id:idOf(a.id,"as"),videoUrl:str(a.videoUrl,""),rawComments:str(a.rawComments,""),ts:num(a.ts,Date.now()),total:num(a.total,0),score:num(a.score,0),themes:arr(a.themes)};
+  const rawComments=str(a.rawComments,""),total=parseComments(rawComments).length;
+  const score=total>0&&typeof a.score==="number"&&Number.isFinite(a.score)&&a.score>=1&&a.score<=10?a.score:null;
+  return{id:idOf(a.id,"as"),videoUrl:str(a.videoUrl,""),rawComments,ts:num(a.ts,Date.now()),total,score,themes:arr(a.themes)};
 }
 
 function normalizeLog(l){
@@ -666,12 +688,18 @@ function showToast(msg,type="success"){
   if(!c)return;
   const t=document.createElement("div");
   t.className=`toast ${type}`;
-  t.innerHTML=`<span>${icons[type]||"✓"}</span><span>${esc(msg)}</span>`;
+  t.setAttribute("role",type==="error"?"alert":"status");
+  t.innerHTML=`<span aria-hidden="true">${icons[type]||"✓"}</span><span>${esc(msg)}</span><button type="button" aria-label="Bildirimi kapat" style="border:0;background:transparent;color:inherit;font-size:20px;cursor:pointer">×</button>`;
   c.appendChild(t);
   t.addEventListener("click",()=>removeToast(t));
   setTimeout(()=>removeToast(t),3500);
 }
-function removeToast(t){ t.classList.add("toast-out"); t.addEventListener("animationend",()=>t.remove(),{once:true}) }
+function removeToast(t){
+  if(t.classList.contains("toast-out"))return;
+  t.classList.add("toast-out");
+  const timeout=setTimeout(()=>t.remove(),400);
+  t.addEventListener("animationend",()=>{clearTimeout(timeout);t.remove()},{once:true});
+}
 
 // ── TEMA ─────────────────────────────────────────────────────────────
 function loadTheme(){ const s=storageGet("kade-theme")||"dark"; document.documentElement.setAttribute("data-theme",s); updateThemeBtn(s) }
@@ -775,16 +803,26 @@ function bindKeyboardShortcuts(){
 // ── GLOBAL AKSİYONLAR ────────────────────────────────────────────────
 function bindGlobalActions(){
   document.getElementById("resetBtn").addEventListener("click",doReset);
+  document.getElementById("clearStarterData")?.addEventListener("click",clearStarterData);
   document.getElementById("printBtn").addEventListener("click",()=>window.print());
   document.getElementById("undoBtn").addEventListener("click",undoLast);
   document.getElementById("assistantForm").addEventListener("submit",e=>{ e.preventDefault(); answerAssistant(document.getElementById("assistantInput").value) });
 }
 
 function doReset(){
-  if(!confirm("Demo verisi yenilensin mi?"))return;
-  snapshotUndo(); state=buildInitial(); activeFilter="all";
+  if(!confirm("Çalışma alanındaki yerel veriler silinsin mi?"))return;
+  snapshotUndo(); state=buildCleanInitial(); activeFilter="all";
   saveState(); renderAll(); runCommentAnalysis(); syncFilterChips();
-  showToast("Demo verisi yüklendi","info");
+  showToast("Çalışma alanı sıfırlandı","info");
+}
+
+function clearStarterData(){
+  if(!confirm("Örnek prodüksiyon, görev, bütçe ve envanter kayıtları kaldırılsın mı?"))return;
+  snapshotUndo();
+  state.productions=[];state.ideas=[];state.inventory=[];state.docs=[];state.media=[];state.videos=[];state.brainstorm=[];state.activityLog=[];state.totalUsdSpent=0;
+  state.settings.monthlyBudget=0;
+  state.users=state.settings.members.map(name=>({name,images:0,videos:0,spend:0}));
+  saveState();renderAll();showToast("Boş çalışma alanı hazır","success");
 }
 
 // ── YEDEK & GERİ YÜKLEME ─────────────────────────────────────────────
@@ -833,19 +871,22 @@ function donutSvg(pct,color){
 
 // ── DASHBOARD ────────────────────────────────────────────────────────
 function renderDashboard(){
-  const prods=filteredProductions(),spent=totalSpent(prods),active=prods.filter(p=>!["published","cancelled"].includes(p.stage)).length,open=openTasks().length,pct=Math.min(100,Math.round((spent/state.settings.monthlyBudget)*100));
+  const prods=filteredProductions(),spent=totalSpent(prods),active=prods.filter(p=>!["published","cancelled"].includes(p.stage)).length,open=openTasks().length;
+  const hasBudget=Number(state.settings.monthlyBudget)>0,pct=hasBudget?Math.min(100,Math.round((spent/state.settings.monthlyBudget)*100)):0;
+  const starterNotice=document.getElementById("starterNotice");
+  if(starterNotice)starterNotice.style.display=state.productions.some(p=>p.id==="p-001")?"flex":"none";
   document.getElementById("dashKpis").innerHTML=[
-    kpi("Aylık Bütçe",fmt.try.format(state.settings.monthlyBudget),`${pct}% kullanıldı`,"teal","wallet"),
-    kpi("Harcanan",fmt.try.format(spent),`${fmt.try.format(Math.max(state.settings.monthlyBudget-spent,0))} kaldı`,"gold","trending-up"),
+    kpi("Aylık Bütçe",hasBudget?fmt.try.format(state.settings.monthlyBudget):"Tanımlı değil",hasBudget?`${pct}% kullanıldı`:"Ayarlardan bütçe gir","teal","wallet"),
+    kpi("Harcanan",fmt.try.format(spent),hasBudget?`${fmt.try.format(Math.max(state.settings.monthlyBudget-spent,0))} kaldı`:"Bütçe ile karşılaştırılamıyor","gold","trending-up"),
     kpi("Aktif Üretim",active,`${state.ideas.length} fikir havuzda`,"indigo","clapperboard"),
     kpi("Açık Görev",open,`${state.inventory.length} envanter`,"coral","list-checks"),
   ].join("");
   renderBudgetOverview(prods); renderUpcomingTasks(); renderRecentMedia(); renderActivityFeed(); renderTeamWorkload();
-  answerAssistant(document.getElementById("assistantInput").value);
 }
 
 function renderBudgetOverview(prods){
-  const spent=totalSpent(prods),pct=Math.min(100,Math.round((spent/state.settings.monthlyBudget)*100));
+  const spent=totalSpent(prods),hasBudget=Number(state.settings.monthlyBudget)>0,pct=hasBudget?Math.min(100,Math.round((spent/state.settings.monthlyBudget)*100)):0;
+  if(!hasBudget){document.getElementById("budgetOverview").innerHTML=`<div class="empty-state">Aylık bütçe tanımlanmadı. Ayarlardan bütçe girildiğinde kullanım oranı burada görünür.</div>`;return}
   let warning="";
   if(pct>=100)warning=`<div class="budget-warning danger">🔴 Bütçe aşımı! ${fmt.try.format(spent-state.settings.monthlyBudget)} fazla harcandı.</div>`;
   else if(pct>=90)warning=`<div class="budget-warning caution">⚠️ Dikkat: Bütçenin %${pct}'i kullanıldı.</div>`;
@@ -861,9 +902,8 @@ function renderUpcomingTasks(){
 }
 
 function renderRecentMedia(){
-  const fallback=[{title:"1 yildizli pizza",model:"Nano Banana Pro",cost:0.72,src:makeThumb("pizza",2)},{title:"Oyuncak makine",model:"GPT Image 2",cost:0.88,src:makeThumb("oyuncak",3)},{title:"Katakomb kesfi",model:"Nano Banana 2",cost:0.56,src:makeThumb("paris",4)}];
-  const items=state.media.length?state.media.slice(-3).reverse():fallback;
-  document.getElementById("recentMedia").innerHTML=items.map(m=>`<div class="media-tile"><img src="${esc(m.src)}" alt="${esc(m.title)}" loading="lazy"/><div><strong style="font-size:13px">${esc(m.title)}</strong><div class="row-meta">${fmt.usd.format(m.cost)} · ${esc(m.model)}</div></div></div>`).join("");
+  const items=state.media.slice(-3).reverse();
+  document.getElementById("recentMedia").innerHTML=items.length?items.map(m=>`<div class="media-tile"><img src="${esc(m.src)}" alt="${esc(m.title)}" loading="lazy"/><div><strong style="font-size:13px">${esc(m.title)}</strong><div class="row-meta">${fmt.usd.format(m.cost)} · ${esc(m.model)}</div></div></div>`).join(""):`<div class="empty-state">Henüz üretilmiş görsel yok.</div>`;
 }
 
 function renderActivityFeed(){
@@ -1131,21 +1171,29 @@ async function fetchYoutubeComments(){
 function setSampleComments(){ const el=document.getElementById("commentsInput"); if(el)el.value=sampleComments.map(c=>`[${c.likes}] ${c.text}`).join("\n") }
 function runCommentAnalysis(){ const raw=document.getElementById("commentsInput").value; const result=analyzeComments(raw); renderCommentResult(result); renderVideoScore(result); renderAnalysisHistory(); refreshIcons() }
 
+function parseComments(raw){
+  return String(raw||"").split(/\n+/).map(line=>{
+    const match=line.match(/^\s*\[(\d+)\]\s*(.*)$/);
+    return{text:match?match[2].trim():line.trim(),likes:match?Number(match[1]):null};
+  }).filter(comment=>comment.text.length>0);
+}
+
 function analyzeComments(raw){
-  const comments=raw.split(/\n+/).map((line,i)=>{ const m=line.match(/^\s*\[(\d+)\]\s*(.+)$/); return{text:m?m[2].trim():line.trim(),likes:m?Number(m[1]):Math.max(1,80-i*4)} }).filter(c=>c.text.length>2);
-  const total=Math.max(comments.length,1);
-  const themes=themeDefinitions.map(td=>{ const hits=comments.filter(c=>containsAny(c.text,td.keywords)); return{...td,count:hits.length,percent:Math.round((hits.length/total)*100),examples:hits.slice(0,2)} }).filter(t=>t.count>0).sort((a,b)=>b.count-a.count);
+  const comments=parseComments(raw);
+  const total=comments.length;
+  const themes=themeDefinitions.map(td=>{ const hits=comments.filter(c=>containsAny(c.text,td.keywords)); return{...td,count:hits.length,percent:total?Math.round((hits.length/total)*100):0,examples:hits.slice(0,2)} }).filter(t=>t.count>0).sort((a,b)=>b.count-a.count);
   const sentiment=comments.reduce((acc,c)=>{ const t=c.text.toLocaleLowerCase("tr-TR"); if(containsAny(t,positiveWords))acc.positive++; if(containsAny(t,negativeWords))acc.negative++; return acc },{positive:0,negative:0});
   const timestamps=comments.map(c=>({...c,stamps:[...c.text.matchAll(/\b\d{1,2}[:.]?\d{2}\b/g)].map(m=>m[0])})).filter(c=>c.stamps.length);
   const score=calcVideoScore(sentiment,total);
   return{total,themes,sentiment,timestamps,score,words:buildWordCloud(comments.map(c=>c.text).join(" ")),topComments:[...comments].sort((a,b)=>b.likes-a.likes).slice(0,8)};
 }
 
-function calcVideoScore(sentiment,total){ const posRate=sentiment.positive/Math.max(total,1),negRate=sentiment.negative/Math.max(total,1),raw=5+posRate*5-negRate*4; return Math.min(10,Math.max(1,parseFloat(raw.toFixed(1)))) }
+function calcVideoScore(sentiment,total){ if(!total||!(sentiment.positive+sentiment.negative))return null;const posRate=sentiment.positive/total,negRate=sentiment.negative/total,raw=5+posRate*5-negRate*4; return Math.min(10,Math.max(1,parseFloat(raw.toFixed(1)))) }
 
 function renderVideoScore(result){
   const el=document.getElementById("videoScore");if(!el)return;
-  const score=result.score,color=score>=8?"teal":score>=6?"gold":"coral",label=score>=8?"Harika içerik! İzleyiciler çok memnun.":score>=6?"İyi içerik. Küçük iyileştirmeler etkili olur.":"Yoğun eleştiri var. Önerileri incele.";
+  if(result.score===null){el.innerHTML=`<div class="empty-state">${result.total?"Yorumlarda puan hesaplamaya yetecek duygu anahtar kelimesi bulunamadı. Bu, olumsuz yorum demek değildir.":"Puan ve duygu yorumu için en az bir yorum ekle."}</div>`;return}
+  const score=result.score,color=score>=8?"teal":score>=6?"gold":"coral",label="Anahtar kelime eşleşmelerine dayalı yaklaşık duygu puanı; içerik kalitesi veya tüm izleyicilerin görüşü değildir.";
   el.innerHTML=`<div style="display:flex;align-items:center;gap:20px;padding:8px 0"><div style="text-align:center"><div style="font-size:52px;font-weight:900;color:var(--${color});line-height:1">${score}</div><div style="font-size:12px;color:var(--ink3);margin-top:4px">/ 10 puan</div></div><div style="flex:1"><div class="progress" style="margin-bottom:10px"><span style="width:${score*10}%;background:var(--${color})"></span></div><div style="font-size:13px;line-height:1.6;color:var(--ink2)">${label}</div><div style="display:flex;gap:10px;margin-top:10px"><span class="pill teal">+${result.sentiment.positive} pozitif</span><span class="pill coral">-${result.sentiment.negative} negatif</span><span class="pill indigo">${result.total} yorum</span></div></div></div>`;
 }
 
@@ -1157,9 +1205,9 @@ function renderCommentResult(result){
   wordCloud.innerHTML=result.words.map(w=>`<button type="button" class="word ${w.sentiment}${activeWordFilter===w.word?" selected":""}" style="font-size:${w.size}px" data-word="${esc(w.word)}">${esc(w.word)}</button>`).join(" ");
   wordCloud.querySelectorAll("[data-word]").forEach(el=>el.addEventListener("click",()=>filterByWord(el.dataset.word||"")));
   const raw=document.getElementById("commentsInput").value;
-  const allComments=raw.split(/\n+/).map(line=>{ const m=line.match(/^\s*\[(\d+)\]\s*(.+)$/); return{text:m?m[2].trim():line.trim(),likes:m?Number(m[1]):0} }).filter(c=>c.text.length>2);
+  const allComments=parseComments(raw);
   const filtered=activeWordFilter?allComments.filter(c=>c.text.toLocaleLowerCase("tr-TR").includes(activeWordFilter)):[...allComments].sort((a,b)=>b.likes-a.likes).slice(0,8);
-  document.getElementById("topComments").innerHTML=`<table class="data-table"><thead><tr><th>👍</th><th>Yorum</th></tr></thead><tbody>${filtered.slice(0,8).map(c=>`<tr><td><span class="pill teal">${c.likes}</span></td><td style="font-size:13px">${esc(c.text)}</td></tr>`).join("")}</tbody></table>`;
+  document.getElementById("topComments").innerHTML=`<table class="data-table"><thead><tr><th>👍</th><th>Yorum</th></tr></thead><tbody>${filtered.slice(0,8).map(c=>`<tr><td><span class="pill teal">${c.likes===null?"—":c.likes}</span></td><td style="font-size:13px">${esc(c.text)}</td></tr>`).join("")}</tbody></table>`;
   document.getElementById("timestampComments").innerHTML=result.timestamps.length?result.timestamps.map(c=>`<div class="ts-row"><div>${c.stamps.map(s=>`<span class="ts-badge">${esc(s)}</span>`).join(" ")}</div><div class="ts-text">${esc(c.text)}</div></div>`).join(""):`<div class="empty-state">Zaman damgali yorum yok.</div>`;
 }
 
@@ -1174,7 +1222,7 @@ function buildWordCloud(text){
 
 function saveAnalysisSession(){
   const url=document.getElementById("videoUrl").value,raw=document.getElementById("commentsInput").value;
-  if(!raw.trim()){showToast("Önce yorum gir","error");return}
+  if(!parseComments(raw).length){showToast("Önce yorum gir","error");return}
   const result=analyzeComments(raw);
   snapshotUndo();
   state.analysisHistory=[{id:uid("as"),videoUrl:url,rawComments:raw,ts:Date.now(),total:result.total,score:result.score,themes:result.themes.slice(0,3)},...state.analysisHistory].slice(0,MAX_HISTORY);
@@ -1183,7 +1231,7 @@ function saveAnalysisSession(){
 
 function renderAnalysisHistory(){
   const el=document.getElementById("analysisHistory");if(!el)return;
-  el.innerHTML=state.analysisHistory.length?`<div style="display:grid;gap:10px">${state.analysisHistory.map(s=>`<div class="analysis-history-item"><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(s.videoUrl||"Demo video")}</div><div class="row-meta">${fmt.dt(s.ts)} · ${s.total} yorum · <span class="pill teal">${s.score}/10</span></div></div><button type="button" class="ghost-btn" style="font-size:12px" onclick="loadAnalysisSession('${s.id}')">Yükle</button><button type="button" onclick="deleteAnalysisSession('${s.id}')" style="border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:18px;padding:0 4px">×</button></div>`).join("")}</div>`:`<div class="empty-state">Analiz kaydet butonuyla gecmise ekle.</div>`;
+  el.innerHTML=state.analysisHistory.length?`<div style="display:grid;gap:10px">${state.analysisHistory.map(s=>`<div class="analysis-history-item"><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(s.videoUrl||"Demo video")}</div><div class="row-meta">${fmt.dt(s.ts)} · ${s.total} yorum · <span class="pill teal">${s.score===null?"Puan hesaplanmadı":s.score+"/10"}</span></div></div><button type="button" class="ghost-btn" style="font-size:12px" onclick="loadAnalysisSession('${s.id}')">Yükle</button><button type="button" onclick="deleteAnalysisSession('${s.id}')" style="border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:18px;padding:0 4px">×</button></div>`).join("")}</div>`:`<div class="empty-state">Analizi Kaydet düğmesiyle geçmişe ekle.</div>`;
 }
 
 function loadAnalysisSession(id){
@@ -1196,7 +1244,7 @@ function deleteAnalysisSession(id){ snapshotUndo(); state.analysisHistory=state.
 
 function exportCommentsCsv(){
   const raw=document.getElementById("commentsInput").value,result=analyzeComments(raw);
-  const rows=[["Video",document.getElementById("videoUrl").value,""],["Skor",result.score+"/10",""],["","",""],["Tip","Icerik","Deger"],...result.themes.map(t=>["Tema",t.name,`${t.percent}%`]),["","",""],["Sentiment","Pozitif",result.sentiment.positive],["Sentiment","Negatif",result.sentiment.negative],["","",""],...result.topComments.map(c=>["Yorum",c.text,c.likes]),...result.timestamps.map(c=>["Zaman",c.stamps.join(" "),c.text])];
+  const rows=[["Video",document.getElementById("videoUrl").value,""],["Skor",result.score===null?"Puan hesaplanmadı":result.score+"/10",""],["","",""],["Tip","İçerik","Değer"],...result.themes.map(t=>["Tema",t.name,`${t.percent}%`]),["","",""],["Sentiment","Pozitif",result.sentiment.positive],["Sentiment","Negatif",result.sentiment.negative],["","",""],...result.topComments.map(c=>["Yorum",c.text,c.likes??""]),...result.timestamps.map(c=>["Zaman",c.stamps.join(" "),c.text])];
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
   const url=URL.createObjectURL(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"}));
   const a=Object.assign(document.createElement("a"),{href:url,download:`sentscan-${Date.now()}.csv`});
@@ -1407,8 +1455,8 @@ function bindBanana(){
   document.getElementById("enhanceImagePrompt").addEventListener("click",()=>{ const el=document.getElementById("imagePrompt");el.value=enhanceImagePrompt(el.value);showToast("Prompt iyilestirildi","info") });
   document.getElementById("enhanceVideoPrompt").addEventListener("click",()=>{ const el=document.getElementById("videoPrompt");el.value=enhanceVideoPrompt(el.value);showToast("Prompt iyilestirildi","info") });
   document.getElementById("saveTemplate").addEventListener("click",()=>{ const prompt=document.getElementById("imagePrompt").value.trim();if(!prompt){showToast("Önce bir prompt yaz","error");return}snapshotUndo();const name=prompt.slice(0,30)+(prompt.length>30?"…":"");if(!state.promptTemplates)state.promptTemplates=[];state.promptTemplates.push({id:uid("tpl"),name,prompt});saveState();renderPromptTemplates();showToast("Sablon kaydedildi","success") });
-  document.getElementById("imageForm").addEventListener("submit",async e=>{ e.preventDefault();const model=imageModels.find(m=>m.id===document.getElementById("imageModel").value)||imageModels[0],count=Number(document.getElementById("imageCount").value||1),prompt=document.getElementById("imagePrompt").value,cost=model.cost*count;if(!prompt.trim()){showToast("Önce prompt yaz","error");return}snapshotUndo();const srcs=await generateImageSrcs(prompt,count,state.media.length);for(let i=0;i<count;i++)state.media.push({id:uid("img"),title:`Görsel ${state.media.length+1}`,prompt,model:API.features.image?model.name:model.name+" (demo)",cost:model.cost,src:srcs[i]});state.media=state.media.slice(-24);state.users[0].images+=count;state.users[0].spend+=cost;state.totalUsdSpent=(state.totalUsdSpent||0)+cost;if(!state.promptHistory)state.promptHistory=[];state.promptHistory=[prompt,...state.promptHistory.filter(p=>p!==prompt)].slice(0,8);saveState();renderBanana();renderRecentMedia();showToast(`${count} görsel ${API.features.image?"üretildi":"(demo) üretildi"} (${fmt.usd.format(cost)})`,"success");logActivity(`Banana: ${count} görsel üretildi`,"success") });
-  document.getElementById("videoForm").addEventListener("submit",e=>{ e.preventDefault();const model=videoModels.find(m=>m.id===document.getElementById("videoModel").value)||videoModels[0],dur=Number(document.getElementById("videoDuration").value||10),cost=model.base*(dur/10);snapshotUndo();state.videos.push({id:uid("vid"),title:`Video ${state.videos.length+1}`,prompt:document.getElementById("videoPrompt").value,model:model.name,cost,dur});state.videos=state.videos.slice(-12);state.users[0].videos++;state.totalUsdSpent=(state.totalUsdSpent||0)+cost;saveState();renderBanana();showToast(`Video üretildi (${fmt.usd.format(cost)})`,"success") });
+  document.getElementById("imageForm").addEventListener("submit",async e=>{ e.preventDefault();if(!API.features.image){showToast("Görsel sağlayıcısı bağlı değil; örnek kayıt oluşturulmadı.","error");return}const model=imageModels.find(m=>m.id===document.getElementById("imageModel").value)||imageModels[0],count=Number(document.getElementById("imageCount").value||1),prompt=document.getElementById("imagePrompt").value,cost=model.cost*count;if(!prompt.trim()){showToast("Önce prompt yaz","error");return}snapshotUndo();const srcs=await generateImageSrcs(prompt,count,state.media.length);for(let i=0;i<count;i++)state.media.push({id:uid("img"),title:`Görsel ${state.media.length+1}`,prompt,model:model.name,cost:model.cost,src:srcs[i]});state.media=state.media.slice(-24);state.users[0].images+=count;state.users[0].spend+=cost;state.totalUsdSpent=(state.totalUsdSpent||0)+cost;if(!state.promptHistory)state.promptHistory=[];state.promptHistory=[prompt,...state.promptHistory.filter(p=>p!==prompt)].slice(0,8);saveState();renderBanana();renderRecentMedia();showToast(`${count} görsel üretildi (${fmt.usd.format(cost)})`,"success");logActivity(`Banana: ${count} görsel üretildi`,"success") });
+  document.getElementById("videoForm").addEventListener("submit",e=>{ e.preventDefault();if(!API.features.video){showToast("Video sağlayıcısı bağlı değil; örnek kayıt oluşturulmadı.","error");return}showToast("Video üretimi bu çalışma alanında henüz etkin değil.","error") });
   document.getElementById("continueVideo").addEventListener("click",()=>{ const el=document.getElementById("videoPrompt");el.value=`[DEVAM] ${el.value}`;el.focus() });
   document.getElementById("referenceForm").addEventListener("submit",e=>{ e.preventDefault();const tag=document.getElementById("referenceTag").value.trim();if(!tag)return;state.references.push({id:uid("ref"),tag:tag.startsWith("@")?tag:`@${tag}`,label:tag.replace("@",""),tone:"teal"});document.getElementById("referenceTag").value="";saveState();renderBanana();refreshIcons() });
 }
@@ -1430,8 +1478,8 @@ function renderBrainstorm(){
   list.innerHTML=state.brainstorm.map((item,idx)=>`<button type="button" style="width:100%;padding:10px 14px;border:0;border-bottom:${idx<state.brainstorm.length-1?`1px solid var(--border)`:"none"};border-radius:${idx===0?`var(--radius) var(--radius) 0 0`:idx===state.brainstorm.length-1?`0 0 var(--radius) var(--radius)`:`0`};background:transparent;text-align:left;color:var(--ink2);font-size:13px;cursor:pointer;transition:var(--transition);display:flex;align-items:flex-start;gap:8px" onmouseover="this.style.background='var(--surface-hover)'" onmouseout="this.style.background='transparent'" onclick="document.getElementById('imagePrompt').value=this.dataset.prompt;showToast('Prompt yüklendi','info')" data-prompt="${esc(item.prompt)}"><span style="color:var(--teal);flex:0 0 auto;font-weight:700">→</span><span>${esc(item.prompt.slice(0,120))}${item.prompt.length>120?"…":""}</span></button>`).join("")
 }
 function renderPromptHistory(){ const el=document.getElementById("promptHistory");if(!el)return;const history=state.promptHistory||[];el.innerHTML=history.length?history.map((p,i)=>`<div class="prompt-history-item"><span class="prompt-history-text">${esc(p.slice(0,100))}${p.length>100?"…":""}</span><button class="prompt-history-use" onclick="document.getElementById('imagePrompt').value=(state.promptHistory||[])[${i}];showToast('Prompt yüklendi','info')">Kullan</button></div>`).join(""):`<div class="empty-state">Görsel üretince burada görünür.</div>` }
-function renderImageGallery(){ const fallback=[{title:"1 yildizli pizza",model:"Nano Banana Pro",cost:0.72,src:makeThumb("pizza",5)},{title:"Sacli sandvic",model:"GPT Image 2",cost:0.88,src:makeThumb("sandvic",6)},{title:"Neon tabela",model:"Nano Banana 2",cost:0.56,src:makeThumb("neon",7)}];const items=state.media.length?state.media.slice(-9).reverse():fallback;document.getElementById("imageGallery").innerHTML=items.map(m=>`<div class="image-tile"><img src="${esc(m.src)}" alt="${esc(m.title)}" loading="lazy"/><div><div style="font-size:12px;font-weight:600">${esc(m.title)}</div><div class="row-meta" style="font-size:11px">${fmt.usd.format(m.cost)} · ${esc(m.model)}</div></div></div>`).join("") }
-function renderVideoHistory(){ const fallback=[{title:"Oyuncak makine",model:"Seadance 2.0",cost:3.0,dur:10},{title:"Padisah sahne",model:"Seadance 2.0",cost:1.5,dur:5},{title:"Dovas devam",model:"Veo Style",cost:2.4,dur:10}];const items=state.videos.length?state.videos.slice(-6).reverse():fallback;document.getElementById("videoHistory").innerHTML=items.map(v=>`<div class="video-tile"><div class="video-thumb"><i data-lucide="play-circle"></i></div><div><div style="font-size:13px;font-weight:600">${esc(v.title)}</div><div class="row-meta" style="font-size:11px">${fmt.usd.format(v.cost)} · ${esc(v.model)} · ${v.dur}s</div></div></div>`).join("") }
+function renderImageGallery(){ const items=state.media.slice(-9).reverse();document.getElementById("imageGallery").innerHTML=items.length?items.map(m=>`<div class="image-tile"><img src="${esc(m.src)}" alt="${esc(m.title)}" loading="lazy"/><div><div style="font-size:12px;font-weight:600">${esc(m.title)}</div><div class="row-meta" style="font-size:11px">${fmt.usd.format(m.cost)} · ${esc(m.model)}</div></div></div>`).join(""):`<div class="empty-state">Henüz gerçek görsel üretimi yok.</div>` }
+function renderVideoHistory(){ const items=state.videos.slice(-6).reverse();document.getElementById("videoHistory").innerHTML=items.length?items.map(v=>`<div class="video-tile"><div class="video-thumb"><i data-lucide="play-circle"></i></div><div><div style="font-size:13px;font-weight:600">${esc(v.title)}</div><div class="row-meta" style="font-size:11px">${fmt.usd.format(v.cost)} · ${esc(v.model)} · ${v.dur}s</div></div></div>`).join(""):`<div class="empty-state">Henüz gerçek video üretimi yok.</div>` }
 const _ytRefs=[
   {title:"En Düşük Puanlı Restoranlar EP.1",date:"2025-11-10",views:2400000},
   {title:"En Düşük Puanlı Restoranlar EP.2",date:"2025-12-22",views:1800000},

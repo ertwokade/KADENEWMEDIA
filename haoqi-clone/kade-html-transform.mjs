@@ -73,6 +73,9 @@ const COPY = [
 /* Bundle içi metinler: footer geç mount olduğu için kade-brand.js'in DOM
    düzeltmesi oraya yetişmiyordu; kaynağında düzeltmek daha güvenilir. */
 export const SCRIPT_COPY = [
+  // Snapshot's native theme provider updates its class on system/manual changes.
+  // Keep the shared CSS attribute and browser color scheme in sync as well.
+  ['i.classList.add(e)', 'i.classList.add(e),i.setAttribute("data-theme",e),i.style.colorScheme=e'],
   ['HAOQI©2026', 'Kade New Media © 2026'],
   /* Alt-sol HUD etiketi şablon içinde üretiliyor: `Haoqi (c) ${yıl}` */
   ['`Haoqi (c) ${', '`Kade New Media (c) ${'],
@@ -126,7 +129,7 @@ export function transformScript(code) {
   return code
 }
 
-const BOOTSTRAP = `<script data-kade-bootstrap>(function(){try{var root=document.documentElement;var migration='kade-light-default-2026-08-17';if(localStorage.getItem(migration)!=='1'){localStorage.setItem('theme','light');localStorage.setItem(migration,'1')}var locale=localStorage.getItem('kade-locale')==='en'?'en':'tr';root.setAttribute('data-locale',locale);root.lang=locale;localStorage.setItem('sound','off');var nativePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this instanceof HTMLAudioElement){this.pause();return Promise.resolve()}return nativePlay.apply(this,arguments)}}catch(error){}})();</script>`
+const BOOTSTRAP = `<script data-kade-bootstrap>(function(){var root=document.documentElement;var mode='system';var locale='tr';try{mode=localStorage.getItem('theme')||localStorage.getItem('kade-theme-mode')||localStorage.getItem('kade-mode')||'system';locale=localStorage.getItem('kade-locale')==='en'?'en':'tr'}catch(error){}var theme=mode==='dark'||mode==='light'?mode:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');root.classList.toggle('dark',theme==='dark');root.setAttribute('data-theme',theme);root.style.colorScheme=theme;root.setAttribute('data-locale',locale);root.lang=locale;try{localStorage.setItem('sound','off')}catch(error){}var nativePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this instanceof HTMLAudioElement){this.pause();return Promise.resolve()}return nativePlay.apply(this,arguments)}})();</script>`
 
 /* The real page finishes behind three lightweight CSS panels, then enters as a
    single composed frame. The panels reuse the site's grid and fold away in 3D;

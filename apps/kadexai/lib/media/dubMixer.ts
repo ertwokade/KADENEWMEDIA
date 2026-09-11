@@ -49,8 +49,11 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
 
 export async function assembleDubTrack(segments: DubSegment[], options: MixOptions): Promise<MixResult> {
   const { duration, originalVolume = 0, originalFile = null, maxSpeedUp = 1.6, onProgress } = options
-  const usable = segments.filter((s) => s.audio)
-  if (!usable.length) throw new Error('Seslendirilmiş parça yok.')
+  if (!segments.length) throw new Error('Seslendirilmiş parça yok.')
+  if (segments.some((segment) => !segment.audio)) {
+    throw new Error('Dublaj tamamlanmadı: eksik ses parçaları var. Lütfen yeniden dene.')
+  }
+  const usable = [...segments].sort((a, b) => a.start - b.start)
 
   const totalDuration = Math.max(duration, ...usable.map((s) => s.end)) + 1
   const decodeCtx = new AudioContext()
@@ -62,7 +65,7 @@ export async function assembleDubTrack(segments: DubSegment[], options: MixOptio
         const buffer = await decodeCtx.decodeAudioData(base64ToArrayBuffer(segment.audio))
         decoded.push({ segment, buffer })
       } catch {
-        // Tek parca cozulemezse dublajin tamami durmaz; o aralik sessiz kalir.
+        throw new Error(`Dublaj tamamlanmadı: ${segment.index} numaralı bölümün sesi çözülemedi. Eksik sesli dosya oluşturulmadı; lütfen yeniden dene.`)
       }
       onProgress?.(i + 1, usable.length)
     }

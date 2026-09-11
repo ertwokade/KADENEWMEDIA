@@ -11,25 +11,10 @@ import { recordAiUsage, getUserUsageSummary } from '@/lib/usage/ledger'
 import { notifyOperation } from '@/lib/notifications/operationFeed'
 import { getToolById } from '@/lib/tools/registry'
 import { isTokenQuotaEnforced, FREE_TIER, type LimitTier } from '@/lib/payments/limits'
+import { normalizeGeneratedHashtags } from '@/lib/ai/hashtags'
 
 function hasEnv(name: string) {
   return Boolean(process.env[name]?.trim())
-}
-
-function normalizeGeneratedHashtags(content: string) {
-  return content.replace(/(^|[\s"'[(])#([\p{L}\p{N}_]+)/gu, (_match, prefix: string, tag: string) => {
-    const asciiTag = tag
-      .replace(/[ıİ]/g, 'i')
-      .replace(/[şŞ]/g, 's')
-      .replace(/[ğĞ]/g, 'g')
-      .replace(/[üÜ]/g, 'u')
-      .replace(/[öÖ]/g, 'o')
-      .replace(/[çÇ]/g, 'c')
-      .normalize('NFKD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-    return `${prefix}#${asciiTag}`
-  })
 }
 
 function fallbackModel(): GenerateRequest['model'] {

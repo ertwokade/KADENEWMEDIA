@@ -151,10 +151,12 @@ export function detectFormats(item: RawTrendItem): string[] {
 export function detectLanguage(item: RawTrendItem): string {
   // Baslik aciklamadan daha guvenilir sinyaldir
   const title = String(item.title || '')
-  if (/[ğışçöüĞİŞÇÖÜ]/.test(title)) return 'tr'
-  const raw = `${title} ${item.description || ''}`
-  if (/[ğışçöüĞİŞÇÖÜ]/.test(raw) && !/[a-z]{4,}\s(the|and|is|of)\s/i.test(title)) return 'tr'
-  const t = normalizeText(raw)
+  // ç/ö/ü also occur in other languages; they alone do not establish Turkish.
+  if (/[ğışĞİŞ]/.test(title)) return 'tr'
+  const description = String(item.description || '').replace(/\[(ÇIKARIM|DEMO VERİ)\][\s\S]*/i, '')
+  const raw = `${title} ${description}`
+  if (/[ğışĞİŞ]/.test(raw) && !/\b(the|and|is|of)\b/i.test(title)) return 'tr'
+  const t = normalizeText(raw).replace(/[^a-z0-9]+/g, ' ')
   const trWords = ['ve', 'bir', 'icin', 'ile', 'bu', 'ne', 'nasil', 'cok', 'daha', 'ama', 'gibi', 'kadar']
   const enWords = ['the', 'and', 'for', 'with', 'this', 'what', 'how', 'you', 'best', 'your']
   const count = (list: string[]) => list.filter((w) => new RegExp(`(^| )${w}( |$)`).test(t)).length

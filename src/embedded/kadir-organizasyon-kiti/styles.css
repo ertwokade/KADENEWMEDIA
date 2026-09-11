@@ -75,6 +75,10 @@ h3{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px}
 .icon-area{width:36px;height:36px;background:var(--teal-dim);border-radius:10px;display:grid;place-items:center}
 .icon-area i{width:18px;height:18px;color:var(--teal)}
 .section-toolbar{display:flex;justify-content:space-between;align-items:center}
+.starter-notice{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:12px 0 16px;padding:12px 14px;border:1px solid rgba(255,209,102,.35);border-radius:12px;background:rgba(255,209,102,.1);color:var(--ink2);font-size:12px;line-height:1.5}
+.starter-notice strong{color:var(--ink)}
+.starter-notice .ghost-btn{flex-shrink:0;min-height:44px}
+@media(max-width:640px){.starter-notice{align-items:flex-start;flex-direction:column}.starter-notice .ghost-btn{width:100%}}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .tabs{display:flex;gap:4px;flex-wrap:wrap}
 .tab-btn{padding:8px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--ink2);font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition)}
@@ -109,6 +113,9 @@ label{display:grid;gap:4px}
 .label-text{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3)}
 input,textarea,select{width:100%;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--ink);font-size:13px;font-family:inherit;outline:none;transition:var(--transition);min-height:38px}
 input:focus,textarea:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim)}
+input[type="file"]{min-width:0;max-width:100%;padding:6px;color:var(--ink2);cursor:pointer}
+input[type="file"]::file-selector-button{min-height:44px;margin-right:10px;padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--ink2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition)}
+input[type="file"]::file-selector-button:hover{border-color:var(--teal);color:var(--teal)}
 textarea{resize:vertical}
 select{cursor:pointer}
 html[data-theme=light] input,html[data-theme=light] textarea,html[data-theme=light] select{background:#fff;color:var(--ink)}

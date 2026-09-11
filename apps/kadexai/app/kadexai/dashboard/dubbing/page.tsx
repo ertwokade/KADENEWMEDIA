@@ -1,12 +1,15 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   AlertTriangle, Check, Download, Languages, Loader2, Mic2, Play, Video, Volume2,
 } from 'lucide-react'
 import { apiFetch } from '@/lib/client/api'
 import TopBar from '@/components/layout/TopBar'
 import CapabilityNotice from '@/components/ui/CapabilityNotice'
+import TranscriptionVocabulary from '@/components/ui/TranscriptionVocabulary'
+import { validateTranscript } from '@/lib/ai/transcription'
+import { completeTranslations } from '@/lib/subtitles/translations'
 import { useModel } from '@/lib/context/ModelContext'
 import { extractAudio, readMediaDuration } from '@/lib/media/extractAudio'
 import { assembleDubTrack, type DubSegment } from '@/lib/media/dubMixer'
@@ -48,6 +51,8 @@ export default function DubbingPage() {
   const [phase, setPhase] = useState<Phase>('idle')
   const [detail, setDetail] = useState('')
   const [error, setError] = useState('')
+  const [vocabulary, setVocabulary] = useState('')
+  const [estimatedTiming, setEstimatedTiming] = useState(false)
 
   const [sourceLang, setSourceLang] = useState('tr')
   const [targetLang, setTargetLang] = useState('en')
@@ -57,11 +62,15 @@ export default function DubbingPage() {
 
   const [sourceCues, setSourceCues] = useState<Cue[]>([])
   const [dubCues, setDubCues] = useState<Cue[]>([])
+  const [dubLang, setDubLang] = useState('')
+  const [audioLang, setAudioLang] = useState('')
   const [audioUrl, setAudioUrl] = useState('')
   const [mixInfo, setMixInfo] = useState<{ hizlandirilan: number; tasan: number } | null>(null)
 
   const busy = phase !== 'idle' && phase !== 'done' && phase !== 'error'
   const totalChars = useMemo(() => dubCues.reduce((sum, c) => sum + c.text.length, 0), [dubCues])
+  const reuseTranslation = dubCues.length > 0 && dubLang === targetLang
+  useEffect(() => () => { if (audioUrl) URL.revokeObjectURL(audioUrl) }, [audioUrl])
 
   const pickFile = async (picked: File | null) => {
     if (!picked) return
@@ -71,6 +80,7 @@ export default function DubbingPage() {
     setSourceCues([])
     setDubCues([])
     setAudioUrl('')
+    setEstimatedTiming(false)
     setDuration(await readMediaDuration(picked))
   }
 
@@ -83,21 +93,26 @@ export default function DubbingPage() {
       const audio = await extractAudio(file, setDetail)
 
       setPhase('transcribe')
-      setDetail('Whisper konuşmayı çözüyor...')
+      setDetail('Konuşma çözümleniyor...')
       const form = new FormData()
       form.append('file', audio)
+      form.append('vocabulary', vocabulary)
       const res = await apiFetch('/api/transcribe', { method: 'POST', body: form }, 180_000)
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Transkripsiyon başarısız')
 
-      const words = (json.words ?? []) as Array<{ word: string; start: number; end: number }>
+      const { words, language } = validateTranscript(json)
       if (!words.length) throw new Error('Ses içinde konuşma bulunamadı.')
 
       // Dublaj kutulari altyazidan biraz daha uzun olabilir: cumle butunlugu
       // seslendirmede okunabilirlikten daha onemli.
       const cues = wordsToCues(words, { maxChars: 140, maxDuration: 8 })
       setSourceCues(cues)
-      setSourceLang((json.language || 'tr').slice(0, 2))
+      setDubCues([])
+      setDubLang('')
+      setAudioUrl('')
+      setSourceLang((language || 'tr').slice(0, 2))
+      setEstimatedTiming(json.timing === 'estimated' || json.saglayici === 'gemini')
       setPhase('done')
       setDetail(`${cues.length} konuşma bölümü bulundu.`)
     } catch (e) {
@@ -107,13 +122,18 @@ export default function DubbingPage() {
   }
 
   /** 2. adım: çevir → seslendir → zaman çizgisine yerleştir. */
-  const dub = async () => {
-    if (!sourceCues.length) return
+  const dub = async (forceTranslate = false) => {
+    if (!sourceCues.length || busy) return
     setError('')
     setAudioUrl('')
     setMixInfo(null)
+    const requestedLang = targetLang
 
     try {
+      let translated: Cue[]
+      if (reuseTranslation && !forceTranslate) {
+        translated = completeTranslations(sourceCues, dubCues)
+      } else {
       setPhase('translate')
       setDetail(`${languageLabel(targetLang)} çevirisi yapılıyor...`)
       const translateRes = await apiFetch(
@@ -134,11 +154,11 @@ export default function DubbingPage() {
       const translateJson = await translateRes.json()
       if (!translateRes.ok) throw new Error(translateJson.error || 'Çeviri başarısız')
 
-      const map = new Map<number, string>(
-        (translateJson.ceviriler ?? []).map((c: { index: number; text: string }) => [c.index, c.text])
-      )
-      const translated = sourceCues.map((c) => ({ ...c, text: map.get(c.index) ?? c.text }))
+      if (translateJson.atlanan > 0) throw new Error('Bazı bölümler çevrilemedi; seslendirme başlatılmadı. Yeniden dene.')
+      translated = completeTranslations(sourceCues, translateJson.ceviriler)
       setDubCues(translated)
+      setDubLang(requestedLang)
+      }
 
       setPhase('tts')
       const parts: DubSegment[] = []
@@ -184,6 +204,7 @@ export default function DubbingPage() {
       })
 
       setAudioUrl(URL.createObjectURL(result.blob))
+      setAudioLang(requestedLang)
       setMixInfo({ hizlandirilan: result.hizlandirilan, tasan: result.tasan })
       setPhase('done')
       setDetail(`Dublaj hazır — ${parts.length} bölüm seslendirildi.`)
@@ -198,7 +219,7 @@ export default function DubbingPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `dublaj-${targetLang}.srt`
+    a.download = `dublaj-${dubLang}.srt`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -231,6 +252,7 @@ export default function DubbingPage() {
                 <span className="text-xs text-zinc-400">{file ? file.name : 'Video veya ses dosyası seç'}</span>
                 {duration > 0 && <span className="text-[10px] text-zinc-600">{formatTimestamp(duration, 'srt')}</span>}
               </button>
+              <TranscriptionVocabulary value={vocabulary} onChange={setVocabulary} disabled={busy} />
               <button
                 type="button"
                 onClick={transcribe}
@@ -324,7 +346,7 @@ export default function DubbingPage() {
 
               <button
                 type="button"
-                onClick={dub}
+                onClick={() => void dub()}
                 disabled={!sourceCues.length || busy}
                 className="flex w-full items-center justify-center gap-2 rounded-lg border border-violet-500/40 bg-violet-500/20 py-2.5 text-sm font-medium text-violet-300 transition-colors hover:bg-violet-500/30 disabled:opacity-50"
               >
@@ -333,8 +355,11 @@ export default function DubbingPage() {
                 ) : (
                   <Play className="h-4 w-4" />
                 )}
-                Dublajı üret
+                {reuseTranslation ? 'Düzenlenen metni seslendir' : 'Dublajı üret'}
               </button>
+              {reuseTranslation && <button type="button" disabled={busy}
+                onClick={() => { if (window.confirm('Düzenlediğin çeviri yeniden oluşturulacak. Devam edilsin mi?')) void dub(true) }}
+                className="min-h-11 w-full rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-400 disabled:opacity-50">Yeniden çevir ve seslendir</button>}
 
               {sourceCues.length > 0 && (
                 <p className="text-[11px] text-zinc-500">
@@ -356,6 +381,7 @@ export default function DubbingPage() {
 
           {/* ── Sağ: sonuç ────────────────────────────────────────────────── */}
           <div className="min-w-0 flex-1">
+            {estimatedTiming && sourceCues.length > 0 && <p role="status" className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-300">Kelime zamanları bölüm sürelerinden tahmin edildi. Dublajı kullanmadan önce senkronu kontrol et.</p>}
             {error && (
               <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
                 <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
@@ -373,13 +399,13 @@ export default function DubbingPage() {
             {audioUrl && (
               <div className="mb-4 space-y-3 rounded-xl border border-zinc-700/50 bg-zinc-900/50 p-4">
                 <h3 className="text-sm font-semibold text-zinc-100">
-                  {languageLabel(targetLang)} dublaj sesi
+                  {languageLabel(audioLang)} dublaj sesi
                 </h3>
                 <audio controls src={audioUrl} className="w-full" />
                 <div className="flex flex-wrap gap-2">
                   <a
                     href={audioUrl}
-                    download={`dublaj-${targetLang}.wav`}
+                    download={`dublaj-${audioLang}.wav`}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-[#f2c322] px-3 py-1.5 text-xs font-medium text-zinc-950 transition-colors hover:bg-[#ffda3f]"
                   >
                     <Download className="h-3.5 w-3.5" />
@@ -409,7 +435,7 @@ export default function DubbingPage() {
             {sourceCues.length > 0 ? (
               <div className="space-y-2">
                 <p className="text-xs text-zinc-500">
-                  Bölümler — çeviri üretildikten sonra metni düzenleyip dublajı yeniden alabilirsin.
+                  Bölümler — çeviri üretildikten sonra metni düzenleyip dublajı yeniden alabilirsin.{dubLang && ` Mevcut çeviri: ${languageLabel(dubLang)}.`}
                 </p>
                 {sourceCues.map((cue) => {
                   const translated = dubCues.find((c) => c.index === cue.index)
@@ -426,11 +452,17 @@ export default function DubbingPage() {
                       {translated && (
                         <textarea
                           value={translated.text}
-                          onChange={(e) =>
+                          aria-label={`${cue.index}. bölüm çevirisi`}
+                          disabled={busy}
+                          maxLength={3000}
+                          onChange={(e) => {
+                            setAudioUrl('')
+                            setMixInfo(null)
+                            setDetail('Çeviri düzenlendi; güncel metni yeniden seslendir.')
                             setDubCues((prev) =>
                               prev.map((c) => (c.index === cue.index ? { ...c, text: e.target.value } : c))
                             )
-                          }
+                          }}
                           rows={2}
                           className="mt-2 w-full resize-none rounded-lg border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-sm text-zinc-100 focus:border-[#f2c322] focus:outline-none"
                         />

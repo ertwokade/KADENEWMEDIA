@@ -35,10 +35,15 @@ export default function ContentPlanPage() {
   const [error, setError] = useState('')
   const [activeWeek, setActiveWeek] = useState(1)
   const [calendarStatus, setCalendarStatus] = useState('')
+  const [calendarError, setCalendarError] = useState('')
+  const [calendarSaving, setCalendarSaving] = useState(false)
+  const [planPlatform, setPlanPlatform] = useState('youtube')
+  const [planStart, setPlanStart] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true); setError(''); setData(null)
+    if (calendarSaving) return
+    setLoading(true); setError(''); setData(null); setCalendarStatus(''); setCalendarError(''); setActiveWeek(1)
     try {
       const res = await apiFetch('/api/generate/content-plan', {
         method: 'POST',
@@ -48,6 +53,8 @@ export default function ContentPlanPage() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error)
       setData(json.plan)
+      setPlanPlatform(platform)
+      setPlanStart(new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()))
     } catch (e) { setError(e instanceof Error ? e.message : 'Hata') }
     finally { setLoading(false) }
   }
@@ -55,56 +62,50 @@ export default function ContentPlanPage() {
   const weekDays = data?.gunler?.filter((d) => Math.ceil(d.gun / 7) === activeWeek) ?? []
 
   const addPlanToCalendar = async () => {
-    if (!data?.gunler?.length) return
+    if (!data?.gunler?.length || calendarSaving || calendarStatus) return
+    setCalendarError('')
     const validPlatforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin', 'pinterest']
-    const selectedPlatform = validPlatforms.includes(platform as Platform) ? platform as Platform : 'youtube'
+    const selectedPlatform = validPlatforms.includes(planPlatform as Platform) ? planPlatform as Platform : 'youtube'
     const toDate = (offset: number) => {
-      const date = new Date()
-      date.setHours(12, 0, 0, 0)
-      date.setDate(date.getDate() + offset)
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+      const date = new Date(`${planStart}T12:00:00Z`)
+      date.setUTCDate(date.getUTCDate() + offset)
+      return date.toISOString().slice(0, 10)
     }
-    const planned = data.gunler.filter((day) => day.baslik?.trim()).map((day, index) => ({
-      id: `local-plan-${Date.now()}-${index}`,
-      date: toDate(Math.max(0, Number(day.gun || index + 1) - 1)),
+    if (data.gunler.some(day => !Number.isInteger(day.gun) || day.gun < 1 || day.gun > 30 || typeof day.baslik !== 'string' || !day.baslik.trim())) {
+      setCalendarError('Planda geçersiz gün veya boş başlık var; takvime eksik aktarım yapılmadı.')
+      return
+    }
+    const planned = data.gunler.map(day => ({
+      date: toDate(day.gun - 1),
       title: day.baslik.trim(),
       platform: selectedPlatform,
       status: 'taslak' as const,
     }))
     if (!planned.length) return
 
-    const storageKey = 'kade-content-calendar'
-    let existing: typeof planned = []
-    try {
-      const stored = JSON.parse(localStorage.getItem(storageKey) || '[]')
-      if (Array.isArray(stored)) existing = stored
-    } catch { localStorage.removeItem(storageKey) }
-    const signatures = new Set(existing.map((entry) => `${entry.date}|${entry.platform}|${entry.title}`))
-    const unique = planned.filter((entry) => !signatures.has(`${entry.date}|${entry.platform}|${entry.title}`))
-    localStorage.setItem(storageKey, JSON.stringify([...existing, ...unique]))
-    setCalendarStatus(`${unique.length} içerik takvime eklendi.`)
+    const signatures = new Set<string>()
+    const unique = planned.filter(entry => {
+      const signature = JSON.stringify([entry.date, entry.platform, entry.title])
+      if (signatures.has(signature)) return false
+      signatures.add(signature)
+      return true
+    })
 
+    setCalendarSaving(true)
     try {
       const response = await apiFetch('/api/calendar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entries: unique.map((entry) => ({ title: entry.title, platform: entry.platform, publish_at: `${entry.date}T12:00:00` })) }),
+        body: JSON.stringify({ entries: unique.map((entry) => ({ title: entry.title, platform: entry.platform, publish_at: `${entry.date}T12:00:00+03:00` })) }),
       })
-      if (response.ok) {
-        const result = await response.json()
-        const remote = Array.isArray(result.entries) ? result.entries : []
-        if (remote.length === unique.length) {
-          const remoteEntries = remote.map((entry: Record<string, unknown>) => ({
-            id: String(entry.id),
-            date: String(entry.publish_at || '').slice(0, 10),
-            title: String(entry.title || ''),
-            platform: String(entry.platform || selectedPlatform),
-            status: 'taslak' as const,
-          }))
-          localStorage.setItem(storageKey, JSON.stringify([...existing, ...remoteEntries]))
-        }
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Plan takvime kaydedilemedi.')
+      if (!Array.isArray(result.entries) || result.entries.length !== unique.length || result.entries.some((entry: { id?: unknown } | null) => !entry || typeof entry.id !== 'string')) {
+        throw new Error('Aktarım sonucu doğrulanamadı. Tekrar aktarmadan önce takvimi kontrol et.')
       }
-    } catch { /* Yerel kayıt takvim sayfasında kullanılmaya devam eder. */ }
+      setCalendarStatus(`${unique.length} içerik takvime eklendi.`)
+    } catch (error) { setCalendarError(error instanceof Error ? error.message : 'Plan takvime kaydedilemedi.') }
+    finally { setCalendarSaving(false) }
   }
 
   return (
@@ -150,7 +151,7 @@ export default function ContentPlanPage() {
                   ))}
                 </div>
               </div>
-              <button type="submit" disabled={loading || !niche.trim()}
+              <button type="submit" disabled={loading || calendarSaving || !niche.trim()}
                 className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 transition-colors">
                 {loading ? 'Plan oluşturuluyor...' : '30 Günlük Plan Üret'}
               </button>
@@ -163,14 +164,16 @@ export default function ContentPlanPage() {
               <div className="space-y-4">
                 <RawModelOutput content={data.raw} />
                 <div className="flex flex-wrap items-center gap-3">
-                  <button type="button" onClick={addPlanToCalendar}
+                  <button type="button" disabled={calendarSaving || !!calendarStatus || !data.gunler?.length} onClick={addPlanToCalendar}
                     className="inline-flex items-center gap-2 rounded-lg bg-[#f2c322] px-4 py-2 text-xs font-semibold text-zinc-950 transition-colors hover:bg-[#ffda3f]">
                     <CalendarPlus className="h-4 w-4" />
-                    Planı İçerik Takvimi’ne Aktar
+                    {calendarSaving ? 'Takvime kaydediliyor…' : calendarStatus ? 'Plan takvime aktarıldı' : 'Planı İçerik Takvimi’ne Aktar'}
                   </button>
-                  {calendarStatus && <span className="text-xs text-emerald-400">{calendarStatus}</span>}
-                  {calendarStatus && <button type="button" onClick={() => router.push('/kadexai/dashboard/calendar')} className="text-xs font-medium text-violet-300 hover:text-violet-200">Takvimi aç →</button>}
+                  {calendarStatus && <span role="status" className="text-xs text-emerald-400">{calendarStatus}</span>}
+                  {(calendarStatus || calendarError) && <button type="button" onClick={() => router.push('/kadexai/dashboard/calendar')} className="min-h-11 text-xs font-medium text-violet-300 hover:text-violet-200">Takvimi aç →</button>}
                 </div>
+                {calendarError && <p role="alert" className="text-xs text-red-400">{calendarError}</p>}
+                <p className="text-xs text-zinc-500">Takvim tarihleri planın oluşturulduğu İstanbul gününden itibaren hesaplanır. Aktarım otomatik yayınlama yapmaz.</p>
                 {data.strateji && (
                   <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4">
                     <p className="text-violet-400 text-xs font-semibold mb-1">Strateji</p>
@@ -178,8 +181,8 @@ export default function ContentPlanPage() {
                   </div>
                 )}
                 {/* Week tabs */}
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4].map((w) => (
+                <div className="flex flex-wrap gap-2">
+                  {[1, 2, 3, 4, 5].map((w) => (
                     <button key={w} onClick={() => setActiveWeek(w)}
                       className={cn('px-4 py-1.5 rounded-lg text-xs font-medium transition-colors',
                         activeWeek === w ? 'bg-[#f2c322] text-zinc-950' : 'bg-zinc-800 text-zinc-500 hover:text-zinc-300')}>

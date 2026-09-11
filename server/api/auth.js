@@ -52,7 +52,7 @@ async function handleLogin(req, res) {
     maxRequests: MAX_LOGIN_ATTEMPTS,
   });
   if (!rl.allowed) {
-    logActivity({
+    await logActivity({
       action: 'Giriş denemesi engellendi (rate limit)',
       detail: `${MAX_LOGIN_ATTEMPTS} başarısız denemeden sonra ${LOGIN_WINDOW_MS / 60000} dk için engellendi`,
       type: 'security',
@@ -98,7 +98,7 @@ async function handleLogin(req, res) {
     if (findError) throw findError;
 
     if (!user) {
-      logActivity({ action: 'Başarısız giriş denemesi', detail: `Bilinmeyen kullanıcı adı: ${username}`, type: 'security', icon: '⚠️', user: 'sistem' }).catch(() => {});
+      await logActivity({ action: 'Başarısız giriş denemesi', detail: `Bilinmeyen kullanıcı adı: ${username}`, type: 'security', icon: '⚠️', user: 'sistem' }).catch(() => {});
       return res.status(401).json({ error: 'Geçersiz kullanıcı adı veya şifre' });
     }
 
@@ -110,7 +110,7 @@ async function handleLogin(req, res) {
     }
 
     if (!valid) {
-      logActivity({ action: 'Başarısız giriş denemesi', detail: `Yanlış şifre: ${user.username}`, type: 'security', icon: '⚠️', user: 'sistem', targetType: 'user', targetId: user.id }).catch(() => {});
+      await logActivity({ action: 'Başarısız giriş denemesi', detail: `Yanlış şifre: ${user.username}`, type: 'security', icon: '⚠️', user: 'sistem', targetType: 'user', targetId: user.id }).catch(() => {});
       return res.status(401).json({ error: 'Geçersiz kullanıcı adı veya şifre' });
     }
 
@@ -122,7 +122,7 @@ async function handleLogin(req, res) {
     });
     const csrfToken = setAuthCookies(req, res, token);
 
-    logActivity({ action: 'Admin girişi yapıldı', detail: `${user.username} giriş yaptı`, type: 'system', icon: '🔐', user: user.username, targetType: 'user', targetId: user.id }).catch(() => {});
+    await logActivity({ action: 'Admin girişi yapıldı', detail: `${user.username} giriş yaptı`, type: 'system', icon: '🔐', user: user.username, targetType: 'user', targetId: user.id }).catch(() => {});
 
     return res.status(200).json({
       csrfToken,

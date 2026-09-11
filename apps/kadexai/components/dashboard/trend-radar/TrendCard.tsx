@@ -4,6 +4,7 @@ import { ArrowUpRight, Link2, Sparkles } from 'lucide-react'
 import { CATEGORIES, KIND_LABELS, STAGES, platformLabel } from '@/lib/kade-search/taxonomy'
 import { fmtCount } from '@/lib/kade-search/util'
 import type { CurrentTrendRow } from '@/lib/kade-search/types'
+import { hasMeasuredVelocity as velocityIsMeasured } from '@/lib/kade-search/export'
 import { cn } from '@/lib/utils'
 
 const stageStyles: Record<string, string> = {
@@ -36,7 +37,7 @@ export default function TrendCard({
   const velocity = trend.velocity ?? 0
   const volume = trend.views || trend.posts || trend.followers || 0
   const isInferred = Boolean(trend.inferred)
-  const hasMeasuredVelocity = trend.snapshot_count >= 2 && trend.breakdown?.hizOlculdu !== false
+  const hasMeasuredVelocity = velocityIsMeasured(trend)
 
   return (
     <article className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4 transition-colors hover:border-zinc-600">
@@ -46,7 +47,7 @@ export default function TrendCard({
         )}
 
         <div className="flex flex-shrink-0 flex-col items-center">
-          <span className={cn('text-lg font-bold leading-none', scoreTone(score))}>{score.toFixed(0)}</span>
+          <span className={cn('text-lg font-bold leading-none', scoreTone(score))}>{trend.score == null ? '—' : score.toFixed(0)}</span>
           <span className="mt-1 text-[10px] uppercase tracking-wide text-zinc-600">skor</span>
         </div>
 
@@ -105,7 +106,7 @@ export default function TrendCard({
                 </b>
                 <span className="text-zinc-600"> / gün</span>
               </span>
-            ) : <span className="text-amber-400">Hız için 2. ölçüm bekleniyor</span>}
+            ) : <span className="text-amber-400">Hız için yeterli doğrulanmış ölçüm yok</span>}
             <span>
               Hacim <b className="text-zinc-300">{fmtCount(volume)}</b>
             </span>

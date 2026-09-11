@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Activity, AlertTriangle, BarChart2, Bell, Eye, Lightbulb, Loader2,
   Download, MessageCircle, Radio, Search, Send, Sprout, Trash2, X,
@@ -12,6 +12,7 @@ import TrendCard from '@/components/dashboard/trend-radar/TrendCard'
 import CollectPanel from '@/components/dashboard/trend-radar/CollectPanel'
 import { CATEGORIES, KIND_LABELS, STAGES, platformLabel } from '@/lib/kade-search/taxonomy'
 import { fmtCount } from '@/lib/kade-search/util'
+import { trendCsv } from '@/lib/kade-search/export'
 import type { CurrentTrendRow } from '@/lib/kade-search/types'
 import { cn } from '@/lib/utils'
 
@@ -66,6 +67,7 @@ interface PulseGroup {
 }
 
 interface Idea {
+  uretim?: 'ai' | 'sablon'
   trendId: string
   baslik: string
   kaynak: { platform: string; skor: number; asama: string; hacim: string; url: string | null }
@@ -131,6 +133,8 @@ export default function TrendRadarPage() {
   const [alerts, setAlerts] = useState<AlertRow[]>([])
   const [watchlist, setWatchlist] = useState<WatchItem[]>([])
   const [watchTerm, setWatchTerm] = useState('')
+  const [watchError, setWatchError] = useState('')
+  const [watchSaving, setWatchSaving] = useState(false)
   const [detail, setDetail] = useState<TrendDetail | null>(null)
   const [canCollect, setCanCollect] = useState(false)
   const [dbMissing, setDbMissing] = useState(false)
@@ -138,6 +142,7 @@ export default function TrendRadarPage() {
   const [digestStatus, setDigestStatus] = useState('')
   const [selectionSending, setSelectionSending] = useState(false)
   const [selectionStatus, setSelectionStatus] = useState('')
+  const tabRequest = useRef(0)
 
   const categoryOptions = useMemo(
     () => Object.entries(CATEGORIES).map(([key, def]) => ({ key, label: `${def.emoji} ${def.label}` })),
@@ -158,51 +163,44 @@ export default function TrendRadarPage() {
   }, [])
 
   const loadWatchlist = useCallback(async () => {
+    setWatchError('')
     try {
       const res = await apiFetch('/api/kade-search/watchlist')
       const json = await res.json()
-      if (res.ok) setWatchlist(json.liste ?? [])
+      if (!res.ok || !Array.isArray(json.liste)) throw new Error('İzleme listesi alınamadı.')
+      setWatchlist(json.liste)
     } catch {
-      /* izleme listesi kritik degil */
+      setWatchError('İzleme listesi alınamadı. Yeniden deneyebilirsin.')
     }
   }, [])
 
   const loadTab = useCallback(async () => {
+    const requestId = ++tabRequest.current
     setLoading(true)
     setError('')
     try {
       const params = new URLSearchParams()
       if (platform !== 'all') params.set('platform', platform)
-      if (country !== 'all') params.set('country', country)
-      if (language !== 'all') params.set('language', language)
+      params.set('country', country)
+      params.set('language', language)
       if (category !== 'all') params.set('category', category)
       if (kind !== 'all') params.set('kind', kind)
       if (stage !== 'all') params.set('stage', stage)
       if (search) params.set('q', search)
       params.set('sort', sort)
       params.set('since', since)
-      params.set('limit', '60')
+      params.set('limit', tab === 'fikirler' ? '12' : tab === 'radar' ? '40' : '60')
 
       const url =
         tab === 'trendler' ? `/api/kade-search/trends?${params}`
-        : tab === 'radar' ? `/api/kade-search/radar?${new URLSearchParams({
-            since,
-            limit: '40',
-            ...(country !== 'all' ? { country } : {}),
-            ...(language !== 'all' ? { language } : {}),
-          })}`
+        : tab === 'radar' ? `/api/kade-search/radar?${params}`
         : tab === 'nabiz' ? '/api/kade-search/pulse?limit=4'
-        : tab === 'fikirler' ? `/api/kade-search/ideas?${new URLSearchParams({
-            limit: '12',
-            ...(category !== 'all' ? { category } : {}),
-            ...(platform !== 'all' ? { platform } : {}),
-            ...(country !== 'all' ? { country } : {}),
-            ...(language !== 'all' ? { language } : {}),
-          })}`
+        : tab === 'fikirler' ? `/api/kade-search/ideas?${params}`
         : '/api/kade-search/alerts?limit=60'
 
       const res = await apiFetch(url)
       const json = await res.json()
+      if (requestId !== tabRequest.current) return
       if (!res.ok) throw new Error(json.error || 'Veri alınamadı')
       /* Uclar yapilandirma eksikken 200 + bos liste donuyor; bunu "kayit yok"
          diye gostermek yanlis, ayirt edilebilir olmasi gerekiyor. */
@@ -213,9 +211,9 @@ export default function TrendRadarPage() {
       else if (tab === 'fikirler') setIdeas(json.fikirler ?? [])
       else setAlerts(json.uyarilar ?? [])
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Veri alınamadı')
+      if (requestId === tabRequest.current) setError(e instanceof Error ? e.message : 'Veri alınamadı')
     } finally {
-      setLoading(false)
+      if (requestId === tabRequest.current) setLoading(false)
     }
   }, [tab, platform, country, language, category, kind, stage, sort, since, search])
 
@@ -228,18 +226,21 @@ export default function TrendRadarPage() {
       .catch(() => setCanCollect(false))
   }, [loadStats, loadWatchlist])
 
+  const invalidateTabRequest = useCallback(() => { ++tabRequest.current }, [])
   useEffect(() => {
     void loadTab()
-  }, [loadTab])
+    return invalidateTabRequest
+  }, [loadTab, invalidateTabRequest])
 
   const openDetail = async (trend: CurrentTrendRow) => {
     setSelectionStatus('')
     try {
       const res = await apiFetch(`/api/kade-search/trend/${encodeURIComponent(trend.id)}`)
       const json = await res.json()
-      if (res.ok) setDetail(json.trend)
+      if (!res.ok || !json.trend) throw new Error('Detay alınamadı.')
+      setDetail(json.trend)
     } catch {
-      /* detay acilamadi - liste calismaya devam eder */
+      setError('Trend detayı alınamadı. Listeden yeniden deneyebilirsin.')
     }
   }
 
@@ -257,23 +258,30 @@ export default function TrendRadarPage() {
   }, [])
 
   const addWatch = async () => {
-    if (!watchTerm.trim()) return
-    const res = await apiFetch('/api/kade-search/watchlist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ term: watchTerm.trim() }),
-    })
-    const json = await res.json()
-    if (res.ok) {
-      setWatchlist(json.liste ?? [])
-      setWatchTerm('')
-    }
+    if (watchSaving || !watchTerm.trim()) return
+    setWatchSaving(true); setWatchError('')
+    try {
+      const res = await apiFetch('/api/kade-search/watchlist', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ term: watchTerm.trim() }),
+      })
+      const json = await res.json()
+      if (!res.ok || !Array.isArray(json.liste)) throw new Error('Terim eklenemedi.')
+      setWatchlist(json.liste); setWatchTerm('')
+    } catch { setWatchError('Terim eklenemedi. Yazdığın metin korundu; yeniden deneyebilirsin.') }
+    finally { setWatchSaving(false) }
   }
 
   const removeWatch = async (term: string) => {
-    const res = await apiFetch(`/api/kade-search/watchlist?term=${encodeURIComponent(term)}`, { method: 'DELETE' })
-    const json = await res.json()
-    if (res.ok) setWatchlist(json.liste ?? [])
+    if (watchSaving) return
+    setWatchSaving(true); setWatchError('')
+    try {
+      const res = await apiFetch(`/api/kade-search/watchlist?term=${encodeURIComponent(term)}`, { method: 'DELETE' })
+      const json = await res.json()
+      if (!res.ok || !Array.isArray(json.liste)) throw new Error('Terim kaldırılamadı.')
+      setWatchlist(json.liste)
+    } catch { setWatchError('Terim kaldırılamadı. Listede korundu; yeniden deneyebilirsin.') }
+    finally { setWatchSaving(false) }
   }
 
   const sendDailyDigest = async () => {
@@ -309,25 +317,12 @@ export default function TrendRadarPage() {
 
   const exportTrends = () => {
     if (!trends.length) return
-    const fields: Array<[string, (trend: CurrentTrendRow) => unknown]> = [
-      ['Başlık', (trend) => trend.title], ['Platform', (trend) => platformLabel(trend.platform)],
-      ['Ülke', (trend) => trend.country], ['Dil', (trend) => trend.language],
-      ['Kategori', (trend) => trend.category], ['Tür', (trend) => trend.kind],
-      ['Skor', (trend) => trend.score], ['Hız', (trend) => trend.velocity],
-      ['Aşama', (trend) => trend.stage], ['Görüntülenme', (trend) => trend.views],
-      ['Beğeni', (trend) => trend.likes], ['İlk görülme', (trend) => trend.first_seen],
-      ['Son görülme', (trend) => trend.last_seen], ['Kaynak', (trend) => trend.url],
-    ]
-    const cell = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`
-    const csv = [fields.map(([label]) => cell(label)), ...trends.map((trend) => fields.map(([, read]) => cell(read(trend))))]
-      .map((row) => row.join(','))
-      .join('\n')
-    const url = URL.createObjectURL(new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' }))
+    const url = URL.createObjectURL(new Blob([trendCsv(trends)], { type: 'text/csv;charset=utf-8' }))
     const anchor = document.createElement('a')
     anchor.href = url
     anchor.download = `trend-radar-${new Date().toISOString().slice(0, 10)}.csv`
     anchor.click()
-    URL.revokeObjectURL(url)
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
   const unconfiguredSources = (stats?.kaynaklar ?? []).filter((k) => !k.configured)
@@ -376,7 +371,9 @@ export default function TrendRadarPage() {
               </div>
             )}
 
-            <div className="space-y-3 rounded-xl border border-zinc-700/50 bg-zinc-900/50 p-4">
+            {(tab === 'nabiz' || tab === 'uyarilar') && <p className="text-xs text-zinc-500">{tab === 'nabiz' ? 'Kategori Nabzı tüm kaynakların son 7 günlük genel özetidir; aşağıdaki filtreler bu sekmede uygulanmaz.' : 'Uyarılar genel olay listesidir; aşağıdaki trend filtreleri bu sekmede uygulanmaz.'}</p>}
+            {tab === 'radar' && <p className="text-xs text-zinc-500">Erken Radar yalnız doğrulanmış pozitif büyümeyi gösterir ve hıza göre sıralar.</p>}
+            <fieldset disabled={tab === 'nabiz' || tab === 'uyarilar'} className="space-y-3 rounded-xl border border-zinc-700/50 bg-zinc-900/50 p-4 disabled:opacity-50">
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-zinc-400">Ara</label>
                 <div className="relative">
@@ -429,14 +426,14 @@ export default function TrendRadarPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-zinc-400">Ülke</label>
-                    <select value={country} onChange={(e) => setCountry(e.target.value)} className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-2 text-xs text-zinc-100 focus:border-[#f2c322] focus:outline-none">
+                    <select aria-label="Ülke" value={country} onChange={(e) => setCountry(e.target.value)} className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-2 text-xs text-zinc-100 focus:border-[#f2c322] focus:outline-none">
                       <option value="all">Tüm ülkeler</option>
                       {COUNTRIES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-zinc-400">Dil</label>
-                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-2 text-xs text-zinc-100 focus:border-[#f2c322] focus:outline-none">
+                    <select aria-label="Dil" value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-2 text-xs text-zinc-100 focus:border-[#f2c322] focus:outline-none">
                       <option value="all">Tüm diller</option>
                       {LANGUAGES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
                     </select>
@@ -490,6 +487,7 @@ export default function TrendRadarPage() {
                     <label className="mb-1.5 block text-xs font-medium text-zinc-400">Sırala</label>
                     <select
                       value={sort}
+                      disabled={tab === 'radar'}
                       onChange={(e) => setSort(e.target.value)}
                       className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-2 text-xs text-zinc-100 focus:border-[#f2c322] focus:outline-none"
                     >
@@ -513,7 +511,7 @@ export default function TrendRadarPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </fieldset>
 
             <div className="space-y-2 rounded-xl border border-zinc-700/50 bg-zinc-900/50 p-4">
               <h3 className="flex items-center gap-1.5 text-sm font-semibold text-zinc-100">
@@ -526,6 +524,7 @@ export default function TrendRadarPage() {
               <div className="flex gap-1.5">
                 <input
                   value={watchTerm}
+                  disabled={watchSaving}
                   onChange={(e) => setWatchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addWatch()}
                   placeholder="örn. yapay zeka"
@@ -534,11 +533,13 @@ export default function TrendRadarPage() {
                 <button
                   type="button"
                   onClick={addWatch}
+                  disabled={watchSaving || !watchTerm.trim()}
                   className="rounded-lg border border-zinc-700 px-2.5 py-1.5 text-xs text-zinc-300 transition-colors hover:border-[#f2c322]/50"
                 >
                   Ekle
                 </button>
               </div>
+              {watchError && <p role="alert" className="text-xs text-amber-400">{watchError} <button type="button" onClick={() => void loadWatchlist()} className="underline">Listeyi yenile</button></p>}
               {watchlist.length > 0 && (
                 <ul className="space-y-1 pt-1">
                   {watchlist.map((w) => (
@@ -547,6 +548,7 @@ export default function TrendRadarPage() {
                       <button
                         type="button"
                         onClick={() => removeWatch(w.term)}
+                        disabled={watchSaving}
                         className="text-zinc-600 transition-colors hover:text-red-400"
                         aria-label={`${w.term} terimini kaldır`}
                       >
@@ -644,7 +646,7 @@ export default function TrendRadarPage() {
                   <p className="font-semibold">Henüz hiç toplama çalışmadı.</p>
                   <p className="text-xs leading-relaxed text-sky-200/80">
                     Veritabanı bağlı ama içi boş: radar ancak toplama çalıştıktan sonra
-                    dolar. Zamanlanmış iş her gün 05:00’te tek bir kaynağı tarar.
+                    dolar. Otomatik toplama sıklığı sunucudaki zamanlama ayarına bağlıdır.
                     {canCollect
                       ? ' Beklemek istemiyorsan soldaki toplama panelinden hemen başlatabilirsin.'
                       : ' Toplamayı yalnızca hesap sahibi başlatabilir.'}
@@ -661,7 +663,7 @@ export default function TrendRadarPage() {
             )}
 
             {error && (
-              <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
+              <div role="alert" className="mb-4 flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
                 <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <span>{error}</span>
               </div>
@@ -740,6 +742,10 @@ export default function TrendRadarPage() {
                         {idea.format.label}
                       </span>
                     </div>
+                    <p className="mt-2 text-[11px] text-amber-300">
+                      {idea.uretim === 'ai' ? 'Kanca, kurgu ve CTA AI ile kişiselleştirildi.' : idea.uretim === 'sablon' ? 'Hazır şablon · AI kişiselleştirmesi tamamlanamadı; yayın öncesi düzenle.' : 'Üretim kaynağı doğrulanamadı; yayın öncesi kontrol et.'}
+                      {' '}Zorluk ve saatler öneridir; hesap analitiğine dayalı ölçüm değildir. Saat dilimi: İstanbul.
+                    </p>
                     <p className="mt-2 rounded-lg border border-violet-500/20 bg-violet-500/10 p-2.5 text-xs text-violet-200">
                       🎣 {idea.kanca}
                     </p>

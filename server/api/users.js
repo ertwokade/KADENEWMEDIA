@@ -86,7 +86,7 @@ export default async function handler(req, res) {
         if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu kullanıcı adı zaten kullanılıyor' });
         throw error;
       }
-      logActivity({ action: 'Kullanıcı oluşturuldu', detail: `${username} - ${role || 'viewer'} rolü`, type: 'create', icon: '👤', user: user.username, targetType: 'user', targetId: created.id }).catch(() => {});
+      await logActivity({ action: 'Kullanıcı oluşturuldu', detail: `${username} - ${role || 'viewer'} rolü`, type: 'create', icon: '👤', user: user.username, targetType: 'user', targetId: created.id }).catch(() => {});
       return res.status(201).json(mapUser(created));
     }
 
@@ -137,7 +137,7 @@ export default async function handler(req, res) {
         if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu kullanıcı adı zaten kullanılıyor' });
         throw error;
       }
-      logActivity({ action: 'Kullanıcı güncellendi', detail: `${username || id}`, type: 'update', icon: '✏️', user: user.username, targetType: 'user', targetId: id }).catch(() => {});
+      await logActivity({ action: 'Kullanıcı güncellendi', detail: `${username || id}`, type: 'update', icon: '✏️', user: user.username, targetType: 'user', targetId: id }).catch(() => {});
       return res.status(200).json({ message: 'Kullanıcı güncellendi' });
     }
 
@@ -157,7 +157,7 @@ export default async function handler(req, res) {
 
       const { error } = await supabase.from('kade_users').delete().eq('id', id);
       if (error) throw error;
-      logActivity({ action: 'Kullanıcı silindi', detail: `${targetUser?.username || id}`, type: 'delete', icon: '🗑️', user: user.username, targetType: 'user', targetId: id }).catch(() => {});
+      await logActivity({ action: 'Kullanıcı silindi', detail: `${targetUser?.username || id}`, type: 'delete', icon: '🗑️', user: user.username, targetType: 'user', targetId: id }).catch(() => {});
       return res.status(200).json({ message: 'Kullanıcı silindi' });
     }
 

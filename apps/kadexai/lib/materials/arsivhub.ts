@@ -96,12 +96,13 @@ export async function collectArsivhub(signal?: AbortSignal): Promise<MaterialIte
   const collected: MaterialItem[] = []
   for (const sitemap of SITEMAPS) {
     const response = await fetch(sitemap.url, {
-      signal,
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15_000)]) : AbortSignal.timeout(15_000),
       cache: 'no-store',
       headers: { 'user-agent': 'KadexAI-Materials/1.0 (+https://kadenewmedia.com)' },
     })
     /* Foto sitemap'i henuz yoksa video tarafi calismaya devam etsin. */
-    if (!response.ok) continue
+    if (sitemap.kind === 'photo' && response.status === 404) continue
+    if (!response.ok) throw new Error('Materyal arşivi taraması tamamlanamadı.')
     collected.push(...parseSitemap(await response.text(), sitemap.kind))
   }
   /* Ayni kayit iki sitemap'te birden gecerse sonuncusu kalir. */

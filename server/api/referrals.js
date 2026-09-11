@@ -106,7 +106,7 @@ export default async function handler(req, res) {
     })
     if (msgError) throw msgError
 
-    logActivity({
+    await logActivity({
       action: 'Yeni referral lead',
       detail: `${created.referrer_name} -> ${created.lead_name}`,
       type: 'message',
@@ -134,7 +134,7 @@ export default async function handler(req, res) {
     if (error) throw error
     if (!data || data.length === 0) return res.status(404).json({ error: 'Referral kaydı bulunamadı' })
 
-    logActivity({
+    await logActivity({
       action: 'Referral güncellendi',
       detail: `${id} ${status || ''}`,
       type: 'update',

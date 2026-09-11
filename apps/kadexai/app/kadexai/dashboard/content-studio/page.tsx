@@ -18,6 +18,7 @@ import {
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
 import RawModelOutput from '@/components/ui/RawModelOutput'
+import AutoSocialExport from '@/components/ui/AutoSocialExport'
 import { apiFetch } from '@/lib/client/api'
 import { useModel } from '@/lib/context/ModelContext'
 import { withBasePath } from '@/lib/appConfig'
@@ -268,6 +269,7 @@ export default function ContentStudioPage() {
                     <div className="flex gap-1 overflow-x-auto border-b border-zinc-800 pb-2">{outputTabs.map((item) => <button key={item.id} onClick={() => setOutputTab(item.id)} className={cn('whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium', outputTab === item.id ? 'bg-violet-500/15 text-violet-300' : 'text-zinc-600 hover:bg-zinc-800 hover:text-zinc-300')}>{item.label}</button>)}</div>
                     <pre className="min-h-[360px] whitespace-pre-wrap break-words rounded-xl border border-zinc-800 bg-zinc-950/70 p-4 text-sm leading-7 text-zinc-300">{packageText(selectedRun.output, outputTab) || 'Bu format için içerik dönmedi. Kaynak metni genişletip yeniden deneyebilirsin.'}</pre>
                     <RawModelOutput content={selectedRun.output.raw} />
+                    <AutoSocialExport key={selectedRun.id} captions={selectedRun.output.captions} />
                     <p className="text-[10px] text-zinc-600">{new Date(selectedRun.created_at).toLocaleString('tr-TR')} · {selectedRun.model}</p>
                   </div>
                 ) : <div className="grid min-h-[520px] place-items-center text-center"><div className="max-w-sm"><FileAudio className="mx-auto h-10 w-10 text-zinc-700" /><p className="mt-4 text-sm font-medium text-zinc-300">Kaynağını ekle, yayın paketini tek seferde al</p><p className="mt-2 text-xs leading-5 text-zinc-600">Çıktılar kaynak kanıtlarıyla birlikte burada görünecek ve kitaplığa kalıcı olarak kaydedilecek.</p></div></div>}

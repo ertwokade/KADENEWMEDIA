@@ -9,5 +9,13 @@ export function whatsappConfiguration() {
 }
 
 export function callMeBotResponseQueued(body: string) {
-  return /message\s+queued/i.test(body)
+  const text = body.replace(/<[^>]*>/g, ' ').replace(/&nbsp;|&#160;/gi, ' ')
+  return /\bmessage\s+queued\b/i.test(text)
+    && !/\b(?:not\s+queued|invalid|failed|error)\b/i.test(text)
+}
+
+export function notificationHourlyBudget(value: string | undefined) {
+  if (!value?.trim()) return 20
+  const budget = Number(value)
+  return Number.isInteger(budget) && budget >= 0 ? budget : 20
 }

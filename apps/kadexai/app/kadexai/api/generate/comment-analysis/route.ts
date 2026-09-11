@@ -1,18 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateContent } from '@/lib/ai/provider'
-import { COMMENT_ANALYSIS_SYSTEM_PROMPT, buildCommentAnalysisPrompt } from '@/lib/ai/prompts'
+import { COMMENT_ANALYSIS_SYSTEM_PROMPT, buildCommentAnalysisPrompt, COMMENT_REPLY_SYSTEM_PROMPT, buildCommentReplyPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
 import { requireApiUser } from '@/lib/auth/server'
-import { asNumber, asRecord, asRecordList, asText, asTextList } from '@/lib/ai/outputValidation'
+import { asRecord, asRecordList, asText, asTextList } from '@/lib/ai/outputValidation'
+import { SELECTABLE_MODELS } from '@/lib/ai/models'
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
+
+function measuredNumber(value: unknown, max = 100): number | null {
+  if (typeof value !== 'number' && (typeof value !== 'string' || !value.trim())) return null
+  const number = Number(value)
+  return Number.isFinite(number) && number >= 0 && number <= max ? number : null
+}
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
   if (guard) return guard
 
+  if (!rateLimit(getRateLimitKey(req)).allowed) return NextResponse.json({ error: 'Çok fazla istek. 1 dakika bekle.' }, { status: 429 })
+
   try {
-    const { comments, contentTitle, model } = await req.json()
-    if (!comments || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
+    const body = asRecord(await req.json().catch(() => null))
+    const { comments, contentTitle = '', model, action = 'analyze', tone = '' } = body || {}
+    if (typeof action !== 'string' || !['analyze', 'reply'].includes(action) || typeof comments !== 'string' || !comments.trim()
+      || comments.length > (action === 'reply' ? 1_000 : 30_000)
+      || typeof contentTitle !== 'string' || contentTitle.length > 1_000
+      || typeof tone !== 'string' || tone.length > 80
+      || typeof model !== 'string' || !SELECTABLE_MODELS.includes(model as AIModel)) {
+      return NextResponse.json({ error: 'Geçerli yorum, başlık ve model bilgisi gerekli. Yorumlar en fazla 30.000 karakter olabilir.' }, { status: 400 })
+    }
+
+    if (action === 'reply') {
+      const result = await generateContent({
+        prompt: buildCommentReplyPrompt(comments.trim(), contentTitle, tone || 'samimi'),
+        model: model as AIModel, systemPrompt: COMMENT_REPLY_SYSTEM_PROMPT, maxTokens: 1200,
+      }, req)
+      const parsed = asRecord(parseStructuredOutput(result.content))
+      const value = asRecord(parsed?.yanit_1)?.metin
+      const draft = typeof value === 'string' ? value.trim().slice(0, 2_000) : ''
+      if (!draft) return NextResponse.json({ error: 'Model kullanılabilir yanıt taslağı döndürmedi. Yeniden dene.' }, { status: 502 })
+      return NextResponse.json({ draft, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
+    }
 
     const result = await generateContent({
       prompt: buildCommentAnalysisPrompt(comments, contentTitle || ''),
@@ -27,11 +56,11 @@ export async function POST(req: NextRequest) {
     const health = asRecord(parsed?.topluluk_sagligi)
     const analysis = {
       ozet: {
-        toplam_yorum: asNumber(summary?.toplam_yorum, 0, 0, 1_000_000),
-        pozitif_oran: asNumber(summary?.pozitif_oran),
-        negatif_oran: asNumber(summary?.negatif_oran),
-        notr_oran: asNumber(summary?.notr_oran),
-        genel_duygu: asText(summary?.genel_duygu, 40) || 'nötr',
+        toplam_yorum: measuredNumber(summary?.toplam_yorum, 1_000_000),
+        pozitif_oran: measuredNumber(summary?.pozitif_oran),
+        negatif_oran: measuredNumber(summary?.negatif_oran),
+        notr_oran: measuredNumber(summary?.notr_oran),
+        genel_duygu: asText(summary?.genel_duygu, 40) || 'Belirtilmedi',
       },
       duygu_analizi: {
         en_cok_hissedilen: asText(sentiment?.en_cok_hissedilen, 300),
@@ -43,10 +72,10 @@ export async function POST(req: NextRequest) {
         const fikir = asText(item.fikir, 1_000)
         return fikir ? { fikir, kaynak_yorum: asText(item.kaynak_yorum, 1_500), potansiyel: asText(item.potansiyel, 40) || 'orta' } : null
       }, 30),
-      topluluk_sagligi: { puan: asNumber(health?.puan), yorum: asText(health?.yorum, 1_000) },
+      topluluk_sagligi: { puan: measuredNumber(health?.puan), yorum: asText(health?.yorum, 1_000) },
       yanit_oncelikleri: asRecordList(parsed?.yanit_oncelikleri, (item) => {
         const yorum_ozeti = asText(item.yorum_ozeti, 1_000)
-        return yorum_ozeti ? { yorum_ozeti, neden_onemli: asText(item.neden_onemli, 800), yanit_tonu: asText(item.yanit_tonu, 80), yanit_taslagi: asText(item.yanit_taslagi, 2_000) } : null
+        return yorum_ozeti ? { yorum_ozeti, neden_onemli: asText(item.neden_onemli, 800), yanit_tonu: asText(item.yanit_tonu, 80), yanit_taslagi: typeof item.yanit_taslagi === 'string' ? asText(item.yanit_taslagi, 2_000) : '' } : null
       }, 30),
       genel_oneriler: asTextList(parsed?.genel_oneriler, 30, 1_000),
     }
@@ -55,7 +84,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ analysis, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
-  } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : 'Sunucu hatası' }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Yorum analizi servisi isteği tamamlayamadı. Yeniden dene.' }, { status: 500 })
   }
 }

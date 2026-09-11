@@ -8,6 +8,8 @@ import {
 import { apiFetch } from '@/lib/client/api'
 import TopBar from '@/components/layout/TopBar'
 import CapabilityNotice from '@/components/ui/CapabilityNotice'
+import TranscriptionVocabulary from '@/components/ui/TranscriptionVocabulary'
+import { validateTranscript } from '@/lib/ai/transcription'
 import { useModel } from '@/lib/context/ModelContext'
 import { extractAudio, readMediaDuration } from '@/lib/media/extractAudio'
 import {
@@ -53,6 +55,8 @@ export default function SubtitlesPage() {
   const [step, setStep] = useState<Step>('idle')
   const [stepMsg, setStepMsg] = useState('')
   const [error, setError] = useState('')
+  const [vocabulary, setVocabulary] = useState('')
+  const [estimatedTiming, setEstimatedTiming] = useState(false)
 
   // Dil kodu -> altyazi kutulari. Kaynak dil ilk uretilen izdir.
   const [tracks, setTracks] = useState<Record<string, Cue[]>>({})
@@ -109,18 +113,20 @@ export default function SubtitlesPage() {
       const audio = await extractAudio(file, setStepMsg)
 
       setStep('transcribe')
-      setStepMsg('Konuşma çözümleniyor (Whisper)...')
+      setStepMsg('Konuşma çözümleniyor...')
       const form = new FormData()
       form.append('file', audio)
+      form.append('vocabulary', vocabulary)
       const res = await apiFetch('/api/transcribe', { method: 'POST', body: form }, 180_000)
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Transkripsiyon başarısız')
 
-      const words = (json.words ?? []) as Array<{ word: string; start: number; end: number }>
+      const { words, language } = validateTranscript(json)
       if (!words.length) throw new Error('Ses içinde konuşma bulunamadı.')
 
       const generated = wordsToCues(words)
-      const lang = (json.language || 'tr').slice(0, 2)
+      const lang = (language || 'tr').slice(0, 2)
+      setEstimatedTiming(json.timing === 'estimated' || json.saglayici === 'gemini')
       setSourceLang(lang)
       setActiveLang(lang)
       setTracks({ [lang]: generated })
@@ -139,6 +145,7 @@ export default function SubtitlesPage() {
       if (!parsed.length) throw new Error('Dosyada altyazı kutusu bulunamadı.')
       setTracks((prev) => ({ ...prev, [sourceLang]: parsed }))
       setActiveLang(sourceLang)
+      setEstimatedTiming(false)
       setStep('done')
       setStepMsg(`${parsed.length} kutu içe aktarıldı.`)
     } catch (e) {
@@ -290,6 +297,7 @@ export default function SubtitlesPage() {
                 {duration > 0 && <span className="text-[10px] text-zinc-600">{formatTimestamp(duration, 'srt')}</span>}
               </button>
 
+              <TranscriptionVocabulary value={vocabulary} onChange={setVocabulary} disabled={busy} />
               <button
                 type="button"
                 onClick={generate}
@@ -450,6 +458,7 @@ export default function SubtitlesPage() {
 
           {/* ── Sağ: editör ───────────────────────────────────────────────── */}
           <div className="min-w-0 flex-1">
+            {estimatedTiming && languageTabs.length > 0 && <p role="status" className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-300">Kelime zamanları bölüm sürelerinden tahmin edildi. Yayınlamadan önce sesle eşleşmesini kontrol et.</p>}
             {error && (
               <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
                 <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />

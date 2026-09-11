@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import TopBar from '@/components/layout/TopBar'
 import { cn, copyToClipboard } from '@/lib/utils'
 import { Copy, Check, Trash2, Plus, Edit2, X, Save } from 'lucide-react'
-import { apiPath } from '@/lib/appConfig'
+import { apiFetch } from '@/lib/client/api'
 
 interface Template {
   id: string
@@ -23,6 +23,16 @@ const STARTER_TEMPLATES: Template[] = [
   { id: 'local-starter-dm', kategori: 'DM', baslik: 'İş birliği ilk mesajı', icerik: 'Merhaba [isim], [özgün içerik/çalışma] yaklaşımını özellikle beğendim. [marka/proje] için iki tarafa da değer katacak kısa bir iş birliği fikrim var. Uygunsan ayrıntıları paylaşabilir miyim?', tarih: 'Başlangıç seti' },
 ]
 
+function readTemplate(value: unknown): Template {
+  if (!value || typeof value !== 'object') throw new Error('Geçerli şablon yanıtı alınamadı.')
+  const t = value as Record<string, unknown>
+  if (typeof t.id !== 'string' || !t.id || typeof t.title !== 'string' || typeof t.content !== 'string' || typeof t.category !== 'string') throw new Error('Geçerli şablon yanıtı alınamadı.')
+  const date = typeof t.created_at === 'string' ? new Date(t.created_at) : null
+  return { id: t.id, baslik: t.title, icerik: t.content, kategori: t.category, tarih: date && Number.isFinite(date.getTime()) ? date.toLocaleDateString('tr-TR') : 'Tarih belirtilmedi' }
+}
+
+const isStarter = (id: string) => STARTER_TEMPLATES.some(template => template.id === id)
+
 export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([])
   const [kategori, setKategori] = useState('Hook')
@@ -32,84 +42,72 @@ export default function TemplatesPage() {
   const [filterKategori, setFilterKategori] = useState('Tümü')
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [syncError, setSyncError] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [revision, setRevision] = useState(0)
+  const [pending, setPending] = useState(false)
 
   useEffect(() => {
-    fetch(apiPath('/api/templates'), { cache: 'no-store' })
+    let active = true
+    const controller = new AbortController()
+    setLoading(true); setLoadError(''); setTemplates([])
+    apiFetch('/api/templates', { cache: 'no-store', signal: controller.signal })
       .then(async (response) => ({ response, data: await response.json() }))
       .then(({ response, data }) => {
-        if (!response.ok) throw new Error('local')
-        const cloud: Template[] = Array.isArray(data.templates) ? data.templates.map((template: Record<string, unknown>) => ({ id: String(template.id), kategori: String(template.category || 'Diğer'), baslik: String(template.title || ''), icerik: String(template.content || ''), tarih: new Date(String(template.created_at)).toLocaleDateString('tr-TR') })) : []
-        let local: Template[] = []
-        try {
-          const saved = JSON.parse(localStorage.getItem('contentai-templates') || '[]')
-          if (Array.isArray(saved)) local = saved.filter((template) => String(template?.id || '').startsWith('local-'))
-        } catch { /* bozuk yerel kayıt yok sayılır */ }
-        const merged = [...cloud, ...local.filter((item) => !cloud.some((saved) => saved.id === item.id))]
-        saveToStorage(merged.length ? merged : STARTER_TEMPLATES)
+        if (!response.ok) throw new Error(response.status === 401 ? 'Şablonlar için yeniden giriş yapmalısın.' : data.error || 'Şablonlar yüklenemedi.')
+        if (!Array.isArray(data.templates)) throw new Error('Geçerli şablon listesi alınamadı.')
+        const cloud = data.templates.map(readTemplate)
+        // Unowned legacy storage is preserved, never displayed or overwritten.
+        if (active) setTemplates([...cloud, ...STARTER_TEMPLATES])
       })
-      .catch(() => {
-        try {
-          const saved = JSON.parse(localStorage.getItem('contentai-templates') || '[]')
-          if (Array.isArray(saved) && saved.length) setTemplates(saved)
-          else setTemplates(STARTER_TEMPLATES)
-        } catch { localStorage.removeItem('contentai-templates') }
-        setSyncError('Bulut şablonları yüklenemedi; yerel kayıtlar kullanılıyor.')
-      })
-  }, [])
-
-  const saveToStorage = (items: Template[]) => {
-    localStorage.setItem('contentai-templates', JSON.stringify(items))
-    setTemplates(items)
-  }
+      .catch(error => { if (active) { setTemplates(STARTER_TEMPLATES); setLoadError(error instanceof Error ? error.message : 'Şablonlar yüklenemedi.') } })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false; controller.abort() }
+  }, [revision])
 
   const handleSave = async () => {
-    if (!baslik.trim() || !icerik.trim()) return
-    if (editingId) {
-      const updated = templates.map((t) =>
-        t.id === editingId ? { ...t, kategori, baslik, icerik } : t)
-      saveToStorage(updated)
-      if (!editingId.startsWith('local-')) {
-        void fetch(apiPath('/api/templates'), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, category: kategori, title: baslik, content: icerik }) }).then(async (response) => { if (!response.ok && response.status !== 401) setSyncError((await response.json()).error || 'Şablon buluta kaydedilemedi.') }).catch(() => setSyncError('Şablon buluta kaydedilemedi.'))
-      }
-      setEditingId(null)
-    } else {
-      const newTemplate: Template = {
-        id: `local-${Date.now()}`,
-        kategori,
-        baslik,
-        icerik,
-        tarih: new Date().toLocaleDateString('tr-TR'),
-      }
-      saveToStorage([newTemplate, ...templates])
-      try {
-        const response = await fetch(apiPath('/api/templates'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ category: kategori, title: baslik, content: icerik }) })
-        const data = await response.json()
-        if (response.ok && data.template) saveToStorage([{ ...newTemplate, id: data.template.id }, ...templates])
-        else if (response.status !== 401) setSyncError(data.error || 'Şablon buluta kaydedilemedi.')
-      } catch { setSyncError('Şablon bu cihazda kaydedildi; bulut bağlantısı kurulamadı.') }
-    }
-    setBaslik('')
-    setIcerik('')
-    setKategori('Hook')
+    if (pending || loading || loadError || !baslik.trim() || !icerik.trim()) return
+    setPending(true); setSyncError('')
+    try {
+      const response = await apiFetch('/api/templates', { method: editingId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId || undefined, category: kategori, title: baslik.trim(), content: icerik.trim() }) })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Şablon kaydedilemedi.')
+      const saved = readTemplate(data.template)
+      if (editingId && saved.id !== editingId) throw new Error('Şablon yanıtı kayıtla eşleşmedi.')
+      setTemplates(current => editingId ? current.map(t => t.id === editingId ? saved : t) : [saved, ...current])
+      setEditingId(null); setBaslik(''); setIcerik(''); setKategori('Hook')
+    } catch (error) { setSyncError(error instanceof Error ? error.message : 'Şablon kaydedilemedi.') }
+    finally { setPending(false) }
   }
 
   const handleEdit = (t: Template) => {
-    setEditingId(t.id)
+    if (pending) return
+    setEditingId(isStarter(t.id) ? null : t.id)
     setKategori(t.kategori)
     setBaslik(t.baslik)
     setIcerik(t.icerik)
   }
 
-  const handleDelete = (id: string) => {
-    saveToStorage(templates.filter((t) => t.id !== id))
-    if (editingId === id) { setEditingId(null); setBaslik(''); setIcerik('') }
-    if (!id.startsWith('local-')) void fetch(apiPath('/api/templates'), { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }).catch(() => setSyncError('Şablon buluttan silinemedi.'))
+  const handleDelete = async (id: string) => {
+    if (pending || isStarter(id) || !window.confirm('Bu şablonu silmek istiyor musun?')) return
+    setPending(true); setSyncError('')
+    try {
+      const response = await apiFetch('/api/templates', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+      const data = await response.json()
+      if (!response.ok || data.success !== true) throw new Error(data.error || 'Şablon silinemedi.')
+      setTemplates(current => current.filter(t => t.id !== id))
+      if (editingId === id) { setEditingId(null); setBaslik(''); setIcerik('') }
+    } catch (error) { setSyncError(error instanceof Error ? error.message : 'Şablon silinemedi.') }
+    finally { setPending(false) }
   }
 
   const handleCopy = async (t: Template) => {
-    await copyToClipboard(t.icerik)
-    setCopiedId(t.id)
-    setTimeout(() => setCopiedId(null), 2000)
+    setCopiedId(null); setSyncError('')
+    try {
+      await copyToClipboard(t.icerik)
+      setCopiedId(t.id)
+      setTimeout(() => setCopiedId(current => current === t.id ? null : current), 2000)
+    } catch { setSyncError('Panoya kopyalanamadı. Metni düzenleme alanından seçip kopyalayabilirsin.') }
   }
 
   const filtered = filterKategori === 'Tümü' ? templates : templates.filter((t) => t.kategori === filterKategori)
@@ -135,40 +133,44 @@ export default function TemplatesPage() {
                   {editingId ? 'Şablonu Düzenle' : 'Yeni Şablon'}
                 </h3>
                 {editingId && (
-                  <button onClick={() => { setEditingId(null); setBaslik(''); setIcerik('') }}
+                  <button disabled={pending} aria-label="Düzenlemeyi iptal et" onClick={() => { setEditingId(null); setBaslik(''); setIcerik('') }}
                     className="text-zinc-500 hover:text-zinc-300 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Kategori</label>
-                <select value={kategori} onChange={(e) => setKategori(e.target.value)}
+                <label htmlFor="template-category" className="block text-zinc-400 text-xs font-medium mb-1.5">Kategori</label>
+                <select id="template-category" disabled={pending} value={kategori} onChange={(e) => setKategori(e.target.value)}
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-[#f2c322]">
                   {kategoriler.map((k) => <option key={k}>{k}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">Başlık</label>
-                <input value={baslik} onChange={(e) => setBaslik(e.target.value)}
+                <label htmlFor="template-title" className="block text-zinc-400 text-xs font-medium mb-1.5">Başlık</label>
+                <input id="template-title" maxLength={200} disabled={pending} value={baslik} onChange={(e) => setBaslik(e.target.value)}
                   placeholder="Şablon başlığı..."
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322]" />
               </div>
               <div>
-                <label className="block text-zinc-400 text-xs font-medium mb-1.5">İçerik</label>
-                <textarea value={icerik} onChange={(e) => setIcerik(e.target.value)}
+                <label htmlFor="template-content" className="block text-zinc-400 text-xs font-medium mb-1.5">İçerik</label>
+                <textarea id="template-content" maxLength={20000} disabled={pending} value={icerik} onChange={(e) => setIcerik(e.target.value)}
                   placeholder="Şablon içeriği..." rows={6}
                   className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322] resize-none" />
               </div>
-              <button onClick={handleSave} disabled={!baslik.trim() || !icerik.trim()}
+              <button onClick={handleSave} disabled={loading || !!loadError || pending || !baslik.trim() || !icerik.trim()}
                 className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
-                {editingId ? <><Save className="w-4 h-4" />Kaydet</> : <><Plus className="w-4 h-4" />Ekle</>}
+                {pending ? 'Kaydediliyor…' : editingId ? <><Save className="w-4 h-4" />Kaydet</> : <><Plus className="w-4 h-4" />Ekle</>}
               </button>
             </div>
           </div>
 
           <div className="flex-1 min-w-0">
-            {syncError && <div className="mb-4 rounded-lg border border-amber-800/50 bg-amber-950/20 p-3 text-xs text-amber-300">{syncError}</div>}
+            {loadError && <div role="alert" className="mb-4 rounded-lg border border-amber-800/50 bg-amber-950/20 p-3 text-xs text-amber-300">
+              <p>{loadError}</p><button onClick={() => setRevision(value => value + 1)} className="min-h-11 underline">Yeniden dene</button>
+            </div>}
+            {syncError && <div role="alert" className="mb-4 rounded-lg border border-amber-800/50 bg-amber-950/20 p-3 text-xs text-amber-300">{syncError}</div>}
+            <p className="mb-3 text-xs text-zinc-500">Başlangıç seti hazır örneklerden oluşur; düzenlediğinde hesabına yeni bir şablon olarak kaydedilir. Kişisel şablonlar yalnız bu hesaptan okunur.</p>
             <div className="flex items-center gap-2 flex-wrap mb-4">
               {['Tümü', ...kategoriler].map((k) => (
                 <button key={k} onClick={() => setFilterKategori(k)}
@@ -178,9 +180,9 @@ export default function TemplatesPage() {
                   {k}
                 </button>
               ))}
-              <span className="ml-auto text-zinc-600 text-xs">{filtered.length} şablon</span>
+              <span className="ml-auto text-zinc-600 text-xs">{loading ? 'Şablonlar yükleniyor…' : `${filtered.length} şablon`}</span>
             </div>
-            {filtered.length === 0 ? (
+            {!loading && filtered.length === 0 ? (
               <div className="flex items-center justify-center h-64 text-zinc-600 text-sm">
                 {templates.length === 0 ? 'Henüz şablon eklenmedi' : 'Bu kategoride şablon yok'}
               </div>
@@ -188,7 +190,7 @@ export default function TemplatesPage() {
               <div className="space-y-3">
                 {filtered.map((t) => (
                   <div key={t.id} className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4">
-                    <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2">
                         <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', catColors[t.kategori] || catColors.Diğer)}>
                           {t.kategori}
@@ -196,15 +198,15 @@ export default function TemplatesPage() {
                         <h4 className="text-zinc-200 text-sm font-semibold">{t.baslik}</h4>
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button onClick={() => handleCopy(t)} className="text-zinc-500 hover:text-violet-400 transition-colors p-1">
+                        <button aria-label={`${t.baslik} kopyala`} onClick={() => handleCopy(t)} className="flex min-h-11 min-w-11 items-center justify-center text-zinc-500 hover:text-violet-400 transition-colors p-1">
                           {copiedId === t.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
-                        <button onClick={() => handleEdit(t)} className="text-zinc-500 hover:text-amber-400 transition-colors p-1">
+                        <button disabled={pending} aria-label={`${t.baslik} düzenle`} onClick={() => handleEdit(t)} className="flex min-h-11 min-w-11 items-center justify-center text-zinc-500 hover:text-amber-400 transition-colors p-1">
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => handleDelete(t.id)} className="text-zinc-500 hover:text-red-400 transition-colors p-1">
+                        {!isStarter(t.id) && <button disabled={pending} aria-label={`${t.baslik} sil`} onClick={() => handleDelete(t.id)} className="flex min-h-11 min-w-11 items-center justify-center text-zinc-500 hover:text-red-400 transition-colors p-1">
                           <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                        </button>}
                       </div>
                     </div>
                     <p className="text-zinc-400 text-xs leading-relaxed line-clamp-3">{t.icerik}</p>

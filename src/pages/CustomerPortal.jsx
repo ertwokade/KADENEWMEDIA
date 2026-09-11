@@ -14,6 +14,7 @@ import { useSEO } from '../hooks/useSEO'
 import { useCustomer } from '../contexts/CustomerContext'
 import { customerPortalApi } from '../api'
 import PageTransition from '../components/PageTransition'
+import ProtectedAccessScreen, { ProtectedAccessLoading } from '../components/ProtectedAccessScreen'
 import '../styles/kade-gate.css'
 import '../styles/kade-surface.css'
 import './CustomerPortal.css'
@@ -69,10 +70,6 @@ export default function CustomerPortal() {
   })
 
   useEffect(() => {
-    if (checked && !customer) navigate('/giris/danismanlik', { replace: true })
-  }, [checked, customer, navigate])
-
-  useEffect(() => {
     if (!customer) return
     setLoading(true)
     customerPortalApi()
@@ -85,7 +82,12 @@ export default function CustomerPortal() {
     navigate('/giris/danismanlik', { replace: true })
   }
 
-  if (!checked || !customer) return null
+  if (!checked) return <ProtectedAccessLoading label="Müşteri hesabı kontrol ediliyor..." />
+  if (!customer) {
+    return <ProtectedAccessScreen customer={null} eyebrow="Güvenli müşteri alanı"
+      title="Müşteri girişi gerekli"
+      description="Paket, proje ve teslimat bilgileri yalnızca oturum açmış müşterilere gösterilir." />
+  }
 
   if (loading) {
     return (

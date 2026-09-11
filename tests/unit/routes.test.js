@@ -11,6 +11,17 @@ test('critical public and protected route declarations remain present', async ()
   }
 })
 
+test('protected application pages are never overwritten by the public clone layer', async () => {
+  const source = await readFile(new URL('../../scripts/merge-clone.mjs', import.meta.url), 'utf8')
+  const pagesBlock = source.match(/const PAGES = \[([\s\S]*?)\]/)
+  assert.ok(pagesBlock, 'merge-clone PAGES list is missing')
+  const clonePages = new Set([...pagesBlock[1].matchAll(/'([^']+)'/g)].map((match) => match[1]))
+
+  for (const route of ['organizasyon-kiti', 'kade-kit-business', 'musteri-panel', 'proje-takip']) {
+    assert.equal(clonePages.has(route), false, `/${route} must keep its React session gate`)
+  }
+})
+
 test('sitemap contains only public indexable routes', () => {
   const privatePrefixes = ['/admin', '/giris', '/musteri-panel', '/organizasyon-kiti', '/kadexai', '/api']
   for (const page of STATIC_PAGES) {

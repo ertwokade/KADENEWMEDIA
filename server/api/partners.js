@@ -120,7 +120,7 @@ export default async function handler(req, res) {
         if (isUniqueViolation(error)) return res.status(400).json({ error: 'Bu slug zaten kullanılıyor' });
         throw error;
       }
-      logActivity({ action: 'Partner eklendi', detail: `${req.body.name || ''}`, type: 'create', icon: '🤝', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Partner eklendi', detail: `${req.body.name || ''}`, type: 'create', icon: '🤝', user: user.username }).catch(() => {});
       return res.status(201).json(rowToPartner(data));
     } catch (error) {
       console.error('Partners POST error:', error);
@@ -151,7 +151,7 @@ export default async function handler(req, res) {
       }
       if (!data || data.length === 0) return res.status(404).json({ error: 'Partner bulunamadı' });
 
-      logActivity({ action: 'Partner güncellendi', detail: `${updateData.name || _id}`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Partner güncellendi', detail: `${updateData.name || _id}`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Partner güncellendi' });
     } catch (error) {
       console.error('Partners PUT error:', error);
@@ -176,7 +176,7 @@ export default async function handler(req, res) {
       if (error) throw error;
       if (!data || data.length === 0) return res.status(404).json({ error: 'Partner bulunamadı' });
 
-      logActivity({ action: 'Partner silindi', detail: `${partner?.name || queryId}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Partner silindi', detail: `${partner?.name || queryId}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Partner silindi' });
     } catch (error) {
       console.error('Partners DELETE error:', error);

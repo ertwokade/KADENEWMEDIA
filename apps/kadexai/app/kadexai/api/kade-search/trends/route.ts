@@ -1,39 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { queryTrends } from '@/lib/kade-search/store'
 import { failure, isKadeSearchConfigured, requireReaderAccess } from '../_guard'
-import type { TrendFilters } from '@/lib/kade-search/types'
+import { trendFiltersFromParams } from '@/lib/kade-search/filters'
 import { ayiklanmisTrendler, turkceGorunuyor } from '@/lib/kade-search/relevance'
 
 export const dynamic = 'force-dynamic'
-
-function filtersFromSearchParams(params: URLSearchParams): TrendFilters {
-  const num = (key: string) => (params.get(key) ? Number(params.get(key)) : undefined)
-  return {
-    platform: params.get('platform') ?? undefined,
-    kind: params.get('kind') ?? undefined,
-    category: params.get('category') ?? undefined,
-    country: params.get('country') ?? undefined,
-    language: params.get('language') ?? undefined,
-    stage: params.get('stage') ?? undefined,
-    format: params.get('format') ?? undefined,
-    q: params.get('q') ?? undefined,
-    sort: (params.get('sort') as TrendFilters['sort']) ?? 'score',
-    limit: num('limit') ?? 50,
-    offset: num('offset') ?? 0,
-    minScore: num('minScore'),
-    sinceHours: num('since'),
-  }
-}
 
 export async function GET(req: NextRequest) {
   const guard = await requireReaderAccess()
   if (guard) return guard
   if (!isKadeSearchConfigured()) {
-    const filters = filtersFromSearchParams(req.nextUrl.searchParams)
+    const filters = trendFiltersFromParams(req.nextUrl.searchParams)
     return NextResponse.json({ adet: 0, filtreler: filters, trendler: [], localFallback: true })
   }
   try {
-    const filters = filtersFromSearchParams(req.nextUrl.searchParams)
+    const filters = trendFiltersFromParams(req.nextUrl.searchParams)
     const relevant = ayiklanmisTrendler(await queryTrends(filters))
     const trends = filters.language === 'tr' ? relevant.filter(turkceGorunuyor) : relevant
     return NextResponse.json({ adet: trends.length, filtreler: filters, trendler: trends })

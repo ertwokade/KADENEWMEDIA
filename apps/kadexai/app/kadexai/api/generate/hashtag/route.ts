@@ -4,6 +4,7 @@ import { SYSTEM_PROMPTS, buildHashtagPrompt } from '@/lib/ai/prompts'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { HashtagRequest } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
+import { parseHashtagGroups } from '@/lib/ai/hashtags'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -19,6 +20,9 @@ export async function POST(req: NextRequest) {
     if (!topic || !platform || !niche || !model) {
       return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
     }
+    if (!Number.isInteger(count) || count < 1 || count > 50) {
+      return NextResponse.json({ error: 'Hashtag sayısı 1–50 arasında tam sayı olmalı.' }, { status: 400 })
+    }
 
     const result = await generateContent({
       prompt: buildHashtagPrompt(topic, platform, niche, count),
@@ -27,20 +31,7 @@ export async function POST(req: NextRequest) {
       maxTokens: 2000,
     }, req)
 
-    let hashtags: { yuksek: string[]; orta: string[]; dusuk: string[]; niche: string[] } = {
-      yuksek: [], orta: [], dusuk: [], niche: [],
-    }
-    try {
-      const parsed: unknown = JSON.parse(result.content)
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-        const value = parsed as Record<string, unknown>
-        const tags = (key: string) => Array.isArray(value[key]) ? value[key].filter((item): item is string => typeof item === 'string').map((item) => item.trim()).filter((item) => item.startsWith('#')).slice(0, 50) : []
-        hashtags = { yuksek: tags('yuksek'), orta: tags('orta'), dusuk: tags('dusuk'), niche: tags('niche') }
-      }
-    } catch {
-      const allTags = result.content.match(/#\w+/g) || []
-      hashtags.niche = allTags.slice(0, 50)
-    }
+    const hashtags = parseHashtagGroups(result.content, count)
 
     if (Object.values(hashtags).every((group) => group.length === 0)) return NextResponse.json({ error: 'Model kullanılabilir hashtag döndürmedi. Yeniden dene.' }, { status: 502 })
 

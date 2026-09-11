@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { assertAuthenticatedUser } from '@/lib/auth/server'
-import { CUSTOM_STEP_CATALOG, PIPELINES, runPipeline } from '@/lib/orchestration/runner'
+import { CUSTOM_STEP_CATALOG, PIPELINES, createCustomPipeline, runPipeline } from '@/lib/orchestration/runner'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { captureApiError } from '@/lib/observability/server'
 import { notifyOperation } from '@/lib/notifications/operationFeed'
@@ -53,6 +53,9 @@ export async function POST(request: NextRequest) {
     const niche = text(body.niche, 200)
     if (!niche) return NextResponse.json({ error: 'Niş alanı zorunlu.' }, { status: 400, headers })
     if (!PLATFORMS.includes(platform)) return NextResponse.json({ error: 'Geçersiz platform.' }, { status: 400, headers })
+    if (body.pipelineId === 'custom' && !createCustomPipeline(body.customSteps)) {
+      return NextResponse.json({ error: 'Özel akışta katalogdan 2–5 farklı adım seçmelisin.' }, { status: 400, headers })
+    }
 
     const result = await runPipeline(user.id, {
       // Hazır akışta yalnız kimlik alınır; özel akış adımları aşağıda sunucu
@@ -66,20 +69,20 @@ export async function POST(request: NextRequest) {
       frequency: text(body.frequency, 60, 'haftada 3 içerik'),
       model: text(body.model, 40, 'auto') as AIModel,
       customSteps: Array.isArray(body.customSteps)
-        ? body.customSteps.map((step) => text(step, 40)).filter(Boolean).slice(0, CUSTOM_STEP_CATALOG.length)
+        ? body.customSteps.map((step) => text(step, 40))
         : undefined,
     })
 
     // 'pipeline_completed' olayı tanımlıydı ama hiçbir yerden tetiklenmiyordu;
     // akışlar bildirim akışında ve gün sonu özetinde hiç görünmüyordu.
     const basarili = result.steps.filter((step) => step.status === 'ok').length
-    const toplam = result.steps.length
+    const toplam = result.totalSteps
     await notifyOperation({
       kind: 'pipeline_completed',
-      title: `Akış tamamlandı · ${text(body.pipelineId, 60)}`,
+      title: `${result.stoppedEarly ? 'Akış tamamlanamadı' : 'Akış tamamlandı'} · ${text(body.pipelineId, 60)}`,
       detail: `${basarili}/${toplam} adım başarılı · niş: ${niche}`,
       userId: user.id,
-    })
+    }).catch(error => captureApiError(error, '/api/orchestrate#notification'))
 
     return NextResponse.json(result, { headers })
   } catch (error) {

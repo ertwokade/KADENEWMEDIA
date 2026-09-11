@@ -18,19 +18,19 @@ async function runSource(source: Source): Promise<MaterialSyncResult> {
     if (source === 'youtube') {
       const items = await collectYouTube()
       if (!items.length && !process.env.YOUTUBE_API_KEY?.trim()) {
-        return { source, found: 0, inserted: 0, updated: 0, ok: true, error: 'YOUTUBE_API_KEY tanımlı değil.' }
+        return { source, found: 0, inserted: 0, updated: 0, ok: false, skipped: true, error: 'YouTube kaynağı henüz yapılandırılmamış.' }
       }
       return await saveMaterials(source, items)
     }
     const tiktok = await collectTikTok()
     if (!tiktok.items.length && tiktok.reason) {
-      return { source, found: 0, inserted: 0, updated: 0, ok: true, error: tiktok.reason }
+      return { source, found: 0, inserted: 0, updated: 0, ok: false, skipped: true, error: 'TikTok kaynağı kullanılamıyor.' }
     }
     return await saveMaterials(source, tiktok.items)
   } catch (e) {
     const message = e instanceof Error ? e.message : 'bilinmeyen hata'
     await recordFailedRun(source, message).catch(() => {})
-    return { source, found: 0, inserted: 0, updated: 0, ok: false, error: message }
+    return { source, found: 0, inserted: 0, updated: 0, ok: false, error: 'Kaynak taraması tamamlanamadı.' }
   }
 }
 
@@ -43,6 +43,9 @@ export async function POST(req: Request) {
   if (guard) return guard
   try {
     const istenen = new URL(req.url).searchParams.get('source')
+    if (istenen && !SOURCES.includes(istenen as Source)) {
+      return NextResponse.json({ error: 'Geçersiz materyal kaynağı.' }, { status: 400 })
+    }
     const secilen: Source[] = istenen && SOURCES.includes(istenen as Source) ? [istenen as Source] : [...SOURCES]
     const sonuclar: MaterialSyncResult[] = []
     for (const source of secilen) sonuclar.push(await runSource(source))
@@ -50,7 +53,11 @@ export async function POST(req: Request) {
       (acc, r) => ({ found: acc.found + r.found, inserted: acc.inserted + r.inserted, updated: acc.updated + r.updated }),
       { found: 0, inserted: 0, updated: 0 }
     )
-    return NextResponse.json({ toplam, sonuclar })
+    const basarili = sonuclar.filter(result => result.ok).length
+    return NextResponse.json({ toplam, sonuclar,
+      partial: basarili > 0 && basarili < sonuclar.length,
+      ...(basarili ? {} : { error: 'Hiçbir kaynak taraması tamamlanamadı. Yapılandırmayı ve kaynak erişimini kontrol et.' }),
+    }, { status: basarili ? 200 : 503 })
   } catch (e) {
     return failure(e, 'Materyal toplama başarısız.')
   }

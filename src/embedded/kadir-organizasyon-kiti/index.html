@@ -104,12 +104,16 @@
           <button class="filter-chip" data-filter="lastmonth">Geçen ay</button>
         </div>
       </div>
+      <div class="starter-notice" id="starterNotice">
+        <span><strong>Başlangıç verileri gösteriliyor.</strong> Tutarlar, görevler ve prodüksiyonlar örnektir; gerçek kayıt değildir.</span>
+        <button type="button" class="ghost-btn" id="clearStarterData">Boş çalışma alanına geç</button>
+      </div>
       <div class="kpi-grid" id="dashKpis"></div>
       <div class="layout-two">
         <article class="panel"><div class="panel-head"><div><p class="eyebrow">Bütçe</p><h2>Aylık kullanım</h2></div><div class="icon-area"><i data-lucide="wallet"></i></div></div><div id="budgetOverview"></div></article>
         <article class="panel"><div class="panel-head"><div><p class="eyebrow">CRM Asistanı</p><h2>Hızlı soru</h2></div><div class="icon-area"><i data-lucide="bot"></i></div></div>
-          <form id="assistantForm" class="inline-form"><input id="assistantInput" type="text" value="Kameramanlara kaşe ücreti nedir?" aria-label="Soru"/><button type="submit" class="primary-btn"><i data-lucide="send"></i></button></form>
-          <div class="answer-box" id="assistantAnswer"></div>
+          <form id="assistantForm" class="inline-form"><input id="assistantInput" type="text" placeholder="Bütçe, ekip veya görevler hakkında sor…" aria-label="Soru"/><button type="submit" class="primary-btn" aria-label="Soruyu gönder"><i data-lucide="send" aria-hidden="true"></i></button></form>
+          <div class="answer-box" id="assistantAnswer" aria-live="polite">Bir soru yaz ve göndermek için ok düğmesine bas.</div>
         </article>
       </div>
       <div class="layout-two">

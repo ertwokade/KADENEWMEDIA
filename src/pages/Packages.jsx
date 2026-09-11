@@ -37,7 +37,7 @@ export default function Packages() {
   }, [])
 
   useSEO({
-    title: isEN ? 'Service Packages | Kade New Media' : 'Sosyal Medya Hizmet Kapsamları | Kade New Media',
+    title: isEN ? 'Service Packages | Kade New Media' : 'Paketler | Kade New Media',
     description: isEN
       ? 'Review Kade New Media service scopes and request a written quote tailored to your needs.'
       : 'Düzenli içerik, reklam yönetimi ve proje bazlı prodüksiyon ihtiyaçlarına göre şekillenen Kade New Media hizmet kapsamlarını inceleyin.',
@@ -57,7 +57,7 @@ export default function Packages() {
           </FadeIn>
           <FadeIn delay={0.1}>
             <h1 className="section-title" style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)' }}>
-              {isEN ? <>Choose the <span>right scope</span></> : <>İhtiyacınıza uygun <span>kapsamı seçin</span></>}
+              {isEN ? <>Service <span>Packages</span></> : <>Hizmet <span>Paketleri</span></>}
             </h1>
           </FadeIn>
           <FadeIn delay={0.2}>

@@ -84,7 +84,7 @@ export default async function handler(req, res) {
         if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu kupon kodu zaten kullanılıyor' });
         throw error;
       }
-      logActivity({ action: 'Kupon oluşturuldu', detail: normalizedCode, type: 'create', icon: '🏷️', user: user.username, targetType: 'coupon', targetId: created.id }).catch(() => {});
+      await logActivity({ action: 'Kupon oluşturuldu', detail: normalizedCode, type: 'create', icon: '🏷️', user: user.username, targetType: 'coupon', targetId: created.id }).catch(() => {});
       return res.status(201).json(mapCoupon(created));
     }
 
@@ -114,7 +114,7 @@ export default async function handler(req, res) {
         if (isNotFound(error)) return res.status(404).json({ error: 'Kupon bulunamadı' });
         throw error;
       }
-      logActivity({ action: 'Kupon güncellendi', detail: id, type: 'update', icon: '✏️', user: user.username, targetType: 'coupon', targetId: id }).catch(() => {});
+      await logActivity({ action: 'Kupon güncellendi', detail: id, type: 'update', icon: '✏️', user: user.username, targetType: 'coupon', targetId: id }).catch(() => {});
       return res.status(200).json({ message: 'Kupon güncellendi' });
     }
 
@@ -125,7 +125,7 @@ export default async function handler(req, res) {
       const { data: existing } = await supabase.from('kade_coupons').select('code').eq('id', id).maybeSingle();
       const { error } = await supabase.from('kade_coupons').delete().eq('id', id);
       if (error) throw error;
-      logActivity({ action: 'Kupon silindi', detail: existing?.code || id, type: 'delete', icon: '🗑️', user: user.username, targetType: 'coupon', targetId: id }).catch(() => {});
+      await logActivity({ action: 'Kupon silindi', detail: existing?.code || id, type: 'delete', icon: '🗑️', user: user.username, targetType: 'coupon', targetId: id }).catch(() => {});
       return res.status(200).json({ message: 'Kupon silindi' });
     }
 

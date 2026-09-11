@@ -19,7 +19,7 @@ const source = join(root, 'haoqi-clone', 'dist')
 const dist = join(root, 'dist')
 
 /* Klondan alınacak sayfalar. Buraya yazılmayan her rota React uygulamasında kalır. */
-/* organizasyon-kiti ALT SAYFALARI BİLEREK YOK.
+/* organizasyon-kiti ve kade-kit-business BİLEREK YOK.
 
    Klon 11 alt sayfa için SEO kabuğu üretiyordu (genel-bakis, marka-kimligi,
    butce…). React uygulamasında ise bambaşka 6 bölüm var (medya-yol-haritasi,
@@ -29,16 +29,16 @@ const dist = join(root, 'dist')
 
    Kabuklar listeden çıkarıldı; o adresler artık React'e düşüyor ve olmayan bir
    sayfa için dürüstçe 404 veriyor. Gerçek 6 bölüm zaten React'ten servis
-   ediliyor (generate-static-routes.mjs kendi dosyalarını üretiyor).
-   Kök /organizasyon-kiti kabuğu kalıyor: giriş öncesi tanıtım sayfası. */
+   ediliyor (generate-static-routes.mjs kendi dosyalarını üretiyor). Kök
+   /organizasyon-kiti ve /kade-kit-business de oturum/yetki kontrolü yapan
+   uygulama rotalarıdır; tanıtım kabuğu bunların güvenlik ekranını ezmemelidir. */
 const PAGES = [
   'hizmetler',
   'hizmetler/sosyal-medya-yonetimi', 'hizmetler/icerik-uretimi', 'hizmetler/reklam-yonetimi',
   'hizmetler/video-produksiyon', 'hizmetler/strateji-danismanlik', 'hizmetler/web-sitesi-tasarimi',
   'hakkimizda', 'neden-biz', 'ekip', 'kariyer', 'basin', 'new-media-ajansi',
   'portfolio', 'referanslar', 'basari-hikayeleri', 'partnerler', 'referans-programi',
-  'blog', 'sss', 'podcast-webinar', 'bulten-arsivi', 'kade-kit-business',
-  'organizasyon-kiti',
+  'blog', 'sss', 'podcast-webinar', 'bulten-arsivi',
   'teklif-al', 'fiyat-hesaplama', 'paketler', 'iletisim', 'tesekkur',
   'kvkk', 'gizlilik', 'cerez-politikasi', 'telif-haklari'
 ]

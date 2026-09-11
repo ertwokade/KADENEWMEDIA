@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { validateTranscript } from './transcription'
 
 /**
  * Gemini ile ses çözümleme.
@@ -82,7 +83,7 @@ export async function geminiTranscribe(dosya: File, vocabulary: string[] = []): 
   for (const ad of MODELLER) {
     try {
       const yanit = await istemci.getGenerativeModel({ model: ad }).generateContent([
-        { inlineData: { mimeType: dosya.type || 'audio/webm', data: veri } },
+        { inlineData: { mimeType: dosya.type.split(';')[0].trim() || 'audio/webm', data: veri } },
         { text: `${TALIMAT}\n- Özel isim sözlüğü: ${vocabulary.join(', ') || 'yok'}. Yalnız sesle eşleştiğinde bu yazımı aynen kullan; seste yoksa ekleme.` },
       ])
       ham = yanit.response.text()
@@ -100,21 +101,23 @@ export async function geminiTranscribe(dosya: File, vocabulary: string[] = []): 
     | null
   if (!cozum) throw new Error('Ses çözümlenemedi.')
 
-  const hamBolumler = Array.isArray(cozum.bolumler) ? cozum.bolumler : []
-  const bolumler: Bolum[] = hamBolumler
-    .map((b: Record<string, unknown>) => ({
-      start: Number(b?.baslangic),
-      end: Number(b?.bitis),
-      text: String(b?.metin ?? '').trim(),
-    }))
-    .filter((b) => Number.isFinite(b.start) && Number.isFinite(b.end) && b.end > b.start && b.text)
-    .sort((a, b) => a.start - b.start)
+  if (!Array.isArray(cozum.bolumler) || cozum.bolumler.length > 10_000) throw new Error('Geçersiz ses bölümleri.')
+  let previousEnd = 0
+  const bolumler: Bolum[] = cozum.bolumler.map((value: unknown) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Geçersiz ses bölümü.')
+    const { baslangic, bitis, metin } = value as Record<string, unknown>
+    if (typeof baslangic !== 'number' || typeof bitis !== 'number' ||
+        !Number.isFinite(baslangic) || !Number.isFinite(bitis) || baslangic < previousEnd || bitis <= baslangic ||
+        typeof metin !== 'string' || !metin.trim() || metin.length > 10_000) throw new Error('Geçersiz ses bölümü.')
+    previousEnd = bitis
+    return { start: baslangic, end: bitis, text: metin.trim() }
+  })
 
   const words = bolumler.flatMap(bolumuKelimelereDagit)
 
-  return {
+  return validateTranscript({
     text: bolumler.map((b) => b.text).join(' '),
     words,
     language: typeof cozum.dil === 'string' ? cozum.dil : '',
-  }
+  })
 }

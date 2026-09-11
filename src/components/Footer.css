@@ -57,6 +57,7 @@
   pointer-events: none;
 }
 .kfoot-link:hover::before { border-color: var(--ky-ink, var(--kade-line-strong)); }
+.kfoot a[href^="mailto:"] { text-transform: none; }
 .kfoot-socials { display: flex; align-items: center; gap: 4px 14px; flex-wrap: wrap; }
 
 .kfoot-legal {

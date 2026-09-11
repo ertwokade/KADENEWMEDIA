@@ -126,6 +126,7 @@ export async function getRequestProfileVocabulary() {
   const brand = parsed?.brand
   return [
     safe(brand?.name, 120),
+    safe(parsed?.profile?.displayName, 120),
     ...safeList(brand?.products, 12),
     ...safeList(brand?.keywords, 12),
   ].filter(Boolean).slice(0, 25)

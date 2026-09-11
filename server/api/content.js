@@ -3,6 +3,7 @@ import { requirePermission } from './_lib/auth.js';
 import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import jwt from 'jsonwebtoken';
+import { publicStats } from './_lib/public-content.js';
 
 // Site yöneticisinin kod değiştirmeden güncellediği içerik bölümleri.
 // Listeyi merkezi tutmak hem yazım hatasıyla ölü kayıt oluşmasını hem de
@@ -46,8 +47,9 @@ async function ga4Token() {
     method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${assertion}`,
   });
-  if (!r.ok) { console.error('GA4 token error:', await r.text()); return null; }
+  if (!r.ok) throw new Error(`GA4 token request failed (${r.status})`);
   const d = await r.json();
+  if (typeof d.access_token !== 'string' || !d.access_token) throw new Error('GA4 token response invalid');
   _ga4Token = d.access_token;
   _ga4Exp = Date.now() + d.expires_in * 1000;
   return _ga4Token;
@@ -58,8 +60,10 @@ async function ga4Report(propId, token, body) {
     method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!r.ok) { console.error('GA4 report error:', await r.text()); return null; }
-  return r.json();
+  if (!r.ok) throw new Error(`GA4 report request failed (${r.status})`);
+  const report = await r.json();
+  if (!report || typeof report !== 'object' || Array.isArray(report) || report.error) throw new Error('GA4 report response invalid');
+  return report;
 }
 
 export default async function handler(req, res) {
@@ -385,7 +389,7 @@ export default async function handler(req, res) {
     }
     try {
       const token = await ga4Token();
-      if (!token) return res.status(200).json({ configured: false, error: 'GA4 token alınamadı' });
+      if (!token) throw new Error('GA4 token alınamadı');
 
       const period = req.query?.period || 'week';
       const days = period === 'quarter' ? 90 : period === 'month' ? 30 : 7;
@@ -491,7 +495,8 @@ export default async function handler(req, res) {
         if (!isKnownContentSection(section)) {
           return res.status(400).json({ error: 'Geçersiz içerik bölümü' });
         }
-        if (!isPublicContentSection(section)) {
+        const statsView = section === 'nedenBiz' && req.query.view === 'public-stats';
+        if (!statsView && !isPublicContentSection(section)) {
           if (!(await requirePermission(req, res, 'content'))) return;
         }
         const { data: content, error } = await supabase
@@ -500,6 +505,7 @@ export default async function handler(req, res) {
           .eq('section', section)
           .maybeSingle();
         if (error) throw error;
+        if (statsView) return res.status(200).json({ section, data: publicStats(content?.data) });
         return res.status(200).json(content || { section, data: {} });
       }
       // Bölümsüz liste yalnız admin içerik ekranı içindir. Önceden anonim

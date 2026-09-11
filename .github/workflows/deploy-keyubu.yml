@@ -8,6 +8,7 @@ on:
       - ".dockerignore"
       - "apps/kadexai/**"
       - "src/**"
+      - "server/**"
       - "scripts/**"
       - "haoqi-clone/**"
       - "public/**"

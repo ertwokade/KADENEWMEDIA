@@ -37,34 +37,68 @@ export function encodeWAV(buffer: AudioBuffer): Blob {
 }
 
 export async function extractAudio(file: File, onMsg: (m: string) => void = () => {}): Promise<File> {
+  const mediaType = file.type.split(';')[0].trim().toLowerCase()
+  if (file.size > 0 && file.size <= 25 * 1024 * 1024 &&
+      ['audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/webm', 'audio/ogg'].includes(mediaType)) {
+    onMsg('Ses dosyası hazır.')
+    return new File([file], file.name, { type: mediaType })
+  }
   type CaptureStreamVideo = HTMLVideoElement & { captureStream: () => MediaStream }
   const supportsCapture = typeof (HTMLVideoElement.prototype as Partial<CaptureStreamVideo>).captureStream === 'function'
 
   if (supportsCapture) {
     try {
-      onMsg('Ses sıkıştırılıyor (WebM/Opus 16x hız)...')
+      onMsg('Ses çıkarılıyor (normal hızda; video süresi kadar sürebilir)...')
       const blob = await new Promise<Blob>((resolve, reject) => {
         const video = document.createElement('video')
         const url = URL.createObjectURL(file)
-        video.src = url; video.muted = false
+        let recorder: MediaRecorder | null = null
+        let stream: MediaStream | null = null
+        let settled = false
+        const finish = (error?: Error, blob?: Blob) => {
+          if (settled) return
+          settled = true
+          clearTimeout(timeout)
+          video.pause()
+          if (recorder?.state === 'recording') recorder.stop()
+          stream?.getTracks().forEach((track) => track.stop())
+          video.removeAttribute('src')
+          video.load()
+          URL.revokeObjectURL(url)
+          if (error) reject(error)
+          else if (blob?.size) resolve(blob)
+          else reject(new Error('Ses kaydı boş.'))
+        }
+        // A timeout is a failure, never an apparently complete truncated recording.
+        const timeout = setTimeout(() => finish(new Error('Ses çıkarma süresi aşıldı. Videoyu kısaltıp yeniden dene.')), 180000)
+        video.muted = false
+        video.playsInline = true
         video.onloadedmetadata = () => {
+          if (settled) return
           try {
-            const stream = (video as CaptureStreamVideo).captureStream()
+            stream = (video as CaptureStreamVideo).captureStream()
             const audioTracks = stream.getAudioTracks()
             if (!audioTracks.length) throw new Error('no audio')
             const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus']
               .find((t) => MediaRecorder.isTypeSupported(t)) ?? 'audio/webm'
             const chunks: Blob[] = []
             const rec = new MediaRecorder(new MediaStream(audioTracks), { mimeType: mime, audioBitsPerSecond: 32000 })
+            recorder = rec
             rec.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data) }
-            rec.onstop = () => { URL.revokeObjectURL(url); resolve(new Blob(chunks, { type: mime })) }
-            rec.onerror = reject
-            video.playbackRate = 16; void video.play(); rec.start(200)
-            video.onended = () => rec.stop()
-            setTimeout(() => { try { if (rec.state === 'recording') rec.stop() } catch {} }, 180000)
-          } catch (err) { URL.revokeObjectURL(url); reject(err) }
+            rec.onstop = () => {
+              if (!video.ended) return finish(new Error('Ses kaydı tamamlanmadan durdu.'))
+              finish(undefined, new Blob(chunks, { type: mime.split(';')[0] }))
+            }
+            rec.onerror = () => finish(new Error('Ses kaydı başarısız.'))
+            // Speeding up playback also speeds up recorded speech and breaks timestamps.
+            video.playbackRate = 1
+            rec.start(200)
+            void video.play().catch(() => finish(new Error('Video oynatılamadı.')))
+            video.onended = () => { if (rec.state === 'recording') rec.stop() }
+          } catch { finish(new Error('Ses kanalı kaydedilemedi.')) }
         }
-        video.onerror = () => { URL.revokeObjectURL(url); reject(new Error('load error')) }
+        video.onerror = () => finish(new Error('Video açılamadı.'))
+        video.src = url
       })
       onMsg('Ses hazır!')
       return new File([blob], 'audio.webm', { type: blob.type })

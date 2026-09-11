@@ -2,9 +2,8 @@
  * Tool-to-tool orchestration (§8) — SAF tanım katmanı.
  *
  * Least-privilege ilkesi: hiçbir tool "istediği tool'u" çağıramaz. Yalnızca
- * burada tanımlı, SUNUCUDA sabit pipeline'lar çalışır ve her pipeline içinde
- * bir adım yalnızca kendisinden hemen sonraki adıma veri geçirebilir. İstemci
- * yalnızca pipeline KİMLİĞİNİ seçer; adım listesini asla göndermez.
+ * sunucunun izin verdiği adımlar çalışır. Hazır akışta sıra sabittir; özel
+ * akışın adım kimlikleri de sunucudaki katalogdan yeniden doğrulanır.
  */
 
 export interface OrchestrationStep {
@@ -14,7 +13,7 @@ export interface OrchestrationStep {
   label: string
   /** Bu adımın çalışması için gereken paket özelliği (entitlement). */
   requiresFeature?: string
-  /** Adım için üst sınır; aşılırsa adım iptal edilir, pipeline devam eder. */
+  /** Bekleme üst sınırı; aşılırsa akış durur. Sağlayıcı iptali ayrıca yönetilir. */
   timeoutMs: number
   maxTokens: number
 }
@@ -36,7 +35,7 @@ const CONTENT_SPRINT: Pipeline = {
   steps: [
     { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 30_000, maxTokens: 1_600 },
     { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 30_000, maxTokens: 1_600 },
-    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 2_000 },
+    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 4_000 },
     { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
     { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 20_000, maxTokens: 800 },
   ],
@@ -49,7 +48,7 @@ const TREND_TO_POST: Pipeline = {
   requiresFeature: 'content-generation',
   steps: [
     { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 30_000, maxTokens: 1_600 },
-    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 2_000 },
+    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 4_000 },
     { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
     { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 20_000, maxTokens: 800 },
   ],
@@ -62,7 +61,7 @@ const COMPETITOR_GAP: Pipeline = {
   requiresFeature: 'content-generation',
   steps: [
     { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 30_000, maxTokens: 1_600 },
-    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 2_000 },
+    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 4_000 },
     { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
   ],
 }
@@ -80,7 +79,7 @@ export const MAX_STEPS_PER_RUN = 8
 export const CUSTOM_STEP_CATALOG: readonly OrchestrationStep[] = [
   { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 30_000, maxTokens: 1_600 },
   { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 30_000, maxTokens: 1_600 },
-  { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 2_000 },
+  { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 4_000 },
   { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
   { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 20_000, maxTokens: 800 },
 ]

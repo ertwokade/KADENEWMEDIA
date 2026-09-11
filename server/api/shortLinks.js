@@ -120,7 +120,7 @@ export default async function handler(req, res) {
         if (isUniqueViolation(error)) return res.status(409).json({ error: 'Bu slug zaten kullanılıyor' });
         throw error;
       }
-      logActivity({ action: 'Kısa link oluşturuldu', detail: data.slug, type: 'create', icon: '🔗', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Kısa link oluşturuldu', detail: data.slug, type: 'create', icon: '🔗', user: user.username }).catch(() => {});
       return res.status(201).json(rowToLink(data));
     } catch (error) {
       console.error('ShortLinks POST error:', error);
@@ -155,7 +155,7 @@ export default async function handler(req, res) {
       }
       if (!data || data.length === 0) return res.status(404).json({ error: 'Link bulunamadı' });
 
-      logActivity({ action: 'Kısa link güncellendi', detail: updateData.slug || _id, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Kısa link güncellendi', detail: updateData.slug || _id, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Link güncellendi' });
     } catch (error) {
       console.error('ShortLinks PUT error:', error);
@@ -180,7 +180,7 @@ export default async function handler(req, res) {
       if (error) throw error;
       if (!data || data.length === 0) return res.status(404).json({ error: 'Link bulunamadı' });
 
-      logActivity({ action: 'Kısa link silindi', detail: link?.slug || queryId, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Kısa link silindi', detail: link?.slug || queryId, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Link silindi' });
     } catch (error) {
       console.error('ShortLinks DELETE error:', error);

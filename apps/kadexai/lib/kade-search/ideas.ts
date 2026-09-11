@@ -12,6 +12,10 @@ import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import { generateContent } from '@/lib/ai/provider'
 import { parseStructuredOutput } from '@/lib/ai/structured'
+import { normalizeGeneratedHashtags } from '@/lib/ai/hashtags'
+import { normalizeIdeaOutput } from './ideaOutput'
+import { structureFor } from './structures'
+import { hasMeasuredVelocity } from './export'
 import { CATEGORIES, FORMATS, STAGES, platformLabel } from './taxonomy'
 import { extractHashtags, fmtCount, normalizeText } from './util'
 import { queryTrends } from './store'
@@ -58,23 +62,6 @@ const SOUND_HOOKS = [
   '{konu} akımına kendi versiyonum',
 ]
 
-const STRUCTURES = {
-  kisa: [
-    '0-2 sn: Kanca (metin + hareket aynı anda)',
-    '2-6 sn: Vaadi netleştir (ne öğrenecek/görecek)',
-    '6-20 sn: Ana içerik, her 3 saniyede görsel değişim',
-    '20-27 sn: Doruk nokta / sonuç',
-    '27-30 sn: CTA — "kaydet" veya "yorumda söyle"',
-  ],
-  orta: [
-    '0-3 sn: Kanca + soru',
-    '3-10 sn: Bağlam ve neden önemli',
-    '10-40 sn: 3 bölümlü ana anlatım',
-    '40-55 sn: Özet + sürpriz detay',
-    '55-60 sn: CTA + seriye bağlama',
-  ],
-}
-
 const CTA = [
   'Kaydet, sonra lazım olacak',
   'Sence hangisi daha iyi? Yoruma yaz',
@@ -115,6 +102,7 @@ function difficultyOf(stage: string | null) {
 }
 
 export interface ContentIdea {
+  uretim: 'ai' | 'sablon'
   trendId: string
   baslik: string
   kaynak: { platform: string; tur: string; url: string | null; skor: number; asama: string; hacim: string }
@@ -133,7 +121,7 @@ export interface ContentIdea {
 }
 
 function hashtag(value: unknown) {
-  const clean = normalizeText(String(value ?? '').replace(/^#/, ''))
+  const clean = normalizeText(normalizeGeneratedHashtags(`#${String(value ?? '').replace(/^#/, '')}`).slice(1))
     .replace(/[^a-z0-9\s]/g, ' ')
     .split(/\s+/)
     .filter(Boolean)
@@ -141,12 +129,6 @@ function hashtag(value: unknown) {
     .join('')
     .slice(0, 32)
   return clean.length >= 2 ? `#${clean}` : ''
-}
-
-function textList(value: unknown, maxItems: number, maxLength: number) {
-  return Array.isArray(value)
-    ? value.map((item) => String(item).trim()).filter(Boolean).slice(0, maxItems).map((item) => item.slice(0, maxLength))
-    : []
 }
 
 async function personalizeIdeas(ideas: ContentIdea[], request?: Request) {
@@ -169,7 +151,8 @@ async function personalizeIdeas(ideas: ContentIdea[], request?: Request) {
 Her trend için birbirinden farklı, doğrudan çekilebilir bir fikir üret. Başlığı bir kalıba yapıştırma.
 Yabancı başlığı Türk kullanıcıya anlamlı bir açıya çeviremiyorsan o kayıt için fikir üretme.
 Hashtagleri yalnız konu ve içerikle doğrudan ilgili, küçük harfli ASCII biçiminde yaz.
-Paylaşım saati ve CTA'yı platforma ve fikre göre seç. Yanıt yalnızca geçerli JSON olsun.`,
+Paylaşım saati ve CTA'yı platforma ve fikre göre seç. Saatler Europe/Istanbul saat diliminde öneridir; hesap analitiği veya ölçülmüş en iyi saat değildir.
+Kaynakta olmayan deneyim, sayı veya başarı iddiası uydurma. Yanıt yalnızca geçerli JSON olsun.`,
       prompt: `Aşağıdaki ölçülmüş trendleri içerik briefine dönüştür:
 ${JSON.stringify(input)}
 
@@ -180,28 +163,19 @@ JSON şeması:
     if (!Array.isArray(parsed.ideas)) return ideas
     const byId = new Map(ideas.map((idea) => [idea.trendId, idea]))
     for (const raw of parsed.ideas) {
-      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) continue
-      const item = raw as Record<string, unknown>
-      const current = byId.get(String(item.trendId || ''))
+      const item = normalizeIdeaOutput(raw)
+      if (!item) continue
+      const current = byId.get(item.trendId)
       if (!current) continue
-      const kanca = typeof item.kanca === 'string' ? item.kanca.trim().slice(0, 500) : ''
-      const kurgu = textList(item.kurgu, 8, 300)
-      const tags = textList(item.hashtagler, 12, 80).map(hashtag).filter(Boolean)
-      const difficulty = item.zorluk && typeof item.zorluk === 'object' && !Array.isArray(item.zorluk)
-        ? item.zorluk as Record<string, unknown>
-        : null
-      if (kanca) current.kanca = kanca
-      const alternatives = textList(item.alternatifKancalar, 3, 500)
-      if (alternatives.length) current.alternatifKancalar = alternatives
-      if (kurgu.length >= 3) current.kurgu = kurgu
-      if (typeof item.cta === 'string' && item.cta.trim()) current.cta = item.cta.trim().slice(0, 240)
-      if (tags.length) current.hashtagler = [...new Set(tags)]
-      if (difficulty && typeof difficulty.level === 'string' && typeof difficulty.note === 'string') {
-        current.zorluk = { level: difficulty.level.slice(0, 40), note: difficulty.note.slice(0, 240) }
-      }
-      const times = textList(item.paylasimSaati, 3, 40).filter((time) => /^\d{2}:\d{2}(?:-\d{2}:\d{2})?$/.test(time))
-      if (times.length) current.paylasimSaati = times
-      if (typeof item.neden === 'string' && item.neden.trim()) current.neden = item.neden.trim().slice(0, 500)
+      current.kanca = item.kanca
+      current.kurgu = item.kurgu
+      current.cta = item.cta
+      current.uretim = 'ai'
+      if (item.alternatifKancalar.length) current.alternatifKancalar = item.alternatifKancalar
+      if (item.hashtagler.length) current.hashtagler = item.hashtagler
+      if (item.zorluk) current.zorluk = item.zorluk
+      if (item.paylasimSaati.length) current.paylasimSaati = item.paylasimSaati
+      if (item.neden) current.neden = item.neden
     }
     return ideas
   } catch {
@@ -225,6 +199,8 @@ export async function generateIdeas(
     limit: Math.min((opts.limit ?? 15) * 4, 100),
     category: opts.category,
     platform: opts.platform,
+    kind: opts.kind,
+    q: opts.q,
     country: opts.country,
     language: opts.language,
     stage: opts.stage,
@@ -269,7 +245,7 @@ export async function generateIdeas(
     return [...tags].map(hashtag).filter(Boolean).slice(0, 10)
   }
 
-  const ideas = trends.map((t, i) => {
+  const ideas: ContentIdea[] = trends.map((t, i) => {
     const seed = seedOf(t.id) + i
     const cat = (t.category ? CATEGORIES[t.category] : undefined) ?? CATEGORIES.diger
     // Muzik kategorisindeki her sey (klip videosu dahil) ses mantigiyla ele alinir
@@ -286,9 +262,10 @@ export async function generateIdeas(
     const stage = STAGES[t.stage ?? 'rising'] ?? STAGES.rising
     const alt = Object.keys(FORMATS)
       .filter((f) => f !== preferredFormat)
-      .slice(seed % 3, (seed % 3) + 2)
+      .slice(Math.abs(seed) % 3, (Math.abs(seed) % 3) + 2)
 
     return {
+      uretim: 'sablon',
       trendId: t.id,
       baslik: `${cat.emoji} ${konu}`,
       kaynak: {
@@ -306,7 +283,7 @@ export async function generateIdeas(
         .filter((h) => h !== hookTemplate)
         .slice(0, 2)
         .map((h) => h.replace(/\{konu\}/g, konu)),
-      kurgu: (t.duration_sec ?? 0) > 60 ? STRUCTURES.orta : STRUCTURES.kisa,
+      kurgu: structureFor(preferredFormat, konu, (t.duration_sec ?? 0) > 60),
       cta: pick(CTA, seed + 3) ?? CTA[0],
       hashtagler: suggestHashtags(t),
       sesOnerisi: t.kind === 'sound' ? {
@@ -316,9 +293,9 @@ export async function generateIdeas(
         platform: platformLabel(t.platform),
       } : null,
       alternatifFormatlar: alt.map((f) => FORMATS[f]?.label).filter(Boolean),
-      zorluk: difficultyOf(t.stage),
+      zorluk: hasMeasuredVelocity(t) ? difficultyOf(t.stage) : { level: 'Belirsiz', note: 'Yeterli ölçüm yok; rekabet düzeyi doğrulanamadı.' },
       paylasimSaati: POST_TIMES[t.platform] ?? POST_TIMES.tiktok,
-      neden: `${stage.desc}. ${t.snapshot_count >= 2 && t.breakdown?.hizOlculdu !== false ? `Günlük büyüme ~%${Math.round((t.velocity ?? 0) * 100)}.` : 'Hız için ikinci ölçüm bekleniyor.'} ${
+      neden: `${hasMeasuredVelocity(t) ? `${stage.desc}. ` : ''}${hasMeasuredVelocity(t) ? `Günlük büyüme ~%${Math.round((t.velocity ?? 0) * 100)}.` : 'Hız için en az 30 dakika aralıklı, karşılaştırılabilir ölçümler gerekli.'} ${
         t.link_count ? `${t.link_count} platformda karşılığı var.` : ''
       }`.trim(),
     }
@@ -329,12 +306,13 @@ export async function generateIdeas(
 /** Kategori bazli hizli ozet: her kategoride su an ne calisiyor. */
 export async function categoryPulse(limit = 5) {
   const supabase = await createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('kade_trend_current')
     .select('id, title, platform, kind, url, score, stage, views, posts, category')
     .gte('last_seen', new Date(Date.now() - 7 * 86400e3).toISOString())
     .order('score', { ascending: false, nullsFirst: false })
     .limit(1200)
+  if (error) throw new Error('Kategori özeti alınamadı.')
 
   const byCategory = new Map<string, typeof data>()
   for (const row of data ?? []) {

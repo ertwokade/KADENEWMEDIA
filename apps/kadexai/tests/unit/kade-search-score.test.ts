@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { classifyCategory, detectLanguage } from '../../lib/kade-search/classify'
-import { scoreTrend } from '../../lib/kade-search/score'
+import { computeVelocity, scoreTrend } from '../../lib/kade-search/score'
 import type { RawTrendItem, SnapshotRow, TrendRow } from '../../lib/kade-search/types'
 
 test('ülke kodu belirsiz içeriğe dil uydurmaz', () => {
@@ -31,4 +31,38 @@ test('birbirine yakın kategori sinyallerinde kesin kategori uydurmaz', () => {
   assert.equal(category.category, 'diger')
   assert.ok(category.confidence < 0.5)
   assert.ok(category.subcategories.length >= 2)
+})
+
+function snap(minutes: number, views: number | null, extra = {}) {
+  return { captured_at: new Date(Date.UTC(2026, 8, 5, 0, minutes)).toISOString(), views, posts: null, followers: null, ...extra } as unknown as SnapshotRow
+}
+
+test('hız için en az 30 dakika aralıklı iki geçerli ölçüm gerekir', () => {
+  assert.equal(computeVelocity([snap(0, 100), snap(29, 110)]), null)
+  assert.equal(computeVelocity([snap(0, 100), snap(0, 110)]), null)
+  assert.equal(computeVelocity([snap(0, 100), { ...snap(30, 110), captured_at: 'invalid' }]), null)
+  assert.ok(Math.abs(computeVelocity([snap(0, 100), snap(30, 110)])! - 4.8) < 1e-9)
+})
+
+test('ölçümler zaman sırasına alınır, girdi değiştirilmez', () => {
+  const snapshots = [snap(60, 110), snap(0, 100), snap(59, 109)]
+  assert.ok(Math.abs(computeVelocity(snapshots)! - 2.4) < 1e-9)
+  assert.equal(snapshots[0].views, 110)
+})
+
+test('sıfır taban, eksik metrik veya değişen ölçüm türü sahte büyüme üretmez', () => {
+  assert.equal(computeVelocity([snap(0, 0), snap(60, 100)]), null)
+  assert.equal(computeVelocity([snap(0, 100), snap(60, null)]), null)
+  assert.equal(computeVelocity([snap(0, 100), snap(60, null, { posts: 100 })]), null)
+  assert.equal(computeVelocity([snap(0, 100), snap(60, 100, { posts: 100 })]), 0)
+  assert.equal(computeVelocity([snap(0, 100), snap(60, 0)]), -3)
+})
+
+test('türetilmiş kayıtların hızı ölçülmüş gibi etiketlenmez', () => {
+  const trend = { id: 'inferred', first_seen: new Date().toISOString(), inferred: true } as TrendRow
+  const score = scoreTrend(trend, [snap(0, 100), snap(60, 110), snap(120, 140)])!
+  assert.equal(score.breakdown.hizOlculdu, false)
+  assert.equal(score.velocity, 0)
+  assert.equal(score.acceleration, 0)
+  assert.equal(scoreTrend(trend, [{ ...snap(0, 100), captured_at: 'invalid' }]), null)
 })

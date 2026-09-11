@@ -93,7 +93,7 @@ export default async function handler(req, res) {
       });
       if (noteError) throw noteError;
 
-      logActivity({ action: 'E-posta yanıtı gönderildi', detail: `${message.name} (${message.email})`, type: 'message', icon: '📤', user: user.username }).catch(() => {});
+      await logActivity({ action: 'E-posta yanıtı gönderildi', detail: `${message.name} (${message.email})`, type: 'message', icon: '📤', user: user.username }).catch(() => {});
 
       return res.status(200).json({ message: 'E-posta başarıyla gönderildi!' });
     } catch (error) {
@@ -135,6 +135,11 @@ export default async function handler(req, res) {
 
       const { error } = await supabase.from('kade_messages').update(update).eq('id', id);
       if (error) throw error;
+      await logActivity({
+        action: status !== undefined ? 'CRM aşaması güncellendi' : 'Mesaj okunma durumu güncellendi',
+        detail: status !== undefined ? status : '', type: 'update', icon: '✉️',
+        user: user.username, targetType: 'message', targetId: id, after: update,
+      });
       return res.status(200).json({ message: 'Güncellendi' });
     } catch (error) {
       console.error('Messages PUT error:', error);
@@ -152,7 +157,7 @@ export default async function handler(req, res) {
       if (findError) throw findError;
       const { error } = await supabase.from('kade_messages').delete().eq('id', queryId);
       if (error) throw error;
-      logActivity({ action: 'Mesaj silindi', detail: `${msg?.name || ''} - ${msg?.subject || ''}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Mesaj silindi', detail: `${msg?.name || ''} - ${msg?.subject || ''}`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Mesaj silindi' });
     } catch (error) {
       console.error('Messages DELETE error:', error);

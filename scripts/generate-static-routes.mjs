@@ -29,7 +29,7 @@ const routes = [
   ['/hizmetler', 'New Media ve Dijital Medya Hizmetleri | Kade Media', 'Kade Media’nın sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon, new media stratejisi ve web tasarımı hizmetleri.', false],
   ['/new-media-ajansi', 'New Media Ajansı İstanbul | Kade Media', 'İstanbul merkezli Kade Media ile new media stratejisi, sosyal medya yönetimi, içerik üretimi, dijital reklam, video prodüksiyon ve web tasarımı.', false],
   ['/iletisim', 'Kade Media İletişim | Projenizi Paylaşın', 'Sosyal medya, dijital pazarlama, içerik üretimi veya web projeniz için Kade Media ile iletişime geçin ve ihtiyacınızı paylaşın.', false],
-  ['/paketler', 'Sosyal Medya Hizmet Kapsamları | Kade Media', 'Düzenli içerik, reklam yönetimi ve proje bazlı prodüksiyon ihtiyaçlarına göre şekillenen Kade Media hizmet kapsamlarını inceleyin.', false],
+  ['/paketler', 'Paketler | Kade Media', 'Düzenli içerik, reklam yönetimi ve proje bazlı prodüksiyon ihtiyaçlarına göre şekillenen Kade Media hizmet kapsamlarını inceleyin.', false],
   ['/sss', 'Dijital Pazarlama Sık Sorulan Sorular | Kade Media', 'Kade Media’nın hizmetleri, teklif süreci, çalışma biçimi, teslimat ve iletişim adımları hakkında sık sorulan soruların yanıtlarını inceleyin.', false],
   ['/ekip', 'Kade Media Ekibi | İstanbul Dijital Pazarlama Ajansı', 'Kade Media’nın sosyal medya, içerik üretimi, reklam ve dijital projelerde birlikte çalışan İstanbul merkezli ekibiyle tanışın.', false],
   ['/kariyer', 'Kade Media Kariyer | Genel Başvuru Bilgileri', 'Kade Media’daki kariyer olanakları ve genel başvuru süreci hakkında bilgi alın; uzmanlık alanınızı ve çalışmalarınızı bizimle paylaşın.', false],

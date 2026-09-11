@@ -13,7 +13,9 @@ function labelOf(value: string) {
 }
 
 function parseJson(content: string): unknown | null {
-  const clean = content.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim()
+  const trimmed = content.trim()
+  const fence = trimmed.match(/^```(?:json)?\s*\n([\s\S]*?)\n```$/i)
+  const clean = fence ? fence[1].trim() : trimmed
   if (!clean.startsWith('{') && !clean.startsWith('[')) return null
   try {
     return JSON.parse(clean) as unknown
@@ -37,7 +39,7 @@ function inline(text: string): ReactNode[] {
 function JsonValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
   if (value === null || value === undefined || value === '') return null
   if (typeof value !== 'object') {
-    return <p className="whitespace-pre-wrap text-sm leading-6 text-zinc-300">{String(value)}</p>
+    return <MarkdownValue content={String(value)} />
   }
   if (Array.isArray(value)) {
     return (
@@ -69,35 +71,58 @@ function JsonValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
 function MarkdownValue({ content }: { content: string }) {
   const blocks: ReactNode[] = []
   let bullets: string[] = []
+  let ordered = false
+  let listStart = 1
+  let codeLines: string[] | null = null
+  let fenceMarker = ''
 
   const flushBullets = () => {
     if (!bullets.length) return
-    blocks.push(
-      <ul key={`list-${blocks.length}`} className="list-disc space-y-1 pl-5 text-sm leading-6 text-zinc-300">
-        {bullets.map((item, index) => <li key={index}>{inline(item)}</li>)}
-      </ul>
-    )
+    const items = bullets.map((item, index) => <li key={index}>{inline(item)}</li>)
+    blocks.push(ordered
+      ? <ol key={`list-${blocks.length}`} start={listStart} className="list-decimal space-y-1 pl-5 text-sm leading-6 text-zinc-300">{items}</ol>
+      : <ul key={`list-${blocks.length}`} className="list-disc space-y-1 pl-5 text-sm leading-6 text-zinc-300">{items}</ul>)
     bullets = []
+  }
+
+  const flushCode = () => {
+    if (codeLines === null) return
+    blocks.push(<pre key={`code-${blocks.length}`} className="max-w-full overflow-x-auto rounded-lg bg-zinc-950 p-3 text-xs text-zinc-300"><code>{codeLines.join('\n')}</code></pre>)
+    codeLines = null
   }
 
   for (const rawLine of content.split(/\r?\n/)) {
     const line = rawLine.trim()
+    if (codeLines !== null) {
+      if (line === fenceMarker) flushCode()
+      else codeLines.push(rawLine)
+      continue
+    }
+    const fence = line.match(/^(`{3,}|~{3,})[\w-]*\s*$/)
+    if (fence) {
+      flushBullets()
+      codeLines = []
+      fenceMarker = fence[1]
+      continue
+    }
     if (!line || /^-{3,}$/.test(line)) {
       flushBullets()
       continue
     }
     const bullet = line.match(/^[-*•]\s+(.+)/)
-    if (bullet) {
-      bullets.push(bullet[1])
+    const numbered = line.match(/^(\d+)[.)]\s+(.+)/)
+    if (bullet || numbered) {
+      const isOrdered = Boolean(numbered)
+      if (bullets.length && ordered !== isOrdered) flushBullets()
+      if (!bullets.length) listStart = numbered ? Number(numbered[1]) : 1
+      ordered = isOrdered
+      bullets.push(numbered ? numbered[2] : bullet![1])
       continue
     }
     flushBullets()
     const heading = line.match(/^(#{1,4})\s+(.+)/)
-    const numbered = line.match(/^\d+[.)]\s+(.+)/)
     if (heading) {
       blocks.push(<h3 key={blocks.length} className="pt-1 text-sm font-semibold text-zinc-100">{inline(heading[2])}</h3>)
-    } else if (numbered) {
-      blocks.push(<p key={blocks.length} className="text-sm leading-6 text-zinc-300"><span className="mr-2 text-violet-300">•</span>{inline(numbered[1])}</p>)
     } else if (line.startsWith('> ')) {
       blocks.push(<blockquote key={blocks.length} className="border-l-2 border-violet-500/40 pl-3 text-sm italic leading-6 text-zinc-400">{inline(line.slice(2))}</blockquote>)
     } else {
@@ -105,6 +130,7 @@ function MarkdownValue({ content }: { content: string }) {
     }
   }
   flushBullets()
+  flushCode()
   return <div className="space-y-2">{blocks}</div>
 }
 

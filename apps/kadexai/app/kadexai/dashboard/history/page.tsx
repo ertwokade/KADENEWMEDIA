@@ -1,19 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import { ChevronDown, History, RotateCcw, Search, Trash2 } from 'lucide-react'
 import { getModelLabel, getModelColor, cn } from '@/lib/utils'
 import { apiFetch, LOCAL_HISTORY_KEY, LocalHistoryEntry } from '@/lib/client/api'
 import { AIModel } from '@/types'
-import { apiPath, withBasePath } from '@/lib/appConfig'
-import { PROFILE_STORAGE_KEY } from '@/lib/profile/types'
+import { withBasePath } from '@/lib/appConfig'
+import { historyReplayEndpoint, mergeAccountHistory } from '@/lib/client/history'
 import { getToolById } from '@/lib/tools/registry'
 import ModelOutput from '@/components/ui/ModelOutput'
 import Link from 'next/link'
 
 interface HistoryEntry {
+  owner_id?: string
+  remote_id?: string
   id: string
   tool: string
   model: string
@@ -61,55 +63,52 @@ export default function HistoryPage() {
   const [from, setFrom]       = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
   const [rerunning, setRerunning] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
-  useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY) || '[]')
-      if (Array.isArray(stored)) setEntries(stored as LocalHistoryEntry[])
-    } catch {
-      localStorage.removeItem(LOCAL_HISTORY_KEY)
-    }
-
-    fetch(apiPath('/api/history'))
-      .then((r) => r.json())
+  const loadHistory = useCallback(() => {
+    setLoading(true)
+    setError('')
+    return apiFetch('/api/history')
+      .then(async (response) => {
+        const data = await response.json()
+        if (!response.ok) throw new Error(data.warning || data.error || 'Geçmiş yüklenemedi.')
+        return data
+      })
       .then((d) => {
         if (Array.isArray(d.history)) {
-          setEntries((current) => {
-            let workspaceId = ''
-            try { workspaceId = JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY) || '{}')?.workspace?.id || '' } catch {}
-            const sameAccountLocal = current.filter((entry) => {
-              if (!entry.id.startsWith('local-') || !workspaceId) return false
-              const snapshot = (entry as LocalHistoryEntry).profile_snapshot as { workspace?: { id?: string } } | undefined
-              return snapshot?.workspace?.id === workspaceId
-            })
-            const ids = new Set(sameAccountLocal.map((entry) => entry.id))
-            return [...sameAccountLocal, ...d.history.filter((entry: HistoryEntry) => !ids.has(entry.id))]
-              .sort((a, b) => b.created_at.localeCompare(a.created_at))
-          })
+          let stored: LocalHistoryEntry[] = []
+          try { const raw = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY) || '[]'); if (Array.isArray(raw)) stored = raw } catch { /* bozuk önbellek sunucu geçmişini engellemez */ }
+          setEntries(mergeAccountHistory(d.history, stored, d.ownerId || ''))
+        } else {
+          throw new Error('Geçmiş yanıtı geçersiz.')
         }
       })
-      .catch(() => undefined)
+      .catch((cause) => setError(cause instanceof Error ? cause.message : 'Geçmiş yüklenemedi.'))
       .finally(() => setLoading(false))
   }, [])
 
+  useEffect(() => { void loadHistory() }, [loadHistory])
+
   const handleDelete = async (id: string) => {
-    const next = entries.filter((entry) => entry.id !== id)
-    setEntries(next)
-
-    if (id.startsWith('local-')) {
-      localStorage.setItem(
-        LOCAL_HISTORY_KEY,
-        JSON.stringify(next.filter((entry) => entry.id.startsWith('local-')))
-      )
-      return
-    }
-
-    const response = await fetch(apiPath('/api/history'), {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    })
-    if (!response.ok) setError('Buluttaki kayıt silinemedi. Yerel listeden kaldırıldı.')
+    setDeleting(id); setError('')
+    try {
+      const entry = entries.find((item) => item.id === id)
+      const remoteId = entry?.remote_id || (!id.startsWith('local-') ? id : null)
+      if (remoteId) {
+        const response = await apiFetch('/api/history', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: remoteId }) })
+        if (!response.ok) throw new Error('Kayıt silinemedi. Listede korundu; yeniden deneyebilirsin.')
+      }
+      try {
+        const stored = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY) || '[]')
+        if (Array.isArray(stored)) localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(stored.filter((item) => item.id !== id && (!remoteId || item.remote_id !== remoteId))))
+      } catch {
+        if (!remoteId) throw new Error('Yerel kayıt silinemedi. Tarayıcı depolama iznini kontrol et.')
+        setError('Sunucu kaydı silindi, ancak tarayıcı önbelleği temizlenemedi.')
+      }
+      setEntries((current) => current.filter((item) => item.id !== id))
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Kayıt silinemedi.')
+    } finally { setDeleting(null) }
   }
 
   const tools = ['tümü', ...Array.from(new Set(entries.map((e) => e.tool)))]
@@ -122,17 +121,9 @@ export default function HistoryPage() {
     return true
   })
 
-  const reloadLocal = () => {
-    try {
-      const stored = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY) || '[]')
-      if (Array.isArray(stored)) setEntries((current) => {
-        const remote = current.filter((entry) => !entry.id.startsWith('local-'))
-        return [...stored, ...remote].sort((a, b) => b.created_at.localeCompare(a.created_at))
-      })
-    } catch {}
-  }
-
   const handleRerun = async (entry: HistoryEntry) => {
+    const endpoint = historyReplayEndpoint(entry.tool)
+    if (!endpoint) { setError('Bu eski araç doğrudan yeniden çalıştırılamıyor. Güncel aracı açıp girdileri kontrol et.'); return }
     if (!entry.input_data || Object.keys(entry.input_data).length === 0) {
       setError('Bu çalıştırmanın girdileri gizlendiği için yeniden çalıştırılamıyor.')
       return
@@ -140,14 +131,14 @@ export default function HistoryPage() {
     setRerunning(entry.id)
     setError('')
     try {
-      const response = await apiFetch(`/api/generate/${entry.tool}`, {
+      const response = await apiFetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(entry.input_data),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Araç yeniden çalıştırılamadı.')
-      window.setTimeout(reloadLocal, 250)
+      window.setTimeout(() => void loadHistory(), 500)
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Araç yeniden çalıştırılamadı.')
     } finally {
@@ -166,8 +157,9 @@ export default function HistoryPage() {
           )}
 
           {error && (
-            <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-4 text-amber-400 text-sm">
+            <div role="alert" className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-4 text-amber-400 text-sm">
               {error}
+              <button type="button" disabled={loading} onClick={() => void loadHistory()} className="ml-3 underline">Yeniden yükle</button>
             </div>
           )}
 
@@ -213,8 +205,8 @@ export default function HistoryPage() {
                       <RotateCcw className="h-4 w-4" />
                     </Link>
                   )}
-                  <button title="Aynı girdilerle yeniden çalıştır" disabled={rerunning === entry.id} onClick={() => handleRerun(entry)} className="text-zinc-600 transition-colors hover:text-amber-300 disabled:animate-pulse"><RotateCcw className="h-4 w-4" /></button>
-                  <button onClick={() => handleDelete(entry.id)}
+                  <button title={historyReplayEndpoint(entry.tool) ? 'Aynı girdilerle yeniden çalıştır' : 'Eski araç doğrudan yeniden çalıştırılamaz'} disabled={rerunning !== null || !historyReplayEndpoint(entry.tool)} onClick={() => handleRerun(entry)} className="text-zinc-600 transition-colors hover:text-amber-300 disabled:opacity-40"><RotateCcw className="h-4 w-4" /></button>
+                  <button aria-label="Kaydı sil" disabled={deleting !== null} onClick={() => handleDelete(entry.id)}
                     className="text-zinc-600 hover:text-red-400 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>

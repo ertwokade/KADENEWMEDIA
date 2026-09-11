@@ -161,7 +161,7 @@ export default async function handler(req, res) {
         if (isUniqueViolation(error)) return res.status(400).json({ error: 'Bu slug zaten kullanılıyor' });
         throw error;
       }
-      logActivity({ action: 'Blog yazısı oluşturuldu', detail: `"${titleTr}"`, type: 'create', icon: '📝', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Blog yazısı oluşturuldu', detail: `"${titleTr}"`, type: 'create', icon: '📝', user: user.username }).catch(() => {});
       return res.status(201).json(rowToPost(data));
     } catch (error) {
       console.error('Blog POST error:', error);
@@ -201,7 +201,7 @@ export default async function handler(req, res) {
       }
       if (!data || data.length === 0) return res.status(404).json({ error: 'Post bulunamadı' });
 
-      logActivity({ action: 'Blog yazısı güncellendi', detail: `"${updateData.titleTr || id}"`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Blog yazısı güncellendi', detail: `"${updateData.titleTr || id}"`, type: 'update', icon: '✏️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Post güncellendi' });
     } catch (error) {
       console.error('Blog PUT error:', error);
@@ -226,7 +226,7 @@ export default async function handler(req, res) {
       if (error) throw error;
       if (!data || data.length === 0) return res.status(404).json({ error: 'Post bulunamadı' });
 
-      logActivity({ action: 'Blog yazısı silindi', detail: `"${post?.title_tr || queryId}"`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Blog yazısı silindi', detail: `"${post?.title_tr || queryId}"`, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
       return res.status(200).json({ message: 'Post silindi' });
     } catch (error) {
       console.error('Blog DELETE error:', error);

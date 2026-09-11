@@ -87,7 +87,7 @@ export default async function handler(req, res) {
         if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
         const { error } = await supabase.from('kade_newsletter').delete().eq('id', id);
         if (error) throw error;
-        logActivity({ action: 'Newsletter abonesi silindi', detail: '', type: 'delete', icon: '📧', user: user.username }).catch(() => {});
+        await logActivity({ action: 'Newsletter abonesi silindi', detail: '', type: 'delete', icon: '📧', user: user.username }).catch(() => {});
         return res.status(200).json({ success: true });
       } catch (err) {
         return res.status(500).json({ error: 'Sunucu hatası' });
@@ -144,7 +144,7 @@ export default async function handler(req, res) {
         }
       }
 
-      logActivity({ action: 'Newsletter gönderildi', detail: `${sent} aboneye: "${subject}"`, type: 'create', icon: '📧', user: user.username }).catch(() => {});
+      await logActivity({ action: 'Newsletter gönderildi', detail: `${sent} aboneye: "${subject}"`, type: 'create', icon: '📧', user: user.username }).catch(() => {});
       return res.status(200).json({ sent, total: subscribers.length, ...(errors.length ? { errors } : {}) });
     } catch (err) {
       return res.status(500).json({ error: 'Sunucu hatası' });
@@ -272,7 +272,7 @@ export default async function handler(req, res) {
       });
       if (insertError) throw insertError;
       persisted = true;
-      logActivity({ action: 'Yeni mesaj alındı', detail: `${name.trim()} - ${service || 'Genel'}`, type: 'message', icon: '✉️', user: 'sistem' }).catch(() => {});
+      await logActivity({ action: 'Yeni mesaj alındı', detail: `${name.trim()} - ${service || 'Genel'}`, type: 'message', icon: '✉️', user: 'sistem' }).catch(() => {});
     } catch (dbErr) {
       console.error('Supabase save failed (non-critical):', dbErr.message);
     }

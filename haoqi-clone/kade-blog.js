@@ -77,7 +77,8 @@
       return res.json();
     })
     .then(function (data) {
-      var posts = Array.isArray(data) ? data.filter(function (p) { return p && p.slug; }) : [];
+      if (!Array.isArray(data)) throw new Error('Invalid article list');
+      var posts = data.filter(function (p) { return p && typeof p.slug === 'string' && p.slug.trim(); });
       if (!posts.length) {
         goster(durum('empty-state', t(
           'Şu anda yayında doğrulanmış bir yazı yok. Yakında tekrar kontrol edin.',

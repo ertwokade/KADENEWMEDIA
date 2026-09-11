@@ -2,6 +2,7 @@ import 'server-only'
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendWhatsAppMessage, whatsappConfiguration } from './whatsapp'
+import { notificationHourlyBudget } from './whatsappConfig'
 
 /**
  * İşlem akışı ve WhatsApp bildirimi.
@@ -43,8 +44,7 @@ const LABEL: Record<OperationKind, string> = {
 
 /** Saat başına anlık mesaj tavanı. 0 = anlık bildirim kapalı, yalnız özet. */
 function hourlyBudget() {
-  const raw = Number(process.env.KADE_WA_HOURLY_LIMIT)
-  return Number.isFinite(raw) && raw >= 0 ? raw : 20
+  return notificationHourlyBudget(process.env.KADE_WA_HOURLY_LIMIT)
 }
 
 /** Anlık bildirim gönderilmeyecek olay türleri (virgülle ayrılmış). */
@@ -76,7 +76,10 @@ export async function notifyOperation(input: OperationInput): Promise<void> {
       })
       .select('id')
       .single()
-    if (error || !data) return
+    if (error || !data) {
+      console.error('[notifications] operation_event_insert_failed')
+      return
+    }
 
     if (mutedKinds().has(input.kind)) return
     const budget = hourlyBudget()
@@ -92,11 +95,11 @@ export async function notifyOperation(input: OperationInput): Promise<void> {
     // Son bir saatte oluşan olay sayısı tavanı belirler; sağlayıcı düşse de
     // üstüne gidilmez.
     const since = new Date(Date.now() - 3_600_000).toISOString()
-    const { count } = await admin
+    const { count, error: budgetError } = await admin
       .from('operation_events')
       .select('id', { count: 'exact', head: true })
       .gte('created_at', since)
-    if ((count ?? 0) > budget) return
+    if (budgetError || count === null || count > budget) return
 
     const lines = [`${LABEL[input.kind]} — ${input.title}`]
     if (input.detail) lines.push(input.detail)
@@ -105,6 +108,7 @@ export async function notifyOperation(input: OperationInput): Promise<void> {
     await sendWhatsAppMessage(lines.join('\n'))
     await admin.from('operation_events').update({ notified_at: new Date().toISOString() }).eq('id', data.id)
   } catch {
+    console.error('[notifications] operation_notification_failed')
     // Bildirim telemetridir; üretim akışını hiçbir koşulda etkilemez.
   }
 }
@@ -149,7 +153,7 @@ export async function sendDailyOperationSummary(): Promise<DailySummary> {
     ...byKind.map((row) => `${LABEL[row.kind as OperationKind] ?? row.kind}: ${row.count}`),
   ]
   if (rows.length > notified) {
-    lines.push('', `${rows.length - notified} işlem anlık gönderilmedi (saatlik tavan).`)
+    lines.push('', `${rows.length - notified} işlem için kuyruğa alma onayı yok (ayar, sessize alma, sınır veya gönderim hatası olabilir).`)
   }
 
   await sendWhatsAppMessage(lines.join('\n'))

@@ -131,7 +131,7 @@ async function handleMarkRefunded(req, res, supabase) {
     .eq('status', 'active')
   if (pkgError) throw pkgError
 
-  logActivity({ action: 'Sipariş iade olarak işaretlendi', detail: orderId, type: 'update', icon: '↩️', user: user.username, targetType: 'shopier_order', targetId: order.id }).catch(() => {})
+  await logActivity({ action: 'Sipariş iade olarak işaretlendi', detail: orderId, type: 'update', icon: '↩️', user: user.username, targetType: 'shopier_order', targetId: order.id }).catch(() => {})
   return res.status(200).json({ success: true })
 }
 

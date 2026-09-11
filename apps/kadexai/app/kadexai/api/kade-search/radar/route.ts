@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { queryTrends } from '@/lib/kade-search/store'
 import { failure, isKadeSearchConfigured, requireReaderAccess } from '../_guard'
 import { ayiklanmisTrendler, turkceGorunuyor } from '@/lib/kade-search/relevance'
+import { boundedNumber, trendFiltersFromParams } from '@/lib/kade-search/filters'
+import { hasMeasuredVelocity } from '@/lib/kade-search/export'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,19 +20,18 @@ export async function GET(req: NextRequest) {
   }
   try {
     const params = req.nextUrl.searchParams
-    const limit = Math.min(Number(params.get('limit') ?? 25), 100)
-    const since = Number(params.get('since') ?? 96)
-
-    const language = params.get('language') ?? undefined
+    const limit = boundedNumber(params.get('limit'), 25, 1, 100)
+    const filters = trendFiltersFromParams(params, 'TR')
+    const language = filters.language
     const rows = ayiklanmisTrendler(await queryTrends({
+      ...filters,
       limit: 120,
       sort: 'velocity',
-      sinceHours: since,
-      country: params.get('country') ?? 'TR',
-      language,
+      sinceHours: filters.sinceHours ?? 96,
     }))
     const trendler = rows
       .filter((trend) => language !== 'tr' || turkceGorunuyor(trend))
+      .filter((trend) => hasMeasuredVelocity(trend) && trend.velocity! > 0)
       .filter((trend) => trend.stage === 'emerging' || trend.stage === 'rising')
       .slice(0, limit)
 

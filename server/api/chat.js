@@ -2,6 +2,8 @@ import { cors } from './_lib/cors.js';
 import { rateLimitCheck } from './_lib/rateLimit.js';
 import { requirePermission } from './_lib/auth.js';
 import { getSupabase } from './_lib/supabase.js';
+import { logActivity } from './_lib/notify.js';
+import { aiDateContext } from './_lib/ai-date-context.js';
 
 async function logAiUsage(scope, model, usageMeta) {
   try {
@@ -12,7 +14,7 @@ async function logAiUsage(scope, model, usageMeta) {
       prompt_tokens: usageMeta?.promptTokenCount || 0,
       output_tokens: usageMeta?.candidatesTokenCount || 0,
       total_tokens: usageMeta?.totalTokenCount || 0,
-    });
+    }).abortSignal(AbortSignal.timeout(5000));
     if (error) throw error;
   } catch (e) { /* non-fatal */ }
 }
@@ -40,7 +42,8 @@ export default async function handler(req, res) {
   // izinsiz kullanıcıya göstermiyor, ama doğrudan API çağrısıyla bu kontrol
   // olmadan bypass edilebilirdi (daha yüksek karakter/token limiti +
   // public rate limitinden muafiyet).
-  const isAdmin = adminMode === true && Boolean(await requirePermission(req, res, 'aiContent'));
+  const adminUser = adminMode === true ? await requirePermission(req, res, 'aiContent') : null;
+  const isAdmin = Boolean(adminUser);
   if (adminMode === true && !isAdmin) return; // requirePermission zaten 401/403 yanıtını yazdı
 
   if (!isAdmin) {
@@ -70,9 +73,10 @@ export default async function handler(req, res) {
   const safeMessage = message.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
 
   try {
-    const systemPrompt = isAdmin
+    const basePrompt = isAdmin
       ? ADMIN_CONTEXT
       : (lang === 'en' ? KADE_CONTEXT_EN : KADE_CONTEXT_TR);
+    const systemPrompt = `${basePrompt}\n\n${aiDateContext()}`;
 
     let promptText = systemPrompt + '\n\n' + (isAdmin ? 'Görev: ' : 'Kullanıcı mesajı: ') + safeMessage;
     if (!isAdmin && Array.isArray(history) && history.length > 0) {
@@ -114,7 +118,10 @@ export default async function handler(req, res) {
       .at(-1)?.text;
 
     if (text) {
-      logAiUsage(isAdmin ? 'admin' : 'public', 'gemini-3.6-flash', data?.usageMetadata);
+      await logAiUsage(isAdmin ? 'admin' : 'public', 'gemini-3.6-flash', data?.usageMetadata);
+      if (isAdmin) {
+        await logActivity({ action: 'AI içerik üretildi', detail: 'İçerik üretimi tamamlandı.', type: 'create', icon: '✨', user: adminUser.username });
+      }
       return res.status(200).json({ reply: text.trim() });
     }
     if (isAdmin) {

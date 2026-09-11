@@ -33,6 +33,7 @@ import { SERVICE_DETAILS } from '../data/serviceDetails'
 import { ABOUT_CONTENT_FALLBACK } from '../data/about'
 import { HOMEPAGE_DEFAULTS } from '../data/homepage'
 import { BRAND } from '../config/brand'
+import { filterLeadRecords, hasTestMarker, serviceLabel } from '../utils/crm'
 import { getPackageEntitlements } from '../config/entitlements'
 import { PROJECT_CATEGORIES, PROJECT_KINDS, normalizeProjects, hasDetailContent, slugify } from '../data/projects'
 import { SERVICES as NMA_SERVICES } from '../data/newMediaAgency'
@@ -182,7 +183,7 @@ function LoginScreen({ onLogin }) {
 }
 
 // ========== DASHBOARD ==========
-function DashboardSection({ stats, onNavigate }) {
+function DashboardSection({ stats, statsLoading, statsError, onRetryStats, onNavigate }) {
   const [recentMessages, setRecentMessages] = useState([])
   const [allMessages, setAllMessages] = useState([])
   const [recentPartners, setRecentPartners] = useState([])
@@ -266,30 +267,32 @@ function DashboardSection({ stats, onNavigate }) {
         </a>
       </div>
 
-      <div className="admin-stats-grid">
+      {statsError && <div role="alert" className="admin-form">{statsError} <button className="btn btn-outline" onClick={onRetryStats} disabled={statsLoading}>Yeniden dene</button></div>}
+      {statsLoading && <p role="status">Gösterge paneli verileri yükleniyor…</p>}
+      <div className="admin-stats-grid" aria-busy={statsLoading}>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.10)', color: '#6C63FF' }}>📝</div>
-          <div className="stat-number">{stats.blogs || 0}</div>
+          <div className="stat-number">{statsLoading ? '…' : stats?.blogs ?? '—'}</div>
           <div className="stat-label">Blog Yazısı</div>
         </div>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--gate-accent) 10%, transparent)', color: 'var(--gate-accent)' }}>🤝</div>
-          <div className="stat-number">{stats.partners || 0}</div>
+          <div className="stat-number">{statsLoading ? '…' : stats?.partners ?? '—'}</div>
           <div className="stat-label">Partner</div>
         </div>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--kade-success) 10%, transparent)', color: 'var(--kade-success)' }}>✉️</div>
-          <div className="stat-number">{stats.messages || 0}</div>
+          <div className="stat-number">{statsLoading ? '…' : stats?.messages ?? '—'}</div>
           <div className="stat-label">Toplam Mesaj</div>
         </div>
         <div className="admin-stat-card" style={{ cursor: 'pointer' }} onClick={() => onNavigate('messages')}>
           <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>📩</div>
-          <div className="stat-number">{stats.unreadMessages || 0}</div>
+          <div className="stat-number">{statsLoading ? '…' : stats?.unreadMessages ?? '—'}</div>
           <div className="stat-label">Okunmamış Mesaj</div>
         </div>
         <div className="admin-stat-card" style={{ cursor: 'pointer' }} onClick={() => onNavigate('newsletter')}>
           <div className="stat-icon" style={{ background: 'rgba(0, 188, 212, 0.10)', color: '#00BCD4' }}>📧</div>
-          <div className="stat-number">{stats.subscribers || 0}</div>
+          <div className="stat-number">{statsLoading ? '…' : stats?.subscribers ?? '—'}</div>
           <div className="stat-label">Newsletter Abone</div>
         </div>
       </div>
@@ -2946,7 +2949,7 @@ function exportToExcel(headers, rows, filename) {
 function exportMessagesExcel(messages) {
   const headers = ['Ad', 'E-posta', 'Telefon', 'Şirket', 'Hizmet', 'Mesaj', 'Durum', 'Tarih']
   const rows = messages.map(m => [
-    m.name, m.email, m.phone || '-', m.company || '-', m.service || '-',
+    m.name, m.email, m.phone || '-', m.company || '-', serviceLabel(m.service),
     m.message || '',
     m.status || 'yeni',
     m.createdAt ? new Date(m.createdAt).toLocaleDateString('tr-TR') : '-'
@@ -2974,6 +2977,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
   const [loading, setLoading] = useState(true)
   const [selectedMessage, setSelectedMessage] = useState(null)
   const [filterStatus, setFilterStatus] = useState('all')
+  const [recordFilter, setRecordFilter] = useState('all')
   const [viewMode, setViewMode] = useState('table') // 'table' | 'kanban'
   const [notes, setNotes] = useState([])
   const [noteText, setNoteText] = useState('')
@@ -3020,6 +3024,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
       onNewMessageCount(arr.filter((m) => !m.read).length)
     } catch (err) {
       console.warn('Mesajlar yüklenemedi:', err.message)
+      showToast('Mesajlar yüklenemedi. Mevcut liste korundu.', 'error')
       // Mevcut listeyi koruyoruz — API hatası listeyi sifirlamaz
     } finally {
       setLoading(false)
@@ -3085,20 +3090,26 @@ function MessagesSection({ showToast, onNewMessageCount }) {
     if (!window.confirm(`${selectedIds.length} mesajı silmek istediğinize emin misiniz?`)) return
     setBulkDeleting(true)
     try {
-      await Promise.all(selectedIds.map(id => deleteMessageApi(id)))
-      showToast(`${selectedIds.length} mesaj silindi!`, 'success')
-      setSelectedIds([])
-      fetchMessages()
+      const results = await Promise.allSettled(selectedIds.map(id => deleteMessageApi(id)))
+      const deletedIds = selectedIds.filter((_, index) => results[index].status === 'fulfilled')
+      const failedIds = selectedIds.filter((_, index) => results[index].status === 'rejected')
+      setMessages(previous => previous.filter(message => !deletedIds.includes(message._id)))
+      setSelectedIds(failedIds)
+      if (selectedMessage && deletedIds.includes(selectedMessage._id)) setSelectedMessage(null)
+      showToast(failedIds.length ? `${deletedIds.length} mesaj silindi; ${failedIds.length} mesaj silinemedi ve seçili bırakıldı.` : `${deletedIds.length} mesaj silindi!`, failedIds.length ? 'error' : 'success')
     } catch (err) { showToast(err.message, 'error') }
     finally { setBulkDeleting(false) }
   }
 
+  const recordMessages = filterLeadRecords(messages, recordFilter)
   const filteredMessages = filterStatus === 'all'
-    ? messages
-    : messages.filter((m) => (m.status || 'yeni') === filterStatus)
+    ? recordMessages
+    : recordMessages.filter((m) => (m.status || 'yeni') === filterStatus)
+
+  useEffect(() => { setSelectedIds([]) }, [recordFilter, filterStatus, viewMode])
 
   const counts = LEAD_STATUSES.reduce((acc, s) => {
-    acc[s.value] = messages.filter((m) => (m.status || 'yeni') === s.value).length
+    acc[s.value] = recordMessages.filter((m) => (m.status || 'yeni') === s.value).length
     return acc
   }, {})
 
@@ -3121,20 +3132,26 @@ function MessagesSection({ showToast, onNewMessageCount }) {
               <HiOutlineViewBoards size={14} /> Kanban
             </button>
           </div>
-          <button className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesExcel(messages)} disabled={messages.length === 0}>
+          <button className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesExcel(filteredMessages)} disabled={filteredMessages.length === 0}>
             📥 Excel İndir
           </button>
         </div>
       </div>
 
       {/* CRM Status Counters */}
+      <label style={{ display: 'block', marginBottom: 16 }}>Kayıt ayrımı{' '}
+        <select aria-label="Kayıt ayrımı" value={recordFilter} onChange={e => setRecordFilter(e.target.value)}>
+          <option value="all">Tüm kayıtlar</option><option value="unmarked">Test işareti olmayanlar</option><option value="test">Olası test kayıtları</option>
+        </select>
+        <small style={{ display: 'block', color: 'var(--text-tertiary)' }}>Ad, kaynak ve örnek e-posta işaretlerine göre filtrelenir; hiçbir kayıt silinmez veya kesin test sayılmaz.</small>
+      </label>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
         <button
           className={`table-action-btn ${filterStatus === 'all' ? 'primary' : ''}`}
           onClick={() => setFilterStatus('all')}
           style={{ padding: '8px 16px', borderRadius: 8 }}
         >
-          Tümü ({messages.length})
+          Tümü ({recordMessages.length})
         </button>
         {LEAD_STATUSES.map((s) => (
           <button
@@ -3165,7 +3182,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                 <div><strong style={{ color: 'var(--accent)' }}>E-posta:</strong> <a href={`mailto:${selectedMessage.email}`} style={{ color: 'var(--accent)' }}>{selectedMessage.email}</a></div>
                 <div><strong style={{ color: 'var(--accent)' }}>Telefon:</strong> {selectedMessage.phone}</div>
                 <div><strong style={{ color: 'var(--accent)' }}>Şirket:</strong> {selectedMessage.company}</div>
-                <div><strong style={{ color: 'var(--accent)' }}>Hizmet:</strong> {selectedMessage.service}</div>
+                <div><strong style={{ color: 'var(--accent)' }}>Hizmet:</strong> {serviceLabel(selectedMessage.service)}</div>
                 <div><strong style={{ color: 'var(--accent)' }}>Kaynak:</strong> {selectedMessage.source || 'iletisim-formu'}</div>
                 <div style={{ background: 'var(--bg-secondary)', padding: 16, borderRadius: 12, marginTop: 8 }}>
                   <strong style={{ color: 'var(--accent)' }}>Mesaj:</strong>
@@ -3253,7 +3270,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                             type="text"
                             value={replySubject}
                             onChange={e => setReplySubject(e.target.value)}
-                            placeholder={`Re: Kade New Media — ${selectedMessage.service && selectedMessage.service !== '-' ? selectedMessage.service : 'İletişim'}`}
+                            placeholder={`Re: Kade New Media — ${selectedMessage.service && selectedMessage.service !== '-' ? serviceLabel(selectedMessage.service) : 'İletişim'}`}
                             style={{ fontSize: '0.85rem' }}
                           />
                         </div>
@@ -3301,7 +3318,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
       {viewMode === 'kanban' && (
         <div className="kanban-board">
           {LEAD_STATUSES.map(status => {
-            const columnMessages = messages.filter(m => (m.status || 'yeni') === status.value)
+            const columnMessages = filteredMessages.filter(m => (m.status || 'yeni') === status.value)
             return (
               <div key={status.value} className="kanban-column">
                 <div className="kanban-column-header">
@@ -3314,10 +3331,10 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                 <div className="kanban-cards">
                   {columnMessages.map(msg => (
                     <div key={msg._id} className="kanban-card" onClick={() => handleRead(msg)}>
-                      <div className="kanban-card-name">{msg.name}</div>
+                      <div className="kanban-card-name">{msg.name}{hasTestMarker(msg) && <small> · Olası test</small>}</div>
                       <div className="kanban-card-company">{msg.company && msg.company !== '-' ? msg.company : ''}</div>
                       <div className="kanban-card-meta">
-                        {msg.service && msg.service !== '-' && <span className="kanban-card-service">{msg.service}</span>}
+                        {msg.service && msg.service !== '-' && <span className="kanban-card-service">{serviceLabel(msg.service)}</span>}
                         <span>{msg.createdAt ? new Date(msg.createdAt).toLocaleDateString('tr-TR') : ''}</span>
                       </div>
                     </div>
@@ -3348,7 +3365,7 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                 <HiOutlineTrash size={14} /> {bulkDeleting ? 'Siliniyor...' : `${selectedIds.length} Seçiliyi Sil`}
               </button>
             )}
-            <button className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesExcel(messages)} disabled={messages.length === 0}>
+            <button className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '0.82rem' }} onClick={() => exportMessagesExcel(filteredMessages)} disabled={filteredMessages.length === 0}>
               📥 Excel
             </button>
           </div>
@@ -3384,9 +3401,9 @@ function MessagesSection({ showToast, onNewMessageCount }) {
                   <td>
                     <LeadStatusBadge status={msg.status || 'yeni'} />
                   </td>
-                  <td><strong>{msg.name}</strong><br /><span style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem' }}>{msg.company !== '-' ? msg.company : ''}</span></td>
+                  <td><strong>{msg.name}</strong>{hasTestMarker(msg) && <small> · Olası test</small>}<br /><span style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem' }}>{msg.company !== '-' ? msg.company : ''}</span></td>
                   <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{msg.email}</td>
-                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>{msg.service !== '-' ? msg.service : '—'}</td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>{serviceLabel(msg.service)}</td>
                   <td style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
                     {new Date(msg.createdAt).toLocaleDateString('tr-TR')}
                   </td>
@@ -3459,6 +3476,7 @@ function SettingsSection({ showToast }) {
 
   const handleSeed = async () => {
     if (!seedSecret) { showToast('Seed secret giriniz', 'error'); return }
+    if (!confirm('İlk kurulum verileri yüklenecek. Canlı veritabanının güncel yedeğini aldığınızdan emin olun. Devam etmek istiyor musunuz?')) return
     setSeedLoading(true)
     try {
       await seedApi(seedSecret)
@@ -4657,6 +4675,7 @@ function AnalyticsSection() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [dataSource, setDataSource] = useState(null) // 'ga4' or 'internal'
+  const [ga4Status, setGa4Status] = useState('loading')
 
   const load = useCallback(async (p) => {
     setLoading(true)
@@ -4667,7 +4686,9 @@ function AnalyticsSection() {
       if (ga4?.configured && ga4?.source === 'google_analytics') {
         setData(ga4)
         setDataSource('ga4')
+        setGa4Status('connected')
       } else {
+        setGa4Status(ga4?.configured === false ? 'unconfigured' : 'unavailable')
         // Fall back to internal analytics
         const res = await getAnalyticsApi(p)
         setData(res)
@@ -4677,7 +4698,8 @@ function AnalyticsSection() {
         }
       }
     } catch (e) {
-      setError(e.message || 'Veri alinamadi')
+      setData(null)
+      setError(e.message || 'Veri alınamadı')
     } finally {
       setLoading(false)
     }
@@ -4687,15 +4709,15 @@ function AnalyticsSection() {
 
   const PAGE_NAMES = {
     '/': 'Ana Sayfa', '/hizmetler': 'Hizmetler', '/paketler': 'Paketler',
-    '/blog': 'Blog', '/iletisim': 'Iletisim', '/hakkimizda': 'Hakkimizda',
+    '/blog': 'Blog', '/iletisim': 'İletişim', '/hakkimizda': 'Hakkımızda',
     '/ekip': 'Ekip', '/kariyer': 'Kariyer', '/partnerler': 'Partnerler', '/portfolio': 'Portfolyo',
-    '/basari-hikayeleri': 'Basari Hikayeleri', '/roi-hesaplayici': 'ROI Hesaplayici',
-    '/kvkk': 'KVKK', '/gizlilik': 'Gizlilik', '/cerez-politikasi': 'Cerez Politikasi',
+    '/basari-hikayeleri': 'Başarı Hikâyeleri', '/roi-hesaplayici': 'ROI Hesaplayıcı',
+    '/kvkk': 'KVKK', '/gizlilik': 'Gizlilik', '/cerez-politikasi': 'Çerez Politikası',
   }
 
   const formatLabel = (date) => {
     const d = new Date(date)
-    if (period === 'week') return ['Pzt','Sal','Car','Per','Cum','Cmt','Paz'][d.getDay() === 0 ? 6 : d.getDay() - 1]
+    if (period === 'week') return ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'][d.getDay() === 0 ? 6 : d.getDay() - 1]
     if (period === 'quarter') return `${d.getDate()}/${d.getMonth() + 1}`
     return `${d.getDate()}/${d.getMonth() + 1}`
   }
@@ -4726,7 +4748,7 @@ function AnalyticsSection() {
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <a
-            href="https://analytics.google.com/analytics/web/#/p/G-R893K1VE79"
+            href="https://analytics.google.com/analytics/web/"
             target="_blank"
             rel="noopener noreferrer"
             className="table-action-btn"
@@ -4738,9 +4760,9 @@ function AnalyticsSection() {
             {loading ? '...' : 'Yenile'}
           </button>
           <div className="admin-tabs" style={{ margin: 0 }}>
-            <button className={`admin-tab ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>7 Gun</button>
-            <button className={`admin-tab ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>30 Gun</button>
-            <button className={`admin-tab ${period === 'quarter' ? 'active' : ''}`} onClick={() => setPeriod('quarter')}>90 Gun</button>
+            <button className={`admin-tab ${period === 'week' ? 'active' : ''}`} onClick={() => setPeriod('week')}>7 Gün</button>
+            <button className={`admin-tab ${period === 'month' ? 'active' : ''}`} onClick={() => setPeriod('month')}>30 Gün</button>
+            <button className={`admin-tab ${period === 'quarter' ? 'active' : ''}`} onClick={() => setPeriod('quarter')}>90 Gün</button>
           </div>
         </div>
       </div>
@@ -4748,7 +4770,7 @@ function AnalyticsSection() {
       {error && <div className="admin-form" style={{ color: '#E91E63', padding: 16 }}>{error}</div>}
 
       {/* GA4 Setup Notice */}
-      {dataSource === 'internal' && !loading && (
+      {dataSource === 'internal' && !loading && data && (
         // GA4 yapılandırılmadığında dahili analitik gösteriliyor. Önceki sürüm
         // burada ham .env değişken adlarını (GA4_PRIVATE_KEY vb.) canlı ekrana
         // döküyordu — kurulum talimatı, üretim analitik ekranında görünmemeli
@@ -4757,11 +4779,12 @@ function AnalyticsSection() {
         // (yalnızca var/yok olarak) izlenir.
         <div className="admin-form" style={{ marginBottom: 16, padding: '10px 16px', background: 'color-mix(in srgb, var(--gate-accent) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--gate-accent) 15%, transparent)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-            <span>ℹ️ Şu an <strong>dahili analitik</strong> gösteriliyor. Google Analytics 4 bağlamak için sunucu ortam değişkenlerinin yapılandırılması gerekir (sistem yöneticisi).</span>
+            <span>ℹ️ Şu an <strong>dahili analitik</strong> gösteriliyor. {ga4Status === 'unconfigured' ? 'Google Analytics 4 bağlantısı yapılandırılmamış.' : 'Google Analytics 4 verisi alınamadı. Bağlantı veya erişim izinleri kontrol edilmeli.'}</span>
           </div>
         </div>
       )}
 
+      {!loading && !data ? <p role="status">Analitik verileri alınamadığı için sayaçlar gösterilemiyor.</p> : <>
       {/* Summary Cards */}
       <div className="admin-stats-grid">
         <div className="admin-stat-card">
@@ -4769,10 +4792,10 @@ function AnalyticsSection() {
             {dataSource === 'ga4' ? 'GA' : 'PV'}
           </div>
           <div className="stat-number">{loading ? '—' : totalVisits.toLocaleString('tr-TR')}</div>
-          <div className="stat-label">Toplam Sayfa Goruntuleme</div>
-          {growth !== null && !loading && (
+          <div className="stat-label">Toplam Sayfa Görüntüleme</div>
+          {Number.isFinite(growth) && !loading && (
             <div style={{ fontSize: '0.75rem', color: growth >= 0 ? 'var(--kade-success)' : '#E91E63', marginTop: 4 }}>
-              {growth >= 0 ? '+' : ''}{growth}% onceki doneme gore
+              {growth >= 0 ? '+' : ''}{growth}% önceki döneme göre
             </div>
           )}
         </div>
@@ -4780,7 +4803,7 @@ function AnalyticsSection() {
           <div className="admin-stat-card">
             <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--kade-success) 10%, transparent)', color: 'var(--kade-success)' }}>AU</div>
             <div className="stat-number">{loading ? '—' : activeUsers}</div>
-            <div className="stat-label">Bugunku Aktif Kullanici</div>
+            <div className="stat-label">Bugünkü Aktif Kullanıcı</div>
           </div>
         )}
         <div className="admin-stat-card">
@@ -4791,25 +4814,25 @@ function AnalyticsSection() {
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--kade-success) 10%, transparent)', color: 'var(--kade-success)' }}>AV</div>
           <div className="stat-number">{loading ? '—' : dailyData.length > 0 ? Math.round(totalVisits / dailyData.length) : 0}</div>
-          <div className="stat-label">Gunluk Ortalama</div>
+          <div className="stat-label">Günlük Ortalama</div>
         </div>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(233, 30, 99, 0.10)', color: '#E91E63' }}>TP</div>
           <div className="stat-number">{loading ? '—' : pages[0]?.views.toLocaleString('tr-TR') || 0}</div>
-          <div className="stat-label">En Cok Ziyaret</div>
+          <div className="stat-label">En Çok Ziyaret</div>
           {pages[0] && <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{PAGE_NAMES[pages[0].path] || pages[0].path}</div>}
         </div>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(108, 99, 255, 0.10)', color: '#6C63FF' }}>PK</div>
           <div className="stat-number">{loading ? '—' : (() => { const peak = dailyData.reduce((max, d) => d.count > max.count ? d : max, { count: 0, date: '' }); return peak.count > 0 ? peak.count.toLocaleString('tr-TR') : '—' })()}</div>
-          <div className="stat-label">En Yogun Gun</div>
+          <div className="stat-label">En Yoğun Gün</div>
           {!loading && dailyData.length > 0 && (() => { const peak = dailyData.reduce((max, d) => d.count > max.count ? d : max, { count: 0, date: '' }); return peak.date ? <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{new Date(peak.date).toLocaleDateString('tr-TR', { weekday: 'short', day: 'numeric', month: 'short' })}</div> : null })()}
         </div>
       </div>
 
       {/* Bar Chart */}
       <div className="admin-form" style={{ marginTop: 24 }}>
-        <h3>Sayfa Goruntuleme Trendi ({period === 'week' ? 'Son 7 Gun' : period === 'month' ? 'Son 30 Gun' : 'Son 90 Gun'})</h3>
+        <h3>Sayfa Görüntüleme Trendi ({period === 'week' ? 'Son 7 Gün' : period === 'month' ? 'Son 30 Gün' : 'Son 90 Gün'})</h3>
         {loading ? (
           <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)' }}>Veriler alınıyor...</div>
         ) : dailyData.length === 0 || totalVisits === 0 ? (
@@ -4868,7 +4891,7 @@ function AnalyticsSection() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginTop: 20 }}>
         {/* Donut Chart */}
         <div className="admin-form" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-          <h3 style={{ marginBottom: 16, textAlign: 'center' }}>Kaynak Dagilimi</h3>
+          <h3 style={{ marginBottom: 16, textAlign: 'center' }}>Kaynak Dağılımı</h3>
           {!loading && sources.length > 0 ? (() => {
             const r = 60, cx = 80, cy = 80, sw = 18
             let offset = 0
@@ -4920,15 +4943,15 @@ function AnalyticsSection() {
         {/* Detailed Source List */}
         <div className="admin-form">
           <div style={{ marginBottom: 16 }}>
-            <h3>Trafik Kaynaklari</h3>
+            <h3>Trafik Kaynakları</h3>
             <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', marginTop: 4 }}>
-              Platform bazinda detayli dagilim
+              Platform bazında detaylı dağılım
             </p>
           </div>
           {loading ? (
-            <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Veriler aliniyor...</div>
+            <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Veriler alınıyor...</div>
           ) : sources.length === 0 ? (
-            <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Henuz trafik verisi yok</div>
+            <div style={{ color: 'var(--text-tertiary)', padding: '16px 0' }}>Henüz trafik verisi yok</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {sources.map((s, i) => {
@@ -4981,41 +5004,41 @@ function AnalyticsSection() {
       {/* Traffic Improvement Recommendations */}
       {!loading && (
         <div className="admin-form" style={{ marginTop: 20 }}>
-          <h3>Trafik Artirma Onerileri</h3>
+          <h3>Trafik Artırma Önerileri</h3>
           <p style={{ color: 'var(--text-tertiary)', fontSize: '0.78rem', marginTop: 4, marginBottom: 16 }}>
-            Verilerinize gore onerilen aksiyonlar
+            Genel öneriler; ziyaret verilerinden kişiselleştirilmemiştir.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
             {[
               {
                 icon: '🔍', title: 'SEO Optimizasyonu', color: 'var(--kade-success)',
-                desc: 'Blog yazilarina anahtar kelime odakli meta description ve baslik ekleyin. Her yazi icin hedef anahtar kelime belirleyin.',
-                action: 'Blog yazilarini SEO icin optimize edin',
+                desc: 'Blog yazılarına anahtar kelime odaklı meta description ve başlık ekleyin. Her yazı için hedef anahtar kelime belirleyin.',
+                action: 'Blog yazılarını SEO için optimize edin',
               },
               {
-                icon: '📱', title: 'Sosyal Medya Paylasimi', color: '#6C63FF',
-                desc: 'Her yeni blog yazisini Instagram, TikTok ve LinkedIn\'de paylasin. Hikaye ve Reels formatinda icerik uretin.',
-                action: 'Haftalik sosyal medya takvimi olusturun',
+                icon: '📱', title: 'Sosyal Medya Paylaşımı', color: '#6C63FF',
+                desc: 'Her yeni blog yazısını Instagram, TikTok ve LinkedIn\'de paylaşın. Hikâye ve Reels formatında içerik üretin.',
+                action: 'Haftalık sosyal medya takvimi oluşturun',
               },
               {
                 icon: '📧', title: 'E-posta Pazarlama', color: '#E91E63',
-                desc: 'Newsletter abonelerine duzenlii icerik gonderin. Blog ozeti + CTA iceren haftalik e-posta kampanyasi baslatin.',
+                desc: 'Newsletter abonelerine düzenli içerik gönderin. Blog özeti + CTA içeren haftalık e-posta kampanyası başlatın.',
                 action: 'Otomatik e-posta serisi kurun',
               },
               {
-                icon: '🤝', title: 'Backlink ve Is Birligi', color: '#FF9800',
-                desc: 'Sektorel bloglarda misafir yazi yayin. Partner sayfalarindan karsilikli link alisveriside bulunun.',
-                action: 'Ayda 2-3 misafir yazi hedefleyin',
+                icon: '🤝', title: 'Backlink ve İş Birliği', color: '#FF9800',
+                desc: 'Sektörel bloglarda misafir yazı yayınlayın. Partner sayfalarından karşılıklı link alışverişinde bulunun.',
+                action: 'Ayda 2-3 misafir yazı hedefleyin',
               },
               {
                 icon: '🎯', title: 'Google Ads', color: '#4285F4',
-                desc: 'Hedef anahtar kelimeler icin arama reklamlari verin. Marka aramalari icin koruyucu kampanya olusturun.',
-                action: 'Dusuk butceli test kampanyasi baslatin',
+                desc: 'Hedef anahtar kelimeler için arama reklamları verin. Marka aramaları için koruyucu kampanya oluşturun.',
+                action: 'Düşük bütçeli test kampanyası başlatın',
               },
               {
-                icon: '📊', title: 'Icerik Stratejisi', color: '#9C27B0',
-                desc: 'En cok ziyaret edilen konularda daha fazla icerik uretin. Uzun kuyruk anahtar kelimeleri hedefleyin.',
-                action: 'Populer konularda seri icerikler olusturun',
+                icon: '📊', title: 'İçerik Stratejisi', color: '#9C27B0',
+                desc: 'En çok ziyaret edilen konularda daha fazla içerik üretin. Uzun kuyruk anahtar kelimeleri hedefleyin.',
+                action: 'Popüler konularda seri içerikler oluşturun',
               },
             ].map((tip, i) => (
               <div key={i} style={{ padding: '16px 18px', background: 'var(--bg-secondary)', borderRadius: 12, borderTop: `3px solid ${tip.color}` }}>
@@ -5032,6 +5055,7 @@ function AnalyticsSection() {
           </div>
         </div>
       )}
+      </>}
     </div>
   )
 }
@@ -5969,10 +5993,11 @@ function SystemHealthSection() {
   useEffect(() => { load() }, [load])
 
   const formatUptime = (seconds) => {
-    if (!seconds && seconds !== 0) return '—'
+    if (!Number.isFinite(seconds) || seconds < 0) return '—'
     const h = Math.floor(seconds / 3600)
     const m = Math.floor((seconds % 3600) / 60)
-    return `${h}s ${m}dk`
+    const s = Math.floor(seconds % 60)
+    return `${h ? `${h} sa ` : ''}${m} dk ${s} sn`
   }
 
   return (
@@ -6068,20 +6093,29 @@ function ActivityLogSection() {
   const [logs, setLogs] = useState([])
   const [filter, setFilter] = useState('all')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const load = useCallback(async (f) => {
-    setLoading(true)
+  const load = useCallback(async (f, background = false) => {
+    if (!background) setLoading(true)
     try {
       const data = await getActivityLogApi(f)
-      setLogs(Array.isArray(data) ? data : [])
+      if (!Array.isArray(data)) throw new Error('Geçersiz aktivite yanıtı')
+      setLogs(data)
+      setError('')
     } catch {
-      setLogs([])
+      setError('Aktivite kayıtları yenilenemedi. Görünen kayıtlar güncel olmayabilir.')
     } finally {
       setLoading(false)
     }
   }, [])
 
-  useEffect(() => { load(filter) }, [filter, load])
+  useEffect(() => {
+    load(filter)
+    const timer = setInterval(() => {
+      if (document.visibilityState === 'visible') load(filter, true)
+    }, 30000)
+    return () => clearInterval(timer)
+  }, [filter, load])
 
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
@@ -6107,12 +6141,13 @@ function ActivityLogSection() {
       <div className="admin-page-header">
         <div>
           <h1>Aktivite <span>Logu</span></h1>
-          <p>Panelde yapılan gerçek zamanlı işlemler</p>
+          <p>Kaydedilen yönetim işlemleri · 30 saniyede bir yenilenir</p>
         </div>
         <button onClick={() => load(filter)} className="table-action-btn" disabled={loading}>
           {loading ? '⏳' : '🔄'} Yenile
         </button>
       </div>
+      {error && <p role="alert" style={{ color: 'var(--gate-danger)' }}>{error}</p>}
 
       <div className="admin-tabs" style={{ marginBottom: 20 }}>
         {['all', 'security', 'create', 'update', 'delete', 'message', 'system'].map(t => (
@@ -6161,6 +6196,7 @@ function ActivityLogSection() {
 function NewsletterSection({ showToast }) {
   const [subscribers, setSubscribers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [showCompose, setShowCompose] = useState(false)
   const [sending, setSending] = useState(false)
@@ -6168,10 +6204,11 @@ function NewsletterSection({ showToast }) {
 
   const fetchSubscribers = async () => {
     setLoading(true)
+    setLoadError('')
     try {
       const data = await getNewsletterSubscribersApi()
       setSubscribers(Array.isArray(data) ? data : [])
-    } catch { setSubscribers([]) }
+    } catch { setLoadError('Abone listesi alınamadı. Yenile düğmesiyle tekrar deneyin.') }
     finally { setLoading(false) }
   }
 
@@ -6206,7 +6243,7 @@ function NewsletterSection({ showToast }) {
   }
 
   const filtered = subscribers.filter(s =>
-    !searchQuery || s.email.toLowerCase().includes(searchQuery.toLowerCase())
+    !searchQuery || String(s.email || '').toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const exportSubscribersExcel = () => {
@@ -6230,15 +6267,16 @@ function NewsletterSection({ showToast }) {
           <button className="btn btn-outline" onClick={() => fetchSubscribers()} disabled={loading}>
             {loading ? '⏳' : '🔄'} Yenile
           </button>
-          <button className="btn btn-outline" onClick={exportSubscribersExcel} disabled={filtered.length === 0}>
+          <button className="btn btn-outline" onClick={exportSubscribersExcel} disabled={loading || !!loadError || filtered.length === 0}>
             📥 Excel İndir
           </button>
-          <button className="btn btn-primary" onClick={() => setShowCompose(v => !v)} disabled={subscribers.length === 0}>
+          <button className="btn btn-primary" onClick={() => setShowCompose(v => !v)} disabled={loading || !!loadError || subscribers.length === 0}>
             📨 Toplu Gönder
           </button>
         </div>
       </div>
 
+      {loadError && <p role="alert">{loadError}</p>}
       {/* Compose newsletter */}
       {showCompose && (
         <div className="admin-form-section" style={{ marginBottom: 24 }}>
@@ -6272,7 +6310,7 @@ function NewsletterSection({ showToast }) {
               />
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button type="submit" className="btn btn-primary" disabled={sending}>
+              <button type="submit" className="btn btn-primary" disabled={sending || loading || !!loadError}>
                 {sending ? '⏳ Gönderiliyor...' : `📨 ${subscribers.length} Aboneye Gönder`}
               </button>
               <button type="button" className="btn btn-outline" onClick={() => setShowCompose(false)}>
@@ -6287,13 +6325,13 @@ function NewsletterSection({ showToast }) {
       <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(0,188,212,0.10)', color: '#00BCD4' }}>📧</div>
-          <div className="stat-number">{subscribers.length}</div>
+          <div className="stat-number">{loading ? '…' : loadError ? '—' : subscribers.length}</div>
           <div className="stat-label">Toplam Abone</div>
         </div>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'color-mix(in srgb, var(--kade-success) 10%, transparent)', color: 'var(--kade-success)' }}>📅</div>
           <div className="stat-number">
-            {subscribers.filter(s => {
+            {loading ? '…' : loadError ? '—' : subscribers.filter(s => {
               if (!s.createdAt) return false
               const d = new Date(s.createdAt)
               const now = new Date()
@@ -6304,7 +6342,7 @@ function NewsletterSection({ showToast }) {
         </div>
         <div className="admin-stat-card">
           <div className="stat-icon" style={{ background: 'rgba(108,99,255,0.10)', color: '#6C63FF' }}>🔍</div>
-          <div className="stat-number">{filtered.length}</div>
+          <div className="stat-number">{loading ? '…' : loadError ? '—' : filtered.length}</div>
           <div className="stat-label">Filtrelenmiş</div>
         </div>
       </div>
@@ -6323,7 +6361,7 @@ function NewsletterSection({ showToast }) {
         </div>
         {loading ? (
           <div className="admin-empty-state"><p>Yükleniyor...</p></div>
-        ) : filtered.length === 0 ? (
+        ) : loadError && filtered.length === 0 ? null : filtered.length === 0 ? (
           <div className="admin-empty-state">
             <div className="empty-icon">📧</div>
             <h3>{searchQuery ? 'Arama sonucu bulunamadı' : 'Henüz abone yok'}</h3>
@@ -6432,7 +6470,7 @@ function RemindersSection({ showToast }) {
 
   const handleSubmit = async () => {
     if (!form.title.trim() || !form.remindAt) {
-      showToast('Baslik ve tarih zorunludur', 'error')
+      showToast('Başlık ve tarih zorunludur', 'error')
       return
     }
     try {
@@ -6441,15 +6479,15 @@ function RemindersSection({ showToast }) {
       const payload = { ...form, remindAt: new Date(form.remindAt).toISOString() }
       if (editingId) {
         await updateReminderApi({ id: editingId, ...payload })
-        showToast('Hatirlatici guncellendi', 'success')
+        showToast('Hatırlatıcı güncellendi', 'success')
       } else {
         await createReminderApi(payload)
-        showToast('Hatirlatici olusturuldu', 'success')
+        showToast('Hatırlatıcı oluşturuldu', 'success')
       }
       resetForm()
       loadReminders()
     } catch (err) {
-      showToast(err.message || 'Hata olustu', 'error')
+      showToast(err.message || 'Hata oluştu', 'error')
     }
   }
 
@@ -6482,13 +6520,13 @@ function RemindersSection({ showToast }) {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Bu hatirlaticiyi silmek istediginize emin misiniz?')) return
+    if (!confirm('Bu hatırlatıcıyı silmek istediğinize emin misiniz?')) return
     try {
       await deleteReminderApi(id)
-      showToast('Hatirlatici silindi', 'success')
+      showToast('Hatırlatıcı silindi', 'success')
       loadReminders()
     } catch (err) {
-      showToast(err.message || 'Hata olustu', 'error')
+      showToast(err.message || 'Hata oluştu', 'error')
     }
   }
 
@@ -6496,10 +6534,10 @@ function RemindersSection({ showToast }) {
     const newStatus = r.status === 'active' ? 'paused' : 'active'
     try {
       await updateReminderApi({ id: r._id, status: newStatus })
-      showToast(newStatus === 'active' ? 'Hatirlatici aktiflestirildi' : 'Hatirlatici duraklatildi', 'success')
+      showToast(newStatus === 'active' ? 'Hatırlatıcı aktifleştirildi' : 'Hatırlatıcı duraklatıldı', 'success')
       loadReminders()
     } catch (err) {
-      showToast(err.message || 'Hata olustu', 'error')
+      showToast(err.message || 'Hata oluştu', 'error')
     }
   }
 
@@ -6509,30 +6547,30 @@ function RemindersSection({ showToast }) {
       const result = await checkRemindersApi()
       const parts = []
       if (result.total === 0) {
-        parts.push('Bekleyen hatirlatici yok')
+        parts.push('Bekleyen hatırlatıcı yok')
       } else {
-        if (result.sent > 0) parts.push(`${result.sent} e-posta gonderildi`)
-        if (result.notifications > 0) parts.push(`${result.notifications} bildirim olusturuldu`)
-        if (result.sent === 0 && !result.smtpConfigured) parts.push('SMTP yapilandirilmamis — e-posta gonderilemedi')
-        if (result.sent === 0 && result.notifications === 0 && result.total > 0) parts.push(`${result.total} hatirlatici islendi`)
+        if (result.sent > 0) parts.push(`${result.sent} e-posta gönderildi`)
+        if (result.notifications > 0) parts.push(`${result.notifications} bildirim oluşturuldu`)
+        if (result.sent === 0 && !result.smtpConfigured) parts.push('SMTP yapılandırılmamış — e-posta gönderilemedi')
+        if (result.sent === 0 && result.notifications === 0 && result.total > 0) parts.push(`${result.total} hatırlatıcı işlendi`)
       }
       if (result.errors?.length) {
         showToast(parts.join(' | ') + ' (hatalar var)', 'error')
         console.warn('Reminder check errors:', result.errors)
       } else {
-        showToast(parts.join(' | ') || 'Kontrol tamamlandi', 'success')
+        showToast(parts.join(' | ') || 'Kontrol tamamlandı', 'success')
       }
       loadReminders()
     } catch (err) {
-      showToast(err.message || 'Kontrol hatasi', 'error')
+      showToast(err.message || 'Kontrol hatası', 'error')
     }
     setChecking(false)
   }
 
   const priorityColors = { low: 'var(--kade-success)', medium: 'var(--gate-accent)', high: '#E91E63' }
-  const priorityLabels = { low: 'Dusuk', medium: 'Orta', high: 'Yuksek' }
-  const repeatLabels = { none: 'Tekrar Yok', daily: 'Gunluk', weekly: 'Haftalik', monthly: 'Aylik' }
-  const statusLabels = { active: 'Aktif', paused: 'Duraklatildi', sent: 'Gonderildi' }
+  const priorityLabels = { low: 'Düşük', medium: 'Orta', high: 'Yüksek' }
+  const repeatLabels = { none: 'Tekrar Yok', daily: 'Günlük', weekly: 'Haftalık', monthly: 'Aylık' }
+  const statusLabels = { active: 'Aktif', paused: 'Duraklatıldı', sent: 'Gönderildi' }
   const statusColors = { active: 'var(--kade-success)', paused: 'var(--gate-accent)', sent: 'var(--gate-muted)' }
 
   const getUserName = (userId) => {
@@ -6544,15 +6582,15 @@ function RemindersSection({ showToast }) {
     <div className="admin-section">
       <div className="section-header">
         <div>
-          <h1>⏰ Hatirlaticilar</h1>
-          <p>Hatirlatici olusturun, zamani gelince e-posta ve sistem ici bildirim alin.</p>
+          <h1>⏰ Hatırlatıcılar</h1>
+          <p>Hatırlatıcı oluşturun, zamanı gelince e-posta ve sistem içi bildirim alın.</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn btn-secondary" onClick={handleCheckNow} disabled={checking}>
-            {checking ? '⏳ Kontrol ediliyor...' : '🔄 Simdi Kontrol Et'}
+            {checking ? '⏳ Kontrol ediliyor...' : '🔄 Şimdi Kontrol Et'}
           </button>
           <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
-            <HiOutlinePlus size={16} /> Yeni Hatirlatici
+            <HiOutlinePlus size={16} /> Yeni Hatırlatıcı
           </button>
         </div>
       </div>
@@ -6566,7 +6604,7 @@ function RemindersSection({ showToast }) {
             onClick={() => setFilter(f)}
             style={{ fontSize: 13, padding: '6px 14px' }}
           >
-            {f === 'all' ? 'Tumu' : f === 'active' ? 'Aktif' : f === 'paused' ? 'Duraklatildi' : 'Gonderildi'}
+            {f === 'all' ? 'Tümü' : f === 'active' ? 'Aktif' : f === 'paused' ? 'Duraklatıldı' : 'Gönderildi'}
           </button>
         ))}
       </div>
@@ -6586,36 +6624,36 @@ function RemindersSection({ showToast }) {
               style={{ maxWidth: 620, width: '95%' }}
             >
               <div className="modal-header">
-                <h2>{editingId ? 'Hatirlatici Duzenle' : 'Yeni Hatirlatici'}</h2>
+                <h2>{editingId ? 'Hatırlatıcı Düzenle' : 'Yeni Hatırlatıcı'}</h2>
                 <button className="modal-close" onClick={resetForm}><HiOutlineX size={20} /></button>
               </div>
               <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '70vh', overflowY: 'auto' }}>
                 <div className="form-group">
-                  <label>Baslik *</label>
-                  <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Orn: Musteri toplantisi" />
+                  <label>Başlık *</label>
+                  <input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Örn: Müşteri toplantısı" />
                 </div>
                 <div className="form-group">
-                  <label>Aciklama</label>
+                  <label>Açıklama</label>
                   <textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Detaylar..." />
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Hatirlatma Zamani *</label>
+                    <label>Hatırlatma Zamanı *</label>
                     <input type="datetime-local" value={form.remindAt} onChange={e => setForm({ ...form, remindAt: e.target.value })} />
                   </div>
                   <div className="form-group">
-                    <label>Oncelik</label>
+                    <label>Öncelik</label>
                     <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}>
-                      <option value="low">🟢 Dusuk</option>
+                      <option value="low">🟢 Düşük</option>
                       <option value="medium">🟡 Orta</option>
-                      <option value="high">🔴 Yuksek</option>
+                      <option value="high">🔴 Yüksek</option>
                     </select>
                   </div>
                 </div>
 
                 {/* Multiple Emails */}
                 <div className="form-group">
-                  <label>E-posta Alicilari (birden fazla eklenebilir)</label>
+                  <label>E-posta Alıcıları (birden fazla eklenebilir)</label>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input
                       type="email"
@@ -6650,14 +6688,14 @@ function RemindersSection({ showToast }) {
                     </div>
                   )}
                   <span style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-                    Bos birakilirsa varsayilan e-posta adresine gonderilir.
+                    Boş bırakılırsa varsayılan e-posta adresine gönderilir.
                   </span>
                 </div>
 
                 {/* Assigned Users for In-App Notifications */}
                 {users.length > 0 && (
                   <div className="form-group">
-                    <label>Sistem Ici Bildirim Alacak Kullanicilar</label>
+                    <label>Sistem İçi Bildirim Alacak Kullanıcılar</label>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 150, overflowY: 'auto', padding: 8, background: 'var(--bg-tertiary, #1a1a2e)', borderRadius: 8, border: '1px solid var(--border-color, #333)' }}>
                       {users.map(u => (
                         <label key={u._id} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'var(--text-primary)' }}>
@@ -6673,7 +6711,7 @@ function RemindersSection({ showToast }) {
                       ))}
                     </div>
                     <span style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-                      Secilen kullanicilar zamani gelince sistem ici bildirim alir.
+                      Seçilen kullanıcılar zamanı gelince sistem içi bildirim alır.
                     </span>
                   </div>
                 )}
@@ -6683,20 +6721,20 @@ function RemindersSection({ showToast }) {
                     <label>Tekrar</label>
                     <select value={form.repeat} onChange={e => setForm({ ...form, repeat: e.target.value })}>
                       <option value="none">Tekrar Yok</option>
-                      <option value="daily">Gunluk</option>
-                      <option value="weekly">Haftalik</option>
-                      <option value="monthly">Aylik</option>
+                      <option value="daily">Günlük</option>
+                      <option value="weekly">Haftalık</option>
+                      <option value="monthly">Aylık</option>
                     </select>
                   </div>
                   <div className="form-group">
                     <label>Kategori</label>
-                    <input type="text" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Orn: Toplanti, Fatura, Kampanya..." />
+                    <input type="text" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Örn: Toplantı, Fatura, Kampanya..." />
                   </div>
                 </div>
                 <div className="admin-form-actions">
-                  <button className="btn btn-secondary" onClick={resetForm}>Iptal</button>
+                  <button className="btn btn-secondary" onClick={resetForm}>İptal</button>
                   <button className="btn btn-primary" onClick={handleSubmit}>
-                    <HiOutlineSave size={16} /> {editingId ? 'Guncelle' : 'Olustur'}
+                    <HiOutlineSave size={16} /> {editingId ? 'Güncelle' : 'Oluştur'}
                   </button>
                 </div>
               </div>
@@ -6707,20 +6745,20 @@ function RemindersSection({ showToast }) {
 
       {/* List */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Yukleniyor...</div>
+        <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Yükleniyor...</div>
       ) : reminders.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-secondary)' }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>⏰</div>
-          <p>Henuz hatirlatici yok.</p>
+          <p>Henüz hatırlatıcı yok.</p>
           <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={() => { resetForm(); setShowForm(true) }}>
-            <HiOutlinePlus size={16} /> Ilk Hatirlaticini Olustur
+            <HiOutlinePlus size={16} /> İlk Hatırlatıcını Oluştur
           </button>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {reminders.map(r => {
             const isOverdue = r.status === 'active' && new Date(r.remindAt) < new Date()
-            const displayEmails = (r.emails && r.emails.length > 0) ? r.emails : (r.email ? [r.email] : ['Varsayilan'])
+            const displayEmails = (r.emails && r.emails.length > 0) ? r.emails : (r.email ? [r.email] : ['Varsayılan'])
             const displayUsers = Array.isArray(r.assignedUsers) ? r.assignedUsers : []
             return (
               <motion.div
@@ -6743,7 +6781,7 @@ function RemindersSection({ showToast }) {
                       )}
                       {isOverdue && (
                         <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: 'var(--gate-danger)22', color: 'var(--gate-danger)' }}>
-                          Suresi Gecmis
+                          Süresi Geçmiş
                         </span>
                       )}
                     </div>
@@ -6770,7 +6808,7 @@ function RemindersSection({ showToast }) {
                         className="btn btn-secondary"
                         style={{ fontSize: 12, padding: '4px 10px' }}
                         onClick={() => handleToggleStatus(r)}
-                        title={r.status === 'active' ? 'Duraklat' : 'Aktiflestir'}
+                        title={r.status === 'active' ? 'Duraklat' : 'Aktifleştir'}
                       >
                         {r.status === 'active' ? '⏸️' : '▶️'}
                       </button>
@@ -6795,7 +6833,7 @@ function RemindersSection({ showToast }) {
 // ========== KANBAN CRM ==========
 const KANBAN_COLUMNS = [
   { id: 'yeni', label: 'Yeni Lead', color: '#6C63FF' },
-  { id: 'gorusme-bekliyor', label: 'Görüşme Bekleniyor', color: 'var(--gate-accent)' },
+  { id: 'gorusme-bekliyor', label: 'Görüşme Bekliyor', color: 'var(--gate-accent)' },
   { id: 'teklif-gonderildi', label: 'Teklif Gönderildi', color: '#00BCD4' },
   { id: 'kazanildi', label: 'Kazanıldı ✅', color: 'var(--kade-success)' },
   { id: 'kaybedildi', label: 'Kaybedildi ❌', color: '#E91E63' },
@@ -6804,30 +6842,38 @@ const KANBAN_COLUMNS = [
 function KanbanSection({ showToast }) {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [recordFilter, setRecordFilter] = useState('all')
+  const [saving, setSaving] = useState(false)
   const [dragOver, setDragOver] = useState(null)
   const [dragging, setDragging] = useState(null)
 
-  useEffect(() => {
+  const fetchKanban = () => {
+    setLoading(true)
+    setLoadError('')
     getMessagesApi().then(data => {
-      if (Array.isArray(data)) setMessages(data)
-    }).catch(() => {}).finally(() => setLoading(false))
-  }, [])
+      if (!Array.isArray(data)) throw new Error('Geçersiz liste')
+      setMessages(data)
+    }).catch(() => setLoadError('CRM kayıtları alınamadı. Lütfen yeniden deneyin.')).finally(() => setLoading(false))
+  }
+  useEffect(() => { fetchKanban() }, [])
 
   const grouped = useMemo(() => {
     const g = {}
     KANBAN_COLUMNS.forEach(c => { g[c.id] = [] })
-    messages.forEach(m => {
+    filterLeadRecords(messages, recordFilter).forEach(m => {
       const col = m.status || 'yeni'
       if (g[col]) g[col].push(m)
       else g['yeni'].push(m)
     })
     return g
-  }, [messages])
+  }, [messages, recordFilter])
 
   const handleDrop = async (e, colId) => {
     e.preventDefault()
     setDragOver(null)
-    if (!dragging || dragging.status === colId) return
+    if (saving || !dragging || dragging.status === colId) return
+    setSaving(true)
     const updated = messages.map(m => m._id === dragging._id ? { ...m, status: colId } : m)
     setMessages(updated)
     setDragging(null)
@@ -6837,7 +6883,7 @@ function KanbanSection({ showToast }) {
     } catch {
       showToast('Güncelleme başarısız', 'error')
       setMessages(messages)
-    }
+    } finally { setSaving(false) }
   }
 
   return (
@@ -6845,9 +6891,14 @@ function KanbanSection({ showToast }) {
       <div className="admin-page-header">
         <div>
           <h1>Kanban <span>CRM</span></h1>
-          <p>Lead'lerinizi görsel pipeline ile yönetin</p>
+          <p>Müşteri adaylarınızı aşamalara göre yönetin</p>
         </div>
       </div>
+      <label className="form-label">Kayıt ayrımı <select aria-label="Kayıt ayrımı" className="form-input" value={recordFilter} onChange={event => { setRecordFilter(event.target.value); setDragging(null) }}>
+        <option value="all">Tüm kayıtlar</option><option value="unmarked">Test işareti olmayanlar</option><option value="test">Olası test kayıtları</option>
+      </select></label>
+      <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Test işareti yalnızca inceleme ipucudur; hiçbir kayıt otomatik silinmez.</p>
+      {loadError && <p role="alert">{loadError} <button className="btn btn-outline" onClick={fetchKanban}>Yeniden dene</button></p>}
       {loading ? (
         <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>Yükleniyor...</div>
       ) : (
@@ -6876,19 +6927,21 @@ function KanbanSection({ showToast }) {
                 {grouped[col.id]?.map(msg => (
                   <div
                     key={msg._id}
-                    draggable
+                    draggable={!saving}
                     onDragStart={() => setDragging(msg)}
+                    onDragEnd={() => setDragging(null)}
                     style={{
                       background: 'var(--bg-secondary)', borderRadius: 10, padding: '10px 12px',
                       cursor: 'grab', border: '1px solid var(--border)', fontSize: '0.82rem',
                     }}
                   >
                     <div style={{ fontWeight: 700, marginBottom: 4 }}>{msg.name}</div>
+                    {hasTestMarker(msg) && <small>Olası test</small>}
                     {msg.company && msg.company !== '-' && (
                       <div style={{ color: 'var(--text-tertiary)', fontSize: '0.75rem' }}>{msg.company}</div>
                     )}
                     {msg.service && (
-                      <div style={{ color: col.color, fontSize: '0.72rem', marginTop: 4, fontWeight: 600 }}>{msg.service}</div>
+                      <div style={{ color: col.color, fontSize: '0.72rem', marginTop: 4, fontWeight: 600 }}>{serviceLabel(msg.service)}</div>
                     )}
                     <div style={{ color: 'var(--text-tertiary)', fontSize: '0.72rem', marginTop: 6 }}>
                       {msg.createdAt ? new Date(msg.createdAt).toLocaleDateString('tr-TR') : ''}
@@ -7993,9 +8046,9 @@ function ReferralTrackingSection({ showToast }) {
           <h1>Referral <span>Takibi</span></h1>
           <p>Referans programından gelen lead'leri ve ödül durumlarını yönetin</p>
         </div>
-        <span className="btn btn-outline" aria-disabled="true" title="Public referans programı sayfası henüz yayınlanmadı">
-          Sayfa henüz yayında değil
-        </span>
+        <a className="btn btn-outline" href="/referans-programi" target="_blank" rel="noopener noreferrer">
+          Canlı Sayfayı Görüntüle
+        </a>
       </div>
 
       <div className="admin-stats-grid" style={{ marginBottom: 18 }}>
@@ -8360,7 +8413,7 @@ function BackupSection({ showToast }) {
       <div className="admin-page-header">
         <div>
           <h1>Yedekleme <span>Paneli</span></h1>
-          <p>MongoDB koleksiyon özetini görün ve manuel JSON yedek alın</p>
+          <p>Veritabanı tablo özetini görün ve manuel JSON yedek alın</p>
         </div>
         <button className="btn btn-primary" onClick={download} disabled={loading}>
           <HiOutlineDatabase size={16} /> Yedek İndir
@@ -8368,13 +8421,13 @@ function BackupSection({ showToast }) {
       </div>
 
       <div className="admin-form">
-        <h3>Koleksiyon Özeti</h3>
+        <h3>Tablo Özeti</h3>
         {loading && !summary ? <p>Yükleniyor...</p> : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
             {Object.entries(summary?.collections || {}).map(([name, count]) => (
               <div key={name} className="admin-stat-card">
                 <div className="stat-number">{count}</div>
-                <div className="stat-label">{name}</div>
+                <div className="stat-label" lang="en" style={{ textTransform: 'none' }}>{name}</div>
               </div>
             ))}
           </div>
@@ -8696,16 +8749,23 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
   const [currentUser, setCurrentUser] = useState(initialUser)
 
   // Stats for dashboard
-  const [stats, setStats] = useState({ blogs: 0, partners: 0, messages: 0, unreadMessages: 0, subscribers: 0 })
+  const [stats, setStats] = useState(null)
+  const [statsLoading, setStatsLoading] = useState(true)
+  const [statsError, setStatsError] = useState('')
 
   const loadStats = async () => {
+    setStatsLoading(true)
+    setStatsError('')
     try {
       const [blogs, partners, messages, subscribers] = await Promise.all([
-        getBlogsApi().catch(() => []),
-        getPartnersApi().catch(() => []),
-        getMessagesApi().catch(() => []),
-        getNewsletterSubscribersApi().catch(() => []),
+        getBlogsApi(),
+        getPartnersApi(),
+        getMessagesApi(),
+        getNewsletterSubscribersApi(),
       ])
+      if (![blogs, partners, messages, subscribers].every(Array.isArray)) {
+        throw new Error('Gösterge paneli verileri beklenen biçimde alınamadı.')
+      }
       const blogArr = Array.isArray(blogs) ? blogs : []
       const partnerArr = Array.isArray(partners) ? partners : []
       const messageArr = Array.isArray(messages) ? messages : []
@@ -8721,6 +8781,10 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
       setUnreadCount(unread)
     } catch (err) {
       console.error('Stats load error:', err)
+      setStats(null)
+      setStatsError('Gösterge paneli verileri alınamadı. Sayaçlar şu anda gösterilemiyor.')
+    } finally {
+      setStatsLoading(false)
     }
   }
 
@@ -9058,7 +9122,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
             ⚠️ Çevrimdışı Mod — Sunucu bağlantısı yok. Veriler okunamıyor, yazma işlemleri çalışmaz.
           </div>
         )}
-        {activeSection === 'dashboard' && <DashboardSection stats={stats} onNavigate={(section) => { setActiveSection(section); setSidebarOpen(false) }} />}
+        {activeSection === 'dashboard' && <DashboardSection stats={stats} statsLoading={statsLoading} statsError={statsError} onRetryStats={loadStats} onNavigate={(section) => { setActiveSection(section); setSidebarOpen(false) }} />}
         {activeSection === 'analytics' && <AnalyticsSection />}
         {activeSection === 'blog' && <BlogSection showToast={showToast} />}
         {activeSection === 'content' && <ContentSection showToast={showToast} />}

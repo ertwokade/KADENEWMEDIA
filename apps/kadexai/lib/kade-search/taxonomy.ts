@@ -151,26 +151,26 @@ export const CATEGORIES: Record<string, CategoryDef> = {
 export interface FormatDef { label: string; desc: string; keywords: string[] }
 
 export const FORMATS: Record<string, FormatDef> = {
-  pov: { label: 'POV', desc: 'Izleyiciyi bir rolun icine sokan bakis acisi videosu', keywords: ['pov', 'p.o.v', 'bakis acisi', 'senin gozunden', 'imagine you'] },
-  gecis: { label: 'Geçiş / Transition', desc: 'Kesme veya efektle ani gorsel gecis', keywords: ['transition', 'gecis', 'outfit change', 'kiyafet degisimi', 'snap transition', 'donusum gecis'] },
-  onceSonra: { label: 'Önce / Sonra', desc: 'Degisimi karsilastiran kalip', keywords: ['before after', 'once sonra', 'transformation', 'donusum', 'glow up', 'makeover', 'degisim'] },
-  ogretici: { label: 'Öğretici / Tutorial', desc: 'Adim adim yapim anlatimi', keywords: ['tutorial', 'nasil yapilir', 'how to', 'adim adim', 'step by step', 'ogretiyorum', 'rehber', 'guide', 'diy tutorial'] },
-  liste: { label: 'Liste / Top N', desc: 'Siralama veya derleme', keywords: ['top 5', 'top 10', 'en iyi', '5 sey', '3 ipucu', 'listesi', 'tier list', 'ranking', 'siralama'] },
-  hikaye: { label: 'Storytime', desc: 'Kisisel anlati / hikaye anlatimi', keywords: ['storytime', 'hikaye', 'basima gelen', 'anlatiyorum', 'story time', 'gercek hikaye', 'itiraf'] },
-  challenge: { label: 'Challenge / Akım', desc: 'Tekrarlanabilir meydan okuma kalibi', keywords: ['challenge', 'akim', 'meydan okuma', 'trend challenge', '24 saat', '30 gun', 'deneme', 'dare'] },
-  duet: { label: 'Duet / Stitch / Yanıt', desc: 'Baska bir icerige yanit veren format', keywords: ['duet', 'stitch', 'yanit', 'reply', 'reaction', 'tepki', 'react', 'cevap videosu'] },
-  asmr: { label: 'ASMR / Satisfying', desc: 'Ses veya gorsel tatmin odakli', keywords: ['asmr', 'satisfying', 'tatmin edici', 'crunchy', 'ses', 'relaxing', 'rahatlatici', 'slime'] },
-  greenScreen: { label: 'Green Screen / Anlatım', desc: 'Ekran arkasinda gorsel ile anlatim', keywords: ['green screen', 'yesil ekran', 'ekranda anlatim', 'haber anlatimi', 'explainer'] },
-  vlog: { label: 'Vlog / Günlük', desc: 'Gunluk hayat kaydi', keywords: ['vlog', 'day in my life', 'bir gunum', 'gunluk', 'daily vlog', 'rutin'] },
-  roportaj: { label: 'Röportaj', desc: 'Soru-cevap, sokak roportaji', keywords: ['roportaj', 'interview', 'sokak roportaji', 'soru sorduk', 'anket'] },
-  edit: { label: 'Edit / Kurgu', desc: 'Muzikli hizli kurgu, fan edit', keywords: ['edit', 'fan edit', 'amv', 'edit audio', 'kurgu', 'montaj', 'velocity edit', 'cinematic'] },
-  skec: { label: 'Skeç / Canlandırma', desc: 'Oyunculuk temelli kisa sahne', keywords: ['skec', 'sketch', 'canlandirma', 'karakter', 'oyunculuk', 'parodi', 'taklit'] },
-  test: { label: 'Test / Deney', desc: 'Bir seyi test etme, deneme', keywords: ['test ettim', 'denedim', 'experiment', 'deney', 'i tested', 'gercek mi', 'calisiyor mu'] },
-  unboxing: { label: 'Unboxing / Haul', desc: 'Kutu acilimi, alisveris derlemesi', keywords: ['unboxing', 'kutu acilimi', 'haul', 'alisveris', 'shopping', 'geldi', 'kargo'] },
-  behindScenes: { label: 'Kamera Arkası', desc: 'Uretim sureci gosterimi', keywords: ['kamera arkasi', 'behind the scenes', 'bts', 'nasil cekildi', 'making of', 'surec'] },
-  tartisma: { label: 'Tartışma / Görüş', desc: 'Fikir beyani, hot take', keywords: ['hot take', 'tartisma', 'gorusum', 'bence', 'unpopular opinion', 'elestiri', 'karsi cikiyorum', 'debate'] },
-  mikroDram: { label: 'Mini Dizi / Seri', desc: 'Bolumlere bolunmus seri anlati', keywords: ['bolum 1', 'part 1', 'seri', 'devami', 'mini dizi', 'episode', '2. bolum'] },
-  soru: { label: 'Kanca Soru', desc: 'Merak uyandiran acilis sorusu', keywords: ['kimse bilmiyor', 'biliyor muydunuz', 'did you know', 'sizce', 'bunu biliyor musunuz', 'sirri'] },
+  pov: { label: 'POV', desc: 'İzleyiciyi bir rolün içine sokan bakış açısı videosu', keywords: ['pov', 'p.o.v', 'bakis acisi', 'senin gozunden', 'imagine you'] },
+  gecis: { label: 'Geçiş / Transition', desc: 'Kesme veya efektle ani görsel geçiş', keywords: ['transition', 'gecis', 'outfit change', 'kiyafet degisimi', 'snap transition', 'donusum gecis'] },
+  onceSonra: { label: 'Önce / Sonra', desc: 'Değişimi karşılaştıran kalıp', keywords: ['before after', 'once sonra', 'transformation', 'donusum', 'glow up', 'makeover', 'degisim'] },
+  ogretici: { label: 'Öğretici / Tutorial', desc: 'Adım adım yapım anlatımı', keywords: ['tutorial', 'nasil yapilir', 'how to', 'adim adim', 'step by step', 'ogretiyorum', 'rehber', 'guide', 'diy tutorial'] },
+  liste: { label: 'Liste / Top N', desc: 'Sıralama veya derleme', keywords: ['top 5', 'top 10', 'en iyi', '5 sey', '3 ipucu', 'listesi', 'tier list', 'ranking', 'siralama'] },
+  hikaye: { label: 'Storytime', desc: 'Kişisel anlatı / hikâye anlatımı', keywords: ['storytime', 'hikaye', 'basima gelen', 'anlatiyorum', 'story time', 'gercek hikaye', 'itiraf'] },
+  challenge: { label: 'Challenge / Akım', desc: 'Tekrarlanabilir meydan okuma kalıbı', keywords: ['challenge', 'akim', 'meydan okuma', 'trend challenge', '24 saat', '30 gun', 'deneme', 'dare'] },
+  duet: { label: 'Duet / Stitch / Yanıt', desc: 'Başka bir içeriğe yanıt veren format', keywords: ['duet', 'stitch', 'yanit', 'reply', 'reaction', 'tepki', 'react', 'cevap videosu'] },
+  asmr: { label: 'ASMR / Satisfying', desc: 'Ses veya görsel tatmin odaklı', keywords: ['asmr', 'satisfying', 'tatmin edici', 'crunchy', 'ses', 'relaxing', 'rahatlatici', 'slime'] },
+  greenScreen: { label: 'Green Screen / Anlatım', desc: 'Ekran arkasında görsel ile anlatım', keywords: ['green screen', 'yesil ekran', 'ekranda anlatim', 'haber anlatimi', 'explainer'] },
+  vlog: { label: 'Vlog / Günlük', desc: 'Günlük hayat kaydı', keywords: ['vlog', 'day in my life', 'bir gunum', 'gunluk', 'daily vlog', 'rutin'] },
+  roportaj: { label: 'Röportaj', desc: 'Soru-cevap, sokak röportajı', keywords: ['roportaj', 'interview', 'sokak roportaji', 'soru sorduk', 'anket'] },
+  edit: { label: 'Edit / Kurgu', desc: 'Müzikli hızlı kurgu, fan edit', keywords: ['edit', 'fan edit', 'amv', 'edit audio', 'kurgu', 'montaj', 'velocity edit', 'cinematic'] },
+  skec: { label: 'Skeç / Canlandırma', desc: 'Oyunculuk temelli kısa sahne', keywords: ['skec', 'sketch', 'canlandirma', 'karakter', 'oyunculuk', 'parodi', 'taklit'] },
+  test: { label: 'Test / Deney', desc: 'Bir şeyi test etme, deneme', keywords: ['test ettim', 'denedim', 'experiment', 'deney', 'i tested', 'gercek mi', 'calisiyor mu'] },
+  unboxing: { label: 'Unboxing / Haul', desc: 'Kutu açılımı, alışveriş derlemesi', keywords: ['unboxing', 'kutu acilimi', 'haul', 'alisveris', 'shopping', 'geldi', 'kargo'] },
+  behindScenes: { label: 'Kamera Arkası', desc: 'Üretim süreci gösterimi', keywords: ['kamera arkasi', 'behind the scenes', 'bts', 'nasil cekildi', 'making of', 'surec'] },
+  tartisma: { label: 'Tartışma / Görüş', desc: 'Fikir beyanı, hot take', keywords: ['hot take', 'tartisma', 'gorusum', 'bence', 'unpopular opinion', 'elestiri', 'karsi cikiyorum', 'debate'] },
+  mikroDram: { label: 'Mini Dizi / Seri', desc: 'Bölümlere bölünmüş seri anlatı', keywords: ['bolum 1', 'part 1', 'seri', 'devami', 'mini dizi', 'episode', '2. bolum'] },
+  soru: { label: 'Kanca Soru', desc: 'Merak uyandıran açılış sorusu', keywords: ['kimse bilmiyor', 'biliyor muydunuz', 'did you know', 'sizce', 'bunu biliyor musunuz', 'sirri'] },
 };
 
 const PLATFORM_LABELS: Record<string, string> = {
@@ -186,11 +186,11 @@ const PLATFORM_LABELS: Record<string, string> = {
 export interface StageDef { label: string; emoji: string; desc: string; color: string }
 
 export const STAGES: Record<string, StageDef> = {
-  emerging: { label: 'Yükselen Filiz', emoji: '🌱', desc: 'Henuz kucuk ama hizli buyuyor - en iyi giris ani', color: '#22c55e' },
-  rising: { label: 'Yükselişte', emoji: '📈', desc: 'Guclu buyume devam ediyor - hala erken', color: '#84cc16' },
-  peak: { label: 'Zirvede', emoji: '🔥', desc: 'Maksimum ilgi - rekabet yuksek ama erisim buyuk', color: '#f97316' },
-  plateau: { label: 'Plato', emoji: '➖', desc: 'Buyume durdu, doygunluk yakin', color: '#94a3b8' },
-  declining: { label: 'Düşüşte', emoji: '📉', desc: 'Ilgi azaliyor - yeni icerik icin gec', color: '#ef4444' },
+  emerging: { label: 'Yükselen Filiz', emoji: '🌱', desc: 'Küçük hacimde büyüme sinyali gözleniyor', color: '#22c55e' },
+  rising: { label: 'Yükselişte', emoji: '📈', desc: 'Büyüme sinyali devam ediyor', color: '#84cc16' },
+  peak: { label: 'Zirvede', emoji: '🔥', desc: 'Yüksek ilgi düzeyi gözleniyor', color: '#f97316' },
+  plateau: { label: 'Plato', emoji: '➖', desc: 'Büyüme yavaşlamış veya sabitlenmiş', color: '#94a3b8' },
+  declining: { label: 'Düşüşte', emoji: '📉', desc: 'İlgide düşüş sinyali gözleniyor', color: '#ef4444' },
   dead: { label: 'Sönmüş', emoji: '💀', desc: 'Trend bitti', color: '#64748b' },
 };
 

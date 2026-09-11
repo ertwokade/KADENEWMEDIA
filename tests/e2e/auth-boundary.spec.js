@@ -11,9 +11,36 @@ test('unauthenticated /admin visit shows the login gate, never the dashboard', a
   await expect(page.getByText('Gösterge Paneli', { exact: false })).toHaveCount(0)
 })
 
-test('unauthenticated /musteri-panel visit does not show authenticated content', async ({ page }) => {
-  const response = await page.goto('/musteri-panel')
-  expect(response?.status()).toBeLessThan(500)
-  // Müşteri paneli de oturumsuzken panel içeriği yerine giriş/yönlendirme göstermeli.
-  await expect(page.locator('body')).toBeVisible()
-})
+for (const path of ['/musteri-panel', '/proje-takip', '/organizasyon-kiti', '/kade-kit-business']) {
+  test(`unauthenticated ${path} uses the same explicit customer login gate`, async ({ page }) => {
+    await page.route('**/api/customer-auth?action=session', route => route.fulfill({
+      status: 401,
+      json: { authenticated: false },
+    }))
+
+    const response = await page.goto(path)
+    expect(response?.status()).toBeLessThan(500)
+    await expect(page.getByRole('heading', { name: 'Bu alan için müşteri girişi gerekli.' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Giriş Yap' })).toHaveAttribute('href', '/giris/danismanlik')
+    await expect(page.getByText('Hoş geldin,', { exact: false })).toHaveCount(0)
+  })
+}
+
+for (const [path, heading] of [
+  ['/organizasyon-kiti', 'Kade Organizasyon Kiti aktif danışmanlık planlarına özeldir.'],
+  ['/kade-kit-business', 'Kade Kit Business erişimi aktif planlara özeldir.'],
+]) {
+  test(`authenticated customer without entitlement sees the package gate on ${path}`, async ({ page }) => {
+    await page.route('**/api/customer-auth?action=session', route => route.fulfill({
+      json: { authenticated: true, customer: { id: 'customer-e2e', name: 'Test Müşteri', email: 'test@example.test' } },
+    }))
+    await page.route('**/api/customer-portal', route => route.fulfill({
+      json: { packages: [], entitlements: {} },
+    }))
+
+    await page.goto(path)
+    await expect(page.getByRole('heading', { name: heading })).toBeVisible()
+    await expect(page.getByRole('link', { name: /Planlarını İncele/ })).toHaveAttribute('href', '/paketler')
+    await expect(page.getByRole('link', { name: 'Giriş Yap' })).toHaveCount(0)
+  })
+}

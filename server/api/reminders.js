@@ -276,7 +276,7 @@ export default async function handler(req, res) {
 
     const { data: created, error } = await supabase.from('kade_reminders').insert(reminder).select().single();
     if (error) throw error;
-    logActivity({ action: 'Yeni hatırlatıcı oluşturuldu', detail: title.trim(), type: 'create', icon: '⏰', user: user.username }).catch(() => {});
+    await logActivity({ action: 'Yeni hatırlatıcı oluşturuldu', detail: title.trim(), type: 'create', icon: '⏰', user: user.username }).catch(() => {});
     return res.status(201).json(mapReminder(created));
   }
 
@@ -303,7 +303,7 @@ export default async function handler(req, res) {
 
     const { error } = await supabase.from('kade_reminders').update(update).eq('id', id);
     if (error) throw error;
-    logActivity({ action: 'Hatırlatıcı güncellendi', detail: title || id, type: 'update', icon: '⏰', user: user.username }).catch(() => {});
+    await logActivity({ action: 'Hatırlatıcı güncellendi', detail: title || id, type: 'update', icon: '⏰', user: user.username }).catch(() => {});
     return res.status(200).json({ success: true });
   }
 
@@ -314,7 +314,7 @@ export default async function handler(req, res) {
     if (!isValidUuid(id)) return res.status(400).json({ error: 'Geçersiz ID' });
     const { error } = await supabase.from('kade_reminders').delete().eq('id', id);
     if (error) throw error;
-    logActivity({ action: 'Hatırlatıcı silindi', detail: id, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
+    await logActivity({ action: 'Hatırlatıcı silindi', detail: id, type: 'delete', icon: '🗑️', user: user.username }).catch(() => {});
     return res.status(200).json({ success: true });
   }
 

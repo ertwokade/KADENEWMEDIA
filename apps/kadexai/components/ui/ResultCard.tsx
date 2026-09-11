@@ -1,6 +1,7 @@
 import { AIModel } from '@/types'
 import { getModelLabel, getModelColor, cn } from '@/lib/utils'
 import CopyButton from './CopyButton'
+import ModelOutput from './ModelOutput'
 
 interface ResultCardProps {
   title?: string
@@ -33,7 +34,7 @@ export default function ResultCard({ title, content, model, isLoading = false, c
         {title && <h3 className="text-zinc-200 font-medium text-sm">{title}</h3>}
         <span className={cn('text-xs font-medium ml-auto', modelColor)}>{modelLabel}</span>
       </div>
-      <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+      <ModelOutput content={content} />
       <div className="flex justify-end pt-1">
         <CopyButton text={content} />
       </div>

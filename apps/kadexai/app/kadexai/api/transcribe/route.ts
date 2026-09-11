@@ -5,6 +5,7 @@ import { requireApiUser } from '@/lib/auth/server'
 import { requireToolFeature } from '@/lib/payments/featureGuard'
 import { geminiTranscribe, geminiTranscribeKullanilabilir } from '@/lib/ai/geminiTranscribe'
 import { getRequestProfileVocabulary } from '@/lib/ai/profileContext'
+import { transcriptionVocabulary, validateTranscript } from '@/lib/ai/transcription'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,33 +43,39 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Transkripsiyon sağlayıcısı yapılandırılmamış.' }, { status: 503 })
     }
 
-    const incoming = await req.formData()
+    let incoming: FormData
+    try { incoming = await req.formData() } catch {
+      return NextResponse.json({ error: 'Geçerli bir dosya yükleme isteği gerekli.' }, { status: 400 })
+    }
     const file = incoming.get('file')
     if (!(file instanceof File)) {
       return NextResponse.json({ error: 'Ses dosyası gerekli.' }, { status: 400 })
     }
+    if (!file.size) return NextResponse.json({ error: 'Ses dosyası boş.' }, { status: 400 })
     if (file.size > 25 * 1024 * 1024) {
       return NextResponse.json({ error: 'Ses dosyası 25 MB sınırını aşıyor.' }, { status: 413 })
     }
     const allowedTypes = new Set(['audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/webm', 'audio/ogg', 'video/mp4', 'video/webm'])
-    if (file.type && !allowedTypes.has(file.type)) {
+    const mediaType = file.type.split(';')[0].trim().toLowerCase()
+    if (mediaType && !allowedTypes.has(mediaType)) {
       return NextResponse.json({ error: 'Desteklenmeyen ses veya video dosya türü.' }, { status: 415 })
     }
     if (!(await hasSupportedSignature(file))) {
       return NextResponse.json({ error: 'Dosya içeriği desteklenen ses veya video biçimiyle eşleşmiyor.' }, { status: 415 })
     }
 
-    const requestedVocabulary = typeof incoming.get('vocabulary') === 'string'
-      ? String(incoming.get('vocabulary')).split(',').map((item) => item.trim().slice(0, 80)).filter(Boolean).slice(0, 20)
-      : []
-    const vocabulary = [...new Set(['Kade Media', 'KadexAI', 'Kade New Media', ...await getRequestProfileVocabulary(), ...requestedVocabulary])]
+    const requestedVocabulary = incoming.get('vocabulary')
+    if (requestedVocabulary !== null && (typeof requestedVocabulary !== 'string' || requestedVocabulary.length > 2000)) {
+      return NextResponse.json({ error: 'Özel isim sözlüğü en fazla 2000 karakterlik metin olmalı.' }, { status: 400 })
+    }
+    const vocabulary = transcriptionVocabulary(await getRequestProfileVocabulary(), requestedVocabulary || '')
 
     if (!apiKey) {
-      const sonuc = await geminiTranscribe(file, vocabulary)
+      const sonuc = validateTranscript(await geminiTranscribe(file, vocabulary))
       if (!sonuc.words.length) {
         return NextResponse.json({ error: 'Ses içinde konuşma bulunamadı.' }, { status: 422 })
       }
-      return NextResponse.json({ ...sonuc, saglayici: 'gemini' })
+      return NextResponse.json({ ...sonuc, saglayici: 'gemini', timing: 'estimated' })
     }
 
     const outgoing = new FormData()
@@ -88,12 +95,10 @@ export async function POST(req: NextRequest) {
     const data = await response.json()
     if (!response.ok) return NextResponse.json({ error: 'Transkripsiyon tamamlanamadı.' }, { status: 502 })
 
-    return NextResponse.json({
-      text: data.text || '',
-      words: data.words || [],
-      language: data.language || '',
-    })
+    const result = validateTranscript(data)
+    if (!result.words.length) return NextResponse.json({ error: 'Ses içinde konuşma bulunamadı.' }, { status: 422 })
+    return NextResponse.json({ ...result, saglayici: 'groq', timing: 'word' })
   } catch {
-    return NextResponse.json({ error: 'Transkripsiyon tamamlanamadı.' }, { status: 500 })
+    return NextResponse.json({ error: 'Transkripsiyon tamamlanamadı. Sağlayıcı geçerli bir ses dökümü döndürmedi.' }, { status: 502 })
   }
 }

@@ -34,6 +34,7 @@ function getStoredMode() {
     if (MODES.includes(stored)) return stored
     // Eski anahtarla kaydedilmiş tercih varsa bir kez devralınır.
     const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY)
+      || window.localStorage.getItem('kade-mode')
     return MODES.includes(legacy) ? legacy : DEFAULT_MODE
   } catch {
     return DEFAULT_MODE

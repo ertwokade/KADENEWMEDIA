@@ -30,20 +30,26 @@ export async function GET(request: NextRequest) {
     if (to && !Number.isNaN(Date.parse(to))) query = query.lte('created_at', new Date(to).toISOString())
 
     const { data, error } = await query
-    if (!error) return NextResponse.json({ history: data ?? [], cloud: true })
+    if (!error) return NextResponse.json({ history: data ?? [], cloud: true, ownerId: user.id })
+    if (!['42P01', 'PGRST205', '42703', 'PGRST204'].includes(error.code)) throw error
 
     // Eski kurulumlar migration uygulanana kadar mevcut geçmiş tablosunu okuyabilir.
-    const { data: legacy, error: legacyError } = await supabase
+    let legacyQuery = supabase
       .from('content_history')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(limit)
-    if (legacyError) throw error
+    if (tool && TOOL_PATTERN.test(tool)) legacyQuery = legacyQuery.eq('tool', tool)
+    if (from && !Number.isNaN(Date.parse(from))) legacyQuery = legacyQuery.gte('created_at', new Date(from).toISOString())
+    if (to && !Number.isNaN(Date.parse(to))) legacyQuery = legacyQuery.lte('created_at', new Date(to).toISOString())
+    const { data: legacy, error: legacyError } = await legacyQuery
+    if (legacyError) throw legacyError
     return NextResponse.json({
-      history: (legacy ?? []).map((entry) => ({ ...entry, status: 'completed', completed_at: entry.created_at })),
+      history: status === 'failed' ? [] : (legacy ?? []).map((entry) => ({ ...entry, status: 'completed', completed_at: entry.created_at })),
       cloud: true,
       legacy: true,
+      ownerId: user.id,
     })
   } catch {
     return NextResponse.json({ history: [], cloud: false, warning: 'Geçmiş yüklenemedi.' }, { status: 500 })
@@ -88,6 +94,7 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await supabase.from('tool_runs').insert(payload).select().single()
     if (!error) return NextResponse.json({ entry: data }, { status: 201 })
+    if (!['42P01', 'PGRST205', '42703', 'PGRST204'].includes(error.code)) throw error
 
     // Tamamlanmış kayıtlar eski şemaya da yazılabilir; hatalı denemeler yerelde korunur.
     if (status === 'completed' && output) {
@@ -110,12 +117,14 @@ export async function DELETE(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 })
     const { id } = await request.json()
-    if (typeof id !== 'string' || id.length > 80) return NextResponse.json({ error: 'Geçersiz kayıt.' }, { status: 400 })
+    if (typeof id !== 'string' || !id.trim() || id.length > 80) return NextResponse.json({ error: 'Geçersiz kayıt.' }, { status: 400 })
 
-    const { error } = await supabase.from('tool_runs').delete().eq('id', id).eq('user_id', user.id)
-    if (error) {
-      const { error: legacyError } = await supabase.from('content_history').delete().eq('id', id).eq('user_id', user.id)
-      if (legacyError) throw error
+    const { data, error } = await supabase.from('tool_runs').delete().eq('id', id).eq('user_id', user.id).select('id')
+    if (error && !['42P01', 'PGRST205'].includes(error.code)) throw error
+    if (!data?.length) {
+      const { data: legacy, error: legacyError } = await supabase.from('content_history').delete().eq('id', id).eq('user_id', user.id).select('id')
+      if (legacyError) throw legacyError
+      if (!legacy?.length) return NextResponse.json({ error: 'Kayıt bulunamadı veya bu hesaba ait değil.' }, { status: 404 })
     }
     return NextResponse.json({ success: true })
   } catch {

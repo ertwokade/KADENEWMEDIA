@@ -54,7 +54,8 @@ export async function saveMaterials(source: string, items: MaterialItem[]): Prom
   const ids = items.map((item) => item.id)
   const existing = new Set<string>()
   for (const part of chunked(ids)) {
-    const { data } = await admin.from('kade_materials').select('id').in('id', part)
+    const { data, error } = await admin.from('kade_materials').select('id').in('id', part)
+    if (error) throw new Error('Mevcut materyal kayıtları doğrulanamadı.')
     for (const row of data ?? []) existing.add(row.id as string)
   }
 
@@ -105,7 +106,7 @@ export async function queryMaterials(filters: MaterialFilters) {
   else if (filters.sort === 'sure') query = query.order('duration_sec', { ascending: false, nullsFirst: false })
   else query = query.order('published_at', { ascending: false, nullsFirst: false })
 
-  const { data, error } = await query.range(filters.offset, filters.offset + filters.limit - 1)
+  const { data, error } = await query.order('id', { ascending: true }).range(filters.offset, filters.offset + filters.limit - 1)
   if (error) throw new Error(error.message)
   return data ?? []
 }
@@ -130,9 +131,10 @@ export async function getMaterialById(id: string) {
 
 export async function materialStats() {
   const supabase = await createClient()
-  const [{ count: toplam }, { data: sonKosu }] = await Promise.all([
+  const [countResult, runResult] = await Promise.all([
     supabase.from('kade_materials').select('id', { count: 'exact', head: true }),
     supabase.from('kade_material_runs').select('*').order('started_at', { ascending: false }).limit(1),
   ])
-  return { toplam: toplam ?? 0, sonKosu: sonKosu?.[0] ?? null }
+  if (countResult.error || runResult.error) throw new Error('Materyal istatistikleri alınamadı.')
+  return { toplam: countResult.count ?? 0, sonKosu: runResult.data?.[0] ?? null }
 }

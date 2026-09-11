@@ -40,11 +40,21 @@ function primaryVolume(snap: Pick<SnapshotRow, 'views' | 'posts' | 'followers'>)
   return Math.max(snap.views || 0, (snap.posts || 0) * 900, (snap.followers || 0) * 12)
 }
 
+function orderedSnapshots(snaps: SnapshotRow[]) {
+  const byTime = new Map<number, SnapshotRow>()
+  for (const snap of snaps) {
+    const time = Date.parse(snap.captured_at)
+    if (Number.isFinite(time)) byTime.set(time, snap)
+  }
+  return [...byTime.entries()].sort(([a], [b]) => a - b).map(([, snap]) => snap)
+}
+
 /**
  * Iki snapshot arasindaki gunluk bagil buyume orani.
  * @returns 0.5 = gunde %50 buyume, olculemiyorsa null
  */
 export function computeVelocity(snaps: SnapshotRow[]): number | null {
+  snaps = orderedSnapshots(snaps)
   if (snaps.length < 2) return null
   const last = snaps[snaps.length - 1]
   // Anlamli fark icin en az yarim saat geride bir olcum ara
@@ -55,12 +65,20 @@ export function computeVelocity(snaps: SnapshotRow[]): number | null {
       break
     }
   }
-  if (!prev) prev = snaps[snaps.length - 2]
+  if (!prev) return null
 
-  const hours = Math.max(hoursBetween(prev.captured_at, last.captured_at), 0.5)
-  const a = primaryVolume(prev)
-  const b = primaryVolume(last)
-  if (a <= 0) return b > 0 ? 1 : 0
+  const hours = hoursBetween(prev.captured_at, last.captured_at)
+  // Compare the same observed metric. Missing values and a zero baseline do
+  // not establish a relative growth rate; changing metric is not growth.
+  const metrics = (['views', 'posts', 'followers'] as const)
+    .filter((key) => typeof prev[key] === 'number' && Number.isFinite(prev[key]) && prev[key]! > 0
+      && typeof last[key] === 'number' && Number.isFinite(last[key]) && last[key]! >= 0)
+  const weight = { views: 1, posts: 900, followers: 12 }
+  metrics.sort((a, b) => prev[b]! * weight[b] - prev[a]! * weight[a])
+  const metric = metrics[0]
+  if (!metric) return null
+  const a = prev[metric]!
+  const b = last[metric]!
   const dailyGrowth = ((b - a) / a) * (24 / hours)
   return clamp(dailyGrowth, -3, 10)
 }
@@ -68,8 +86,9 @@ export function computeVelocity(snaps: SnapshotRow[]): number | null {
 /** Ivme: hiz degisiyor mu (hizlanma / yavaslama). */
 function computeAcceleration(snaps: SnapshotRow[]) {
   if (snaps.length < 3) return 0
-  const v2 = computeVelocity(snaps) ?? 0
-  const v1 = computeVelocity(snaps.slice(0, -1)) ?? 0
+  const v2 = computeVelocity(snaps)
+  const v1 = computeVelocity(snaps.slice(0, -1))
+  if (v1 === null || v2 === null) return 0
   return clamp(v2 - v1, -3, 3)
 }
 
@@ -121,17 +140,18 @@ function determineStage(input: {
  * degil, kaynak havuzunun degismesinin yan etkisidir.
  */
 export function scoreTrend(trend: TrendRow, snaps: SnapshotRow[], linkCount = 0): ScoreRecord | null {
+  snaps = orderedSnapshots(snaps ?? [])
   if (!snaps?.length) return null
   const last = snaps[snaps.length - 1]
   const inferred = Boolean(trend.inferred)
 
   const volume_score = logNorm(primaryVolume(last), 5e8)
-  const measuredVelocity = computeVelocity(snaps)
+  const measuredVelocity = inferred ? null : computeVelocity(snaps)
   const velocityMeasured = measuredVelocity !== null
   let velocity = measuredVelocity ?? 0
   // Olculemeyen hiz sinirlanir - tahmin kaydi "gunde %1000 buyuyor" diyemez
   if (inferred) velocity = clamp(velocity, -0.2, 0.3)
-  const acceleration = computeAcceleration(snaps)
+  const acceleration = inferred ? 0 : computeAcceleration(snaps)
   const engagement = computeEngagement(last)
   const rank_score = last.rank ? clamp(1 - (last.rank - 1) / 60, 0, 1) : 0.45
   const cross_score = clamp(linkCount / 3, 0, 1)

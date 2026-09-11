@@ -5,12 +5,15 @@ import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
 import { requireApiUser } from '@/lib/auth/server'
 import { requireToolFeature } from '@/lib/payments/featureGuard'
+import { SELECTABLE_MODELS } from '@/lib/ai/models'
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
+import { parseHashtagGroups } from '@/lib/ai/hashtags'
 
 function normalizeBulkOutput(data: Record<string, unknown>, platforms: string[]) {
   if (Array.isArray(data.basliklar) || data.raw) return data
 
   const platformItems = platforms.flatMap((platform) => {
-    const items = data[platform]
+    const items = data[platform] ?? (platform === 'x' ? data.twitter : undefined)
     if (!Array.isArray(items)) return []
     return items
       .filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
@@ -39,7 +42,7 @@ function normalizeBulkOutput(data: Record<string, unknown>, platforms: string[])
 
 function mergeBulkOutputs(outputs: Record<string, unknown>[], platforms: string[], limit: number) {
   const strings = (value: unknown) => Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+    ? value.filter((item): item is string => typeof item === 'string' && Boolean(item.trim())).map(item => item.trim().slice(0, 4_000))
     : []
   const unique = (values: string[]) => [...new Set(values)].slice(0, limit)
   const captions = Object.fromEntries(platforms.map((platform) => [
@@ -47,16 +50,17 @@ function mergeBulkOutputs(outputs: Record<string, unknown>[], platforms: string[
     unique(outputs.flatMap((output) => {
       const map = output.captions
       return map && typeof map === 'object' && !Array.isArray(map)
-        ? strings((map as Record<string, unknown>)[platform])
+        ? strings((map as Record<string, unknown>)[platform] ?? (platform === 'x' ? (map as Record<string, unknown>).twitter : undefined))
         : []
     })),
   ]))
   const hashtagSets = outputs
     .flatMap((output) => Array.isArray(output.hashtag_setleri) ? output.hashtag_setleri : [])
     .filter((set): set is string[] => Array.isArray(set) && set.every((tag) => typeof tag === 'string'))
+    .map(set => parseHashtagGroups(JSON.stringify(set), 30).niche)
+    .filter(set => set.length > 0)
     .filter((set, index, all) => all.findIndex((candidate) => candidate.join('\u0000') === set.join('\u0000')) === index)
     .slice(0, limit)
-  const raw = outputs.map((output) => typeof output.raw === 'string' ? output.raw : '').filter(Boolean).join('\n\n')
 
   return {
     basliklar: unique(outputs.flatMap((output) => strings(output.basliklar))),
@@ -64,7 +68,6 @@ function mergeBulkOutputs(outputs: Record<string, unknown>[], platforms: string[
     captions,
     hashtag_setleri: hashtagSets,
     kisa_fikirler: unique(outputs.flatMap((output) => strings(output.kisa_fikirler))),
-    ...(raw ? { raw } : {}),
   }
 }
 
@@ -75,31 +78,48 @@ export async function POST(req: NextRequest) {
   // Paket kısıtlaması sunucuda uygulanır; menüdeki kilit yalnızca işarettir.
   const paket = await requireToolFeature('bulk')
   if (paket) return paket
+  if (!rateLimit(getRateLimitKey(req)).allowed) return NextResponse.json({ error: 'Çok fazla istek. 1 dakika bekle.' }, { status: 429 })
 
   try {
-    const { topic, niche, platforms, count, model } = await req.json()
-    if (typeof topic !== 'string' || !topic.trim() || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
-    const allowedPlatforms = new Set(['youtube', 'instagram', 'tiktok', 'linkedin', 'twitter'])
+    const body = await req.json().catch(() => null)
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'Geçerli üretim bilgileri gerekli.' }, { status: 400 })
+    const { topic, niche = '', platforms, count, model } = body
+    if (typeof topic !== 'string' || !topic.trim() || topic.length > 500 || typeof niche !== 'string' || niche.length > 200
+      || typeof model !== 'string' || !SELECTABLE_MODELS.includes(model as AIModel)
+      || !Number.isInteger(count) || count < 3 || count > 50) return NextResponse.json({ error: 'Konu, model ve 3–50 arasında tam sayı içerik adedi gerekli.' }, { status: 400 })
+    const allowedPlatforms = new Set(['youtube', 'instagram', 'tiktok', 'linkedin', 'x', 'twitter'])
+    if (!Array.isArray(platforms) || !platforms.length || platforms.length > 5 || platforms.some(platform => typeof platform !== 'string' || !allowedPlatforms.has(platform))) {
+      return NextResponse.json({ error: 'En az bir geçerli platform seç.' }, { status: 400 })
+    }
     const selectedPlatforms = Array.isArray(platforms)
-      ? platforms.filter((platform): platform is string => typeof platform === 'string' && allowedPlatforms.has(platform))
+      ? [...new Set(platforms.map((platform: string) => platform === 'twitter' ? 'x' : platform))]
       : []
-    if (selectedPlatforms.length === 0) selectedPlatforms.push('instagram', 'youtube', 'tiktok')
-    const requestedCount = Math.min(50, Math.max(3, Number.isFinite(Number(count)) ? Math.round(Number(count)) : 5))
+    const requestedCount = count
     const batchSizes = Array.from({ length: Math.ceil(requestedCount / 10) }, (_, index) => Math.min(10, requestedCount - index * 10))
-    const results = await Promise.all(batchSizes.map((batchSize, index) => generateContent({
+    const settled = await Promise.allSettled(batchSizes.map((batchSize, index) => generateContent({
       prompt: buildBulkPrompt(topic.trim().slice(0, 500), typeof niche === 'string' ? niche.slice(0, 200) : '', selectedPlatforms, batchSize, `${index + 1}/${batchSizes.length}`),
       model: model as AIModel,
       systemPrompt: BULK_SYSTEM_PROMPT,
       maxTokens: 4000,
       toolId: 'bulk',
     }, req)))
-    const outputs = results.map((result) => normalizeBulkOutput(parseStructuredOutput(result.content), selectedPlatforms))
+    const results = settled.flatMap(result => result.status === 'fulfilled' ? [result.value] : [])
+    const outputs = results.map(result => {
+      try { return mergeBulkOutputs([normalizeBulkOutput(parseStructuredOutput(result.content), selectedPlatforms)], selectedPlatforms, 10) }
+      catch { return null }
+    }).filter((output): output is NonNullable<typeof output> => !!output && (output.basliklar.length > 0 || output.hooklar.length > 0 || Object.values(output.captions).some(items => items.length > 0)))
+    if (!outputs.length) return NextResponse.json({ error: 'Hiçbir üretim parçasından kullanılabilir içerik alınamadı. Yeniden dene.' }, { status: 502 })
     const data = mergeBulkOutputs(outputs, selectedPlatforms, requestedCount)
+    const coverage = { requested: requestedCount, titles: data.basliklar.length, hooks: data.hooklar.length, captions: Object.fromEntries(selectedPlatforms.map(platform => [platform, data.captions[platform].length])) }
+    const partial = outputs.length < batchSizes.length || coverage.titles < requestedCount || coverage.hooks < requestedCount || Object.values(coverage.captions).some(count => count < requestedCount)
     return NextResponse.json({
       data,
+      partial,
+      coverage,
+      batches: { total: batchSizes.length, usable: outputs.length, failed: batchSizes.length - outputs.length },
       model: results[0]?.model,
       routingReason: results.map((result) => result.routingReason).filter(Boolean).join(' · '),
       tokensUsed: results.reduce((sum, result) => sum + (result.tokensUsed || 0), 0),
     })
-  } catch (e) { return NextResponse.json({ error: e instanceof Error ? e.message : 'Sunucu hatası' }, { status: 500 }) }
+  } catch { return NextResponse.json({ error: 'Toplu üretim tamamlanamadı. Yeniden dene.' }, { status: 500 }) }
 }

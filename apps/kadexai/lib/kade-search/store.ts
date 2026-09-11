@@ -10,6 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { normalizeText, stableHash } from './util'
 import { scoreTrend } from './score'
+import { uniqueAlerts, withAlertTrend } from './alerts'
 import { similarity } from './util'
 import type {
   CurrentTrendRow,
@@ -199,7 +200,8 @@ export async function addAlerts(
     const { error, count } = await db
       .from('kade_trend_alerts')
       .upsert(part, { onConflict: 'trend_id,type', ignoreDuplicates: true, count: 'exact' })
-    if (!error) written += count ?? part.length
+    if (error) throw new Error(`Uyarı yazılamadı: ${error.message}`)
+    written += count ?? part.length
   }
   return written
 }
@@ -421,18 +423,22 @@ export async function getTrendDetail(id: string) {
 
 export async function recentAlerts(limit = 50): Promise<Array<TrendAlert & { title?: string | null; platform?: string | null; url?: string | null }>> {
   const supabase = await createClient()
-  const { data } = await supabase
+  const boundedLimit = Number.isFinite(limit) ? Math.max(1, Math.min(Math.floor(limit), 200)) : 50
+  const { data, error } = await supabase
     .from('kade_trend_alerts')
     .select('*')
     .order('created_at', { ascending: false })
-    .limit(Math.min(limit, 200))
+    .order('id', { ascending: false })
+    .limit(Math.min(boundedLimit * 5, 1000))
 
-  const alerts = (data ?? []) as TrendAlert[]
+  if (error) throw new Error(error.message)
+  const alerts = uniqueAlerts((data ?? []) as TrendAlert[]).slice(0, boundedLimit)
   const ids = [...new Set(alerts.map((a) => a.trend_id).filter((x): x is string => Boolean(x)))]
   if (!ids.length) return alerts
-  const { data: trends } = await supabase.from('kade_trends').select('id, title, platform, url').in('id', ids)
+  const { data: trends, error: trendsError } = await supabase.from('kade_trends').select('id, title, platform, url').in('id', ids)
+  if (trendsError) throw new Error(trendsError.message)
   const byId = new Map((trends ?? []).map((t) => [t.id, t]))
-  return alerts.map((a) => ({ ...a, ...(a.trend_id ? byId.get(a.trend_id) : undefined) }))
+  return alerts.map((a) => withAlertTrend(a, a.trend_id ? byId.get(a.trend_id) : undefined))
 }
 
 /** Kaynak sağlığı uyarıları trend kimliği taşımaz; aynı uyarı listede yığılmasın. */
@@ -743,7 +749,8 @@ export async function buildCrossPlatformLinks({ threshold = 0.45 } = {}) {
   }
 
   for (const part of chunked(links)) {
-    await db.from('kade_trend_links').upsert(part, { onConflict: 'a_id,b_id' })
+    const { error } = await db.from('kade_trend_links').upsert(part, { onConflict: 'a_id,b_id' })
+    if (error) throw new Error(`Trend bağlantıları yazılamadı: ${error.message}`)
   }
 
   // 3+ platformda gorunen trendler icin uyari
@@ -752,29 +759,30 @@ export async function buildCrossPlatformLinks({ threshold = 0.45 } = {}) {
     const a = meta.get(l.a_id)
     const b = meta.get(l.b_id)
     if (!a || !b) continue
-    const setA = platformsByTrend.get(l.a_id) ?? new Set<string>()
+    const setA = platformsByTrend.get(l.a_id) ?? new Set<string>([a.platform])
     setA.add(b.platform)
     platformsByTrend.set(l.a_id, setA)
-    const setB = platformsByTrend.get(l.b_id) ?? new Set<string>()
+    const setB = platformsByTrend.get(l.b_id) ?? new Set<string>([b.platform])
     setB.add(a.platform)
     platformsByTrend.set(l.b_id, setB)
   }
 
   const multi = [...platformsByTrend.entries()]
-    .filter(([, set]) => set.size >= 2)
+    .filter(([, set]) => set.size >= 3)
     .sort((a, b) => b[1].size - a[1].size)
     .slice(0, 25)
 
-  await addAlerts(
+  const crossPlatformAlerts = uniqueAlerts(
     multi.map(([id, set]) => ({
       trend_id: id,
       type: 'cross_platform',
-      message: `"${meta.get(id)?.title ?? id}" ${set.size + 1} platformda birden görülüyor — güçlü çapraz trend`,
+      message: `"${meta.get(id)?.title ?? id}" ${set.size} platformda birden görülüyor — güçlü çapraz trend`,
       severity: 'high',
     }))
   )
+  await addAlerts(crossPlatformAlerts)
 
-  return { links: links.length, multiPlatform: multi.length }
+  return { links: links.length, multiPlatform: crossPlatformAlerts.length }
 }
 
 /* ----------------------------- Izleme listesi ---------------------------- */

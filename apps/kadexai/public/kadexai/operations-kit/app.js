@@ -541,7 +541,9 @@ function normalizeTemplate(t){
 
 function normalizeAnalysis(a){
   if(!isObj(a))return null;
-  return{id:idOf(a.id,"as"),videoUrl:str(a.videoUrl,""),rawComments:str(a.rawComments,""),ts:num(a.ts,Date.now()),total:num(a.total,0),score:num(a.score,0),themes:arr(a.themes)};
+  const rawComments=str(a.rawComments,""),total=parseComments(rawComments).length;
+  const score=total>0&&typeof a.score==="number"&&Number.isFinite(a.score)&&a.score>=1&&a.score<=10?a.score:null;
+  return{id:idOf(a.id,"as"),videoUrl:str(a.videoUrl,""),rawComments,ts:num(a.ts,Date.now()),total,score,themes:arr(a.themes)};
 }
 
 function normalizeLog(l){
@@ -874,7 +876,8 @@ function showToast(msg,type="success"){
   if(!c)return;
   const t=document.createElement("div");
   t.className=`toast ${type}`;
-  t.innerHTML=`<span>${icons[type]||"✓"}</span><span>${esc(msg)}</span>`;
+  t.setAttribute("role",type==="error"?"alert":"status");
+  t.innerHTML=`<span aria-hidden="true">${icons[type]||"✓"}</span><span>${esc(msg)}</span><button type="button" aria-label="Bildirimi kapat" style="border:0;background:transparent;color:inherit;font-size:20px;cursor:pointer">×</button>`;
   c.appendChild(t);
   t.addEventListener("click",()=>removeToast(t));
   setTimeout(()=>removeToast(t),3500);
@@ -884,7 +887,12 @@ function showToast(msg,type="success"){
     reportOperation(msg,type);
   }
 }
-function removeToast(t){ t.classList.add("toast-out"); t.addEventListener("animationend",()=>t.remove(),{once:true}) }
+function removeToast(t){
+  if(t.classList.contains("toast-out"))return;
+  t.classList.add("toast-out");
+  const timeout=setTimeout(()=>t.remove(),400);
+  t.addEventListener("animationend",()=>{clearTimeout(timeout);t.remove()},{once:true});
+}
 
 let operationsReportingReady=false;
 let operationSilentReportTimer=null;
@@ -1481,8 +1489,15 @@ async function fetchYoutubeComments(){
 function setSampleComments(){ const el=document.getElementById("commentsInput"); if(el)el.value=sampleComments.map(c=>`[${c.likes}] ${c.text}`).join("\n") }
 function runCommentAnalysis(){ const raw=document.getElementById("commentsInput").value; const result=analyzeComments(raw); renderCommentResult(result); renderVideoScore(result); renderAnalysisHistory(); refreshIcons() }
 
+function parseComments(raw){
+  return String(raw||"").split(/\n+/).map(line=>{
+    const match=line.match(/^\s*\[(\d+)\]\s*(.*)$/);
+    return{text:match?match[2].trim():line.trim(),likes:match?Number(match[1]):null};
+  }).filter(comment=>comment.text.length>0);
+}
+
 function analyzeComments(raw){
-  const comments=raw.split(/\n+/).map((line,i)=>{ const m=line.match(/^\s*\[(\d+)\]\s*(.+)$/); return{text:m?m[2].trim():line.trim(),likes:m?Number(m[1]):Math.max(1,80-i*4)} }).filter(c=>c.text.length>2);
+  const comments=parseComments(raw);
   const total=comments.length;
   const themes=themeDefinitions.map(td=>{ const hits=comments.filter(c=>containsAny(c.text,td.keywords)); return{...td,count:hits.length,percent:total?Math.round((hits.length/total)*100):0,examples:hits.slice(0,2)} }).filter(t=>t.count>0).sort((a,b)=>b.count-a.count);
   const sentiment=comments.reduce((acc,c)=>{ const t=c.text.toLocaleLowerCase("tr-TR"); if(containsAny(t,positiveWords))acc.positive++; if(containsAny(t,negativeWords))acc.negative++; return acc },{positive:0,negative:0});
@@ -1491,12 +1506,13 @@ function analyzeComments(raw){
   return{total,themes,sentiment,timestamps,score,words:buildWordCloud(comments.map(c=>c.text).join(" ")),topComments:[...comments].sort((a,b)=>b.likes-a.likes).slice(0,8)};
 }
 
-function calcVideoScore(sentiment,total){ if(!total)return null;const posRate=sentiment.positive/total,negRate=sentiment.negative/total,raw=5+posRate*5-negRate*4; return Math.min(10,Math.max(1,parseFloat(raw.toFixed(1)))) }
+function calcVideoScore(sentiment,total){ if(!total||!(sentiment.positive+sentiment.negative))return null;const posRate=sentiment.positive/total,negRate=sentiment.negative/total,raw=5+posRate*5-negRate*4; return Math.min(10,Math.max(1,parseFloat(raw.toFixed(1)))) }
 
 function renderVideoScore(result){
   const el=document.getElementById("videoScore");if(!el)return;
-  if(result.score===null){el.innerHTML='<div class="empty-state">Puan ve duygu yorumu için en az bir gerçek yorum ekle.</div>';return}
-  const score=result.score,color=score>=8?"teal":score>=6?"gold":"coral",label=score>=8?"Harika içerik! İzleyiciler çok memnun.":score>=6?"İyi içerik. Küçük iyileştirmeler etkili olur.":"Yoğun eleştiri var. Önerileri incele.";
+
+  if(result.score===null){el.innerHTML=`<div class="empty-state">${result.total?"Yorumlarda puan hesaplamaya yetecek duygu anahtar kelimesi bulunamadı. Bu, olumsuz yorum demek değildir.":"Puan ve duygu yorumu için en az bir yorum ekle."}</div>`;return}
+  const score=result.score,color=score>=8?"teal":score>=6?"gold":"coral",label="Anahtar kelime eşleşmelerine dayalı yaklaşık duygu puanı; içerik kalitesi veya tüm izleyicilerin görüşü değildir.";
   el.innerHTML=`<div style="display:flex;align-items:center;gap:20px;padding:8px 0"><div style="text-align:center"><div style="font-size:52px;font-weight:900;color:var(--${color});line-height:1">${score}</div><div style="font-size:12px;color:var(--ink3);margin-top:4px">/ 10 puan</div></div><div style="flex:1"><div class="progress" style="margin-bottom:10px"><span style="width:${score*10}%;background:var(--${color})"></span></div><div style="font-size:13px;line-height:1.6;color:var(--ink2)">${label}</div><div style="display:flex;gap:10px;margin-top:10px"><span class="pill teal">+${result.sentiment.positive} pozitif</span><span class="pill coral">-${result.sentiment.negative} negatif</span><span class="pill indigo">${result.total} yorum</span></div></div></div>`;
 }
 
@@ -1508,9 +1524,9 @@ function renderCommentResult(result){
   wordCloud.innerHTML=result.words.map(w=>`<button type="button" class="word ${w.sentiment}${activeWordFilter===w.word?" selected":""}" style="font-size:${w.size}px" data-word="${esc(w.word)}">${esc(w.word)}</button>`).join(" ");
   wordCloud.querySelectorAll("[data-word]").forEach(el=>el.addEventListener("click",()=>filterByWord(el.dataset.word||"")));
   const raw=document.getElementById("commentsInput").value;
-  const allComments=raw.split(/\n+/).map(line=>{ const m=line.match(/^\s*\[(\d+)\]\s*(.+)$/); return{text:m?m[2].trim():line.trim(),likes:m?Number(m[1]):0} }).filter(c=>c.text.length>2);
+  const allComments=parseComments(raw);
   const filtered=activeWordFilter?allComments.filter(c=>c.text.toLocaleLowerCase("tr-TR").includes(activeWordFilter)):[...allComments].sort((a,b)=>b.likes-a.likes).slice(0,8);
-  document.getElementById("topComments").innerHTML=`<table class="data-table"><thead><tr><th>👍</th><th>Yorum</th></tr></thead><tbody>${filtered.slice(0,8).map(c=>`<tr><td><span class="pill teal">${c.likes}</span></td><td style="font-size:13px">${esc(c.text)}</td></tr>`).join("")}</tbody></table>`;
+  document.getElementById("topComments").innerHTML=`<table class="data-table"><thead><tr><th>👍</th><th>Yorum</th></tr></thead><tbody>${filtered.slice(0,8).map(c=>`<tr><td><span class="pill teal">${c.likes===null?"—":c.likes}</span></td><td style="font-size:13px">${esc(c.text)}</td></tr>`).join("")}</tbody></table>`;
   document.getElementById("timestampComments").innerHTML=result.timestamps.length?result.timestamps.map(c=>`<div class="ts-row"><div>${c.stamps.map(s=>`<span class="ts-badge">${esc(s)}</span>`).join(" ")}</div><div class="ts-text">${esc(c.text)}</div></div>`).join(""):`<div class="empty-state">Zaman damgali yorum yok.</div>`;
 }
 
@@ -1525,7 +1541,7 @@ function buildWordCloud(text){
 
 function saveAnalysisSession(){
   const url=document.getElementById("videoUrl").value,raw=document.getElementById("commentsInput").value;
-  if(!raw.trim()){showToast("Önce yorum gir","error");return}
+  if(!parseComments(raw).length){showToast("Önce yorum gir","error");return}
   const result=analyzeComments(raw);
   snapshotUndo();
   state.analysisHistory=[{id:uid("as"),videoUrl:url,rawComments:raw,ts:Date.now(),total:result.total,score:result.score,themes:result.themes.slice(0,3)},...state.analysisHistory].slice(0,MAX_HISTORY);
@@ -1534,7 +1550,7 @@ function saveAnalysisSession(){
 
 function renderAnalysisHistory(){
   const el=document.getElementById("analysisHistory");if(!el)return;
-  el.innerHTML=state.analysisHistory.length?`<div style="display:grid;gap:10px">${state.analysisHistory.map(s=>`<div class="analysis-history-item"><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(s.videoUrl||"Manuel yorum seti")}</div><div class="row-meta">${fmt.dt(s.ts)} · ${s.total} yorum · <span class="pill teal">${s.score}/10</span></div></div><button type="button" class="ghost-btn" style="font-size:12px" onclick="loadAnalysisSession('${s.id}')">Yükle</button><button type="button" onclick="deleteAnalysisSession('${s.id}')" style="border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:18px;padding:0 4px">×</button></div>`).join("")}</div>`:`<div class="empty-state">Analizi Kaydet düğmesiyle geçmişe ekle.</div>`;
+  el.innerHTML=state.analysisHistory.length?`<div style="display:grid;gap:10px">${state.analysisHistory.map(s=>`<div class="analysis-history-item"><div style="flex:1"><div style="font-weight:600;font-size:13px">${esc(s.videoUrl||"Manuel yorum seti")}</div><div class="row-meta">${fmt.dt(s.ts)} · ${s.total} yorum · <span class="pill teal">${s.score===null?"Puan hesaplanmadı":s.score+"/10"}</span></div></div><button type="button" class="ghost-btn" style="font-size:12px" onclick="loadAnalysisSession('${s.id}')">Yükle</button><button type="button" onclick="deleteAnalysisSession('${s.id}')" style="border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:18px;padding:0 4px">×</button></div>`).join("")}</div>`:`<div class="empty-state">Analizi Kaydet düğmesiyle geçmişe ekle.</div>`;
 }
 
 function loadAnalysisSession(id){
@@ -1547,7 +1563,7 @@ function deleteAnalysisSession(id){ snapshotUndo(); state.analysisHistory=state.
 
 function exportCommentsCsv(){
   const raw=document.getElementById("commentsInput").value,result=analyzeComments(raw);
-  const rows=[["Video",document.getElementById("videoUrl").value,""],["Skor",result.score+"/10",""],["","",""],["Tip","Icerik","Deger"],...result.themes.map(t=>["Tema",t.name,`${t.percent}%`]),["","",""],["Sentiment","Pozitif",result.sentiment.positive],["Sentiment","Negatif",result.sentiment.negative],["","",""],...result.topComments.map(c=>["Yorum",c.text,c.likes]),...result.timestamps.map(c=>["Zaman",c.stamps.join(" "),c.text])];
+  const rows=[["Video",document.getElementById("videoUrl").value,""],["Skor",result.score===null?"Puan hesaplanmadı":result.score+"/10",""],["","",""],["Tip","İçerik","Değer"],...result.themes.map(t=>["Tema",t.name,`${t.percent}%`]),["","",""],["Sentiment","Pozitif",result.sentiment.positive],["Sentiment","Negatif",result.sentiment.negative],["","",""],...result.topComments.map(c=>["Yorum",c.text,c.likes??""]),...result.timestamps.map(c=>["Zaman",c.stamps.join(" "),c.text])];
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
   const url=URL.createObjectURL(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"}));
   const a=Object.assign(document.createElement("a"),{href:url,download:`sentscan-${Date.now()}.csv`});

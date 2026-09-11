@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
-import MobileInstallPrompt from '@/components/mobile/MobileInstallPrompt'
+import { ServiceWorkerRegistration } from '@/components/mobile/MobileInstallPrompt'
 import KadeDocumentTitle from '@/components/metadata/KadeDocumentTitle'
 import { ThemeProvider } from '@/lib/context/ThemeContext'
 import './globals.css'
@@ -106,7 +106,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <KadeDocumentTitle />
           {children}
-          <MobileInstallPrompt />
+          <ServiceWorkerRegistration />
         </ThemeProvider>
       </body>
     </html>

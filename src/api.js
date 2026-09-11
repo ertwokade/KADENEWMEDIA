@@ -722,7 +722,13 @@ export async function getNewsletterSubscribersApi() {
   const res = await fetch(`${API_BASE}/contact?action=subscribers`, {
     headers: getAuthHeaders(),
   });
-  return handleResponse(res);
+  const data = await handleResponse(res);
+  if (!Array.isArray(data)) throw new Error('Abone listesi beklenmeyen bir yanıt verdi.');
+  return data.map(subscriber => ({
+    ...subscriber,
+    _id: subscriber.id ?? subscriber._id,
+    createdAt: subscriber.created_at ?? subscriber.createdAt,
+  }));
 }
 
 export async function deleteNewsletterSubscriberApi(id) {

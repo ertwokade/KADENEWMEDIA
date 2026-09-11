@@ -33,5 +33,6 @@ export interface MaterialSyncResult {
   inserted: number
   updated: number
   ok: boolean
+  skipped?: boolean
   error?: string
 }

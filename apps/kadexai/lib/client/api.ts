@@ -8,6 +8,8 @@ import { captureAnalytics } from '@/lib/analytics/client'
 export const LOCAL_HISTORY_KEY = 'kade-generation-history'
 
 export interface LocalHistoryEntry {
+  owner_id?: string
+  remote_id?: string
   id: string
   tool: string
   model: AIModel | string
@@ -63,13 +65,21 @@ function persistHistory(entry: LocalHistoryEntry) {
     const history = Array.isArray(stored) ? stored : []
     localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify([entry, ...history].slice(0, 200)))
   } catch {
-    localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify([entry]))
+    // A storage quota/private-mode error must not fail a successful generation.
   }
 
   void fetch(apiPath('/api/history'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(entry),
+  }).then(async (response) => {
+    if (!response.ok) return
+    const data = await response.json()
+    if (typeof data.entry?.user_id !== 'string' || typeof data.entry?.id !== 'string') return
+    const current = JSON.parse(localStorage.getItem(LOCAL_HISTORY_KEY) || '[]')
+    if (!Array.isArray(current)) return
+    localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(current.map((item) => item.id === entry.id
+      ? { ...item, owner_id: data.entry.user_id, remote_id: data.entry.id } : item)))
   }).catch(() => undefined)
 }
 

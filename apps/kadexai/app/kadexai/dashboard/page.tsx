@@ -3,6 +3,7 @@ import {
   ArrowRight, BarChart3, Clapperboard, FileText, ImagePlus, Sparkles, Zap,
 } from 'lucide-react'
 import DashboardMobileHeader from '@/components/dashboard/DashboardMobileHeader'
+import MobileInstallPrompt from '@/components/mobile/MobileInstallPrompt'
 import WorkspaceStatus from '@/components/dashboard/WorkspaceStatus'
 import { getAuthenticatedUser } from '@/lib/auth/server'
 import { isAllowedOwnerEmail } from '@/lib/featureAccess'
@@ -36,6 +37,7 @@ export default async function DashboardPage() {
     <div className="kade-home flex-1 overflow-y-auto">
       <div className="kade-home-wrap mx-auto w-full px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
         <DashboardMobileHeader />
+        <MobileInstallPrompt />
 
         <section className="kade-workspace-head">
           <div className="kade-section-heading">

@@ -6,6 +6,7 @@ import { requireToolFeature } from '@/lib/payments/featureGuard'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { languageByCode } from '@/lib/subtitles/languages'
 import type { AIModel } from '@/types'
+import { SELECTABLE_MODELS } from '@/lib/ai/models'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -72,12 +73,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Geçersiz istek gövdesi.' }, { status: 400 })
   }
 
-  const cues = (body.cues ?? [])
-    .filter((c) => typeof c?.index === 'number' && typeof c?.text === 'string' && c.text.trim())
-    .map((c) => ({ index: c.index, text: c.text.trim().slice(0, 600) }))
+  if (!body || typeof body !== 'object' || Array.isArray(body) || !Array.isArray(body.cues)) {
+    return NextResponse.json({ error: 'Geçerli bir altyazı listesi gerekli.' }, { status: 400 })
+  }
+  if (body.cues.length > 900) return NextResponse.json({ error: 'Altyazı çok uzun (en fazla 900 kutu).' }, { status: 413 })
+  if (!body.cues.every((c) => c && Number.isInteger(c.index) && c.index > 0 && typeof c.text === 'string' && c.text.trim() && c.text.length <= 600) ||
+      new Set(body.cues.map((c) => c.index)).size !== body.cues.length ||
+      (body.model !== undefined && !SELECTABLE_MODELS.includes(body.model)) ||
+      (body.mode !== undefined && body.mode !== 'subtitle' && body.mode !== 'dubbing')) {
+    return NextResponse.json({ error: 'Altyazı kutuları, model veya çeviri modu geçersiz. Her kutu benzersiz numaralı ve en fazla 600 karakter olmalı.' }, { status: 400 })
+  }
+  const cues = body.cues.map((c) => ({ index: c.index, text: c.text.trim() }))
 
   if (!cues.length) return NextResponse.json({ error: 'Çevrilecek altyazı yok.' }, { status: 400 })
-  if (cues.length > 900) return NextResponse.json({ error: 'Altyazı çok uzun (en fazla 900 kutu).' }, { status: 413 })
 
   const target = languageByCode(String(body.targetLang ?? ''))
   if (!target) return NextResponse.json({ error: 'Desteklenmeyen hedef dil.' }, { status: 400 })
@@ -105,9 +113,13 @@ export async function POST(req: NextRequest) {
       tokens += result.tokensUsed ?? 0
 
       const parsed = extractJsonArray<Array<{ i?: number; t?: string }>>(result.content)
-      if (!parsed) throw new Error('Çeviri yanıtı çözümlenemedi.')
+      if (!Array.isArray(parsed)) throw new Error('Çeviri yanıtı çözümlenemedi.')
+      const expected = new Set(batch.map((c) => c.index))
+      const seen = new Set<number>()
       for (const row of parsed) {
-        if (typeof row?.i === 'number' && typeof row?.t === 'string') translated.set(row.i, row.t.trim())
+        if (typeof row?.i !== 'number' || !expected.has(row.i) || seen.has(row.i) || typeof row?.t !== 'string' || row.t.length > 3000) throw new Error('Geçersiz çeviri kutusu.')
+        seen.add(row.i)
+        if (row.t.trim()) translated.set(row.i, row.t.trim())
       }
     }
 
@@ -125,7 +137,7 @@ export async function POST(req: NextRequest) {
       model: usedModel,
       tokensUsed: tokens,
     })
-  } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : 'Çeviri tamamlanamadı.' }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Çeviri sağlayıcısından geçerli yanıt alınamadı. Yeniden dene.' }, { status: 502 })
   }
 }

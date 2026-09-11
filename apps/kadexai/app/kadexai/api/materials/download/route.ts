@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getMaterialById } from '@/lib/materials/store'
 import { requireReaderAccess } from '../../kade-search/_guard'
+import { fetchMaterial, materialTarget } from '@/lib/materials/fetch'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,8 +15,6 @@ export const dynamic = 'force-dynamic'
  *
  * Adres istekten alınmaz, havuzdaki kayıttan okunur.
  */
-const IZINLI_SEMA = new Set(['http:', 'https:'])
-
 function dosyaAdi(baslik: string, url: string): string {
   const uzanti = (url.split('?')[0].match(/\.([a-z0-9]{2,4})$/i)?.[1] ?? 'bin').toLowerCase()
   const ad = baslik
@@ -42,15 +41,11 @@ export async function GET(req: NextRequest) {
 
     let hedef: URL
     try {
-      hedef = new URL(materyal.media_url)
+      hedef = materialTarget(materyal.media_url)
     } catch {
       return NextResponse.json({ error: 'Kayıttaki adres geçersiz.' }, { status: 422 })
     }
-    if (!IZINLI_SEMA.has(hedef.protocol)) {
-      return NextResponse.json({ error: 'Desteklenmeyen adres.' }, { status: 422 })
-    }
-
-    const kaynak = await fetch(hedef, { redirect: 'follow' })
+    const kaynak = await fetchMaterial(hedef.href)
     if (!kaynak.ok || !kaynak.body) {
       return NextResponse.json({ error: `Dosya alınamadı (${kaynak.status}).` }, { status: 502 })
     }
@@ -59,15 +54,17 @@ export async function GET(req: NextRequest) {
       'Content-Type': kaynak.headers.get('content-type') || 'application/octet-stream',
       'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(dosyaAdi(materyal.title ?? '', hedef.pathname))}`,
       'Cache-Control': 'private, no-store',
+      'X-Content-Type-Options': 'nosniff',
+      'Content-Security-Policy': "sandbox; default-src 'none'",
     })
     const uzunluk = kaynak.headers.get('content-length')
     if (uzunluk) basliklar.set('Content-Length', uzunluk)
 
     return new NextResponse(kaynak.body, { status: 200, headers: basliklar })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'İndirme başarısız.' },
-      { status: 500 },
+      { error: 'İndirme başarısız. Kaynak dosyaya şu anda erişilemiyor.' },
+      { status: 502 },
     )
   }
 }
