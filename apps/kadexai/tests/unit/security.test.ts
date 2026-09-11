@@ -22,12 +22,21 @@ test('user A cannot access a resource owned by user B', () => {
   assert.equal(canAccessOwnedResource('', 'user-b'), false)
 })
 
-test('settings are restricted to the single account owner email', () => {
+test('settings accept the legacy owner and explicitly configured owner accounts', () => {
+  const previousOwners = process.env.KADE_OWNER_EMAILS
   assert.equal(isSettingsOwnerEmail('thekademedia@gmail.com'), true)
   assert.equal(isSettingsOwnerEmail(' THEKADEMEDIA@GMAIL.COM '), true)
   assert.equal(isSettingsOwnerEmail('demirk314@gmail.com'), false)
   assert.equal(isSettingsOwnerEmail('another-owner@gmail.com'), false)
   assert.equal(isSettingsOwnerEmail(null), false)
+  process.env.KADE_OWNER_EMAILS = 'configured-owner@example.com'
+  try {
+    assert.equal(isSettingsOwnerUser({ email: 'CONFIGURED-OWNER@example.com' }), true)
+    assert.equal(isSettingsOwnerUser({ email: 'another-owner@gmail.com' }), false)
+  } finally {
+    if (previousOwners === undefined) delete process.env.KADE_OWNER_EMAILS
+    else process.env.KADE_OWNER_EMAILS = previousOwners
+  }
   assert.equal(isSettingsOwnerOnlyRoute('/dashboard/settings'), true)
   assert.equal(isSettingsOwnerOnlyRoute('/api/env-status'), true)
   assert.equal(isSettingsOwnerOnlyRoute('/dashboard/title'), false)

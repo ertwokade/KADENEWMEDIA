@@ -114,7 +114,10 @@ export function isKadeAdminUser(user?: AuthUserLike | null) {
 }
 
 export function isSettingsOwnerUser(user?: AuthUserLike | null) {
-  return isSettingsOwnerEmail(user?.email) || isKadeAdminUser(user)
+  // Altyapı ayarları yalnız eski sabit e-posta hesabına kilitlenmemeli.
+  // KADE_OWNER_EMAIL(S) listesine açıkça eklenen sahipler ve servis rolünün
+  // doğruladığı kade_admin hesapları aynı yönetim yetkisine sahiptir.
+  return isSettingsOwnerEmail(user?.email) || isAllowedOwnerEmail(user?.email) || isKadeAdminUser(user)
 }
 
 export function isAllowedOwnerEmail(email?: string | null) {
@@ -123,10 +126,12 @@ export function isAllowedOwnerEmail(email?: string | null) {
     .filter(Boolean)
     .join(',')
     .split(',')
-    .map((value) => value.trim().toLocaleLowerCase('tr-TR'))
+    // E-posta yerel dile göre küçültülmez: Türkçe I → ı dönüşümü ASCII
+    // adreslerinde büyük/küçük harf eşleşmesini bozuyordu.
+    .map((value) => value.trim().toLowerCase())
     .filter(Boolean)
 
-  return configured.includes(email.trim().toLocaleLowerCase('tr-TR'))
+  return configured.includes(email.trim().toLowerCase())
 }
 
 export function isAllowedOwnerUser(user?: AuthUserLike | null) {
