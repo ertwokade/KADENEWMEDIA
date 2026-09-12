@@ -79,12 +79,16 @@ eskiden en yeniye.
 ## 6. İzleme (Monitoring)
 
 KadexAI sağlık ucu, Docker healthcheck'leri, cron sonuç günlüğü ve yönetim
-bildirim katmanı mevcuttur. Sentry entegrasyonu kodda hazırdır fakat canlıda
-`SENTRY_ENABLED=0` ve DSN tanımsızdır; PostHog da kapalıdır. Bu nedenle bağımsız
-harici uptime/hata servisi hâlâ yoktur. Sunucu için `/srv/kade/logs/cron.log`,
-`/srv/kade/logs/backup.log` ve Docker sağlık durumları; ana site için Vercel
-deployment/log ekranı izlenmelidir. Harici izleme hesabı bağlanana kadar bu
-durum açık operasyon riski olarak kalır.
+bildirim katmanı mevcuttur. `.github/workflows/uptime-monitor.yml`, GitHub'ın
+sunucularından ana siteyi ve KadexAI sağlık ucunu 15 dakikada bir denetler;
+SSL/HTTP hatasında veya KadexAI `auth`/`ai` sağlık kontrolü bozulduğunda iş
+başarısız olur ve GitHub Actions kaydında görünür. Ayrıca elle çalıştırılabilir.
+
+Sentry entegrasyonu kodda hazırdır fakat canlıda `SENTRY_ENABLED=0` ve DSN
+tanımsızdır; PostHog da kapalıdır. Dolayısıyla uptime kontrolü artık sunucudan
+bağımsız olsa da ayrıntılı uygulama hata/performans takibi henüz yoktur. Sunucu
+için `/srv/kade/logs/cron.log`, `/srv/kade/logs/backup.log` ve Docker sağlık
+durumları; ana site için Vercel deployment/log ekranı izlenmelidir.
 
 ## 7. Rutin bakım
 

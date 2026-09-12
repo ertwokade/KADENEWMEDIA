@@ -1,0 +1,52 @@
+name: Production Uptime Monitor
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-uptime-monitor
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check main site
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            --retry 2 --retry-delay 2 --retry-all-errors \
+            --connect-timeout 10 --max-time 30 \
+            https://kadenewmedia.com/ >/dev/null
+
+      - name: Check KadexAI health
+        shell: bash
+        run: |
+          set -euo pipefail
+          response_file="$(mktemp)"
+          trap 'rm -f "$response_file"' EXIT
+
+          curl --fail --silent --show-error \
+            --retry 2 --retry-delay 2 --retry-all-errors \
+            --connect-timeout 10 --max-time 30 \
+            --output "$response_file" \
+            https://kadexai.kadenewmedia.com/kadexai/api/health
+
+          node - "$response_file" <<'NODE'
+          const fs = require('node:fs')
+          const response = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'))
+
+          if (response?.status !== 'ok' || response?.checks?.auth !== true || response?.checks?.ai !== true) {
+            console.error('KadexAI health response is not ready:', JSON.stringify(response))
+            process.exit(1)
+          }
+
+          console.log('KadexAI production health check passed.')
+          NODE
