@@ -4,6 +4,7 @@ import { SYSTEM_PROMPTS, buildDescriptionPrompt } from '@/lib/ai/prompts'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { DescriptionGenerateRequest } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
+import { asGeneratedText } from '@/lib/ai/outputValidation'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -27,7 +28,12 @@ export async function POST(req: NextRequest) {
       maxTokens: 2500,
     }, req)
 
-    return NextResponse.json({ description: result.content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
+    const description = asGeneratedText(result.content, 12_000)
+    if (!description) {
+      return NextResponse.json({ error: 'Model kullanılabilir bir açıklama döndürmedi. Yeniden dene.' }, { status: 502 })
+    }
+
+    return NextResponse.json({ description, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sunucu hatası'
     return NextResponse.json({ error: message }, { status: 500 })

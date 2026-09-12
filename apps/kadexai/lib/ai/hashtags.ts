@@ -14,6 +14,12 @@ export function normalizeGeneratedHashtags(content: string): string {
     (_match, prefix: string, tag: string) => `${prefix}#${normalizeTag(tag)}`)
 }
 
+/** Yapılandırılmış araç çıktıları için ortak, sınırlı hashtag listesi. */
+export function normalizeHashtagList(value: unknown, count = 30): string[] {
+  if (!Array.isArray(value)) return []
+  return parseHashtagGroups(JSON.stringify(value), count).niche
+}
+
 /** Model cevabı güvenilmezdir: yalnız metin etiketleri, toplam sınır ve tekilleştirme. */
 export function parseHashtagGroups(content: string, count = 30): HashtagGroups {
   const groups: HashtagGroups = { yuksek: [], orta: [], dusuk: [], niche: [] }

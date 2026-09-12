@@ -1,10 +1,10 @@
 ﻿import { NextRequest, NextResponse } from 'next/server'
 import { generateContent } from '@/lib/ai/provider'
 import { SYSTEM_PROMPTS, buildTitlePrompt } from '@/lib/ai/prompts'
-import { extractJsonArray } from '@/lib/ai/json'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { TitleGenerateRequest } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
+import { normalizeTitleOutput } from '@/lib/ai/toolOutput'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -28,15 +28,12 @@ export async function POST(req: NextRequest) {
       maxTokens: 2000,
     }, req)
 
-    const parsed = extractJsonArray<unknown[]>(result.content)
-    const validated = Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string').map((item) => item.trim()).filter(Boolean).slice(0, 10) : []
-    const titles = validated.length
-      ? validated
-      : result.content.split('\n').map((t) => t.replace(/^[-*\d.)\s]+/, '').trim()).filter(Boolean).slice(0, 5)
+    const validated = normalizeTitleOutput(result.content)
+    if (validated.length === 0) {
+      return NextResponse.json({ error: 'Model geçerli bir başlık listesi döndürmedi. Yeniden dene.' }, { status: 502 })
+    }
 
-    if (titles.length === 0) return NextResponse.json({ error: 'Model kullanılabilir başlık döndürmedi. Yeniden dene.' }, { status: 502 })
-
-    return NextResponse.json({ titles, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed }, {
+    return NextResponse.json({ titles: validated, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed }, {
       headers: { 'X-RateLimit-Remaining': String(remaining) },
     })
   } catch (error) {

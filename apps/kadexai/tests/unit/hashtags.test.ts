@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { normalizeGeneratedHashtags, parseHashtagGroups } from '../../lib/ai/hashtags'
+import { normalizeGeneratedHashtags, normalizeHashtagList, parseHashtagGroups } from '../../lib/ai/hashtags'
 
 test('hashtag normalleştirmesi Türkçe ve birleşik Unicode harfleri kesmez', () => {
   assert.equal(normalizeGeneratedHashtags('Görüş: #İÇERİK, #GÜÇLÜ #I\u0307stanbul #Şişli'), 'Görüş: #icerik, #guclu #istanbul #sisli')
@@ -22,4 +22,9 @@ test('kod çitli JSON, düz dizi ve bozuk değerler güvenle işlenir', () => {
   assert.deepEqual(parseHashtagGroups('["#Örnek"]', 1).niche, ['#ornek'])
   assert.deepEqual(parseHashtagGroups('{"niche":[12,{},"iki kelime","<script>"]}').niche, [])
   assert.deepEqual(parseHashtagGroups('null').niche, [])
+})
+
+test('yapılandırılmış araçlar aynı hashtag listesini kullanır', () => {
+  assert.deepEqual(normalizeHashtagList(['İçerik', '#icerik', '#Şişli', 'iki kelime', false], 5), ['#icerik', '#sisli'])
+  assert.deepEqual(normalizeHashtagList('yanlış'), [])
 })

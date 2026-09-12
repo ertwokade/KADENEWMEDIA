@@ -3,6 +3,7 @@ import { generateContent } from '@/lib/ai/provider'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { AIModel } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
+import { asGeneratedText } from '@/lib/ai/outputValidation'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -43,8 +44,13 @@ Bu içeriği analiz et.
 - 100 üzerinden retention skoru`,
     }, req)
 
+    const analysis = asGeneratedText(result.content, 20_000)
+    if (!analysis) {
+      return NextResponse.json({ error: 'Model kullanılabilir bir izlenme analizi döndürmedi. Yeniden dene.' }, { status: 502 })
+    }
+
     return NextResponse.json(
-      { content: result.content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed },
+      { content: analysis, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed },
       { headers: { 'X-RateLimit-Remaining': String(remaining) } }
     )
   } catch (error) {

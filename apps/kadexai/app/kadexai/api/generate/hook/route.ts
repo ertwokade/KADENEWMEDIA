@@ -1,10 +1,10 @@
 ﻿import { NextRequest, NextResponse } from 'next/server'
 import { generateContent } from '@/lib/ai/provider'
 import { SYSTEM_PROMPTS, buildHookPrompt } from '@/lib/ai/prompts'
-import { extractJsonArray } from '@/lib/ai/json'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { HookGenerateRequest } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
+import { normalizeHookOutput } from '@/lib/ai/toolOutput'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -28,18 +28,12 @@ export async function POST(req: NextRequest) {
       maxTokens: 2500,
     }, req)
 
-    const parsed = extractJsonArray<unknown[]>(result.content)
-    const validated = Array.isArray(parsed) ? parsed.flatMap((item) => {
-      if (!item || typeof item !== 'object') return []
-      const value = item as Record<string, unknown>
-      const hook = String(value.hook || '').trim()
-      if (!hook) return []
-      return [{ hook: hook.slice(0, 800), tip: String(value.tip || 'genel').slice(0, 80), neden: String(value.neden || '').slice(0, 600) }]
-    }).slice(0, 20) : []
-    const hooks = validated.length ? validated : (result.content.trim() ? [{ hook: result.content.trim(), tip: 'genel', neden: 'Modelin düz metin yanıtı' }] : [])
-    if (hooks.length === 0) return NextResponse.json({ error: 'Model kullanılabilir hook döndürmedi. Yeniden dene.' }, { status: 502 })
+    const validated = normalizeHookOutput(result.content)
+    if (validated.length === 0) {
+      return NextResponse.json({ error: 'Model geçerli hook kartları döndürmedi. Yeniden dene.' }, { status: 502 })
+    }
 
-    return NextResponse.json({ hooks, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
+    return NextResponse.json({ hooks: validated, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Sunucu hatası'
     return NextResponse.json({ error: message }, { status: 500 })

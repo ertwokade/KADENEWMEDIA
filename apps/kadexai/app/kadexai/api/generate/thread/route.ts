@@ -4,6 +4,7 @@ import { THREAD_SYSTEM_PROMPT, buildThreadPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
 import { requireApiUser } from '@/lib/auth/server'
+import { normalizeHashtagList } from '@/lib/ai/hashtags'
 
 function normalizeThread(value: Record<string, unknown>, platform: string) {
   const limit = platform === 'linkedin' ? 1300 : 280
@@ -22,7 +23,7 @@ function normalizeThread(value: Record<string, unknown>, platform: string) {
   return {
     hook: typeof value.hook === 'string' ? value.hook.trim() : posts[0].icerik,
     posts,
-    hashtags: Array.isArray(value.hashtags) ? value.hashtags.filter((tag): tag is string => typeof tag === 'string') : [],
+    hashtags: normalizeHashtagList(value.hashtags, 20),
   }
 }
 

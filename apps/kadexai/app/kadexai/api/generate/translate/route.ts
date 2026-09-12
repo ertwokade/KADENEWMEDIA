@@ -3,6 +3,21 @@ import { generateContent } from '@/lib/ai/provider'
 import { DUBBING_SYSTEM_PROMPT, buildTranslatePrompt } from '@/lib/ai/prompts'
 import { TranslateRequest } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
+import { normalizeTranslationOutput } from '@/lib/ai/toolOutput'
+import { SELECTABLE_MODELS } from '@/lib/ai/models'
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  english: 'İngilizce',
+  german: 'Almanca',
+  french: 'Fransızca',
+  spanish: 'İspanyolca',
+  arabic: 'Arapça',
+  japanese: 'Japonca',
+  korean: 'Korece',
+  russian: 'Rusça',
+  portuguese: 'Portekizce',
+  italian: 'İtalyanca',
+}
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -20,28 +35,17 @@ export async function POST(req: NextRequest) {
       includeCulturalNotes = true,
     } = body
 
-    if (!content?.trim() || !targetLang || !model) {
+    if (typeof content !== 'string' || !content.trim() || content.length > 20_000 ||
+        typeof targetLang !== 'string' || !targetLang || !Object.prototype.hasOwnProperty.call(LANGUAGE_LABELS, targetLang) ||
+        typeof model !== 'string' || !SELECTABLE_MODELS.includes(model)) {
       return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
-    }
-
-    const langLabels: Record<string, string> = {
-      english: 'İngilizce',
-      german: 'Almanca',
-      french: 'Fransızca',
-      spanish: 'İspanyolca',
-      arabic: 'Arapça',
-      japanese: 'Japonca',
-      korean: 'Korece',
-      russian: 'Rusça',
-      portuguese: 'Portekizce',
-      italian: 'İtalyanca',
     }
 
     const result = await generateContent({
       prompt: buildTranslatePrompt(
         content,
         sourceLang,
-        langLabels[targetLang] || targetLang,
+        LANGUAGE_LABELS[targetLang],
         includePronunciation,
         includeTimingNotes,
         includeCulturalNotes
@@ -51,12 +55,9 @@ export async function POST(req: NextRequest) {
       maxTokens: 3000,
     }, req)
 
-    let translation: Record<string, unknown> = {}
-    try {
-      const jsonMatch = result.content.match(/\{[\s\S]*\}/)
-      if (jsonMatch) translation = JSON.parse(jsonMatch[0])
-    } catch {
-      translation = { ceviri: result.content, bolumler: [], kulturel_notlar: [], genel_yonerge: '' }
+    const translation = normalizeTranslationOutput(result.content)
+    if (!translation) {
+      return NextResponse.json({ error: 'Model geçerli bir çeviri şeması döndürmedi. Yeniden dene.' }, { status: 502 })
     }
 
     return NextResponse.json({ translation, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })

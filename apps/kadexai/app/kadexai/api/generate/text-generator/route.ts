@@ -3,6 +3,7 @@ import { generateContent } from '@/lib/ai/provider'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { AIModel } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
+import { asGeneratedText } from '@/lib/ai/outputValidation'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -39,8 +40,13 @@ Bu bilgilerle kullanıma hazır Türkçe metin üret.
 4. Yayınlamadan önce kontrol listesi`,
     }, req)
 
+    const content = asGeneratedText(result.content, 20_000)
+    if (!content) {
+      return NextResponse.json({ error: 'Model kullanılabilir bir metin döndürmedi. Yeniden dene.' }, { status: 502 })
+    }
+
     return NextResponse.json(
-      { content: result.content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed },
+      { content, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed },
       { headers: { 'X-RateLimit-Remaining': String(remaining) } }
     )
   } catch (error) {

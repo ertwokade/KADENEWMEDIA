@@ -12,6 +12,18 @@ export function asText(value: unknown, maxLength = 10_000): string {
   return ''
 }
 
+/**
+ * Düz metin üreten araçlar da boş veya aşırı uzun model yanıtını
+ * başarılı içerik gibi sunmamalı. Sayı/boolean gibi yanlış tipler burada
+ * metne çevrilmez; yalnız gerçek bir model metni kabul edilir.
+ */
+export function asGeneratedText(value: unknown, maxLength = 20_000, minLength = 1): string | null {
+  if (typeof value !== 'string') return null
+  const text = value.trim()
+  if (text.length < minLength || text.length > maxLength) return null
+  return text
+}
+
 export function asNumber(value: unknown, fallback = 0, min = 0, max = 100): number {
   const parsed = typeof value === 'number' ? value : Number(value)
   return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback

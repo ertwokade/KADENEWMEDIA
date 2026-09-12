@@ -1,12 +1,19 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { asBoolean, asNumber, asRecord, asRecordList, asText, asTextList, asTextRecord } from '../../lib/ai/outputValidation'
+import { asBoolean, asGeneratedText, asNumber, asRecord, asRecordList, asText, asTextList, asTextRecord } from '../../lib/ai/outputValidation'
 
 test('model çıktı doğrulayıcıları nesne ve liste dışı değerleri güvenle reddeder', () => {
   assert.equal(asRecord(['yanlış']), null)
   assert.equal(asRecord(null), null)
   assert.deepEqual(asTextList({ value: 'yanlış' }), [])
   assert.deepEqual(asRecordList('yanlış', () => ({ ok: true })), [])
+})
+
+test('düz model çıktısı yalnız sınırlar içindeki gerçek metni kabul eder', () => {
+  assert.equal(asGeneratedText('  Kullanılabilir yanıt  ', 100), 'Kullanılabilir yanıt')
+  assert.equal(asGeneratedText('   ', 100), null)
+  assert.equal(asGeneratedText(false, 100), null)
+  assert.equal(asGeneratedText('uzun yanıt', 4), null)
 })
 
 test('model çıktı doğrulayıcıları metinleri sınırlar ve sayıları aralıkta tutar', () => {

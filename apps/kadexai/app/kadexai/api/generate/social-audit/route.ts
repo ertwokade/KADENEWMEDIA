@@ -3,6 +3,7 @@ import { generateContent } from '@/lib/ai/provider'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { AIModel } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
+import { asGeneratedText } from '@/lib/ai/outputValidation'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -66,9 +67,14 @@ Verilen metriklerde bulunuyorsa takipçi büyümesi, gösterim, erişim, etkile�
 10. En öncelikli 5 görev`,
     }, req)
 
+    const content = asGeneratedText(result.content, 24_000)
+    if (!content) {
+      return NextResponse.json({ error: 'Model kullanılabilir bir sosyal medya analizi döndürmedi. Yeniden dene.' }, { status: 502 })
+    }
+
     return NextResponse.json(
       {
-        content: result.content,
+        content,
         model: result.model,
         routingReason: result.routingReason,
         tokensUsed: result.tokensUsed,
