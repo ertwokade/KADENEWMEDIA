@@ -2,6 +2,7 @@ import { getSupabase, isValidUuid } from './_lib/supabase.js'
 import { requirePermission } from './_lib/auth.js'
 import { cors } from './_lib/cors.js'
 import { rateLimitCheck } from './_lib/rateLimit.js'
+import { ADMIN_JSON_EXPORT_MAX_ROWS, buildAdminJsonExportMetadata } from './_lib/adminExport.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const QUOTE_SERVICES = new Set(['Sosyal Medya Yönetimi', 'İçerik Üretimi', 'Reklam Yönetimi', 'Video Prodüksiyon', 'Web Sitesi', 'Danışmanlık', 'Social Media Management', 'Content Production', 'Ads Management', 'Video Production', 'Website', 'Consulting'])
@@ -351,23 +352,35 @@ async function handleBackup(req, res, supabase) {
       if (error) throw error
       counts[name] = count || 0
     }
-    return res.status(200).json({ generatedAt: new Date().toISOString(), generatedBy: user.username, collections: counts })
+    return res.status(200).json({
+      generatedAt: new Date().toISOString(),
+      generatedBy: user.username,
+      collections: counts,
+      export: buildAdminJsonExportMetadata(counts),
+    })
   }
 
   if (req.method === 'POST') {
     const data = {}
+    const counts = {}
     for (const [name, table] of Object.entries(TABLES)) {
-      const { data: rows, error } = await supabase.from(table).select('*').order('created_at', { ascending: false }).limit(1000)
+      const { data: rows, count, error } = await supabase
+        .from(table)
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .limit(ADMIN_JSON_EXPORT_MAX_ROWS)
       if (error) throw error
       data[name] = rows || []
+      counts[name] = count || 0
     }
+    const exportMetadata = buildAdminJsonExportMetadata(counts)
     const { error: insertErr } = await supabase.from('kade_backups').insert({
       generated_at: new Date().toISOString(),
       generated_by: user.username,
       collections: Object.fromEntries(Object.entries(data).map(([name, items]) => [name, items.length])),
     })
     if (insertErr) throw insertErr
-    return res.status(200).json({ generatedAt: new Date().toISOString(), data })
+    return res.status(200).json({ generatedAt: new Date().toISOString(), export: exportMetadata, data })
   }
 
   return res.status(405).json({ error: 'Method not allowed' })

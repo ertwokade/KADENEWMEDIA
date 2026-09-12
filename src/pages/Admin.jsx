@@ -8396,10 +8396,10 @@ function BackupSection({ showToast }) {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `kade-backup-${new Date().toISOString().slice(0, 10)}.json`
+      a.download = `kade-admin-export-${new Date().toISOString().slice(0, 10)}.json`
       a.click()
       URL.revokeObjectURL(url)
-      showToast('Yedek indirildi')
+      showToast('JSON dışa aktarımı indirildi')
       load()
     } catch (err) {
       showToast(err.message || 'Yedek alınamadı', 'error')
@@ -8412,16 +8412,26 @@ function BackupSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Yedekleme <span>Paneli</span></h1>
-          <p>Veritabanı tablo özetini görün ve manuel JSON yedek alın</p>
+          <h1>JSON <span>Dışa Aktarım</span></h1>
+          <p>Yönetim koleksiyonlarının özetini görün ve sınırlı JSON dışa aktarımı alın</p>
         </div>
         <button className="btn btn-primary" onClick={download} disabled={loading}>
-          <HiOutlineDatabase size={16} /> Yedek İndir
+          <HiOutlineDatabase size={16} /> JSON İndir
         </button>
       </div>
 
       <div className="admin-form">
         <h3>Tablo Özeti</h3>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>
+          Bu dosya tam veritabanı veya afet kurtarma yedeği değildir. Kimlik doğrulama verilerini içermez
+          ve koleksiyon başına en yeni {summary?.export?.maxRowsPerCollection || 1000} kayıtla sınırlıdır.
+          Tam şifreli sunucu yedeği ayrı ve otomatik alınır.
+        </p>
+        {summary?.export?.truncatedCollections?.length > 0 && (
+          <p role="status" style={{ color: 'var(--gate-accent)', marginBottom: 16 }}>
+            Sınırı aşan koleksiyonlar: {summary.export.truncatedCollections.join(', ')}
+          </p>
+        )}
         {loading && !summary ? <p>Yükleniyor...</p> : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
             {Object.entries(summary?.collections || {}).map(([name, count]) => (

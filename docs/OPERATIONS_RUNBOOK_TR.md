@@ -73,8 +73,11 @@ eskiden en yeniye.
   tablolarında saklanıyor (bkz. `docs/01` bulgusu) — bu, DB backup'ının
   medyayı da kapsadığı anlamına gelir ama ölçeklenebilirlik açısından
   ideal değil, object storage'a taşıma önerilir.
-- **Admin panelindeki "Yedekleme" modülü:** Var (`BackupSection`) —
-  kapsamı bu oturumda doğrulanmadı, bir sonraki incelemede kontrol edilmeli.
+- **Admin panelindeki JSON dışa aktarımı:** 11 yönetim koleksiyonunun özetini
+  gösterir ve koleksiyon başına en yeni 1000 kaydı indirir. Kimlik doğrulama
+  tablolarını içermez; tam veritabanı/afet kurtarma yedeği değildir. Arayüz ve
+  indirilen dosya bu sınırı açıkça bildirir. Gerçek kurtarma kaynağı yukarıdaki
+  günlük şifreli PostgreSQL yedeğidir.
 
 ## 6. İzleme (Monitoring)
 
@@ -97,5 +100,5 @@ durumları; ana site için Vercel deployment/log ekranı izlenmelidir.
   Studio Next.js `16.3.5` sürümüne, e-posta/HTML temizleme ve ilgili geçişli
   paketler yamalı sürümlere alındı. CI her push'ta üç kilit dosya için de
   `moderate` ve üzeri açığı reddeder.
-- **Lint/test taban çizgisi:** Legacy ESLint temizdir ve 12 Eylül 2026 itibarıyla 98 birim testi geçer. KadexAI TypeScript/ESLint temizdir ve 265 birim testi geçer.
+- **Lint/test taban çizgisi:** Legacy ESLint temizdir ve 12 Eylül 2026 itibarıyla 99 birim testi geçer. KadexAI TypeScript/ESLint temizdir ve 265 birim testi geçer.
 - **Kupon kullanım sayaçları:** `kade_coupons.used_count` şu an hiçbir yerden otomatik artırılmıyor (checkout'a bağlanmadığı için, bkz. blocker #14) — canlıya alınırsa bu sayaç mantığı da eklenmeli.
