@@ -16,7 +16,7 @@
     "@kade/editor-core": "workspace:*",
     "@kade/shared": "workspace:*",
     "drizzle-orm": "latest",
-    "next": "latest",
+    "next": "16.3.5",
     "openai": "latest",
     "react": "latest",
     "react-dom": "latest",
@@ -32,10 +32,10 @@
     "dotenv": "latest",
     "dotenv-cli": "latest",
     "eslint": "^9.39.5",
-    "eslint-config-next": "latest",
+    "eslint-config-next": "16.3.5",
     "execa": "latest",
     "tailwindcss": "latest",
     "typescript": "^5.9.3",
-    "vitest": "latest"
+    "vitest": "4.1.11"
   }
 }

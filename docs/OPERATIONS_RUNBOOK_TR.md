@@ -92,6 +92,10 @@ durumları; ana site için Vercel deployment/log ekranı izlenmelidir.
 
 ## 7. Rutin bakım
 
-- **Bağımlılık güncellemeleri:** `npm audit` periyodik çalıştırılmalı (bu oturumda çalıştırıldı, 2 düşük önem düzeltildi, 1 yüksek önem — yalnızca dev-bağımlılığı `concurrently` etkiliyor — bilinçli ertelendi).
+- **Bağımlılık güvenliği:** 12 Eylül 2026'da ana site, KadexAI ve pnpm Studio
+  kilit dosyalarının denetimleri sıfır bilinen açıkla tamamlandı. KadexAI ve
+  Studio Next.js `16.3.5` sürümüne, e-posta/HTML temizleme ve ilgili geçişli
+  paketler yamalı sürümlere alındı. CI her push'ta üç kilit dosya için de
+  `moderate` ve üzeri açığı reddeder.
 - **Lint/test taban çizgisi:** Legacy ESLint temizdir ve 12 Eylül 2026 itibarıyla 98 birim testi geçer. KadexAI TypeScript/ESLint temizdir ve 265 birim testi geçer.
 - **Kupon kullanım sayaçları:** `kade_coupons.used_count` şu an hiçbir yerden otomatik artırılmıyor (checkout'a bağlanmadığı için, bkz. blocker #14) — canlıya alınırsa bu sayaç mantığı da eklenmeli.
