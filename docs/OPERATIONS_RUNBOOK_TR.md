@@ -6,11 +6,11 @@ mimari kararların gerekçesi için `docs/02`, güvenlik denetimi için
 
 ## 1. Dağıtım (Deployment)
 
-- **Platform:** Vercel, proje adı `kademedia` (org: `demirk314-3297s-projects`), git push ile otomatik deploy (`main` dalı → production).
+- **Platform:** Vercel, proje adı `kadenewmedia` (hesap: `kadeertwo`), git push ile otomatik deploy (`main` dalı → production).
 - **Framework Preset:** `vercel.json`'da `"framework": "vite"` **zorunlu** — proje dashboard'undaki Framework Preset ayarı yanlışlıkla "Services" olarak kalırsa (bu, PR #8 denemesinden kalma bir ayardı ve bu oturumda düzeltildi) her deployment 2-3 saniyede başarısız olur. `vercel.json`'daki `framework` alanı bu dashboard ayarını override eder — **bu satırı vercel.json'dan silmeyin.**
 - **Build komutu:** `npm run legacy:build` (`vite build` + `index.html`→`app.html` yeniden adlandırma + statik rota üretimi).
-- **Sorun giderme:** `npx vercel ls kademedia` ile son deployment'ların durumunu kontrol edin; `● Error` art arda görülüyorsa `npx vercel build` ile yerelde build'i taklit edip hatayı erken yakalayın.
-- **apps/kadexai:** Ayrı bir Vercel projesi (`kadexai`), kök `vercel.json`'daki `rewrites` ile `/kadexai/**` altında sunuluyor — iki proje birbirinden bağımsız deploy edilir.
+- **Sorun giderme:** `npx vercel ls kadenewmedia` ile son deployment'ların durumunu kontrol edin; `● Error` art arda görülüyorsa `npx vercel build` ile yerelde build'i taklit edip hatayı erken yakalayın.
+- **apps/kadexai:** Keyubu Windows Server üzerindeki WSL2/Ubuntu ve Docker'da çalışır. `main` dalında `apps/kadexai/**`, `server/**` veya ilgili dağıtım yolları değişince `.github/workflows/deploy-keyubu.yml` tam commit'i otomatik dağıtır. Canlı uç `https://kadexai.kadenewmedia.com/kadexai` adresidir; ana site Vercel'de kalır.
 
 ## 2. Ortam değişkenleri (kritik olanlar)
 
@@ -32,16 +32,18 @@ durumunu** canlıda gösterir — gerçek değerleri asla göstermez.
 ## 3. Veritabanı migrasyonları
 
 Migration dosyaları `apps/kadexai/supabase/migrations/*.sql` — kronolojik
-sırayla, ellemeden uygulanmalı. Bu oturumda eklenen ve **henüz canlıya
-uygulanmamış** olanlar (blocker #1):
+sırayla uygulanmalı. Aşağıdaki üç migration 12 Eylül 2026'da taze şifreli
+yedek ve transaction dry-run sonrasında self-hosted üretim PostgreSQL'e
+tek transaction olarak uygulandı:
 
 - `202607230001_kademedia_audit_and_quote_states.sql` — teklif durum makinesi + audit log alanları
 - `202607230002_kademedia_coupons.sql` — kupon tablosu
 - `202607230003_kademedia_shopier_refund_state.sql` — iade durumu
 
-Bunlar uygulanmadan da sistem çalışır (kod geriye dönük uyumlu tasarlandı,
-eksik kolonlara yazma denemesi sessizce eski davranışa düşer) — ama yeni
-özellikler (kupon, yapısal audit log, iade takibi) tam işlevsel olmaz.
+Canlı doğrulamada `kade_coupons`, `kade_activity_log.target_* / before / after`
+ve `kade_shopier_orders.refunded_*` alanları ile genişletilmiş durum constraint'i
+mevcuttur. Migration'ları rastgele tekrar çalıştırmak yerine önce şemayı ve bu
+runbook kaydını kontrol edin.
 
 **Migration uygulama sırası:** Supabase projesindeki SQL editöründen ya
 da `supabase db push` ile, dosya adındaki tarih sırasına göre, en
@@ -60,10 +62,12 @@ eskiden en yeniye.
 
 ## 5. Yedekleme ve kurtarma
 
-- **Veritabanı:** Supabase'in kendi otomatik backup mekanizması
-  kullanılıyor (proje planına göre değişir) — bu oturumda şifreleme/
-  restore testi **doğrulanmadı** (bkz. `docs/THREAT_MODEL_TR.md`, açık madde).
-  Prodüksiyona geçmeden önce en az bir gerçek restore testi yapılmalı.
+- **Veritabanı:** Self-hosted Supabase her gün 02:20 UTC'de şifreli olarak
+  `/srv/kade/backups/selfhosted-supabase` altına yedeklenir ve 14 gün tutulur.
+  Her pazar son arşiv ayrı/geçici PostgreSQL veritabanına geri yüklenir; tablo
+  envanteri üretimle eşleşince geçici veritabanı silinir. 11 Eylül arşiviyle
+  123 tablo için gerçek restore doğrulaması başarılıdır. 12 Eylül migration'ı
+  öncesinde ayrıca taze şifreli yedek alınmıştır.
 - **Kod:** Git (GitHub) — her commit push edildiğinde otomatik yedek.
 - **Medya:** Şu an base64 olarak `kade_media`/`kade_link_profiles`
   tablolarında saklanıyor (bkz. `docs/01` bulgusu) — bu, DB backup'ının
@@ -72,17 +76,18 @@ eskiden en yeniye.
 - **Admin panelindeki "Yedekleme" modülü:** Var (`BackupSection`) —
   kapsamı bu oturumda doğrulanmadı, bir sonraki incelemede kontrol edilmeli.
 
-## 6. İzleme (Monitoring) — açık boşluk
+## 6. İzleme (Monitoring)
 
-Gerçek zamanlı hata/uptime izleme (Sentry, PagerDuty, UptimeRobot vb.)
-bu oturumda **tespit edilmedi** — yalnızca `console.error` var, bu da
-yalnızca Vercel'in kendi log arayüzünden manuel görülüyor. Bu,
-`docs/THREAT_MODEL_TR.md`'de release-blocker adayı olarak işaretli bir
-boşluk. Kurulana kadar: kritik hataları fark etmenin tek yolu Vercel
-deployment log'larını (`npx vercel logs kademedia`) manuel kontrol etmek.
+KadexAI sağlık ucu, Docker healthcheck'leri, cron sonuç günlüğü ve yönetim
+bildirim katmanı mevcuttur. Sentry entegrasyonu kodda hazırdır fakat canlıda
+`SENTRY_ENABLED=0` ve DSN tanımsızdır; PostHog da kapalıdır. Bu nedenle bağımsız
+harici uptime/hata servisi hâlâ yoktur. Sunucu için `/srv/kade/logs/cron.log`,
+`/srv/kade/logs/backup.log` ve Docker sağlık durumları; ana site için Vercel
+deployment/log ekranı izlenmelidir. Harici izleme hesabı bağlanana kadar bu
+durum açık operasyon riski olarak kalır.
 
 ## 7. Rutin bakım
 
 - **Bağımlılık güncellemeleri:** `npm audit` periyodik çalıştırılmalı (bu oturumda çalıştırıldı, 2 düşük önem düzeltildi, 1 yüksek önem — yalnızca dev-bağımlılığı `concurrently` etkiliyor — bilinçli ertelendi).
-- **Lint/test taban çizgisi:** Kök `npx eslint . --ext .js,.jsx` şu an 25 hata/7 uyarı veriyor (hepsi bu oturumdan önce vardı, `docs/01`'de kayıtlı) — yeni kod bu sayıyı ARTIRMAMALI, azaltmaya çalışılabilir.
+- **Lint/test taban çizgisi:** Legacy ESLint temizdir ve 12 Eylül 2026 itibarıyla 98 birim testi geçer. KadexAI TypeScript/ESLint temizdir ve 265 birim testi geçer.
 - **Kupon kullanım sayaçları:** `kade_coupons.used_count` şu an hiçbir yerden otomatik artırılmıyor (checkout'a bağlanmadığı için, bkz. blocker #14) — canlıya alınırsa bu sayaç mantığı da eklenmeli.

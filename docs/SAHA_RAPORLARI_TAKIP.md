@@ -6,7 +6,7 @@ Bu dosya tamamlanan düzeltme gruplarının durumudur. Rapor düzeltmeleri, son 
 
 ## Güvenlik ve kapsam
 
-Gerçek müşteri kayıtları, admin hesapları, seed verileri, domain ve üretim veritabanı değiştirilmedi. Mevcut CallMeBot ayarları dışında anahtar değişikliği yapılmadı. Tarayıcı testleri yerel API mock kullanır; gerçek backend bağlantısının çalıştığını kanıtlamaz.
+Gerçek müşteri kayıtları, admin hesapları, seed verileri ve domain değiştirilmedi. 12 Eylül'de üç hazırlanmış şema migration'ı taze şifreli yedek ve transaction dry-run sonrasında üretim veritabanına uygulandı; mevcut veri satırları silinmedi veya tahminle değiştirilmedi. Mevcut CallMeBot ayarları dışında anahtar değişikliği yapılmadı. Tarayıcı testleri yerel API mock kullanır; gerçek backend bağlantısının çalıştığını tek başına kanıtlamaz.
 
 ## Son doğrulama
 
@@ -49,7 +49,7 @@ Kaynak: `/Users/kadirdemir/Desktop/adminpanelraporu.html`
 | 01 | Dokuz lead'in dokuzu da altı aydır "Yeni" kutusunda | İşletme kararı: gerçek lead aşamaları ve müşteri iletişimi kendiliğinden değiştirilmedi. |
 | 02 | Altı bölümün ⚠ "sayfa sitede yok" uyarısı — genel site raporunda yanlış çıktı | Düzeltildi ve dağıtıldı: admin sekmeleri gerçek rota tablosuyla eşlendi; var olan klon sayfalar `static`, olmayan sayfalar ayrı durumla gösteriliyor. Kaynakla eşleşme birim testinde korunuyor. |
 | 03 | Türkçe karakterler baştan sona silinmiş, ayrıca sabit karışık | Bu tur: Analitik metinleri düzeltildi; masaüstü/mobil etiket testi geçti. |
-| 04 | "Gerçek zamanlı işlemler" diyor, son kayıt 44 gün önce | Düzeltildi: desteklenen admin yazma uçları ortak log yardımcısını kullanıyor; log yazımı yanıt öncesi bekleniyor, eski şema geri dönüşü ve 5 sn süre sınırı var. Liste görünürken 30 sn yenileniyor ve hata eski kaydı güncelmiş gibi göstermiyor. Gerçek işletme kayıtlarına test logu eklenmedi. |
+| 04 | "Gerçek zamanlı işlemler" diyor, son kayıt 44 gün önce | Düzeltildi: desteklenen admin yazma uçları ortak log yardımcısını kullanıyor; log yazımı yanıt öncesi bekleniyor ve 5 sn süre sınırı var. Yapısal hedef/önce/sonra alanları 12 Eylül'de canlı şemaya uygulandı. Liste görünürken 30 sn yenileniyor ve hata eski kaydı güncelmiş gibi göstermiyor. Gerçek işletme kayıtlarına test logu eklenmedi. |
 | 05 | Şirketin ikinci, ayrı AI içerik üreticisi — ve aynı tarih hatasını taşıyor | Bu tur: İstanbul saat diliminde güncel tarih bağlamı eklendi; yıl geçişi testi geçti. Gerçek model çıktısı ayrıca kontrol edilecek. |
 | 06 | Aynı kelimenin içinde hem doğru hem yanlış Türkçe harf | Bu tur: Hatırlatıcılar ekranı, formu ve hata/başarı metinlerinin Türkçe karakterleri düzeltildi. |
 | 07 | İngilizce koleksiyon adlarına Türkçe büyütme kuralı uygulanmış | Bu tur: tablo adlarının otomatik büyük harfe dönüşmesi kaldırıldı; eski MongoDB açıklaması düzeltildi. |
