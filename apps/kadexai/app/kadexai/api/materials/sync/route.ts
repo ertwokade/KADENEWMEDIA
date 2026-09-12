@@ -28,6 +28,10 @@ async function runSource(source: Source): Promise<MaterialSyncResult> {
     }
     return await saveMaterials(source, tiktok.items)
   } catch (e) {
+    const errorName = e && typeof e === 'object' && 'name' in e ? String(e.name) : ''
+    if (source === 'arsivhub' && errorName === 'MaterialSourceUnavailableError') {
+      return { source, found: 0, inserted: 0, updated: 0, ok: false, skipped: true, error: 'Materyal arşivi artık yayın yapmıyor.' }
+    }
     const message = e instanceof Error ? e.message : 'bilinmeyen hata'
     await recordFailedRun(source, message).catch(() => {})
     return { source, found: 0, inserted: 0, updated: 0, ok: false, error: 'Kaynak taraması tamamlanamadı.' }
@@ -54,10 +58,12 @@ export async function POST(req: Request) {
       { found: 0, inserted: 0, updated: 0 }
     )
     const basarili = sonuclar.filter(result => result.ok).length
+    const tumuAtlandi = sonuclar.every(result => result.skipped)
     return NextResponse.json({ toplam, sonuclar,
       partial: basarili > 0 && basarili < sonuclar.length,
-      ...(basarili ? {} : { error: 'Hiçbir kaynak taraması tamamlanamadı. Yapılandırmayı ve kaynak erişimini kontrol et.' }),
-    }, { status: basarili ? 200 : 503 })
+      ...(tumuAtlandi ? { skipped: true, message: 'Etkin materyal kaynağı yok; mevcut arşiv korunuyor.' } : {}),
+      ...(basarili || tumuAtlandi ? {} : { error: 'Hiçbir kaynak taraması tamamlanamadı. Yapılandırmayı ve kaynak erişimini kontrol et.' }),
+    }, { status: basarili || tumuAtlandi ? 200 : 503 })
   } catch (e) {
     return failure(e, 'Materyal toplama başarısız.')
   }

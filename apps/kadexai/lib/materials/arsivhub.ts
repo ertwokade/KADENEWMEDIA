@@ -17,6 +17,13 @@ const SITEMAPS: Array<{ url: string; kind: MaterialKind }> = [
   { url: `${BASE}/photo-sitemap.xml`, kind: 'photo' },
 ]
 
+export class MaterialSourceUnavailableError extends Error {
+  constructor() {
+    super('Materyal arşivi artık sitemap yayınlamıyor.')
+    this.name = 'MaterialSourceUnavailableError'
+  }
+}
+
 function decode(value: string) {
   return value
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
@@ -94,17 +101,21 @@ function parseSitemap(xml: string, kind: MaterialKind): MaterialItem[] {
 
 export async function collectArsivhub(signal?: AbortSignal): Promise<MaterialItem[]> {
   const collected: MaterialItem[] = []
+  let availableSitemaps = 0
   for (const sitemap of SITEMAPS) {
     const response = await fetch(sitemap.url, {
       signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15_000)]) : AbortSignal.timeout(15_000),
       cache: 'no-store',
       headers: { 'user-agent': 'KadexAI-Materials/1.0 (+https://kadenewmedia.com)' },
     })
-    /* Foto sitemap'i henuz yoksa video tarafi calismaya devam etsin. */
-    if (sitemap.kind === 'photo' && response.status === 404) continue
+    /* Kaynak sitemap'i kaldırdıysa bunu ağ/sunucu arızası gibi raporlama.
+       En az bir sitemap hâlâ açıksa kalan veri toplanmaya devam eder. */
+    if (response.status === 404 || response.status === 410) continue
     if (!response.ok) throw new Error('Materyal arşivi taraması tamamlanamadı.')
+    availableSitemaps += 1
     collected.push(...parseSitemap(await response.text(), sitemap.kind))
   }
+  if (availableSitemaps === 0) throw new MaterialSourceUnavailableError()
   /* Ayni kayit iki sitemap'te birden gecerse sonuncusu kalir. */
   const unique = new Map(collected.map((item) => [item.id, item]))
   return [...unique.values()]

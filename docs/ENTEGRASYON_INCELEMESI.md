@@ -55,10 +55,11 @@ Mevcut WhatsApp çalışır durumda bırakıldı. Telegram teslim katmanı sıf�
 - Yetki testi başarısız platform sağlayıcıları ortam allow/deny katmanıyla kullanım dışı bırakıldı. Çalışmayan modeller seçicide görünmüyor ve otomatik yönlendirmede denenmiyor; anahtar yenilendiğinde bayrak kaldırılarak geri açılabilir. YouTube veri bağlantısı da anahtar düzelene kadar kapalı gösteriliyor. Google OAuth istemcisi mevcut, fakat gerçek kanal bağlantısı hesap sahibinin Google onayını gerektiriyor.
 - Şifreli Supabase yedeği günlük çalışıyor. 11 Eylül arşivi ayrı/geçici PostgreSQL veritabanına gerçekten geri yüklendi; üretimle 123 tablo eşleşti ve geçici veritabanı temizlendi. Bu geri-dönüş doğrulaması her pazar cron ile otomatik çalışacak.
 - 12 Eylül salt-okunur kontrolde Google OAuth istemcisi, yönlendirme adresi ve entegrasyon belirteci şifreleme anahtarı Keyubu ortamında mevcut; dolayısıyla YouTube kanal bağlantısının kod tarafı hazır. Kanal onayı kullanıcı oturumu gerektiriyor. Ana-site Vercel ortamında GA4 değişken adları bulunsa da üç değer de örnek/placeholder çıktı; RSA imzası üretilemedi. Kod artık bu değerleri yapılandırılmış saymıyor ve Google'a gereksiz istek göndermiyor. Gerçek GA4 property ve servis hesabı hâlâ gerekli.
+- 12 Eylül cron denetiminde materyal eşitlemenin iki gündür HTTP 503 verdiği görüldü. Arsivhub'ın video ve foto sitemap'leri hem yerel ağdan hem Keyubu'dan HTTP 410 dönüyor; YouTube ve TikTok da yapılandırılmamış. Kaldırılmış sitemap artık güvenli “kaynak kullanılamıyor” durumuna dönüşüyor. Bütün kaynaklar kullanılamazsa mevcut arşiv silinmeden başarılı no-op dönüyor; gerçek ağ/veritabanı hataları HTTP 503 kalıyor.
 
 ## Doğrulama
 
-- KadexAI: 263 birim testi geçti; TypeScript, ESLint ve üretim derlemesi başarılı.
+- KadexAI: 265 birim testi geçti; TypeScript, ESLint ve üretim derlemesi başarılı.
 - Ana site: GA4 placeholder regresyonu dahil 98 birim testi, ESLint ve üretim derlemesi başarılı.
 - Yeni tarayıcı regresyonları: 4 geçti (AutoSocial ve Radar, 1440px masaüstü/390px mobil). Bütün veri API'leri mock; video yüklenmediği ve gerçek paylaşım yapılmadığı doğrulandı.
 - Görseller incelendi; mevcut site tema sistemi korundu. `edit-section` yaklaşımı değişiklikleri mevcut İçerik Stüdyosu/Radar bölümlerinde sınırlandırdı.
