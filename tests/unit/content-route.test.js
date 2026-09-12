@@ -5,8 +5,9 @@ import vm from 'node:vm'
 import { publicStats } from '../../server/api/_lib/public-content.js'
 
 // Execute the real handler with isolated DB/auth/network dependencies.
-function setup({ permitted = false, reportFails = false, tokenFails = false, configured = false } = {}) {
+function setup({ permitted = false, reportFails = false, tokenFails = false, configured = false, placeholder = false } = {}) {
   const calls = [];
+  const networkCalls = [];
   const builder = {
     select() { return this; }, eq() { return this; },
     async maybeSingle() { return { data: { data: { notes: 'private', rakamlar: [{ sayi: 0, etiket: 'Kampanya' }] } } }; },
@@ -15,17 +16,26 @@ function setup({ permitted = false, reportFails = false, tokenFails = false, con
     .replace(/^import .*;\r?$/gm, '').replace(/export default /g, '').replace(/export /g, '');
   const context = vm.createContext({
     publicStats, URL, console: { error() {} },
-    process: { env: configured ? { GA4_PROPERTY_ID: 'test', GA4_CLIENT_EMAIL: 'test@example.com', GA4_PRIVATE_KEY: 'test' } : {} },
+    process: { env: configured
+      ? {
+          GA4_PROPERTY_ID: placeholder ? '123456789' : '987654321',
+          GA4_CLIENT_EMAIL: placeholder ? 'service-account@example-project.iam.gserviceaccount.com' : 'analytics-reader@kade-production.iam.gserviceaccount.com',
+          GA4_PRIVATE_KEY: placeholder
+            ? '-----BEGIN PRIVATE KEY-----\\nREPLACE_ME\\n-----END PRIVATE KEY-----'
+            : `-----BEGIN PRIVATE KEY-----\\n${'a'.repeat(120)}\\n-----END PRIVATE KEY-----`,
+        }
+      : {} },
     jwt: { sign: () => 'test-jwt' }, cors: () => false,
     getSupabase: () => ({ from(table) { calls.push(table); return builder; } }),
     requirePermission: async (_req, res) => { if (!permitted) res.status(401).json({ error: 'Giriş gerekli' }); return permitted; },
     fetch: async url => {
+      networkCalls.push(url);
       if (url.includes('oauth2')) return tokenFails ? Response.json({}, { status: 401 }) : Response.json({ access_token: 'test-token', expires_in: 3600 });
       return reportFails ? Response.json({ error: 'private provider detail' }, { status: 503 }) : Response.json({ rows: [] });
     },
   });
   vm.runInContext(code, context);
-  return { calls, async request(query, method = 'GET') {
+  return { calls, networkCalls, async request(query, method = 'GET') {
     const res = { statusCode: 200, body: null, status(code) { this.statusCode = code; return this; }, json(data) { this.body = JSON.parse(JSON.stringify(data)); return this; } };
     await context.handler({ method, query, body: { section: 'nedenBiz', data: {} } }, res);
     return res;
@@ -65,4 +75,12 @@ test('unconfigured GA4 and real empty GA4 results remain distinct', async () => 
   assert.equal(empty.statusCode, 200);
   assert.equal(empty.body.configured, true);
   assert.equal(empty.body.totalVisits, 0);
+});
+
+test('GA4 placeholder values are treated as unconfigured without contacting Google', async () => {
+  const app = setup({ permitted: true, configured: true, placeholder: true });
+  const res = await app.request({ action: 'ga4' });
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.configured, false);
+  assert.deepEqual(app.networkCalls, []);
 });

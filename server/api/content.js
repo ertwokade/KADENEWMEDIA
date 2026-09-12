@@ -33,6 +33,22 @@ export function isPublicContentSection(section) {
 let _ga4Token = null;
 let _ga4Exp = 0;
 
+export function hasValidGa4Configuration(env = process.env) {
+  const propertyId = (env.GA4_PROPERTY_ID || '').trim();
+  const email = (env.GA4_CLIENT_EMAIL || '').trim().toLowerCase();
+  const key = (env.GA4_PRIVATE_KEY || '').replace(/\\n/g, '\n').trim();
+  const placeholder = /replace[_ -]?me|example-project|your[_ -]?/i;
+
+  return /^\d{5,}$/.test(propertyId)
+    && propertyId !== '123456789'
+    && /^[^\s@]+@[^\s@]+\.iam\.gserviceaccount\.com$/.test(email)
+    && !placeholder.test(email)
+    && key.startsWith('-----BEGIN PRIVATE KEY-----')
+    && key.endsWith('-----END PRIVATE KEY-----')
+    && key.length > 100
+    && !placeholder.test(key);
+}
+
 async function ga4Token() {
   const email = process.env.GA4_CLIENT_EMAIL;
   const key = (process.env.GA4_PRIVATE_KEY || '').replace(/\\n/g, '\n');
@@ -384,7 +400,7 @@ export default async function handler(req, res) {
     if (!(await requirePermission(req, res, ['analytics', 'dashboard']))) return;
 
     const propertyId = process.env.GA4_PROPERTY_ID;
-    if (!propertyId || !process.env.GA4_CLIENT_EMAIL || !process.env.GA4_PRIVATE_KEY) {
+    if (!hasValidGa4Configuration()) {
       return res.status(200).json({ configured: false, error: 'GA4 yapılandırılmamış' });
     }
     try {

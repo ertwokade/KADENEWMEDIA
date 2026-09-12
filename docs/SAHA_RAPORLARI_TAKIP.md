@@ -54,7 +54,7 @@ Kaynak: `/Users/kadirdemir/Desktop/adminpanelraporu.html`
 | 06 | Aynı kelimenin içinde hem doğru hem yanlış Türkçe harf | Bu tur: Hatırlatıcılar ekranı, formu ve hata/başarı metinlerinin Türkçe karakterleri düzeltildi. |
 | 07 | İngilizce koleksiyon adlarına Türkçe büyütme kuralı uygulanmış | Bu tur: tablo adlarının otomatik büyük harfe dönüşmesi kaldırıldı; eski MongoDB açıklaması düzeltildi. |
 | 08 | Sayaçlar ilk yüklemede sıfır gösterip sonra doluyor | Bu tur: yükleniyor, hata ve gerçek sıfır ayrıldı; yeniden deneme eklendi. Masaüstü/mobil testleri geçti. |
-| 09 | Google Analytics tamamen sıfır, yapılandırma durumu belirsiz | Yerel: UI ve gerçek GA4 route kodunda yapılandırılmamış, erişilemeyen ve gerçek sıfır ayrıldı. Token/rapor reddi artık başarılı sıfır dönmüyor; birim ve UI testi geçti. Gerçek GA4 bağlantısı kurulmadı. |
+| 09 | Google Analytics tamamen sıfır, yapılandırma durumu belirsiz | Düzeltildi: UI ve gerçek GA4 route kodunda yapılandırılmamış, erişilemeyen ve gerçek sıfır ayrıldı. Token/rapor reddi başarılı sıfır dönmüyor. 12 Eylül canlı denetiminde Vercel'deki üç GA4 değerinin örnek/placeholder olduğu kanıtlandı; kod bunları artık yapılandırılmış saymıyor veya Google'a göndermiyor. Gerçek property ve servis hesabı kullanıcıdan bekleniyor. |
 | 10 | Beş partnerin beşi de uydurma seed verisi | İşletme kararı: seed kayıtları silinmedi; gerçek partner bilgileri gerekli. |
 | 11 | "Veritabanını Başlat" düğmesi tek adımlık, uyarısız | Bu tur: seed işlemi öncesinde yedek hatırlatmalı açık onay eklendi; gerçek seed çalıştırılmadı. |
 | 12 | "0 proje" diyor ama canlı sayfa dolu — CMS ile site bağlantısız | Önceki CMS portföy bağlantısı kodda mevcut; statik referans vitrini ayrı kalıyor. İçerik sahipliği ve canlı doğrulama bekliyor. |

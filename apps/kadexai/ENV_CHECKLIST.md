@@ -5,21 +5,23 @@ Vercel → Project Settings → Environment Variables. Hepsi **Production + Prev
 > Değerleri ben giremiyorum (API anahtarı/token alanlarına yazmam kapalı).
 > Aşağıdaki liste, hangi anahtarın nereden alınacağını gösteriyor.
 
-## A. Bunlar OLMADAN BUILD PATLAR
+## A. Üretim ortamı doğrulamasının zorunlu tuttukları
 
-`apps/kadexai/scripts/validate-env.mjs` bunları zorunlu tutuyor:
+`apps/kadexai/scripts/validate-env.mjs` iki Supabase değerini ve aşağıdaki AI
+sağlayıcılarından **en az birinin** anahtarını zorunlu tutuyor. Her AI anahtarının
+aynı anda bulunması gerekmez.
 
-| Anahtar | Nereden |
+| Anahtar | Gereklilik / nereden |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API (anon/public) |
-| `ANTHROPIC_API_KEY` | console.anthropic.com |
-| `OPENAI_API_KEY` | platform.openai.com |
-| `GROQ_API_KEY` | console.groq.com |
-| `MISTRAL_API_KEY` | console.mistral.ai |
-| `CEREBRAS_API_KEY` | cloud.cerebras.ai |
-| `OPENROUTER_API_KEY` | openrouter.ai/keys |
-| `GEMINI_API_KEY` | ✅ projede zaten var |
+| `NEXT_PUBLIC_SUPABASE_URL` | Zorunlu — Supabase → Project Settings → API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Zorunlu — Supabase → Project Settings → API (anon/public) |
+| `GEMINI_API_KEY` | AI seçeneklerinden biri — canlıda doğrulanan mevcut sağlayıcı |
+| `ANTHROPIC_API_KEY` | AI seçeneklerinden biri — console.anthropic.com |
+| `OPENAI_API_KEY` | AI seçeneklerinden biri — platform.openai.com |
+| `GROQ_API_KEY` | AI seçeneklerinden biri — console.groq.com |
+| `MISTRAL_API_KEY` | AI seçeneklerinden biri — console.mistral.ai |
+| `CEREBRAS_API_KEY` | AI seçeneklerinden biri — cloud.cerebras.ai |
+| `OPENROUTER_API_KEY` | AI seçeneklerinden biri — openrouter.ai/keys |
 
 ## B. Çalışma anında gerekenler
 
