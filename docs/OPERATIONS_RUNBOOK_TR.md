@@ -100,5 +100,11 @@ durumları; ana site için Vercel deployment/log ekranı izlenmelidir.
   Studio Next.js `16.3.5` sürümüne, e-posta/HTML temizleme ve ilgili geçişli
   paketler yamalı sürümlere alındı. CI her push'ta üç kilit dosya için de
   `moderate` ve üzeri açığı reddeder.
-- **Lint/test taban çizgisi:** Legacy ESLint temizdir ve 12 Eylül 2026 itibarıyla 99 birim testi geçer. KadexAI TypeScript/ESLint temizdir ve 265 birim testi geçer.
+- **Lint/test taban çizgisi:** Legacy ESLint temizdir ve 13 Eylül 2026 itibarıyla 101 birim testi geçer. KadexAI TypeScript/ESLint temizdir ve 265 birim testi geçer.
 - **Kupon kullanım sayaçları:** `kade_coupons.used_count` şu an hiçbir yerden otomatik artırılmıyor (checkout'a bağlanmadığı için, bkz. blocker #14) — canlıya alınırsa bu sayaç mantığı da eklenmeli.
+- **HTML temizleme bağımlılığı:** `sanitize-html` güvenlik yamaları nedeniyle
+  `2.17.7` sürümünde tutulur. Vercel'in sunucu fonksiyonu paketleyicisindeki
+  CommonJS/ESM uyumsuzluğu sebebiyle yalnız bu paketin `htmlparser2` alt
+  bağımlılığı `10.1.0` sürümüne sabitlenmiştir. `package.json` ve
+  `pnpm-workspace.yaml` içindeki bu hedefli override kaldırılmadan önce
+  `/api/ops?resource=backup` gibi sunucu uçları Vercel önizlemesinde denenmelidir.

@@ -57,7 +57,7 @@ Durum değerleri: **Doğrulandı** (kod okunarak kanıtlandı) / **Yapısal N/A*
 | Race condition | Doğrulandı (webhook) | `reserveShopierOrder` unique-constraint tabanlı atomik — eşzamanlı çift-webhook testle doğrulandı (`tests/unit/security.test.js`) |
 | Mass assignment | Doğrulandı | `sanitizePartnerUpdate` ve benzeri allowlist desenleri, testli |
 | Prototype pollution | Yapısal N/A | `JSON.parse` sonrası hiçbir yerde kullanıcı objesi doğrudan `Object.assign`/spread ile prototip zincirine erişilebilir bir hedefe yazılmıyor; Supabase insert/update payload'ları alan-bazlı allowlist'ten geçiyor |
-| Dependency vulnerabilities | Doğrulandı, kısmen düzeltildi | `npm audit` çalıştırıldı: 2 düşük önem (`body-parser` DoS, `dompurify` bypass) `npm audit fix` ile düzeltildi. 1 yüksek önem (`shell-quote`, yalnızca `--force` ile ve yalnızca dev-bağımlılığı `concurrently`'yi kıran bir yükseltmeyle düzeltilebiliyor) bilinçli olarak ertelendi — production runtime'ı etkilemiyor, yalnızca yerel geliştirme script orkestrasyonunda kullanılıyor |
+| Dependency vulnerabilities | Doğrulandı ve kapatıldı | Kök npm, KadexAI npm ve pnpm Studio kilit dosyalarında `moderate` ve üzeri denetim CI'da zorunludur; 12 Eylül 2026 denetiminde üçü de sıfır bilinen açık döndürdü. Next.js ve HTML temizleme zinciri yamalı sürümlere alındı. |
 | Supply chain | Doğrulanmadı | SBOM/lockfile bütünlük taraması yapılmadı |
 | Unsafe deserialization | Yapısal N/A | Yalnızca `JSON.parse` kullanılıyor (güvenli), `eval`/`vm`/özel deserializer yok |
 | Email template injection | Doğrulandı | `client.js`'teki e-posta gönderiminde `escapeHtml`/`cleanHeader` (CRLF header injection'a karşı) kullanılıyor |
@@ -67,8 +67,8 @@ Durum değerleri: **Doğrulandı** (kod okunarak kanıtlandı) / **Yapısal N/A*
 | Rate limit bypass | Doğrulandı (kısmi) | IP bazlı; `X-Forwarded-For` güvenilir proxy arkasında doğru çalışır ama sahte header ile bypass teorik olarak mümkün (Vercel'in kendi header'ları güvenilir kabul ediliyor) — Vercel dışı bir ortamda bu varsayım geçersiz olur |
 | Bot scraping/credential stuffing | Doğrulandı (kısmi) | Login rate limit var; CAPTCHA/bot-tespiti yok — düşük hacimli bir ajans sitesi için orantılı ama not edilmeli |
 | PII export/delete güvenliği | Doğrulanmadı — Yok | KVKK "verilerimi indir/sil" akışı hiç yok (docs/06 madde 43) |
-| Backup encryption ve restore testi | Doğrulanmadı | Supabase'in kendi backup mekanizması kullanılıyor (varsayım); şifreleme/restore testi bu turda doğrulanmadı |
-| Monitoring ve alarm | Doğrulanmadı | Gerçek zamanlı alarm (Sentry/PagerDuty vb.) bu turda tespit edilmedi — yalnızca `console.error` var |
+| Backup encryption ve restore testi | Doğrulandı | Self-hosted PostgreSQL günlük şifreli yedekleniyor; 11 Eylül 2026 arşivi ayrı/geçici veritabanına geri yüklenerek 123 tablo envanteriyle doğrulandı. |
+| Monitoring ve alarm | Kısmen doğrulandı | GitHub Actions ana siteyi ve KadexAI sağlık ucunu 15 dakikada bir dışarıdan denetliyor. Ayrıntılı uygulama hata/performans izlemesi için Sentry/PostHog yapılandırması hazır fakat canlı anahtarlar verilmediği için kapalı. |
 
 ## Öncelikli, henüz kapatılmamış maddeler (release blocker adayları)
 
@@ -76,10 +76,10 @@ Durum değerleri: **Doğrulandı** (kod okunarak kanıtlandı) / **Yapısal N/A*
 Bu listeden gerçek risk taşıyanlar:
 
 1. **MFA/2FA yok** — admin hesapları için orta-yüksek risk (yalnızca şifre).
-2. **`npm audit`/bağımlılık taraması hiç yapılmadı** — bilinmeyen risk, ucuz ve hızlı kapatılabilir.
+2. ~~**`npm audit`/bağımlılık taraması hiç yapılmadı**~~ — **Kapatıldı:** üç kilit dosyası temiz ve CI denetimi zorunlu.
 3. **PII export/delete akışı yok** — KVKK uyumluluğu için gerekli, hukuki blocker (#2) ile bağlantılı.
-4. **Monitoring/alarm yok** — bir ihlal olsa fark edilmesi yalnızca manuel log incelemesine bağlı.
+4. **Ayrıntılı monitoring anahtarları yok** — dış uptime alarmı çalışıyor; Sentry/PostHog için gerçek hesap anahtarları bekleniyor.
 
-Bunlardan #2 (bağımlılık taraması) bu oturumda yapıldı — 2 düşük önem
-düzeltildi, 1 yüksek önem (yalnızca dev-bağımlılığı etkiliyor) bilinçli
-olarak ertelendi.
+Bunlardan #2 (bağımlılık taraması) kapatıldı: kök npm, KadexAI npm ve pnpm
+Studio denetimleri sıfır bilinen açık veriyor ve her push'ta CI tarafından
+yeniden çalıştırılıyor.
