@@ -55,7 +55,10 @@ durumu tahmin edilip yazılmaz.
 Telegram artık bekleyen girdi değildir: 15 Eylül 2026'da `KadeX` /
 `@KadeXAiBot` oluşturuldu, bot token'ı ile özel hedef yalnız Keyubu'nun korumalı
 secret dosyasına kaydedildi, KadexAI yeniden başlatıldı ve canlı korumalı test
-mesajı teslim edildi. Gizli değerler depoya veya bu belgeye yazılmadı.
+mesajı teslim edildi. Ardından güçlü secret-token doğrulamalı webhook, özel hesap
+izin listesi, Türkçe komut menüsü ve yedi salt-okunur yönetim komutu canlıya
+alındı; gerçek komut yanıtı ve düğmeler Telegram Web'de doğrulandı. Gizli
+değerler depoya veya bu belgeye yazılmadı.
 
 ## Bilinçli kararlar — açık hata değildir
 

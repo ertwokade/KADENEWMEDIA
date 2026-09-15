@@ -56,6 +56,14 @@ oluşturuldu, KadexAI sağlık ucu HTTP 200 verdi, çalışma zamanı üç Teleg
 ayarını gördü ve sunucudan gönderilen korumalı test mesajı Telegram Web'de
 doğrulandı. Geçici aktarım dosyaları her iki makineden silindi.
 
+Aynı gün bot etkileşimli yönetim yardımcısına tamamlandı. Telegram'ın gizli
+başlık doğrulamalı webhook'u doğrudan Keyubu KadexAI rotasına bağlandı; yalnız
+tanımlı özel hesap ve bire bir sohbet kabul ediliyor. Komut menüsünde sistem
+sağlığı, günlük operasyon özeti, seçili trendler, teklif durumları, son hatalar
+ve kısa canlı rapor var. Komutlar salt okunur; veri silme, ödeme veya kullanıcı
+yetkisi değiştirmez. Bekleyen gerçek komut işlendi, düğmeli yanıt Telegram Web'de
+görüldü; webhook kuyruğu sıfır ve son hata alanı boş doğrulandı.
+
 ## AI, YouTube ve yedek doğrulaması
 
 - 11 Eylül'de üretim konteynerindeki sağlayıcılar salt-okunur kimlik uçlarıyla kontrol edildi. Gemini HTTP 200 verdi. Groq, Cerebras, OpenRouter, Mistral, Anthropic ve OpenAI anahtarları 401/403 yetki hatası verdi; YouTube API anahtarı 403 döndürdü. Değerler yazdırılmadı veya silinmedi.

@@ -29,6 +29,9 @@ bulgusunun ayrıntılı eşlemesi `docs/SAHA_RAPORLARI_TAKIP.md` dosyasıdır.
 - `KadeX` / `@KadeXAiBot` oluşturuldu; token ve özel hedef yalnız Keyubu'nun
   `0600` izinli secret dosyasına yazıldı. KadexAI çalışma zamanı ayarları gördü,
   sağlık ucu HTTP 200 verdi ve korumalı gerçek test bildirimi teslim edildi.
+  Güçlü webhook sırrı, izinli özel hesap denetimi, Telegram komut menüsü ve
+  `durum`, `bugun`, `trendler`, `teklifler`, `hatalar`, `rapor`, `yardim`
+  komutları canlıya alındı; gerçek Telegram yanıtı Web istemcisinde doğrulandı.
 
 Bir maddenin tamamlanması için gerçek girdi sağlandığında bu liste güncellenir;
 değer uydurularak “kapalı” işareti verilmez.
