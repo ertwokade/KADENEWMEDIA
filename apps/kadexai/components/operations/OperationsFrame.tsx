@@ -66,7 +66,7 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
             setReportError('')
           })
           .catch(() => {
-            setReportError('WhatsApp operasyon raporu gönderilemedi. Bildirim ayarlarını kontrol edin.')
+            setReportError('Operasyon bildirimi gönderilemedi. Bildirim ayarlarını kontrol edin.')
           })
       }
     }

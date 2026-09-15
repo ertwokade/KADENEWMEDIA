@@ -95,7 +95,7 @@ export async function proxy(request: NextRequest) {
   const isOperationsKitAsset = isOperationsKit && /\.(?:css|js|png|svg|webp|woff2?)$/i.test(pathname)
   const isSettingsOwnerRoute = isSettingsOwnerOnlyRoute(pathname)
   const isAdminRoute = isAdminOnlyRoute(pathname)
-  const isPublicApi = pathname === '/api/health' || pathname === '/api/auth/password' || pathname === '/api/auth/recovery' || pathname === '/api/auth/recovery-session' || pathname === '/api/payments/webhook' || pathname === '/api/legal'
+  const isPublicApi = pathname === '/api/health' || pathname === '/api/auth/password' || pathname === '/api/auth/recovery' || pathname === '/api/auth/recovery-session' || pathname === '/api/payments/webhook' || pathname === '/api/telegram/webhook' || pathname === '/api/legal'
   const protectedApi = isApi && !isPublicApi
   const requiresAuth = isDashboard || (isOperationsKit && !isOperationsKitAsset) || isSettingsOwnerRoute || isAdminRoute || protectedApi
   const isAiApi = pathname === '/api/assistant' || pathname === '/api/image' || pathname === '/api/transcribe' || pathname === '/api/youtube/comments' || pathname.startsWith('/api/generate/')

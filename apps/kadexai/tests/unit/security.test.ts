@@ -104,6 +104,26 @@ test('proxy leaves the main-site API alone and still protects KadexAI routes', (
   assert.equal(unstable_doesMiddlewareMatch({ config: proxyConfig, url: '/kadexai/dashboard' }), true)
 })
 
+test('Telegram webhook reaches its own secret guard without a browser session', async () => {
+  const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const previousAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  delete process.env.NEXT_PUBLIC_SUPABASE_URL
+  delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  try {
+    const response = await proxy(new NextRequest(
+      'https://kadexai.kadenewmedia.com/kadexai/api/telegram/webhook',
+      { method: 'POST', headers: { 'x-telegram-bot-api-secret-token': 'unit-secret' } },
+    ))
+    assert.equal(response.status, 200)
+    assert.equal(response.headers.get('x-middleware-next'), '1')
+  } finally {
+    if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL
+    else process.env.NEXT_PUBLIC_SUPABASE_URL = previousUrl
+    if (previousAnonKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    else process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = previousAnonKey
+  }
+})
+
 test('unauthenticated KadexAI routes keep the /kadexai prefix when redirecting', async () => {
   const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const previousAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -366,6 +386,7 @@ test('oturum gerektiren her API route handler kendi kontrolünü de yapar', asyn
     ['auth/recovery-session/route.ts', 'şifre sıfırlama — oturum henüz yok'],
     ['auth/logout/route.ts', 'çıkış; oturum yoksa da güvenle çalışmalı'],
     ['payments/webhook/route.ts', 'PSP imzasıyla doğrulanır, oturum taşımaz'],
+    ['telegram/webhook/route.ts', 'Telegram secret_token başlığıyla doğrulanır, oturum taşımaz'],
     ['payments/admin/pricing/route.ts', 'sunucular-arası sır (hasValidAdminSecret)'],
     ['payments/admin/custom-offer/route.ts', 'sunucular-arası sır (hasValidAdminSecret)'],
     ['packages/route.ts', 'genel paket kataloğu — giriş öncesi fiyat sayfasında okunur'],

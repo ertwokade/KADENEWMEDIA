@@ -1,6 +1,7 @@
 const BOT_TOKEN_PATTERN = /^\d{5,20}:[A-Za-z0-9_-]{20,}$/
 const NUMERIC_CHAT_PATTERN = /^-?\d{5,20}$/
 const PUBLIC_CHAT_PATTERN = /^@[A-Za-z][A-Za-z0-9_]{4,31}$/
+const WEBHOOK_SECRET_PATTERN = /^[A-Za-z0-9_-]{32,256}$/
 
 function validChatId(value: string) {
   return NUMERIC_CHAT_PATTERN.test(value) || PUBLIC_CHAT_PATTERN.test(value)
@@ -29,6 +30,23 @@ export function telegramConfiguration() {
     missing,
     botToken,
     chatIds,
+  }
+}
+
+export function telegramWebhookConfiguration() {
+  const delivery = telegramConfiguration()
+  const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim() ?? ''
+  const missing = [...delivery.missing]
+
+  if (!WEBHOOK_SECRET_PATTERN.test(webhookSecret) || /[\r\n]/.test(webhookSecret)) {
+    missing.push('TELEGRAM_WEBHOOK_SECRET')
+  }
+
+  return {
+    ...delivery,
+    configured: missing.length === 0,
+    missing,
+    webhookSecret,
   }
 }
 

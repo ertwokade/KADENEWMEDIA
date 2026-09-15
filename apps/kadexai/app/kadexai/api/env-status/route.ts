@@ -2,7 +2,7 @@ import { getAuthenticatedUser } from '@/lib/auth/server'
 import { isSettingsOwnerUser } from '@/lib/featureAccess'
 import { getVercelGatewayToken, VERCEL_GATEWAY_STATUS_KEY } from '@/lib/ai/gatewayAuth'
 import { whatsappConfiguration } from '@/lib/notifications/whatsappConfig'
-import { telegramConfiguration } from '@/lib/notifications/telegramConfig'
+import { telegramWebhookConfiguration } from '@/lib/notifications/telegramConfig'
 import { getAvailableModels } from '@/lib/ai/modelRouter'
 import { isIntegrationEnabled } from '@/lib/ai/runtimeAvailability'
 
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
   // Değer DEĞİL, yalnızca yapılandırılmış olup olmadığı. Bildirim gitmediğinde
   // sebebini dışarıdan görebilmek için.
   status.WHATSAPP = whatsappConfiguration().configured
-  status.TELEGRAM = telegramConfiguration().configured
+  status.TELEGRAM = telegramWebhookConfiguration().configured
 
   return Response.json(status, {
     headers: {

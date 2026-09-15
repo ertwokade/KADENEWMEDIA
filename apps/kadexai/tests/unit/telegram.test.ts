@@ -1,10 +1,19 @@
 import assert from 'node:assert/strict'
 import { afterEach, test } from 'node:test'
-import { deliverTelegram } from '../../lib/notifications/telegramDelivery'
-import { maskTelegramChat, telegramConfiguration } from '../../lib/notifications/telegramConfig'
+import {
+  answerTelegramCallback,
+  deliverTelegram,
+  deliverTelegramToAllowedChat,
+} from '../../lib/notifications/telegramDelivery'
+import {
+  maskTelegramChat,
+  telegramConfiguration,
+  telegramWebhookConfiguration,
+} from '../../lib/notifications/telegramConfig'
 
 const originalToken = process.env.TELEGRAM_BOT_TOKEN
 const originalChats = process.env.TELEGRAM_CHAT_IDS
+const originalWebhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET
 const token = '123456789:abcdefghijklmnopqrstuvwxyzABCDE_12345'
 
 afterEach(() => {
@@ -12,6 +21,21 @@ afterEach(() => {
   else process.env.TELEGRAM_BOT_TOKEN = originalToken
   if (originalChats === undefined) delete process.env.TELEGRAM_CHAT_IDS
   else process.env.TELEGRAM_CHAT_IDS = originalChats
+  if (originalWebhookSecret === undefined) delete process.env.TELEGRAM_WEBHOOK_SECRET
+  else process.env.TELEGRAM_WEBHOOK_SECRET = originalWebhookSecret
+})
+
+test('Telegram webhook requires a strong secret in addition to delivery settings', () => {
+  process.env.TELEGRAM_BOT_TOKEN = token
+  process.env.TELEGRAM_CHAT_IDS = '123456789'
+  process.env.TELEGRAM_WEBHOOK_SECRET = 'short'
+  assert.equal(telegramWebhookConfiguration().configured, false)
+  assert.deepEqual(telegramWebhookConfiguration().missing, ['TELEGRAM_WEBHOOK_SECRET'])
+
+  process.env.TELEGRAM_WEBHOOK_SECRET = 'a'.repeat(32)
+  const config = telegramWebhookConfiguration()
+  assert.equal(config.configured, true)
+  assert.equal(config.webhookSecret.length, 32)
 })
 
 test('Telegram configuration accepts and deduplicates an allowlist', () => {
@@ -76,4 +100,35 @@ test('Telegram returns partial success without exposing failed chat IDs', async 
   assert.equal(result.failures.length, 1)
   assert.equal(result.failures[0].includes('-1001234567890'), false)
   assert.equal(maskTelegramChat('@kade_alerts').endsWith('rts'), true)
+})
+
+test('Telegram bot replies only to an allowed chat and includes inline buttons', async () => {
+  const replyMarkup = { inline_keyboard: [[{ text: 'Durum', callback_data: 'cmd:durum' }]] }
+  const result = await deliverTelegramToAllowedChat(
+    'Hazır',
+    '123456789',
+    { botToken: token, chatIds: ['123456789'] },
+    { replyMarkup },
+    async (_input, init) => {
+      const body = JSON.parse(String(init?.body))
+      assert.equal(body.chat_id, '123456789')
+      assert.deepEqual(body.reply_markup, replyMarkup)
+      assert.equal(body.protect_content, true)
+      return Response.json({ ok: true, result: { message_id: 77 } })
+    },
+  )
+  assert.equal(result.messageId, 77)
+
+  await assert.rejects(
+    deliverTelegramToAllowedChat('Hayır', '999999999', { botToken: token, chatIds: ['123456789'] }),
+    /izin listesinde değil/,
+  )
+})
+
+test('Telegram callback acknowledgement uses the dedicated API method', async () => {
+  await answerTelegramCallback('callback-1', token, async (input, init) => {
+    assert.equal(String(input), `https://api.telegram.org/bot${token}/answerCallbackQuery`)
+    assert.deepEqual(JSON.parse(String(init?.body)), { callback_query_id: 'callback-1' })
+    return Response.json({ ok: true, result: true })
+  })
 })
