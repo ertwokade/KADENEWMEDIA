@@ -95,12 +95,17 @@ durumu tahmin edilip yazılmaz.
   54 sayfalık production build geçti. Python backend 5/5 güvenlik-smoke testi
   temiz Python 3.12 ortamında sabit requirements sürümleriyle geçti.
 - Studio: ESLint, TypeScript, 13/13 çekirdek testi ve production build geçti.
-  Entegrasyon paketi yerel PostgreSQL olmadığı için yerelde koşturulamadı;
-  GitHub CI'daki PostgreSQL 17 servisi üzerinde push sonrasında doğrulanır.
+  Yerelde PostgreSQL olmadığı için ilk entegrasyon denemesi yapılamadı; aynı
+  paket GitHub CI'daki PostgreSQL 17 servisi üzerinde migration'larla birlikte
+  başarıyla geçti. CI medya-smoke ve final build işleri de başarılıdır.
 - Ana npm, KadexAI npm ve pnpm production dependency denetimlerinin üçü de
   sıfır bilinen açık bildirdi. Supabase migration manifesti `PASS`; canlı apply
   kontrolü bu yerel ortamda üretim bağlantısı verilmediği için yapılmadı.
 - Son `git diff --check` temizdir.
-
-Canlı URL ve dağıtım sonucu commit/push sonrası aynı kayda eklenir; başarı
-iddiası yalnız CI sonucu ve canlı HTTP kontrolüyle yazılır.
+- Kod commit'i `c2bccb4` `origin/main` dalına gönderildi. Kade Studio CI
+  (`34947452418`) başarılı; Keyubu exact-commit dağıtımı (`34947452544`) 16 dk
+  10 sn'de başarılı ve public health kontrolü geçti.
+- Vercel production dağıtımı `Ready` durumunda ve `kadenewmedia.com` alias'ı
+  bağlıdır. Canlı ana sayfa, hizmetler, paketler, iletişim, blog, sitemap ve
+  KadexAI health uçları HTTP 200 döndürdü. Canlı ana sayfanın kaynak HTML'i de
+  görünür eski şablon metinlerinden arınmış olarak doğrulandı.
