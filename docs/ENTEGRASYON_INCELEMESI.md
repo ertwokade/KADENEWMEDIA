@@ -47,7 +47,14 @@ Resmî kaynak: https://core.telegram.org/bots/api#sendmessage
 
 Yönetim bildirimleri için Telegram'a doğrudan Bot API ile bağlanan ikinci kanal uygun bir seçenek: yapılandırılmış yanıtlar, mesaj kimliği ve hız sınırında `retry_after` bilgisi var. Bu, hataları izlemeyi kolaylaştırır; kesintisizlik garantisi değildir. CallMeBot'un ücretsiz API belgesi kişisel kullanım kapsamını belirtiyor: https://www.callmebot.com/blog/free-api-whatsapp-messages/
 
-Mevcut WhatsApp çalışır durumda bırakıldı. Telegram teslim katmanı sıfırdan eklendi: yalnız sunucu tarafında token kullanıyor, izinli hedef listesini doğruluyor/tekilleştiriyor, hedefleri maskeleyerek raporluyor, belirsiz ağ sonucunda otomatik tekrar yapmıyor, 429 `retry_after` bilgisini güvenli biçimde döndürüyor ve birden fazla hedefte kısmi başarıyı ayırıyor. Operasyon bildirimleri yapılandırılmış WhatsApp ve Telegram kanallarına ortak dağıtılıyor; sahip hesabına kanala göre güvenli test ucu eklendi. Canlıda bot token/chat ID henüz yok, dolayısıyla Telegram teslimi yapılandırılana kadar WhatsApp tek başına çalışmayı sürdürüyor.
+Mevcut WhatsApp çalışır durumda bırakıldı. Telegram teslim katmanı sıfırdan eklendi: yalnız sunucu tarafında token kullanıyor, izinli hedef listesini doğruluyor/tekilleştiriyor, hedefleri maskeleyerek raporluyor, belirsiz ağ sonucunda otomatik tekrar yapmıyor, 429 `retry_after` bilgisini güvenli biçimde döndürüyor ve birden fazla hedefte kısmi başarıyı ayırıyor. Operasyon bildirimleri yapılandırılmış WhatsApp ve Telegram kanallarına ortak dağıtılıyor; sahip hesabına kanala göre güvenli test ucu eklendi.
+
+15 Eylül 2026 canlı kurulumu: `KadeX` / `@KadeXAiBot` oluşturuldu. Token ve
+özel chat ID yalnız `/srv/kade/secrets/kadexai.env` içinde tutuluyor;
+`KADE_NOTIFICATION_CHANNELS=whatsapp,telegram` etkin. Konteynerler yeniden
+oluşturuldu, KadexAI sağlık ucu HTTP 200 verdi, çalışma zamanı üç Telegram
+ayarını gördü ve sunucudan gönderilen korumalı test mesajı Telegram Web'de
+doğrulandı. Geçici aktarım dosyaları her iki makineden silindi.
 
 ## AI, YouTube ve yedek doğrulaması
 

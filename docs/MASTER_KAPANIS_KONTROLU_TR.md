@@ -41,17 +41,21 @@ denetim tarihlerinin tarihsel kaydıdır.
 
 | Konu | Kod durumu | Tamamlamak için gerekli gerçek girdi |
 |---|---|---|
-| Telegram bildirimleri | Teslim katmanı, doğrulama ve testler hazır | Telegram Web'e giriş, BotFather bot token'ı ve hedef chat ID |
 | GA4 raporları | Placeholder'ı gerçek ayardan ayıran güvenli durumlar hazır | Gerçek GA4 property ID ve servis hesabı |
 | YouTube | OAuth ve güvenli token saklama akışı hazır | Google kanal sahibi onayı ve çalışan API erişimi |
 | Yedek AI sağlayıcıları | Hatalı anahtarlar güvenle devre dışı; Gemini çalışıyor | Kullanılacak sağlayıcılar için geçerli anahtarlar |
 | Gerçek işletme içeriği | CRUD, filtre, boş/hata durumları hazır | Partner/proje/basın/CRM/admin iletişim verileri ve onaylı fiyatlar |
 | Hukuki son onay | KVKK/gizlilik/çerez/telif ve satış taslakları mevcut | Türkiye mevzuatına göre hukukçu onayı |
-| Canlı kalite kabulü | Sahte çıktı üretmeyen hata yolları ve sözleşme testleri hazır | Gerçek hesapla AI/video/ses/WhatsApp teslim kalite testi |
+| Canlı kalite kabulü | Sahte çıktı üretmeyen hata yolları ve sözleşme testleri hazır | Gerçek hesapla AI/video/ses teslim kalite testi |
 | Opsiyonel servisler | Güvenli biçimde kapalı/opt-in | Sentry, PostHog, e-posta ve ödeme kullanılacaksa hesap/ürün kararı |
 
 Bu girdiler verilmeden kayıt, fiyat, hukuki iddia, erişim anahtarı veya müşteri
 durumu tahmin edilip yazılmaz.
+
+Telegram artık bekleyen girdi değildir: 15 Eylül 2026'da `KadeX` /
+`@KadeXAiBot` oluşturuldu, bot token'ı ile özel hedef yalnız Keyubu'nun korumalı
+secret dosyasına kaydedildi, KadexAI yeniden başlatıldı ve canlı korumalı test
+mesajı teslim edildi. Gizli değerler depoya veya bu belgeye yazılmadı.
 
 ## Bilinçli kararlar — açık hata değildir
 

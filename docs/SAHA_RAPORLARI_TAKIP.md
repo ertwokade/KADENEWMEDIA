@@ -31,7 +31,13 @@ JavaScript kapalı production audit bunu kalıcı olarak denetliyor.
 
 8 Eylül ek grubu: zorunlu açık tema göçü kaldırıldı; snapshot, React ve statik sayfalar ortak tercihle sistem temasını izliyor. Referanslar CMS yorumlarını gösteriyor; Neden Biz yalnız dar kapsamlı, özel alanları dışlamış istatistik izdüşümünü okuyor. Materyal önizlemesi/klavye odağı, sayfalama, hata-boş ayrımı ve toplamada kısmi başarı düzeltildi. Akış adımlarında çıktı doğrulaması ve etiketli bağlam, Radar’da 20 farklı kurgu şablonu, Türkçe açıklamalar ve yinelenen uyarı düzeltmeleri eklendi. Mobil kurulum önerisi asistan düğmesiyle çakışıyordu; sabit bindirme yerine Genel Bakış sayfasının akışına alındı.
 
-11 Eylül canlı kontrolü: ana site ve KadexAI temel rotaları sağlıklı. Keyubu web/medya/Supabase konteynerleri çalışıyor. Üretim ortamında AI anahtar adları mevcut olsa da salt-okunur sağlayıcı kontrolünde yalnız Gemini HTTP 200 verdi; Groq, Cerebras, OpenRouter, Mistral, Anthropic ve OpenAI 401/403, YouTube API 403 döndürdü. Bozuk anahtarlar silinmedi, ilgili sağlayıcılar yenilenene kadar seçici ve otomatik yönlendirmeden çıkarıldı. OAuth istemcisi mevcut fakat kanal onayı, Telegram token/chat ID ve GA4 sunucu raporlama kimlikleri gerçek hesap erişimi bekliyor. Günlük şifreli Supabase yedeğinin 11 Eylül arşivi geçici veritabanına geri yüklendi; üretimle 123 tablo eşleşti ve geçici veritabanı silindi.
+11 Eylül canlı kontrolü: ana site ve KadexAI temel rotaları sağlıklı. Keyubu web/medya/Supabase konteynerleri çalışıyor. Üretim ortamında AI anahtar adları mevcut olsa da salt-okunur sağlayıcı kontrolünde yalnız Gemini HTTP 200 verdi; Groq, Cerebras, OpenRouter, Mistral, Anthropic ve OpenAI 401/403, YouTube API 403 döndürdü. Bozuk anahtarlar silinmedi, ilgili sağlayıcılar yenilenene kadar seçici ve otomatik yönlendirmeden çıkarıldı. OAuth istemcisi mevcut fakat kanal onayı ve GA4 sunucu raporlama kimlikleri gerçek hesap erişimi bekliyor. Günlük şifreli Supabase yedeğinin 11 Eylül arşivi geçici veritabanına geri yüklendi; üretimle 123 tablo eşleşti ve geçici veritabanı silindi.
+
+15 Eylül Telegram canlı kurulumu: `KadeX` / `@KadeXAiBot` oluşturuldu; token
+ve özel hedef yalnız Keyubu secret dosyasına kaydedildi. WhatsApp ve Telegram
+ortak kanal seçimi etkinleştirildi, KadexAI konteynerleri sağlıklı yeniden
+başladı ve sunucudan gönderilen korumalı test bildirimi Telegram Web'de görüldü.
+Geçici token/kurulum dosyaları silindi; gizli değerler git'e yazılmadı.
 
 12 Eylül operasyon kontrolü: GitHub'ın kendi sunucularından ana site ve KadexAI sağlık ucunu 15 dakikada bir denetleyen bağımsız uptime workflow'u eklendi. Kontrol SSL/HTTP başarısını ve KadexAI `auth`/`ai` hazır durumunu doğruluyor; başarısızlık GitHub Actions kaydına düşüyor. Ayrıntılı Sentry/PostHog takibi gerçek hesap yapılandırması bekliyor.
 
@@ -49,7 +55,7 @@ JavaScript kapalı production audit bunu kalıcı olarak denetliyor.
 
 ## Kod dışı / canlı doğrulama gerektiren kalanlar
 
-1. YouTube kanal onayı, yenilenecek yedek AI sağlayıcı anahtarları, GA4 erişimi ve Telegram bot hedefi kullanıcıya ait gerçek hesap/anahtar ister; değer uydurulmadı. Kod, durum görünümü ve güvenli teslim katmanı hazır.
+1. YouTube kanal onayı, yenilenecek yedek AI sağlayıcı anahtarları ve GA4 erişimi kullanıcıya ait gerçek hesap/anahtar ister; değer uydurulmadı. Kod ve güvenli durum görünümü hazır.
 2. Gerçek partner, proje, basın, admin e-postası ve CRM aşamaları işletme verisidir; mevcut kayıtlar tahmin edilerek değiştirilmedi veya silinmedi.
 3. Gerçek AI/video/ses kalitesi ve zamanlanmış bildirim teslimi sağlayıcılarla canlı uçtan uca denenmelidir.
 4. Kod GitHub'a gönderildi; KadexAI Keyubu'ya, ana site Vercel'e dağıtıldı ve iki hedefte temel canlı sağlık/rota testlerinden geçti. Sonraki `main` push'ları Vercel üretim dağıtımını otomatik başlatır; Keyubu dağıtımı ise ilgili yol filtreli GitHub Actions iş akışıyla çalışır.
