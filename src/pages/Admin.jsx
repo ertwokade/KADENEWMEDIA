@@ -1260,7 +1260,7 @@ function ContentSection({ showToast }) {
       {activeTabMeta && activeTabMeta.status !== 'live' && (
         <div
           className={`admin-content-notice admin-content-notice--${activeTabMeta.status}`}
-          role="status"
+          role="note"
         >
           {activeTabMeta.status === 'no-page' ? (
             <>

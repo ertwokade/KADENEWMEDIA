@@ -68,7 +68,7 @@ test.describe('admin içerik CRUD', () => {
     await expect.poll(() => savedBody).not.toBeNull()
     expect(savedBody.section).toBe('footer')
     expect(savedBody.data.email).toBe('yeni@example.test')
-    await expect(page.getByRole('status')).toContainText('İçerik güncellendi!')
+    await expect(page.locator('.admin-toast.success')).toContainText('İçerik güncellendi!')
   })
 
   test('API doğrulama hatasını başarı gibi göstermez', async ({ page }) => {
@@ -79,6 +79,6 @@ test.describe('admin içerik CRUD', () => {
     await page.getByRole('button', { name: 'Kaydet' }).click()
 
     await expect(page.getByRole('alert')).toContainText('Doğrulama hatası')
-    await expect(page.getByRole('status')).toHaveCount(0)
+    await expect(page.locator('.admin-toast.success')).toHaveCount(0)
   })
 })

@@ -164,13 +164,14 @@ try {
   if (!consentInvalid || contactRequests !== 0) addError('contact consent validation did not trigger')
   await consentControl.check()
   await contactForm.locator('button[type="submit"]').click()
-  const confirmedCopy = await contactForm.locator('.form-status').getByText('Mesajınız alındı. Teşekkürler.').textContent({ timeout: 8000 }).catch(() => '')
+  await page.waitForURL(/\/tesekkur/, { timeout: 8000 }).catch(() => {})
+  const confirmedCopy = await page.locator('.page-head h1').textContent({ timeout: 3000 }).catch(() => '')
   page.off('request', countContactRequest)
-  if (!confirmedCopy) addError('successful contact response did not produce a confirmed state')
+  if (confirmedCopy?.trim() !== 'Talebiniz alındı') addError('successful contact response did not produce a confirmed state')
 
   await page.goto(`${BASE}/tesekkur?direct=1`, { waitUntil: 'domcontentloaded' })
-  const directThankYouCopy = await page.getByText(/Talep durumu doğrulanamadı/i).textContent({ timeout: 2000 }).catch(() => '')
-  if (!directThankYouCopy) addError('direct thank-you route presented an unverified success state')
+  const directThankYouCopy = await page.locator('.page-head .lead').textContent({ timeout: 2000 }).catch(() => '')
+  if (!/Talep durumu doğrulanamadı/i.test(directThankYouCopy || '')) addError('direct thank-you route presented an unverified success state')
 
   await page.goto(`${BASE}/proje-takip`, { waitUntil: 'domcontentloaded' })
   const protectedCopy = await page.getByText('Müşteri girişi gerekli').textContent({ timeout: 3000 }).catch(() => '')
@@ -179,7 +180,8 @@ try {
   for (const viewport of viewports) {
     await page.setViewportSize({ width: viewport.width, height: viewport.height })
     await page.goto(BASE, { waitUntil: 'domcontentloaded' })
-    await page.waitForTimeout(450)
+    await page.waitForSelector('html[data-kade-loaded]', { timeout: 10000 })
+    await page.getByText('Biz', { exact: true }).waitFor({ state: 'visible', timeout: 10000 })
     const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - document.documentElement.clientWidth)
     if (overflow > 1) addError(`/: horizontal overflow ${overflow}px at ${viewport.name}`)
     await page.screenshot({ path: new URL(`audit-home-${viewport.name}.png`, outputDir).pathname, fullPage: true })
@@ -189,7 +191,9 @@ try {
     for (const viewport of [{ name: '390x844', width: 390, height: 844 }, { name: '1440x900', width: 1440, height: 900 }]) {
       await page.setViewportSize({ width: viewport.width, height: viewport.height })
       await page.goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded' })
-      await page.waitForTimeout(200)
+      // The static marketing shell intentionally scrambles a few labels on load.
+      // Capture evidence only after the animation has settled.
+      await page.waitForTimeout(800)
       await page.screenshot({
         path: new URL(`audit-${route.slice(1)}-${viewport.name}.png`, outputDir).pathname,
         fullPage: true,
@@ -207,6 +211,9 @@ try {
     const response = await noJsPage.goto(`${BASE}${route}`, { waitUntil: 'domcontentloaded' })
     const text = (await noJsPage.locator('body').innerText()).trim()
     if (response?.status() !== 200 || text.length < 80) addError(`${route}: insufficient no-JavaScript baseline`)
+    if (/Haoqi|Reunimos|aDrive|Teambition|Inspire Mono|Wasm design utils|VectorSymbols|DarkSide/i.test(text)) {
+      addError(`${route}: foreign template content remains without JavaScript`)
+    }
   }
   await noJs.close()
 

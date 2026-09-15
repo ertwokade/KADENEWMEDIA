@@ -28,3 +28,6 @@ body::before{content:'';position:fixed;inset:-25vmax;pointer-events:none;z-index
   html.kade-static-menu-open .hud>nav a:nth-child(n){display:block;width:100%;font:700 clamp(24px,9vw,42px)/1.15 montserrat,Arial,sans-serif;letter-spacing:-.04em}
   html.kade-static-menu-open .hud>nav button[data-theme-toggle]{margin-top:18px}
 }
+
+.kade-form button:disabled{cursor:wait;opacity:.58}
+.package-price{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin:10px 0 14px;padding:12px 14px;border:1px solid var(--line);background:var(--panel)}.package-price[hidden]{display:none}.package-price strong{font:700 20px montserrat,Arial,sans-serif}.package-price span{font:12px geist,monospace;color:var(--muted)}

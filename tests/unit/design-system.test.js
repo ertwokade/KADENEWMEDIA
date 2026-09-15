@@ -130,9 +130,10 @@ test('snapshot varlıkları eksiksiz, hazırlama scriptleri yok', async () => {
   assert.equal(strays, false, 'public/stickers geri gelmiş — snapshot bu seti kullanmıyor')
 })
 
-test('ana sayfa snapshot\'tan, iç sayfalar React\'ten servis edilir', async () => {
+test('ana sayfa snapshot\'tan, public pazarlama sayfaları statik Kade kabuğundan servis edilir', async () => {
   // `/` derlenmiş statik snapshot'a rewrite edilir (site sahibinin kararı);
-  // diğer bütün rotalar React uygulamasından gelir. Bu test SERVİS yolunu
+  // public pazarlama sayfaları statik Kade kabuğundan, uygulama rotaları
+  // React'ten gelir. Bu test SERVİS yolunu
   // doğrular — snapshot dosyalarının varlığını doğrulayan ayrı bir test
   // aşağıdadır; ikisi bilerek ayrı tutulur çünkü "yönlendirme doğru" ile
   // "dosya yerinde" farklı arıza biçimleridir.

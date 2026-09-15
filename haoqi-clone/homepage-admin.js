@@ -20,6 +20,15 @@
     return fallback || '#'
   }
   function setText(node, value) { if (node && typeof value === 'string') node.textContent = value }
+  function ensureSeoHeading() {
+    var node = document.querySelector('h1[data-kade-seo-title]')
+    if (node) return node
+    node = document.createElement('h1')
+    node.setAttribute('data-kade-seo-title', '')
+    node.style.cssText = 'position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important'
+    document.body.prepend(node)
+    return node
+  }
   function replaceLines(node, lines) {
     if (!node || !Array.isArray(lines)) return
     node.replaceChildren()
@@ -52,6 +61,13 @@
     }
 
     var nav = header.querySelector('.kade-navrow') || (top && top.children[1])
+    var login = document.getElementById('kade-login-btn')
+    if (!login) {
+      login = document.createElement('a')
+      login.id = 'kade-login-btn'
+      login.className = 'kade-navadd'
+      login.style.cssText = 'font-family:inherit;color:#101210;text-decoration:none;text-transform:uppercase;padding:8px;background:#c0fe04;white-space:nowrap'
+    }
     if (nav && Array.isArray(data.navItems)) {
       var theme = nav.querySelector('[aria-label^="Theme"]') || nav.querySelector('[role="button"]')
       nav.replaceChildren()
@@ -64,6 +80,7 @@
         link.style.cssText = 'font-family:inherit;color:inherit;text-decoration:none;text-transform:uppercase;padding:4px;white-space:nowrap'
         nav.appendChild(link)
       })
+      nav.appendChild(login)
       if (theme) {
         var leaf = theme
         while (leaf.firstElementChild) leaf = leaf.firstElementChild
@@ -74,7 +91,6 @@
       nav.style.opacity = '1'
     }
 
-    var login = document.getElementById('kade-login-btn')
     if (login) {
       setText(login, data.loginLabel)
       login.href = safeUrl(data.loginUrl, '/giris')
@@ -84,8 +100,15 @@
 
   function applyHero(data) {
     var hero = data.hero || {}
-    var heading = Array.prototype.slice.call(document.querySelectorAll('h1')).find(function (node) {
-      return node.parentElement && node.parentElement.querySelector('svg.svg-sign') == null
+    var seoHeading = ensureSeoHeading()
+    if (seoHeading && Array.isArray(hero.titleLines)) {
+      setText(seoHeading, hero.titleLines.filter(function (line) { return string(line) }).join(' '))
+    }
+    /* Snapshot'ın görünür kahraman başlığı semantik h1 değil, üç satırlı bir
+       div'dir. Gizli SEO h1'ini seçmek editörde kaydedilen başlığın ekranda hiç
+       değişmemesine yol açıyordu. Görünür başlık kabını metin/yapı üzerinden bul. */
+    var heading = Array.prototype.slice.call(document.querySelectorAll('div.font-bold.uppercase.leading-none')).find(function (node) {
+      return node.children.length >= 3 && /biz|marka|büyüt/i.test(node.textContent || '')
     })
     if (!heading) return
     replaceLines(heading, hero.titleLines)

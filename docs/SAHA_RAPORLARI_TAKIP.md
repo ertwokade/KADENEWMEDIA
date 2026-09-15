@@ -1,6 +1,6 @@
 # Saha raporları — düzeltme takibi
 
-Güncelleme: 2026-09-12. Toplam 113 numaralı bulgu: admin 26, genel site 14, KadexAI 73. Tekrarlar ve olumlu gözlemler de özgün numarasıyla korunur; 113 ayrı hata olduğu anlamına gelmez.
+Güncelleme: 2026-09-15. Toplam 113 numaralı bulgu: admin 26, genel site 14, KadexAI 73. Tekrarlar ve olumlu gözlemler de özgün numarasıyla korunur; 113 ayrı hata olduğu anlamına gelmez. Güncel tek kapanış özeti `MASTER_KAPANIS_KONTROLU_TR.md` dosyasıdır.
 
 Bu dosya tamamlanan düzeltme gruplarının durumudur. Rapor düzeltmeleri, son güvenlik/dağıtım ve çıktı-sözleşmesi sertleştirmeleriyle birlikte `origin/main` dalına gönderildi. GitHub kalite kontrolleri, GitHub Actions Keyubu dağıtımı ve Vercel üretim dağıtımı başarıyla tamamlandı; ana site Vercel'de, KadexAI Keyubu'da çalışıyor. CallMeBot ayarları geri yüklendi; Telegram teslim katmanı, sağlayıcı kullanılabilirlik koruması ve yedekten gerçek geri yükleme testi eklendi. Ayrıntılar `ENTEGRASYON_INCELEMESI.md` içindedir. Rapor içindeki 100 yeni özellik fikri bu hata listesine dahil değil.
 
@@ -10,9 +10,19 @@ Gerçek müşteri kayıtları, admin hesapları, seed verileri ve domain değiş
 
 ## Son doğrulama
 
-- Legacy birim testleri: 97 geçti; gerçek içerik API kodunda anonim/özel alan ayrımı, GA4 hata/sıfır ayrımı ve korumalı rotaların klon katmanıyla ezilmemesi dahil.
+15 Eylül ek kapanışı: iletişim/teklif formlarında gerçek başarıya bağlı teşekkür
+yönlendirmesi, çift gönderim kilidi, kısa mesaj açıklaması ve teknik hata
+gizleme tamamlandı. Ana sayfa admin içeriğinin final klon derlemesinden düşmesi
+engellendi; görünür kahraman başlığı ve SEO h1 birlikte güncelleniyor. Paket
+fiyat editörü canlı statik `/paketler` sayfasına bağlandı; boş fiyat hâlâ
+uydurulmuyor. Mobil meta yazıları 12 px tabana çıkarıldı, analitik açık çerez
+onayına bağlandı ve eski `REUNIMOS` 3B dokusu Kade logosuyla değiştirildi.
+Sunucu HTML'i ve bundle içindeki görünür eski şablon metinleri de temizlendi;
+JavaScript kapalı production audit bunu kalıcı olarak denetliyor.
+
+- Legacy birim testleri: 101 geçti; gerçek içerik API kodunda anonim/özel alan ayrımı, GA4 hata/sıfır ayrımı ve korumalı rotaların klon katmanıyla ezilmemesi dahil.
 - KadexAI birim testleri: 265 geçti; gerçek history/materyal/akış/uyarı/yorum analizi/takvim/şablon/toplu üretim/ses dökümü kodu sahte bağımlılıklarla çalıştırıldı. Hesap izolasyonu, yönlendirme güvenliği, yönlendirilmiş ve düz metin çıktı sözleşmeleri, kaldırılmış materyal kaynağı, uyarı tekilleştirme, platform sayımı, dublaj bütünlüğü, Telegram teslim güvenliği ve ses çıkarma temizliği dahil.
-- Masaüstü/mobil: rapor regresyonları 40, ortak müşteri erişim kapıları 14; KadexAI seçili regresyonları 52 geçti. Toplam 106 tarayıcı testi başarılı; tüm API çağrıları yerel sahte yanıtlarla sınandı.
+- Masaüstü/mobil tam Playwright koşusu: 252 geçti, 0 başarısız, ortam koşuluna bağlı 2 bilinçli atlandı. Production audit ayrıca 37 rota, 35 dahili bağlantı ve 7 görünümü sıfır hatayla denetledi; API çağrıları yerel güvenli test yanıtlarıyla sınandı.
 - KadexAI TypeScript, değişen kodların ESLint kontrolü, legacy ve KadexAI üretim build başarılı.
 - Vercel Git otomatik dağıtımı doğrulandı. Canlı ana sayfa, blog, paketler ve ana-site sitemap'i HTTP 200 döndü. Keyubu KadexAI sağlık ucu HTTP 200; oturumsuz yapılandırma ve bildirim uçları HTTP 401; korumalı panel rotaları girişe HTTP 307 döndü. Beş kritik KadexAI rotasına yapılan 20'şer ardışık istekte 503 görülmedi.
 - Üretim kimlik uçlarında Gemini doğrulandı; diğer altı AI sağlayıcısı yetki hatası verdi ve güvenli bayrakla kullanım dışı bırakıldı. Gerçek medya üretimi henüz uçtan uca denenmedi.

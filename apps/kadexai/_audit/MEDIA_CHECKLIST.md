@@ -1,5 +1,9 @@
 # KadexAI Medya Kontrol Listesi
 
+> Bu iki boş kutu uygulama işi değil, sağlanan eski videonun kanıt sınırıdır.
+> Güncel login/mobil davranışları otomatik testlerle ayrıca doğrulanır; güncel
+> durum için `../../../docs/MASTER_KAPANIS_KONTROLU_TR.md` geçerlidir.
+
 ## Kaynaklar
 
 - `Ekran Kaydı 2026-07-16 20.22.36.mov`: bulundu ve incelendi.

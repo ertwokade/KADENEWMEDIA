@@ -38,7 +38,10 @@ test('admin homepage content updates the Haoqi snapshot', async ({ page }) => {
   })
 
   await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('YENİANABAŞLIK')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('YENİ ANA BAŞLIK')
+  const visualHero = page.locator('div.font-bold.uppercase.leading-none').filter({ hasText: 'YENİANABAŞLIK' }).first()
+  await expect(visualHero).toBeVisible()
+  await expect(visualHero.locator(':scope > span')).toHaveText(['YENİ', 'ANA', 'BAŞLIK'])
   await expect(page.locator('header')).toContainText('Test Marka')
   await expect(page.locator('#selected-work article')).toHaveCount(2)
   await expect(page.locator('#selected-work')).toContainText('Eklenen Kart')

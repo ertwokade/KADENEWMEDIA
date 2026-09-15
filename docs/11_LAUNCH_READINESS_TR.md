@@ -1,5 +1,8 @@
 # 11 — Satışa Hazır Olma Değerlendirmesi (şartname §31)
 
+> **Tarihsel ilk değerlendirme:** Bu skor güncel durumu temsil etmez. Güncel
+> kapanış ve dış-girdi listesi `docs/MASTER_KAPANIS_KONTROLU_TR.md` dosyasındadır.
+
 **Sonuç: Sistem "satışa hazır" sınıfında DEĞİL.** Şartnamenin kendi
 21 maddelik kriterinden 7'si tam karşılanıyor, 8'i kısmen, 6'sı
 karşılanmıyor. Bu, kod kalitesinin düşük olduğu anlamına gelmiyor —

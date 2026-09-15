@@ -58,11 +58,9 @@ async function fillContactForm(page, overrides = {}) {
  * gibi etikete tıklanır.
  */
 async function acceptKvkk(page) {
-  // Onay kutusu görsel olarak gizli; işaretleme .checkbox-mark üzerinden
-  // yapılır. Etiket metnine tıklamak KVKK/Gizlilik bağlantılarına denk
-  // geldiği için kullanılmaz.
-  await page.locator('.kvkk-consent .checkbox-mark').first().click()
-  await expect(page.locator('.kvkk-consent input[type="checkbox"]')).toBeChecked()
+  const consent = page.locator('form[data-contact-form] input[name="consent"]')
+  await consent.check()
+  await expect(consent).toBeChecked()
 }
 
 test.describe('iletişim formu', () => {

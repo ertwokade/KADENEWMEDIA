@@ -155,7 +155,7 @@ function extraContent(route) {
   if (route === '/paketler') {
     return `
       <h2>Hizmet Kapsamları</h2>
-      ${PACKAGE_SCOPES.map((p) => `<h3>${escapeHtml(p.nameTr)}</h3>\n      <p>${escapeHtml(p.descTr)}</p>`).join('\n      ')}
+      ${PACKAGE_SCOPES.map((p) => `<section class="package-scope" data-package-id="${escapeHtml(p.id)}"><h3>${escapeHtml(p.nameTr)}</h3>\n      <div class="package-price" data-package-price hidden aria-live="polite"></div>\n      <p>${escapeHtml(p.descTr)}</p>\n      ${bulletList(p.featuresTr)}\n      <a class="button-link" href="/teklif-al?paket=${escapeHtml(p.id)}">Teklif al →</a></section>`).join('\n      ')}
       ${faqSection(packageFaqItems, 'Net Koşullar')}`
   }
 

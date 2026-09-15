@@ -364,6 +364,15 @@
       document.querySelectorAll('a[href="https://reunimos.cc"]').forEach(function(a){setAnchor(a,'/hizmetler/sosyal-medya-yonetimi','Sosyal medya yönetimi')});
       document.querySelectorAll('a[href="https://www.alipan.com/"]').forEach(function(a){setAnchor(a,'/hizmetler/icerik-uretimi','İçerik üretimi')});
       document.querySelectorAll('a[href="https://www.teambition.com/"]').forEach(function(a){setAnchor(a,'/hizmetler/web-sitesi-tasarimi','Web sitesi tasarımı')});
+      /* Kaynak şablonun tanıtım paragrafındaki bağlantı metinleri iş kartı
+         adlarıyla aynı olduğu için genel metin dönüşümünde birbirine
+         karışabiliyor. Hydration tamamlandıktan sonra yalnız bu paragrafın
+         yaprak metinlerini gerçek Kade hizmetleriyle sabitle. */
+      var teamParagraph=document.querySelector('p:has(a[data-kade-href="/hizmetler/sosyal-medya-yonetimi"]):has(a[data-kade-href="/hizmetler/icerik-uretimi"]):has(a[data-kade-href="/hizmetler/web-sitesi-tasarimi"])');
+      if(teamParagraph){
+        var teamSpan=teamParagraph.querySelector(':scope > span')||teamParagraph;
+        teamSpan.innerHTML='İstanbul merkezli ekibimiz; <a class="inline text-l1 underline underline-offset-[0.08em] decoration-solid decoration-(--label-3)" href="/hizmetler/sosyal-medya-yonetimi" data-kade-href="/hizmetler/sosyal-medya-yonetimi">sosyal medya</a>, <a class="inline text-l1 underline underline-offset-[0.08em] decoration-solid decoration-(--label-3)" href="/hizmetler/icerik-uretimi" data-kade-href="/hizmetler/icerik-uretimi">içerik üretimi</a> ve <a class="inline text-l1 underline underline-offset-[0.08em] decoration-solid decoration-(--label-3)" href="/hizmetler/web-sitesi-tasarimi" data-kade-href="/hizmetler/web-sitesi-tasarimi">web sitesi tasarımı</a> alanlarında çalışıyor.';
+      }
       /* Footer'daki e-posta ve sosyal bağlantılar artık kaynağında (bundle +
          sunucu HTML'i) düzeltiliyor. Burada DOM'a dokunmak React'in o bölümü
          yeniden render ettiği anda removeChild hatasına ve sayfanın boşalmasına

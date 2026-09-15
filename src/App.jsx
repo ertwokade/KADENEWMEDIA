@@ -189,6 +189,10 @@ function getCanvasTheme(pathname) {
 
 function App() {
   const location = useLocation()
+  const [analyticsConsent, setAnalyticsConsent] = useState(() => {
+    try { return localStorage.getItem('cookie_consent') === 'accepted' }
+    catch { return false }
+  })
   const isAdmin = location.pathname === '/admin'
   const isHome = location.pathname === '/'
   const isLoginArea = location.pathname.startsWith('/giris')
@@ -216,6 +220,12 @@ function App() {
   const canvasTheme = getCanvasTheme(location.pathname)
   const prevPath = useRef(null)
 
+  useEffect(() => {
+    const updateConsent = (event) => setAnalyticsConsent(event.detail?.consent === 'accepted')
+    window.addEventListener('kade:cookie-consent', updateConsent)
+    return () => window.removeEventListener('kade:cookie-consent', updateConsent)
+  }, [])
+
   // Dekoratif altın imleç sadece pazarlama sayfalarında kalsın — admin ve
   // araç/panel sayfalarında (KadexAI panelleri dahil) normal imleç kullanılır.
   useEffect(() => {
@@ -225,7 +235,7 @@ function App() {
 
   useEffect(() => {
     // Don't track admin visits, avoid duplicate on first render
-    if (isAdmin) return
+    if (isAdmin || !analyticsConsent) return
     if (prevPath.current === location.pathname) return
     prevPath.current = location.pathname
     trackPageviewApi(location.pathname, document.referrer)
@@ -238,11 +248,11 @@ function App() {
         page_title: document.title,
       })
     }
-  }, [location.pathname, isAdmin])
+  }, [location.pathname, isAdmin, analyticsConsent])
 
   // Active visitor heartbeat — keeps our real-time counter accurate.
   useEffect(() => {
-    if (isAdmin) return
+    if (isAdmin || !analyticsConsent) return
     let sid
     try {
       sid = sessionStorage.getItem('kade_visitor_sid')
@@ -258,7 +268,7 @@ function App() {
     const onVisible = () => { if (document.visibilityState === 'visible') ping() }
     document.addEventListener('visibilitychange', onVisible)
     return () => { clearInterval(interval); document.removeEventListener('visibilitychange', onVisible) }
-  }, [location.pathname, isAdmin])
+  }, [location.pathname, isAdmin, analyticsConsent])
 
   return (
     <CustomerProvider>

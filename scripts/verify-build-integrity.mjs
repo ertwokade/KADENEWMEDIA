@@ -15,9 +15,9 @@
  *     ya da referans verdiği chunk'lardan biri dist'e girmezse anasayfa
  *     sessizce boş/bozuk yayına çıkar — build burada durur.
  *
- *     Snapshot yabancı kaynaklıdır ve kaynak kodu bu repoda yoktur; içeriği
- *     elle düzenlenebilir değildir. Diğer 38 rota kaynak koddaki React
- *     uygulamasından gelmeye devam eder (bkz. aşağıdaki bundle kontrolü).
+ *     Ana sayfa ve public pazarlama rotaları kürate edilmiş statik Kade
+ *     kabuğundan, giriş/admin/portal gibi uygulama rotaları React bundle'ından
+ *     gelir (bkz. aşağıdaki iki-kabuk kontrolü).
  *
  *  2) Tasarım token katmanı bundle'a girsin. src/styles/kade-tokens.css tek
  *     doğruluk kaynağı; bir import zinciri kopar da token'lar üretilen CSS'e
@@ -90,8 +90,17 @@ if (!snapshotHtml) {
   else if (!await exists(join(DIST, 'homepage-admin.js'))) fail('dist/homepage-admin.js yok — admin içerikleri ana sayfaya uygulanamaz')
   else ok('admin ana sayfa runtime bağlantısı yerinde')
 
-  if (indexHtml !== snapshotHtml) fail('dist/index.html Haoqi snapshot\'ıyla aynı değil — Vercel kökte React fallback servis edebilir')
-  else ok('dist/index.html doğrudan Haoqi snapshot\'ını içeriyor')
+  const foreignVisibleMarkers = [
+    '>I explore how to shape AI-era workflows', '>I’m building', '>reunimos™<',
+    '>Reunimos™<', '>aDrive<', '>aDrive 阿里云盘<', '>Teambition<',
+    '>Inspire Mono<', '>Wasm design utils<', '>VectorSymbols<', '>DarkSide<',
+  ]
+  const foreignVisible = foreignVisibleMarkers.filter((marker) => snapshotHtml.includes(marker))
+  if (foreignVisible.length) fail(`dist/site.html: görünür eski şablon içeriği kaldı (${foreignVisible.join(', ')})`)
+  else ok('JavaScript kapalıyken görünür eski şablon içeriği yok')
+
+  if (indexHtml !== snapshotHtml) fail('dist/index.html Kade snapshot\'ıyla aynı değil — Vercel kökte React fallback servis edebilir')
+  else ok('dist/index.html doğrudan Kade snapshot\'ını içeriyor')
 }
 
 // Snapshot DIŞINDAKİ hiçbir HTML yabancı bundle'a referans vermemeli; verirse
@@ -106,17 +115,25 @@ for (const file of htmlFiles) {
 }
 if (!failures.some((f) => f.includes('sızmış'))) ok(`${htmlFiles.length - 2} iç sayfa HTML'inde snapshot varlık referansı yok`)
 
-// React iç sayfaları ve app.html aynı uygulama bundle'ını yüklemeli. Anasayfa
-// özellikle Haoqi snapshot'ıdır ve bu karşılaştırmaya dahil edilmez.
+// Uygulama rotaları app.html ile aynı React bundle'ını; public pazarlama
+// rotaları ise kade-site.js statik kabuğunu yüklemeli. Bu iki mimariyi birbirine
+// eşitlemeye çalışmak final merge'den sonra yanlış alarm üretiyordu.
 const bundleOf = (html) => (html.match(/\/assets\/(index-[A-Za-z0-9_-]+\.js)/) || [])[1] || null
 const appBundle = bundleOf(await readFile(join(DIST, 'app.html'), 'utf8'))
-const innerPath = join(DIST, 'hakkimizda', 'index.html')
+const adminPath = join(DIST, 'admin', 'index.html')
+const marketingPath = join(DIST, 'hakkimizda', 'index.html')
 if (!appBundle) {
   fail('dist/app.html bir /assets/index-*.js bundle\'ı yüklemiyor')
-} else if (await exists(innerPath)) {
-  const innerBundle = bundleOf(await readFile(innerPath, 'utf8'))
-  if (appBundle !== innerBundle) fail(`app.html (${appBundle}) ve /hakkimizda (${innerBundle}) farklı bundle yüklüyor`)
-  else ok(`React iç sayfaları aynı bundle'ı yüklüyor (${appBundle})`)
+} else if (await exists(adminPath)) {
+  const adminBundle = bundleOf(await readFile(adminPath, 'utf8'))
+  if (appBundle !== adminBundle) fail(`app.html (${appBundle}) ve /admin (${adminBundle}) farklı React bundle yüklüyor`)
+  else ok(`React uygulama rotaları aynı bundle'ı yüklüyor (${appBundle})`)
+}
+if (process.env.FINAL_MERGE === '1' && await exists(marketingPath)) {
+  const marketingHtml = await readFile(marketingPath, 'utf8')
+  if (bundleOf(marketingHtml)) fail('/hakkimizda statik Kade kabuğu yerine React bundle yüklüyor')
+  else if (!/src="\/kade-site\.js"/.test(marketingHtml)) fail('/hakkimizda statik Kade runtime bağlantısını yüklemiyor')
+  else ok('public pazarlama rotaları statik Kade kabuğunu yüklüyor')
 }
 
 // ── 2. Tasarım token katmanı ───────────────────────────────────────────────

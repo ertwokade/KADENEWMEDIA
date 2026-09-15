@@ -32,8 +32,8 @@ export const PACKAGE_SCOPES = [
 
 export const PACKAGE_FAQS = [
   {
-    tr: ['Fiyatlar neden listelenmiyor?', 'Hizmet bedeli kanal, üretim adedi, reklam operasyonu ve teslim kapsamına göre değişir. KDV ve ek maliyetler yazılı teklifte ayrıca belirtilir.'],
-    en: ['Why are prices not listed?', 'Fees vary by channel, production volume, advertising operations, and delivery scope. Taxes and additional costs are stated separately in the written quote.'],
+    tr: ['Fiyatlar neden her zaman listelenmiyor?', 'Onaylanmış standart bir bedel varsa sayfada gösterilir. Görünmüyorsa hizmet bedeli kanal, üretim adedi, reklam operasyonu ve teslim kapsamına göre yazılı teklifte netleştirilir. KDV ve ek maliyetler ayrıca belirtilir.'],
+    en: ['Why are prices not always listed?', 'An approved standard fee is shown when available. Otherwise, the fee is confirmed in a written quote based on channel, production volume, advertising operations, and delivery scope. Taxes and additional costs are stated separately.'],
   },
   {
     tr: ['Reklam bütçesi pakete dahil mi?', 'Dahil olduğu varsayılmaz. Medya bütçesi ile hizmet bedeli, hazırlanacak teklifte ayrı kalemler olarak açıklanır.'],

@@ -128,7 +128,7 @@ test.describe('admin içerik kaydetme', () => {
     expect(saved.data.instagram).toBe('https://instagram.com/kade')
     // Dokunulmayan alanlar gövdede korunmalı — kısmi kayıt veri kaybettirmemeli.
     expect(saved.data.phone).toBe('+90 500 000 00 00')
-    await expect(page.getByRole('status')).toContainText('İçerik güncellendi!')
+    await expect(page.locator('.admin-toast.success')).toContainText('İçerik güncellendi!')
   })
 
   test('API hatası başarı gibi gösterilmez', async ({ page }) => {
@@ -139,19 +139,19 @@ test.describe('admin içerik kaydetme', () => {
     await page.getByRole('button', { name: 'Kaydet' }).click()
 
     await expect(page.getByRole('alert')).toContainText('Doğrulama hatası')
-    await expect(page.getByRole('status')).toHaveCount(0)
+    await expect(page.locator('.admin-toast.success')).toHaveCount(0)
   })
 
-  test('hedef sayfası olmayan sekme açıkça uyarır', async ({ page }) => {
+  test('yayındaki ancak koddan beslenen sekme açıkça uyarır', async ({ page }) => {
     await mockAdminApi(page)
     await openAdmin(page)
     await gotoSection(page, 'İÇERİK', 'İçerik Yönetimi')
 
     await page.getByRole('tab', { name: /Basın/ }).click()
-    const notice = page.locator('.admin-content-notice--no-page')
+    const notice = page.locator('.admin-content-notice--static')
     await expect(notice).toBeVisible()
-    await expect(notice).toContainText('sitede yok')
-    // Yönetici hangi URL'nin 404 döndüğünü görebilmeli.
+    await expect(notice).toContainText('kodda sabit')
+    // Yönetici hangi canlı URL'nin bu kaydı henüz okumadığını görebilmeli.
     await expect(notice).toContainText('/basin')
   })
 

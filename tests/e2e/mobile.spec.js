@@ -14,7 +14,10 @@ test.describe('mobile-chromium', () => {
   for (const route of KEY_ROUTES) {
     test(`no horizontal overflow on ${route}`, async ({ page }) => {
       await page.goto(route, { waitUntil: 'domcontentloaded' })
-      await expect(page.locator('body')).toBeVisible()
+      // Statik pazarlama kabuğunda tüm ana yüzeyler fixed olduğu için body'nin
+      // kendi geometrik yüksekliği 0'dır. Kullanıcının gördüğü kökü ölç.
+      const surface = route === '/' ? page.locator('header').first() : page.locator('main').first()
+      await expect(surface).toBeVisible()
       // Vendored ana sayfa snapshot'ı uzun ömürlü/arka plan istekleri
       // başlatabildiğinden `networkidle` güvenilir bir layout hazır sinyali
       // değildir. İki paint turu, ölçülecek geometri için yeterlidir.

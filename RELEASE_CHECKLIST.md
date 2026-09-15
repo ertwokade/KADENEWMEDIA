@@ -2,6 +2,10 @@
 
 Denetim tarihi: 19 Temmuz 2026
 
+> **Tarihsel kayıt:** Aşağıdaki kutular 19 Temmuz denetiminin snapshot'ıdır ve
+> güncel iş listesi olarak kullanılmaz. Güncel tek liste:
+> `docs/MASTER_KAPANIS_KONTROLU_TR.md`.
+
 `BLOCKER` maddeleri tamamlanmadan production’a çıkılmamalı. Bu belge secret değerlerini içermez.
 
 ## 1. Zorunlu release kapıları

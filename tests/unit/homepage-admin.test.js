@@ -12,14 +12,17 @@ test('homepage content is public and editable', async () => {
 
 test('Haoqi snapshot loads the homepage admin runtime', async () => {
   const [snapshot, runtime] = await Promise.all([
-    read('public/site.html'),
-    read('public/homepage-admin.js'),
+    read('haoqi-clone/index.html'),
+    read('haoqi-clone/homepage-admin.js'),
   ])
-  assert.match(snapshot, /src="\/homepage-admin\.js"/)
+  const transform = await read('haoqi-clone/kade-html-transform.mjs')
+  assert.match(transform, /['"]\/homepage-admin\.js['"]/)
   assert.match(runtime, /fetch\('\/api\/content\?section=homepage'/)
   assert.match(runtime, /data\.workItems/)
   assert.match(runtime, /data\.navItems/)
   assert.match(runtime, /data\.contactLines/)
+  assert.match(runtime, /h1\[data-kade-seo-title\]/)
+  assert.match(runtime, /div\.font-bold\.uppercase\.leading-none/)
 })
 
 test('admin exposes an addable homepage editor', async () => {

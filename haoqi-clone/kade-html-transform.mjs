@@ -18,6 +18,29 @@ const COPY = [
   ['>to digital work<', '>büyütüyoruz<'],
   ["I&#x27;m Haoqi Wen, leading Design Engineering and AI exploration at ", 'Kade New Media; strateji, içerik, reklam ve prodüksiyonla markaları dijitalde büyütür. '],
   [', engineering, and AI at scale. Outside work, I build design tools for team efficiency.', ''],
+  ['I explore how to shape AI-era workflows with craft and taste, building the next generation of digital products.', 'Strateji, içerik ve reklamı tek bir üretim hattında birleştirerek markalara ölçülebilir dijital büyüme sağlıyoruz.'],
+  ['I’m building', 'İstanbul merkezli ekibimiz'],
+  ['reunimos™', 'sosyal medya'],
+  [', and previously worked on Alibaba', '; içerik'],
+  [', and 100offer.', ' ve web tasarımı alanlarında çalışıyor.'],
+  ['Coding Project', 'Hizmet'],
+  ['Reunimos™', 'Kade Portfolio'],
+  ['Inspire Mono', 'Sosyal Medya'],
+  ['Wasm design utils', 'Dijital Pazarlama'],
+  ['VectorSymbols', 'Marka Tasarımı'],
+  ['DarkSide', 'Video Prodüksiyon'],
+  ['aDrive 阿里云盘', 'Reklam Yönetimi'],
+  ['aDrive', 'içerik üretimi'],
+  ['Shore Icon', 'Kade Studio'],
+  ['Teambition', 'Kade Business'],
+  ['FoF: See Hear Touch', 'Kade Event'],
+  ['FoF: Design System', 'Kade Design'],
+  ['https://reunimos.cc', '/hizmetler/sosyal-medya-yonetimi'],
+  ['https://www.alipan.com/', '/hizmetler/icerik-uretimi'],
+  ['https://www.teambition.com/', '/hizmetler/web-sitesi-tasarimi'],
+  ['https://www.figma.com/community/plugin/1255914175202017737/vectorsymbols', '/hizmetler/web-sitesi-tasarimi'],
+  ['https://www.figma.com/community/plugin/986289377230504703/darkside', '/hizmetler/video-produksiyon'],
+  ['https://friends.figma.com/events/details/figma-shanghai-presents-see-hear-touch/', '/portfolio'],
   /* Footer: sunucu HTML'i ile bundle aynı metni üretmeli, yoksa hidrasyon
      uyuşmazlığı (React #418) çıkıyor — ikisi de aynı listeden besleniyor. */
   ['mailto:curiosity.wen@gmail.com', 'mailto:thekademedia@gmail.com'],
@@ -73,6 +96,34 @@ const COPY = [
 /* Bundle içi metinler: footer geç mount olduğu için kade-brand.js'in DOM
    düzeltmesi oraya yetişmiyordu; kaynağında düzeltmek daha güvenilir. */
 export const SCRIPT_COPY = [
+  /* Düşen 3B çıkartmaların dördüncüsü eski ürün adını görünür biçimde
+     taşıyordu. Aynı sahne/animasyon korunur, yabancı marka dokusu Kade
+     logosuyla değiştirilir. */
+  ['/sticker_img/s_04.png', '/logo.png'],
+  ['/sticker_img/s_04.webp', '/logo.png'],
+  ['I explore how to shape AI-era workflows with craft and taste, building the next generation of digital products.', 'Strateji, içerik ve reklamı tek bir üretim hattında birleştirerek markalara ölçülebilir dijital büyüme sağlıyoruz.'],
+  ['I’m building', 'İstanbul merkezli ekibimiz'],
+  ['reunimos™', 'sosyal medya'],
+  [', and previously worked on Alibaba', '; içerik'],
+  [', and 100offer.', ' ve web tasarımı alanlarında çalışıyor.'],
+  ['Coding Project', 'Hizmet'],
+  ['Reunimos™', 'Kade Portfolio'],
+  ['Inspire Mono', 'Sosyal Medya'],
+  ['Wasm design utils', 'Dijital Pazarlama'],
+  ['VectorSymbols', 'Marka Tasarımı'],
+  ['DarkSide', 'Video Prodüksiyon'],
+  ['aDrive 阿里云盘', 'Reklam Yönetimi'],
+  ['aDrive', 'içerik üretimi'],
+  ['Shore Icon', 'Kade Studio'],
+  ['Teambition', 'Kade Business'],
+  ['FoF: See Hear Touch', 'Kade Event'],
+  ['FoF: Design System', 'Kade Design'],
+  ['https://reunimos.cc', '/hizmetler/sosyal-medya-yonetimi'],
+  ['https://www.alipan.com/', '/hizmetler/icerik-uretimi'],
+  ['https://www.teambition.com/', '/hizmetler/web-sitesi-tasarimi'],
+  ['https://www.figma.com/community/plugin/1255914175202017737/vectorsymbols', '/hizmetler/web-sitesi-tasarimi'],
+  ['https://www.figma.com/community/plugin/986289377230504703/darkside', '/hizmetler/video-produksiyon'],
+  ['https://friends.figma.com/events/details/figma-shanghai-presents-see-hear-touch/', '/portfolio'],
   // Snapshot's native theme provider updates its class on system/manual changes.
   // Keep the shared CSS attribute and browser color scheme in sync as well.
   ['i.classList.add(e)', 'i.classList.add(e),i.setAttribute("data-theme",e),i.style.colorScheme=e'],
@@ -141,7 +192,7 @@ const HEAD_ASSETS = [
   ['/kade-routes.css', '<link rel="stylesheet" href="/kade-routes.css">']
 ]
 
-const BODY_ASSETS = ['/kade-routes.js', '/kade-access.js', '/kade-footer.js', '/kade-brand.js', '/kade-entry-watchdog.js']
+const BODY_ASSETS = ['/kade-routes.js', '/kade-access.js', '/kade-footer.js', '/kade-brand.js', '/homepage-admin.js', '/kade-entry-watchdog.js']
 
 const KADE_FAVICONS = '<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/favicon.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-icon.png">'
 

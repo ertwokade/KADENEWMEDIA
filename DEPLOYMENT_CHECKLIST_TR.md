@@ -2,6 +2,10 @@
 
 Tarih: 22 Temmuz 2026
 
+> **Tarihsel kayıt:** Bu belge 22 Temmuz snapshot'ıdır; aşağıdaki açık kutuların
+> çoğu daha sonra tamamlandı veya ürün kararı olarak yeniden sınıflandırıldı.
+> Güncel tek liste: `docs/MASTER_KAPANIS_KONTROLU_TR.md`.
+
 ## Ortam ve mimari
 
 - [x] Framework/runtime tespit edildi: kök = Vite 8 + React 19 (legacy), `apps/kadexai` = Next.js 16 App Router, `apps/studio-web`/`studio-worker` = ayrı Kade Studio (kapsam dışı ama not edildi).

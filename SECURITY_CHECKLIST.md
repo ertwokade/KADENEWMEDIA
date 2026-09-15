@@ -2,6 +2,10 @@
 
 Denetim tarihi: 19 Temmuz 2026
 
+> **Tarihsel kayıt:** Aşağıdaki kutular 19 Temmuz denetiminin snapshot'ıdır.
+> Güncel kapanış ve yalnız dış girdi isteyen maddeler için
+> `docs/MASTER_KAPANIS_KONTROLU_TR.md` ile `docs/BLOCKERS_TR.md` geçerlidir.
+
 İşaretler: `[x]` kaynak ve test ile doğrulandı, `[-]` kısmi veya production doğrulaması gerekli, `[ ]` eksik/bloker.
 
 ## OWASP Top 10 (2021)

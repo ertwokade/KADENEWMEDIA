@@ -27,10 +27,8 @@ const PUBLIC_ROUTES = [
   '/telif-haklari',
 ]
 
-// Ana sayfa artık React uygulamasının parçası (src/pages/Home.jsx).
-// Daha önce `/` başka bir projenin statik snapshot'ına rewrite ediliyordu ve
-// hydration "Minified React error #418" üretiyordu; o muafiyet kaldırıldı —
-// hiçbir public rota konsola kritik hata basmamalı.
+// Ana sayfa vendored Next snapshot'ı, iç sayfalar ise statik pazarlama
+// kabuğudur. İki kabuk da kritik console hatası üretmemelidir.
 const KNOWN_CONSOLE_ISSUES = {}
 
 for (const route of PUBLIC_ROUTES) {
@@ -43,7 +41,8 @@ for (const route of PUBLIC_ROUTES) {
 
     const response = await page.goto(route)
     expect(response?.status(), `${route} HTTP status`).toBeLessThan(500)
-    await expect(page.locator('body')).toBeVisible()
+    const surface = route === '/' ? page.locator('header').first() : page.locator('main').first()
+    await expect(surface).toBeVisible()
 
     // Bu test ortamında server.js/API çalışmadığı için (bkz.
     // docs/BLOCKERS_TR.md #1) her /api isteği 502 dönüyor — bu, sayfanın
@@ -72,10 +71,14 @@ test('invalid fixed service route also returns HTTP 404', async ({ page }) => {
   expect(response?.status()).toBe(404)
 })
 
-test('public archive routes remain noindex, follow after hydration', async ({ page }) => {
-  for (const route of ['/blog', '/portfolio', '/partnerler', '/referanslar', '/basari-hikayeleri']) {
+test('public route robots kararları build manifestiyle uyumlu', async ({ page }) => {
+  for (const route of ['/portfolio', '/partnerler', '/referanslar']) {
     await page.goto(route)
     await expect(page.locator('meta[name="robots"]'), route).toHaveAttribute('content', 'noindex, follow')
+  }
+  for (const route of ['/blog', '/basari-hikayeleri']) {
+    await page.goto(route)
+    await expect(page.locator('meta[name="robots"]'), route).toHaveAttribute('content', 'index, follow')
   }
 })
 

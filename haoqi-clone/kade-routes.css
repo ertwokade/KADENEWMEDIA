@@ -252,7 +252,7 @@
   .kade-routes__grid{grid-template-columns:1fr 1fr}
   .kade-routes__col{border-right:0;border-bottom:1px solid var(--line);padding-bottom:22px}
   .kade-routes__col:nth-child(odd){border-right:1px solid var(--line);padding-right:16px}
-  .kade-meta{font-size:9px!important;gap:6px 14px}
+  .kade-meta{font-size:12px!important;gap:6px 14px}
 }
 
 /* Card internals follow the same marker + mono link language as the rest. */

@@ -62,12 +62,14 @@ export default function CookieBanner() {
 
   const handleAccept = () => {
     localStorage.setItem('cookie_consent', 'accepted')
+    window.dispatchEvent(new CustomEvent('kade:cookie-consent', { detail: { consent: 'accepted' } }))
     enableAnalytics()
     setVisible(false)
   }
 
   const handleDecline = () => {
     localStorage.setItem('cookie_consent', 'declined')
+    window.dispatchEvent(new CustomEvent('kade:cookie-consent', { detail: { consent: 'declined' } }))
     disableAnalytics()
     setVisible(false)
   }
