@@ -5,6 +5,7 @@ import { acknowledgeTelegramButton, sendTelegramBotReply } from '@/lib/notificat
 import { telegramWebhookConfiguration } from '@/lib/notifications/telegramConfig'
 import { executeTelegramCommand } from '@/lib/notifications/telegramCommands'
 import { parseTelegramBotUpdate, TELEGRAM_MAIN_KEYBOARD } from '@/lib/notifications/telegramBot'
+import { activateTelegramGroup, deactivateTelegramGroup, telegramGroupIsActive } from '@/lib/notifications/telegramGroupAccess'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -49,23 +50,70 @@ export async function POST(request: Request) {
   }
 
   const action = parseTelegramBotUpdate(payload)
-  if (!action || !config.chatIds.includes(action.chatId) || alreadySeen(action.updateId)) {
+  if (!action || alreadySeen(action.updateId)) {
     return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
   }
 
+  const ownerActor = config.chatIds.includes(action.actorId)
+  const isGroup = action.chatType !== 'private'
+  if (!isGroup && (!ownerActor || action.chatId !== action.actorId)) {
+    return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
+  }
+
+  let canReply = !isGroup && ownerActor
   try {
+    let groupActive = false
+    if (isGroup) {
+      if (action.command === 'baslat') {
+        if (!ownerActor) return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
+        await activateTelegramGroup({
+          chatId: action.chatId,
+          chatType: action.chatType === 'supergroup' ? 'supergroup' : 'group',
+          chatTitle: action.chatTitle,
+          actorId: action.actorId,
+        })
+        groupActive = true
+        canReply = true
+      } else if (action.command === 'durdur') {
+        if (!ownerActor) return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
+        canReply = true
+        await deactivateTelegramGroup(action.chatId)
+      } else {
+        groupActive = await telegramGroupIsActive(action.chatId)
+        canReply = groupActive
+        if (!groupActive) {
+          if (ownerActor) {
+            await sendTelegramBotReply(
+              action.chatId,
+              '⏸️ KadeX bu grupta henüz etkin değil. Bu grubun sahibi olarak /baslat yaz; ardından rapor komutları açılır.',
+              undefined,
+              [action.chatId],
+            )
+          }
+          return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
+        }
+      }
+    }
     if (action.callbackQueryId) {
       await acknowledgeTelegramButton(action.callbackQueryId).catch(() => undefined)
     }
-    const message = await executeTelegramCommand(action.command)
-    await sendTelegramBotReply(action.chatId, message, TELEGRAM_MAIN_KEYBOARD)
-  } catch (error) {
-    captureApiError(error, '/api/telegram/webhook')
+    const message = await executeTelegramCommand(action.command, { chatType: action.chatType, groupActive })
     await sendTelegramBotReply(
       action.chatId,
-      '⚠️ KadeX bu komutu şu anda tamamlayamadı. Sistem kaydı alındı; biraz sonra yeniden deneyebilirsin.',
+      message,
       TELEGRAM_MAIN_KEYBOARD,
-    ).catch(() => undefined)
+      isGroup ? [action.chatId] : [],
+    )
+  } catch (error) {
+    captureApiError(error, '/api/telegram/webhook')
+    if (canReply) {
+      await sendTelegramBotReply(
+        action.chatId,
+        '⚠️ KadeX bu komutu şu anda tamamlayamadı. Sistem kaydı alındı; biraz sonra yeniden deneyebilirsin.',
+        TELEGRAM_MAIN_KEYBOARD,
+        isGroup ? [action.chatId] : [],
+      ).catch(() => undefined)
+    }
   }
 
   return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })

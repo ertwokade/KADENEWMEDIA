@@ -20,10 +20,14 @@ export async function sendTelegramBotReply(
   chatId: string,
   message: string,
   replyMarkup?: TelegramReplyMarkup,
+  additionalAllowedChatIds: string[] = [],
 ) {
   const config = telegramConfiguration()
   if (!config.configured) throw new Error(`Telegram yapılandırılmamış: ${config.missing.join(', ')}`)
-  return deliverTelegramToAllowedChat(message, chatId, config, { replyMarkup })
+  return deliverTelegramToAllowedChat(message, chatId, {
+    ...config,
+    chatIds: [...new Set([...config.chatIds, ...additionalAllowedChatIds])],
+  }, { replyMarkup })
 }
 
 export async function acknowledgeTelegramButton(callbackQueryId: string) {

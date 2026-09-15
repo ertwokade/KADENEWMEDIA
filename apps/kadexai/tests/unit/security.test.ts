@@ -124,6 +124,26 @@ test('Telegram webhook reaches its own secret guard without a browser session', 
   }
 })
 
+test('Telegram group activation records are service-role only', async () => {
+  const migration = await readFile(
+    new URL('../../supabase/migrations/202609150001_telegram_bot_groups.sql', import.meta.url),
+    'utf8',
+  )
+  assert.match(migration, /ALTER TABLE public\.telegram_bot_chats ENABLE ROW LEVEL SECURITY/)
+  assert.match(migration, /ALTER TABLE public\.telegram_bot_chats FORCE ROW LEVEL SECURITY/)
+  assert.match(migration, /REVOKE ALL ON public\.telegram_bot_chats FROM anon, authenticated/)
+  assert.doesNotMatch(migration, /GRANT .*telegram_bot_chats.*authenticated/i)
+
+  const route = await readFile(
+    new URL('../../app/kadexai/api/telegram/webhook/route.ts', import.meta.url),
+    'utf8',
+  )
+  assert.match(route, /config\.chatIds\.includes\(action\.actorId\)/)
+  assert.match(route, /action\.command === 'baslat'[\s\S]+if \(!ownerActor\)[\s\S]+activateTelegramGroup/)
+  assert.match(route, /action\.command === 'durdur'[\s\S]+if \(!ownerActor\)[\s\S]+deactivateTelegramGroup/)
+  assert.match(route, /groupActive = await telegramGroupIsActive\(action\.chatId\)/)
+})
+
 test('unauthenticated KadexAI routes keep the /kadexai prefix when redirecting', async () => {
   const previousUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const previousAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
