@@ -31,6 +31,8 @@ const COMMON_ENV_KEYS = [
   'INSTAGRAM_SESSION_ID',
   'KADE_FASTAPI_BASE_URL',
   'KADE_BACKEND_TOKEN',
+  'PEXELS_API_KEY',
+  'PIXABAY_API_KEY',
 ] as const
 
 export const dynamic = 'force-dynamic'
@@ -50,6 +52,7 @@ export async function GET(request: Request) {
   status.YOUTUBE_AVAILABLE = status.YOUTUBE_API_KEY && isIntegrationEnabled('youtube')
   status.TIKTOK_OFFICIAL = tiktokAccess().official
   status.INSTAGRAM_OFFICIAL = instagramAccess().official
+  status.VIDEO_STOCK = status.PEXELS_API_KEY || status.PIXABAY_API_KEY
   // Değer DEĞİL, yalnızca yapılandırılmış olup olmadığı. Bildirim gitmediğinde
   // sebebini dışarıdan görebilmek için.
   status.WHATSAPP = whatsappConfiguration().configured

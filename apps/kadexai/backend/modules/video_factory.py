@@ -94,11 +94,16 @@ def generate_video(
         from app.services import task as mpt_task  # type: ignore
     except Exception as exc:  # ImportError vb.
         raise VideoEngineUnavailable(
-            "Video motoru bağımlılıkları kurulu değil (moviepy, edge_tts, "
-            "faster-whisper). Kurulum: pip install -r backend/requirements.txt"
+            "Video motoru şu anda kullanılamıyor. Sistem yöneticisine bildirildi."
         ) from exc
 
     _bridge_env_to_config(config, language=language)
+
+    if not (config.app.get("pexels_api_keys") or config.app.get("pixabay_api_keys")):
+        raise VideoEngineUnavailable(
+            "Video Fabrikası için stok görüntü anahtarı tanımlı değil "
+            "(PEXELS_API_KEY veya PIXABAY_API_KEY)."
+        )
 
     if not (config.app.get("gemini_api_key") or config.app.get("openai_api_key")):
         raise VideoEngineUnavailable(

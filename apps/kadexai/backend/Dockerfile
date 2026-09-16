@@ -21,6 +21,9 @@ RUN python -m pip install --upgrade pip \
     && python -m pip install -r requirements.txt
 
 COPY . .
+# Video Fabrikası motoru eksik paketle sessizce 503 dönüyordu. Import burada
+# doğrulanır: bir bağımlılık eksikse imaj derlenmez ve dağıtım eski sürüme döner.
+RUN python -c "import sys; sys.path.insert(0, 'vendor/mpturbo'); from app.config import config; from app.models.schema import VideoParams; from app.services import task; print('video engine import ok')"
 RUN mkdir -p /app/media && chown -R kade:kade /app
 USER kade
 

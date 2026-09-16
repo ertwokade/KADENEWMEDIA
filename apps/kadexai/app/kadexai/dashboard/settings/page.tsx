@@ -150,6 +150,7 @@ const INFRA_DEFS = [
   { id: 'INSTAGRAM_SESSION_ID', label: 'Instagram oturumu (yedek)', use: 'Resmi API yoksa Instagram trend toplama' },
   { id: 'KADE_FASTAPI_BASE_URL', label: 'Medya işlem motoru', use: 'Video Fabrikası, klip ve dublaj işlemleri' },
   { id: 'KADE_BACKEND_TOKEN', label: 'Medya motoru erişim belirteci', use: 'FastAPI isteklerinin kimlik doğrulaması' },
+  { id: 'VIDEO_STOCK', label: 'Stok görüntü anahtarı (Pexels veya Pixabay)', use: 'Video Fabrikası sahne görüntüleri — PEXELS_API_KEY veya PIXABAY_API_KEY' },
   { id: 'WHATSAPP', label: 'WhatsApp bildirimi', use: 'Operasyon raporları ve trend seçkileri' },
   { id: 'TELEGRAM', label: 'Telegram bildirimi', use: 'İzinli sohbetlere operasyon raporları ve trend seçkileri' },
 ] as const
@@ -186,6 +187,7 @@ export default function SettingsPage() {
     INSTAGRAM_SESSION_ID: false,
     KADE_FASTAPI_BASE_URL: false,
     KADE_BACKEND_TOKEN: false,
+    VIDEO_STOCK: false,
     WHATSAPP: false,
     TELEGRAM: false,
   })
