@@ -13,11 +13,12 @@ export async function GET(req: NextRequest) {
   }
   try {
     const p = req.nextUrl.searchParams
-    const ideas = await generateIdeas({
+    const { ideas, ozet } = await generateIdeas({
       ...trendFiltersFromParams(p, 'TR'),
       limit: boundedNumber(p.get('limit'), 10, 1, 40),
     }, req)
-    return NextResponse.json({ adet: ideas.length, fikirler: ideas })
+    // `kisisellestirme`: kaç fikrin AI ile, kaçının şablonla kaldığı ve hata türleri (ayrıntısız).
+    return NextResponse.json({ adet: ideas.length, fikirler: ideas, kisisellestirme: ozet })
   } catch (e) {
     return failure(e, 'İçerik fikirleri üretilemedi.')
   }

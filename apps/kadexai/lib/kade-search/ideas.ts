@@ -141,7 +141,9 @@ function hashtag(value: unknown) {
   return clean.length >= 2 ? `#${clean}` : ''
 }
 
-const PERSONALIZE_BATCH = 4
+// Sağlayıcı katmanı her isteği 25 sn'de keser; 4 fikirlik JSON üretimi bu süreyi
+// aşıyordu. İki fikirlik gruplar süre sınırının rahat altında kalır.
+const PERSONALIZE_BATCH = 2
 
 async function personalizeBatch(batch: ContentIdea[], request?: Request) {
   // Uzun UUID'ler modelde bozulabiliyordu; her fikir kısa, sıralı bir anahtarla gider.
@@ -158,7 +160,7 @@ async function personalizeBatch(batch: ContentIdea[], request?: Request) {
   const result = await generateContent({
     model: 'auto',
     toolId: 'trend-radar',
-    maxTokens: 3200,
+    maxTokens: 1800,
     systemPrompt: `Sen Türkiye'deki içerik üreticileri için çalışan kıdemli kısa video stratejistisin.
 Her trend için birbirinden farklı, doğrudan çekilebilir bir fikir üret. Başlığı bir kalıba yapıştırma.
 Başlık yabancı dilde olsa bile konusunu Türk izleyiciye uyarlayan özgün bir açı bul; her trendId için mutlaka bir fikir döndür.
@@ -172,7 +174,7 @@ JSON şeması:
 {"ideas":[{"trendId":"t1","kanca":"","alternatifKancalar":["",""],"kurgu":["0-3 sn: ...","3-10 sn: ...","10-30 sn: ..."],"cta":"","hashtagler":["#etiket"],"zorluk":{"level":"Düşük|Orta|Yüksek|Çok yüksek","note":""},"paylasimSaati":["19:00-21:00"],"neden":"Bu fikrin bu trende neden uyduğunu tek cümlede açıkla"}]}`,
   }, request)
   const parsed = parseStructuredOutput(result.content)
-  if (!Array.isArray(parsed.ideas)) return
+  if (!Array.isArray(parsed.ideas)) throw new Error('invalid-output')
   for (const raw of parsed.ideas) {
     const item = normalizeIdeaOutput(raw)
     if (!item) continue
@@ -190,11 +192,28 @@ JSON şeması:
   }
 }
 
+export interface PersonalizationSummary {
+  toplam: number
+  ai: number
+  sablon: number
+  hatalar: Record<'zaman_asimi' | 'gecersiz_cikti' | 'saglayici', number>
+}
+
 export async function personalizeIdeas(ideas: ContentIdea[], request?: Request) {
   // Bir grubun hatası diğer grupların AI çıktısını kaybettirmez; başarısız
   // gruptaki fikirler açıkça "hazır şablon" olarak kalır.
-  await runInBatches(ideas, PERSONALIZE_BATCH, (batch) => personalizeBatch(batch, request))
-  return ideas
+  const results = await runInBatches(ideas, PERSONALIZE_BATCH, (batch) => personalizeBatch(batch, request))
+  const hatalar = { zaman_asimi: 0, gecersiz_cikti: 0, saglayici: 0 }
+  for (const result of results) {
+    if (result.status === 'fulfilled') continue
+    const message = result.reason instanceof Error ? result.reason.message : ''
+    if (/invalid-output/.test(message)) hatalar.gecersiz_cikti++
+    else if (/yanıt vermedi|timeout|timed out|abort/i.test(message)) hatalar.zaman_asimi++
+    else hatalar.saglayici++
+  }
+  const ai = ideas.filter((idea) => idea.uretim === 'ai').length
+  const ozet: PersonalizationSummary = { toplam: ideas.length, ai, sablon: ideas.length - ai, hatalar }
+  return { ideas, ozet }
 }
 
 /**
@@ -205,7 +224,7 @@ export async function personalizeIdeas(ideas: ContentIdea[], request?: Request) 
 export async function generateIdeas(
   opts: TrendFilters & { format?: string } = {},
   request?: Request,
-): Promise<ContentIdea[]> {
+): Promise<{ ideas: ContentIdea[]; ozet: PersonalizationSummary | null }> {
   const supabase = await createClient()
   const queriedTrends = ayiklanmisTrendler(await queryTrends({
     // Eski yanlış dil etiketli kayıtlar ayıklanınca istenen sayıya ulaşmak
@@ -225,7 +244,7 @@ export async function generateIdeas(
   // Dil filtresi veritabanı sorgusunda uygulanır. Başlığı ikinci kez sezgisel
   // bir Türkçe filtreden geçirmek, doğru dil meta verisi taşıyan kayıtları eliyordu.
   const trends = queriedTrends.slice(0, opts.limit ?? 15)
-  if (!trends.length) return []
+  if (!trends.length) return { ideas: [], ozet: null }
 
   const categories = [...new Set(trends.map((t) => t.category).filter((c): c is string => Boolean(c)))]
 
