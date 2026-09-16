@@ -5,6 +5,7 @@ import { whatsappConfiguration } from '@/lib/notifications/whatsappConfig'
 import { telegramWebhookConfiguration } from '@/lib/notifications/telegramConfig'
 import { getAvailableModels } from '@/lib/ai/modelRouter'
 import { isIntegrationEnabled } from '@/lib/ai/runtimeAvailability'
+import { instagramAccess, tiktokAccess } from '@/lib/kade-search/officialSocial'
 
 const COMMON_ENV_KEYS = [
   'AI_GATEWAY_API_KEY',
@@ -22,7 +23,11 @@ const COMMON_ENV_KEYS = [
   'GOOGLE_OAUTH_CLIENT_ID',
   'GOOGLE_OAUTH_CLIENT_SECRET',
   'KADE_TOKEN_ENCRYPTION_KEY',
+  'TIKTOK_RESEARCH_CLIENT_KEY',
+  'TIKTOK_RESEARCH_CLIENT_SECRET',
   'TIKTOK_COOKIE',
+  'INSTAGRAM_GRAPH_ACCESS_TOKEN',
+  'INSTAGRAM_BUSINESS_ACCOUNT_ID',
   'INSTAGRAM_SESSION_ID',
   'KADE_FASTAPI_BASE_URL',
   'KADE_BACKEND_TOKEN',
@@ -43,6 +48,8 @@ export async function GET(request: Request) {
   status[VERCEL_GATEWAY_STATUS_KEY] = Boolean(await getVercelGatewayToken(request))
   status.AI_AVAILABLE_MODELS = getAvailableModels().length > 1
   status.YOUTUBE_AVAILABLE = status.YOUTUBE_API_KEY && isIntegrationEnabled('youtube')
+  status.TIKTOK_OFFICIAL = tiktokAccess().official
+  status.INSTAGRAM_OFFICIAL = instagramAccess().official
   // Değer DEĞİL, yalnızca yapılandırılmış olup olmadığı. Bildirim gitmediğinde
   // sebebini dışarıdan görebilmek için.
   status.WHATSAPP = whatsappConfiguration().configured

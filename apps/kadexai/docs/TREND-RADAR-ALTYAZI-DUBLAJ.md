@@ -17,8 +17,8 @@ bir *snapshot* yazar, skor bu zaman serisinden hesaplanır.
    Yedi tablo + `kade_trend_current` görünümü oluşturur.
 2. `.env` içine (hepsi opsiyonel, bkz. `.env.example`):
    - `YOUTUBE_API_KEY` — yoksa YouTube arama sayfası ayrıştırılır (daha kırılgan).
-   - `TIKTOK_COOKIE` — yoksa TikTok kayıtları **çıkarım modunda** üretilir.
-   - `INSTAGRAM_SESSION_ID` — yoksa Instagram kayıtları çıkarım modunda üretilir.
+   - `TIKTOK_RESEARCH_CLIENT_KEY` + `TIKTOK_RESEARCH_CLIENT_SECRET` (resmi, önerilen) veya yedek `TIKTOK_COOKIE` — hiçbiri yoksa TikTok kaynağı kapalı kalır, tahmini kayıt üretilmez. Kurulum: `docs/KADESEARCH-SOSYAL-API.md`.
+   - `INSTAGRAM_BUSINESS_ACCOUNT_ID` + `INSTAGRAM_GRAPH_ACCESS_TOKEN` (resmi, önerilen) veya yedek `INSTAGRAM_SESSION_ID` — hiçbiri yoksa Instagram kaynağı kapalı kalır.
    - `SUPABASE_SERVICE_ROLE_KEY` — toplama bu anahtarla yazar, **zorunlu**.
 
 ### Veri modeli

@@ -7,6 +7,7 @@ import musicCharts from './musicCharts'
 import reddit from './reddit'
 import instagram from './instagram'
 import type { Collector, SourceId } from '../types'
+import { instagramAccess, tiktokAccess } from '../officialSocial'
 
 export const COLLECTORS: Record<SourceId, Collector> = {
   googleTrends,
@@ -29,8 +30,8 @@ export function availableSources() {
     countryAware: id !== 'reddit',
     configured:
       id === 'youtube' ? Boolean(process.env.YOUTUBE_API_KEY?.trim())
-      : id === 'tiktok' ? Boolean(process.env.TIKTOK_COOKIE?.trim())
-      : id === 'instagram' ? Boolean(process.env.INSTAGRAM_SESSION_ID?.trim())
+      : id === 'tiktok' ? tiktokAccess().live
+      : id === 'instagram' ? instagramAccess().live
       : true,
   }))
 }

@@ -9,10 +9,12 @@ import 'server-only'
  * ONEMLI: TikTok bu uclari oturum arkasina aldi; cerez olmadan "no permission"
  * doner. Gercek veri icin TIKTOK_COOKIE ortam degiskeni gerekir. Canli veri
  * yoksa toplayici bos doner; baska platformlardan TikTok sayisi uydurmaz.
+ * TIKTOK_RESEARCH_CLIENT_KEY/SECRET tanimliysa resmi Research API onceliklidir.
  */
 import { getJson } from '../http'
 import { parseCount } from '../util'
 import type { Collector, RawTrendItem } from '../types'
+import { searchTikTokResearch, tiktokAccess } from '../officialSocial'
 
 const BASE = 'https://ads.tiktok.com/creative_radar_api/v1'
 
@@ -177,6 +179,20 @@ const tiktok: Collector = {
   async collect({ country, period, limit }) {
     const items: RawTrendItem[] = []
     const errors: string[] = []
+
+    // Resmi Research API tanimliysa once o kullanilir; cerez yolu yalniz yedektir.
+    if (tiktokAccess().official) {
+      try {
+        const videos = await searchTikTokResearch({ country, periodDays: period, limit: 100 })
+        if (videos.length) return { items: videos.slice(0, Math.max(limit, 50)), errors, note: 'TikTok Research API (resmi)' }
+        errors.push(`tiktok/research-api/${country}: bu aralıkta video dönmedi`)
+      } catch (e) {
+        errors.push(`tiktok/research-api/${country}: ${(e as Error).message}`)
+      }
+      if (!tiktokAccess().legacy) {
+        return { items: [], errors, note: 'TikTok Research API veri döndürmedi; tahmini kayıt üretilmedi' }
+      }
+    }
     const tasks: Array<[string, () => Promise<RawTrendItem[]>]> = [
       ['hashtag', () => fetchHashtags(country, period, limit)],
       ['sarki', () => fetchSongs(country, period, limit)],

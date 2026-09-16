@@ -4,6 +4,8 @@ import 'server-only'
  * Instagram / Reels toplayici.
  *
  * Instagram'in halka acik bir "trendler" API'si YOKTUR. Uc kademeli calisiriz:
+ *   0) INSTAGRAM_GRAPH_ACCESS_TOKEN + INSTAGRAM_BUSINESS_ACCOUNT_ID tanimliysa
+ *      resmi Graph API Hashtag Search (hashtag kotasi nedeniyle az sayida etiket).
  *   1) INSTAGRAM_SESSION_ID tanimliysa web ic API'si ile gercek hashtag verisi.
  *   2) Anahtar yoksa herkese acik hashtag sayfasindan og meta verisi okunur.
  *   3) Ikisi de olmazsa kaynak kullanılamaz olarak raporlanır. Başka
@@ -13,6 +15,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getJson, getText } from '../http'
 import { parseCount, normalizeText } from '../util'
 import type { Collector, RawTrendItem } from '../types'
+import { instagramAccess, searchInstagramGraph } from '../officialSocial'
 
 const IG_APP_ID = '936619743392459'
 
@@ -46,6 +49,8 @@ const SEED_TAGS: Record<string, string[]> = {
   isyeri: ['kariyer', 'ofis', 'ishayati'],
   toplum: ['sokakroportaji', 'roportaj'],
 }
+
+const OFFICIAL_SEED_TAGS = ['reels', 'kesfet', 'viral', 'trending', 'komedi', 'yemektarifi']
 
 const GLOBAL_TAGS = ['reels', 'reelsinstagram', 'trending', 'viral', 'explore', 'kesfet', 'kesfetteyiz', 'fyp']
 
@@ -186,9 +191,29 @@ const instagram: Collector = {
   label: 'Instagram Reels',
   platforms: ['instagram'],
 
-  async collect({ country }) {
+  async collect({ country, period }) {
     const items: RawTrendItem[] = []
     const errors: string[] = []
+
+    if (instagramAccess().official) {
+      // Meta 7 gunde 30 farkli hashtag'e izin verir; kullanici aramalarina pay birakmak
+      // icin toplayici sabit ve kucuk bir cekirdek listeyle calisir.
+      for (const tag of OFFICIAL_SEED_TAGS) {
+        try {
+          items.push(...(await searchInstagramGraph({ query: tag, country, periodDays: period, limit: 50 })))
+        } catch (e) {
+          errors.push(`instagram/graph-api/${tag}: ${(e as Error).message}`)
+        }
+      }
+      if (items.length) return { items, errors: errors.slice(0, 5), note: 'Instagram Graph API (resmi)' }
+      if (!instagramAccess().legacy) {
+        return {
+          items: [],
+          errors: errors.length ? errors.slice(0, 5) : ['instagram: Graph API veri döndürmedi'],
+          note: 'Instagram Graph API veri döndürmedi; tahmini kayıt üretilmedi',
+        }
+      }
+    }
     const hasSession = Boolean(process.env.INSTAGRAM_SESSION_ID?.trim())
 
     // Izlenecek hashtag havuzu: cekirdek + veritabanindaki populer TikTok hashtag'leri

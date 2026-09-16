@@ -11,7 +11,9 @@ import {
   type DiscoveryResult,
 } from './discovery'
 import { searchYoutubeNow } from './collectors/youtube'
+import { instagramAccess, searchInstagramGraph, searchTikTokResearch, tiktokAccess } from './officialSocial'
 import { queryTrends } from './store'
+import type { RawTrendItem } from './types'
 
 const ALL_PLATFORMS: DiscoveryPlatform[] = [
   'tiktok', 'instagram', 'youtube_shorts', 'youtube', 'google', 'reddit', 'music',
@@ -41,13 +43,31 @@ function matchesLanguage(value: string | null | undefined, language: DiscoveryLa
 }
 
 function coverageNote(platform: DiscoveryPlatform) {
-  if (platform === 'tiktok' && !process.env.TIKTOK_COOKIE?.trim()) {
-    return 'TikTok canlı erişimi bağlı değil; tahmini TikTok sonucu gösterilmiyor'
+  if (platform === 'tiktok') {
+    const mode = tiktokAccess().mode
+    if (mode === 'official') return 'TikTok Research API ile canlı arama ve taze ölçümler'
+    if (mode === 'none') return 'TikTok canlı erişimi bağlı değil; tahmini TikTok sonucu gösterilmiyor'
   }
-  if (platform === 'instagram' && !process.env.INSTAGRAM_SESSION_ID?.trim()) {
-    return 'Instagram canlı erişimi bağlı değil; tahmini Reels sonucu gösterilmiyor'
+  if (platform === 'instagram') {
+    const mode = instagramAccess().mode
+    if (mode === 'official') return 'Instagram Graph API hashtag araması (Meta izlenme sayısı vermez; beğeni ve yorum gerçek)'
+    if (mode === 'none') return 'Instagram canlı erişimi bağlı değil; tahmini Reels sonucu gösterilmiyor'
   }
   return PLATFORM_NOTES[platform]
+}
+
+type LiveSearch = { items: RawTrendItem[]; source: 'live-api' | 'live-web'; errors: string[] }
+
+const NO_LIVE: LiveSearch = { items: [], source: 'live-api', errors: [] }
+
+async function officialSearch(label: string, run: () => Promise<RawTrendItem[]>): Promise<LiveSearch> {
+  try {
+    return { items: await run(), source: 'live-api', errors: [] }
+  } catch (error) {
+    // OfficialApiError mesajları sır içermez; diğer hatalar genel metne indirgenir.
+    const message = (error as Error).name === 'OfficialApiError' ? (error as Error).message : 'beklenmeyen hata'
+    return { items: [], source: 'live-api', errors: [`${label}: ${message}`] }
+  }
 }
 
 export async function discoverContent(input: {
@@ -66,7 +86,9 @@ export async function discoverContent(input: {
   const limit = Math.max(6, Math.min(Math.floor(input.limit ?? 36), 60))
   const notices: string[] = []
 
-  const [stored, youtube] = await Promise.all([
+  const tiktok = tiktokAccess()
+  const instagram = instagramAccess()
+  const [stored, youtube, tiktokLive, instagramLive] = await Promise.all([
     queryTrends({
       q: query,
       platform: platforms.join(','),
@@ -79,6 +101,12 @@ export async function discoverContent(input: {
     platforms.some((platform) => platform === 'youtube' || platform === 'youtube_shorts')
       ? searchYoutubeNow({ query, country, language: input.language, periodDays, limit: Math.min(limit, 30) })
       : Promise.resolve({ items: [], source: 'live-web' as const, errors: [] as string[] }),
+    platforms.includes('tiktok') && tiktok.official
+      ? officialSearch('TikTok', () => searchTikTokResearch({ query, country, periodDays, limit: 100 }))
+      : Promise.resolve(NO_LIVE),
+    platforms.includes('instagram') && instagram.official
+      ? officialSearch('Instagram', () => searchInstagramGraph({ query, country, periodDays, limit: 50 }))
+      : Promise.resolve(NO_LIVE),
   ])
 
   const measured = stored
@@ -96,21 +124,25 @@ export async function discoverContent(input: {
     })
     .map(discoveryFromTrend)
     .filter((row): row is DiscoveryResult => Boolean(row))
-  const live = youtube.items
+  const live = [youtube, tiktokLive, instagramLive].flatMap((search) => search.items
     .map((item) => enrich(item))
     .filter((item) => matchesLanguage(item.language, input.language))
-    .map((item) => discoveryFromRaw(item, youtube.source))
-    .filter((row): row is DiscoveryResult => Boolean(row))
+    .map((item) => discoveryFromRaw(item, search.source))
+    .filter((row): row is DiscoveryResult => Boolean(row)))
 
-  if (youtube.errors.length && !live.length) {
+  const youtubeLive = live.filter((row) => row.platform === 'youtube' || row.platform === 'youtube_shorts')
+  if (youtube.errors.length && !youtubeLive.length) {
     notices.push('YouTube canlı araması yanıt vermedi; sonuçlarda yalnız son doğrulanmış KadeSearch ölçümleri kullanıldı.')
   } else if (youtube.errors.length) {
     notices.push('YouTube resmi API yanıt vermedi; canlı web arama yedeği kullanıldı.')
   }
-  if (platforms.includes('tiktok') && !process.env.TIKTOK_COOKIE?.trim()) {
+  for (const error of [...tiktokLive.errors, ...instagramLive.errors]) {
+    notices.push(`${error}. Bu platformda yalnız son doğrulanmış KadeSearch ölçümleri kullanıldı.`)
+  }
+  if (platforms.includes('tiktok') && !tiktok.live) {
     notices.push('TikTok canlı erişimi bağlı değil. Doğrulanmamış veya tahmini TikTok sonuçları listeye alınmadı.')
   }
-  if (platforms.includes('instagram') && !process.env.INSTAGRAM_SESSION_ID?.trim()) {
+  if (platforms.includes('instagram') && !instagram.live) {
     notices.push('Instagram canlı erişimi bağlı değil. Doğrulanmamış veya tahmini Reels sonuçları listeye alınmadı.')
   }
 
