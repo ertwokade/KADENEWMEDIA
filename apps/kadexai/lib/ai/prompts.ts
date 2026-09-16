@@ -662,13 +662,15 @@ JSON formatı:
 // ═══════════════════════════════════════════════════════════════════════════
 // FAQ ÜRETİCİ
 // ═══════════════════════════════════════════════════════════════════════════
-export const FAQ_SYSTEM_PROMPT = `Sen içerik stratejisti ve SEO uzmanısın. İçeriklerden en sık sorulan soruları ve yanıtları çıkarıyorsun. Yanıtını SADECE JSON formatında ver.`
+export const FAQ_SYSTEM_PROMPT = `Sen içerik stratejisti ve SEO uzmanısın. İçeriklerden en sık sorulan soruları ve yanıtları çıkarıyorsun.
+Her cevap yalnız verilen içerikte açıkça yazan bilgiye dayanmalı. İçerikte olmayan hizmet bölgesi, fiyat, süre, garanti, müşteri, sonuç veya genel sektör iddiası ekleme; cevabı içerik desteklemiyorsa o soruyu hiç üretme.
+Yeterli bilgi yoksa istenenden az soru döndür. Yanıtını SADECE JSON formatında ver.`
 export function buildFAQPrompt(content: string, platform: string, count: number): string {
   return `Platform: ${platform}
 İçerik: ${content}
 Soru sayısı: ${count}
 
-Bu içerikten en değerli ${count} soru-cevap üret. SEO dostu, gerçekçi sorular olsun.
+Bu içerikten en fazla ${count} soru-cevap üret. SEO dostu, gerçekçi sorular olsun; her cevap yalnız yukarıdaki içerikte yazanlara dayansın.
 JSON: {"faqs":[{"soru":"","cevap":"","kategori":"teknik|genel|fiyat|kullanim","seo_degeri":"yüksek|orta|düşük"}],"schema_markup":"JSON-LD schema.org/FAQPage formatında markup"}`
 }
 

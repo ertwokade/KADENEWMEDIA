@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   HiOutlineLogin, HiOutlineLogout, HiOutlineHome,
@@ -38,6 +38,7 @@ import { getPackageEntitlements } from '../config/entitlements'
 import { PROJECT_CATEGORIES, PROJECT_KINDS, normalizeProjects, hasDetailContent, slugify } from '../data/projects'
 import { SERVICES as NMA_SERVICES } from '../data/newMediaAgency'
 import { useDialogBehavior } from '../hooks/useDialog'
+import { THEME_OWNER_ATTRIBUTE, THEME_RELEASE_EVENT } from '../i18n/themeOwner'
 import {
   apiFetch,
   loginApi, logoutApi, getSessionApi, changePasswordApi,
@@ -664,7 +665,7 @@ function BlogSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Blog <span>Yönetimi</span></h1>
+          <h1>Blog <span>Yazıları</span></h1>
           <p>Blog yazılarını oluşturun, düzenleyin veya silin</p>
         </div>
         <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
@@ -1102,19 +1103,19 @@ function ContentSection({ showToast }) {
   // olmalı — durum değerini değiştirmeden önce sayfanın veriyi gerçekten
   // okuduğunu doğrulayın.
   const tabs = [
-    { id: 'homepage', label: '✨ Ana Sayfa', desc: 'Ana sayfadaki tüm görünen içerikler', route: '/', status: 'static' },
-    { id: 'hero', label: '🏠 Hero', desc: 'Anasayfa başlık ve açıklama', route: '/', status: 'static' },
-    { id: 'stats', label: '📊 İstatistikler', desc: 'Sayaç verileri', route: '/', status: 'static' },
+    { id: 'homepage', label: '✨ Ana Sayfa', desc: 'Ana sayfadaki tüm görünen içerikler', route: '/', status: 'live' },
+    { id: 'hero', label: '🏠 Hero', desc: 'Eski anasayfa başlık alanı (yerine ✨ Ana Sayfa kullanılır)', route: '/', status: 'static' },
+    { id: 'stats', label: '📊 İstatistikler', desc: 'Eski anasayfa sayaç alanı (yerine ✨ Ana Sayfa kullanılır)', route: '/', status: 'static' },
     { id: 'services', label: '⚡ Hizmetler', desc: 'Hizmet kartları', route: '/hizmetler', status: 'static' },
     { id: 'faq', label: '❓ SSS', desc: 'Sıkça sorulan sorular', route: '/sss', status: 'static' },
-    { id: 'testimonials', label: '💬 Referanslar', desc: 'Müşteri yorumları', route: '/referanslar', status: 'static' },
-    { id: 'packages', label: '💰 Paketler', desc: 'Fiyatlandırma', route: '/paketler', status: 'static' },
+    { id: 'testimonials', label: '💬 Referanslar', desc: 'Müşteri yorumları', route: '/referanslar', status: 'live' },
+    { id: 'packages', label: '💰 Paketler', desc: 'Fiyatlandırma', route: '/paketler', status: 'partial', liveNote: 'Yalnız paket fiyatları (TL, USD ve fiyat notu) canlı sayfaya yansır; paket adları, kapsam ve açıklamalar sayfada sabittir.' },
     { id: 'priceCalculator', label: '🧮 Fiyat Hesaplayıcı', desc: 'Fiyat hesaplama katsayıları', route: '/fiyat-hesaplama', status: 'static' },
     { id: 'about', label: '👥 Hakkımızda', desc: 'Hikâye, istatistik ve ekip', route: '/hakkimizda', status: 'static' },
     { id: 'footer', label: '🦶 Footer', desc: 'Alt bilgi, iletişim ve sosyal medya', route: '/iletisim', status: 'static' },
     { id: 'careers', label: '💼 Kariyer', desc: 'İş ilanları', route: '/kariyer', status: 'static' },
     { id: 'basin', label: '📰 Basın', desc: 'Basın sayfası içeriği', route: '/basin', status: 'static' },
-    { id: 'nedenBiz', label: '💡 Neden Biz', desc: 'Neden Biz sayfası içeriği', route: '/neden-biz', status: 'static' },
+    { id: 'nedenBiz', label: '💡 Neden Biz', desc: 'Neden Biz sayfası içeriği', route: '/neden-biz', status: 'partial', liveNote: 'Yalnız sayısal sonuçlar (rakam ve etiket) canlı sayfaya yansır; diğer metinler sayfada sabittir.' },
     { id: 'tesekkur', label: '🙏 Teşekkür', desc: 'Teşekkür sayfası içeriği', route: '/tesekkur', status: 'static' },
     { id: 'referralProgram', label: '🎁 Referans Programı', desc: 'Referans programı sayfası içeriği', route: '/referans-programi', status: 'static' },
     { id: 'podcastWebinar', label: '🎙️ Podcast & Webinar', desc: 'Podcast & webinar sayfası içeriği', route: '/podcast-webinar', status: 'static' },
@@ -1243,6 +1244,7 @@ function ContentSection({ showToast }) {
             type="button"
             aria-selected={activeTab === tab.id}
             title={tab.status === 'live' ? `${tab.desc} — ${tab.route} sayfasında yayında`
+              : tab.status === 'partial' ? `${tab.desc} — ${tab.route} sayfasına kısmen yansır`
               : tab.status === 'no-page' ? `${tab.desc} — ${tab.route} sayfası sitede yok`
               : `${tab.desc} — ${tab.route} sayfasındaki metin kodda sabit`}
             className={`admin-tab ${activeTab === tab.id ? 'active' : ''} admin-tab--${tab.status}`}
@@ -1262,7 +1264,13 @@ function ContentSection({ showToast }) {
           className={`admin-content-notice admin-content-notice--${activeTabMeta.status}`}
           role="note"
         >
-          {activeTabMeta.status === 'no-page' ? (
+          {activeTabMeta.status === 'partial' ? (
+            <>
+              <strong>Bu bölüm canlı sayfaya kısmen bağlı.</strong>{' '}
+              <a href={activeTabMeta.route} target="_blank" rel="noopener noreferrer">{activeTabMeta.route}</a>{' '}
+              — {activeTabMeta.liveNote}
+            </>
+          ) : activeTabMeta.status === 'no-page' ? (
             <>
               <strong>Bu ekranın hedef sayfası sitede yok.</strong>{' '}
               <code>{activeTabMeta.route}</code> adresi şu anda 404 dönüyor. Buraya
@@ -2231,7 +2239,7 @@ function PartnersSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Partner <span>Yönetimi</span></h1>
+          <h1>Partner<span>ler</span></h1>
           <p>Sponsorları ve partnerleri yönetin</p>
         </div>
         <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
@@ -3512,7 +3520,7 @@ function SettingsSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Ayarlar <span>& Güvenlik</span></h1>
+          <h1>Ayar<span>lar</span></h1>
           <p>Site ayarları, SMTP ve güvenlik işlemleri</p>
         </div>
       </div>
@@ -4157,7 +4165,7 @@ function CalendarSection({ showToast }) {
                                 ))}
                                 {adminUsers.filter(u => u.email).length === 0 && (
                                   <p style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                                    Kullanıcılara e-posta adresi ekleyin (Kullanıcı Yönetimi)
+                                    Kullanıcılara e-posta adresi ekleyin (Kullanıcılar)
                                   </p>
                                 )}
                               </div>
@@ -4247,38 +4255,38 @@ function CalendarSection({ showToast }) {
 // Bu liste server/api/_lib/auth.js içindeki DEFAULT_ROLE_PERMISSIONS anahtarlarıyla
 // senkron tutulmalı — burada yalnızca görüntüleme/etiket amaçlı kopyalanmıştır.
 const PERMISSION_MODULES = [
-  { key: 'dashboard', label: 'Panel' },
+  { key: 'dashboard', label: 'Gösterge Paneli' },
   { key: 'analytics', label: 'Analitik' },
-  { key: 'blog', label: 'Blog' },
-  { key: 'content', label: 'Site İçeriği' },
+  { key: 'blog', label: 'Blog Yazıları' },
+  { key: 'content', label: 'İçerik Yönetimi' },
   { key: 'partners', label: 'Partnerler' },
-  { key: 'portfolio', label: 'Portfolyo' },
-  { key: 'linkProfiles', label: 'Link Profilleri' },
+  { key: 'portfolio', label: 'Portföy' },
+  { key: 'linkProfiles', label: 'Link Sayfaları' },
   { key: 'shortLinks', label: 'Kısa Linkler' },
-  { key: 'messages', label: 'Mesajlar' },
-  { key: 'calendar', label: 'Takvim' },
+  { key: 'messages', label: 'İletişim & CRM' },
+  { key: 'calendar', label: 'İçerik Takvimi' },
   { key: 'reminders', label: 'Hatırlatıcılar' },
   { key: 'users', label: 'Kullanıcılar' },
   { key: 'settings', label: 'Ayarlar' },
-  { key: 'activity', label: 'Aktivite Günlüğü' },
+  { key: 'activity', label: 'Aktivite Logu' },
   { key: 'systemHealth', label: 'Sistem Sağlığı' },
-  { key: 'backup', label: 'Yedekleme' },
-  { key: 'media', label: 'Medya' },
-  { key: 'crm', label: 'CRM' },
+  { key: 'backup', label: 'JSON Dışa Aktarım' },
+  { key: 'media', label: 'Medya Kütüphanesi' },
+  { key: 'crm', label: 'Kanban CRM' },
   { key: 'proposals', label: 'Teklifler' },
-  { key: 'quoteLeads', label: 'Teklif Talepleri' },
-  { key: 'portalCustomers', label: 'Müşteri Portalı' },
+  { key: 'quoteLeads', label: 'Online Teklifler' },
+  { key: 'portalCustomers', label: 'Portal Müşterileri' },
   { key: 'customerProfiles', label: 'Müşteri Profilleri' },
-  { key: 'invoices', label: 'Faturalar' },
+  { key: 'invoices', label: 'Fatura & Ödeme' },
   { key: 'coupons', label: 'Kupon/Kampanya' },
   { key: 'tasks', label: 'Görevler' },
   { key: 'subscriptions', label: 'Abonelikler' },
-  { key: 'surveys', label: 'Anketler' },
-  { key: 'referrals', label: 'Referanslar' },
+  { key: 'surveys', label: 'NPS Anketleri' },
+  { key: 'referrals', label: 'Referral Takibi' },
   { key: 'onboarding', label: 'Onboarding' },
-  { key: 'report', label: 'Rapor' },
+  { key: 'report', label: 'Rapor Oluştur' },
   { key: 'emailTemplates', label: 'E-posta Şablonları' },
-  { key: 'aiContent', label: 'AI İçerik' },
+  { key: 'aiContent', label: 'AI İçerik Üretici' },
 ]
 
 const ROLE_DEFAULT_PERMISSIONS = {
@@ -4407,7 +4415,7 @@ function UsersSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Kullanıcı <span>Yönetimi</span></h1>
+          <h1>Kullanıcı<span>lar</span></h1>
           <p>Admin paneli kullanıcılarını yönetin</p>
         </div>
         <button className="btn btn-primary" onClick={() => { resetForm(); setShowForm(true) }}>
@@ -4734,7 +4742,7 @@ function AnalyticsSection() {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Analitik <span>Paneli</span></h1>
+          <h1>Anali<span>tik</span></h1>
           <p>
             {dataSource === 'ga4'
               ? 'Google Analytics 4 verileri'
@@ -4780,6 +4788,14 @@ function AnalyticsSection() {
         <div className="admin-form" style={{ marginBottom: 16, padding: '10px 16px', background: 'color-mix(in srgb, var(--gate-accent) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--gate-accent) 15%, transparent)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
             <span>ℹ️ Şu an <strong>dahili analitik</strong> gösteriliyor. {ga4Status === 'unconfigured' ? 'Google Analytics 4 bağlantısı yapılandırılmamış.' : 'Google Analytics 4 verisi alınamadı. Bağlantı veya erişim izinleri kontrol edilmeli.'}</span>
+          </div>
+        </div>
+      )}
+
+      {dataSource === 'ga4' && !loading && data && !(data.totalVisits > 0) && (
+        <div className="admin-form" role="status" style={{ marginBottom: 16, padding: '10px 16px', background: 'color-mix(in srgb, var(--gate-accent) 6%, transparent)', border: '1px solid color-mix(in srgb, var(--gate-accent) 15%, transparent)' }}>
+          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+            ℹ️ Google Analytics 4 bağlantısı çalışıyor ancak bu dönemde GA4'e hiç ziyaret ulaşmamış. Sıfırlar ölçülmüş gerçek trafik değil; ziyaretçiler çerez onayı vermedikçe ölçüm yapılmaz ve yeni eklenen ölçüm verileri GA4'te 24–48 saat içinde görünür.
           </div>
         </div>
       )}
@@ -5181,8 +5197,8 @@ function PortfolioSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Portföy <span>Yönetimi</span></h1>
-          <p>Public /portfolio sayfasını ve proje detaylarını buradan yönetirsiniz.</p>
+          <h1>Port<span>föy</span></h1>
+          <p>Buraya eklenen yayındaki projeler /portfolio sayfasındaki sabit müşteri vitrininin altında “Projeler” bölümü olarak görünür. Özet, süreç, medya veya sonuç girilen projeler /portfolio/proje-adresi detay sayfasına bağlanır.</p>
         </div>
         <button className="btn btn-primary" type="button" onClick={openNew}>
           <HiOutlinePlus size={18} /> Yeni Proje
@@ -5209,7 +5225,7 @@ function PortfolioSection({ showToast }) {
             <p>{items.length === 0 ? 'Henüz proje eklenmemiş.' : 'Aramanıza uyan proje yok.'}</p>
             {items.length === 0 && (
               <p className="admin-empty-hint">
-                Proje eklenene kadar public portfolyo sayfası “yakında” durumu gösterir.
+                Proje eklenene kadar /portfolio yalnız sabit müşteri vitrinini (begenetik, Çiçek Otomotiv) gösterir; vitrindeki markalar bu listeden yönetilmez.
               </p>
             )}
           </div>
@@ -5919,7 +5935,7 @@ function ShopierOrdersSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Ödeme <span>Kayıtları</span></h1>
+          <h1>Ödeme Kayıtları <span>(Shopier)</span></h1>
           <p>Shopier webhook üzerinden gelen tüm sipariş denemeleri</p>
         </div>
         <button onClick={load} className="table-action-btn" disabled={loading}>{loading ? '⏳' : '🔄'} Yenile</button>
@@ -6260,7 +6276,7 @@ function NewsletterSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Newsletter <span>Aboneleri</span></h1>
+          <h1>News<span>letter</span></h1>
           <p>E-bülten abonelerini yönetin ve dışa aktarın</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -6582,7 +6598,7 @@ function RemindersSection({ showToast }) {
     <div className="admin-section">
       <div className="section-header">
         <div>
-          <h1>⏰ Hatırlatıcılar</h1>
+          <h1>Hatırlatıcı<span>lar</span></h1>
           <p>Hatırlatıcı oluşturun, zamanı gelince e-posta ve sistem içi bildirim alın.</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -7003,7 +7019,7 @@ function ProposalBuilderSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Teklif <span>Builder</span></h1>
+          <h1>Teklif<span>ler</span></h1>
           <p>Müşterilere özel teklif oluştur ve e-posta ile gönder</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
@@ -7496,7 +7512,7 @@ function TasksSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Görev <span>Atama</span></h1>
+          <h1>Görev<span>ler</span></h1>
           <p>Ekip üyelerine görev ata ve takip et</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
@@ -7648,7 +7664,7 @@ function AIContentSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>AI İçerik <span>Asistanı</span></h1>
+          <h1>AI İçerik <span>Üretici</span></h1>
           <p>Gemini AI ile içerik üretin, başlık önerin, caption yazın</p>
         </div>
       </div>
@@ -7780,7 +7796,7 @@ function SubscriptionsSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Abonelik <span>Takibi</span></h1>
+          <h1>Abonelik<span>ler</span></h1>
           <p>Aylık retainer müşterilerini takip edin ({subs.filter(s => s.status === 'aktif').length} aktif)</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
@@ -7892,7 +7908,7 @@ function NPSSurveysSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>NPS <span>Anket</span> Sistemi</h1>
+          <h1>NPS <span>Anketleri</span></h1>
           <p>Müşteri memnuniyetini ölçün ve takip edin</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
@@ -8520,7 +8536,7 @@ function OnboardingSection({ showToast }) {
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Müşteri <span>Onboarding</span></h1>
+          <h1>Onboard<span>ing</span></h1>
           <p>Yeni müşteri bilgi toplama formları ({forms.length} kayıt)</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowNew(!showNew)}>
@@ -8663,7 +8679,7 @@ ${metrics.notes ? `<div class="notes"><strong>Notlar & Sonraki Adımlar:</strong
     <div>
       <div className="admin-page-header">
         <div>
-          <h1>Rapor <span>Export</span></h1>
+          <h1>Rapor <span>Oluştur</span></h1>
           <p>Müşteri performans raporu oluştur ve indir</p>
         </div>
       </div>
@@ -8807,6 +8823,22 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
 
   const showToast = useCallback((message, type = 'success') => {
     setToast({ message, type })
+  }, [])
+
+  // Panel açıkken <html> temasını panelin kendi tercihi belirler; aksi hâlde
+  // genel sitede koyu tema seçmiş yöneticinin açık paneldeki form metni beyaz kalır.
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    const theme = darkMode ? 'dark' : 'light'
+    root.setAttribute(THEME_OWNER_ATTRIBUTE, 'admin')
+    root.setAttribute('data-theme', theme)
+    root.setAttribute('data-theme-mode', theme)
+    root.style.colorScheme = theme
+  }, [darkMode])
+
+  useLayoutEffect(() => () => {
+    document.documentElement.removeAttribute(THEME_OWNER_ATTRIBUTE)
+    window.dispatchEvent(new Event(THEME_RELEASE_EVENT))
   }, [])
 
   const toggleDarkMode = () => {
@@ -8968,7 +9000,7 @@ export default function Admin({ initialAuth = false, initialUser = null } = {}) 
     { id: 'users', label: 'Kullanıcılar', icon: HiOutlineUsers },
     { id: 'activity', label: 'Aktivite Logu', icon: HiOutlineAnnotation },
     { id: 'system-health', label: 'Sistem Sağlığı', icon: HiOutlineStatusOnline },
-    { id: 'backup', label: 'Yedekleme', icon: HiOutlineDatabase },
+    { id: 'backup', label: 'JSON Dışa Aktarım', icon: HiOutlineDatabase },
     { id: 'settings', label: 'Ayarlar', icon: HiOutlineCog },
   ])
 

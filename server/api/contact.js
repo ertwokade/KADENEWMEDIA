@@ -133,7 +133,7 @@ export default async function handler(req, res) {
             <a href="${unsubLink}" style="color:#888;">Abonelikten çık</a>
           </div>`;
           await transporter.sendMail({
-            from: `"Kade Media" <${process.env.SMTP_USER}>`,
+            from: `"Kade New Media" <${process.env.SMTP_USER}>`,
             to: sub.email,
             subject: escapeHtml(subject),
             html: safeHtml,
@@ -188,7 +188,7 @@ export default async function handler(req, res) {
         .update({ status: 'unsubscribed', unsubscribed_at: new Date().toISOString() })
         .eq('email', email.toLowerCase());
       if (error) throw error;
-      return res.status(200).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2 style="color:#eac321">Aboneliğiniz iptal edildi.</h2><p style="color:#888">Kade Media bülteninden başarıyla çıktınız.</p></body></html>');
+      return res.status(200).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2 style="color:#eac321">Aboneliğiniz iptal edildi.</h2><p style="color:#888">Kade New Media bülteninden başarıyla çıktınız.</p></body></html>');
     } catch {
       return res.status(500).send('<html><body style="font-family:Arial;text-align:center;padding:60px;background:#0a0a0a;color:#fff"><h2>Bir hata oluştu, lütfen tekrar deneyin.</h2></body></html>');
     }
@@ -284,13 +284,13 @@ export default async function handler(req, res) {
     if (transporter) {
       try {
         await transporter.sendMail({
-          from: `"Kade Media Website" <${process.env.SMTP_USER}>`,
+          from: `"Kade New Media Website" <${process.env.SMTP_USER}>`,
           to: mailTo,
           subject: cleanHeader(`🔔 Yeni Lead: ${name} — ${service || 'Genel'}`),
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#fff;border-radius:12px;">
               <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
-                <h1 style="color:#eac321;margin:0;">⚡ Kade Media</h1>
+                <h1 style="color:#eac321;margin:0;">⚡ Kade New Media</h1>
                 <p style="color:#888;margin:8px 0 0">Yeni Lead Bildirimi</p>
               </div>
               <div style="padding:30px 20px;">
@@ -319,20 +319,20 @@ export default async function handler(req, res) {
       // Thank you email
       try {
         await transporter.sendMail({
-          from: `"Kade Media" <${process.env.SMTP_USER}>`,
+          from: `"Kade New Media" <${process.env.SMTP_USER}>`,
           to: email,
-          subject: 'Mesajınız Alındı — Kade Media',
+          subject: 'Mesajınız Alındı — Kade New Media',
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px;">
               <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
-                <h1 style="color:#eac321;margin:0;">Kade Media</h1>
+                <h1 style="color:#eac321;margin:0;">Kade New Media</h1>
               </div>
               <div style="padding:30px 20px;">
                 <h2 style="color:#fff;">Merhaba ${escapeHtml(name)},</h2>
                 <p style="color:#ccc;line-height:1.8;">Mesajınız başarıyla alındı. Talebiniz incelendikten sonra verdiğiniz iletişim bilgileri üzerinden yanıtlanacaktır.</p>
                 <p style="color:#ccc;line-height:1.8;">Ek bilgi paylaşmak için bu e-postayı yanıtlayabilirsiniz.</p>
                 <hr style="border:none;border-top:1px solid #333;margin:24px 0;" />
-                <p style="color:#888;font-size:13px;">Kade Media | İstanbul<br/>thekademedia@gmail.com</p>
+                <p style="color:#888;font-size:13px;">Kade New Media | İstanbul<br/>thekademedia@gmail.com</p>
               </div>
             </div>
           `,

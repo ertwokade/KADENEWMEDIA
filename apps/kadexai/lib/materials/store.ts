@@ -84,6 +84,19 @@ export async function saveMaterials(source: string, items: MaterialItem[]): Prom
   return result
 }
 
+export const NO_ACTIVE_MATERIAL_SOURCE = 'Etkin materyal kaynağı yok: arşiv kaynağı yayını durdurdu, YouTube ve TikTok erişimi tanımlı değil. Mevcut arşiv korunuyor.'
+
+/** Tüm kaynaklar kullanılamazken de denemenin yapıldığı ve nedeni görünür kalsın. */
+export async function recordSkippedRun() {
+  const admin = createAdminClient()
+  await admin.from('kade_material_runs').insert({
+    source: 'all',
+    finished_at: new Date().toISOString(),
+    ok: false,
+    error: NO_ACTIVE_MATERIAL_SOURCE,
+  })
+}
+
 export async function recordFailedRun(source: string, error: string) {
   const admin = createAdminClient()
   await admin.from('kade_material_runs').insert({
@@ -136,5 +149,8 @@ export async function materialStats() {
     supabase.from('kade_material_runs').select('*').order('started_at', { ascending: false }).limit(1),
   ])
   if (countResult.error || runResult.error) throw new Error('Materyal istatistikleri alınamadı.')
-  return { toplam: countResult.count ?? 0, sonKosu: runResult.data?.[0] ?? null }
+  const run = runResult.data?.[0] ?? null
+  // Sağlayıcı hata ayrıntısı istemciye gönderilmez; yalnız bilinen güvenli neden gösterilir.
+  const sonKosu = run ? { ...run, error: run.error === NO_ACTIVE_MATERIAL_SOURCE ? run.error : null } : null
+  return { toplam: countResult.count ?? 0, sonKosu }
 }

@@ -90,7 +90,7 @@ export default async function handler(req, res) {
       if (transporter) {
         try {
           await transporter.sendMail({
-            from: `"Kade Media" <${process.env.SMTP_USER}>`,
+            from: `"Kade New Media" <${process.env.SMTP_USER}>`,
             to: process.env.MAIL_TO,
             subject: cleanHeader(`⚠️ Düşük NPS Puanı: ${npsScore}/10 — ${survey.client_name}`),
             html: `<p>Müşteri <strong>${escapeHtml(survey.client_name)}</strong> NPS anketi için <strong>${npsScore}/10</strong> verdi.</p><p>Kategori: ${category}</p>${comment ? `<p>Yorum: ${escapeHtml(comment)}</p>` : ''}`,
@@ -183,7 +183,7 @@ export default async function handler(req, res) {
             <h2 style="color:#111">Memnuniyet Anketimiz</h2>
             <p>Sayın ${escapeHtml(clientName)},</p>
             <p>${projectName ? `<strong>${escapeHtml(projectName)}</strong> projemizin` : 'Çalışmamızın'} tamamlanmasının ardından görüşleriniz bizim için çok değerli.</p>
-            <p style="color:#555">Kade Media ile çalışma deneyiminizi 0-10 arasında değerlendirin:</p>
+            <p style="color:#555">Kade New Media ile çalışma deneyiminizi 0-10 arasında değerlendirin:</p>
             <div style="text-align:center;margin:28px 0">
               <a href="${surveyUrl}" style="background:#eac321;color:#111;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:1rem">Anketi Doldurun (1 dakika)</a>
             </div>
@@ -193,9 +193,9 @@ export default async function handler(req, res) {
       `;
       try {
         await transporter.sendMail({
-          from: `"Kade Media" <${process.env.SMTP_USER}>`,
+          from: `"Kade New Media" <${process.env.SMTP_USER}>`,
           to: clientEmail,
-          subject: cleanHeader('Hizmet Değerlendirme — Kade Media'),
+          subject: cleanHeader('Hizmet Değerlendirme — Kade New Media'),
           html,
         });
       } catch (e) {

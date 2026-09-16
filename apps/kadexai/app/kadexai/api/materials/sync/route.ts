@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { collectArsivhub } from '@/lib/materials/arsivhub'
 import { collectTikTok } from '@/lib/materials/tiktok'
 import { collectYouTube } from '@/lib/materials/youtube'
-import { recordFailedRun, saveMaterials } from '@/lib/materials/store'
+import { recordFailedRun, recordSkippedRun, saveMaterials } from '@/lib/materials/store'
 import { failure, requireCollectorAccess } from '../../kade-search/_guard'
 import type { MaterialSyncResult } from '@/lib/materials/types'
 
@@ -59,6 +59,7 @@ export async function POST(req: Request) {
     )
     const basarili = sonuclar.filter(result => result.ok).length
     const tumuAtlandi = sonuclar.every(result => result.skipped)
+    if (tumuAtlandi && !istenen) await recordSkippedRun().catch(() => {})
     return NextResponse.json({ toplam, sonuclar,
       partial: basarili > 0 && basarili < sonuclar.length,
       ...(tumuAtlandi ? { skipped: true, message: 'Etkin materyal kaynağı yok; mevcut arşiv korunuyor.' } : {}),

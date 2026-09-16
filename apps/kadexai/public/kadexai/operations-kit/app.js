@@ -679,8 +679,19 @@ async function hydrateRemoteState(){
     if(!response.ok)return;
     const payload=await response.json();
     if(payload.state&&revisionAtStart===stateRevision){
-      state=normalizeState(deepMerge(buildInitial(),payload.state));
+      // Bulut kaydı da yerel kayıtla aynı başlangıç verisi geçişinden geçer;
+      // aksi hâlde örnek prodüksiyon ve ₺ harcamaları buluttan geri gelir.
+      const remote=clone(payload.state);
+      const hadStarter=arr(remote?.productions).some(item=>/^p-00[1-5]$/.test(String(item?.id)))||remote?.settings?.monthlyBudget===650000;
+      if(isUntouchedStarterState(remote)){
+        state=buildCleanInitial();
+      }else{
+        removeLegacyStarterData(remote);
+        const explicitEmptyArrays=new Set(isObj(remote)?Object.keys(remote).filter(k=>Array.isArray(remote[k])&&!remote[k].length):[]);
+        state=normalizeState(deepMerge(buildInitial(),remote),explicitEmptyArrays);
+      }
       storageSet(STORE_KEY,JSON.stringify(state));
+      if(hadStarter)syncStateToCloud();
       renderAll();
       runCommentAnalysis();
       updateBadge();

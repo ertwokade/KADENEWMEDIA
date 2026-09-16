@@ -149,7 +149,7 @@ export default function Home() {
             </Reveal>
             <Reveal delay={140}>
               <p className="home-top__note">
-                Kade Media — İstanbul merkezli dijital pazarlama ajansı. Sosyal medya,
+                Kade New Media — İstanbul merkezli dijital pazarlama ajansı. Sosyal medya,
                 içerik, reklam ve prodüksiyonla markanı dijitalde konumlandırıyoruz.
               </p>
             </Reveal>

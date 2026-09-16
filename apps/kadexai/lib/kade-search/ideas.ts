@@ -5,15 +5,15 @@ import 'server-only'
  * Yuksek skorlu trendleri alir, kategori + format kaliplariyla birlestirip
  * cekime hazir brief uretir: kanca, kurgu iskeleti, hashtag seti, ses onerisi.
  *
- * Ölçülmüş trend verisi önce güvenli bir taslağa dönüşür; ardından tek bir
- * toplu AI çağrısı kanca, kurgu ve CTA'yı trende özel hâle getirir. Sağlayıcı
+ * Ölçülmüş trend verisi önce güvenli bir taslağa dönüşür; ardından küçük,
+ * paralel AI grupları kanca, kurgu ve CTA'yı trende özel hâle getirir. Sağlayıcı
  * çalışmazsa kullanıcı boş kalmaz, doğrulanmış taslak döner.
  */
 import { createClient } from '@/lib/supabase/server'
 import { generateContent } from '@/lib/ai/provider'
 import { parseStructuredOutput } from '@/lib/ai/structured'
 import { normalizeGeneratedHashtags } from '@/lib/ai/hashtags'
-import { normalizeIdeaOutput } from './ideaOutput'
+import { normalizeIdeaOutput, runInBatches } from './ideaOutput'
 import { structureFor } from './structures'
 import { hasMeasuredVelocity } from './export'
 import { CATEGORIES, FORMATS, STAGES, platformLabel } from './taxonomy'
@@ -120,6 +120,16 @@ export interface ContentIdea {
   neden: string
 }
 
+// Başlık kelimelerinden etiket türetirken bağlaç ve dolgu kelimeleri atlanır
+// (#gibi, #olan, #the gibi etiketler aranmaz ve konuyu anlatmaz).
+const TAG_STOPWORDS = new Set([
+  've', 'ile', 'icin', 'gibi', 'olan', 'olarak', 'bir', 'bu', 'su', 'da', 'de', 'mi', 'mu', 'ne', 'nasil', 'neden',
+  'cok', 'daha', 'en', 'her', 'hic', 'ama', 'veya', 'ise', 'kadar', 'sonra', 'once', 'bile', 'diye', 'yeni', 'ben', 'sen',
+  'biz', 'siz', 'onlar', 'benim', 'senin', 'bunu', 'sunu', 'yok', 'var', 'oldu', 'olur', 'yapan', 'yapti', 'bolum',
+  'the', 'and', 'for', 'with', 'you', 'your', 'this', 'that', 'what', 'how', 'why', 'are', 'was', 'from', 'shorts', 'short',
+  'video', 'official', 'part', 'new', 'vs', 'amp',
+])
+
 function hashtag(value: unknown) {
   const clean = normalizeText(normalizeGeneratedHashtags(`#${String(value ?? '').replace(/^#/, '')}`).slice(1))
     .replace(/[^a-z0-9\s]/g, ' ')
@@ -131,56 +141,60 @@ function hashtag(value: unknown) {
   return clean.length >= 2 ? `#${clean}` : ''
 }
 
-async function personalizeIdeas(ideas: ContentIdea[], request?: Request) {
-  if (!ideas.length) return ideas
-  try {
-    const input = ideas.map((idea) => ({
-      trendId: idea.trendId,
-      baslik: idea.baslik.replace(/^\S+\s/, ''),
-      platform: idea.kaynak.platform,
-      kategori: idea.kategori,
-      asama: idea.kaynak.asama,
-      hacim: idea.kaynak.hacim,
-      format: idea.format.label,
-    }))
-    const result = await generateContent({
-      model: 'auto',
-      toolId: 'trend-radar',
-      maxTokens: 4000,
-      systemPrompt: `Sen Türkiye'deki içerik üreticileri için çalışan kıdemli kısa video stratejistisin.
+const PERSONALIZE_BATCH = 4
+
+async function personalizeBatch(batch: ContentIdea[], request?: Request) {
+  // Uzun UUID'ler modelde bozulabiliyordu; her fikir kısa, sıralı bir anahtarla gider.
+  const byKey = new Map(batch.map((idea, index) => [`t${index + 1}`, idea]))
+  const input = [...byKey].map(([key, idea]) => ({
+    trendId: key,
+    baslik: idea.baslik.replace(/^\S+\s/, ''),
+    platform: idea.kaynak.platform,
+    kategori: idea.kategori,
+    asama: idea.kaynak.asama,
+    hacim: idea.kaynak.hacim,
+    format: idea.format.label,
+  }))
+  const result = await generateContent({
+    model: 'auto',
+    toolId: 'trend-radar',
+    maxTokens: 3200,
+    systemPrompt: `Sen Türkiye'deki içerik üreticileri için çalışan kıdemli kısa video stratejistisin.
 Her trend için birbirinden farklı, doğrudan çekilebilir bir fikir üret. Başlığı bir kalıba yapıştırma.
-Yabancı başlığı Türk kullanıcıya anlamlı bir açıya çeviremiyorsan o kayıt için fikir üretme.
+Başlık yabancı dilde olsa bile konusunu Türk izleyiciye uyarlayan özgün bir açı bul; her trendId için mutlaka bir fikir döndür.
 Hashtagleri yalnız konu ve içerikle doğrudan ilgili, küçük harfli ASCII biçiminde yaz.
 Paylaşım saati ve CTA'yı platforma ve fikre göre seç. Saatler Europe/Istanbul saat diliminde öneridir; hesap analitiği veya ölçülmüş en iyi saat değildir.
 Kaynakta olmayan deneyim, sayı veya başarı iddiası uydurma. Yanıt yalnızca geçerli JSON olsun.`,
-      prompt: `Aşağıdaki ölçülmüş trendleri içerik briefine dönüştür:
+    prompt: `Aşağıdaki ölçülmüş trendleri içerik briefine dönüştür. trendId değerlerini aynen geri yaz:
 ${JSON.stringify(input)}
 
 JSON şeması:
-{"ideas":[{"trendId":"","kanca":"","alternatifKancalar":["",""],"kurgu":["0-3 sn: ...","3-10 sn: ...","10-30 sn: ..."],"cta":"","hashtagler":["#etiket"],"zorluk":{"level":"Düşük|Orta|Yüksek|Çok yüksek","note":""},"paylasimSaati":["19:00-21:00"],"neden":"Bu fikrin bu trende neden uyduğunu tek cümlede açıkla"}]}`,
-    }, request)
-    const parsed = parseStructuredOutput(result.content)
-    if (!Array.isArray(parsed.ideas)) return ideas
-    const byId = new Map(ideas.map((idea) => [idea.trendId, idea]))
-    for (const raw of parsed.ideas) {
-      const item = normalizeIdeaOutput(raw)
-      if (!item) continue
-      const current = byId.get(item.trendId)
-      if (!current) continue
-      current.kanca = item.kanca
-      current.kurgu = item.kurgu
-      current.cta = item.cta
-      current.uretim = 'ai'
-      if (item.alternatifKancalar.length) current.alternatifKancalar = item.alternatifKancalar
-      if (item.hashtagler.length) current.hashtagler = item.hashtagler
-      if (item.zorluk) current.zorluk = item.zorluk
-      if (item.paylasimSaati.length) current.paylasimSaati = item.paylasimSaati
-      if (item.neden) current.neden = item.neden
-    }
-    return ideas
-  } catch {
-    return ideas
+{"ideas":[{"trendId":"t1","kanca":"","alternatifKancalar":["",""],"kurgu":["0-3 sn: ...","3-10 sn: ...","10-30 sn: ..."],"cta":"","hashtagler":["#etiket"],"zorluk":{"level":"Düşük|Orta|Yüksek|Çok yüksek","note":""},"paylasimSaati":["19:00-21:00"],"neden":"Bu fikrin bu trende neden uyduğunu tek cümlede açıkla"}]}`,
+  }, request)
+  const parsed = parseStructuredOutput(result.content)
+  if (!Array.isArray(parsed.ideas)) return
+  for (const raw of parsed.ideas) {
+    const item = normalizeIdeaOutput(raw)
+    if (!item) continue
+    const current = byKey.get(item.trendId)
+    if (!current) continue
+    current.kanca = item.kanca
+    current.kurgu = item.kurgu
+    current.cta = item.cta
+    current.uretim = 'ai'
+    if (item.alternatifKancalar.length) current.alternatifKancalar = item.alternatifKancalar
+    if (item.hashtagler.length) current.hashtagler = item.hashtagler
+    if (item.zorluk) current.zorluk = item.zorluk
+    if (item.paylasimSaati.length) current.paylasimSaati = item.paylasimSaati
+    if (item.neden) current.neden = item.neden
   }
+}
+
+export async function personalizeIdeas(ideas: ContentIdea[], request?: Request) {
+  // Bir grubun hatası diğer grupların AI çıktısını kaybettirmez; başarısız
+  // gruptaki fikirler açıkça "hazır şablon" olarak kalır.
+  await runInBatches(ideas, PERSONALIZE_BATCH, (batch) => personalizeBatch(batch, request))
+  return ideas
 }
 
 /**
@@ -238,8 +252,10 @@ export async function generateIdeas(
   const suggestHashtags = (t: CurrentTrendRow) => {
     const tags = new Set<string>()
     for (const found of extractHashtags(t.title)) tags.add(found)
-    const words = normalizeText(t.title).split(/[^a-z0-9]+/).filter((word) => word.length >= 3 && word.length <= 18)
-    for (const word of words.slice(0, 4)) tags.add(word)
+    const words = normalizeText(t.title)
+      .split(/[^a-z0-9]+/)
+      .filter((word) => word.length >= 3 && word.length <= 18 && !/^\d+$/.test(word) && !TAG_STOPWORDS.has(word))
+    for (const word of words.slice(0, 3)) tags.add(word)
     const categoryTags = hashtagsByCategory.get(t.category ?? '') ?? []
     for (const tag of categoryTags) {
       if (words.some((word) => normalizeText(tag).includes(word))) tags.add(tag)

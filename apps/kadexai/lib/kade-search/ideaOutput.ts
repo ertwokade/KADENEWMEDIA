@@ -31,3 +31,11 @@ export function normalizeIdeaOutput(value: unknown) {
     neden: text(item.neden, 500),
   }
 }
+
+/** Öğeleri sabit boyutlu gruplara böler, grupları paralel çalıştırır; bir grubun hatası diğerlerini durdurmaz. */
+export async function runInBatches<T>(items: T[], size: number, run: (batch: T[]) => Promise<unknown>) {
+  const step = Math.max(1, Math.floor(size))
+  const batches: T[][] = []
+  for (let index = 0; index < items.length; index += step) batches.push(items.slice(index, index + step))
+  return Promise.allSettled(batches.map((batch) => run(batch)))
+}

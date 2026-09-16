@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { THEME_OWNER_ATTRIBUTE, THEME_RELEASE_EVENT } from './themeOwner'
 
 const ThemeContext = createContext()
 
@@ -43,6 +44,7 @@ function getStoredMode() {
 
 function applyTheme(theme) {
   const root = document.documentElement
+  if (root.hasAttribute(THEME_OWNER_ATTRIBUTE)) return
   root.setAttribute('data-theme', theme)
   root.setAttribute('data-theme-mode', theme)
   root.style.colorScheme = theme
@@ -68,6 +70,9 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     applyTheme(theme)
+    const release = () => applyTheme(theme)
+    window.addEventListener(THEME_RELEASE_EVENT, release)
+    return () => window.removeEventListener(THEME_RELEASE_EVENT, release)
   }, [theme])
 
   useEffect(() => {

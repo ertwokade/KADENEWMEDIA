@@ -140,17 +140,17 @@ export default async function handler(req, res) {
               </div>
             </div>
             <div style="padding:20px 32px;border-top:1px solid #eee;font-size:0.8rem;color:#999;text-align:center">
-              Kade Media Dijital Pazarlama | thekademedia@gmail.com
+              Kade New Media Dijital Pazarlama | thekademedia@gmail.com
             </div>
           </div>
         `;
 
         try {
           await transporter.sendMail({
-            from: `"Kade Media" <${process.env.SMTP_USER}>`,
+            from: `"Kade New Media" <${process.env.SMTP_USER}>`,
             to: clientEmail,
             cc: process.env.MAIL_TO,
-            subject: `Teklif ${proposalNumber} — Kade Media`,
+            subject: `Teklif ${proposalNumber} — Kade New Media`,
             html,
           });
           const { data: updated, error: updateError } = await supabase

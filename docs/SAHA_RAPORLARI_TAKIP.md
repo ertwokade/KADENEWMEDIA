@@ -1,8 +1,28 @@
 # Saha raporları — düzeltme takibi
 
-Güncelleme: 2026-09-15. Toplam 113 numaralı bulgu: admin 26, genel site 14, KadexAI 73. Tekrarlar ve olumlu gözlemler de özgün numarasıyla korunur; 113 ayrı hata olduğu anlamına gelmez. Güncel tek kapanış özeti `MASTER_KAPANIS_KONTROLU_TR.md` dosyasıdır.
+Güncelleme: 2026-09-16. Toplam 113 numaralı bulgu: admin 26, genel site 14, KadexAI 73. Tekrarlar ve olumlu gözlemler de özgün numarasıyla korunur; 113 ayrı hata olduğu anlamına gelmez. Güncel tek kapanış özeti `MASTER_KAPANIS_KONTROLU_TR.md` dosyasıdır.
 
 Bu dosya tamamlanan düzeltme gruplarının durumudur. Rapor düzeltmeleri, son güvenlik/dağıtım ve çıktı-sözleşmesi sertleştirmeleriyle birlikte `origin/main` dalına gönderildi. GitHub kalite kontrolleri, GitHub Actions Keyubu dağıtımı ve Vercel üretim dağıtımı başarıyla tamamlandı; ana site Vercel'de, KadexAI Keyubu'da çalışıyor. CallMeBot ayarları geri yüklendi; Telegram teslim katmanı, sağlayıcı kullanılabilirlik koruması ve yedekten gerçek geri yükleme testi eklendi. Ayrıntılar `ENTEGRASYON_INCELEMESI.md` içindedir. Rapor içindeki 100 yeni özellik fikri bu hata listesine dahil değil.
+
+## 16 Eylül canlı denetim düzeltmesi
+
+Üç rapor gerçek hesapla (admin + KadexAI sahip oturumu) Chrome'da yeniden gezildi; bu belgede "düzeltildi" yazan dört madde canlıda hâlâ açık çıktı, ayrıca yeni hatalar bulundu. Hepsi kodda kapatıldı:
+
+- **Admin AI İçerik Üretici kesik çıktı (yeni, kritik):** `server/api/chat.js` Gemini cevabının yalnız son metin parçasını (`.at(-1)`) alıyordu; "5 başlık" isteği tek yarım satır gösteriyordu. Tüm düşünce dışı parçalar birleştiriliyor (`_lib/gemini-text.js`, birim testli).
+- **Admin form metni görünmüyordu (yeni):** genel sitede koyu tema seçilince `html[data-theme="dark"] textarea {color:#fff}` açık admin paneline sızıyordu. Admin açıkken `<html>` temasını panelin kendi tercihi belirliyor, çıkışta site teması geri yükleniyor.
+- **İçerik Yönetimi çelişkili uyarı (yeni):** 18 sekmenin tamamı "kayıt sayfada görünmez" diyordu. Canlı ağ ölçümüyle Ana Sayfa ve Referanslar `live`, Paketler (fiyat) ve Neden Biz (rakamlar) `partial` olarak işaretlendi; test artık klon betiklerinin okuduğu bölümleri kaynaktan çıkarıyor.
+- **Admin #21:** 16 ekran başlığı ve yetki listesi etiketleri menü adlarıyla eşitlendi ("Blog Yönetimi"→"Blog Yazıları", "Rapor Export"→"Rapor Oluştur" vb.; "Yedekleme" menüsü gerçek kapsamıyla "JSON Dışa Aktarım").
+- **Admin #12 / Genel #04:** Portföy ekranı "public sayfa 'yakında' gösterir" diyordu; canlı sayfa sabit vitrin + CMS projelerini gösteriyor. Metin gerçeğe göre düzeltildi. `/portfolio/begenetik` bir CMS projesi değil marka kartı olduğu için 404 doğru davranıştır.
+- **Admin #09 (kök neden):** GA4 API bağlı ve çalışıyor, ama canlı pazarlama sayfaları statik klon olduğundan GA etiketi, çerez bandı ve iç sayfa görüntüleme sayacı hiç yüklenmiyordu. Statik sayfalara onaya bağlı `kade-analytics.js` eklendi (onaysız hiçbir istek yok); ölçüm kimliği yalnız geçerliyse `/api/content?action=analytics-config` ile veriliyor. GA4 bağlı ama veri yokken Analitik ekranı bunu açıkça söylüyor.
+- **Genel site (yeni):** `homepage-admin.js` her sayfada çalışıp iç sayfaların başlık/açıklamasını ezebiliyor ve boş gizli h1 ekliyordu (`/paketler`); yalnız ana sayfaya sınırlandı. "KADE MEDİA", "KADE KİT BUSİNESS" gibi Türkçe kuralla büyütülen İngilizce adlar `lang="en"` ile düzeltildi; React tarafındaki "Kade Media" görünen metinleri resmî ad "Kade New Media" ile eşitlendi.
+- **KadexAI #01:** Canlıda 12 fikrin 8'i şablonda kalıyordu. 12 fikir tek istek/4000 token ve uzun UUID ile gidiyordu; cevap kesilince veya kimlik bozulunca AI çıktısı eşleşmiyordu. Fikirler 4'erli paralel gruplar ve kısa anahtarlarla işleniyor; bir grubun hatası diğerlerini silmiyor.
+- **KadexAI #07:** Başlıktan türetilen `#gibi #olan` gibi bağlaç etiketleri eleniyor.
+- **KadexAI #05 (kök neden):** 2 saatlik döngü erişimi olmayan TikTok/Instagram dilimlerinde her gün 4 kez sıfır kayıt ve yanlış kaynak uyarısı üretiyordu (16.09 11:17 = TikTok dilimi). Döngü yalnız veri alınabilen kaynaklar arasında dönüyor; erişim eklenince kaynak kendiliğinden döngüye giriyor.
+- **Materyal Kütüphanesi:** tüm kaynaklar kullanılamazken deneme kaydedilmiyor, ekran 12.09 tarihli "tamamlanamadı" gösteriyordu. Deneme ve güvenli nedeni kayda geçiyor.
+- **KadexAI #13:** Operasyon Merkezi örnek verisi (₺274.440) buluttan geri geliyordu: başlangıç verisi geçişi yalnız tarayıcı kaydına uygulanıyordu. Bulut kaydı da aynı geçişten geçiyor ve temizlenmiş hâli buluta yazılıyor.
+- **Viral Skor:** eşit puanda "Kazanan" yerine "Berabere" gösteriliyor. **FAQ Üretici:** kaynakta olmayan iddia (ör. hizmet bölgesi) üretmemesi için talimat sıkılaştırıldı.
+- **KadexAI #27 düzeltmesi:** Canlı Ayarlar → Altyapı ekranında Google OAuth istemci kimliği/sırrı ve YouTube API anahtarı **eksik** görünüyor; önceki "mevcut" kaydı geçersizdir. Kanal bağlantısı için bu üç değer gerekir.
+- **KadexAI #14:** Şirket hafızası canlıda %31, brief boş; kullanıcı verisi olduğu için doldurulmadı.
 
 ## Güvenlik ve kapsam
 
@@ -84,10 +104,10 @@ Kaynak: `/Users/kadirdemir/Desktop/adminpanelraporu.html`
 | 06 | Aynı kelimenin içinde hem doğru hem yanlış Türkçe harf | Bu tur: Hatırlatıcılar ekranı, formu ve hata/başarı metinlerinin Türkçe karakterleri düzeltildi. |
 | 07 | İngilizce koleksiyon adlarına Türkçe büyütme kuralı uygulanmış | Bu tur: tablo adlarının otomatik büyük harfe dönüşmesi kaldırıldı; eski MongoDB açıklaması düzeltildi. |
 | 08 | Sayaçlar ilk yüklemede sıfır gösterip sonra doluyor | Bu tur: yükleniyor, hata ve gerçek sıfır ayrıldı; yeniden deneme eklendi. Masaüstü/mobil testleri geçti. |
-| 09 | Google Analytics tamamen sıfır, yapılandırma durumu belirsiz | Düzeltildi: UI ve gerçek GA4 route kodunda yapılandırılmamış, erişilemeyen ve gerçek sıfır ayrıldı. Token/rapor reddi başarılı sıfır dönmüyor. 12 Eylül canlı denetiminde Vercel'deki üç GA4 değerinin örnek/placeholder olduğu kanıtlandı; kod bunları artık yapılandırılmış saymıyor veya Google'a göndermiyor. Gerçek property ve servis hesabı kullanıcıdan bekleniyor. |
+| 09 | Google Analytics tamamen sıfır, yapılandırma durumu belirsiz | 16 Eylül kök neden: GA4 API bağlı ama statik canlı sayfalar ölçüm göndermiyordu. Onaya bağlı statik ölçüm betiği ve "bağlı ama veri yok" bildirimi eklendi. |
 | 10 | Beş partnerin beşi de uydurma seed verisi | İşletme kararı: seed kayıtları silinmedi; gerçek partner bilgileri gerekli. |
 | 11 | "Veritabanını Başlat" düğmesi tek adımlık, uyarısız | Bu tur: seed işlemi öncesinde yedek hatırlatmalı açık onay eklendi; gerçek seed çalıştırılmadı. |
-| 12 | "0 proje" diyor ama canlı sayfa dolu — CMS ile site bağlantısız | Önceki CMS portföy bağlantısı kodda mevcut; statik referans vitrini ayrı kalıyor. İçerik sahipliği ve canlı doğrulama bekliyor. |
+| 12 | "0 proje" diyor ama canlı sayfa dolu — CMS ile site bağlantısız | 16 Eylül: canlıda metin hâlâ yanlıştı; sabit vitrin + CMS projeleri ayrımını anlatan metinle düzeltildi. |
 | 13 | Aynı pipeline aşaması iki ayrı görünümde iki farklı isim taşıyor | Bu tur: Görüşme Bekliyor etiketi eşitlendi; veritabanı aşama kimlikleri korunuyor. |
 | 14 | Gerçek talepler test kayıtlarıyla aynı listede, ayrıştırılmamış | Yerel düzeltme: CRM ve ayrı Kanban'da tüm/test işareti olmayan/olası test filtresi var. Sayımlar ve dışa aktarma görünür filtreyi izliyor. İşaretler yalnız ipucu; gerçek kayıt silinmedi. Birim ve masaüstü/mobil test geçti. |
 | 15 | Hizmet alanı iki farklı formatta karışık | Yerel düzeltme: kodlar ve virgüllü/dizi hizmetler ortak Türkçe etikete dönüştürülüyor; özel adlar korunuyor. Tablo, detay, Kanban ve Excel aynı gösterimi kullanıyor. Test geçti. |
@@ -96,7 +116,7 @@ Kaynak: `/Users/kadirdemir/Desktop/adminpanelraporu.html`
 | 18 | Sayfa canlı değil, tek kayıt test verisi | Yerel: `/referans-programi` rotası mevcut ve üretim çıktısında üretiliyor; adminin yanlış “Sayfa henüz yayında değil” etiketi gerçek sayfaya açılan bağlantıyla değiştirildi ve masaüstü/mobil test edildi. Rapordaki test kayıt gerçek veriden ayrıştırılmadan silinmedi. |
 | 19 | "İşletme Adı" alanında kurumsal değil kişisel kimlik | İşletme kararı: marka/işletme bilgileri tahmin edilerek değiştirilmedi. |
 | 20 | Dört admin kullanıcısının ikisinde e-posta kaydı yok | İşletme kararı: kade dahil mevcut admin yetkileri korunuyor; e-posta eksikliği tek başına yetki kaldırma gerekçesi değil. |
-| 21 | KadexAI raporundaki isim tutarsızlığı burada da var | Doğrulandı: yönetim menüsünde `Blog Yazıları` ve `Rapor Oluştur` etiketleri kullanılıyor; eski tutarsız adlar kaynakta yok. |
+| 21 | KadexAI raporundaki isim tutarsızlığı burada da var | 16 Eylül: önceki "doğrulandı" kaydı yanlıştı (Blog Yönetimi, Rapor Export). 16 ekran başlığı ve yetki etiketleri menüyle eşitlendi. |
 | 22 | Sekiz gündür yeni yazı eklenmemiş | İçerik operasyonu: yazı yayın sıklığı kod hatası değil; kullanıcı adına yeni yazı yayınlanmadı. |
 | 23 | Çalışma süresi ters sırada yazılmış | Bu tur: çalışma süresi sa/dk/sn olarak açık gösteriliyor; geçersiz değer bilinmiyor olarak gösteriliyor. |
 | 24 | Dört bölüm tamamen boş, dördü de birbirine bağlı değil | Ürün kapsamı: görev, abonelik, NPS ve onboarding ekranlarının boş olması kod arızası değildir. Gerçek müşteri/iş akışı verisi uydurulmadı; bunları tek süreçte birleştirmek ayrı ürün kararıdır. |
@@ -112,7 +132,7 @@ Kaynak: `/Users/kadirdemir/Desktop/genelsiteraporu.html`
 | 01 | Üç yayında yazının üçü de blog listesinde görünmüyor | Düzeltildi ve dağıtıldı: liste/tarih düzeltmesi mevcut; API hatası boş yayın gibi sunulmuyor. Serbest Türkçe tarih ve güvenli metin çizimi masaüstü/mobilde geçti; canlı blog rotası HTTP 200. |
 | 02 | İki bağımsız tasarım sistemi aynı domain altında, hiçbiri sistem temasını dinlemiyor | Yerel: ilk girişte zorunlu açık tema kaydı kaldırıldı; snapshot/React/statik sayfalarda sistem değişimi ve manuel tercihin rota değişiminde korunması masaüstü/mobilde geçti. Tasarım sistemleri birleştirilmedi. |
 | 03 | Admin panelinin altı "sayfa sitede yok" uyarısının hepsi yanlış | Admin #02 ile aynı bulgu; kaynak/rota eşleşmesi düzeltildi, birim testinde korunuyor ve üretime dağıtıldı. |
-| 04 | Admin'in "0 proje" dediği portföy, canlıda dolu — çünkü farklı bir kaynaktan geliyor | Admin #12 ile aynı konu; CMS bağlantısı kodda mevcut, statik vitrin ayrı. |
+| 04 | Admin'in "0 proje" dediği portföy, canlıda dolu — çünkü farklı bir kaynaktan geliyor | Admin #12 ile birlikte 16 Eylül'de admin metni gerçeğe göre düzeltildi. |
 | 05 | Proje detay rotası tanımlı ama tamamen ölü | Kodda dinamik detay rotası ve sunucu doğrulaması mevcut; yayınlanmayan/geçersiz slug SPA kabuğu yerine 404 döner. Gerçek yayınlanmış proje verisi olmadan içerik uydurulmadı. |
 | 06 | E-posta adresi büyük harfe çevrilerek gösteriliyor | Bu tur: React footer e-posta adresinde büyük harf dönüşümü kaldırıldı; statik footer zaten korumalı. |
 | 07 | İki ayrı rota, birebir aynı içerik | Yerel: Referanslar, portföy kopyası yerine CMS müşteri yorumlarını gösteriyor; boş/hata ayrımı ve yayınlanmayan satırların gizlenmesi test edildi. Portföy verisi silinmedi. |
@@ -130,11 +150,11 @@ Kaynak: `/Users/kadirdemir/Desktop/kadexaisaharaporu.html`
 
 | No | Rapordaki bulgu | Durum / kalan doğrulama |
 | --- | --- | --- |
-| 01 | Fikir üretimi yapay zekâ kullanmıyor, şablon dolduruyor | AI çağrısı zaten mevcut. Bu tur: Radar’da AI/şablon kaynağı açık etiketleniyor; eksik kanca/kurgu/CTA cevabı kişiselleştirme sayılmıyor. Birim ve mobil/masaüstü testleri geçti; gerçek model kalitesi ayrıca kontrol edilecek. |
+| 01 | Fikir üretimi yapay zekâ kullanmıyor, şablon dolduruyor | 16 Eylül canlı: 12 fikrin 8'i şablondaydı. Tek büyük istek yerine 4'erli paralel gruplar ve kısa kimliklerle düzeltildi; grup hatası diğerlerini silmiyor. |
 | 02 | Radar yabancı içerikle dolu, Türk kullanıcı için kullanılamaz | Kısmi: ülke/dil filtreleri mevcut; tüm ülkeler seçiminin tekrar TR'ye düşmesi ve Radar/İçerik Fikirleri'nde sorguya aktarılmayan filtreler düzeltildi. Yanlış etiketli canlı kayıtların dil kalitesi ayrıca değerlendirilecek. |
 | 03 | Her trendde “1 ölçüm” — hız motoru ölü | Yerel sahte hız korumaları test edildi. 7 Eylül canlı örnekleminde 1000 kaydın 240'ında çoklu/doğrulanmış ölçüm var; motor tamamen ölü değil. Tek ölçümlü ve türetilmiş kayıtlar hâlâ açıkça ayrılıyor. |
 | 04 | Altı kaynağın üçü anahtarsız | Canlı yapılandırma: arayüz kaynakları “yapılandırılmış / anahtarsız / çıkarım” diye ayırıyor ve türetilmiş kayıtları gerçek ölçüm gibi sunmuyor. YouTube API, TikTok çerezi ve Instagram erişimi gerçek hesap/anahtar ister; değer uydurulmadı. |
-| 05 | Bugünkü zamanlanmış toplama sıfır kayıt getirdi | 7 Eylül canlı son altı koşu kayıt buldu (42,40,247,100,195,10); bir koşu kısmi. Önceki günün sıfır sonucu bugünkü tüm toplayıcıların bozuk olduğunu göstermiyor. Eksik kaynak anahtarları ayrı izleniyor. |
+| 05 | Bugünkü zamanlanmış toplama sıfır kayıt getirdi | 16 Eylül kök neden: döngü erişimsiz TikTok/Instagram dilimlerinde sıfır kayıt üretiyordu. Döngü yalnız erişimi olan kaynaklarda dönüyor. |
 | 06 | Kategori ataması güvenilmez | Yerel sınıflandırıcı boş sinyali rastgele kategoriye atamıyor; `diğer` + 0 güven döndürüyor. Yakın iki adayda kesin kategori iddia etmiyor, `diğer` altında adayları ve düşük güveni koruyor; resmi YouTube/TikTok kategori sinyalleri ayrı ağırlık alıyor. Birim testi geçti; canlı yabancı başlık kalitesi ayrıca ölçülmeli. |
 | 07 | Hashtag üretimi bozuk | Radar AI çıktısı ortak etiket normalleştirmesine bağlandı; nesne/bozuk etiketler eleniyor, Türkçe etiketler tutarlı dönüştürülüp tekilleştiriliyor. Test geçti; konu uygunluğu gerçek model çıktısıyla değerlendirilecek. |
 | 08 | Kullanıcıya görünen metinde Türkçe karakterler silinmiş | Yerel: 20 Radar formatı ve aşama açıklamalarının Türkçesi düzeltildi. Yalnız ç/ö/ü içeren yabancı metin otomatik Türkçe sayılmıyor; dil sınıflandırma testi geçti. |
@@ -142,7 +162,7 @@ Kaynak: `/Users/kadirdemir/Desktop/kadexaisaharaporu.html`
 | 10 | Aynı uyarı defalarca üretiliyor | Yerel: aynı çapraz-platform mesajı üretimde ve okumada tekilleştiriliyor; eski satırlar silinmedi. Trend ID'sinin uyarı ID'sini ezmesi ve aynı platformun fazladan sayılması düzeltildi. Gerçek store koduyla dört regresyon testi geçti. |
 | 11 | Sonuçlarda dil ve ülke filtresi yok | Yerel düzeltme: ülke/dil ve diğer desteklenen filtreler Trendler/Radar/Fikirler sorgusuna aktarılıyor; genel Nabız/Uyarılar için uygulanmadığı açık ve kontroller pasif. Eski ağ yanıtı yeni filtre sonucunu ezemiyor; parametre sınırları güvenli. Birim ve masaüstü/mobil test geçti. |
 | 12 | Ses önerisi içerikle ilgisiz | Kodda ses önerisi yalnız trendin kendisi sound ise kendi başlık/kaynak adresinden geliyor; rastgele başka şarkı seçilmiyor. Gerçek model/medya kalite kontrolü ayrıca bekliyor. |
-| 13 | Canlı panelde örnek veri gerçek gibi duruyor | Yerel: yeni çalışma alanı temiz açılıyor; eski dokunulmamış başlangıç seti temiz duruma taşınıyor, değiştirilmiş veri korunuyor. Başlangıç verisi açıkça etiketli ve tek tıkla temizlenebilir; sağlayıcı yokken sahte görsel/video veya maliyet kaydı üretilmiyor. |
+| 13 | Canlı panelde örnek veri gerçek gibi duruyor | 16 Eylül: örnek veri buluttan geri geliyordu; bulut kaydı da başlangıç verisi geçişinden geçiyor. |
 | 14 | Marka briefi yarım kalıyor, uyarı şeridi pasif | Mevcut uyarıda Bilgileri tamamla bağlantısı /kadexai/onboarding'e gidiyor; boş brief kullanıcı adına doldurulmadı. Yerel UI bağlantısı doğrulandı. |
 | 15 | “Telefona ekle” bandı içeriğin üstünü kapatıyor | Yerel: kurulum kartı Genel Bakış sayfasının normal akışında; araç formlarını örtmüyor. Kapatma hedefi 44×44, klavye ve depolama erişilemezken kapatma çalışıyor. Dört masaüstü/mobil testi geçti; ekran görüntüsü incelendi. |
 | 16 | Zorluk değerlendirmesi sabit | Kısmi: ölçüm yokken yedek zorluk “Belirsiz”; AI zorluk etiketleri doğrulanıyor ve öneri olduğu açıklanıyor. Hesap analitiğinden ölçülmüş rekabet modeli kurulmadı. |
@@ -156,7 +176,7 @@ Kaynak: `/Users/kadirdemir/Desktop/kadexaisaharaporu.html`
 | 24 | Paketle satılan araç canlıda kapalı | Taşınma sonrasında video servisi yapılandırılmıştı; güncel uçtan uca üretim tekrar doğrulanacak. |
 | 25 | Beş adımlı zincirin çıktısı ham JSON dökümü | Bu tur: akışın kullandığı ortak çıktı göstericisinde iç içe Markdown, numaralı listeler ve kod blokları düzeltildi. SSR testleri geçti; gerçek beş adımlı üretim ayrıca doğrulanacak. |
 | 26 | Akış, adımlar arasında bozulmuş metin taşıyor | Yerel: ham JSON kesmek yerine etiketli/sınırlı bağlam taşınıyor; bozuk/eksik adım çıktısında zincir duruyor. İlerleme ve bildirim toplam adımı doğru gösteriyor. Gerçek runner ile hata/başarı birim testleri geçti. |
-| 27 | YouTube’a yükleme kapalı | Canlı OAuth istemci kimliği/gizlisi ve belirteç şifreleme anahtarı mevcut. YouTube API anahtarı 403 verdiği için veri bağlantısı geçici kapalı; yükleme için hesap sahibinin Google kanal onayı hâlâ gerekli. |
+| 27 | YouTube’a yükleme kapalı | 16 Eylül canlı Altyapı: Google OAuth istemci kimliği/sırrı ve YouTube API anahtarı eksik. Hesap sahibi girdisi bekliyor. |
 | 28 | 553 materyal var, hiçbirinin önizlemesi yok | Düzeltildi: güvenli küçük resim proxy'si, fotoğraf yedeği, hata göstergesi, erişilebilir önizleme penceresi, 60'lık sayfalama, geç yanıt koruması ve kısmi toplama durumu test edildi. Canlı iki örnek resim JPEG/200. 12 Eylül'de Arsivhub sitemap'leri 410 ile kaldırıldı; mevcut 553 kayıt korunuyor ve tüm dış kaynaklar kullanılamazken zamanlanmış iş artık bunu sunucu arızası diye raporlamıyor. Gerçek video oynatımı kullanıcı oturumuyla ayrıca doğrulanacak. |
 | 29 | Üretim 40-70 saniye sürüyor, ilerleme göstergesi yok | Yerel: uzun süren medya üretimlerinde aşamalı yüklenme/uzun işlem göstergesi; zincirlerde adım/toplam ilerleme mevcut. Gerçek sağlayıcı süreleri dağıtım sonrası ölçülmeli. |
 | 30 | Platformun kendi kazıyıcısı var ama hiçbir analiz aracı kullanmıyor | Ürün kapsamı: kazıyıcı materyal havuzu/Radar verisi üretir; analiz araçları kullanıcı girdisi ve hesap yetkisiyle çalışır. Bu iki veri alanını otomatik birleştirmek içerik sahipliği/onay akışı gerektirir; rastgele materyal kullanıcı analizine sokulmadı. |

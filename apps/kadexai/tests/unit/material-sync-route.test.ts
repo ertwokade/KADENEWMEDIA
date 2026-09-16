@@ -24,7 +24,7 @@ function syncRoute({ archiveFails = false, archiveUnavailable = false, denied = 
     } }
     if (name === '@/lib/materials/youtube') return { collectYouTube: async () => { collected.push('youtube'); return [] } }
     if (name === '@/lib/materials/tiktok') return { collectTikTok: async () => { collected.push('tiktok'); return { items: [], reason: 'Private config detail' } } }
-    if (name === '@/lib/materials/store') return { recordFailedRun: async () => {}, saveMaterials: async (source: string) => { saved.push(source); return { source, ok: true, found: 1, inserted: 1, updated: 0 } } }
+    if (name === '@/lib/materials/store') return { recordFailedRun: async () => {}, recordSkippedRun: async () => { saved.push('skipped-run') }, saveMaterials: async (source: string) => { saved.push(source); return { source, ok: true, found: 1, inserted: 1, updated: 0 } } }
     throw new Error(`Unexpected import: ${name}`)
   } })
   return { post: (source = '') => exports.POST(new Request(`http://localhost/api/materials/sync${source ? `?source=${source}` : ''}`, { method: 'POST' })), collected, saved }
@@ -61,10 +61,11 @@ test('all failed or skipped sources return a failure without exposing provider d
 })
 
 test('all unavailable sources are a successful no-op that preserves the existing archive', async () => {
-  const { post } = syncRoute({ archiveUnavailable: true })
+  const { post, saved } = syncRoute({ archiveUnavailable: true })
   const response = await post()
   const body = await response.json()
   assert.equal(response.status, 200)
+  assert.deepEqual(saved, ['skipped-run'], 'denemenin nedeni kayda geçer, arşiv üzerine yazılmaz')
   assert.equal(body.skipped, true)
   assert.equal(body.partial, false)
   assert.equal(body.error, undefined)

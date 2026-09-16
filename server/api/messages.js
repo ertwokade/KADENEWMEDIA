@@ -63,22 +63,22 @@ export default async function handler(req, res) {
         connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000,
       });
 
-      const mailSubject = cleanHeader(subject || `Re: Kade Media — ${message.service && message.service !== '-' ? message.service : 'İletişim'}`);
+      const mailSubject = cleanHeader(subject || `Re: Kade New Media — ${message.service && message.service !== '-' ? message.service : 'İletişim'}`);
 
       await transporter.sendMail({
-        from: `"Kade Media" <${smtpUser}>`,
+        from: `"Kade New Media" <${smtpUser}>`,
         to: message.email,
         subject: mailSubject,
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#fff;border-radius:12px;">
             <div style="text-align:center;padding:16px 0;border-bottom:1px solid #333;">
-              <h2 style="color:#eac321;margin:0;">⚡ Kade Media</h2>
+              <h2 style="color:#eac321;margin:0;">⚡ Kade New Media</h2>
             </div>
             <div style="padding:24px 20px;">
               <p style="color:#ccc;margin:0 0 8px;">Merhaba ${escapeHtml(message.name)},</p>
               <div style="margin:20px 0;padding:16px;background:#1a1a1a;border-radius:8px;border-left:3px solid #eac321;white-space:pre-wrap;line-height:1.7;color:#e0e0e0;">${escapeHtml(replyText)}</div>
               <hr style="border:none;border-top:1px solid #222;margin:24px 0;" />
-              <p style="color:#888;font-size:12px;margin:0;">Kade Media | İstanbul<br/>thekademedia@gmail.com</p>
+              <p style="color:#888;font-size:12px;margin:0;">Kade New Media | İstanbul<br/>thekademedia@gmail.com</p>
             </div>
           </div>
         `,

@@ -4,6 +4,7 @@ import { requirePermission } from './_lib/auth.js';
 import { getSupabase } from './_lib/supabase.js';
 import { logActivity } from './_lib/notify.js';
 import { aiDateContext } from './_lib/ai-date-context.js';
+import { geminiResponseText } from './_lib/gemini-text.js';
 
 async function logAiUsage(scope, model, usageMeta) {
   try {
@@ -19,12 +20,12 @@ async function logAiUsage(scope, model, usageMeta) {
   } catch (e) { /* non-fatal */ }
 }
 
-const KADE_CONTEXT_TR = `Sen Kade Media'nın web sitesi asistanısın.
-Yalnızca şu doğrulanmış bilgileri kullan: Kade Media İstanbul merkezli bir dijital pazarlama markasıdır. Hizmet alanları sosyal medya yönetimi, içerik üretimi, reklam yönetimi, video prodüksiyon, strateji danışmanlığı ve web sitesi tasarımıdır. İletişim e-postası thekademedia@gmail.com adresidir.
+const KADE_CONTEXT_TR = `Sen Kade New Media'nın web sitesi asistanısın.
+Yalnızca şu doğrulanmış bilgileri kullan: Kade New Media İstanbul merkezli bir dijital pazarlama markasıdır. Hizmet alanları sosyal medya yönetimi, içerik üretimi, reklam yönetimi, video prodüksiyon, strateji danışmanlığı ve web sitesi tasarımıdır. İletişim e-postası thekademedia@gmail.com adresidir.
 Fiyat, süre, ekip büyüklüğü, müşteri, başarı metriği, adres, telefon veya sosyal medya hesabı uydurma. Bu konularda yazılı teklif veya e-posta ile doğrulama öner.`;
 
-const KADE_CONTEXT_EN = `You are the Kade Media website assistant.
-Use only these verified facts: Kade Media is an Istanbul-based digital marketing brand. Its service areas are social media management, content production, ad management, video production, strategy consulting, and website design. The verified contact email is thekademedia@gmail.com.
+const KADE_CONTEXT_EN = `You are the Kade New Media website assistant.
+Use only these verified facts: Kade New Media is an Istanbul-based digital marketing brand. Its service areas are social media management, content production, ad management, video production, strategy consulting, and website design. The verified contact email is thekademedia@gmail.com.
 Do not invent prices, timing, team size, clients, performance metrics, address, phone numbers, or social accounts. Recommend verification by written proposal or email.`;
 
 const ADMIN_CONTEXT = `Sen bir dijital pazarlama ve içerik üretim uzmanısın. Kısa, doğrudan ve üretime hazır Türkçe içerik üret. Süsleme veya açıklama ekleme; sadece istenen çıktıyı ver.`;
@@ -113,16 +114,14 @@ export default async function handler(req, res) {
     }
 
     const data = await apiRes.json();
-    const text = data?.candidates?.[0]?.content?.parts
-      ?.filter(part => typeof part?.text === 'string' && part.thought !== true)
-      .at(-1)?.text;
+    const text = geminiResponseText(data);
 
     if (text) {
       await logAiUsage(isAdmin ? 'admin' : 'public', 'gemini-3.6-flash', data?.usageMetadata);
       if (isAdmin) {
         await logActivity({ action: 'AI içerik üretildi', detail: 'İçerik üretimi tamamlandı.', type: 'create', icon: '✨', user: adminUser.username });
       }
-      return res.status(200).json({ reply: text.trim() });
+      return res.status(200).json({ reply: text });
     }
     if (isAdmin) {
       return res.status(502).json({ error: 'Gemini yanıtı boş döndü. Prompt içeriğini kontrol edin.' });

@@ -474,6 +474,22 @@
     event.preventDefault();event.stopImmediatePropagation();control.click();
     },true);
   }
+  /* Büyük harfe çevrilen İngilizce adlar Türkçe kuralla "MEDİA", "LİNKEDİN"
+     olarak basılıyordu. Yalnız bu adları taşıyan ve CSS ile büyütülen öğeye
+     lang="en" verilir; metin değişmez, Türkçe kelimeler Türkçe kalır. */
+  var EN_NAMES=/\b(Kade New Media|Kade Media|Kade Kit Business|Business|Media|Podcast|Webinar|LinkedIn|TikTok|KadexAI|Studio|Links?)\b/i;
+  function markEnglishUppercase(){
+    var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+    var seen=[];
+    while(walker.nextNode()){
+      var node=walker.currentNode;var parent=node.parentElement;
+      if(!parent||parent.closest('[lang]:not(html)')||!EN_NAMES.test(node.nodeValue||''))continue;
+      if(/[çğışöüÇĞİŞÖÜ]/.test(node.nodeValue))continue;
+      if(getComputedStyle(parent).textTransform!=='uppercase')continue;
+      seen.push(parent);
+    }
+    seen.forEach(function(el){el.setAttribute('lang','en')});
+  }
   function normalizeBrand(){
     setMode(document.documentElement.classList.contains('dark')?'dark':'light');
     document.querySelectorAll('a.brand').forEach(function(brand){
@@ -519,6 +535,8 @@
         bindControls();
         setMode(resolvedMode());
         normalizeBrand();
+        markEnglishUppercase();
+        setTimeout(markEnglishUppercase,2000);
       },100);
     },100);
   }
@@ -527,7 +545,7 @@
     else addEventListener('load',startEnhancements,{once:true});
   }else{
     bindControls();
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setMode(resolvedMode());normalizeBrand()});
-    else{setMode(resolvedMode());normalizeBrand()}
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setMode(resolvedMode());normalizeBrand();markEnglishUppercase();setTimeout(markEnglishUppercase,2000)});
+    else{setMode(resolvedMode());normalizeBrand();markEnglishUppercase();setTimeout(markEnglishUppercase,2000)}
   }
 })();

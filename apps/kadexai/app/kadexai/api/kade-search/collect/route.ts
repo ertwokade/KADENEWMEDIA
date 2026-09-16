@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { collectSource, finalizeCollection, isSourceId } from '@/lib/kade-search/collect'
 import { SOURCE_ORDER } from '@/lib/kade-search/collectors'
 import { replaceSourceHealthAlert } from '@/lib/kade-search/store'
+import { instagramAccess, tiktokAccess } from '@/lib/kade-search/officialSocial'
+import { rotationSource } from '@/lib/kade-search/rotation'
 import { adminNotificationConfiguration, sendAdminNotification } from '@/lib/notifications/adminDelivery'
 import { failure, requireCollectorAccess } from '../_guard'
 
@@ -67,8 +69,8 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Vercel Cron yalnız GET gönderir. Cron iki saatte bir çalışır ve kaynakları
- * döngüsel tarar; böylece her kaynak günde iki kez yeniden ölçülür. Altı ağır
+ * Vercel Cron yalnız GET gönderir. Cron iki saatte bir çalışır ve erişimi olan
+ * kaynakları döngüsel tarar; böylece her kaynak günde iki kez yeniden ölçülür. Altı ağır
  * toplayıcıyı tek isteğe sıkıştırmadan hız hesabına gerçek ikinci veri noktası
  * sağlanır.
  */
@@ -77,8 +79,9 @@ export async function GET(req: NextRequest) {
   if (guard) return guard
 
   try {
-    const twoHourBucket = Math.floor(Date.now() / (2 * 60 * 60 * 1000))
-    const source = SOURCE_ORDER[twoHourBucket % SOURCE_ORDER.length]
+    const source = rotationSource(SOURCE_ORDER, (id) =>
+      id === 'tiktok' ? tiktokAccess().live : id === 'instagram' ? instagramAccess().live : true)
+    if (!source) return NextResponse.json({ source: null, bildirim: 'gereksiz' })
     const result = await collectSource({ source, countries: ['TR'], limit: 50, period: 7 })
     let bildirim: 'gonderildi' | 'yapilandirilmamis' | 'basarisiz' | 'gereksiz' = 'gereksiz'
     if (result.found === 0) {

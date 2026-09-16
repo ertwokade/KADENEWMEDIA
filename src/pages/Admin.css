@@ -1147,6 +1147,10 @@
   border-left-color: var(--kade-danger, var(--gate-danger));
   background: var(--kade-danger-bg, color-mix(in srgb, var(--gate-danger) 8%, transparent));
 }
+.admin-content-notice--partial {
+  border-left-color: var(--kade-info, var(--gate-accent));
+  background: color-mix(in srgb, var(--gate-accent) 8%, transparent);
+}
 .admin-content-notice--static {
   border-left-color: var(--kade-warning, var(--gate-accent-text));
   background: var(--kade-warning-bg, color-mix(in srgb, var(--gate-accent) 14%, transparent));

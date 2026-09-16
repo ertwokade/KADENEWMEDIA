@@ -41,10 +41,10 @@ function PageHero({ badge, title, highlight, suffix, description, icon = <HiOutl
 
 export function BasinPage() {
   const { content } = useSiteContent('basin', BASIN_DEFAULTS)
-  useSEO({ title: 'Basın Odası | Kade Media', description: 'Kade Media şirket bilgileri, marka materyalleri ve basın iletişimi.', path: '/basin' })
+  useSEO({ title: 'Basın Odası | Kade New Media', description: 'Kade New Media şirket bilgileri, marka materyalleri ve basın iletişimi.', path: '/basin' })
   return (
     <PageTransition>
-      <PageHero badge="Basın Odası" title="Kade Media" highlight="basın kiti" description="Kurumsal bilgiler, marka materyalleri ve güncel haberler." icon={<HiOutlineNewspaper size={15} />} />
+      <PageHero badge="Basın Odası" title="Kade New Media" highlight="basın kiti" description="Kurumsal bilgiler, marka materyalleri ve güncel haberler." icon={<HiOutlineNewspaper size={15} />} />
       <section className="section"><div className="container content-page-grid">
         <article className="content-panel glass-card">
           <p className="content-kicker">Şirket bilgileri</p>
@@ -74,17 +74,17 @@ export function BasinPage() {
 
 export function NedenBizPage() {
   const { content } = useSiteContent('nedenBiz', NEDEN_BIZ_DEFAULTS)
-  useSEO({ title: 'Neden Kade Media?', description: 'Kade Media çalışma modeli, süreçleri ve ölçülebilir farkları.', path: '/neden-biz' })
+  useSEO({ title: 'Neden Kade New Media?', description: 'Kade New Media çalışma modeli, süreçleri ve ölçülebilir farkları.', path: '/neden-biz' })
   return (
     <PageTransition>
-      <PageHero badge={content.heroBadge} title="Neden" highlight="Kade Media?" description={content.heroSubtitle} />
+      <PageHero badge={content.heroBadge} title="Neden" highlight="Kade New Media?" description={content.heroSubtitle} />
       <section className="section"><div className="container content-card-grid content-stat-grid">
         {(content.rakamlar || []).map((item, index) => <article className="content-card glass-card" key={`${item.etiket}-${index}`}><span className="content-emoji">{item.ikon}</span><strong className="content-big-number">{item.sayi}</strong><p>{item.etiket}</p></article>)}
       </div></section>
       <section className="section content-muted-section"><div className="container">
         <div className="section-header"><div className="section-badge">Karşılaştırma</div><h2 className="section-title">Süreçte <span>görünür fark</span></h2></div>
         <div className="comparison-table" role="table">
-          <div className="comparison-row comparison-head" role="row"><span>Kriter</span><span>Kade Media</span><span>Genel yaklaşım</span></div>
+          <div className="comparison-row comparison-head" role="row"><span>Kriter</span><span>Kade New Media</span><span>Genel yaklaşım</span></div>
           {(content.karsilastirma || []).map((row, index) => <div className="comparison-row" role="row" key={`${row.kriter}-${index}`}><strong>{row.kriter}</strong><span><HiOutlineCheck size={16} />{row.biz}</span><span>{row.diger}</span></div>)}
         </div>
       </div></section>
@@ -98,7 +98,7 @@ export function NedenBizPage() {
 
 export function ReferralProgramPage() {
   const { content } = useSiteContent('referralProgram', REFERRAL_DEFAULTS)
-  useSEO({ title: 'Referans Programı | Kade Media', description: 'Kade Media referans programı ve işleyişi.', path: '/referans-programi', noindex: true })
+  useSEO({ title: 'Referans Programı | Kade New Media', description: 'Kade New Media referans programı ve işleyişi.', path: '/referans-programi', noindex: true })
   return (
     <PageTransition>
       <PageHero badge={content.heroBadge} title={content.heroTitleBefore} highlight={content.heroTitleHighlight} suffix={content.heroTitleAfter} description={content.heroSubtitle} />
@@ -112,7 +112,7 @@ export function ReferralProgramPage() {
 
 export function PodcastWebinarPage() {
   const { content } = useSiteContent('podcastWebinar', PODCAST_DEFAULTS)
-  useSEO({ title: 'Podcast & Webinar | Kade Media', description: content.heroSubtitle, path: '/podcast-webinar' })
+  useSEO({ title: 'Podcast & Webinar | Kade New Media', description: content.heroSubtitle, path: '/podcast-webinar' })
   return (
     <PageTransition>
       <PageHero badge={content.heroBadge} title={content.heroTitleBefore} highlight={content.heroTitleHighlight} suffix={content.heroTitleAfter} description={content.heroSubtitle} icon={<HiOutlineMicrophone size={15} />} />
@@ -126,7 +126,7 @@ export function PodcastWebinarPage() {
 
 export function NewsletterArchivePage() {
   const { content } = useSiteContent('newsletterArchive', NEWSLETTER_DEFAULTS)
-  useSEO({ title: 'Bülten Arşivi | Kade Media', description: 'Kade Media bültenleri ve dijital pazarlama notları.', path: '/bulten-arsivi' })
+  useSEO({ title: 'Bülten Arşivi | Kade New Media', description: 'Kade New Media bültenleri ve dijital pazarlama notları.', path: '/bulten-arsivi' })
   return (
     <PageTransition>
       <PageHero badge="Bülten Arşivi" title="Kısa, uygulanabilir" highlight="medya notları" description="Yeni medya, içerik ve reklam üzerine yayınlanan bültenleri tek yerde inceleyin." icon={<HiOutlineMail size={15} />} />
@@ -144,7 +144,7 @@ export function PriceCalculatorPage() {
   const [reels, setReels] = useState(4)
   const [ads, setAds] = useState(false)
   const [reporting, setReporting] = useState('monthly')
-  useSEO({ title: 'Fiyat Hesaplama | Kade Media', description: 'Hizmet kapsamınıza göre yaklaşık aylık bütçe hesaplayın.', path: '/fiyat-hesaplama', noindex: true })
+  useSEO({ title: 'Fiyat Hesaplama | Kade New Media', description: 'Hizmet kapsamınıza göre yaklaşık aylık bütçe hesaplayın.', path: '/fiyat-hesaplama', noindex: true })
 
   const estimate = useMemo(() => {
     const reportCost = reporting === 'weekly' ? Number(content.reportWeekly) : reporting === 'biweekly' ? Number(content.reportBiweekly) : 0

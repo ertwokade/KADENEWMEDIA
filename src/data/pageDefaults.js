@@ -14,7 +14,7 @@ export const NAVIGATION_DEFAULTS = {
 export const HOME_HERO_DEFAULTS = {
   tr: {
     eyebrow: 'Sosyal Medya & Pazarlama',
-    introLine: 'Kade Media — İstanbul merkezli dijital pazarlama ajansı.',
+    introLine: 'Kade New Media — İstanbul merkezli dijital pazarlama ajansı.',
     title1: 'BİZ',
     title2: 'markanı',
     title3: 'büyütüyoruz',
@@ -27,7 +27,7 @@ export const HOME_HERO_DEFAULTS = {
   },
   en: {
     eyebrow: 'Social Media & Marketing',
-    introLine: 'Kade Media — an Istanbul-based digital marketing agency.',
+    introLine: 'Kade New Media — an Istanbul-based digital marketing agency.',
     title1: 'WE',
     title2: 'grow your',
     title3: 'brand',
@@ -113,7 +113,7 @@ export const REFERRAL_DEFAULTS = {
   heroTitleBefore: 'İyi işi',
   heroTitleHighlight: 'iyi markalarla',
   heroTitleAfter: ' buluşturun',
-  heroSubtitle: 'Kade Media ile çalışmasını önerdiğiniz marka müşterimiz olduğunda ödülünüzü birlikte netleştirelim.',
+  heroSubtitle: 'Kade New Media ile çalışmasını önerdiğiniz marka müşterimiz olduğunda ödülünüzü birlikte netleştirelim.',
   rewardKicker: 'Ödül modeli',
   rewardTitle: 'İlk ay hizmet bedelinden %10’a kadar referral ödülü',
   rewardText: 'Ödül oranı proje kapsamına göre netleşir ve anlaşma aktif olduktan sonra takip edilir.',

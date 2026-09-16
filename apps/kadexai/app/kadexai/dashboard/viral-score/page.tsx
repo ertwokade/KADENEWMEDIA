@@ -27,6 +27,8 @@ interface ModelResult {
   /** A/B modunda hangi başlığın sonucu olduğunu ayırt etmek için. */
   subject?: string
   kazanan?: boolean
+  /** İki başlık aynı puanı aldığında kazanan ilan edilmez. */
+  berabere?: boolean
 }
 
 function ScoreBadge({ score }: { score: number }) {
@@ -61,8 +63,8 @@ function AnalysisCard({ result }: { result: ModelResult }) {
         <span className={cn('text-xs font-bold', getModelColor(result.model))}>{getModelLabel(result.model)}</span>
         {result.kazanan !== undefined && (
           <span className={cn('rounded-full px-2 py-0.5 text-[11px] font-semibold',
-            result.kazanan ? 'bg-emerald-500/15 text-emerald-300' : 'bg-zinc-700 text-zinc-400')}>
-            {result.kazanan ? 'Kazanan' : 'Alternatif'}
+            result.kazanan && !result.berabere ? 'bg-emerald-500/15 text-emerald-300' : 'bg-zinc-700 text-zinc-400')}>
+            {result.berabere ? 'Berabere' : result.kazanan ? 'Kazanan' : 'Alternatif'}
           </span>
         )}
       </div>
@@ -229,8 +231,9 @@ export default function ViralScorePage() {
           analyze(selectedModel, title),
           analyze(selectedModel, rival),
         ])
-        const aWins = a.analysis.toplam_puan >= b.analysis.toplam_puan
-        setResults([{ ...a, kazanan: aWins }, { ...b, kazanan: !aWins }])
+        const tie = a.analysis.toplam_puan === b.analysis.toplam_puan
+        const aWins = a.analysis.toplam_puan > b.analysis.toplam_puan
+        setResults([{ ...a, kazanan: aWins, berabere: tie }, { ...b, kazanan: !aWins && !tie, berabere: tie }])
       }
     } catch (err) { setError(err instanceof Error ? err.message : 'Hata') }
     finally { setLoading(false) }

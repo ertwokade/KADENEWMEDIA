@@ -105,7 +105,7 @@ export default function KadeKitBusinessStudio() {
           <main className="ok-main kk-main">
             <section className="kk-header">
               <div>
-                <span className="ok-eyebrow">Kade Kit Business</span>
+                <span className="ok-eyebrow" lang="en">Kade Kit Business</span>
                 <h1>AI Üretim Merkezi</h1>
                 <p>Yorum analizi, prodüksiyon CRM, kreatif üretim ve AI kaynak radarını KadeMedia temasında tek çalışma alanında kullanın.</p>
               </div>

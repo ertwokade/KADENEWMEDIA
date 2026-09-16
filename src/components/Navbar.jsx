@@ -83,7 +83,7 @@ export default function Navbar() {
           {/* Sembol dekoratif; markanın adını yanındaki metin veriyor, bu
               yüzden ekran okuyucuya iki kez okunmaz. */}
           <img src="/favicon.png" alt="" aria-hidden="true" width="26" height="26" className="knav-brand__mark" />
-          <span className="knav-brand__text">kade media</span>
+          <span className="knav-brand__text" lang="en">kade new media</span>
         </Link>
 
         <div className="knav-links">

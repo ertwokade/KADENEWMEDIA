@@ -98,7 +98,7 @@ export default function Careers() {
                   )}
                   <a
                     className="btn btn-outline"
-                    href={`mailto:${applicationEmail}?subject=${encodeURIComponent(`Kade Media Başvuru — ${job.title}`)}`}
+                    href={`mailto:${applicationEmail}?subject=${encodeURIComponent(`Kade New Media Başvuru — ${job.title}`)}`}
                   >
                     <HiOutlineMail size={16} /> {isEN ? 'Apply' : 'Başvur'}
                   </a>

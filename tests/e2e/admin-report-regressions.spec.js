@@ -69,7 +69,7 @@ async function analytics(page) {
   const menu = page.locator('.mobile-menu-btn')
   if (await menu.isVisible()) await menu.click()
   await page.getByRole('button', { name: 'Analitik', exact: true }).click()
-  await expect(page.getByRole('heading', { name: 'Analitik Paneli' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Analitik' })).toBeVisible()
 }
 
 test('sayaçlar yüklenirken sıfır göstermez; gerçek sıfır korunur', async ({ page }) => {

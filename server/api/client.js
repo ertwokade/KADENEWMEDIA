@@ -259,7 +259,7 @@ async function handleSurveys(req, res, supabase, user) {
     const transporter = makeTransporter();
     if (transporter) {
       const html = `<div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto"><div style="background:#111;padding:28px;text-align:center;border-radius:12px 12px 0 0"><h1 style="color:#eac321;margin:0">kade<span style="color:#fff">media</span></h1></div><div style="padding:32px;background:#fff;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none"><h2 style="color:#111">Memnuniyet Anketimiz</h2><p>Sayın ${escapeHtml(clientName)},</p><p>${projectName ? `<strong>${escapeHtml(projectName)}</strong> projemizin` : 'Çalışmamızın'} tamamlanmasının ardından görüşleriniz bizim için değerli.</p><div style="text-align:center;margin:28px 0"><a href="${surveyUrl}" style="background:#eac321;color:#111;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:1rem">Anketi Doldurun (1 dakika)</a></div></div></div>`;
-        try { await transporter.sendMail({ from: `"Kade Media" <${process.env.SMTP_USER}>`, to: clientEmail, subject: cleanHeader('Hizmet Değerlendirme — Kade Media'), html }); } catch (e) { console.error('Anket gönderim hatası:', e.message); }
+        try { await transporter.sendMail({ from: `"Kade New Media" <${process.env.SMTP_USER}>`, to: clientEmail, subject: cleanHeader('Hizmet Değerlendirme — Kade New Media'), html }); } catch (e) { console.error('Anket gönderim hatası:', e.message); }
     }
     return res.status(201).json({ success: true, token, surveyUrl });
   }
@@ -302,7 +302,7 @@ export default async function handler(req, res) {
     if (npsScore <= 6 && process.env.MAIL_TO) {
       const transporter = makeTransporter();
       if (transporter) {
-        try { await transporter.sendMail({ from: `"Kade Media" <${process.env.SMTP_USER}>`, to: process.env.MAIL_TO, subject: cleanHeader(`⚠️ Düşük NPS Puanı: ${npsScore}/10 — ${survey.client_name}`), html: `<p>Müşteri <strong>${escapeHtml(survey.client_name)}</strong> NPS anketi için <strong>${npsScore}/10</strong> verdi.</p><p>Kategori: ${category}</p>${comment ? `<p>Yorum: ${escapeHtml(String(comment))}</p>` : ''}` }); } catch (e) { console.error('NPS bildirim hatası:', e.message); }
+        try { await transporter.sendMail({ from: `"Kade New Media" <${process.env.SMTP_USER}>`, to: process.env.MAIL_TO, subject: cleanHeader(`⚠️ Düşük NPS Puanı: ${npsScore}/10 — ${survey.client_name}`), html: `<p>Müşteri <strong>${escapeHtml(survey.client_name)}</strong> NPS anketi için <strong>${npsScore}/10</strong> verdi.</p><p>Kategori: ${category}</p>${comment ? `<p>Yorum: ${escapeHtml(String(comment))}</p>` : ''}` }); } catch (e) { console.error('NPS bildirim hatası:', e.message); }
       }
     }
     return res.json({ success: true, message: 'Yanıtınız kaydedildi, teşekkür ederiz!' });

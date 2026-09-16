@@ -9,7 +9,7 @@ export default function KadeKitBusinessGuard({ children }) {
   }
 
   if (!entitlements?.hasKadeKitBusinessAccess) {
-    return <ProtectedAccessScreen customer={customer} eyebrow="Kade Kit Business"
+    return <ProtectedAccessScreen customer={customer} eyebrow="Kade Kit Business" eyebrowLang="en"
       title="Kade Kit Business erişimi aktif planlara özeldir."
       description="İçerik, prodüksiyon, yorum analizi, AI üretim araçları ve operasyon ekranlarını kullanmak için Business erişiminizi aktifleştirin."
       packageLabel="Business Planlarını İncele" />

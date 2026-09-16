@@ -326,10 +326,26 @@ test('admin içerik sekmeleri public karşılığını bildirir', async () => {
   const tabRows = [...source.matchAll(/\{\s*id:\s*'([a-zA-Z]+)',[^}]*route:\s*'([^']*)'[^}]*status:\s*'([a-z-]+)'[^}]*\}/g)]
   assert.ok(tabRows.length >= 15, 'admin sekme tablosu okunamadı')
 
+  // Klon sayfası statik olsa da bazı bölümleri çalışma anında /api/content'ten
+  // okuyan scriptler yükler. Bu sekmeler 'live' ya da 'partial' olmalıdır.
+  const runtimeSections = new Set()
+  for (const script of ['kade-site.js', 'homepage-admin.js', 'kade-public-content.js', 'kade-portfolio.js']) {
+    const code = await readRepo(`haoqi-clone/${script}`)
+    for (const match of code.matchAll(/section=(?:'\s*\+\s*encodeURIComponent\(section\)|([a-zA-Z]+))/g)) {
+      if (match[1]) runtimeSections.add(match[1])
+    }
+    for (const match of code.matchAll(/section !== '([a-zA-Z]+)'/g)) runtimeSections.add(match[1])
+  }
+  assert.ok(runtimeSections.has('homepage') && runtimeSections.has('packages'), 'çalışma anı içerik bağlantıları okunamadı')
+
   for (const [, tabId, route, status] of tabRows) {
     // Anasayfa da klon anlık görüntüsünden geliyor (merge-clone site.html'i yazıyor).
     const cloneServed = route === '/' || clonePages.has(route.replace(/^\//, ''))
     if (!cloneServed) continue
+    if (runtimeSections.has(tabId)) {
+      assert.ok(['live', 'partial'].includes(status), `${tabId}: canlı sayfa bu bölümü /api/content'ten okuyor, 'static' denemez`)
+      continue
+    }
 
     assert.notStrictEqual(
       status,

@@ -42,3 +42,14 @@ test('aktivite günlüğü gerçek insert sonucunu bekler ve yalnız şema hatal
   assert.equal(await logActivity({ action: 'Test' }), false)
   assert.equal(calls, 1, 'izin hatası şema hatası gibi tekrar denenmez')
 })
+
+test('Gemini cevabının tüm metin parçaları birleştirilir, düşünce parçası atlanır', async () => {
+  const { geminiResponseText } = await import('../../server/api/_lib/gemini-text.js')
+  const data = { candidates: [{ content: { parts: [
+    { text: 'gizli plan', thought: true },
+    { text: '1. Yerel İşletmeler İçin Rehber\n2. Yer' },
+    { text: 'el İşletmelere Özel Sosyal Medya İpuçları\n' },
+  ] } }] }
+  assert.equal(geminiResponseText(data), '1. Yerel İşletmeler İçin Rehber\n2. Yerel İşletmelere Özel Sosyal Medya İpuçları')
+  assert.equal(geminiResponseText({}), '')
+})

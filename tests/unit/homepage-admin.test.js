@@ -36,3 +36,10 @@ test('admin exposes an addable homepage editor', async () => {
   assert.match(editor, /Çalışma \/ hizmet kartları/)
   assert.match(editor, /Sosyal bağlantılar/)
 })
+
+test('ana sayfa içerik betiği iç sayfaların SEO başlığını ezmez', async () => {
+  const runtime = await read('haoqi-clone/homepage-admin.js')
+  const guard = runtime.indexOf("if (!/^\\/(en\\/?)?$/.test(window.location.pathname)) return")
+  assert.ok(guard > 0, 'yalnız ana sayfa koruması bulunmalı')
+  assert.ok(guard < runtime.lastIndexOf('load()'), 'koruma ilk yüklemeden önce çalışmalı')
+})

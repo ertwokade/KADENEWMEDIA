@@ -261,6 +261,10 @@
       })
       .catch(function () {})
   }
+  // Betik ortak varlık listesiyle her sayfaya ekleniyor, ama yalnız ana sayfanın
+  // yapısını düzenler. İç sayfalarda çalışırsa başlık/açıklamayı ezer ve boş
+  // gizli bir h1 ekler.
+  if (!/^\/(en\/?)?$/.test(window.location.pathname)) return
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load)
   else load()
   window.addEventListener('pageshow', function () { if (pageShowCount++ > 0) load() })

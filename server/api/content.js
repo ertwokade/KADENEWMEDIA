@@ -33,6 +33,11 @@ export function isPublicContentSection(section) {
 let _ga4Token = null;
 let _ga4Exp = 0;
 
+export function publicGaMeasurementId(env = process.env) {
+  const id = String(env.VITE_GA_ID || env.GA_MEASUREMENT_ID || '').trim().toUpperCase();
+  return /^G-[A-Z0-9]{6,12}$/.test(id) && !/^G-X+$/.test(id) ? id : null;
+}
+
 export function hasValidGa4Configuration(env = process.env) {
   const propertyId = (env.GA4_PROPERTY_ID || '').trim();
   const email = (env.GA4_CLIENT_EMAIL || '').trim().toLowerCase();
@@ -86,6 +91,14 @@ export default async function handler(req, res) {
   if (cors(req, res)) return;
 
   const action = req.query?.action;
+
+  // ── Public analytics config (GET /api/content?action=analytics-config) — no auth ──
+  // Statik sayfalar derleme anı değişkenlerini okuyamaz; ölçüm kimliği zaten herkese
+  // açık bir değerdir. Örnek/eksik değer istemciye gönderilmez.
+  if (action === 'analytics-config' && req.method === 'GET') {
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600');
+    return res.status(200).json({ gaMeasurementId: publicGaMeasurementId() });
+  }
 
   // ── Heartbeat (POST /api/content?action=heartbeat) — no auth ──
   // Tracks active visitor sessions. Frontend sends every ~30s while tab is visible.

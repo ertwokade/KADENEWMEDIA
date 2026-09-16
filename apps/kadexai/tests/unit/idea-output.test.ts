@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { normalizeIdeaOutput } from '../../lib/kade-search/ideaOutput'
+import { normalizeIdeaOutput, runInBatches } from '../../lib/kade-search/ideaOutput'
 
 const valid = { trendId: 'id', kanca: 'Kanca', kurgu: ['A', 'B', 'C'], cta: 'Kaydet' }
 
@@ -21,4 +21,17 @@ test('invalid clock values and arbitrary difficulty labels are rejected', () => 
   const output = normalizeIdeaOutput({ ...valid, paylasimSaati: ['99:99', '24:00', '12:60', '19:00-21:00', '23:59'], zorluk: { level: 'Kesin viral', note: 'iddia' } })!
   assert.deepEqual(output.paylasimSaati, ['19:00-21:00', '23:59'])
   assert.equal(output.zorluk, null)
+})
+
+test('fikirler küçük gruplarla işlenir ve bir grubun hatası diğerlerini silmez', async () => {
+  const seen: number[][] = []
+  const done: number[] = []
+  const results = await runInBatches([1, 2, 3, 4, 5, 6, 7, 8, 9], 4, async (batch) => {
+    seen.push(batch)
+    if (batch.includes(5)) throw new Error('sağlayıcı zaman aşımı')
+    done.push(...batch)
+  })
+  assert.deepEqual(seen, [[1, 2, 3, 4], [5, 6, 7, 8], [9]])
+  assert.deepEqual(done.sort(), [1, 2, 3, 4, 9])
+  assert.deepEqual(results.map((result) => result.status), ['fulfilled', 'rejected', 'fulfilled'])
 })

@@ -192,7 +192,7 @@ const HEAD_ASSETS = [
   ['/kade-routes.css', '<link rel="stylesheet" href="/kade-routes.css">']
 ]
 
-const BODY_ASSETS = ['/kade-routes.js', '/kade-access.js', '/kade-footer.js', '/kade-brand.js', '/homepage-admin.js', '/kade-entry-watchdog.js']
+const BODY_ASSETS = ['/kade-routes.js', '/kade-access.js', '/kade-footer.js', '/kade-brand.js', '/homepage-admin.js', '/kade-entry-watchdog.js', '/kade-analytics.js']
 
 const KADE_FAVICONS = '<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="/favicon.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-icon.png">'
 

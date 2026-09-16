@@ -151,7 +151,8 @@ export default function MateryalPage() {
     if (toplam == null) return 'İstatistik henüz doğrulanmadı'
     if (!sonKosu?.finished_at) return 'Henüz toplama yapılmadı'
     const tarih = new Date(sonKosu.finished_at).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' })
-    return sonKosu.ok ? `Son toplama ${tarih} · ${sonKosu.found} kayıt tarandı, ${sonKosu.inserted} yeni` : `Son toplama ${tarih} · tamamlanamadı`
+    if (sonKosu.ok) return `Son toplama ${tarih} · ${sonKosu.found} kayıt tarandı, ${sonKosu.inserted} yeni`
+    return sonKosu.error ? `Son deneme ${tarih} · ${sonKosu.error}` : `Son toplama ${tarih} · tamamlanamadı`
   }, [sonKosu, toplam])
 
   return (

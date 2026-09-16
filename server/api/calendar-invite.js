@@ -36,7 +36,7 @@ function generateICS({ title, description, date, time, duration = 60 }) {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Kade Media//Calendar//TR',
+    'PRODID:-//Kade New Media//Calendar//TR',
     'CALSCALE:GREGORIAN',
     'METHOD:REQUEST',
     'BEGIN:VTIMEZONE',
@@ -52,7 +52,7 @@ function generateICS({ title, description, date, time, duration = 60 }) {
     `DTEND;TZID=Europe/Istanbul:${endFmt}`,
     `SUMMARY:${escapeICS(title)}`,
     `DESCRIPTION:${escapeICS(description)}`,
-    'ORGANIZER;CN=Kade Media:mailto:thekademedia@gmail.com',
+    'ORGANIZER;CN=Kade New Media:mailto:thekademedia@gmail.com',
     `UID:${Date.now()}@kadenewmedia.com`,
     'STATUS:CONFIRMED',
     'END:VEVENT',
@@ -146,7 +146,7 @@ export default async function handler(req, res) {
     const emailBody = `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px;">
         <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
-          <h1 style="color:#eac321;margin:0;">Kade Media</h1>
+          <h1 style="color:#eac321;margin:0;">Kade New Media</h1>
           <p style="color:#aaa;margin:5px 0 0;">İçerik Takvimi Daveti</p>
         </div>
         <div style="padding:20px 0;">
@@ -161,7 +161,7 @@ export default async function handler(req, res) {
           ${event.description ? `<div style="padding:16px;background:#16213e;border-radius:8px;margin-top:12px;"><p style="color:#eac321;font-weight:bold;margin:0 0 8px;">Açıklama:</p><p style="color:#fff;line-height:1.6;margin:0;">${escapeHtml(event.description)}</p></div>` : ''}
         </div>
         <div style="text-align:center;padding:15px 0;border-top:1px solid #333;color:#666;font-size:12px;">
-          Kade Media İçerik Takvimi
+          Kade New Media İçerik Takvimi
         </div>
       </div>
     `;
@@ -172,7 +172,7 @@ export default async function handler(req, res) {
     for (const email of emails) {
       try {
         await transporter.sendMail({
-          from: `"Kade Media Takvim" <${smtpUser}>`,
+          from: `"Kade New Media Takvim" <${smtpUser}>`,
           to: email,
           subject: cleanHeader(`📅 ${event.title} — ${event.date} ${event.time || ''}`),
           html: emailBody,

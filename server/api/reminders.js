@@ -142,14 +142,14 @@ export default async function handler(req, res) {
             const label = priorityLabels[reminder.priority] || 'Orta';
 
             await transporter.sendMail({
-              from: `"Kade Media Hatırlatıcı" <${process.env.SMTP_USER}>`,
+              from: `"Kade New Media Hatırlatıcı" <${process.env.SMTP_USER}>`,
               to: emails.join(', '),
               subject: cleanHeader(`⏰ Hatırlatıcı: ${reminder.title}`),
               html: `
                 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#fff;border-radius:12px;">
                   <div style="text-align:center;padding:20px 0;border-bottom:1px solid #333;">
                     <h1 style="color:#eac321;margin:0;">⏰ Hatırlatıcı</h1>
-                    <p style="color:#888;margin:8px 0 0">Kade Media Admin</p>
+                    <p style="color:#888;margin:8px 0 0">Kade New Media Admin</p>
                   </div>
                   <div style="padding:30px 20px;">
                     <h2 style="color:#fff;margin:0 0 16px;">${escapeHtml(reminder.title)}</h2>
@@ -164,7 +164,7 @@ export default async function handler(req, res) {
                     </div>
                   </div>
                   <div style="text-align:center;padding:16px;border-top:1px solid #333;">
-                    <p style="color:#666;font-size:12px;margin:0;">Bu e-posta Kade Media hatırlatıcı sistemi tarafından gönderilmiştir.</p>
+                    <p style="color:#666;font-size:12px;margin:0;">Bu e-posta Kade New Media hatırlatıcı sistemi tarafından gönderilmiştir.</p>
                   </div>
                 </div>
               `,
@@ -333,7 +333,7 @@ export default async function handler(req, res) {
       const endM = String(endTotal % 60).padStart(2, '0');
       const startFmt = `${year}${month}${day}T${hours.padStart(2, '0')}${minutes.padStart(2, '0')}00`;
       const endFmt = `${year}${month}${day}T${endH}${endM}00`;
-      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Kade Media//Calendar//TR','CALSCALE:GREGORIAN','METHOD:REQUEST','BEGIN:VTIMEZONE','TZID:Europe/Istanbul','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:+0300','TZOFFSETTO:+0300','END:STANDARD','END:VTIMEZONE','BEGIN:VEVENT',`DTSTART;TZID=Europe/Istanbul:${startFmt}`,`DTEND;TZID=Europe/Istanbul:${endFmt}`,`SUMMARY:${escapeICS(title)}`,`DESCRIPTION:${escapeICS(description)}`,'ORGANIZER;CN=Kade Media:mailto:thekademedia@gmail.com',`UID:${Date.now()}@kademedia.com`,'STATUS:CONFIRMED','END:VEVENT','END:VCALENDAR'].join('\r\n');
+      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Kade New Media//Calendar//TR','CALSCALE:GREGORIAN','METHOD:REQUEST','BEGIN:VTIMEZONE','TZID:Europe/Istanbul','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:+0300','TZOFFSETTO:+0300','END:STANDARD','END:VTIMEZONE','BEGIN:VEVENT',`DTSTART;TZID=Europe/Istanbul:${startFmt}`,`DTEND;TZID=Europe/Istanbul:${endFmt}`,`SUMMARY:${escapeICS(title)}`,`DESCRIPTION:${escapeICS(description)}`,'ORGANIZER;CN=Kade New Media:mailto:thekademedia@gmail.com',`UID:${Date.now()}@kademedia.com`,'STATUS:CONFIRMED','END:VEVENT','END:VCALENDAR'].join('\r\n');
     }
 
     const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -356,11 +356,11 @@ export default async function handler(req, res) {
     const port2 = parseInt(process.env.SMTP_PORT) || 587;
     const transporter2 = nodemailer.createTransport({ host: smtpHost, port: port2, secure: port2 === 465, auth: { user: smtpUser, pass: smtpPass }, ...(port2 === 587 ? { requireTLS: true } : {}), tls: { rejectUnauthorized: true, minVersion: 'TLSv1.2' }, connectionTimeout: 10000, greetingTimeout: 10000, socketTimeout: 15000 });
     const icsContent = generateICS(event);
-    const emailBody = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px"><div style="text-align:center;padding:20px 0;border-bottom:1px solid #333"><h1 style="color:#eac321;margin:0">Kade Media</h1><p style="color:#aaa;margin:5px 0 0">İçerik Takvimi Daveti</p></div><div style="padding:20px 0"><h2 style="color:#fff;margin:0 0 16px">${escapeHtml(event.title)}</h2><p style="color:#eac321">Tarih: ${escapeHtml(event.date)} ${escapeHtml(event.time || '10:00')}</p>${message ? `<p style="color:#fff">${escapeHtml(message)}</p>` : ''}${event.description ? `<p style="color:#fff">${escapeHtml(event.description)}</p>` : ''}</div></div>`;
+    const emailBody = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#1a1a2e;color:#fff;border-radius:12px"><div style="text-align:center;padding:20px 0;border-bottom:1px solid #333"><h1 style="color:#eac321;margin:0">Kade New Media</h1><p style="color:#aaa;margin:5px 0 0">İçerik Takvimi Daveti</p></div><div style="padding:20px 0"><h2 style="color:#fff;margin:0 0 16px">${escapeHtml(event.title)}</h2><p style="color:#eac321">Tarih: ${escapeHtml(event.date)} ${escapeHtml(event.time || '10:00')}</p>${message ? `<p style="color:#fff">${escapeHtml(message)}</p>` : ''}${event.description ? `<p style="color:#fff">${escapeHtml(event.description)}</p>` : ''}</div></div>`;
 
     let sent = 0; let failed = 0;
     for (const email of emails) {
-	      try { await transporter2.sendMail({ from: `"Kade Media Takvim" <${smtpUser}>`, to: email, subject: cleanHeader(`📅 ${event.title} — ${event.date}`), html: emailBody, icalEvent: { method: 'REQUEST', content: icsContent } }); sent++; }
+	      try { await transporter2.sendMail({ from: `"Kade New Media Takvim" <${smtpUser}>`, to: email, subject: cleanHeader(`📅 ${event.title} — ${event.date}`), html: emailBody, icalEvent: { method: 'REQUEST', content: icsContent } }); sent++; }
       catch (err) { console.error(`Davet hatası ${email}:`, err.message); failed++; }
     }
     return res.status(200).json({ message: `${sent} kişiye davet gönderildi${failed > 0 ? `, ${failed} başarısız` : ''}`, sent, failed });
