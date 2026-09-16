@@ -29,3 +29,11 @@ test('statik sayfalar ölçümü yalnız çerez onayından sonra başlatır', as
   assert.match(code, /else if \(consent !== 'declined'\) banner\(\)/)
   assert.ok(code.indexOf("post('pageview'") > code.indexOf('function start()'), 'sayfa görüntüleme yalnız start() içinde gönderilir')
 })
+
+test('analitik ayar ucu genel sorgu doğrulamasından geçer', async () => {
+  const { validateQuery } = await import('../../server/api/_lib/validation.js')
+  let status = 200
+  const res = { status(code) { status = code; return this }, json() { return this } }
+  assert.equal(validateQuery({ query: { action: 'analytics-config' } }, res), true)
+  assert.equal(status, 200)
+})
