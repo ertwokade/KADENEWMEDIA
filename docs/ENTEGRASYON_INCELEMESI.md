@@ -56,13 +56,22 @@ oluşturuldu, KadexAI sağlık ucu HTTP 200 verdi, çalışma zamanı üç Teleg
 ayarını gördü ve sunucudan gönderilen korumalı test mesajı Telegram Web'de
 doğrulandı. Geçici aktarım dosyaları her iki makineden silindi.
 
-Aynı gün bot etkileşimli yönetim yardımcısına tamamlandı. Telegram'ın gizli
-başlık doğrulamalı webhook'u doğrudan Keyubu KadexAI rotasına bağlandı; yalnız
-tanımlı özel hesap ve bire bir sohbet kabul ediliyor. Komut menüsünde sistem
-sağlığı, günlük operasyon özeti, seçili trendler, teklif durumları, son hatalar
-ve kısa canlı rapor var. Komutlar salt okunur; veri silme, ödeme veya kullanıcı
-yetkisi değiştirmez. Bekleyen gerçek komut işlendi, düğmeli yanıt Telegram Web'de
-görüldü; webhook kuyruğu sıfır ve son hata alanı boş doğrulandı.
+Aynı gün bot kapsamlı etkileşimli yönetim yardımcısına tamamlandı. Telegram'ın
+gizli başlık doğrulamalı webhook'u doğrudan Keyubu KadexAI rotasına bağlandı;
+özel sohbette yalnız tanımlı sahip kabul ediliyor. Türkçe menü 22 komut içeriyor:
+ana menü ve grup yaşam döngüsünün yanında yönetim özeti, sistem sağlığı,
+bugün/hafta operasyonları, son işlemler, trendler, teklifler, abonelikler,
+kullanıcılar, AI kullanımı ve sağlayıcıları, bildirimler, hatalar, uç performansı,
+sitemap ve birleşik canlı rapor. Komutlar salt okunur; veri silme, ödeme veya
+kullanıcı yetkisi değiştirmez.
+
+Bot gruplara da eklenebilir. Yalnız yapılandırılmış sahip `/baslat` ile grubu
+etkinleştirip `/durdur` ile kapatabilir; durum `telegram_bot_chats` tablosunda
+kalıcı tutulur. Etkin gruptaki üyeler salt-okunur komutları çalıştırabilir, fakat
+yaşam döngüsünü veya uygulama verisini değiştiremez. Tablo zorunlu RLS kullanır
+ve `anon`/`authenticated` rolleri doğrudan erişemez. Migration önce güncel
+şifreli yedek alındıktan sonra transaction içinde rollback provasıyla sınandı ve
+üretime uygulandı.
 
 ## AI, YouTube ve yedek doğrulaması
 

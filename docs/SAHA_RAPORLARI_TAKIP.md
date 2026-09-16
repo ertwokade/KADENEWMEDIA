@@ -21,7 +21,7 @@ Sunucu HTML'i ve bundle içindeki görünür eski şablon metinleri de temizlend
 JavaScript kapalı production audit bunu kalıcı olarak denetliyor.
 
 - Legacy birim testleri: 101 geçti; gerçek içerik API kodunda anonim/özel alan ayrımı, GA4 hata/sıfır ayrımı ve korumalı rotaların klon katmanıyla ezilmemesi dahil.
-- KadexAI birim testleri: 273 geçti; gerçek history/materyal/akış/uyarı/yorum analizi/takvim/şablon/toplu üretim/ses dökümü kodu sahte bağımlılıklarla çalıştırıldı. Hesap izolasyonu, yönlendirme güvenliği, yönlendirilmiş ve düz metin çıktı sözleşmeleri, kaldırılmış materyal kaynağı, uyarı tekilleştirme, platform sayımı, dublaj bütünlüğü, Telegram teslim/webhook/komut güvenliği ve ses çıkarma temizliği dahil.
+- KadexAI birim testleri: 276 geçti; gerçek history/materyal/akış/uyarı/yorum analizi/takvim/şablon/toplu üretim/ses dökümü kodu sahte bağımlılıklarla çalıştırıldı. Hesap izolasyonu, yönlendirme güvenliği, yönlendirilmiş ve düz metin çıktı sözleşmeleri, kaldırılmış materyal kaynağı, uyarı tekilleştirme, platform sayımı, dublaj bütünlüğü, Telegram teslim/webhook/özel sohbet/grup yaşam döngüsü güvenliği ve ses çıkarma temizliği dahil.
 - Masaüstü/mobil tam Playwright koşusu: 252 geçti, 0 başarısız, ortam koşuluna bağlı 2 bilinçli atlandı. Production audit ayrıca 37 rota, 35 dahili bağlantı ve 7 görünümü sıfır hatayla denetledi; API çağrıları yerel güvenli test yanıtlarıyla sınandı.
 - KadexAI TypeScript, değişen kodların ESLint kontrolü, legacy ve KadexAI üretim build başarılı.
 - Vercel Git otomatik dağıtımı doğrulandı. Canlı ana sayfa, blog, paketler ve ana-site sitemap'i HTTP 200 döndü. Keyubu KadexAI sağlık ucu HTTP 200; oturumsuz yapılandırma ve bildirim uçları HTTP 401; korumalı panel rotaları girişe HTTP 307 döndü. Beş kritik KadexAI rotasına yapılan 20'şer ardışık istekte 503 görülmedi.
@@ -39,10 +39,13 @@ ortak kanal seçimi etkinleştirildi, KadexAI konteynerleri sağlıklı yeniden
 başladı ve sunucudan gönderilen korumalı test bildirimi Telegram Web'de görüldü.
 Geçici token/kurulum dosyaları silindi; gizli değerler git'e yazılmadı.
 Etkileşimli bot devamında webhook secret-token denetimiyle Keyubu rotasına
-bağlandı. Yalnız izinli bire bir sohbet kabul ediliyor; Türkçe komut menüsü ve
-`durum`, `bugun`, `trendler`, `teklifler`, `hatalar`, `rapor`, `yardim`
-komutları salt-okunur çalışıyor. Canlı bekleyen komut yanıtlandı, düğmeler
-Telegram Web'de görüldü; Telegram webhook kuyruğu sıfır ve son hata boştu.
+bağlandı. Özel sohbette yalnız izinli sahip kabul ediliyor; Türkçe menüde 22
+salt-okunur yönetim komutu bulunuyor. Botun eklendiği grubu yalnız sahip
+`/baslat` ile etkinleştirip `/durdur` ile kapatabiliyor; üyeler etkin grupta
+rapor komutlarını kullanabiliyor. Kalıcı grup izin tablosu şifreli yedekten sonra
+rollback provasıyla üretime uygulandı, zorunlu RLS ve rol yetkileri doğrulandı.
+Canlı bekleyen komut yanıtlandı, düğmeler Telegram Web'de görüldü; Telegram
+webhook kuyruğu sıfır ve son hata boştu.
 
 12 Eylül operasyon kontrolü: GitHub'ın kendi sunucularından ana site ve KadexAI sağlık ucunu 15 dakikada bir denetleyen bağımsız uptime workflow'u eklendi. Kontrol SSL/HTTP başarısını ve KadexAI `auth`/`ai` hazır durumunu doğruluyor; başarısızlık GitHub Actions kaydına düşüyor. Ayrıntılı Sentry/PostHog takibi gerçek hesap yapılandırması bekliyor.
 
