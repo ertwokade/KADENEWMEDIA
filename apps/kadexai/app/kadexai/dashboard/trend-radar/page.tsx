@@ -10,6 +10,7 @@ import { apiPath } from '@/lib/appConfig'
 import TopBar from '@/components/layout/TopBar'
 import TrendCard from '@/components/dashboard/trend-radar/TrendCard'
 import CollectPanel from '@/components/dashboard/trend-radar/CollectPanel'
+import ContentDiscovery from '@/components/kade-search/ContentDiscovery'
 import { CATEGORIES, KIND_LABELS, STAGES, platformLabel } from '@/lib/kade-search/taxonomy'
 import { fmtCount } from '@/lib/kade-search/util'
 import { trendCsv } from '@/lib/kade-search/export'
@@ -344,6 +345,9 @@ export default function TrendRadarPage() {
       />
 
       <div className="flex-1 overflow-y-auto">
+        <div className="px-4 pt-4 sm:px-6 sm:pt-6">
+          <ContentDiscovery />
+        </div>
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">
           {/* ── Sol sütun: durum, filtreler, izleme listesi ───────────────── */}
           <div className="w-full flex-shrink-0 space-y-4 lg:w-80">

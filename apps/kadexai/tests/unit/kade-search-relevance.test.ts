@@ -29,6 +29,14 @@ test('müzik kaydı kategoriden yakalanır', () => {
   assert.equal(elemeSebebi(satir({ title: 'Mabel Matiz - Ha Leylim', normalized: 'mabel matiz - ha leylim', category: 'muzik' })), 'muzik-kaydi')
 })
 
+test('çıkarım kayıtları gerçek popülerlik listesine girmez', () => {
+  assert.equal(elemeSebebi(satir({ title: 'Tahmini TikTok adayı', inferred: true })), 'tahmini-kayit')
+  assert.equal(ayiklanmisTrendler([
+    satir({ id: 'inferred', title: 'Tahmini TikTok adayı', inferred: true, score: 99 }),
+    satir({ id: 'measured', title: 'Ölçülmüş içerik', inferred: false, score: 10 }),
+  ]).map((row) => row.id).join(','), 'measured')
+})
+
 test('hashtagler yabancı dil ölçümünü seyreltmemeli', () => {
   // Devanagari başlık, İngilizce hashtag'lerle Latin oranını yükseltip
   // filtreden kaçıyordu.

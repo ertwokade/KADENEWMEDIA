@@ -19,7 +19,7 @@ import { hasMeasuredVelocity } from './export'
 import { CATEGORIES, FORMATS, STAGES, platformLabel } from './taxonomy'
 import { extractHashtags, fmtCount, normalizeText } from './util'
 import { queryTrends } from './store'
-import { ayiklanmisTrendler, turkceGorunuyor } from './relevance'
+import { ayiklanmisTrendler } from './relevance'
 import type { CurrentTrendRow, TrendFilters } from './types'
 
 const HOOKS: Record<string, string[]> = {
@@ -208,7 +208,9 @@ export async function generateIdeas(
     sort: opts.sort ?? 'score',
     sinceHours: opts.sinceHours ?? 24 * 14,
   }))
-  const trends = (opts.language === 'tr' ? queriedTrends.filter(turkceGorunuyor) : queriedTrends).slice(0, opts.limit ?? 15)
+  // Dil filtresi veritabanı sorgusunda uygulanır. Başlığı ikinci kez sezgisel
+  // bir Türkçe filtreden geçirmek, doğru dil meta verisi taşıyan kayıtları eliyordu.
+  const trends = queriedTrends.slice(0, opts.limit ?? 15)
   if (!trends.length) return []
 
   const categories = [...new Set(trends.map((t) => t.category).filter((c): c is string => Boolean(c)))]

@@ -147,7 +147,26 @@ export function detectFormats(item: RawTrendItem): string[] {
   return [...new Set(found.sort((a, b) => b.score - a.score).map((f) => f.key))].slice(0, 4)
 }
 
-/** Dil tahmini (kaba ama isimizi goruyor). */
+const LANGUAGE_WORDS: Record<string, string[]> = {
+  tr: ['ve', 'bir', 'icin', 'ile', 'bu', 'ne', 'nasil', 'cok', 'daha', 'ama', 'gibi', 'kadar', 'neden'],
+  en: ['the', 'and', 'for', 'with', 'this', 'what', 'how', 'you', 'best', 'your', 'why'],
+  de: ['der', 'die', 'das', 'und', 'mit', 'für', 'wie', 'warum', 'nicht', 'eine'],
+  fr: ['le', 'la', 'les', 'et', 'avec', 'pour', 'comment', 'pourquoi', 'une', 'des'],
+  es: ['el', 'la', 'los', 'las', 'y', 'con', 'para', 'como', 'por', 'una', 'que'],
+  it: ['il', 'lo', 'la', 'gli', 'e', 'con', 'per', 'come', 'perché', 'una'],
+  pt: ['o', 'a', 'os', 'as', 'e', 'com', 'para', 'como', 'porque', 'uma'],
+}
+
+function scriptLanguage(text: string) {
+  if (/[\u0600-\u06ff]/u.test(text)) return 'ar'
+  if (/[\u0400-\u04ff]/u.test(text)) return 'ru'
+  if (/[\u0900-\u097f]/u.test(text)) return 'hi'
+  if (/[\u3040-\u30ff]/u.test(text)) return 'ja'
+  if (/[\uac00-\ud7af]/u.test(text)) return 'ko'
+  return null
+}
+
+/** Dil tahmini: açık dil meta verisi yoksa başlık ve açıklamadan sınırlı tahmin. */
 export function detectLanguage(item: RawTrendItem): string {
   // Baslik aciklamadan daha guvenilir sinyaldir
   const title = String(item.title || '')
@@ -155,15 +174,15 @@ export function detectLanguage(item: RawTrendItem): string {
   if (/[ğışĞİŞ]/.test(title)) return 'tr'
   const description = String(item.description || '').replace(/\[(ÇIKARIM|DEMO VERİ)\][\s\S]*/i, '')
   const raw = `${title} ${description}`
+  const scripted = scriptLanguage(raw)
+  if (scripted) return scripted
   if (/[ğışĞİŞ]/.test(raw) && !/\b(the|and|is|of)\b/i.test(title)) return 'tr'
   const t = normalizeText(raw).replace(/[^a-z0-9]+/g, ' ')
-  const trWords = ['ve', 'bir', 'icin', 'ile', 'bu', 'ne', 'nasil', 'cok', 'daha', 'ama', 'gibi', 'kadar']
-  const enWords = ['the', 'and', 'for', 'with', 'this', 'what', 'how', 'you', 'best', 'your']
-  const count = (list: string[]) => list.filter((w) => new RegExp(`(^| )${w}( |$)`).test(t)).length
-  const tr = count(trWords)
-  const en = count(enWords)
-  if (tr > en) return 'tr'
-  if (en > tr) return 'en'
+  const scores = Object.entries(LANGUAGE_WORDS).map(([language, words]) => ({
+    language,
+    score: words.filter((word) => new RegExp(`(^| )${normalizeText(word)}( |$)`).test(t)).length,
+  })).sort((a, b) => b.score - a.score)
+  if (scores[0]?.score > 0 && scores[0].score > (scores[1]?.score ?? 0)) return scores[0].language
   // Ülke, içeriğin dilini kanıtlamaz. Belirsiz kaydı yanlış dil filtresine
   // sokmak yerine açıkça "und" (undetermined) olarak işaretle.
   return 'und'

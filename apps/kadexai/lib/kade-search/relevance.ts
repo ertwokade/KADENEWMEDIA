@@ -87,6 +87,7 @@ const LATIN_DISI_ESIGI = 0.35
 
 export type ElemeSebebi =
   | 'baslik-yok'
+  | 'tahmini-kayit'
   | 'muzik-platformu'
   | 'dizi-kaydi'
   | 'muzik-kaydi'
@@ -95,6 +96,10 @@ export type ElemeSebebi =
 /** Satır listeye girmeli mi? Girmemeliyse sebebi döner. */
 export function elemeSebebi(row: CurrentTrendRow): ElemeSebebi | null {
   const baslik = baslikOf(row)
+  // Kullanıcı popülerlik listesinde yalnız ölçülmüş kaynakları görür.
+  // Çapraz-platform çıkarımları fikir üretiminde yararlı olabilir ama gerçek
+  // izlenme/etkileşim gibi sıralanamaz.
+  if (row.inferred) return 'tahmini-kayit'
   // Kısa olmak alakasızlık göstergesi değil (bir hashtag ya da marka adı iki
   // harf olabilir); yalnızca boş başlık elenir.
   if (baslik.length === 0) return 'baslik-yok'

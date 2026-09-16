@@ -95,13 +95,14 @@ async function fetchSub(entry: { sub: string; hint: string }, limit: number): Pr
     rank: i + 1,
     published_at: e.updated ? new Date(e.updated).toISOString() : null,
     hint: `${entry.hint} ${entry.sub}`,
+    inferred: true,
     metrics: {
       // RSS begeni/yorum sayisi vermez; siralama konumundan kaba ilgi tahmini
       views: Math.round(200000 / (i + 1)),
       likes: Math.round(4000 / (i + 1)),
       extra: { subreddit: entry.sub, kaynak: 'rss', tahmini: true },
     },
-    raw: { subreddit: entry.sub, source: 'rss' },
+    raw: { subreddit: entry.sub, source: 'rss', inferred: true },
   }))
 }
 

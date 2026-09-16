@@ -49,6 +49,7 @@ function mapApiVideo(v: ApiVideo, country: string, rank: number): RawTrendItem {
     url: `https://www.youtube.com/watch?v=${v.id}`,
     thumbnail: v.snippet?.thumbnails?.medium?.url ?? v.snippet?.thumbnails?.default?.url ?? null,
     country,
+    language: v.snippet?.defaultAudioLanguage?.split('-')[0]?.toLowerCase() ?? null,
     rank,
     duration_sec: dur,
     published_at: v.snippet?.publishedAt ?? null,
@@ -113,6 +114,43 @@ async function apiTrendingShorts(opts: { country: string; limit: number; key: st
     ...mapApiVideo(v, country, i + 1),
     platform: 'youtube_shorts' as const,
   }))
+}
+
+async function apiSearchVideos(opts: {
+  query: string
+  country: string
+  language?: string
+  limit: number
+  periodDays: number
+  key: string
+}) {
+  const { query, country, language, limit, periodDays, key } = opts
+  const params = new URLSearchParams({
+    part: 'snippet',
+    q: query,
+    type: 'video',
+    order: 'viewCount',
+    regionCode: country,
+    maxResults: String(Math.min(limit, 50)),
+    publishedAfter: new Date(Date.now() - periodDays * 86400e3).toISOString(),
+    safeSearch: 'moderate',
+    key,
+  })
+  if (language && language !== 'all') params.set('relevanceLanguage', language)
+  const search = await getJson<{ items?: Array<{ id?: { videoId?: string } }> }>(`${API}/search?${params}`, {
+    label: `yt-live-search-${country}`,
+  })
+  if (!search.ok) throw new Error(search.error)
+  const ids = (search.data.items ?? []).map((item) => item.id?.videoId).filter((id): id is string => Boolean(id))
+  if (!ids.length) return []
+  const details = await getJson<{ items?: ApiVideo[] }>(
+    `${API}/videos?part=snippet,statistics,contentDetails&id=${ids.join(',')}&key=${key}`,
+    { label: `yt-live-details-${country}` },
+  )
+  if (!details.ok) throw new Error(details.error)
+  const byId = new Map((details.data.items ?? []).map((video) => [video.id, video]))
+  return ids.map((id, index) => byId.get(id) ? mapApiVideo(byId.get(id)!, country, index + 1) : null)
+    .filter((item): item is RawTrendItem => Boolean(item))
 }
 
 /* ----------------------------- HTML ayristirma ---------------------------- */
@@ -243,6 +281,46 @@ async function scrapeSearch(opts: { query: string; country: string; limit: numbe
     if (out.length >= limit) break
   }
   return out
+}
+
+/** Kullanıcı araması için o anda alınan YouTube sonuçları; API bozuksa web yedeğine düşer. */
+export async function searchYoutubeNow(opts: {
+  query: string
+  country: string
+  language?: string
+  limit?: number
+  periodDays?: number
+}) {
+  const limit = Math.max(1, Math.min(opts.limit ?? 24, 40))
+  const periodDays = Math.max(1, Math.min(opts.periodDays ?? 7, 30))
+  const key = process.env.YOUTUBE_API_KEY?.trim()
+  const errors: string[] = []
+  if (key) {
+    try {
+      const items = await apiSearchVideos({ ...opts, limit, periodDays, key })
+      if (items.length) return { items, source: 'live-api' as const, errors }
+    } catch (error) {
+      errors.push(`YouTube API: ${(error as Error).message}`)
+    }
+  }
+  try {
+    const cutoff = Date.now() - periodDays * 86400e3
+    const rows = await scrapeSearch({
+      query: opts.query,
+      country: opts.country,
+      limit,
+      sp: periodDays <= 7 ? SP.buHaftaEnCokIzlenen : undefined,
+      hint: opts.query,
+    })
+    return {
+      items: rows.filter((row) => !row.published_at || Date.parse(row.published_at) >= cutoff),
+      source: 'live-web' as const,
+      errors,
+    }
+  } catch (error) {
+    errors.push(`YouTube web: ${(error as Error).message}`)
+    return { items: [], source: 'live-web' as const, errors }
+  }
 }
 
 const youtube: Collector = {

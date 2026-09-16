@@ -7,6 +7,7 @@ import {
   PackageCheck, RefreshCw, Sparkles, ThumbsDown, Undo2,
 } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
+import ContentDiscovery from '@/components/kade-search/ContentDiscovery'
 import SourcesPanel from '@/components/kade-search/SourcesPanel'
 import { apiFetch } from '@/lib/client/api'
 import { cn } from '@/lib/utils'
@@ -179,7 +180,7 @@ export default function KadeSearchApprovalPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[.16em] text-emerald-400"><Sparkles className="h-4 w-4" /> Günlük karar masası</p>
-                <h2 className="text-xl font-semibold text-white sm:text-2xl">Bugün ne üreteceğimize sen karar ver.</h2>
+                <h2 className="text-xl font-semibold text-zinc-100 sm:text-2xl">Bugün ne üreteceğimize sen karar ver.</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">KadeSearch güncel sinyalleri toplar. Onayladığın aday için başlık, caption, hashtag, görsel brief ve çekim akışı otomatik hazırlanır.</p>
               </div>
               <button onClick={() => void load(true)} disabled={refreshing} className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-zinc-200 hover:border-zinc-600 disabled:opacity-50">
@@ -187,6 +188,8 @@ export default function KadeSearchApprovalPage() {
               </button>
             </div>
           </div>
+
+          <ContentDiscovery />
 
           <SourcesPanel />
 

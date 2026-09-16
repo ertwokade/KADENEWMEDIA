@@ -6,8 +6,8 @@ import 'server-only'
  * Instagram'in halka acik bir "trendler" API'si YOKTUR. Uc kademeli calisiriz:
  *   1) INSTAGRAM_SESSION_ID tanimliysa web ic API'si ile gercek hashtag verisi.
  *   2) Anahtar yoksa herkese acik hashtag sayfasindan og meta verisi okunur.
- *   3) Ikisi de olmazsa "cikarim modu": TikTok + Google sinyallerinden Reels'e
- *      tasinmasi muhtemel akimlar uretilir ve `inferred` ile isaretlenir.
+ *   3) Ikisi de olmazsa kaynak kullanılamaz olarak raporlanır. Başka
+ *      platformlardan Reels izlenmesi veya popülerliği uydurulmaz.
  */
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getJson, getText } from '../http'
@@ -181,50 +181,12 @@ async function scrapeTagCount(tag: string, country: string): Promise<RawTrendIte
   ]
 }
 
-/**
- * Cikarim modu: TikTok'ta yukselen hashtag/sesler Reels'e ~1-3 hafta icinde tasinir.
- */
-async function inferFromOtherPlatforms(country: string, limit: number): Promise<RawTrendItem[]> {
-  const db = createAdminClient()
-  const { data } = await db
-    .from('kade_trend_current')
-    .select('title, kind, author, category, score, posts, views')
-    .in('platform', ['tiktok', 'google', 'music'])
-    .in('kind', ['hashtag', 'sound', 'topic'])
-    .order('score', { ascending: false, nullsFirst: false })
-    .limit(limit)
-
-  return (data ?? []).map((r, i) => ({
-    platform: 'instagram',
-    kind: r.kind === 'sound' ? 'sound' : 'hashtag',
-    external_id: `inferred:${normalizeText(r.title)}`,
-    title: r.title,
-    author: r.author,
-    description:
-      '[ÇIKARIM] Bu trend diğer platformlarda yükselişte; Reels tarafına taşınması bekleniyor. Gerçek Instagram ölçümü değildir.',
-    url:
-      r.kind === 'hashtag'
-        ? `https://www.instagram.com/explore/tags/${encodeURIComponent(normalizeText(r.title).replace(/[^a-z0-9]/g, ''))}/`
-        : `https://www.instagram.com/explore/search/keyword/?q=${encodeURIComponent(r.title)}`,
-    country,
-    rank: i + 1,
-    sourceCategory: r.category,
-    metrics: {
-      posts: Math.round((r.posts ?? 0) * 0.35),
-      views: Math.round((r.views ?? 0) * 0.3),
-      extra: { inferred: true, sourceScore: r.score },
-    },
-    inferred: true,
-    raw: { inferred: true, basis: 'tiktok/google sinyali' },
-  }))
-}
-
 const instagram: Collector = {
   id: 'instagram',
   label: 'Instagram Reels',
   platforms: ['instagram'],
 
-  async collect({ country, limit }) {
+  async collect({ country }) {
     const items: RawTrendItem[] = []
     const errors: string[] = []
     const hasSession = Boolean(process.env.INSTAGRAM_SESSION_ID?.trim())
@@ -258,10 +220,15 @@ const instagram: Collector = {
       }
     }
 
-    // Canli veri alinamadiysa cikarim moduna dus
+    // Canli veri yoksa yanlış popülerlik üretme; kaynağı açıkça kullanılamaz bırak.
     if (liveOk === 0) {
-      const inferred = await inferFromOtherPlatforms(country, limit)
-      return { items: inferred, errors: [], note: 'çıkarım modu (tahmin) — canlı veri alınamadı' }
+      return {
+        items: [],
+        errors: errors.length ? errors.slice(0, 5) : ['instagram: canlı ve ölçülmüş veri alınamadı'],
+        note: hasSession
+          ? 'Instagram oturumu çalışmadı veya süresi doldu; tahmini kayıt üretilmedi'
+          : 'INSTAGRAM_SESSION_ID tanımlı değil; tahmini kayıt üretilmedi',
+      }
     }
 
     return {

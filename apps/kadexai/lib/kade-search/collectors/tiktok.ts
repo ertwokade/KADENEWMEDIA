@@ -7,13 +7,11 @@ import 'server-only'
  * populer video ve kreator listeleri.
  *
  * ONEMLI: TikTok bu uclari oturum arkasina aldi; cerez olmadan "no permission"
- * doner. Gercek veri icin TIKTOK_COOKIE ortam degiskeni gerekir. Cerez yoksa
- * toplayici diger platformlardaki sinyallerden TikTok adaylari uretir ve
- * bunlari acikca "cikarim" (inferred) olarak isaretler.
+ * doner. Gercek veri icin TIKTOK_COOKIE ortam degiskeni gerekir. Canli veri
+ * yoksa toplayici bos doner; baska platformlardan TikTok sayisi uydurmaz.
  */
-import { createAdminClient } from '@/lib/supabase/admin'
 import { getJson } from '../http'
-import { parseCount, normalizeText } from '../util'
+import { parseCount } from '../util'
 import type { Collector, RawTrendItem } from '../types'
 
 const BASE = 'https://ads.tiktok.com/creative_radar_api/v1'
@@ -171,42 +169,6 @@ async function fetchCreators(country: string, limit: number): Promise<RawTrendIt
   })
 }
 
-/**
- * Cerez yoksa: diger platformlardaki yuksek skorlu sinyallerden TikTok adaylari
- * uretir. Bunlar OLCUM DEGIL TAHMINDIR ve `inferred` ile isaretlenir.
- */
-async function inferFromOtherPlatforms(country: string, limit: number): Promise<RawTrendItem[]> {
-  const db = createAdminClient()
-  const { data } = await db
-    .from('kade_trend_current')
-    .select('title, kind, author, category, score, views')
-    .in('platform', ['youtube_shorts', 'google', 'music', 'reddit'])
-    .gte('last_seen', new Date(Date.now() - 7 * 86400e3).toISOString())
-    .order('score', { ascending: false, nullsFirst: false })
-    .limit(limit)
-
-  return (data ?? []).map((r, i) => {
-    const isSound = r.kind === 'sound'
-    const term = normalizeText(r.title).replace(/[^a-z0-9]/g, '').slice(0, 30)
-    return {
-      platform: 'tiktok',
-      kind: isSound ? 'sound' : 'keyword',
-      external_id: `inferred:${term || i}`,
-      title: r.title,
-      author: r.author,
-      description:
-        '[ÇIKARIM] TikTok çerezi tanımlı değil. Bu kayıt diğer platformlardaki sinyallerden türetilmiş bir adaydır, gerçek TikTok ölçümü değildir.',
-      url: `https://www.tiktok.com/search?q=${encodeURIComponent(r.title)}`,
-      country,
-      rank: i + 1,
-      sourceCategory: r.category,
-      metrics: { views: Math.round((r.views ?? 0) * 0.6), extra: { inferred: true, sourceScore: r.score } },
-      inferred: true,
-      raw: { inferred: true, basis: 'capraz platform sinyali' },
-    }
-  })
-}
-
 const tiktok: Collector = {
   id: 'tiktok',
   label: 'TikTok',
@@ -231,13 +193,12 @@ const tiktok: Collector = {
     }
 
     if (!items.length) {
-      const inferred = await inferFromOtherPlatforms(country, Math.min(limit, 40))
       return {
-        items: inferred,
-        errors: [],
+        items: [],
+        errors: errors.length ? errors.slice(0, 6) : ['tiktok: canlı ve ölçülmüş veri alınamadı'],
         note: process.env.TIKTOK_COOKIE?.trim()
-          ? 'çıkarım modu — çerez çalışmadı (süresi dolmuş olabilir)'
-          : 'çıkarım modu (tahmin) — TIKTOK_COOKIE tanımlı değil',
+          ? 'TikTok çerezi çalışmadı veya süresi doldu; tahmini kayıt üretilmedi'
+          : 'TIKTOK_COOKIE tanımlı değil; tahmini kayıt üretilmedi',
       }
     }
 
