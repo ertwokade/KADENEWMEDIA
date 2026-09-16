@@ -33,8 +33,21 @@ function normalizedPlatforms(value: string[] | undefined) {
 }
 
 function matchesLanguage(value: string | null | undefined, language: DiscoveryLanguage) {
-  if (!value || value === 'und') return true
+  // YouTube relevanceLanguage yalnızca sıralamayı etkiler; farklı dildeki
+  // videoları tamamen elemez. Dilini doğrulayamadığımız canlı kaydı seçilen
+  // dile aitmiş gibi göstermek yerine dışarıda bırakıyoruz.
+  if (!value || value === 'und') return false
   return value.toLocaleLowerCase('en-US').split('-')[0] === language
+}
+
+function coverageNote(platform: DiscoveryPlatform) {
+  if (platform === 'tiktok' && !process.env.TIKTOK_COOKIE?.trim()) {
+    return 'TikTok canlı erişimi bağlı değil; tahmini TikTok sonucu gösterilmiyor'
+  }
+  if (platform === 'instagram' && !process.env.INSTAGRAM_SESSION_ID?.trim()) {
+    return 'Instagram canlı erişimi bağlı değil; tahmini Reels sonucu gösterilmiyor'
+  }
+  return PLATFORM_NOTES[platform]
 }
 
 export async function discoverContent(input: {
@@ -80,16 +93,23 @@ export async function discoverContent(input: {
   } else if (youtube.errors.length) {
     notices.push('YouTube resmi API yanıt vermedi; canlı web arama yedeği kullanıldı.')
   }
+  if (platforms.includes('tiktok') && !process.env.TIKTOK_COOKIE?.trim()) {
+    notices.push('TikTok canlı erişimi bağlı değil. Doğrulanmamış veya tahmini TikTok sonuçları listeye alınmadı.')
+  }
+  if (platforms.includes('instagram') && !process.env.INSTAGRAM_SESSION_ID?.trim()) {
+    notices.push('Instagram canlı erişimi bağlı değil. Doğrulanmamış veya tahmini Reels sonuçları listeye alınmadı.')
+  }
 
   const results = rankDiscoveryResults([...live, ...measured], limit)
   const coverage: DiscoveryCoverage[] = platforms.map((platform) => {
     const count = results.filter((row) => row.platform === platform).length
     const liveCount = live.filter((row) => row.platform === platform).length
+    const baseNote = coverageNote(platform)
     return {
       platform,
       count,
       mode: liveCount > 0 ? 'live' : count > 0 ? 'measured' : 'unavailable',
-      note: count > 0 ? PLATFORM_NOTES[platform] : `${PLATFORM_NOTES[platform]} — bu aramada taze eşleşme bulunamadı`,
+      note: count > 0 ? baseNote : `${baseNote} — bu aramada taze eşleşme bulunamadı`,
     }
   })
 
