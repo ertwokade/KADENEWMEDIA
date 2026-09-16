@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { enrich } from './classify'
+import { detectLanguage, enrich } from './classify'
 import {
   discoveryFromRaw,
   discoveryFromTrend,
@@ -81,7 +81,21 @@ export async function discoverContent(input: {
       : Promise.resolve({ items: [], source: 'live-web' as const, errors: [] as string[] }),
   ])
 
-  const measured = stored.map(discoveryFromTrend).filter((row): row is DiscoveryResult => Boolean(row))
+  const measured = stored
+    .filter((row) => {
+      const detected = detectLanguage({
+        platform: row.platform,
+        kind: row.kind,
+        title: row.title,
+        description: row.description,
+        author: row.author,
+      })
+      // Eski kayıtlardaki hatalı dil etiketlerini canlı keşfe taşımıyoruz.
+      // Metin belirsizse DB etiketi (sorguda zaten seçilen dil) geçerli kalır.
+      return detected === 'und' || detected === input.language
+    })
+    .map(discoveryFromTrend)
+    .filter((row): row is DiscoveryResult => Boolean(row))
   const live = youtube.items
     .map((item) => enrich(item))
     .filter((item) => matchesLanguage(item.language, input.language))

@@ -61,6 +61,7 @@ test('istemciden gelen kaynak yeniden doğrulanır', () => {
 })
 
 test('seçilebilir diller temel metin sinyallerinden ayırt edilir', () => {
+  assert.equal(detectLanguage(raw({ title: 'Signs of Crisis Are Mounting! Markets on Edge, Interest Rates and Oil' })), 'en')
   assert.equal(detectLanguage(raw({ title: 'Warum ist dieses Video so beliebt und wie funktioniert es?' })), 'de')
   assert.equal(detectLanguage(raw({ title: 'Pourquoi cette vidéo est devenue populaire avec une idée simple' })), 'fr')
   assert.equal(detectLanguage(raw({ title: 'Как это видео стало популярным' })), 'ru')
