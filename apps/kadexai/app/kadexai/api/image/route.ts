@@ -4,6 +4,7 @@ import { hasAuthenticatedUser } from '@/lib/auth/server'
 import { getRequestProfileInstruction } from '@/lib/ai/profileContext'
 import { requireApiUser } from '@/lib/auth/server'
 import { requireToolFeature } from '@/lib/payments/featureGuard'
+import { geminiImageError, isGeminiModelUnavailable, pickGeminiImageModel, type GeminiModelInfo } from '@/lib/ai/geminiImage'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,25 +32,51 @@ async function generateWithOpenAI(prompt: string, width: number, height: number)
   return b64 ? { image: `data:image/png;base64,${b64}` } : { error: 'Görsel dönmedi.' }
 }
 
-async function generateWithGemini(prompt: string) {
-  const key = process.env.GEMINI_API_KEY?.trim()
-  if (!key) return null
+let discoveredGeminiImageModel: string | null = null
 
-  const model = process.env.OPERATIONS_IMAGE_MODEL || 'gemini-2.5-flash-image'
+async function discoverGeminiImageModel(key: string) {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key=${key}`, {
+    signal: AbortSignal.timeout(10000),
+  })
+  if (!response.ok) return null
+  const data = await response.json().catch(() => null) as { models?: GeminiModelInfo[] } | null
+  return pickGeminiImageModel(data?.models ?? [])
+}
+
+async function requestGeminiImage(key: string, model: string, prompt: string) {
   const endpoint = model.startsWith('imagen') ? 'predict' : 'generateContent'
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:${endpoint}?key=${key}`
   const body = model.startsWith('imagen')
     ? { instances: [{ prompt }], parameters: { sampleCount: 1 } }
     : { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['IMAGE'] } }
-
   const response = await fetch(url, {
     method: 'POST',
     signal: AbortSignal.timeout(45000),
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
-  const data = await response.json()
-  if (!response.ok) return { error: 'Gemini görsel isteği tamamlanamadı.' }
+  const data = await response.json().catch(() => ({}))
+  return { response, data }
+}
+
+async function generateWithGemini(prompt: string) {
+  const key = process.env.GEMINI_API_KEY?.trim()
+  if (!key) return null
+
+  let model = discoveredGeminiImageModel || process.env.OPERATIONS_IMAGE_MODEL || 'gemini-2.5-flash-image'
+  let { response, data } = await requestGeminiImage(key, model, prompt)
+  if (!response.ok && isGeminiModelUnavailable(response.status, String(data?.error?.message ?? ''))) {
+    const discovered = await discoverGeminiImageModel(key)
+    if (discovered && discovered !== model) {
+      model = discovered
+      ;({ response, data } = await requestGeminiImage(key, model, prompt))
+      if (response.ok) discoveredGeminiImageModel = discovered
+    }
+  }
+  if (!response.ok) {
+    console.error('[kadexai/image] Gemini görsel isteği başarısız:', { model, status: response.status })
+    return { error: geminiImageError(response.status) }
+  }
 
   if (model.startsWith('imagen')) {
     const b64 = data.predictions?.[0]?.bytesBase64Encoded
