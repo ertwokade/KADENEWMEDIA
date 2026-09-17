@@ -1078,6 +1078,8 @@ html[data-theme='dark'] .kade-auth-success { border-color: #7ee2ac; background: 
 .kade-assistant-mesaj p { margin: 0; white-space: pre-wrap; }
 .kade-assistant-sen { justify-self: end; max-width: 85%; background: var(--kade-gradient); color: var(--kade-on-accent); font-weight: 500; }
 .kade-assistant-asistan { max-width: 92%; border: 1px solid var(--kade-line); background: color-mix(in srgb, var(--kade-surface-soft) 70%, transparent); color: var(--kade-ink); }
+/* Asistan cevabı markdown olarak çizilir; balon yazı boyu ve rengi korunur. */
+.kade-assistant-asistan :is(p, li, h3, blockquote) { font-size: 13px; line-height: 1.55; color: var(--kade-ink); }
 .kade-assistant-araclar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .kade-assistant-araclar a {
   display: inline-flex; align-items: center; gap: 5px;

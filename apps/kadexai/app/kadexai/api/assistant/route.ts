@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const question = String(body.question || '').slice(0, 4000)
-    const context = String(body.context || '').slice(0, 12000)
+    const context = String(body.context || '').slice(0, 16000)
     if (!question) return NextResponse.json({ error: 'Soru boş.' }, { status: 400 })
 
     const requestedModel = String(body.model || '') as AIModel
@@ -39,16 +39,18 @@ export async function POST(req: NextRequest) {
       ? requestedModel
       : selectOperationsModel()
     if (!model) {
-      return NextResponse.json({ error: 'Operasyon asistanı için GEMINI_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY veya OPENAI_API_KEY gerekli.' })
+      return NextResponse.json({ error: 'Asistan için yönetici ayarı gerekli: bağlı AI sağlayıcısı yok.' })
     }
 
     const result = await generateContent({
       model,
       maxTokens: 1200,
       systemPrompt:
-        'Sen KADE ekibinin Türkçe konuşan yapım ve operasyon asistanısın. ' +
-        'Aşağıdaki ekip verisine dayanarak kısa, net ve uygulanabilir cevap ver. ' +
-        'Veri yoksa genel öneride bulun.\n\n--- EKIP VERISI ---\n' + context,
+        'Sen KadexAI çalışma alanının Türkçe konuşan asistanısın. ' +
+        'Aşağıdaki kullanıcı bağlamına dayanarak kısa, net ve uygulanabilir cevap ver. ' +
+        'Selamlama veya "ekip olarak" gibi girişler yazma; doğrudan cevaba başla. ' +
+        'Araçlar sorulursa bağlamdaki araç kataloğunun TAMAMINI kategorileriyle ver; son kullanılan araçları tam liste gibi sunma. ' +
+        'Bağlamda olmayan veriyi varmış gibi anlatma; veri yoksa bunu söyleyip genel öneride bulun.\n\n--- KULLANICI BAĞLAMI ---\n' + context,
       prompt: question,
       // İstek geçilmezse bildirim ve maliyet dökümü aracı "unknown" olarak
       // kaydediyordu; asistan çalıştırmaları kendi adıyla görünsün.

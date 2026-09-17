@@ -10,6 +10,8 @@ import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 import { TOOL_REGISTRY, getToolById } from '@/lib/tools/registry'
 import { cn } from '@/lib/utils'
 import KadeOrb from './KadeOrb'
+import ModelOutput from '@/components/ui/ModelOutput'
+import { assistantToolCatalog } from '@/lib/assistant/toolCatalog'
 import { kayitBaslat, sesKaydiDesteklenir, type KayitOturumu } from '@/lib/client/voice'
 import {
   AdimDurumu,
@@ -34,6 +36,19 @@ import {
  */
 
 type Mesaj = { rol: 'sen' | 'asistan'; metin: string; araclar?: string[] }
+
+// Sohbet ve sesli yanıt tercihi bu tarayıcıda saklanır; sayfa yenilenince kaybolmaz.
+const SOHBET_ANAHTARI = 'kade:assistant:messages'
+const SES_ANAHTARI = 'kade:assistant:voice-reply'
+
+function kayitliMesajlar(): Mesaj[] {
+  try {
+    const value = JSON.parse(window.localStorage.getItem(SOHBET_ANAHTARI) || '[]')
+    return Array.isArray(value)
+      ? value.filter((m): m is Mesaj => m && (m.rol === 'sen' || m.rol === 'asistan') && typeof m.metin === 'string').slice(-30)
+      : []
+  } catch { return [] }
+}
 
 /** Cevap gelmeden önce yapılan işler. Eskiden görünmezdi: kullanıcı yalnızca
  *  "Düşünüyor…" görüp asistanın neyi bildiğini bilmiyordu. */
@@ -60,12 +75,21 @@ export default function WorkspaceAssistant() {
   const [adimlar, setAdimlar] = useState<Adim[]>([])
   // Sesli kullanım: konuş → yazıya çevrilir → cevap gelir → sesli okunur.
   const [kayitta, setKayitta] = useState(false)
-  const [sesliCevap, setSesliCevap] = useState(true)
+  const [sesliCevap, setSesliCevap] = useState(false)
+  const [sesHatasi, setSesHatasi] = useState('')
   const [sesDestegi, setSesDestegi] = useState(false)
   const oturumRef = useRef<KayitOturumu | null>(null)
   const sesRef = useRef<HTMLAudioElement | null>(null)
 
-  useEffect(() => { setSesDestegi(sesKaydiDesteklenir()) }, [])
+  useEffect(() => {
+    setSesDestegi(sesKaydiDesteklenir())
+    setMesajlar(kayitliMesajlar())
+    try { setSesliCevap(window.localStorage.getItem(SES_ANAHTARI) === '1') } catch { /* tercih okunamazsa kapalı kalır */ }
+  }, [])
+
+  useEffect(() => {
+    try { window.localStorage.setItem(SOHBET_ANAHTARI, JSON.stringify(mesajlar.slice(-30))) } catch { /* depolama kapalı olabilir */ }
+  }, [mesajlar])
 
   // Panel kapanınca ya da bileşen sökülünce mikrofon ve ses açık kalmasın.
   useEffect(() => () => {
@@ -128,26 +152,29 @@ export default function WorkspaceAssistant() {
       adimYaz('Son çalışmalar okunamadı', 'hata', 'Ağ hatası — bağlam dar kaldı.')
     }
 
-    return parcalar.join('\n') || 'Kullanıcı henüz marka profilini doldurmadı.'
+    if (!parcalar.some((p) => p.startsWith('Marka') || p.startsWith('Niş') || p.startsWith('Açıklama'))) parcalar.unshift('Kullanıcı henüz marka profilini doldurmadı.')
+    parcalar.push(assistantToolCatalog())
+    return parcalar.join('\n')
   }
 
   /** Cevabı sesli okur. Başarısız olursa sessizce geçilir: metin zaten ekranda. */
   const sesliOku = async (metin: string) => {
+    setSesHatasi('')
     try {
       const r = await apiFetch('/api/assistant/speech', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ metin }),
       })
-      if (!r.ok) return
-      const d = await r.json()
-      if (!d.ses) return
+      const d = await r.json().catch(() => ({}))
+      if (!r.ok || !d.ses) { setSesHatasi('Sesli yanıt oluşturulamadı; cevap metin olarak duruyor.'); return }
       sesRef.current?.pause()
       const ses = new Audio(`data:${d.mime || 'audio/wav'};base64,${d.ses}`)
       sesRef.current = ses
       await ses.play()
     } catch {
       // Otomatik oynatma engellenmiş olabilir; cevap metin olarak duruyor.
+      setSesHatasi('Tarayıcı sesi otomatik çalmadı; cevap metin olarak duruyor.')
     }
   }
 
@@ -215,7 +242,8 @@ export default function WorkspaceAssistant() {
       if (!r.ok || d.error) throw new Error(d.error || 'Cevap alınamadı')
       adimYaz('Asistan yanıtladı', 'bitti', d.model ? `Model: ${d.model}` : undefined)
       setMesajlar((m) => [...m, { rol: 'asistan', metin: d.answer, araclar: gecenAraclar(d.answer) }])
-      if (sesli && sesliCevap) void sesliOku(d.answer)
+      // Sesli cevap açıksa yazılı ve sesli sorular okunur; mikrofonla sorulunca her zaman okunur.
+      if (sesli || sesliCevap) void sesliOku(d.answer)
     } catch (err) {
       adimYaz('Asistan yanıtlayamadı', 'hata', err instanceof Error ? err.message : undefined)
       setHata(err instanceof Error ? err.message : 'Hata oluştu')
@@ -241,14 +269,16 @@ export default function WorkspaceAssistant() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <span className="kade-eyebrow">Asistan</span>
-                <p>Markanı ve son çalışmalarını biliyor.</p>
+                <p>{account?.brand?.name || account?.brand?.description ? 'Markanı, araçları ve son çalışmalarını biliyor.' : 'Araçları ve son çalışmalarını biliyor. Marka profilin boş.'}</p>
               </div>
               {sesDestegi && (
                 <button
                   type="button"
                   onClick={() => {
-                    setSesliCevap((v) => !v)
-                    if (sesliCevap) sesRef.current?.pause()
+                    const yeni = !sesliCevap
+                    setSesliCevap(yeni)
+                    try { window.localStorage.setItem(SES_ANAHTARI, yeni ? '1' : '0') } catch { /* tercih bu oturumda geçerli */ }
+                    if (!yeni) sesRef.current?.pause()
                   }}
                   aria-pressed={sesliCevap}
                   aria-label={sesliCevap ? 'Sesli cevabı kapat' : 'Sesli cevabı aç'}
@@ -272,7 +302,7 @@ export default function WorkspaceAssistant() {
             )}
             {mesajlar.map((m, i) => (
               <div key={i} className={`kade-assistant-mesaj kade-assistant-${m.rol}`}>
-                <p>{m.metin}</p>
+                {m.rol === 'asistan' ? <ModelOutput content={m.metin} /> : <p>{m.metin}</p>}
                 {m.araclar && m.araclar.length > 0 && (
                   <div className="kade-assistant-araclar">
                     {m.araclar.map((id) => {
@@ -311,6 +341,10 @@ export default function WorkspaceAssistant() {
               </div>
             )}
             {hata && <p className="kade-assistant-hata">{hata}</p>}
+            {sesHatasi && <p className="kade-assistant-hata">{sesHatasi}</p>}
+            {mesajlar.length > 0 && !yukleniyor && (
+              <button type="button" onClick={() => { setMesajlar([]); setAdimlar([]) }} className="justify-self-center text-[11px] text-zinc-500 underline">Sohbeti temizle</button>
+            )}
             <div ref={sonRef} />
           </div>
 
