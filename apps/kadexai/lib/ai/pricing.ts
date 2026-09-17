@@ -23,7 +23,7 @@ export interface ModelRate {
 }
 
 /** Tablonun elle en son gözden geçirildiği tarih. */
-export const RATES_REVIEWED_AT = '2026-08-26'
+export const RATES_REVIEWED_AT = '2026-09-17'
 
 const DEFAULT_RATES: Partial<Record<AIModel, ModelRate>> = {
   // Premium
@@ -36,6 +36,9 @@ const DEFAULT_RATES: Partial<Record<AIModel, ModelRate>> = {
   'gemini-flash-latest': { in: 0.3, out: 2.5 },
   'gemini-flash-lite': { in: 0.1, out: 0.4 },
   'gemini-lite-latest': { in: 0.1, out: 0.4 },
+  // ai.google.dev/gemini-api/docs/pricing, ücretli standart katman (17.09.2026)
+  'gemini-3-1-lite': { in: 0.25, out: 1.5 },
+  'gemini-3-5-flash': { in: 1.5, out: 9 },
 
   // Groq
   'groq-llama-70b': { in: 0.59, out: 0.79 },
