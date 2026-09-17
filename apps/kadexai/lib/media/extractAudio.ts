@@ -6,7 +6,8 @@
  * Transkripsiyon ucu 25 MB sinirli ve videolar bunu kolayca asiyor. Burada ses
  * kanali tarayicida ayristirilip kucultuluyor:
  *   1. Yontem: captureStream + MediaRecorder -> WebM/Opus ~32 kbps (en kucuk)
- *   2. Yontem: Web Audio API -> 8 kHz mono WAV (her tarayicida calisir)
+ *   Hızlı yol: Web Audio API -> 16/8 kHz mono WAV (video süresini beklemez)
+ *   Yedek: captureStream + MediaRecorder (gerçek zamanlı)
  *
  * Klip Ureticisi, Altyazi Studyosu ve Dublaj ayni boru hattini kullanir.
  */
@@ -43,6 +44,15 @@ export async function extractAudio(file: File, onMsg: (m: string) => void = () =
     onMsg('Ses dosyası hazır.')
     return new File([file], file.name, { type: mediaType })
   }
+  // Hızlı yol: ses tarayıcının arka plan çözücüsüyle çıkarılır (video süresi kadar
+  // beklemez, sesli oynatmaz). Çok büyük dosyada bellek için gerçek zamanlı kayda düşülür.
+  if (file.size > 0 && file.size <= 120 * 1024 * 1024 && typeof OfflineAudioContext !== 'undefined') {
+    try {
+      onMsg('Ses kanalı ayrıştırılıyor...')
+      return await decodeToWav(file, onMsg)
+    } catch { /* gerçek zamanlı kayda düş */ }
+  }
+
   type CaptureStreamVideo = HTMLVideoElement & { captureStream: () => MediaStream }
   const supportsCapture = typeof (HTMLVideoElement.prototype as Partial<CaptureStreamVideo>).captureStream === 'function'
 
@@ -106,18 +116,30 @@ export async function extractAudio(file: File, onMsg: (m: string) => void = () =
   }
 
   onMsg('Ses kanalı ayrıştırılıyor...')
+  return decodeToWav(file, onMsg)
+}
+
+async function decodeToWav(file: File, onMsg: (m: string) => void): Promise<File> {
   const ab = await file.arrayBuffer()
   const tmpCtx = new AudioContext()
   let original: AudioBuffer
   try { original = await tmpCtx.decodeAudioData(ab) }
   catch { throw new Error('Video formatı desteklenmiyor. MP4 veya MOV kullan.') }
   finally { await tmpCtx.close() }
+  if (!original.duration || original.numberOfChannels === 0) throw new Error('Ses kanalı yok.')
 
-  onMsg('8 kHz WAV oluşturuluyor...')
-  const SR = 8000
+  // Transkripsiyon ucu 25 MB kabul ediyor: 16 kHz ≈ 12 dk, 8 kHz ≈ 25 dk sığar.
+  const SR = original.duration <= 12 * 60 ? 16000 : 8000
+  if (original.duration * SR * 2 > 24 * 1024 * 1024) throw new Error('Video çok uzun; yaklaşık 25 dakikadan kısa bir bölüm yükle.')
+  onMsg(`${SR / 1000} kHz WAV oluşturuluyor...`)
   const offline = new OfflineAudioContext(1, Math.ceil(original.duration * SR), SR)
   const src = offline.createBufferSource(); src.buffer = original; src.connect(offline.destination); src.start(0)
-  return new File([encodeWAV(await offline.startRendering())], 'audio.wav', { type: 'audio/wav' })
+  const rendered = await offline.startRendering()
+  // Uzun seslerde WAV kodlaması ana iş parçacığını kilitlemesin diye önce bir kare çizilir.
+  await new Promise((resolve) => setTimeout(resolve, 0))
+  const wav = new File([encodeWAV(rendered)], 'audio.wav', { type: 'audio/wav' })
+  onMsg('Ses hazır!')
+  return wav
 }
 
 /** Ses veya video dosyasinin suresini (saniye) okur. */
