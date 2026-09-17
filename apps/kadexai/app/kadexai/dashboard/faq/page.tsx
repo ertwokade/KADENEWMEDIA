@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -42,6 +43,12 @@ export default function FAQPage() {
   const [result, setResult] = useState<FAQResult | null>(null)
   const [error, setError] = useState('')
   const [schemaCopied, setSchemaCopied] = useState(false)
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['content', 'platform', 'count'] as const)
+    if (v.content) setContent(v.content); if (v.platform) setPlatform(v.platform as Platform); if (v.count && Number(v.count) > 0) setCount(Number(v.count))
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,7 +115,7 @@ export default function FAQPage() {
               </div>
               <button type="submit" disabled={loading || !content.trim()}
                 className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                {loading ? 'Oluşturuluyor...' : 'SSS Oluştur'}
+                {loading ? 'Oluşturuluyor…' : 'FAQ Oluştur'}
               </button>
             </form>
           </div>

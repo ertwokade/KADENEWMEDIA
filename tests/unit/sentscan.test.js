@@ -33,7 +33,12 @@ for (const source of ['src/embedded/kadir-organizasyon-kiti/app.js', 'apps/kadex
       document: { getElementById: id => elements[id] }, state: { analysisHistory: [] },
       esc: value => String(value), fmt: { dt: () => 'test' },
     })
-    for (const name of ['parseComments', 'analyzeComments', 'calcVideoScore', 'normalizeAnalysis', 'renderVideoScore', 'renderAnalysisHistory']) {
+    const names = ['parseComments', 'analyzeComments', 'calcVideoScore', 'normalizeAnalysis', 'renderVideoScore', 'renderAnalysisHistory']
+    if (code.includes('function commentSentiment(')) {
+      names.push('commentSentiment')
+      vm.runInContext('var negationPattern = /(değil|olmamış|olmadı|yaramadı|yok)\\b/', context)
+    }
+    for (const name of names) {
       const start = code.indexOf(`function ${name}(`)
       assert.notEqual(start, -1, `${name} mevcut olmalı`)
       const end = code.indexOf('\nfunction ', start + 1)
@@ -78,3 +83,49 @@ for (const source of ['src/embedded/kadir-organizasyon-kiti/app.js', 'apps/kadex
     assert.doesNotMatch(elements.analysisHistory.innerHTML, /null\/10|0\/10/)
   })
 }
+
+test('KadexAI SentScan açık olumsuz yorumları sayar, soru ve istekleri nötr bırakır', () => {
+  const code = readFileSync(new URL('../../apps/kadexai/public/kadexai/operations-kit/app.js', import.meta.url), 'utf8')
+  const context = vm.createContext({ buildWordCloud: () => [] })
+  for (const constant of ['themeDefinitions', 'positiveWords', 'negativeWords', 'negationPattern']) {
+    const start = code.indexOf(`const ${constant} =`)
+    const end = code.indexOf(';\n', start)
+    vm.runInContext(code.slice(start, end + 1).replace(/^const /, 'var '), context)
+  }
+  for (const name of ['containsAny', 'commentSentiment', 'parseComments', 'analyzeComments', 'calcVideoScore']) {
+    const start = code.indexOf(`function ${name}(`)
+    const end = code.indexOf('\nfunction ', start + 1)
+    vm.runInContext(code.slice(start, end === -1 ? undefined : end), context)
+  }
+  const result = context.analyzeComments('Harika video, çok işime yaradı!\nSesi çok düşük, anlaşılmıyor.\nFiyatlar ne kadar?\nBir sonraki bölüm ne zaman?\nBence konu yüzeysel kalmış.')
+  assert.equal(result.total, 5)
+  assert.equal(result.sentiment.positive, 1)
+  assert.equal(result.sentiment.negative, 2)
+  assert.equal(result.sentiment.neutral, 2)
+  assert.equal(result.sentiment.question, 2)
+  const themeNames = result.themes.map((theme) => theme.name)
+  assert.ok(themeNames.includes('Ses ve görüntü kalitesi'))
+  assert.ok(themeNames.includes('İçerik derinliği'))
+  assert.ok(!themeNames.some((name) => /Konsept|Kamusal/.test(name)))
+  assert.equal(context.commentSentiment('Hiç güzel değil'), 'negative')
+})
+
+test('KadexAI SentScan transkripti konuya göre özetler, SRT satırlarını temizler ve cümle tekrarlamaz', () => {
+  const code = readFileSync(new URL('../../apps/kadexai/public/kadexai/operations-kit/app.js', import.meta.url), 'utf8')
+  const context = vm.createContext({})
+  const stop = code.indexOf('const stopWords =')
+  vm.runInContext(code.slice(stop, code.indexOf(';\n', stop) + 1).replace(/^const /, 'var '), context)
+  for (const name of ['transcriptCueTimes', 'analyzeTranscriptText', 'repairTextEncoding', 'cleanTranscript', 'countWords']) {
+    const start = code.indexOf(`function ${name}(`)
+    const end = code.indexOf('\nfunction ', start + 1)
+    vm.runInContext(code.slice(start, end === -1 ? undefined : end), context)
+  }
+  const srt = '1\n00:00:00,000 --> 00:00:03,758\nMerhaba ben Kadir, bugün sosyal medya hatalarını anlatıyorum.\n\n2\n00:00:03,758 --> 00:00:08,000\nSosyal medya hatalarını anlatıyorum.\n\n3\n00:00:08,000 --> 00:00:12,000\nİlk hata hedef kitleyi bilmeden paylaşım yapmak.\n'
+  const clean = context.cleanTranscript(srt)
+  assert.doesNotMatch(clean, /-->|^\s*\d+\s*$/m)
+  const insight = context.analyzeTranscriptText(srt)
+  assert.equal(insight.timestamps.length, 3)
+  assert.ok(insight.topics.some((topic) => topic.word === 'sosyal' || topic.word === 'hatalarını'))
+  assert.equal(new Set(insight.keySentences).size, insight.keySentences.length)
+  assert.doesNotMatch(insight.summary, /Yayın takvimi|Müşteri/)
+})

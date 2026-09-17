@@ -173,7 +173,7 @@ export default function KadeSearchApprovalPage() {
 
   return (
     <div className="flex h-full flex-col bg-zinc-950">
-      <TopBar title="KadeSearch Onay Merkezi" description="Günlük trend adaylarını seç, üretim paketini hazırla ve WhatsApp’tan al" showModelSelector={false} />
+      <TopBar title="KadeSearch Onay" description="Günlük trend adaylarını seç, üretim paketini hazırla ve WhatsApp’tan al" showModelSelector={false} />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7">
         <section className="mx-auto max-w-7xl space-y-5">
           <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-900 to-emerald-950/30 p-5 sm:p-6">

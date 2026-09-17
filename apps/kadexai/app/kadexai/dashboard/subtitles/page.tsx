@@ -5,7 +5,7 @@ import {
   AlertTriangle, Check, Download, Loader2, Link2, Captions,
   Languages, MonitorPlay, Upload, Video, X,
 } from 'lucide-react'
-import { apiFetch } from '@/lib/client/api'
+import { apiFetch, recordToolRun } from '@/lib/client/api'
 import TopBar from '@/components/layout/TopBar'
 import CapabilityNotice from '@/components/ui/CapabilityNotice'
 import TranscriptionVocabulary from '@/components/ui/TranscriptionVocabulary'
@@ -130,6 +130,7 @@ export default function SubtitlesPage() {
       setSourceLang(lang)
       setActiveLang(lang)
       setTracks({ [lang]: generated })
+      recordToolRun({ tool: 'subtitles', input: { language: lang }, output: generated.map((cue) => cue.text).join('\n') })
       setStep('done')
       setStepMsg(`${generated.length} altyazı kutusu üretildi.`)
     } catch (e) {

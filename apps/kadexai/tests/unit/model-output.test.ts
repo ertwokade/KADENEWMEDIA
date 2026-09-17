@@ -31,5 +31,5 @@ test('yarım kod çiti çıktıyı kaybetmez; sıfır ve false kaybolmaz', () =>
   assert.match(render('```\nörnek'), /<code>örnek<\/code>/)
   const html = render('{"puan":0,"hazir":false}')
   assert.match(html, />0<\/p>/)
-  assert.match(html, />false<\/p>/)
+  assert.match(html, />Hayır<\/p>/)
 })

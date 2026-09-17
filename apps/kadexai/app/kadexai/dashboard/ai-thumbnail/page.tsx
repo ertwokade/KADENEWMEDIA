@@ -205,7 +205,7 @@ export default function AiThumbnailPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="AI Thumbnail Üretici" description="Başlık, fotoğraf ve stil ile profesyonel thumbnail üret" showModelSelector={false} />
+      <TopBar title="AI Thumbnail" description="Başlık, fotoğraf ve stil ile profesyonel thumbnail üret" showModelSelector={false} />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80 space-y-4">

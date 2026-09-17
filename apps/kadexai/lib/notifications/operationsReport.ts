@@ -1,5 +1,5 @@
 const VIEW_LABELS: Record<string, string> = {
-  dashboard: 'Operasyon Özeti',
+  dashboard: 'Operasyon Merkezi',
   comments: 'SentScan',
   crm: 'Prodüksiyon CRM',
   banana: 'Banana Studio',

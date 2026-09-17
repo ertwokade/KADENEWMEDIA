@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -37,6 +38,12 @@ export default function QuoteExtractorPage() {
   const [result, setResult] = useState<QuoteResult | null>(null)
   const [error, setError] = useState('')
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['content', 'authorName'] as const)
+    if (v.content) setContent(v.content); if (v.authorName) setAuthorName(v.authorName)
+  }, [])
 
   const handleCopy = async (text: string, idx: number) => {
     await copyToClipboard(text)

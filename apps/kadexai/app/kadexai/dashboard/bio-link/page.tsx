@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill, splitList } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -24,6 +25,12 @@ export default function BioLinkPage() {
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('instagram')
   const [copied, setCopied] = useState<string | null>(null)
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['name', 'niche', 'highlights', 'tone', 'platforms'] as const)
+    if (v.name) setName(v.name); if (v.niche) setNiche(v.niche); if (v.highlights) setHighlights(v.highlights); if (v.tone) setTone(v.tone); if (v.platforms) setPlatforms(splitList(v.platforms) as Platform[])
+  }, [])
 
   const togglePlatform = (p: Platform) => setPlatforms(ps => ps.includes(p) ? ps.filter(x => x !== p) : [...ps, p])
 

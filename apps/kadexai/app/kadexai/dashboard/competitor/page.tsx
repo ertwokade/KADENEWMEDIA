@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -22,6 +23,12 @@ export default function CompetitorPage() {
   const [error, setError] = useState('')
   const [importingMaterials, setImportingMaterials] = useState(false)
   const [materialNotice, setMaterialNotice] = useState('')
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['competitorInfo', 'myNiche', 'myPlatform'] as const)
+    if (v.competitorInfo) setCompetitorInfo(v.competitorInfo); if (v.myNiche) setMyNiche(v.myNiche); if (v.myPlatform) setMyPlatform(v.myPlatform)
+  }, [])
 
   const importMaterials = async () => {
     const query = competitorInfo.trim().split(/\n/)[0]?.slice(0, 120)

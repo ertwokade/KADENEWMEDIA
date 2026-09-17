@@ -7,7 +7,7 @@ import { useModel } from '@/lib/context/ModelContext'
 
 const viewMeta: Record<string, { title: string; description: string }> = {
   dashboard: {
-    title: 'Operasyon Özeti',
+    title: 'Operasyon Merkezi',
     description: 'Bütçe, görevler, üretim durumu ve hızlı operasyon görünümü',
   },
   comments: {

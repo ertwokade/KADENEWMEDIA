@@ -3,6 +3,7 @@ import { ModelConfig, getModelConfig } from '@/lib/ai/models'
 import { getVercelGatewayToken } from '@/lib/ai/gatewayAuth'
 import { getAvailableModels, routeModelForTask } from '@/lib/ai/modelRouter'
 import { getRequestProfileInstruction } from '@/lib/ai/profileContext'
+import { contentIntegrityInstruction, isTransientProviderError } from '@/lib/ai/integrity'
 import { assertAuthenticatedUser } from '@/lib/auth/server'
 import { generateMockContent } from '@/lib/ai/mockProvider'
 import { getActiveEntitlement } from '@/lib/payments/access'
@@ -498,6 +499,16 @@ async function generateWithByok(req: GenerateRequest, userId: string): Promise<G
  * Bellek örnek başınadır (serverless), kalıcı olması da gerekmez: amaç aynı
  * örnek üzerinden gelen sonraki isteklerin aynı duvara toslamaması.
  */
+async function withTransientRetry<T>(run: () => Promise<T>): Promise<T> {
+  try {
+    return await run()
+  } catch (error) {
+    if (!isTransientProviderError(error)) throw error
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+    return run()
+  }
+}
+
 const PROVIDER_COOLDOWN_MS = 5 * 60_000
 const recentProviderFailures = new Map<string, number>()
 
@@ -670,9 +681,10 @@ async function runGeneration(
     return generateMockContent(boundedRequest)
   }
   const profileInstruction = await getRequestProfileInstruction()
-  const enrichedRequest: GenerateRequest = profileInstruction
-    ? { ...boundedRequest, systemPrompt: `${boundedRequest.systemPrompt || 'Kullanıcıya doğru ve yararlı bir yanıt ver.'}${profileInstruction}` }
-    : boundedRequest
+  const enrichedRequest: GenerateRequest = {
+    ...boundedRequest,
+    systemPrompt: `${boundedRequest.systemPrompt || 'Kullanıcıya doğru ve yararlı bir yanıt ver.'}${contentIntegrityInstruction()}${profileInstruction || ''}`,
+  }
 
   if (user && entitlement?.api_included === false) {
     return generateWithByok(enrichedRequest, user.id)
@@ -682,7 +694,7 @@ async function runGeneration(
     if (!getAvailableModels().includes(enrichedRequest.model)) {
       throw new Error('Seçilen AI sağlayıcısı şu anda kullanılamıyor. Otomatik modeli veya yapılandırılmış başka bir modeli seç.')
     }
-    return generateWithResolvedModel(enrichedRequest, gatewayToken)
+    return withTransientRetry(() => generateWithResolvedModel(enrichedRequest, gatewayToken))
   }
 
   // Not: gateway modeli burada AYRICA eklenmez. Eskiden ekleniyordu ve
@@ -740,5 +752,17 @@ async function runGeneration(
   }
 
   if (lastError instanceof Error && lastError.message === 'Oturum gerekli.') throw lastError
-  throw new Error('AI sağlayıcısı isteği tamamlanamadı.')
+  // Tek sağlayıcı bağlıyken yedek yok: geçici hatada (zaman aşımı, 429, 5xx, ağ)
+  // ilk adayı bir kez daha dene. Yapılandırma/yetki hatası tekrar denenmez.
+  if (isTransientProviderError(lastError)) {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1200))
+      const result = await generateWithResolvedModel({ ...enrichedRequest, model: candidates[0] }, gatewayToken)
+      markProviderHealthy(candidates[0])
+      return { ...result, routingReason: `${routed.reason}; geçici sağlayıcı hatası sonrası yeniden denendi` }
+    } catch {
+      /* aşağıdaki anlaşılır mesaj döner */
+    }
+  }
+  throw new Error('AI sağlayıcısı şu anda yanıt vermedi. Birkaç saniye sonra yeniden dene.')
 }

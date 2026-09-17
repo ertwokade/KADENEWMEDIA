@@ -200,6 +200,8 @@ export default function Sidebar() {
 
   const isHrefActive = (href: string) => {
     const [hrefPath, hrefQuery] = href.split('?')
+    // Teklif Al menüde yok; Paketler sayfasının içinden açıldığı için Paketler vurgulu kalır.
+    if (pathname === '/dashboard/quote' && hrefPath === '/dashboard/packages') return true
     const pathMatches = pathname === hrefPath || (hrefPath !== '/dashboard' && pathname.startsWith(hrefPath + '/'))
     if (!pathMatches) return false
     if (!hrefQuery) return true
@@ -221,7 +223,7 @@ export default function Sidebar() {
 
   useEffect(() => {
     const syncOperationsView = () => {
-      if (stripBasePath(window.location.pathname) === '/dashboard/operations') {
+      if (splitWorkspacePath(stripBasePath(window.location.pathname)).kalan === '/dashboard/operations') {
         const view = new URLSearchParams(window.location.search).get('view') || 'dashboard'
         setOperationsView(view)
         window.dispatchEvent(new CustomEvent('kade:operations-request-view', { detail: { view } }))
@@ -385,9 +387,10 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="kade-sidebar-bottom space-y-2 border-t border-zinc-100 px-4 py-4 flex-shrink-0">
-          <div className="kade-sidebar-theme-row flex items-center justify-between rounded-xl px-3 py-2">
+        {/* Footer — tek satır: kategori listesine dikey alan kalsın diye
+            görünüm, sistem durumu ve çıkış yan yana tutulur. */}
+        <div className="kade-sidebar-bottom flex flex-shrink-0 items-center gap-2 border-t border-zinc-100 px-4 py-3">
+          <div className="kade-sidebar-theme-row flex min-w-0 flex-1 items-center justify-between rounded-xl px-3 py-1.5">
             <span className="text-[11px] font-semibold">Görünüm</span>
             <ThemeToggle />
           </div>
@@ -395,19 +398,23 @@ export default function Sidebar() {
             <Link
               href={alanYolu('/dashboard/settings')}
               onClick={() => close()}
-              className="kade-sidebar-footer flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-colors hover:bg-zinc-50"
+              title="Sistem durumunu kontrol et"
+              aria-label="Sistem durumunu kontrol et"
+              className="kade-sidebar-footer grid h-9 w-9 flex-shrink-0 place-items-center rounded-xl border transition-colors hover:bg-zinc-50"
             >
-              <Activity className="h-3.5 w-3.5 flex-shrink-0 text-emerald-500" />
-              <p className="text-[10px] font-medium text-[#8f8b80]">Sistem durumunu kontrol et</p>
+              <Activity className="h-3.5 w-3.5 text-emerald-500" />
             </Link>
           )}
+          {/* Çıkış bağlantısı ön yüklenirse tarayıcı arka planda oturumu kapatma adresini çağırıyordu. */}
           <Link
             href={withBasePath('/logout')}
+            prefetch={false}
             onClick={() => close()}
-            className="flex items-center gap-2.5 rounded-xl border border-zinc-200 px-3 py-2.5 text-zinc-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+            title="Çıkış yap"
+            aria-label="Çıkış yap"
+            className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-xl border border-zinc-200 text-zinc-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600"
           >
-            <LogOut className="h-3.5 w-3.5 flex-shrink-0" />
-            <span className="text-[11px] font-semibold">Çıkış Yap</span>
+            <LogOut className="h-3.5 w-3.5" />
           </Link>
         </div>
       </aside>

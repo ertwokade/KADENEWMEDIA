@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -30,6 +31,12 @@ export default function CarouselPage() {
   const [carousel, setCarousel] = useState<Carousel | null>(null)
   const [error, setError] = useState('')
   const [activeSlide, setActiveSlide] = useState(0)
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['topic', 'platform', 'slideCount', 'tone'] as const)
+    if (v.topic) setTopic(v.topic); if (v.platform) setPlatform(v.platform); if (v.slideCount && Number(v.slideCount) > 0) setSlideCount(Number(v.slideCount)); if (v.tone) setTone(v.tone)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

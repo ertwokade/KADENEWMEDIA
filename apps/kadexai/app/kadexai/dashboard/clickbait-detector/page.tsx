@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -165,6 +166,12 @@ export default function ClickbaitDetectorPage() {
   const [results, setResults] = useState<ModelResult[]>([])
   const [error, setError] = useState('')
   const [copiedIdx, setCopiedIdx] = useState<string | null>(null)
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['title', 'platform'] as const)
+    if (v.title) setTitle(v.title); if (v.platform) setPlatform(v.platform as Platform)
+  }, [])
 
   const handleCopy = async (text: string, key: string) => {
     await copyToClipboard(text)

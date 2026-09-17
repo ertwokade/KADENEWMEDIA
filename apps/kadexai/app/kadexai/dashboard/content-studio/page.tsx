@@ -19,11 +19,11 @@ import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
 import RawModelOutput from '@/components/ui/RawModelOutput'
 import AutoSocialExport from '@/components/ui/AutoSocialExport'
-import { apiFetch } from '@/lib/client/api'
+import { apiFetch, recordToolRun } from '@/lib/client/api'
 import { useModel } from '@/lib/context/ModelContext'
-import { withBasePath } from '@/lib/appConfig'
 import { cn, copyToClipboard } from '@/lib/utils'
 import type { ContentStudioPackage } from '@/lib/contentStudio'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 
 type View = 'studio' | 'library' | 'voice'
 type OutputTab = 'short-video' | 'thread' | 'linkedin' | 'newsletter' | 'captions' | 'summary' | 'quotes' | 'evidence'
@@ -74,6 +74,7 @@ function packageText(content: ContentStudioPackage, tab: OutputTab) {
 }
 
 export default function ContentStudioPage() {
+  const workspaceHref = useWorkspaceHref()
   const params = useSearchParams()
   const { selectedModel } = useModel()
   const [view, setView] = useState<View>('studio')
@@ -179,6 +180,7 @@ export default function ContentStudioPage() {
       if (!response.ok) throw new Error(data.error || 'İçerik paketi oluşturulamadı.')
       const run = data.run as Run
       setRuns((current) => [run, ...current.filter((item) => item.id !== run.id)])
+      recordToolRun({ tool: 'content-studio', input: { sourceTitle, sourceUrl }, output: `Haftalık paket oluşturuldu: ${sourceTitle || run.id}` })
       setSelectedRun(run)
       setOutputTab('short-video')
       setNotice('İçerik paketi hazır ve kitaplığa kaydedildi.')
@@ -213,7 +215,7 @@ export default function ContentStudioPage() {
     setSelectedRun(run)
     setOutputTab('short-video')
     setView('studio')
-    window.history.replaceState(window.history.state, '', withBasePath(`/dashboard/content-studio?run=${run.id}`))
+    window.history.replaceState(window.history.state, '', workspaceHref(`/dashboard/content-studio?run=${run.id}`))
   }
 
   return (
@@ -229,8 +231,8 @@ export default function ContentStudioPage() {
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">Dökümde söylenmeyeni uydurmadan Reels, TikTok ve Shorts senaryoları; X dizisi, LinkedIn gönderisi, bülten, platform açıklamaları, özet ve gerçek alıntılar üretir.</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Link href={withBasePath('/dashboard/kade-search')} className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 hover:border-violet-500/50 hover:text-white"><Search className="h-4 w-4" /> KadeSearch’ten konu seç</Link>
-                <Link href={withBasePath('/dashboard/clip-generator')} className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 hover:border-violet-500/50 hover:text-white"><Scissors className="h-4 w-4" /> Viral klip çıkar</Link>
+                <Link href={workspaceHref('/dashboard/kade-search')} className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 hover:border-violet-500/50 hover:text-white"><Search className="h-4 w-4" /> KadeSearch’ten konu seç</Link>
+                <Link href={workspaceHref('/dashboard/clip-generator')} className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 hover:border-violet-500/50 hover:text-white"><Scissors className="h-4 w-4" /> Viral klip çıkar</Link>
               </div>
             </div>
           </div>

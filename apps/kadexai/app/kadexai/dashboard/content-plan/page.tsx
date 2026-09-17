@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useRouter } from 'next/navigation'
 import { CalendarPlus } from 'lucide-react'
 import { useModel } from '@/lib/context/ModelContext'
@@ -39,6 +40,12 @@ export default function ContentPlanPage() {
   const [calendarSaving, setCalendarSaving] = useState(false)
   const [planPlatform, setPlanPlatform] = useState('youtube')
   const [planStart, setPlanStart] = useState('')
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['niche', 'platform', 'goal', 'frequency'] as const)
+    if (v.niche) setNiche(v.niche); if (v.platform) setPlatform(v.platform); if (v.goal) setGoal(v.goal); if (v.frequency) setFrequency(v.frequency)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

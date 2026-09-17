@@ -1003,7 +1003,7 @@ JSON:
 {
   "saglik_skoru": 0-100,
   "skor_gerekcesi": "tek cümle",
-  "veri_eksigi": ["puanlanamayan boyutlar için eksik veri"],
+  "veri_eksigi": ["puanlanamayan boyut için eksik veri, okunur Türkçe (ör. bio metni, son içerik örnekleri); alan adı veya alt çizgi yazma"],
   "boyutlar": [
     { "ad": "", "puan": 0-100, "durum": "iyi|orta|zayif|veri_yok", "yorum": "tek cümle" }
   ],
@@ -1018,7 +1018,8 @@ JSON:
 Kurallar:
 - boyutlar en az 4, en çok 6 madde.
 - hizli_kazanimlar TAM 3 madde.
-- yol_haritasi 3 dönem (1. ay, 2-3. ay, 4-6. ay).
+- yol_haritasi TAM 3 dönem ve donem değerleri birebir "1. ay", "2-3. ay", "4-6. ay" olsun.
+- hizli_kazanimlar.baslik ilgili araçta doğrudan konu olarak kullanılabilecek kısa bir ifade olsun.
 - Metrik verilmediyse ilgili boyut "veri_yok" ve puanı 0 olsun; skor
   hesaplanırken bu boyutlar sayılmasın, skor_gerekcesi bunu söylesin.`
 }

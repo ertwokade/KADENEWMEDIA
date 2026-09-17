@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
@@ -21,6 +22,12 @@ export default function RetentionAnalysisPage() {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['title', 'platform', 'audience', 'metrics', 'content'] as const)
+    if (v.title) setTitle(v.title); if (v.platform) setPlatform(v.platform); if (v.audience) setAudience(v.audience); if (v.metrics) setMetrics(v.metrics); if (v.content) setInput(v.content)
+  }, [])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()

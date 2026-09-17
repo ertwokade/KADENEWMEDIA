@@ -1,14 +1,16 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
 import { Platform } from '@/types'
 import { getPlatformLabel, cn } from '@/lib/utils'
-import { withBasePath } from '@/lib/appConfig'
+import { useRouter } from 'next/navigation'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 
 const platforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin']
 const styles = ['karışık', 'eğitici', 'eğlenceli', 'motivasyonel', 'hikaye anlatımı', 'liste', 'challenge']
@@ -35,6 +37,8 @@ const zorlukColors = {
 }
 
 export default function IdeasPage() {
+  const router = useRouter()
+  const workspaceHref = useWorkspaceHref()
   const { selectedModel } = useModel()
   const [niche, setNiche]           = useState('')
   const [platform, setPlatform]     = useState<Platform>('youtube')
@@ -44,6 +48,12 @@ export default function IdeasPage() {
   const [ideas, setIdeas]           = useState<Idea[]>([])
   const [error, setError]           = useState('')
   const [filter, setFilter]         = useState<string>('tümü')
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['niche', 'platform', 'style', 'count'] as const)
+    if (v.niche) setNiche(v.niche); if (v.platform) setPlatform(v.platform as Platform); if (v.style) setStyle(v.style); if (v.count && Number(v.count) > 0) setCount(Number(v.count))
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -67,8 +77,8 @@ export default function IdeasPage() {
   }
 
   const sendToTitle = (idea: Idea) => {
-    localStorage.setItem('contentai_idea_topic', idea.baslik)
-    window.location.href = withBasePath('/dashboard/title')
+    // Zincir çalışma alanı adresini korur; tam sayfa yenileme yerine istemci geçişi yapılır.
+    router.push(workspaceHref(`/dashboard/title?topic=${encodeURIComponent(idea.baslik)}&platform=${platform}`))
   }
 
   const filtered = filter === 'tümü' ? ideas : ideas.filter((i) => i.tip === filter || i.zorluk === filter)

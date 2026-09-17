@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -22,6 +23,12 @@ export default function ThreadPage() {
   const [thread, setThread] = useState<Thread | null>(null)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['topic', 'platform', 'style', 'tweetCount'] as const)
+    if (v.topic) setTopic(v.topic); if (v.platform === 'x' || v.platform === 'linkedin') setPlatform(v.platform); if (v.style) setStyle(v.style); if (v.tweetCount && Number(v.tweetCount) > 0) setCount(Number(v.tweetCount))
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

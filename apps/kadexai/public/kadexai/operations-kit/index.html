@@ -12,12 +12,12 @@
   <meta name="description" content="SentScan yorum analizi, prodüksiyon CRM, Banana Studio görsel üretimi ve AI araç rehberi."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="styles.css?v=20260825a"/>
-  <link rel="stylesheet" href="kademedia-theme.css?v=20260825a"/>
+  <link rel="stylesheet" href="styles.css?v=20260917a"/>
+  <link rel="stylesheet" href="kademedia-theme.css?v=20260917a"/>
   <!-- Ikon kitapligi yerelde: ana site CSP'si dis script kaynagina izin
        vermiyor, unpkg'den yuklenince kit hic baslamiyordu. -->
   <script src="lucide.min.js?v=20260825a" defer></script>
-  <script src="app.js?v=20260825a" defer></script>
+  <script src="app.js?v=20260917a" defer></script>
 </head>
 <body>
 
@@ -236,7 +236,7 @@
             <div class="panel-head"><div><p class="eyebrow">Yeni fikir</p><h2>Kart aç</h2></div><div class="icon-area"><i data-lucide="plus-circle"></i></div></div>
             <form id="ideaForm" class="form-grid">
               <label><span class="label-text">Başlık</span><input id="ideaTitle" required placeholder="Fikrin adı"/></label>
-              <label><span class="label-text">Kanal</span><select id="ideaChannel"><option value="Kade Media">Kade Media</option><option value="Kade V2">Kade V2</option></select></label>
+              <label><span class="label-text">Kanal</span><select id="ideaChannel"><option value="Kade New Media">Kade New Media</option><option value="Kade V2">Kade V2</option></select></label>
               <label><span class="label-text">Not</span><textarea id="ideaNotes" rows="4" placeholder="Açıklama…"></textarea></label>
               <button class="primary-btn" type="submit"><i data-lucide="save"></i>Kaydet</button>
             </form>
@@ -310,9 +310,9 @@
                 <label><span class="label-text">Model</span><select id="imageModel"></select></label>
                 <label><span class="label-text">Oran</span><select id="imageRatio"></select></label>
                 <label><span class="label-text">Çözünürlük</span><select id="imageResolution"></select></label>
-                <label><span class="label-text">Adet</span><input id="imageCount" type="number" min="1" max="12" value="4"/></label>
+                <label><span class="label-text">Adet</span><input id="imageCount" type="number" min="1" max="12" value="1"/></label>
               </div>
-              <label><span class="label-text">Prompt</span><textarea id="imagePrompt" rows="5" placeholder="@ana-kisi ve @ikinci-kisi 1 yıldızlı restoranda kapak pozu veriyor…"></textarea></label>
+              <label><span class="label-text">Prompt</span><textarea id="imagePrompt" rows="5" placeholder="Örn. @ana-kişi ofiste laptopla çalışıyor, sıcak ışık, YouTube kapak kompozisyonu"></textarea></label>
               <div class="form-actions">
                 <select id="brainstormCount" class="count-select" aria-label="Brainstorm adet">
                   <option value="5">5 fikir</option>
@@ -349,14 +349,14 @@
       <div class="banana-tab" id="banana-video">
         <div class="layout-two wide-left">
           <article class="panel">
-            <div class="panel-head"><div><p class="eyebrow">Video üretimi</p><h2>Seadance akışı</h2></div><div class="icon-area"><i data-lucide="film"></i></div></div>
+            <div class="panel-head"><div><p class="eyebrow">Video üretimi</p><h2>Seedance akışı</h2></div><div class="icon-area"><i data-lucide="film"></i></div></div>
             <form id="videoForm" class="form-grid">
               <div class="form-row" style="grid-template-columns:repeat(3,minmax(0,1fr))">
                 <label><span class="label-text">Model</span><select id="videoModel"></select></label>
                 <label><span class="label-text">Süre</span><select id="videoDuration"></select></label>
                 <label><span class="label-text">Çözünürlük</span><select id="videoResolution"></select></label>
               </div>
-              <label><span class="label-text">Video promptu</span><textarea id="videoPrompt" rows="6" placeholder="@ana-kisi makinenin içinde saklanıyor…"></textarea></label>
+              <label><span class="label-text">Video promptu</span><textarea id="videoPrompt" rows="6" placeholder="Örn. @ana-kişi kameraya doğru yürüyor, 5 saniye, yavaş kamera hareketi"></textarea></label>
               <div class="form-actions">
                 <button type="button" class="ghost-btn" id="continueVideo"><i data-lucide="step-forward"></i>Devam Ettir</button>
                 <button type="button" class="ghost-btn" id="enhanceVideoPrompt"><i data-lucide="wand-sparkles"></i>İyileştir</button>

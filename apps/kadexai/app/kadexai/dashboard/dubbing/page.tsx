@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   AlertTriangle, Check, Download, Languages, Loader2, Mic2, Play, Video, Volume2,
 } from 'lucide-react'
-import { apiFetch } from '@/lib/client/api'
+import { apiFetch, recordToolRun } from '@/lib/client/api'
 import TopBar from '@/components/layout/TopBar'
 import CapabilityNotice from '@/components/ui/CapabilityNotice'
 import TranscriptionVocabulary from '@/components/ui/TranscriptionVocabulary'
@@ -208,6 +208,7 @@ export default function DubbingPage() {
       setMixInfo({ hizlandirilan: result.hizlandirilan, tasan: result.tasan })
       setPhase('done')
       setDetail(`Dublaj hazır — ${parts.length} bölüm seslendirildi.`)
+      recordToolRun({ tool: 'dubbing', input: { targetLang: requestedLang }, output: translated.map((cue) => cue.text).join('\n') })
     } catch (e) {
       setPhase('error')
       setError(e instanceof Error ? e.message : 'Dublaj tamamlanamadı.')

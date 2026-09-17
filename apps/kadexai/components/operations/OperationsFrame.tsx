@@ -5,6 +5,7 @@ import { AlertTriangle, Loader2, RefreshCw, X } from 'lucide-react'
 import { AIModel } from '@/types'
 import { useTheme } from '@/lib/context/ThemeContext'
 import { apiPath } from '@/lib/appConfig'
+import { recordToolRun } from '@/lib/client/api'
 
 interface OperationsFrameProps {
   src: string
@@ -43,6 +44,16 @@ export default function OperationsFrame({ src, title, activeView, selectedModel,
           { type: 'kade:set-operations-theme', theme },
           window.location.origin,
         )
+        return
+      }
+      // SentScan tarayıcıda çalışır, API çağırmaz; kaydedilen analiz Geçmiş'e buradan eklenir.
+      if (event.data?.type === 'kade:operations-history' && typeof event.data.output === 'string') {
+        recordToolRun({
+          tool: 'sentscan',
+          input: typeof event.data.title === 'string' ? { title: event.data.title.slice(0, 300) } : {},
+          output: event.data.output.slice(0, 20_000),
+          model: 'yerel-analiz',
+        })
         return
       }
       if (event.data?.type === 'kade:operations-view' && typeof event.data.view === 'string') {

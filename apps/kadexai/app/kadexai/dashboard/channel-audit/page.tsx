@@ -1,6 +1,7 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useState, useEffect } from 'react'
+import { readPrefill, splitList } from '@/lib/client/prefill'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
@@ -9,6 +10,8 @@ import { apiFetch } from '@/lib/client/api'
 import { useModel } from '@/lib/context/ModelContext'
 import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 import { cn, getPlatformLabel } from '@/lib/utils'
+import { withPrefill } from '@/lib/client/prefill'
+import { humanizeCodeList } from '@/lib/ui/outputLabels'
 import type { Platform } from '@/types'
 
 /**
@@ -44,6 +47,9 @@ const DURUM_ETIKET: Record<string, string> = {
   iyi: 'iyi', orta: 'orta', zayif: 'zayıf', veri_yok: 'veri yok',
 }
 
+// Zincir düğmesiyle başka araca gidip geri dönüldüğünde sonuç kaybolmasın.
+const DENETIM_ANAHTARI = 'kade:channel-audit:last'
+
 const alan = 'w-full rounded-xl border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-[#f2c322] focus:outline-none'
 
 export default function ChannelAuditPage() {
@@ -59,6 +65,23 @@ export default function ChannelAuditPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [denetim, setDenetim] = useState<Denetim | null>(null)
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(DENETIM_ANAHTARI) || 'null')
+      if (!saved?.denetim) return
+      setDenetim(saved.denetim)
+      if (typeof saved.accountName === 'string') setAccountName((current) => current || saved.accountName)
+      if (typeof saved.niche === 'string') setNiche((current) => current || saved.niche)
+      if (Array.isArray(saved.platforms)) setPlatforms(saved.platforms)
+    } catch { /* bozuk kayıt yok sayılır */ }
+  }, [])
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['accountName', 'niche', 'platforms', 'bio', 'metrics', 'recentPosts', 'goal'] as const)
+    if (v.accountName) setAccountName(v.accountName); if (v.niche) setNiche(v.niche); if (v.platforms) setPlatforms(splitList(v.platforms) as Platform[]); if (v.bio) setBio(v.bio); if (v.metrics) setMetrics(v.metrics); if (v.recentPosts) setRecentPosts(v.recentPosts); if (v.goal) setGoal(v.goal)
+  }, [])
 
   const platformSec = (p: Platform) =>
     setPlatforms((c) => (c.includes(p) ? c.filter((x) => x !== p) : [...c, p]))
@@ -76,6 +99,7 @@ export default function ChannelAuditPage() {
       const d = await r.json()
       if (!r.ok) throw new Error(d.error || 'Denetim üretilemedi')
       setDenetim(d.denetim)
+      try { sessionStorage.setItem(DENETIM_ANAHTARI, JSON.stringify({ denetim: d.denetim, accountName, niche, platforms })) } catch { /* depolama kapalıysa sonuç yalnız bu sayfada kalır */ }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Hata oluştu')
     } finally {
@@ -167,7 +191,7 @@ export default function ChannelAuditPage() {
                   {denetim.skorGerekcesi && <p className="mt-3 text-sm text-zinc-400">{denetim.skorGerekcesi}</p>}
                   {denetim.veriEksigi.length > 0 && (
                     <p className="mt-2 text-xs text-[color:var(--kade-warn-400)]">
-                      Puanlanamayan: {denetim.veriEksigi.join(', ')}
+                      Puanlanamayan: {humanizeCodeList(denetim.veriEksigi.join(', '))}
                     </p>
                   )}
                 </div>
@@ -197,7 +221,7 @@ export default function ChannelAuditPage() {
                           <p className="text-sm font-medium text-zinc-100">{k.baslik}</p>
                           {k.neden && <p className="mt-1 text-xs text-zinc-500">{k.neden}</p>}
                           {k.rota && (
-                            <Link href={alanYolu(k.rota)}
+                            <Link prefetch={false} href={alanYolu(withPrefill(k.rota, { topic: k.baslik, title: k.baslik, niche, platform: platforms[0], platforms }))}
                               className="mt-3 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[color:var(--kade-accent-text)]">
                               {k.aracAdi} ile yap <ArrowRight className="h-3 w-3" />
                             </Link>

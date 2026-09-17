@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import Link from 'next/link'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
@@ -31,6 +32,12 @@ export default function HashtagPage() {
   const [hashtags, setHashtags] = useState<HashtagGroups | null>(null)
   const [error, setError] = useState('')
 
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['topic', 'niche', 'platform', 'count'] as const)
+    if (v.topic) setTopic(v.topic); if (v.niche) setNiche(v.niche); if (v.platform) setPlatform(v.platform as Platform); if (v.count && Number(v.count) > 0) setCount(Number(v.count))
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!topic.trim() || !niche.trim()) return
@@ -55,6 +62,8 @@ export default function HashtagPage() {
   const allHashtags = hashtags
     ? [...(hashtags.yuksek || []), ...(hashtags.orta || []), ...(hashtags.dusuk || []), ...(hashtags.niche || [])].join(' ')
     : ''
+  // Başlık üreticisine 30 etiketin hepsi değil, konuya en yakın birkaç anahtar kelime gider.
+  const titleKeywords = [...(hashtags?.niche ?? []), ...(hashtags?.orta ?? [])].slice(0, 5).map((tag) => tag.replace(/^#/, '')).join(', ')
 
   const groups = hashtags
     ? [
@@ -118,7 +127,7 @@ export default function HashtagPage() {
                   <h3 className="text-zinc-200 font-medium text-sm">Hashtag Seti</h3>
                   <div className="flex items-center gap-3">
                     <CopyButton text={allHashtags} />
-                    <Link prefetch={false} href={workspaceHref(`/dashboard/title?topic=${encodeURIComponent(topic)}&keywords=${encodeURIComponent(allHashtags)}&platform=${platform}`)} className="text-xs text-violet-400 hover:text-violet-300">Başlık üret →</Link>
+                    <Link prefetch={false} href={workspaceHref(`/dashboard/title?topic=${encodeURIComponent(topic)}&keywords=${encodeURIComponent(titleKeywords)}&platform=${platform}`)} className="text-xs text-violet-400 hover:text-violet-300">Başlık üret →</Link>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">

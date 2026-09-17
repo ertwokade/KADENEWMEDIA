@@ -5,7 +5,7 @@ import {
   ArrowUpRight, Check, Clapperboard, Copy, ExternalLink, Loader2,
   Search, Sparkles, X,
 } from 'lucide-react'
-import { apiFetch } from '@/lib/client/api'
+import { apiFetch, recordToolRun } from '@/lib/client/api'
 import {
   DISCOVERY_LANGUAGES,
   type DiscoveryCoverage,
@@ -137,6 +137,7 @@ export default function ContentDiscovery() {
       if (!result.ok || !json.script) throw new Error(json.error || 'Sahneli video metni üretilemedi.')
       setScript(json.script)
       setScriptModel(json.model || '')
+      recordToolRun({ tool: 'kade-search', model: json.model, input: { title: selected.title, url: selected.url, language: scriptLanguage, durationSec }, output: JSON.stringify(json.script) })
     } catch (cause) {
       setScriptError(cause instanceof Error ? cause.message : 'Sahneli video metni üretilemedi.')
     } finally {

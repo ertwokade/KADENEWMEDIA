@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -25,6 +26,12 @@ export default function YoutubeSeoPage() {
   const [data, setData] = useState<SeoData | null>(null)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState<string | null>(null)
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['title', 'description', 'tags', 'niche'] as const)
+    if (v.title) setTitle(v.title); if (v.description) setDescription(v.description); if (v.tags) setTags(v.tags); if (v.niche) setNiche(v.niche)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

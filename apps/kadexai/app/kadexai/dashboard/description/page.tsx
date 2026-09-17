@@ -1,7 +1,9 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { calendarHref } from '@/lib/client/calendarLink'
+import { readPrefill, splitList } from '@/lib/client/prefill'
 import Link from 'next/link'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
@@ -38,6 +40,12 @@ export default function DescriptionPage() {
   const [loading, setLoading]           = useState(false)
   const [results, setResults]           = useState<PlatformDesc[]>([])
   const [error, setError]               = useState('')
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['title', 'summary', 'platform', 'targetAudience'] as const)
+    if (v.title) setTitle(v.title); if (v.summary) setSummary(v.summary); if (v.platform) setSelectedPlatforms(splitList(v.platform) as Platform[]); if (v.targetAudience) setExtraAudience(v.targetAudience)
+  }, [])
 
   const togglePlatform = (p: Platform) =>
     setSelectedPlatforms(prev => prev.includes(p) ? (prev.length > 1 ? prev.filter(x => x !== p) : prev) : [...prev, p])
@@ -155,7 +163,7 @@ export default function DescriptionPage() {
                   <h3 className="text-zinc-200 font-semibold text-sm">{getPlatformLabel(r.platform)}</h3>
                   <div className="flex items-center gap-3">
                     <CopyButton text={r.description} />
-                    <Link prefetch={false} href={workspaceHref(`/dashboard/calendar?title=${encodeURIComponent(title)}&platform=${r.platform}`)} className="text-xs text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
+                    <Link prefetch={false} href={workspaceHref(calendarHref(title, r.platform))} className="text-xs text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
                   </div>
                 </div>
                 <ModelOutput content={r.description} />

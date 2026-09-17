@@ -9,7 +9,7 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react'
 import { ArrowDown, ArrowUp, CheckCircle2, Clock, Play, Plus, SkipForward, Trash2, XCircle } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
-import { apiFetch } from '@/lib/client/api'
+import { apiFetch, recordToolRun } from '@/lib/client/api'
 import ModelOutput from '@/components/ui/ModelOutput'
 
 interface Pipeline {
@@ -99,6 +99,13 @@ export default function OrchestratePage() {
       if (!response.ok) throw new Error(data.error || 'Akış çalıştırılamadı.')
       setSteps(data.steps || [])
       setStoppedEarly(data.stoppedEarly === true)
+      recordToolRun({
+        tool: 'orchestrate',
+        input: { pipelineId: selected, platform, niche: String(form.get('niche') || ''), goal: String(form.get('goal') || '') },
+        output: JSON.stringify({ adimlar: ((data.steps || []) as StepResult[]).map((step) => ({ adim: step.label, cikti: step.output || step.reason || '' })) }),
+        status: data.stoppedEarly === true ? 'failed' : 'completed',
+        error: data.stoppedEarly === true ? 'Akış tamamlanmadan durdu.' : undefined,
+      })
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Akış çalıştırılamadı.')
     } finally {

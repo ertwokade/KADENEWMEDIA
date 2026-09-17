@@ -48,22 +48,27 @@ const imageModels = [
 ];
 
 const videoModels = [
-  {id:"seadance-2",   name:"Seadance 2.0",  base:3.0},
+  {id:"seadance-2",   name:"Seedance 2.0",  base:3.0},
   {id:"veo-style",    name:"Veo Style",     base:2.4},
   {id:"runway-style", name:"Runway Style",  base:2.1},
 ];
 
+// Yorum temaları genel içerik üreticisi sinyallerine göre tanımlanır. Önceki liste
+// eski bir restoran serisine özeldi ("bölüm" → Konsept övgüsü, "ses" → Kamusal alan).
 const themeDefinitions = [
-  {name:"Doğallık ve samimiyet",  keywords:["samimi","doğal","gerçek","içten","sohbet"],        next:"Doğal ekip sohbetlerini kesme; kamera arkası anları kısa bloklar halinde tut."},
-  {name:"Konsept övgüsü",         keywords:["konsept","seri","format","tur","restoran","bölüm"], next:"Konsepti seri formatına çevir; her bölümde küçük bir kural değişikliği dene."},
-  {name:"Ekip dinamiği",          keywords:["emir","emre","cagri","berkin","merve","ekip"],      next:"Ekip eslesmelerini baslikta ve kapaklarda daha gorünür yap."},
-  {name:"Kurgu ve tempo",         keywords:["kurgu","tempo","uzun","sıkıcı","akıcı","montaj"],   next:"Orta bolumde tempo olcumu yap; 30s uzun dusuk aksiyon bloklarini isaretle."},
-  {name:"Kamusal alan sesi",      keywords:["gürültü","otobüs","rahatsız","ses","bagir"],        next:"Kamusal alan sahnelerinde daha kısa, kontrollü ses kullan."},
-  {name:"Kural ihlali",           keywords:["galeri","telefon","bakma","hile","uydurma"],        next:"Kural ihlali algılanan anları çıkar ya da ekranda gerekçelendir."},
+  {name:"Ses ve görüntü kalitesi", keywords:["ses","sesi","mikrofon","duyulmuyor","anlaşılmıyor","görüntü","ışık","bulanık","çözünürlük","kalite"], next:"Ses seviyesini ve anlaşılırlığı yayından önce kulaklıkla kontrol et; gerekiyorsa altyazı ekle."},
+  {name:"İçerik derinliği", keywords:["yüzeysel","derin","detay","ayrıntı","örnek","konu","anlatım","bilgi","açıklama"], next:"Yüzeysel bulunan başlıkları somut örnek ve adımlarla genişlet; gerekirse devam videosu planla."},
+  {name:"Fayda ve teşekkür", keywords:["işime yaradı","faydalı","yararlı","teşekkür","sağ ol","sağol","öğrendim","emeğine sağlık","eline sağlık"], next:"Fayda bulunan kısmı kısa bir klip veya carousel olarak yeniden paylaş."},
+  {name:"Soru ve bilgi talebi", keywords:["?","fiyat","ücret","kaç para","nasıl","nerede","hangi","ne kadar"], next:"Tekrarlayan soruları SSS videosu veya sabit yorumla yanıtla."},
+  {name:"Devam talebi", keywords:["sonraki bölüm","devamı","devam","part 2","2. bölüm","ne zaman gelecek","ne zaman"], next:"Devam içeriğinin yayın tarihini açıkla ve takvime ekle."},
+  {name:"Tempo ve süre", keywords:["sıkıcı","tempo","çok uzun","uzamış","kısa tut","hızlı","yavaş","kurgu"], next:"Tempo düşen bölümleri kısalt; ilk 3 saniyedeki kancayı güçlendir."},
 ];
 
-const positiveWords = ["mükemmel","harika","çok iyi","efsane","güzel","bayıldım","seviyorum","komik","samimi","başarılı","süper","güldüm","inanılmaz"];
-const negativeWords = ["kötü","sıkıcı","fazla","rahatsız","gürültü","beğenmedi","uzun","hile","yapay","eksik","berbat","zayıf"];
+const positiveWords = ["mükemmel","harika","çok iyi","efsane","güzel","bayıldım","seviyorum","süper","inanılmaz","başarılı","işime yaradı","faydalı","yararlı","teşekkür","sağ ol","emeğine sağlık","eline sağlık","beğendim","öğretici","bilgilendirici","akıcı","net anlatım","tebrik"];
+const negativeWords = ["kötü","sıkıcı","berbat","rahatsız","gürültü","beğenmedim","yapay","eksik","zayıf","yüzeysel","anlaşılmıyor","duyulmuyor","çok düşük","düşük kalmış","olmamış","gereksiz","saçma","kalitesiz","hayal kırıklığı","vasat","abartı","yanlış bilgi","boş içerik"];
+// "iyi değil", "işe yaramadı" gibi olumsuzlamalar olumlu kelimeyi tersine çevirir.
+const negationPattern = /(değil|olmamış|olmadı|yaramadı|yok)\b/;
+
 const stopWords = new Set("ve veya ama için gibi daha çok bir bu su o da de mi ma mu mü ile ise ben sen biz siz onlar burada böyle olarak kadar sonra önce zaten hep hiç ne nasıl ya yani sadece".split(" "));
 
 const defaultPromptTemplates = [
@@ -223,12 +228,12 @@ const initialState = {
     {id:"inv-006",name:"ND filtresi",    qty:12, location:"Depo A / Raf 1"},
   ],
   docs:[
-    {title:"Ekip Bilgileri & IK",      type:"IK",      owner:"Operasyon",  icon:"👥"},
-    {title:"Sirket Hesapları",          type:"Finans",  owner:"Yönetim",    icon:"💰"},
+    {title:"Ekip Bilgileri & İK",      type:"İK",      owner:"Operasyon",  icon:"👥"},
+    {title:"Şirket Hesapları",          type:"Finans",  owner:"Yönetim",    icon:"💰"},
     {title:"Grafik & Marka Paketleri",  type:"Tasarım", owner:"Kurgu",      icon:"🎨"},
-    {title:"Prodüksiyon Sözlesmeleri",  type:"Hukuk",   owner:"Prodüksiyon",icon:"📄"},
-    {title:"AI Arac Rehberleri",        type:"Teknik",  owner:"Tüm ekip",   icon:"🤖"},
-    {title:"Kase ve Ücret Tablosu",     type:"Finans",  owner:"Yönetim",    icon:"💳"},
+    {title:"Prodüksiyon Sözleşmeleri",  type:"Hukuk",   owner:"Prodüksiyon",icon:"📄"},
+    {title:"AI Araç Rehberleri",        type:"Teknik",  owner:"Tüm ekip",   icon:"🤖"},
+    {title:"Kaşe ve Ücret Tablosu",     type:"Finans",  owner:"Yönetim",    icon:"💳"},
   ],
   media:[],videos:[],brainstorm:[],
   sourceVideo:null,
@@ -383,7 +388,7 @@ function normalizeState(input,explicitEmptyArrays=new Set()){
   s.settings={
     ...base.settings,
     ...settings,
-    teamName:str(settings.teamName,base.settings.teamName),
+    teamName:str(settings.teamName,base.settings.teamName).replace(/^Kade Media$/,"Kade New Media"),
     monthlyBudget:num(settings.monthlyBudget,base.settings.monthlyBudget),
     usdTryRate:num(settings.usdTryRate,base.settings.usdTryRate),
     members:members.length?members:clone(base.settings.members),
@@ -596,7 +601,7 @@ function saveState(){
 
 function buildCleanInitial(){
   const s=buildInitial();
-  s.settings={teamName:"Kade Media",monthlyBudget:0,usdTryRate:0,members:["Kadir"]};
+  s.settings={teamName:"Kade New Media",monthlyBudget:0,usdTryRate:0,members:["Kadir"]};
   s.references=[];
   s.productions=[];
   s.ideas=[];
@@ -781,7 +786,7 @@ function buildAssistantContext(){
       `\nENVANTER:\n${inv||"yok"}`,
       `\nFIKIRLER:\n${ideas||"yok"}`,
     ].join("\n");
-  }catch{ return "(veri ozeti oluşturulamadı)"; }
+  }catch{ return "(veri özeti oluşturulamadı)"; }
 }
 
 // ── BOOTSTRAP ────────────────────────────────────────────────────────
@@ -1008,8 +1013,8 @@ function buildCommandItems(query){
     ...viewOrder.map((v,i)=>({label:labels[i]||v,sub:document.getElementById(v)?.dataset.eyebrow||"",icon:icons[i],action:()=>navigateTo(v)})),
     ...state.productions.map(p=>({label:p.title,sub:`${p.channel} · ${stages.find(s=>s.id===p.stage)?.label||p.stage}`,icon:"clapperboard",action:()=>{ navigateTo("crm"); openProduction(p.id) }})),
     {label:"JSON Yedek Al",        sub:"Tüm veriyi indir",    icon:"download-cloud",action:doBackup},
-    {label:"Tema Degistir",         sub:"Dark / Light",        icon:"sun",           action:()=>document.getElementById("themeToggle").click()},
-    {label:"Yeni Prodüksiyon Karti",sub:"CRM Kanban",          icon:"plus-circle",   action:()=>{ navigateTo("crm"); document.getElementById("quickAddProduction").click() }},
+    {label:"Tema Değiştir",         sub:"Dark / Light",        icon:"sun",           action:()=>document.getElementById("themeToggle").click()},
+    {label:"Yeni Prodüksiyon Kartı",sub:"CRM Kanban",          icon:"plus-circle",   action:()=>{ navigateTo("crm"); document.getElementById("quickAddProduction").click() }},
     {label:"Analiz Et",             sub:"SentScan",            icon:"bar-chart-3",   action:()=>{ navigateTo("comments"); runCommentAnalysis() }},
     {label:"Yeni Sayfa",            sub:"Sayfalar",            icon:"file-plus-2",   action:()=>{ navigateTo("pages"); createPage(null) }},
     ...(q?searchPages(q).map(p=>({label:p.title||"Başlıksız",sub:"📄 Sayfa",icon:"notebook-text",action:()=>{openPageEditor(p.id);navigateTo("pages")}})):[]),
@@ -1097,8 +1102,8 @@ function bindGlobalActions(){
   document.getElementById("assistantForm").addEventListener("submit",e=>{ e.preventDefault(); answerAssistant(document.getElementById("assistantInput").value) });
 }
 
-function doReset(){
-  if(!confirm("Çalışma alanındaki yerel veriler silinsin mi?"))return;
+async function doReset(){
+  if(!await uiConfirm("Çalışma alanındaki yerel veriler silinsin mi?",{confirmLabel:"Sil"}))return;
   snapshotUndo(); state=buildCleanInitial(); activeFilter="all";
   saveState(); renderAll(); runCommentAnalysis(); syncFilterChips();
   showToast("Çalışma alanı sıfırlandı","info");
@@ -1154,8 +1159,8 @@ function bindDashboardActions(){
   });
 }
 
-function clearStarterData(){
-  if(!confirm("Örnek prodüksiyon, görev, bütçe ve envanter kayıtları kaldırılsın mı?"))return;
+async function clearStarterData(){
+  if(!await uiConfirm("Örnek prodüksiyon, görev, bütçe ve envanter kayıtları kaldırılsın mı?",{confirmLabel:"Kaldır"}))return;
   snapshotUndo();
   state.productions=[];
   state.ideas=[];
@@ -1257,7 +1262,7 @@ async function answerAssistant(question){
     try{
       const res=await apiPost("/api/assistant",{question:q,context:buildAssistantContext(),model:selectedOperationsModel});
       if(res.error){ if(out)out.textContent="AI bağlantısı kurulamadı. Yerel çalışma alanı özeti gösteriliyor."; answerAssistantLocal(question); return; }
-      if(out)out.textContent=(res.answer||"(boş cevap)")+`\n\n— Model: ${res.model||selectedOperationsModel}`+(res.note?`\n— ${res.note}`:"");
+      if(out)out.textContent=(res.answer||"(boş cevap)")+(res.note?`\n\n— ${res.note}`:"");
       if(typeof logActivity==="function")logActivity("AI asistana soruldu","info");
       return;
     }catch{ if(out)out.textContent="AI bağlantısı kurulamadı. Yerel çalışma alanı özeti gösteriliyor."; answerAssistantLocal(question); return; }
@@ -1283,9 +1288,11 @@ function bindSourceImport(){
   document.getElementById("sourceVideoFile")?.addEventListener("change",handleSourceVideoFile);
   document.getElementById("transcriptFile")?.addEventListener("change",handleTranscriptFile);
   document.getElementById("analyzeTranscriptBtn")?.addEventListener("click",()=>{
+    const btn=document.getElementById("analyzeTranscriptBtn");
     const raw=document.getElementById("transcriptInput")?.value||"";
     if(!raw.trim()){showToast("Transkript boş","error");return}
-    loadTranscriptText(raw,state.transcriptName||"Yapıştırılan transkript");
+    const old=btn.innerHTML; btn.disabled=true; btn.textContent="Analiz ediliyor…";
+    setTimeout(()=>{ try{ loadTranscriptText(raw,state.transcriptName||"Yapıştırılan transkript") } finally { btn.disabled=false; btn.innerHTML=old; refreshIcons() } },60);
   });
   document.getElementById("sendTranscriptPage")?.addEventListener("click",createTranscriptPage);
   document.getElementById("clearTranscriptBtn")?.addEventListener("click",clearTranscriptImport);
@@ -1299,8 +1306,26 @@ function handleSourceVideoFile(e){
   state.sourceVideo={name:file.name,size:file.size,type:file.type||"video",ts:Date.now()};
   saveState();
   renderSourceImport();
-  showToast("Video yüklendi","success");
   logActivity(`Kaynak video yüklendi: ${file.name}`,"success");
+  transcribeSourceVideo(file);
+}
+
+/** Videonun sesini sunucudaki döküm servisine gönderir; sonuç transkript alanına ve analize düşer. */
+async function transcribeSourceVideo(file){
+  const meta=document.getElementById("transcriptMeta");
+  if(file.size>25*1024*1024){ showToast("Video 25 MB'tan büyük; transkripti .srt veya metin olarak yükle","warning"); return }
+  if(meta)meta.innerHTML=`<span class="pill gold">Videodan transkript çıkarılıyor…</span>`;
+  try{
+    const body=new FormData(); body.append("file",file);
+    const res=await fetch(apiUrl("/api/transcribe"),{method:"POST",body,credentials:"same-origin"});
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok||typeof data.text!=="string"||!data.text.trim())throw new Error(data.error||"Transkript çıkarılamadı.");
+    loadTranscriptText(data.text,file.name);
+    showToast("Videodan transkript çıkarıldı ve analiz edildi","success");
+  }catch(error){
+    renderSourceImport();
+    showToast(`${error.message||"Transkript çıkarılamadı."} Transkripti metin veya .srt olarak da yükleyebilirsin.`,"error");
+  }
 }
 
 function handleTranscriptFile(e){
@@ -1312,11 +1337,12 @@ function handleTranscriptFile(e){
 }
 
 function loadTranscriptText(raw,name){
-  const text=repairTextEncoding(raw);
+  const repaired=repairTextEncoding(raw);
   snapshotUndo();
-  state.transcriptText=text;
+  // SRT/VTT sıra numaraları ve zaman satırları metin alanına yazılmaz; zamanlar analizde kullanılır.
+  state.transcriptText=cleanTranscript(repaired);
   state.transcriptName=name||"Transkript";
-  state.transcriptInsights=analyzeTranscriptText(text);
+  state.transcriptInsights=analyzeTranscriptText(repaired);
   saveState();
   renderSourceImport();
   showToast("Transkript analiz edildi","success");
@@ -1371,13 +1397,12 @@ function renderTranscriptInsights(){
   el.innerHTML=`
     <div class="transcript-kpis">
       <div><span>${ins.wordCount}</span><small>Kelime</small></div>
-      <div><span>${ins.modules.length}</span><small>Modül</small></div>
-      <div><span>${ins.timestamps.length}</span><small>Zaman</small></div>
+      <div><span>${arr(ins.topics).length}</span><small>Konu</small></div>
+      <div><span>${ins.timestamps.length||"—"}</span><small>Zaman damgası</small></div>
     </div>
     <div class="transcript-summary">${esc(ins.summary)}</div>
-    <div class="transcript-module-grid">
-      ${ins.modules.map(m=>`<div class="transcript-module-card ${m.color}"><div class="transcript-module-head"><strong>${esc(m.title)}</strong><span>${m.score}</span></div><p>${esc(m.reason)}</p>${m.snippets.length?`<div class="transcript-snippets">${m.snippets.map(s=>`<span>${esc(s)}</span>`).join("")}</div>`:""}</div>`).join("")}
-    </div>
+    ${arr(ins.topics).length?`<div class="transcript-snippets">${arr(ins.topics).map(t=>`<span>${esc(t.word)} · ${t.count}</span>`).join("")}</div>`:""}
+    ${arr(ins.keySentences).length?`<div class="transcript-module-grid">${arr(ins.keySentences).map(sentence=>`<div class="transcript-module-card teal"><p>${esc(sentence)}</p></div>`).join("")}</div>`:""}
     <div class="transcript-actions">
       ${ins.actions.map(a=>`<div class="transcript-action"><span class="pill ${a.color}">${esc(a.module)}</span><span>${esc(a.text)}</span></div>`).join("")}
     </div>
@@ -1395,8 +1420,10 @@ function createTranscriptPage(){
   pg.blocks=[
     newBlockObj("heading1",{content:pg.title}),
     newBlockObj("callout",{content:ins.summary,emoji:"🎬"}),
-    newBlockObj("heading2",{content:"Öne çıkan modüller"}),
-    ...ins.modules.map(m=>newBlockObj("bulletList",{content:`${m.title}: ${m.reason}`})),
+    newBlockObj("heading2",{content:"Öne çıkan konular"}),
+    ...arr(ins.topics).map(t=>newBlockObj("bulletList",{content:`${t.word} (${t.count} kez)`})),
+    newBlockObj("heading2",{content:"Öne çıkan cümleler"}),
+    ...arr(ins.keySentences).map(sentence=>newBlockObj("quote",{content:sentence})),
     newBlockObj("heading2",{content:"Aksiyonlar"}),
     ...ins.actions.map(a=>newBlockObj("todo",{content:`${a.module}: ${a.text}`,done:false})),
     newBlockObj("heading2",{content:"Ham transkript"}),
@@ -1411,32 +1438,37 @@ function createTranscriptPage(){
   showToast("Transkript notlara aktarıldı","success");
 }
 
+/** SRT/VTT zaman satırlarından ipucu sayısını ve başlangıç zamanlarını çıkarır. */
+function transcriptCueTimes(raw){
+  return [...String(raw||"").matchAll(/(\d{2}):(\d{2}):(\d{2})[,.]\d{3}\s*-->/g)].map(m=>`${m[1]==="00"?"":`${Number(m[1])}:`}${m[2]}:${m[3]}`);
+}
+
 function analyzeTranscriptText(raw){
   const text=cleanTranscript(raw);
   const lower=text.toLocaleLowerCase("tr-TR");
-  const sentences=(text.match(/[^.!?\n]+[.!?]?/g)||[]).map(s=>s.trim()).filter(s=>s.length>20);
-  const moduleDefs=[
-    {title:"SentScan yorum analizi",color:"teal",keywords:["yorum","tema","kelime bulutu","beğen","begen","zaman damga","analiz","izleyici"],actions:["Yorum metni girişini ve CSV çıktısını canlı tut.","Tema, duygu, en çok beğenilen yorum ve zaman damgası alanlarını aynı akışta göster."]},
-    {title:"Prodüksiyon CRM",color:"indigo",keywords:["notion","crm","prodüksiyon","produksiyon","bütçe","bütçe","görev","görev","envanter","kütüphane","kutuphane"],actions:["Kanban kartlarında çekim, yayın, görev ve bütçe bilgisini tek detay ekranında tut.","Genel görev, envanter ve doküman kütüphanesini aynı veri setine bağla."]},
-    {title:"Banana görsel stüdyosu",color:"gold",keywords:["görsel","görsel","prompt","template","şablon","sablon","brainstorm","beyin fırtınası","kapak","referans"],actions:["Prompt iyileştirme, şablon kaydetme ve brainstorm akışını tek panelden çalıştır.","Referans etiketlerini prompt içinde kullanılabilir hale getir."]},
-    {title:"Banana video stüdyosu",color:"violet",keywords:["video","seadance","cde","continue","devam ettir","saniye","kamera","referans video"],actions:["Video promptunu saniye, kamera ve referans bilgisiyle iyileştir.","Devam ettir akışında önceki promptu ve seçilen videoyu birlikte kullan."]},
-    {title:"Müşteri & teslim takibi",color:"coral",keywords:["müşteri","musteri","teslim","termin","fatura","sözleşme","sozlesme","brief","iş","teklif"],actions:["Müşteri kartı aç ve teslimleri termine bağla."]},
-    {title:"Yayın takvimi",color:"teal",keywords:["takvim","tarih","çekim","cekim","yayın","yayin","plan","program","hafta","ay"],actions:["Çekim ve yayın tarihlerini takvimde gör."]},
-  ];
-  const modules=moduleDefs.map(def=>{
-    const hits=def.keywords.reduce((sum,k)=>sum+countTerm(lower,k),0);
-    const snippets=sentences.filter(s=>def.keywords.some(k=>s.toLocaleLowerCase("tr-TR").includes(k))).slice(0,2).map(s=>s.slice(0,180));
-    return{...def,hits,score:Math.min(99,Math.max(12,30+hits*9)),snippets,reason:snippets[0]||`${def.title} ile ilgili anahtar akışlar transkriptte eşleşti.`};
-  }).filter(m=>m.hits>0).sort((a,b)=>b.hits-a.hits).slice(0,6);
-  const top=modules.map(m=>m.title).slice(0,3).join(", ");
-  const actions=modules.flatMap(m=>m.actions.map(text=>({module:m.title.replace(/ .*/,""),text,color:m.color}))).slice(0,8);
-  const timestamps=[...new Set((raw.match(/\b(?:\d{1,2}:)?\d{1,2}[:.]\d{2}\b/g)||[]).slice(0,12))];
+  const words=lower.replace(/[^\p{L}\p{N}\s]/gu," ").split(/\s+/).filter(w=>w.length>3&&!stopWords.has(w));
+  const counts=new Map();
+  words.forEach(w=>counts.set(w,(counts.get(w)||0)+1));
+  const topics=[...counts.entries()].filter(([,n])=>n>=1).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([word,count])=>({word,count}));
+  const topicWords=new Set(topics.map(t=>t.word));
+  const seen=new Set();
+  const sentences=(text.replace(/\n+/g," ").match(/[^.!?]+[.!?]?/g)||[])
+    .map(s=>s.trim()).filter(s=>s.length>20)
+    .filter(s=>{ const key=s.toLocaleLowerCase("tr-TR"); if(seen.has(key))return false; seen.add(key); return true });
+  const keySentences=sentences
+    .map((sentence,index)=>({sentence,index,score:sentence.toLocaleLowerCase("tr-TR").split(/\s+/).filter(w=>topicWords.has(w.replace(/[^\p{L}\p{N}]/gu,""))).length}))
+    .sort((a,b)=>b.score-a.score||a.index-b.index).slice(0,3).sort((a,b)=>a.index-b.index).map(item=>item.sentence.slice(0,220));
+  const timestamps=[...new Set([...transcriptCueTimes(raw),...(text.match(/\b(?:\d{1,2}:)?\d{1,2}:\d{2}\b/g)||[])])].slice(0,50);
+  const actions=topics.slice(0,3).map(t=>({module:"İçerik",text:`"${t.word}" konusunu ayrı bir kısa video veya carousel olarak planla.`,color:"teal"}));
+  const topList=topics.slice(0,3).map(t=>t.word).join(", ");
   return{
     wordCount:countWords(text),
-    modules,
+    topics,
+    keySentences,
+    modules:[],
     actions,
     timestamps,
-    summary:top?`Transkript ağırlıklı olarak ${top} başlıklarını anlatıyor. Uygulamadaki karşılığı; dosya içe aktarma, analiz, üretim akışları, CRM takibi ve notlara dönüştürülebilir aksiyon listesidir.`:"Transkript yüklendi; ana başlıklar sınırlı eşleştiği için genel not ve aksiyon sayfası üretilebilir.",
+    summary:topList?`Transkriptte en sık geçen konular: ${topList}. Öne çıkan cümleler aşağıda; notlara aktararak içerik planına dönüştürebilirsin.`:"Transkript çok kısa olduğu için belirgin bir konu çıkarılamadı.",
   };
 }
 
@@ -1454,8 +1486,11 @@ function repairTextEncoding(raw){
 
 function cleanTranscript(raw){
   return repairTextEncoding(raw)
+    .replace(/^WEBVTT.*$/gm,"")
     .replace(/^\s*\d+\s*$/gm,"")
-    .replace(/\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}/g," ")
+    .replace(/(?:\d{2}:)?\d{2}:\d{2}[,.]\d{3}\s*-->\s*(?:\d{2}:)?\d{2}:\d{2}[,.]\d{3}[^\n]*/g," ")
+    .replace(/<[^>]+>/g," ")
+    .replace(/\n+/g," ")
     .replace(/\[(?:müzik|music|alkış|applause)[^\]]*\]/gi," ")
     .replace(/[ \t]+/g," ")
     .replace(/\n{3,}/g,"\n\n")
@@ -1511,10 +1546,23 @@ function analyzeComments(raw){
   const comments=parseComments(raw);
   const total=comments.length;
   const themes=themeDefinitions.map(td=>{ const hits=comments.filter(c=>containsAny(c.text,td.keywords)); return{...td,count:hits.length,percent:total?Math.round((hits.length/total)*100):0,examples:hits.slice(0,2)} }).filter(t=>t.count>0).sort((a,b)=>b.count-a.count);
-  const sentiment=comments.reduce((acc,c)=>{ const t=c.text.toLocaleLowerCase("tr-TR"); if(containsAny(t,positiveWords))acc.positive++; if(containsAny(t,negativeWords))acc.negative++; return acc },{positive:0,negative:0});
+  const sentiment=comments.reduce((acc,c)=>{ const kind=commentSentiment(c.text); acc[kind]++; if(/\?\s*$|\?/.test(c.text))acc.question++; return acc },{positive:0,negative:0,neutral:0,question:0});
   const timestamps=comments.map(c=>({...c,stamps:[...c.text.matchAll(/\b\d{1,2}[:.]?\d{2}\b/g)].map(m=>m[0])})).filter(c=>c.stamps.length);
   const score=calcVideoScore(sentiment,total);
   return{total,themes,sentiment,timestamps,score,words:buildWordCloud(comments.map(c=>c.text).join(" ")),topComments:[...comments].sort((a,b)=>b.likes-a.likes).slice(0,8)};
+}
+
+/** Her yorum tek sınıfa düşer: olumlu, olumsuz veya nötr (soru, istek, belirsiz). */
+function commentSentiment(text){
+  const t=String(text||"").toLocaleLowerCase("tr-TR");
+  const pos=positiveWords.some(w=>t.includes(w));
+  const neg=negativeWords.some(w=>t.includes(w));
+  const negated=negationPattern.test(t);
+  if(neg&&!pos)return"negative";
+  if(pos&&negated)return"negative";
+  if(pos&&!neg)return"positive";
+  if(pos&&neg)return"negative";
+  return"neutral";
 }
 
 function calcVideoScore(sentiment,total){ if(!total||!(sentiment.positive+sentiment.negative))return null;const posRate=sentiment.positive/total,negRate=sentiment.negative/total,raw=5+posRate*5-negRate*4; return Math.min(10,Math.max(1,parseFloat(raw.toFixed(1)))) }
@@ -1524,7 +1572,7 @@ function renderVideoScore(result){
 
   if(result.score===null){el.innerHTML=`<div class="empty-state">${result.total?"Yorumlarda puan hesaplamaya yetecek duygu anahtar kelimesi bulunamadı. Bu, olumsuz yorum demek değildir.":"Puan ve duygu yorumu için en az bir yorum ekle."}</div>`;return}
   const score=result.score,color=score>=8?"teal":score>=6?"gold":"coral",label="Anahtar kelime eşleşmelerine dayalı yaklaşık duygu puanı; içerik kalitesi veya tüm izleyicilerin görüşü değildir.";
-  el.innerHTML=`<div style="display:flex;align-items:center;gap:20px;padding:8px 0"><div style="text-align:center"><div style="font-size:52px;font-weight:900;color:var(--${color});line-height:1">${score}</div><div style="font-size:12px;color:var(--ink3);margin-top:4px">/ 10 puan</div></div><div style="flex:1"><div class="progress" style="margin-bottom:10px"><span style="width:${score*10}%;background:var(--${color})"></span></div><div style="font-size:13px;line-height:1.6;color:var(--ink2)">${label}</div><div style="display:flex;gap:10px;margin-top:10px"><span class="pill teal">+${result.sentiment.positive} pozitif</span><span class="pill coral">-${result.sentiment.negative} negatif</span><span class="pill indigo">${result.total} yorum</span></div></div></div>`;
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:20px;padding:8px 0"><div style="text-align:center"><div style="font-size:52px;font-weight:900;color:var(--${color});line-height:1">${score}</div><div style="font-size:12px;color:var(--ink3);margin-top:4px">/ 10 puan</div></div><div style="flex:1"><div class="progress" style="margin-bottom:10px"><span style="width:${score*10}%;background:var(--${color})"></span></div><div style="font-size:13px;line-height:1.6;color:var(--ink2)">${label}</div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px"><span class="pill teal">${result.sentiment.positive} olumlu</span><span class="pill coral">${result.sentiment.negative} olumsuz</span><span class="pill gold">${result.sentiment.neutral??0} nötr</span>${result.sentiment.question?`<span class="pill violet">${result.sentiment.question} soru</span>`:""}<span class="pill indigo">${result.total} yorum</span></div></div></div>`;
 }
 
 function renderCommentResult(result){
@@ -1537,8 +1585,10 @@ function renderCommentResult(result){
   const raw=document.getElementById("commentsInput").value;
   const allComments=parseComments(raw);
   const filtered=activeWordFilter?allComments.filter(c=>c.text.toLocaleLowerCase("tr-TR").includes(activeWordFilter)):[...allComments].sort((a,b)=>b.likes-a.likes).slice(0,8);
-  document.getElementById("topComments").innerHTML=`<table class="data-table"><thead><tr><th>👍</th><th>Yorum</th></tr></thead><tbody>${filtered.slice(0,8).map(c=>`<tr><td><span class="pill teal">${c.likes===null?"—":c.likes}</span></td><td style="font-size:13px">${esc(c.text)}</td></tr>`).join("")}</tbody></table>`;
-  document.getElementById("timestampComments").innerHTML=result.timestamps.length?result.timestamps.map(c=>`<div class="ts-row"><div>${c.stamps.map(s=>`<span class="ts-badge">${esc(s)}</span>`).join(" ")}</div><div class="ts-text">${esc(c.text)}</div></div>`).join(""):`<div class="empty-state">Zaman damgali yorum yok.</div>`;
+  const noLikes=allComments.length>0&&allComments.every(c=>c.likes===null);
+  const sentimentLabel={positive:["teal","Olumlu"],negative:["coral","Olumsuz"],neutral:["gold","Nötr"]};
+  document.getElementById("topComments").innerHTML=`${noLikes?`<p class="row-meta" style="margin:0 0 8px">Yorumlarda beğeni sayısı yok. Sıralama için satır başına [12] biçiminde beğeni sayısı yazabilirsin.</p>`:""}<table class="data-table"><thead><tr>${noLikes?"":"<th>Beğeni</th>"}<th>Duygu</th><th>Yorum</th></tr></thead><tbody>${filtered.slice(0,8).map(c=>{const[color,label]=sentimentLabel[commentSentiment(c.text)];return`<tr>${noLikes?"":`<td><span class="pill teal">${c.likes===null?"—":c.likes}</span></td>`}<td><span class="pill ${color}">${label}</span></td><td style="font-size:13px">${esc(c.text)}</td></tr>`}).join("")}</tbody></table>`;
+  document.getElementById("timestampComments").innerHTML=result.timestamps.length?result.timestamps.map(c=>`<div class="ts-row"><div>${c.stamps.map(s=>`<span class="ts-badge">${esc(s)}</span>`).join(" ")}</div><div class="ts-text">${esc(c.text)}</div></div>`).join(""):`<div class="empty-state">Zaman damgası içeren yorum yok.</div>`;
 }
 
 function filterByWord(word){ if(activeWordFilter===word){clearWordFilter();return} activeWordFilter=word; document.getElementById("wordFilterLabel").textContent=`"${word}" içeren yorumlar`; document.getElementById("wordFilterBar").style.display="flex"; const raw=document.getElementById("commentsInput").value; renderCommentResult(analyzeComments(raw)); refreshIcons() }
@@ -1547,7 +1597,7 @@ function clearWordFilter(){ activeWordFilter=null; document.getElementById("word
 function buildWordCloud(text){
   const counts=new Map();
   text.toLocaleLowerCase("tr-TR").replace(/[^\p{L}\p{N}\s]/gu," ").split(/\s+/).filter(w=>w.length>3&&!stopWords.has(w)).forEach(w=>counts.set(w,(counts.get(w)||0)+1));
-  return[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,28).map(([word,count])=>({word,size:13+Math.min(22,count*5),sentiment:containsAny(word,positiveWords)?"positive":containsAny(word,negativeWords)?"negative":"neutral"}));
+  return[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,28).map(([word,count])=>({word,size:13+Math.min(22,count*5),sentiment:commentSentiment(word)}));
 }
 
 function saveAnalysisSession(){
@@ -1557,6 +1607,9 @@ function saveAnalysisSession(){
   snapshotUndo();
   state.analysisHistory=[{id:uid("as"),videoUrl:url,rawComments:raw,ts:Date.now(),total:result.total,score:result.score,themes:result.themes.slice(0,3)},...state.analysisHistory].slice(0,MAX_HISTORY);
   saveState(); renderAnalysisHistory(); showToast("Analiz kaydedildi","success"); logActivity(`Analiz kaydedildi: ${url||"Manuel yorum seti"}`,"success");
+  if(document.documentElement.classList.contains("embedded")&&window.parent!==window){
+    window.parent.postMessage({type:"kade:operations-history",title:url||"Manuel yorum seti",output:JSON.stringify({yorum:result.total,olumlu:result.sentiment.positive,olumsuz:result.sentiment.negative,notr:result.sentiment.neutral,puan:result.score,temalar:result.themes.slice(0,3).map(t=>t.name)})},location.origin);
+  }
 }
 
 function renderAnalysisHistory(){
@@ -1589,14 +1642,16 @@ function bindCrm(){
     snapshotUndo();
     const idea=state.ideas[0];
     state.productions.unshift({id:uid("p"),title:idea?idea.title:"Yeni prodüksiyon",channel:idea?.channel||"Kade",stage:"draft",shootDate:"",publishDate:"",ideaId:idea?.id||"",owner:state.settings.members[0]||"Operasyon",tags:[],updates:["Kart oluşturuldu."],tasks:[],budgets:[{category:"Hazırlık",items:[]}]});
-    saveState();renderAll();showToast("Yeni kart oluşturuldu","success");logActivity("Yeni prodüksiyon kartı açıldı","success");
+    saveState();renderAll();showToast("Yeni kart oluşturuldu; başlığı ve tarihleri düzenleyebilirsin","success");logActivity("Yeni prodüksiyon kartı açıldı","success");
+    openProduction(state.productions[0].id);
+    setTimeout(()=>{ const field=document.querySelector('#dialogBody [data-edit="title"]'); if(field){ field.focus(); field.select() } },50);
   });
   document.getElementById("kanbanBoard").addEventListener("click",e=>{ const card=e.target.closest("[data-production-id]"); if(card)openProduction(card.dataset.productionId) });
   document.getElementById("dialogBody").addEventListener("click",handleDialogClick);
   document.getElementById("dialogBody").addEventListener("change",handleDialogChange);
-  document.getElementById("deleteProductionBtn").addEventListener("click",()=>{
+  document.getElementById("deleteProductionBtn").addEventListener("click",async()=>{
     const prod=state.productions.find(p=>p.id===currentProductionId);
-    if(!prod||!confirm(`"${prod.title}" silinsin mi?`))return;
+    if(!prod||!await uiConfirm(`"${prod.title}" silinsin mi?`,{confirmLabel:"Sil"}))return;
     snapshotUndo(); state.productions=state.productions.filter(p=>p.id!==currentProductionId);
     document.getElementById("productionDialog").close(); saveState();renderAll();
     showToast(`"${prod.title}" silindi`,"warning"); logActivity(`Prodüksiyon silindi: ${prod.title}`,"warning");
@@ -1608,7 +1663,7 @@ function bindCrm(){
     state.productions.unshift(copy); document.getElementById("productionDialog").close(); saveState();renderAll();
     showToast("Kart kopyalandı","info"); logActivity(`Kart kopyalandı: ${prod.title}`,"info");
   });
-  document.getElementById("ideaForm").addEventListener("submit",e=>{ e.preventDefault(); snapshotUndo(); state.ideas.unshift({id:uid("i"),title:document.getElementById("ideaTitle").value,channel:document.getElementById("ideaChannel").value,notes:document.getElementById("ideaNotes").value}); e.target.reset(); document.getElementById("ideaChannel").value="Kade Media"; saveState();renderAll();showToast("Fikir eklendi","success") });
+  document.getElementById("ideaForm").addEventListener("submit",e=>{ e.preventDefault(); snapshotUndo(); state.ideas.unshift({id:uid("i"),title:document.getElementById("ideaTitle").value,channel:document.getElementById("ideaChannel").value,notes:document.getElementById("ideaNotes").value}); e.target.reset(); document.getElementById("ideaChannel").value="Kade New Media"; saveState();renderAll();showToast("Fikir eklendi","success");logActivity(`Fikir eklendi: ${state.ideas[0]?.title||"Fikir"}`,"success") });
   document.getElementById("inventoryForm").addEventListener("submit",e=>{ e.preventDefault(); snapshotUndo(); state.inventory.unshift({id:uid("inv"),name:document.getElementById("inventoryName").value,qty:Number(document.getElementById("inventoryQty").value||1),location:document.getElementById("inventoryLocation").value}); e.target.reset(); document.getElementById("inventoryQty").value=1; document.getElementById("inventoryLocation").value="Depo A / Raf 1"; saveState();renderAll();showToast("Envanter eklendi","success") });
 }
 
@@ -1687,8 +1742,8 @@ function openProduction(id){
 }
 
 function toggleProdTag(tagId){ const prod=state.productions.find(p=>p.id===currentProductionId);if(!prod)return;if(!prod.tags)prod.tags=[];const idx=prod.tags.indexOf(tagId);if(idx===-1)prod.tags.push(tagId);else prod.tags.splice(idx,1);saveState();renderKanban();openProduction(prod.id) }
-function deleteTask(prodId,taskId){ const prod=state.productions.find(p=>p.id===prodId);if(!prod||!confirm("Görev silinsin mi?"))return;snapshotUndo();prod.tasks=prod.tasks.filter(t=>t.id!==taskId);saveState();renderAll();openProduction(prodId);showToast("Görev silindi","warning") }
-function deleteBudgetItem(groupIdx,itemId){ const prod=state.productions.find(p=>p.id===currentProductionId);if(!prod||!confirm("Bütçe kalemi silinsin mi?"))return;snapshotUndo();const group=prod.budgets[Number(groupIdx)];if(group)group.items=group.items.filter(i=>String(i.id)!==String(itemId));saveState();renderAll();openProduction(prod.id);showToast("Kalemi silindi","warning") }
+async function deleteTask(prodId,taskId){ const prod=state.productions.find(p=>p.id===prodId);if(!prod||!await uiConfirm("Görev silinsin mi?",{confirmLabel:"Sil"}))return;snapshotUndo();prod.tasks=prod.tasks.filter(t=>t.id!==taskId);saveState();renderAll();openProduction(prodId);showToast("Görev silindi","warning") }
+async function deleteBudgetItem(groupIdx,itemId){ const prod=state.productions.find(p=>p.id===currentProductionId);if(!prod||!await uiConfirm("Bütçe kalemi silinsin mi?",{confirmLabel:"Sil"}))return;snapshotUndo();const group=prod.budgets[Number(groupIdx)];if(group)group.items=group.items.filter(i=>String(i.id)!==String(itemId));saveState();renderAll();openProduction(prod.id);showToast("Bütçe kalemi silindi","warning") }
 
 function handleDialogClick(e){
   const prod=state.productions.find(p=>p.id===currentProductionId);if(!prod)return;
@@ -1699,7 +1754,7 @@ function handleDialogClick(e){
   if(e.target.closest("[data-add-task]")){const inp=document.getElementById("newTaskText");if(inp.value.trim()){snapshotUndo();prod.tasks.unshift({id:uid("t"),title:inp.value.trim(),assignee:state.settings.members[0]||"Operasyon",priority:"Orta",due:"",done:false,desc:""});saveState();renderAll();openProduction(prod.id);showToast("Görev eklendi","success")}return}
   const budgetAddBtn=e.target.closest("[data-add-budget]");
   if(budgetAddBtn){const gi=Number(budgetAddBtn.dataset.addBudget),form=budgetAddBtn.closest(".budget-add-form"),label=form.querySelector("[data-ba-label]").value.trim(),amount=Number(form.querySelector("[data-ba-amount]").value),spender=form.querySelector("[data-ba-spender]").value;if(!label||!amount){showToast("Kalem adı ve tutar zorunludur","error");return}snapshotUndo();prod.budgets[gi].items.push({id:uid("bi"),label,amount,spender});saveState();renderAll();openProduction(prod.id);showToast(`${fmt.try.format(amount)} eklendi`,"success");return}
-  if(e.target.closest("[data-add-category]")){const name=prompt("Yeni kategori adı:");if(name?.trim()){snapshotUndo();prod.budgets.push({category:name.trim(),items:[]});saveState();renderAll();openProduction(prod.id);showToast("Kategori eklendi","success")}}
+  if(e.target.closest("[data-add-category]")){uiPrompt("Bütçe kategorisi ekle",[{label:"Kategori adı",required:true}]).then(values=>{const name=values?.[0];if(name?.trim()){snapshotUndo();prod.budgets.push({category:name.trim(),items:[]});saveState();renderAll();openProduction(prod.id);showToast("Kategori eklendi","success")}})}
 }
 
 function handleDialogChange(e){
@@ -1713,11 +1768,11 @@ function handleDialogChange(e){
 function toggleTask(id,done){ const t=findTask(id);if(t)t.done=done;saveState();renderDashboard();renderGeneralTasks();updateBadge();refreshIcons() }
 
 function renderIdeas(){
-  document.getElementById("ideaList").innerHTML=state.ideas.map(idea=>`<div class="idea-item"><h3>${esc(idea.title)}</h3><span class="pill teal">${esc(idea.channel)}</span><p class="row-meta" style="font-size:13px;margin-top:6px">${esc(idea.notes)}</p><div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="ghost-btn" style="font-size:12px" onclick="ideaToProduction('${idea.id}')"><i data-lucide="arrow-right" style="width:13px;height:13px"></i> Prodüksiyona Taşı</button><button type="button" onclick="deleteIdea('${idea.id}')" style="border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:18px;padding:0">×</button></div></div>`).join("")||`<div class="empty-state">Fikir havuzu bos.</div>`;
+  document.getElementById("ideaList").innerHTML=state.ideas.map(idea=>`<div class="idea-item"><h3>${esc(idea.title)}</h3><span class="pill teal">${esc(idea.channel)}</span><p class="row-meta" style="font-size:13px;margin-top:6px">${esc(idea.notes)}</p><div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="ghost-btn" style="font-size:12px" onclick="ideaToProduction('${idea.id}')"><i data-lucide="arrow-right" style="width:13px;height:13px"></i> Prodüksiyona Taşı</button><button type="button" onclick="deleteIdea('${idea.id}')" style="border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:18px;padding:0">×</button></div></div>`).join("")||`<div class="empty-state">Fikir havuzu boş.</div>`;
 }
 
-function ideaToProduction(ideaId){ const idea=state.ideas.find(i=>i.id===ideaId);if(!idea||!confirm(`"${idea.title}" → prodüksiyon kartı açılsın mı?`))return;snapshotUndo();state.productions.unshift({id:uid("p"),title:idea.title,channel:idea.channel,stage:"draft",shootDate:"",publishDate:"",ideaId:idea.id,owner:state.settings.members[0]||"Operasyon",tags:[],updates:[`"${idea.title}" fikrinden oluşturuldu.`],tasks:[],budgets:[{category:"Hazırlık",items:[]}]});saveState();renderAll();switchTab("crm","productions");showToast("Prodüksiyon kartı açıldı","success");logActivity(`Fikir prodüksiyona taşındı: ${idea.title}`,"success") }
-function deleteIdea(id){ if(!confirm("Fikir silinsin mi?"))return;snapshotUndo();state.ideas=state.ideas.filter(i=>i.id!==id);saveState();renderIdeas();showToast("Fikir silindi","warning") }
+async function ideaToProduction(ideaId){ const idea=state.ideas.find(i=>i.id===ideaId);if(!idea||!await uiConfirm(`"${idea.title}" için prodüksiyon kartı açılsın mı?`,{title:"Prodüksiyona taşı",confirmLabel:"Kart aç",danger:false}))return;snapshotUndo();state.productions.unshift({id:uid("p"),title:idea.title,channel:idea.channel,stage:"draft",shootDate:"",publishDate:"",ideaId:idea.id,owner:state.settings.members[0]||"Operasyon",tags:[],updates:[`"${idea.title}" fikrinden oluşturuldu.`],tasks:[],budgets:[{category:"Hazırlık",items:[]}]});saveState();renderAll();switchTab("crm","productions");showToast("Prodüksiyon kartı açıldı","success");logActivity(`Fikir prodüksiyona taşındı: ${idea.title}`,"success") }
+async function deleteIdea(id){ const idea=state.ideas.find(i=>i.id===id); if(!await uiConfirm("Fikir silinsin mi?",{confirmLabel:"Sil"}))return;snapshotUndo();state.ideas=state.ideas.filter(i=>i.id!==id);saveState();renderIdeas();showToast("Fikir silindi","warning");logActivity(`Fikir silindi: ${idea?.title||"Fikir"}`,"warning") }
 
 function renderGeneralTasks(){
   const assigneeSel=document.getElementById("taskAssigneeFilter");
@@ -1743,17 +1798,19 @@ function renderLibrary(){
   const el=document.getElementById("libraryList");if(!el)return;
   el.innerHTML=state.docs.map(doc=>`<div class="doc-item" style="position:relative"><div style="font-size:28px">${esc(doc.icon||"📄")}</div><h3>${esc(doc.title)}</h3><div class="card-meta"><span class="pill indigo">${esc(doc.type)}</span><span class="row-meta">${esc(doc.owner)}</span></div><button onclick="deleteDoc('${doc.id}')" style="position:absolute;top:8px;right:8px;border:0;background:transparent;color:var(--coral);cursor:pointer;font-size:20px;line-height:1;padding:2px;opacity:.5;transition:var(--transition)" title="Sil" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">×</button></div>`).join("")+`<div class="doc-item" style="border-style:dashed;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:.55;transition:var(--transition)" onclick="addDoc()" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.55"><div style="font-size:28px">+</div><h3 style="font-size:12px;font-weight:600">Yeni Doküman</h3></div>`;
 }
-function addDoc(){
-  const title=prompt("Doküman adı:");if(!title?.trim())return;
-  const type=prompt("Tür (Finans / IK / Hukuk / Tasarım / Teknik / Genel):")||"Genel";
-  const owner=prompt("Sorumlu:")||"Operasyon";
-  const icons={Finans:"💰",IK:"👥",Hukuk:"📄",Tasarım:"🎨",Teknik:"🤖",Genel:"📋"};
+async function addDoc(){
+  const values=await uiPrompt("Doküman ekle",[{label:"Doküman adı",required:true},{label:"Tür (Finans / İK / Hukuk / Tasarım / Teknik / Genel)",value:"Genel"},{label:"Sorumlu",value:"Operasyon"}]);
+  if(!values)return;
+  const[title,rawType,rawOwner]=values;if(!title?.trim())return;
+  const type=(rawType||"Genel").replace(/^IK$/i,"İK")||"Genel";
+  const owner=rawOwner||"Operasyon";
+  const icons={Finans:"💰","İK":"👥",Hukuk:"📄",Tasarım:"🎨",Teknik:"🤖",Genel:"📋"};
   snapshotUndo();
   state.docs.push({id:uid("doc"),title:title.trim(),type:type.trim(),owner:owner.trim(),icon:icons[type.trim()]||"📋"});
   saveState();renderLibrary();showToast("Doküman eklendi","success");
 }
-function deleteDoc(idOrTitle){
-  if(!confirm("Doküman silinsin mi?"))return;
+async function deleteDoc(idOrTitle){
+  if(!await uiConfirm("Doküman silinsin mi?",{confirmLabel:"Sil"}))return;
   snapshotUndo();
   state.docs=state.docs.filter(d=>(d.id||d.title)!==idOrTitle);
   saveState();renderLibrary();showToast("Doküman silindi","warning");
@@ -1781,7 +1838,7 @@ function populateSelects(){
 
 function bindBanana(){
   document.querySelectorAll("[data-banana-tab]").forEach(btn=>btn.addEventListener("click",()=>switchTab("banana",btn.dataset.bananaTab)));
-  document.getElementById("brainstormImage").addEventListener("click",()=>{ const cnt=Number(document.getElementById("brainstormCount").value)||5; state.brainstorm=createBrainstorm(document.getElementById("imagePrompt").value,cnt);saveState();renderBanana() });
+  document.getElementById("brainstormImage").addEventListener("click",()=>{ const prompt=document.getElementById("imagePrompt").value; if(!prompt.trim()){showToast("Önce görsel için kısa bir fikir yaz; öneriler bu metinden türetilir","warning");document.getElementById("imagePrompt").focus();return} const cnt=Number(document.getElementById("brainstormCount").value)||5; state.brainstorm=createBrainstorm(prompt,cnt);saveState();renderBanana() });
   document.getElementById("enhanceImagePrompt").addEventListener("click",()=>{ const el=document.getElementById("imagePrompt");el.value=enhanceImagePrompt(el.value);showToast("Prompt iyilestirildi","info") });
   document.getElementById("enhanceVideoPrompt").addEventListener("click",()=>{ const el=document.getElementById("videoPrompt");el.value=enhanceVideoPrompt(el.value);showToast("Prompt iyilestirildi","info") });
   document.getElementById("saveTemplate").addEventListener("click",()=>{ const prompt=document.getElementById("imagePrompt").value.trim();if(!prompt){showToast("Önce bir prompt yaz","error");return}snapshotUndo();const name=prompt.slice(0,30)+(prompt.length>30?"…":"");if(!state.promptTemplates)state.promptTemplates=[];state.promptTemplates.push({id:uid("tpl"),name,prompt});saveState();renderPromptTemplates();showToast("Şablon kaydedildi","success") });
@@ -1848,32 +1905,27 @@ function renderYoutubeRefs(){
 function renderAdminSpend(){ document.getElementById("adminSpend").innerHTML=`<table class="data-table"><thead><tr><th>Kullanıcı</th><th>Görsel</th><th>Video</th><th>Tahmini sağlayıcı kullanımı</th></tr></thead><tbody>${state.users.map(u=>`<tr><td style="font-weight:700">${esc(u.name)}</td><td><span class="pill indigo">${u.images}</span></td><td><span class="pill violet">${u.videos}</span></td><td><span class="cost-chip">${providerCost(u.spend)}</span></td></tr>`).join("")}</tbody></table><div style="margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:10px;background:var(--gold-dim)"><div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px">TAHMİNİ TOPLAM SAĞLAYICI KULLANIMI</div><div style="font-size:28px;font-weight:900;color:var(--gold)">${providerCost(state.totalUsdSpent||0)}</div></div>` }
 function renderModelCosts(){ document.getElementById("modelCosts").innerHTML=`<table class="data-table"><thead><tr><th>Model</th><th>Tip</th><th>Birim</th></tr></thead><tbody>${imageModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill teal">Görsel</span></td><td><span class="cost-chip">${providerCost(m.cost,"/görsel")}</span></td></tr>`).join("")}${videoModels.map(m=>`<tr><td style="font-weight:700;font-size:13px">${esc(m.name)}</td><td><span class="pill violet">Video</span></td><td><span class="cost-chip">${providerCost(m.base,"/10 sn")}</span></td></tr>`).join("")}</tbody></table>` }
 function renderSpendingChart(){ const el=document.getElementById("spendingChart");if(!el)return;const max=Math.max(...state.users.map(u=>u.spend),1),cls=["#00d4aa","#6c8ef5","#c77dff"];el.innerHTML=state.users.map((u,i)=>`<div class="bar-row"><div class="bar-label">${esc(u.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round((u.spend/max)*100)}%;background:${cls[i%cls.length]}"></div></div><div class="bar-val">${providerCost(u.spend)}</div></div>`).join("") }
+/** Girilen prompttan kompozisyon, ışık ve duygu varyasyonları üretir. Sabit bir tema dayatmaz. */
 function createBrainstorm(cur,count){
   const n=Math.min(Number(count)||5,20);
-  const base=[
-    "Zehirlenme konsepti: @ana-kişi şüpheli yemegin önünde, abartılı yüz ifadesi, gicirdayan restoran tabelası.",
-    "Böcekli dürüm: @ana-kişi büyütecle inceliyor, karanlık neon ışığı, ultra-gerçekçi doku.",
-    "1 Yıldızlı Restoran: Eski soluk tabela ön planda, @ana-kişi ve @ikinci-kişi saskin bakis.",
-    "Sac çıkan yemek: @ana-kişi dehsetle geri çekiliyor, stüdyo ışığı, sinema rengi.",
-    "Paket servisi felaketi: Şekilsiz paket, neon çerçeveli sahne, @ikinci-kişi dehsette.",
-    "Gizli kamera: @ana-kişi restoran mutfagina bakıyor, dehset yüzü, dramatik aydınlatma.",
-    "Fiyat soku: @ana-kişi fatura görürken çatılı kasilar, gold-noir renk paleti.",
-    "Böcek temalı: @ana-kişi ve @ikinci-kişi büyütecle yemeği inceliyor, siyah arkaplan.",
-    "Yemek kriteri: Kalem ve defter ön planda, @ana-kişi ciddi degerlendirme pozu.",
-    "Geri döndük: @ana-kişi restoranın önünde 'Tekrar Denedim' yazisiyla, dramatik pozlama.",
-    "Düşük bütçeli lüks: @ana-kişi sofistike restoranın önünde eski kiyafetlerle, komik kontrast.",
-    "Hayatta kalma: @ana-kişi sacini tutarak çikis kapısı önünde, dramatik siluet.",
-    "En kötüsü: @ana-kişi siyah fonda kirmizi '1 yildiz' hologram, sinematik kompozisyon.",
-    "Uzman testi: @ana-kişi önlük ve büyütecle, laboratuvar estetigiyle yemek analizi.",
-    "Teselli ödülü: @ana-kişi berbat yemek sonrası emoji ifadesiyle, canlı renk paleti.",
-    "Seri final: @ana-kişi ve @ikinci-kişi arka arkaya yüz ifadeleri kolaji.",
-    "Sosyal medya: Telefon ekraninda 1 yildiz yorumu büyük yazılı, @ana-kişi saskin.",
-    "Karşılaştırma: Solda lüks restoran renderı, sağda gerçek mekân; bölünmüş ekran.",
-    "Macera devam: @ana-kişi yeni restoranın önünde 'Bu sefer ne olacak?' bakışıyla.",
-    "Kolabo: @ana-kişi ve @ikinci-kişi baskica el sikisirken tabelalı restoran fon.",
+  const base=String(cur||"").trim().replace(/\s+/g," ").replace(/[.。]+$/,"");
+  if(!base)return[];
+  const variations=[
+    "yakın plan portre, sığ alan derinliği, sıcak stüdyo ışığı",
+    "geniş açı, ortam detayları görünür, doğal gün ışığı",
+    "yüksek kontrast, koyu arka plan, tek renkli vurgu ışığı",
+    "üstten çekim, sade kompozisyon, bol negatif alan",
+    "hareketli an, hafif hareket bulanıklığı, dinamik açı",
+    "canlı renk paleti, eğlenceli ve enerjik ifade",
+    "minimalist stil, açık tonlar, düzenli yerleşim",
+    "sinematik geniş kadraj, dramatik gölgeler",
+    "belgesel havası, gerçekçi doku, kamera arkası hissi",
+    "bölünmüş ekran karşılaştırması, önce ve sonra düzeni",
+    "karakter kameraya bakıyor, merak uyandıran ifade",
+    "ürün veya konu ön planda, bulanık arka plan",
   ];
   const out=[];
-  for(let i=0;i<n;i++)out.push({id:uid("bs"),prompt:base[i%base.length],idx:i});
+  for(let i=0;i<n;i++)out.push({id:uid("bs"),prompt:`${base}. ${variations[i%variations.length]}.`,idx:i});
   return out;
 }
 function enhanceImagePrompt(raw){ const refs=state.references.map(r=>r.tag).join(", ");return`${raw.trim()}\n\n— Sistem: sinematik aydınlatma, ultra-gerçekçi doku, sığ alan derinliği, profesyonel YouTube kapak kompozisyonu. Referanslar: ${refs||"@ana-kişi"}. Stil: edgy editorial, vibrant renk paleti.` }
@@ -2005,7 +2057,7 @@ function bindClients(){
       createdAt:new Date().toISOString(), deliveries:[],
     });
     document.getElementById("clientForm").reset();
-    saveState(); renderClients(); showToast("Müşteri eklendi","success");
+    saveState(); renderClients(); showToast("Müşteri eklendi","success"); logActivity(`Müşteri eklendi: ${ad.slice(0,80)}`,"success");
   });
 
   document.getElementById("clientList")?.addEventListener("click",e=>{
@@ -2020,14 +2072,15 @@ function bindClients(){
 
 function findClient(id){ return arr(state.clients).find(c=>c.id===id) }
 
-function addDelivery(clientId){
+async function addDelivery(clientId){
   const c=findClient(clientId); if(!c)return;
-  const baslik=prompt("Teslim edilecek iş:"); if(!baslik||!baslik.trim())return;
-  const tarih=prompt("Termin (YYYY-AA-GG, boş bırakılabilir):")||"";
+  const values=await uiPrompt(`${c.name} için teslim ekle`,[{label:"Teslim edilecek iş",required:true},{label:"Termin (isteğe bağlı)",type:"date"}]);
+  if(!values)return;
+  const[baslik,tarih=""]=values; if(!baslik||!baslik.trim())return;
   snapshotUndo();
   c.deliveries=arr(c.deliveries);
   c.deliveries.push({id:uid("dlv"),title:baslik.trim().slice(0,120),due:/^\d{4}-\d{2}-\d{2}$/.test(tarih.trim())?tarih.trim():"",status:"pending"});
-  saveState(); renderClients(); showToast("Teslim eklendi","success");
+  saveState(); renderClients(); showToast("Teslim eklendi","success"); logActivity(`Teslim eklendi: ${c.name} · ${baslik.trim().slice(0,60)}`,"success");
 }
 
 function cycleDelivery(deliveryId, clientId){
@@ -2039,9 +2092,9 @@ function cycleDelivery(deliveryId, clientId){
   saveState(); renderClients();
 }
 
-function deleteClient(id){
+async function deleteClient(id){
   const c=findClient(id); if(!c)return;
-  if(!confirm(`"${c.name}" ve teslimleri silinsin mi?`))return;
+  if(!await uiConfirm(`"${c.name}" ve teslimleri silinsin mi?`,{confirmLabel:"Sil"}))return;
   snapshotUndo();
   state.clients=arr(state.clients).filter(x=>x.id!==id);
   saveState(); renderClients(); showToast("Müşteri silindi","warning");
@@ -2070,7 +2123,7 @@ function renderClients(){
       return `<div class="dlv-row${gec?" dlv-late":""}">
         <button class="dlv-status" data-delivery-cycle="${esc(d.id)}" data-client-id="${esc(c.id)}" title="Durumu değiştir">${esc(durum.label)}</button>
         <span class="dlv-title">${esc(d.title)}</span>
-        <span class="dlv-due">${d.due?esc(d.due):"—"}</span>
+        <span class="dlv-due">${d.due?esc(fmt.date(d.due)):"—"}</span>
       </div>`;
     }).join(""):'<p class="empty-hint">Henüz teslim yok.</p>';
     return `<article class="client-card">
@@ -2259,8 +2312,8 @@ function restorePage(pageId){
   showToast("Sayfa geri yüklendi","success");
 }
 
-function permanentDeletePage(pageId){
-  if(!confirm("Bu sayfa kalıcı olarak silinsin mi?"))return;
+async function permanentDeletePage(pageId){
+  if(!await uiConfirm("Bu sayfa kalıcı olarak silinsin mi? Bu işlem geri alınamaz.",{confirmLabel:"Kalıcı sil"}))return;
   const ids=[pageId];
   function collect(id){ (state.pages||[]).filter(p=>p.parentId===id).forEach(c=>{ids.push(c.id);collect(c.id)}) }
   collect(pageId);
@@ -2784,8 +2837,8 @@ function removeCover(){
   const ca=document.getElementById("pageCoverArea");if(ca)ca.innerHTML="";
 }
 
-function addPageCover(){
-  const url=prompt("Kapak görsel URL'si girin:");
+async function addPageCover(){
+  const url=(await uiPrompt("Kapak görseli",[{label:"Görsel bağlantısı (https://…)",type:"url",required:true}]))?.[0];
   if(!url)return;
   const pg=currentPage();if(!pg)return;
   pg.cover=url;pg.updatedAt=Date.now();saveState();renderPageEditor();
@@ -2975,9 +3028,16 @@ function caretIsAtEnd(el){
 // ── Title Binding ─────────────────────────────────────────────────────────
 function bindPageTitleEl(){
   const titleEl=document.getElementById("pageTitleEl");if(!titleEl)return;
+  let titleAtFocus="";
+  titleEl.addEventListener("focus",()=>{ titleAtFocus=currentPage()?.title||"" });
   titleEl.addEventListener("input",()=>{
     const pg=currentPage();if(!pg)return;
     pg.title=titleEl.textContent||""; pg.updatedAt=Date.now(); saveState(); renderPageTree();
+    const cur=document.querySelector("#pageBreadcrumb .bc-cur"); if(cur)cur.textContent=pg.title||"Başlıksız";
+  });
+  titleEl.addEventListener("blur",()=>{
+    const pg=currentPage();if(!pg)return;
+    if((pg.title||"")!==titleAtFocus&&pg.title)logActivity(`Sayfa adı: ${titleAtFocus||"Başlıksız"} → ${pg.title}`,"info");
   });
   titleEl.addEventListener("keydown",e=>{
     if(e.key==="Enter"){
@@ -3002,7 +3062,7 @@ function bindPages(){
   document.getElementById("pageDupBtn")?.addEventListener("click",duplicatePage);
   document.getElementById("pageMoveBtn")?.addEventListener("click",showMovePageModal);
   document.getElementById("pageExportMdBtn")?.addEventListener("click",exportPageMarkdown);
-  document.getElementById("pageDeleteBtn")?.addEventListener("click",()=>{ const pg=currentPage();if(pg&&confirm(`"${pg.title||"Sayfa"}" silinsin mi?`))deletePage(pg.id) });
+  document.getElementById("pageDeleteBtn")?.addEventListener("click",async()=>{ const pg=currentPage();if(pg&&await uiConfirm(`"${pg.title||"Sayfa"}" çöp kutusuna taşınsın mı?`,{confirmLabel:"Sil"}))deletePage(pg.id) });
   document.getElementById("pageIconBtn")?.addEventListener("click",function(){openPageIconEmoji(this)});
   document.getElementById("pageRelationType")?.addEventListener("change",event=>{
     const pg=currentPage();if(!pg)return;
@@ -3037,7 +3097,7 @@ function bindPages(){
         const sel=window.getSelection();
         if(sel&&!sel.isCollapsed){const t=sel.toString();document.execCommand("insertHTML",false,`<code style="background:rgba(0,0,0,.2);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:.9em">${esc(t)}</code>`)}
       } else if(cmd==="createLink"){
-        const url=prompt("Link URL'si:");if(url)document.execCommand("createLink",false,url);
+        const sel=window.getSelection();const range=sel&&sel.rangeCount?sel.getRangeAt(0).cloneRange():null;uiPrompt("Bağlantı ekle",[{label:"Bağlantı (https://…)",type:"url",required:true}]).then(values=>{const url=values?.[0];if(!url)return;if(range){const current=window.getSelection();current.removeAllRanges();current.addRange(range)}document.execCommand("createLink",false,url)});
       } else { document.execCommand(cmd,false,val||null) }
     });
   });
@@ -3120,3 +3180,31 @@ Object.assign(window,{
   applyTemplate,
   applyMovePage,
 });
+
+
+// ── UYGULAMA İÇİ DİYALOG ─────────────────────────────────────────────
+// Tarayıcının yerel prompt()/confirm() pencereleri sayfayı kilitliyor, tema ve
+// Türkçe başlık taşımıyordu. Aynı işlevi kit içi <dialog> sağlar.
+function uiDialog({title,message="",fields=[],confirmLabel="Tamam",danger=false}){
+  return new Promise(resolve=>{
+    const dlg=document.createElement("dialog");
+    dlg.className="ui-dialog";
+    dlg.setAttribute("aria-label",title);
+    dlg.innerHTML=`<form class="ui-dialog-form"><h2>${esc(title)}</h2>${message?`<p>${esc(message)}</p>`:""}${fields.map((f,i)=>`<label><span class="label-text">${esc(f.label)}</span><input name="f${i}" type="${esc(f.type||"text")}" value="${esc(f.value||"")}" ${f.required?"required":""}/></label>`).join("")}<div class="ui-dialog-actions"><button type="button" class="ghost-btn" data-ui-cancel>Vazgeç</button><button type="submit" class="${danger?"danger-btn":"primary-btn"}">${esc(confirmLabel)}</button></div></form>`;
+    document.body.appendChild(dlg);
+    let done=false;
+    const finish=value=>{ if(done)return; done=true; if(dlg.open)dlg.close(); dlg.remove(); resolve(value) };
+    dlg.querySelector("[data-ui-cancel]").addEventListener("click",()=>finish(null));
+    dlg.addEventListener("cancel",e=>{ e.preventDefault(); finish(null) });
+    dlg.querySelector("form").addEventListener("submit",e=>{
+      e.preventDefault();
+      finish(fields.length?fields.map((_,i)=>dlg.querySelector(`[name="f${i}"]`).value.trim()):true);
+    });
+    dlg.showModal();
+    (dlg.querySelector("input")||dlg.querySelector('[type="submit"]')).focus();
+  });
+}
+function uiConfirm(message,options={}){
+  return uiDialog({title:options.title||"Onay gerekiyor",message,confirmLabel:options.confirmLabel||"Evet",danger:options.danger!==false}).then(Boolean);
+}
+function uiPrompt(title,fields){ return uiDialog({title,fields,confirmLabel:"Kaydet",danger:false}) }

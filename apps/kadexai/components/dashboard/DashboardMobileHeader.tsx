@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Menu, Settings } from 'lucide-react'
 import { useSidebar } from '@/lib/context/SidebarContext'
-import { apiPath, withBasePath } from '@/lib/appConfig'
+import { apiPath } from '@/lib/appConfig'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 
 export default function DashboardMobileHeader() {
+  const workspaceHref = useWorkspaceHref()
   const { toggle } = useSidebar()
   const [settingsAccess, setSettingsAccess] = useState(false)
 
@@ -32,7 +34,7 @@ export default function DashboardMobileHeader() {
       </button>
       {settingsAccess && (
         <Link
-          href={withBasePath('/dashboard/settings')}
+          href={workspaceHref('/dashboard/settings')}
           className="kade-mobile-btn inline-flex h-11 w-11 items-center justify-center rounded-xl"
           aria-label="Ayarlar"
         >

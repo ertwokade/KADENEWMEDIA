@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
@@ -23,6 +24,12 @@ export default function TextGeneratorPage() {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['goal', 'format', 'platform', 'audience', 'tone', 'keyPoints'] as const)
+    if (v.goal) setGoal(v.goal); if (v.format) setFormat(v.format); if (v.platform) setPlatform(v.platform); if (v.audience) setAudience(v.audience); if (v.tone) setTone(v.tone); if (v.keyPoints) setKeyPoints(v.keyPoints)
+  }, [])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()

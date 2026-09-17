@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -59,6 +60,12 @@ export default function CommentAnalysisPage() {
   const [data, setData] = useState<AnalysisData | null>(null)
   const [error, setError] = useState('')
   const [analyzedTitle, setAnalyzedTitle] = useState('')
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['comments', 'contentTitle'] as const)
+    if (v.comments) setComments(v.comments); if (v.contentTitle) setContentTitle(v.contentTitle)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -17,6 +18,12 @@ export default function CollabMailPage() {
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<'kisa' | 'uzun' | 'takip'>('kisa')
   const [copied, setCopied] = useState(false)
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['senderName', 'senderChannel', 'senderNiche', 'targetName', 'dealType', 'extraNotes'] as const)
+    setForm((current) => ({ ...current, ...Object.fromEntries(Object.entries(v).filter(([, value]) => Boolean(value))) }))
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

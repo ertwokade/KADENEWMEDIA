@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
 import { Calendar, Plus, Trash2 } from 'lucide-react'
 import { Platform } from '@/types'
 import { getPlatformLabel, cn } from '@/lib/utils'
@@ -45,14 +46,14 @@ export default function CalendarPage() {
   const [syncError, setSyncError] = useState('')
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const title = params.get('title')
-    const platform = params.get('platform')
+    // Parametreler bir kez okunup adresten silinir; kayıttan sonra sayfa yenilenince form yeniden dolmaz.
+    const { title, platform, date } = readPrefill(['title', 'platform', 'date'] as const)
     if (!title) return
     setNewEntry((current) => ({
       ...current,
       title: title.slice(0, 300),
       platform: platforms.includes(platform as Platform) ? platform as Platform : current.platform,
+      date: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : current.date,
     }))
     setShowForm(true)
   }, [])

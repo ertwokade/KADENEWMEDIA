@@ -538,3 +538,39 @@ mark.page-search-hl{background:rgba(255,209,102,0.35);color:inherit;border-radiu
 /* ── Page empty state fullheight ── */
 #pages{min-height:calc(100vh - 57px)}
 .page-empty-state{min-height:400px}
+
+/* ── 17 Eylül 2026 canlı denetim düzeltmeleri ─────────────────────── */
+/* Panelle aynı yazı tipi: ana uygulama Montserrat kullanıyor. */
+@font-face{font-family:"KadeMontserrat";src:url("../fonts/kade/montserrat-400.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"KadeMontserrat";src:url("../fonts/kade/montserrat-500.ttf") format("truetype");font-weight:500;font-display:swap}
+@font-face{font-family:"KadeMontserrat";src:url("../fonts/kade/montserrat-600.ttf") format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"KadeMontserrat";src:url("../fonts/kade/montserrat-700.ttf") format("truetype");font-weight:700 900;font-display:swap}
+*,*::before,*::after{font-family:"KadeMontserrat","Poppins",system-ui,sans-serif!important}
+.nt-code,.nt-code *{font-family:"Fira Code","Cascadia Code","Consolas",monospace!important}
+
+/* Genel sıfırlama (margin:0) yerel <dialog> ortalamasını bozuyordu. */
+dialog[open]{margin:auto;inset:0}
+
+/* Bildirimler sağ alttaki asistan düğmesinin altında kalıyordu. */
+#toastContainer{bottom:96px}
+
+/* Onay kutuları genel input kuralından tam genişlik ve 38px yükseklik alıyordu. */
+input[type=checkbox],input[type=radio]{width:auto;min-height:0;height:auto;padding:0;flex:0 0 auto;accent-color:var(--teal)}
+
+/* Notlar: blok tutamaçları metnin başına biniyordu. */
+.blocks-inner{padding-left:68px}
+.blk-ctrl-bar{left:-64px}
+html.embedded .pages-tree-slot{top:12px;margin-top:12px}
+
+/* Banana: model adı dar sütunda kesiliyordu. */
+#imageForm .form-row{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) 88px}
+@media(max-width:820px){#imageForm .form-row{grid-template-columns:1fr 1fr}}
+
+/* Uygulama içi onay ve giriş penceresi */
+.ui-dialog{width:min(92vw,440px);background:var(--bg2);color:var(--ink);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0;box-shadow:0 24px 80px rgba(0,0,0,.45)}
+.ui-dialog::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(6px)}
+.ui-dialog-form{display:flex;flex-direction:column;gap:14px;padding:22px 24px}
+.ui-dialog-form h2{font-size:17px}
+.ui-dialog-form p{font-size:13px;line-height:1.6;color:var(--ink2)}
+.ui-dialog-form label{display:flex;flex-direction:column;gap:6px}
+.ui-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}

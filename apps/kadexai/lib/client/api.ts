@@ -83,6 +83,32 @@ function persistHistory(entry: LocalHistoryEntry) {
   }).catch(() => undefined)
 }
 
+export function historyToolId(url: string) {
+  if (url === '/api/image') return 'ai-thumbnail'
+  return url.split('?')[0].split('/').pop() || 'generation'
+}
+
+/**
+ * Üretim uçları dışında çalışan araçlar (İçerik Stüdyosu, Akışlar, Altyazı,
+ * Dublaj, Video Fabrikası, KadeSearch senaryo) Geçmiş'te hiç görünmüyordu.
+ * Bu araçlar çalıştırma sonucunu açıkça kaydeder.
+ */
+export function recordToolRun(run: { tool: string; input?: Record<string, unknown>; output: string; status?: 'completed' | 'failed'; error?: string; model?: string }) {
+  if (typeof window === 'undefined') return
+  const account = readAccountContext()
+  persistHistory({
+    id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    tool: run.tool,
+    model: run.model || 'auto',
+    output: run.output.slice(0, 200_000),
+    input_data: account.preferences.rememberInputs ? (run.input || {}) : {},
+    created_at: new Date().toISOString(),
+    status: run.status || 'completed',
+    error_message: run.error,
+    profile_snapshot: accountContextForRequest(account) as unknown as Record<string, unknown>,
+  })
+}
+
 function saveGenerationResult(url: string, init: RequestInit | undefined, response: Response) {
   if (typeof window === 'undefined' || (!url.startsWith('/api/generate/') && url !== '/api/image')) return
 
@@ -120,7 +146,7 @@ function saveGenerationResult(url: string, init: RequestInit | undefined, respon
     const account = readAccountContext()
     const entry: LocalHistoryEntry = {
       id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      tool: url === '/api/image' ? 'ai-thumbnail' : (url.split('/').pop() || 'generation'),
+      tool: historyToolId(url),
       model: typeof data.model === 'string'
         ? data.model
         : typeof inputData.model === 'string'
@@ -148,7 +174,7 @@ function saveNetworkFailure(url: string, init: RequestInit | undefined, error: u
   const account = readAccountContext()
   persistHistory({
     id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    tool: url === '/api/image' ? 'ai-thumbnail' : (url.split('/').pop() || 'generation'),
+    tool: historyToolId(url),
     model: typeof inputData.model === 'string' ? inputData.model : 'auto',
     output: '',
     input_data: account.preferences.rememberInputs ? inputData : {},

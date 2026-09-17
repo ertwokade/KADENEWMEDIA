@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
-import { ChevronDown, History, RotateCcw, Search, Trash2 } from 'lucide-react'
+import { ChevronDown, ExternalLink, History, RotateCcw, Search, Trash2 } from 'lucide-react'
 import { getModelLabel, getModelColor, cn } from '@/lib/utils'
 import { apiFetch, LOCAL_HISTORY_KEY, LocalHistoryEntry } from '@/lib/client/api'
 import { AIModel } from '@/types'
-import { withBasePath } from '@/lib/appConfig'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
+import { withPrefill } from '@/lib/client/prefill'
+import { humanizeKey, humanizeValue } from '@/lib/ui/outputLabels'
 import { historyReplayEndpoint, mergeAccountHistory } from '@/lib/client/history'
 import { getToolById } from '@/lib/tools/registry'
 import ModelOutput from '@/components/ui/ModelOutput'
@@ -30,12 +32,16 @@ interface HistoryEntry {
 /** Araç adlarının kaynağı kayıt defteri; burada yalnızca birleştirilmiş ya da
  *  kaldırılmış eski araçların geçmişte kalan id'leri karşılanıyor. */
 const LEGACY_TOOL_LABELS: Record<string, string> = {
-  clips: 'Klip Analizi',
-  performance: 'Viral Skor · Performans Tahmini',
-  analytics: 'Analitik',
+  clips: 'Klip Üretici',
+  performance: 'Viral Skor',
+  analytics: 'Sosyal Medya Analizi',
   trends: 'Trend Radar',
   thread: 'Thread Yazarı',
-  bulk: 'Toplu Üretim',
+  bulk: 'Toplu İçerik',
+  translate: 'Altyazı Stüdyosu',
+  tts: 'Dublaj Stüdyosu',
+  'kade-search-script': 'KadeSearch Onay',
+  sentscan: 'SentScan',
 }
 
 function toolLabel(id: string) {
@@ -47,6 +53,19 @@ const LEGACY_TOOL_ROUTES: Record<string, string> = {
   trends: '/dashboard/trend-radar',
   analytics: '/dashboard/social-audit',
   clips: '/dashboard/clip-generator',
+  translate: '/dashboard/subtitles',
+  tts: '/dashboard/dubbing',
+  'kade-search-script': '/dashboard/kade-search',
+  sentscan: '/dashboard/operations?view=comments',
+}
+
+/** Girdi özetinde teknik alanlar gösterilmez; değerler okunur metne çevrilir. */
+const HIDDEN_INPUT_KEYS = new Set(['model', 'profile', 'words', 'file'])
+
+function inputPreview(value: unknown) {
+  if (Array.isArray(value)) return value.filter((item) => typeof item === 'string' || typeof item === 'number').join(', ')
+  if (value && typeof value === 'object') return ''
+  return humanizeValue(value)
 }
 
 function toolRoute(id: string) {
@@ -54,6 +73,7 @@ function toolRoute(id: string) {
 }
 
 export default function HistoryPage() {
+  const workspaceHref = useWorkspaceHref()
   const [entries, setEntries] = useState<HistoryEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState('')
@@ -201,11 +221,17 @@ export default function HistoryPage() {
                 <div className="flex items-center gap-2">
                   {entry.output && <CopyButton text={entry.output} />}
                   {toolRoute(entry.tool) && (
-                    <Link href={withBasePath(toolRoute(entry.tool))} title={`${toolLabel(entry.tool)} aracını aç`} className="text-zinc-600 transition-colors hover:text-violet-300">
-                      <RotateCcw className="h-4 w-4" />
+                    <Link
+                      prefetch={false}
+                      href={workspaceHref(withPrefill(toolRoute(entry.tool)!, entry.input_data))}
+                      title={`${toolLabel(entry.tool)} aracını bu girdilerle aç`}
+                      aria-label={`${toolLabel(entry.tool)} aracını bu girdilerle aç`}
+                      className="text-zinc-600 transition-colors hover:text-violet-300"
+                    >
+                      <ExternalLink className="h-4 w-4" />
                     </Link>
                   )}
-                  <button title={historyReplayEndpoint(entry.tool) ? 'Aynı girdilerle yeniden çalıştır' : 'Eski araç doğrudan yeniden çalıştırılamaz'} disabled={rerunning !== null || !historyReplayEndpoint(entry.tool)} onClick={() => handleRerun(entry)} className="text-zinc-600 transition-colors hover:text-amber-300 disabled:opacity-40"><RotateCcw className="h-4 w-4" /></button>
+                  <button title={historyReplayEndpoint(entry.tool) ? 'Aynı girdilerle yeniden çalıştır (sonuç Geçmiş’e eklenir)' : 'Bu araç doğrudan yeniden çalıştırılamaz; aracı açıp çalıştır'} aria-label="Aynı girdilerle yeniden çalıştır" disabled={rerunning !== null || !historyReplayEndpoint(entry.tool)} onClick={() => handleRerun(entry)} className="text-zinc-600 transition-colors hover:text-amber-300 disabled:opacity-40"><RotateCcw className={cn('h-4 w-4', rerunning === entry.id && 'animate-spin')} /></button>
                   <button aria-label="Kaydı sil" disabled={deleting !== null} onClick={() => handleDelete(entry.id)}
                     className="text-zinc-600 hover:text-red-400 transition-colors">
                     <Trash2 className="w-4 h-4" />
@@ -217,11 +243,14 @@ export default function HistoryPage() {
               </div>
               {entry.input_data && Object.keys(entry.input_data).length > 0 && (
                 <div className="flex gap-2 flex-wrap">
-                  {Object.entries(entry.input_data).slice(0, 3).map(([k, v]) => (
-                    <span key={k} className="text-xs bg-zinc-700 text-zinc-400 px-2 py-0.5 rounded">
-                      {k}: {String(v).slice(0, 30)}
-                    </span>
-                  ))}
+                  {Object.entries(entry.input_data)
+                    .filter(([k, v]) => !HIDDEN_INPUT_KEYS.has(k) && inputPreview(v))
+                    .slice(0, 3)
+                    .map(([k, v]) => (
+                      <span key={k} className="text-xs bg-zinc-700 text-zinc-400 px-2 py-0.5 rounded">
+                        {humanizeKey(k)}: {inputPreview(v).slice(0, 40)}
+                      </span>
+                    ))}
                 </div>
               )}
               <button onClick={() => setExpanded(expanded === entry.id ? null : entry.id)} className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300"><ChevronDown className={`h-3.5 w-3.5 transition-transform ${expanded === entry.id ? 'rotate-180' : ''}`} /> {expanded === entry.id ? 'Ayrıntıları kapat' : 'Ayrıntıları göster'}</button>

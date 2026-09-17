@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { apiFetch } from '@/lib/client/api'
-import { apiPath, withBasePath } from '@/lib/appConfig'
+import { apiPath } from '@/lib/appConfig'
 import Link from 'next/link'
 import TopBar from '@/components/layout/TopBar'
 import { cn } from '@/lib/utils'
 import { captureAnalytics } from '@/lib/analytics/client'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 
 type Tier = 'baslangic' | 'pro' | 'sinirsiz'
 type Period = 'weekly' | 'monthly' | 'yearly'
@@ -89,6 +90,7 @@ function bitisMetni(iso: string | null): string | null {
 }
 
 export default function PackagesPage() {
+  const workspaceHref = useWorkspaceHref()
   const [packages, setPackages] = useState<Pkg[]>([])
   const [period, setPeriod] = useState<Period>('monthly')
   const [apiIncluded, setApiIncluded] = useState(true)
@@ -349,7 +351,7 @@ export default function PackagesPage() {
             sana özel bir paket ve fiyat hazırlayalım.
           </p>
           <Link
-            href={withBasePath('/dashboard/quote')}
+            href={workspaceHref('/dashboard/quote')}
             className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#f2c322] px-5 py-2.5 text-sm font-semibold text-zinc-950"
           >
             Teklif al

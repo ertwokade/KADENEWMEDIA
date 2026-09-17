@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill, splitList } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
@@ -49,6 +50,12 @@ export default function BulkPage() {
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({})
   const [resultInfo, setResultInfo] = useState<{ requested: number; partial: boolean } | null>(null)
 
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['topic', 'niche', 'platforms', 'count'] as const)
+    if (v.topic) setTopic(v.topic); if (v.niche) setNiche(v.niche); if (v.platforms) setPlatforms(splitList(v.platforms) as Platform[]); if (v.count && Number(v.count) > 0) setCount(Number(v.count))
+  }, [])
+
   const togglePlatform = (p: Platform) => {
     setPlatforms((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p])
   }
@@ -89,7 +96,7 @@ export default function BulkPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <TopBar title="Toplu İçerik Üretici" description="Tek konudan çoklu platform içerikleri oluştur" />
+      <TopBar title="Toplu İçerik" description="Tek konudan çoklu platform içerikleri oluştur" />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:h-full lg:flex-row lg:gap-6">
           <div className="w-full flex-shrink-0 lg:w-80">

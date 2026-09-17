@@ -1,7 +1,9 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { readPrefill } from '@/lib/client/prefill'
+import { calendarHref } from '@/lib/client/calendarLink'
 import Link from 'next/link'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
@@ -50,6 +52,12 @@ export default function HookPage() {
   const [loading, setLoading]   = useState(false)
   const [results, setResults]   = useState<FormatResult[]>([])
   const [error, setError]       = useState('')
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['topic', 'niche', 'format', 'platform'] as const)
+    if (v.topic) setTopic(v.topic); if (v.niche) setNiche(v.niche); const format = (v.format || { instagram: 'reels', tiktok: 'tiktok', youtube: 'youtube', youtube_shorts: 'shorts' }[v.platform || '']) as HookFormat | undefined; if (format && formats.some((item) => item.id === format)) setSelectedFormats([format])
+  }, [])
 
   const toggleFormat = (f: HookFormat) =>
     setSelectedFormats(prev => prev.includes(f) ? (prev.length > 1 ? prev.filter(x => x !== f) : prev) : [...prev, f])
@@ -150,7 +158,7 @@ export default function HookPage() {
                             <CopyButton text={item.hook} />
                             <Link prefetch={false} href={workspaceHref(`/dashboard/viral-score?title=${encodeURIComponent(item.hook)}`)} className="text-violet-400 hover:text-violet-300">Viral skoru ölç →</Link>
                             <Link prefetch={false} href={workspaceHref(`/dashboard/ai-thumbnail?title=${encodeURIComponent(item.hook)}&topic=${encodeURIComponent(topic)}`)} className="text-violet-400 hover:text-violet-300">Thumbnail üret →</Link>
-                            <Link prefetch={false} href={workspaceHref(`/dashboard/calendar?title=${encodeURIComponent(item.hook)}`)} className="text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
+                            <Link prefetch={false} href={workspaceHref(calendarHref(item.hook, r.format))} className="text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
                           </div>
                         </div>
                       ))}

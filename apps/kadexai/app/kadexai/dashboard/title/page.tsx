@@ -2,6 +2,7 @@
 
 import { apiFetch } from '@/lib/client/api'
 import { useEffect, useState } from 'react'
+import { calendarHref } from '@/lib/client/calendarLink'
 import Link from 'next/link'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
@@ -174,7 +175,7 @@ export default function TitlePage() {
                         <div className="ml-7 flex w-full flex-wrap gap-2 text-[11px]">
                           <Link prefetch={false} href={workspaceHref(`/dashboard/viral-score?title=${encodeURIComponent(title)}&platform=${r.platform}`)} className="text-violet-400 hover:text-violet-300">Viral skoru ölç →</Link>
                           <Link prefetch={false} href={workspaceHref(`/dashboard/ai-thumbnail?title=${encodeURIComponent(title)}&topic=${encodeURIComponent(topic)}`)} className="text-violet-400 hover:text-violet-300">Thumbnail üret →</Link>
-                          <Link prefetch={false} href={workspaceHref(`/dashboard/calendar?title=${encodeURIComponent(title)}&platform=${r.platform}`)} className="text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
+                          <Link prefetch={false} href={workspaceHref(calendarHref(title, r.platform))} className="text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
                         </div>
                       </div>
                     ))}

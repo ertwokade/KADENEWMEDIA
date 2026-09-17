@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { apiFetch } from '@/lib/client/api'
+import { apiFetch, recordToolRun } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
 import TopBar from '@/components/layout/TopBar'
 import CapabilityNotice from '@/components/ui/CapabilityNotice'
@@ -54,6 +54,7 @@ export default function VideoFactoryPage() {
       }
       if (!res.ok) throw new Error(data.error || 'Video üretilemedi.')
       setResult(data.data ?? data)
+      recordToolRun({ tool: 'video-factory', input: { subject, script, language, aspect }, output: `Video üretildi: ${subject}` })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Video üretilemedi.')
     } finally {

@@ -101,10 +101,12 @@ export async function POST(req: NextRequest) {
       })
       .filter((k: Kazanim) => k.baslik)
 
+    const DONEMLER = ['1. ay', '2-3. ay', '4-6. ay', '6+ ay']
     const yol: Donem[] = (Array.isArray(ham.yol_haritasi) ? ham.yol_haritasi : [])
       .slice(0, 4)
-      .map((d: Record<string, unknown>) => ({
-        donem: metin(d?.donem, 40),
+      .map((d: Record<string, unknown>, index: number) => ({
+        // Model bazen dönemi yalnız "ay" yazıyordu; sıradaki standart etiket kullanılır.
+        donem: /\d/.test(metin(d?.donem, 40)) ? metin(d?.donem, 40) : DONEMLER[index],
         hedef: metin(d?.hedef, 200),
         isler: metinListesi(d?.isler, 6),
       }))

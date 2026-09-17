@@ -1,7 +1,8 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useState, useEffect } from 'react'
+import { readPrefill, splitList } from '@/lib/client/prefill'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
 import LoadingState from '@/components/ui/LoadingState'
@@ -45,6 +46,12 @@ export default function SocialAuditPage() {
   const [missingEvidence, setMissingEvidence] = useState<string[]>([])
   const [importingMaterials, setImportingMaterials] = useState(false)
   const [materialNotice, setMaterialNotice] = useState('')
+
+  // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
+  useEffect(() => {
+    const v = readPrefill(['accountName', 'niche', 'platforms', 'bio', 'metrics', 'recentPosts', 'goal'] as const)
+    if (v.accountName) setAccountName(v.accountName); if (v.niche) setNiche(v.niche); if (v.platforms) setPlatforms(splitList(v.platforms)); if (v.bio) setBio(v.bio); if (v.metrics) setMetrics(v.metrics); if (v.recentPosts) setRecentPosts(v.recentPosts); if (v.goal) setGoal(v.goal)
+  }, [])
 
   const togglePlatform = (platform: string) => {
     setPlatforms((current) =>
