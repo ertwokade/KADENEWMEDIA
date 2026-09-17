@@ -89,10 +89,15 @@ export default function AIHealthPanel() {
           <p className="mt-0.5 text-xs text-zinc-500">
             {loading ? 'Sağlayıcı durumları kontrol ediliyor' : `${readyCount}/${providers.length} AI sağlayıcısı bağlı`}
           </p>
+          {!loading && readyCount <= 1 && (
+            <p className="mt-1 text-xs text-amber-300">
+              {readyCount === 0 ? 'Bağlı sağlayıcı yok; AI araçları çalışmaz.' : 'Yalnız bir sağlayıcı bağlı; o sağlayıcı yanıt vermezse otomatik yedek yok.'}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-xs font-semibold text-zinc-300">
           <Activity className="h-3.5 w-3.5 text-orange-400" />
-          Otomatik seçim aktif
+          {readyCount > 1 ? 'Otomatik seçim aktif' : 'Otomatik seçim: tek sağlayıcı'}
         </div>
       </div>
 

@@ -102,6 +102,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>
 }
 
+/** Sağlayıcı dışında (ör. onboarding) null döner; üst çubuk gibi ortak parçalar için. */
+export function useOptionalProfile() {
+  return useContext(ProfileContext)
+}
+
 export function useProfile() {
   const value = useContext(ProfileContext)
   if (!value) throw new Error('useProfile must be used inside ProfileProvider')

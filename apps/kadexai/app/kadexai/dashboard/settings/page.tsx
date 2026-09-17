@@ -299,7 +299,7 @@ export default function SettingsPage() {
               <h2 className="text-zinc-200 font-medium">Sistem Durumu</h2>
               <p className="text-zinc-500 text-sm mt-0.5">
                 {envLoaded || isElectron
-                  ? `${visibleCapabilityCount}/3 çalışma özelliği etkin`
+                  ? `Metin, görsel ve ses özelliklerinden ${visibleCapabilityCount}/3 tanesi çalışıyor`
                   : 'API anahtarları kontrol ediliyor'}
               </p>
               {isElectron && (
@@ -378,13 +378,11 @@ export default function SettingsPage() {
             // Web: read-only status + instructions
             <>
               <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4 space-y-2">
-                <h3 className="text-violet-300 font-medium text-sm">Nasıl Yapılandırılır?</h3>
-                <ol className="space-y-1.5 text-zinc-400 text-sm">
-                  <li className="flex gap-2"><span className="text-violet-400 font-mono text-xs mt-0.5">1.</span>Proje kökündeki <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-xs text-violet-300">.env.local</code> dosyasını aç</li>
-                  <li className="flex gap-2"><span className="text-violet-400 font-mono text-xs mt-0.5">2.</span>Aşağıdaki linklere git, API anahtarı oluştur</li>
-                  <li className="flex gap-2"><span className="text-violet-400 font-mono text-xs mt-0.5">3.</span>Vercel'de <strong>Settings → Environment Variables</strong>'a ekle</li>
-                  <li className="flex gap-2"><span className="text-violet-400 font-mono text-xs mt-0.5">4.</span>Yeniden deploy et</li>
-                </ol>
+                <h3 className="text-violet-300 font-medium text-sm">Sağlayıcı nasıl bağlanır?</h3>
+                <p className="text-zinc-400 text-sm">
+                  Sağlayıcı anahtarları güvenlik için tarayıcıdan girilmez; sunucu ayarlarında tutulur. Aşağıdaki bağlantıdan anahtar oluşturup sunucu yöneticisine ilet.
+                  Birden fazla sağlayıcı bağlıysa biri yanıt vermediğinde diğeri otomatik devreye girer.
+                </p>
               </div>
 
               <div className="space-y-3">
@@ -400,7 +398,7 @@ export default function SettingsPage() {
                           ? 'border-amber-500/20 bg-amber-500/5'
                           : 'border-red-500/20 bg-red-500/5')}>
                       <div className="flex items-center gap-2">
-                        <span className={cn('w-2.5 h-2.5 rounded-full', k.dot)} />
+                        <span className={cn('w-2.5 h-2.5 rounded-full', !envLoaded ? 'bg-zinc-600' : ok ? 'bg-emerald-400' : optionalMissing ? 'bg-zinc-600' : 'bg-red-400')} aria-hidden="true" />
                         <span className={cn('text-sm font-medium', k.color)}>{k.label}</span>
                         <span className="ml-auto flex items-center gap-1 text-xs">
                           {!envLoaded
@@ -429,11 +427,6 @@ export default function SettingsPage() {
                 })}
               </div>
 
-              <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/30 p-4 space-y-2">
-                <h3 className="text-zinc-300 font-medium text-sm">Supabase DB Schema</h3>
-                <pre className="bg-zinc-900 rounded-lg p-3 text-xs text-zinc-400 overflow-x-auto">{`-- supabase/schema.sql dosyasını
--- Supabase Dashboard > SQL Editor'da çalıştır`}</pre>
-              </div>
             </>
           )}
           </>}

@@ -20,6 +20,7 @@ import ModelSelector from './ModelSelector'
 import { cn } from '@/lib/utils'
 import ToolRequirementBanner from '@/components/profile/ToolRequirementBanner'
 import ThemeToggle from '@/components/theme/ThemeToggle'
+import { useOptionalProfile } from '@/lib/context/ProfileContext'
 
 interface TopBarProps {
   title: string
@@ -52,6 +53,9 @@ export default function TopBar({ title, description, showModelSelector = true }:
   const pathname = mantiksalYol(usePathname() ?? '')  // usePathname() null dönebilir; boş yol güvenli varsayılan.
 
   const isOperations = pathname.startsWith('/dashboard/operations')
+  const account = useOptionalProfile()?.account
+  // Marka girilmemişse başka bir markanın adı gösterilmez.
+  const contextLabel = account?.brand.name?.trim() || account?.workspace.name?.trim() || 'Çalışma alanı'
 
   const borderColor = isOperations ? 'border-cyan-900/50' : 'border-zinc-800'
 
@@ -74,7 +78,7 @@ export default function TopBar({ title, description, showModelSelector = true }:
         <div className="min-w-0">
           <div className="flex items-center gap-2.5">
             <ModuleBadge />
-            <span className="kade-topbar-context hidden text-[10px] font-bold uppercase tracking-[0.16em] md:block">KADE NEW MEDIA / WORKSPACE</span>
+            <span className="kade-topbar-context hidden text-[10px] font-bold uppercase tracking-[0.16em] md:block">{contextLabel}</span>
           </div>
           <h1 className="kade-topbar-title mt-1 text-zinc-100 font-semibold text-sm leading-tight truncate">{title}</h1>
           {description && (

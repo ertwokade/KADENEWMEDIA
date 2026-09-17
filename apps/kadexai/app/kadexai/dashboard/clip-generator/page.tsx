@@ -9,7 +9,7 @@ import CapabilityNotice from '@/components/ui/CapabilityNotice'
 import { cn } from '@/lib/utils'
 import {
   Upload, Scissors, Download, Zap, CheckCircle,
-  Loader2, AlertCircle, Film, TrendingUp, Sparkles,
+  Loader2, AlertCircle, Film, TrendingUp,
 } from 'lucide-react'
 import type { ClipSuggestion } from '@/app/kadexai/api/generate/clips/route'
 import { withBasePath } from '@/lib/appConfig'
@@ -33,10 +33,13 @@ type Step = 'idle' | 'audio' | 'transcribe' | 'analyze' | 'cut' | 'done' | 'erro
 const stepOrder: Step[] = ['audio', 'transcribe', 'analyze', 'cut', 'done']
 const STEPS = [
   { key: 'audio' as Step,      label: 'Ses çıkarılıyor',   detail: 'Web Audio API · Tarayıcıda, indirme yok' },
-  { key: 'transcribe' as Step, label: 'Transkripsiyon',     detail: 'Groq Whisper · Ücretsiz' },
-  { key: 'analyze' as Step,    label: 'Viral analiz',       detail: 'Groq LLaMA 3.3 70B · Ücretsiz' },
-  { key: 'cut' as Step,        label: 'Klip kesiliyor',     detail: 'FFmpeg WASM · Sadece bu adımda yüklenir' },
+  { key: 'transcribe' as Step, label: 'Transkripsiyon',     detail: 'Bağlı konuşma tanıma sağlayıcısı' },
+  { key: 'analyze' as Step,    label: 'Viral analiz',       detail: 'Bağlı AI sağlayıcısı' },
+  { key: 'cut' as Step,        label: 'Klip kesiliyor',     detail: 'Tarayıcıda FFmpeg · "Kes & İndir" ile başlar' },
 ]
+const CATEGORY_LABELS: Record<string, string> = {
+  knowledge: 'bilgi', emotional: 'duygusal', shocking: 'şok', inspirational: 'ilham', entertainment: 'eğlence',
+}
 const catColors: Record<string, string> = {
   knowledge: 'bg-blue-500/20 text-blue-300', emotional: 'bg-pink-500/20 text-pink-300',
   shocking: 'bg-red-500/20 text-red-300', inspirational: 'bg-violet-500/20 text-violet-300',
@@ -86,7 +89,7 @@ export default function ClipGeneratorPage() {
   const handleVideoSelect = (file: File) => {
     if (!file.type.startsWith('video/')) { setError('Sadece video dosyası yükleyebilirsin.'); return }
     if (file.size > 500 * 1024 * 1024) { setError('Video 500 MB sınırını aşıyor. Daha kısa veya sıkıştırılmış bir dosya seç.'); return }
-    setVideoFile(file); setClips([]); setOutputClips([]); setTranscript(''); setDetectedLang(''); setError(''); setStep('idle'); setFfmpegLog('')
+    setVideoFile(file); setClips([]); setOutputClips({}); setTranscript(''); setDetectedLang(''); setError(''); setStep('idle'); setFfmpegLog('')
     const url = URL.createObjectURL(file)
     const vid = document.createElement('video')
     vid.src = url
@@ -194,10 +197,6 @@ export default function ClipGeneratorPage() {
 
           {/* Sol panel */}
           <div className="w-full flex-shrink-0 lg:w-80 space-y-4">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-              <p className="text-emerald-400 text-xs font-medium">100% Ücretsiz — Groq Whisper + LLaMA 3.3</p>
-            </div>
 
             {/* Upload */}
             <div
@@ -222,7 +221,7 @@ export default function ClipGeneratorPage() {
               ) : (
                 <>
                   <p className="text-zinc-400 text-sm">Video sürükle veya tıkla</p>
-                  <p className="text-zinc-600 text-xs mt-1">MP4 · MOV · AVI · MKV · Boyut sınırı yok</p>
+                  <p className="text-zinc-600 text-xs mt-1">MP4 · MOV · AVI · MKV · En fazla 500 MB</p>
                 </>
               )}
             </div>
@@ -255,9 +254,10 @@ export default function ClipGeneratorPage() {
             {/* Progress */}
             {step !== 'idle' && (
               <div className="space-y-2.5 pt-1">
-                {STEPS.map((s, i) => {
+                {/* Kesim adımı yalnız "Kes & İndir" başlatıldığında listelenir; analiz bitti diye ✓ olmaz. */}
+                {STEPS.filter((s) => s.key !== 'cut' || step === 'cut' || Object.keys(outputClips).length > 0).map((s, i) => {
                   const sIdx = stepOrder.indexOf(s.key)
-                  const isDone = stepIdx > sIdx
+                  const isDone = s.key === 'cut' ? step !== 'cut' && Object.keys(outputClips).length > 0 : stepIdx > sIdx
                   const isCur = stepOrder[stepIdx] === s.key
                   return (
                     <div key={s.key} className="flex items-start gap-2.5">
@@ -322,7 +322,7 @@ export default function ClipGeneratorPage() {
                             <span className="text-zinc-600 text-xs font-mono">#{clip.id}</span>
                             {clip.category && (
                               <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium', catColors[clip.category] ?? 'bg-zinc-700 text-zinc-300')}>
-                                {clip.category}
+                                {CATEGORY_LABELS[clip.category] ?? clip.category}
                               </span>
                             )}
                             <span className="text-zinc-600 text-xs ml-auto">{clip.start.toFixed(1)}s–{clip.end.toFixed(1)}s · {dur}s</span>
@@ -369,7 +369,7 @@ export default function ClipGeneratorPage() {
                 <Upload className="w-10 h-10 text-zinc-800" />
                 <p className="text-zinc-600 text-sm">Video yükle, viral kısımları bul</p>
                 <div className="flex items-center gap-3 text-zinc-700 text-xs">
-                  <span>Web Audio API</span><span>→</span><span>Groq Whisper</span><span>→</span><span>LLaMA 3.3</span>
+                  <span>Ses çıkarma</span><span>→</span><span>Transkripsiyon</span><span>→</span><span>Viral analiz</span>
                 </div>
               </div>
             )}

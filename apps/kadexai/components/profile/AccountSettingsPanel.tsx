@@ -111,7 +111,7 @@ export default function AccountSettingsPanel() {
         <div><h2 className="font-semibold text-zinc-100">Şirket hafızası ve aktif marka</h2><p className="mt-0.5 text-xs text-zinc-500">Kaydettiğiniz bağlam bütün KadexAI araçlarında otomatik kullanılır.</p></div>
         <div className="ml-auto flex items-center gap-2 text-xs text-zinc-500">
           {cloudBacked ? <Cloud className="h-4 w-4 text-emerald-400" /> : <HardDrive className="h-4 w-4 text-amber-400" />}
-          %{getProfileCompletion(draft)} · {cloudBacked ? 'Hesaba kayıtlı' : 'Bu cihazda'}
+          Profil %{getProfileCompletion(draft)} dolu · Şirket bağlamı {knownContext.length}/10 · {cloudBacked ? 'Hesaba kayıtlı' : 'Bu cihazda'}
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export default function AccountSettingsPanel() {
             <div className="grid h-10 w-10 place-items-center rounded-lg bg-amber-400 text-zinc-950">
               <BrainCircuit className="h-5 w-5" />
             </div>
-            <div className="min-w-0 flex-1">
+            <div className="min-w-[min(100%,18rem)] flex-1">
               <h3 className="text-sm font-semibold text-zinc-100">Şirket Briefi ve AI Hafızası</h3>
               <p className="mt-1 max-w-xl text-xs leading-relaxed text-zinc-400">
                 Şirketinizi, müşterinizi, tonunuzu ve kurallarınızı bir kez tanıtın. KadexAI; başlık, reklam,
