@@ -1,5 +1,6 @@
 'use client'
 
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { useState, useEffect } from 'react'
 import TopBar from '@/components/layout/TopBar'
 import { cn, copyToClipboard } from '@/lib/utils'
@@ -34,6 +35,7 @@ function readTemplate(value: unknown): Template {
 const isStarter = (id: string) => STARTER_TEMPLATES.some(template => template.id === id)
 
 export default function TemplatesPage() {
+  const [confirm, confirmDialog] = useConfirm()
   const [templates, setTemplates] = useState<Template[]>([])
   const [kategori, setKategori] = useState('Hook')
   const [baslik, setBaslik] = useState('')
@@ -89,7 +91,8 @@ export default function TemplatesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (pending || isStarter(id) || !window.confirm('Bu şablonu silmek istiyor musun?')) return
+    if (pending || isStarter(id)) return
+    if (!(await confirm('Bu şablon kalıcı olarak silinecek.', { title: 'Şablon silinsin mi?', confirmLabel: 'Sil', danger: true }))) return
     setPending(true); setSyncError('')
     try {
       const response = await apiFetch('/api/templates', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
@@ -123,6 +126,7 @@ export default function TemplatesPage() {
 
   return (
     <div className="flex flex-col h-full">
+      {confirmDialog}
       <TopBar title="Şablon Kütüphanesi" description="Kendi içerik şablonlarını oluştur ve yönet" showModelSelector={false} />
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-5 p-4 sm:p-6 lg:h-full lg:flex-row lg:gap-6">

@@ -66,8 +66,20 @@ export async function PUT(request: NextRequest) {
   const current = await session()
   if (!current) return NextResponse.json({ error: 'Oturum gerekli.' }, { status: 401 })
   const body = await readBody(request)
-  if (!body || typeof body.id !== 'string' || !body.id.trim() || typeof body.status !== 'string' || !['taslak', 'hazır', 'yayında'].includes(body.status)) return NextResponse.json({ error: 'Geçerli kayıt kimliği ve durum gerekli.' }, { status: 400 })
-  const { data, error } = await current.supabase.from('content_calendar_items').update({ status: body.status, updated_at: new Date().toISOString() }).eq('id', body.id).eq('user_id', current.user.id).select().maybeSingle()
+  if (!body || typeof body.id !== 'string' || !body.id.trim()) return NextResponse.json({ error: 'Geçerli kayıt kimliği ve durum gerekli.' }, { status: 400 })
+  const changes: Record<string, string> = {}
+  if ('status' in body) {
+    if (typeof body.status !== 'string' || !['taslak', 'hazır', 'yayında'].includes(body.status)) return NextResponse.json({ error: 'Geçerli kayıt kimliği ve durum gerekli.' }, { status: 400 })
+    changes.status = body.status
+  }
+  // Başlık, platform ve tarih birlikte gönderilir; biri geçersizse hiçbir alan yazılmaz.
+  if ('title' in body || 'platform' in body || 'publish_at' in body) {
+    const entry = normalizeEntry(body)
+    if (!entry.title || !entry.platform || !entry.publish_at) return NextResponse.json({ error: 'Başlık, platform ve geçerli tarih gerekli.' }, { status: 400 })
+    Object.assign(changes, entry)
+  }
+  if (!Object.keys(changes).length) return NextResponse.json({ error: 'Geçerli kayıt kimliği ve durum gerekli.' }, { status: 400 })
+  const { data, error } = await current.supabase.from('content_calendar_items').update({ ...changes, updated_at: new Date().toISOString() }).eq('id', body.id).eq('user_id', current.user.id).select().maybeSingle()
   if (error) return NextResponse.json({ error: 'Takvim kaydı güncellenemedi.' }, { status: 500 })
   if (!data) return NextResponse.json({ error: 'Takvim kaydı bulunamadı.' }, { status: 404 })
   return NextResponse.json({ entry: data })

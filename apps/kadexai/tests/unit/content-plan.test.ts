@@ -27,3 +27,13 @@ test('fazla gün atılır; diğer sıklıklar doğru sayıda gün üretir', () =
   assert.deepEqual(planSlots('iki haftada 1', '2026-09-16').map((s) => s.gun), [1, 15, 29])
   assert.equal(planSlots('her gün', '2026-12-31')[1].tarih, '2027-01-01')
 })
+
+test('takvim ay görünümü pazartesiden başlar ve ay geçişleri yıl sınırını aşar', async () => {
+  const { monthCells, shiftMonth } = await import('../../components/calendar/CalendarMonth')
+  const cells = monthCells('2026-09')
+  assert.equal(cells.length % 7, 0)
+  assert.equal(cells.indexOf('2026-09-01'), 1) // 1 Eylül 2026 salı
+  assert.equal(cells.filter(Boolean).length, 30)
+  assert.equal(shiftMonth('2026-12', 1), '2027-01')
+  assert.equal(shiftMonth('2026-01', -1), '2025-12')
+})

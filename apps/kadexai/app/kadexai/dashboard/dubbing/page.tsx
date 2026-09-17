@@ -1,5 +1,6 @@
 'use client'
 
+import { useConfirm } from '@/components/ui/ConfirmDialog'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   AlertTriangle, Check, Download, Languages, Loader2, Mic2, Play, Video, Volume2,
@@ -43,6 +44,7 @@ const PHASE_LABELS: Record<Phase, string> = {
 }
 
 export default function DubbingPage() {
+  const [confirm, confirmDialog] = useConfirm()
   const { selectedModel } = useModel()
   const fileInput = useRef<HTMLInputElement>(null)
 
@@ -227,6 +229,7 @@ export default function DubbingPage() {
 
   return (
     <div className="flex h-full flex-col">
+      {confirmDialog}
       <TopBar title="Dublaj Stüdyosu" description="Videoyu otomatik olarak başka dillerde seslendir" />
       <div className="px-4 pt-4 sm:px-6"><CapabilityNotice need="transcribe" /></div>
 
@@ -359,7 +362,7 @@ export default function DubbingPage() {
                 {reuseTranslation ? 'Düzenlenen metni seslendir' : 'Dublajı üret'}
               </button>
               {reuseTranslation && <button type="button" disabled={busy}
-                onClick={() => { if (window.confirm('Düzenlediğin çeviri yeniden oluşturulacak. Devam edilsin mi?')) void dub(true) }}
+                onClick={() => { void confirm('Düzenlediğin çeviri silinip yeniden oluşturulacak.', { title: 'Yeniden çevrilsin mi?', confirmLabel: 'Yeniden çevir' }).then((ok) => { if (ok) void dub(true) }) }}
                 className="min-h-11 w-full rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-400 disabled:opacity-50">Yeniden çevir ve seslendir</button>}
 
               {sourceCues.length > 0 && (

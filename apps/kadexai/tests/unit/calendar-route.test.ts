@@ -114,3 +114,18 @@ test('template database failures never become successful writes', async () => {
     assert.doesNotMatch(await response.text(), /Private/)
   }
 })
+
+test('calendar edits title, platform and date together and rejects partial invalid edits', async () => {
+  const api = calendar({ data: { id: 'record' } })
+  assert.equal((await api.run('PUT', { id: 'record', title: 'Yeni', platform: 'instagram', publish_at: '2026-10-01T12:00:00+03:00' })).status, 200)
+  const update = api.calls.find(call => call.method === 'update')!.args[0] as Record<string, unknown>
+  assert.equal(update.title, 'Yeni')
+  assert.equal(update.platform, 'instagram')
+  assert.equal(update.publish_at, '2026-10-01T09:00:00.000Z')
+  assert.equal('status' in update, false)
+  const invalid = calendar({ data: { id: 'record' } })
+  for (const body of [{ id: 'record', title: ' ', platform: 'x', publish_at: '2026-10-01T12:00:00Z' }, { id: 'record', title: 'A', platform: 'x' }, { id: 'record', title: 'A', platform: 'x', publish_at: '2026-10-01T12:00:00Z', status: 'bad' }]) {
+    assert.equal((await invalid.run('PUT', body)).status, 400)
+  }
+  assert.ok(!invalid.calls.some(call => call.method === 'update'))
+})
