@@ -36,6 +36,7 @@ interface UsageReport {
     available: boolean
     grossMarginPercent: number | null
     usdTryRate: number | null
+    usdTryRateSource?: string | null
     reason: string | null
   }
   byUser?: Bucket[]
@@ -141,7 +142,7 @@ export default function CostPanel() {
                   icon={<TrendingUp className="h-4 w-4 text-violet-400" />}
                   label="Brüt marj"
                   value={margin?.available && margin.grossMarginPercent !== null ? `%${margin.grossMarginPercent}` : '—'}
-                  hint={margin?.available ? `Kur: ${margin.usdTryRate} ₺/$` : margin?.reason || ''}
+                  hint={margin?.available ? `Kur: ${margin.usdTryRate} ₺/$${margin.usdTryRateSource ? ` (${margin.usdTryRateSource})` : ''}` : margin?.reason || ''}
                 />
                 <Card icon={<Cpu className="h-4 w-4 text-sky-400" />} label="Kendi anahtarı (BYOK)" value={String(totals.byokRequests)} hint={`${totals.unpricedRequests} çağrının fiyatı bilinmiyor`} />
               </div>

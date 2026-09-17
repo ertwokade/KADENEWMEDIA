@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { usdTryRate } from '@/lib/finance/usdTry'
 import { assertAuthenticatedUser } from '@/lib/auth/server'
 import { isAllowedOwnerUser, isSettingsOwnerUser } from '@/lib/featureAccess'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -21,14 +22,6 @@ interface UsageRow {
   byok: boolean
 }
 
-/**
- * USD → TRY dönüşümü yalnızca `KADE_USD_TRY_RATE` tanımlıysa yapılır.
- * Kur uydurulmaz; tanımsızsa brüt marj "hesaplanamadı" olarak döner.
- */
-function usdTryRate(): number | null {
-  const raw = Number(process.env.KADE_USD_TRY_RATE)
-  return Number.isFinite(raw) && raw > 0 ? raw : null
-}
 
 function bucketAdd(
   map: Map<string, { tokens: number; costUsd: number; costKnown: boolean; requests: number }>,
@@ -130,7 +123,9 @@ export async function GET(request: NextRequest) {
       revenueByProduct.set(String(order.product_id), (revenueByProduct.get(String(order.product_id)) || 0) + Number(order.amount_minor || 0))
     }
 
-    const rate = usdTryRate()
+    // Kur ayarı yoksa TCMB günlük kuru okunur; o da alınamazsa marj hesaplanmaz.
+    const exchange = await usdTryRate()
+    const rate = exchange?.rate ?? null
     const revenueTryMinor = revenueByCurrency.get('TRY') || 0
     const costTryMinor = rate === null ? null : Math.round(totalCostUsd * rate * 100)
     const marginAvailable = rate !== null && unpricedRequests === 0 && revenueTryMinor > 0
@@ -157,10 +152,11 @@ export async function GET(request: NextRequest) {
         available: marginAvailable,
         grossMarginPercent,
         usdTryRate: rate,
+        usdTryRateSource: exchange?.source ?? null,
         reason: marginAvailable
           ? null
           : rate === null
-            ? 'KADE_USD_TRY_RATE tanımlı değil; USD maliyet TRY gelirle karşılaştırılamıyor.'
+            ? 'USD/TRY kuru alınamadı (ayar yok, TCMB yanıt vermedi); USD maliyet TRY gelirle karşılaştırılamıyor.'
             : unpricedRequests > 0
               ? `${unpricedRequests} çağrının modeli fiyat tablosunda yok; maliyet eksik.`
               : 'Seçilen aralıkta ödenmiş sipariş yok.',
