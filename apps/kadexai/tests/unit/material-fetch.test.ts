@@ -23,3 +23,18 @@ test('thumbnail accepts raster bytes and rejects SVG, empty and oversized respon
   await assert.rejects(thumbnailBytes(new Response('12345', { headers: { 'content-type': 'image/jpeg' } }), 4))
   await assert.rejects(thumbnailBytes(new Response('', { headers: { 'content-type': 'image/jpeg' } })))
 })
+
+test('video önizleme aralık isteğini iletir, geçersiz aralığı göndermez ve sayılar Türkçe kısaltılır', async () => {
+  const seen: (string | null)[] = []
+  const request = (async (_url: URL, init?: RequestInit) => {
+    seen.push(new Headers(init?.headers).get('range'))
+    return new Response('ok', { status: 206, headers: { 'content-range': 'bytes 0-1/2' } })
+  }) as typeof fetch
+  await fetchMaterial('https://str.arsivhub.com/a.mp4', request, 'bytes=0-')
+  await fetchMaterial('https://str.arsivhub.com/a.mp4', request, 'bytes=0-\r\nx: y')
+  assert.deepEqual(seen, ['bytes=0-', null])
+  const { sayiMetni } = await import('../../lib/materials/format')
+  assert.equal(sayiMetni(1_000), '1 bin')
+  assert.equal(sayiMetni(2_450_000), '2,5 Mn')
+  assert.equal(sayiMetni(999), '999')
+})

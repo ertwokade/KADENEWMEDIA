@@ -13,25 +13,30 @@ export function materialTarget(source: string): URL {
 }
 
 /** Database rows originate in external feeds too; validate every redirect, not only the initial URL. */
-export async function fetchMaterial(source: string, request: typeof fetch = fetch): Promise<Response> {
+export async function fetchMaterial(source: string, request: typeof fetch = fetch, range?: string | null): Promise<Response> {
   let target = materialTarget(source)
-  const signal = AbortSignal.timeout(20_000)
-  for (let hop = 0; hop <= 3; hop++) {
-    const response = await request(target, {
-      redirect: 'manual', signal,
-      headers: { accept: 'image/*,video/*,application/octet-stream;q=0.5', 'user-agent': 'KadexAI-Materials/1.0' },
-    })
-    if ([301, 302, 303, 307, 308].includes(response.status)) {
-      const location = response.headers.get('location')
-      await response.body?.cancel()
-      if (!location) throw new Error('Materyal yönlendirmesi geçersiz.')
-      target = materialTarget(new URL(location, target).href)
-      continue
+  // Zaman aşımı yalnız yanıt başlıklarına uygulanır; uzun video akışı 20 sn'de kesilmez.
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 20_000)
+  const headers: Record<string, string> = { accept: 'image/*,video/*,application/octet-stream;q=0.5', 'user-agent': 'KadexAI-Materials/1.0' }
+  if (range && /^bytes=\d*-\d*$/.test(range)) headers.range = range
+  try {
+    for (let hop = 0; hop <= 3; hop++) {
+      const response = await request(target, { redirect: 'manual', signal: controller.signal, headers })
+      if ([301, 302, 303, 307, 308].includes(response.status)) {
+        const location = response.headers.get('location')
+        await response.body?.cancel()
+        if (!location) throw new Error('Materyal yönlendirmesi geçersiz.')
+        target = materialTarget(new URL(location, target).href)
+        continue
+      }
+      if (!response.ok || !response.body) { await response.body?.cancel(); throw new Error('Materyal kaynağı şu anda yanıt vermiyor.') }
+      return response
     }
-    if (!response.ok || !response.body) { await response.body?.cancel(); throw new Error('Materyal kaynağı şu anda yanıt vermiyor.') }
-    return response
+    throw new Error('Materyal kaynağı çok fazla yönlendirme yaptı.')
+  } finally {
+    clearTimeout(timer)
   }
-  throw new Error('Materyal kaynağı çok fazla yönlendirme yaptı.')
 }
 
 export async function thumbnailBytes(response: Response, maxBytes = 8 * 1024 * 1024) {

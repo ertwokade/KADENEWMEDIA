@@ -6,6 +6,7 @@ import { apiFetch } from '@/lib/client/api'
 import { apiPath } from '@/lib/appConfig'
 import TopBar from '@/components/layout/TopBar'
 import { cn } from '@/lib/utils'
+import { sayiMetni } from '@/lib/materials/format'
 
 interface MaterialRow {
   id: string
@@ -55,12 +56,6 @@ function sourceLink(value: string) {
   catch { return undefined }
 }
 
-function sayiMetni(deger: number | null) {
-  if (deger == null) return null
-  if (deger >= 1_000_000) return `${(deger / 1_000_000).toFixed(1)}M`
-  if (deger >= 1_000) return `${(deger / 1_000).toFixed(1)}B`
-  return String(deger)
-}
 
 export default function MateryalPage() {
   const [materyaller, setMateryaller] = useState<MaterialRow[]>([])
@@ -331,9 +326,9 @@ export default function MateryalPage() {
               <X className="w-4 h-4" /> Kapat
             </button>
             {onizlemeHatasi || (!acik.media_url && !acik.thumbnail) ? (
-              <p role="status" className="py-16 text-center">Önizleme açılamadı. Materyali kaynak sayfasından inceleyebilirsin.</p>
+              <p role="status" className="py-16 text-center">Önizleme açılamadı: kaynak dosyaya şu anda erişilemiyor. Materyali aşağıdaki kaynak sayfasından inceleyebilirsin.</p>
             ) : acik.kind === 'video' && acik.media_url ? (
-              <video src={acik.media_url} poster={acik.thumbnail ? apiPath(`/api/materials/thumbnail?id=${encodeURIComponent(acik.id)}`) : undefined} onError={() => setOnizlemeHatasi(true)} controls autoPlay className="w-full max-h-[65dvh] rounded-xl bg-black" />
+              <video src={apiPath(`/api/materials/download?id=${encodeURIComponent(acik.id)}&inline=1`)} poster={acik.thumbnail ? apiPath(`/api/materials/thumbnail?id=${encodeURIComponent(acik.id)}`) : undefined} onError={() => setOnizlemeHatasi(true)} controls autoPlay className="w-full max-h-[65dvh] rounded-xl bg-black" />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={apiPath(`/api/materials/thumbnail?id=${encodeURIComponent(acik.id)}`)} onError={() => setOnizlemeHatasi(true)} alt={acik.title} className="w-full max-h-[65dvh] object-contain rounded-xl" />
