@@ -545,3 +545,23 @@ export function compareModelsFrom(available: readonly string[]): AIModel[] {
 export function getModelConfig(model: AIModel): ModelConfig {
   return MODEL_CONFIGS[model] ?? MODEL_CONFIGS['groq-llama-70b']
 }
+
+/**
+ * Geçmiş, stüdyo ve asistanda aynı model farklı adlarla görünüyordu
+ * ("gemini-3-1-lite", "gemini-3.1-flash-lite"). Kimlik veya sağlayıcı model adı
+ * tek bir okunur ada çevrilir; bilinmeyen ad başka bir modelin adına düşmez.
+ */
+export function modelDisplayName(model: string | null | undefined): string {
+  const id = String(model ?? '').trim()
+  if (!id) return 'Bilinmiyor'
+  if (id === 'auto') return 'Otomatik seçim'
+  const known = MODEL_CONFIGS[id as AIModel]
+    ?? Object.values(MODEL_CONFIGS).find((config) => [config.geminiModel, config.groqModel, config.cerebrasModel, config.gatewayModel, config.openRouterModel, config.mistralModel].includes(id))
+  if (known) return known.label
+  return id
+    .replace(/^models\//, '')
+    .split(/[-_/\s]+/)
+    .filter(Boolean)
+    .map((part) => /^\d/.test(part) ? part : part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+}

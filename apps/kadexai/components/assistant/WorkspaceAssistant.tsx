@@ -1,5 +1,6 @@
 'use client'
 
+import { modelDisplayName } from '@/lib/ai/models'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, MessageCircle, Mic, Square, Volume2, VolumeX, X } from 'lucide-react'
@@ -240,7 +241,7 @@ export default function WorkspaceAssistant() {
       })
       const d = await r.json()
       if (!r.ok || d.error) throw new Error(d.error || 'Cevap alınamadı')
-      adimYaz('Asistan yanıtladı', 'bitti', d.model ? `Model: ${d.model}` : undefined)
+      adimYaz('Asistan yanıtladı', 'bitti', d.model ? `Model: ${modelDisplayName(d.model)}` : undefined)
       setMesajlar((m) => [...m, { rol: 'asistan', metin: d.answer, araclar: gecenAraclar(d.answer) }])
       // Sesli cevap açıksa yazılı ve sesli sorular okunur; mikrofonla sorulunca her zaman okunur.
       if (sesli || sesliCevap) void sesliOku(d.answer)

@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { Platform, AIModel } from '@/types'
-import { getModelConfig } from '@/lib/ai/models'
+import { getModelConfig, modelDisplayName } from '@/lib/ai/models'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -20,7 +20,7 @@ export function getPlatformLabel(platform: Platform): string {
 }
 
 export function getModelLabel(model: AIModel): string {
-  return getModelConfig(model).label
+  return modelDisplayName(model)
 }
 
 export function getModelColor(model: AIModel): string {

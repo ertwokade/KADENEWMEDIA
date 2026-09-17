@@ -1,5 +1,6 @@
 'use client'
 
+import { modelDisplayName } from '@/lib/ai/models'
 import { useCallback, useEffect, useState } from 'react'
 import TopBar from '@/components/layout/TopBar'
 import CopyButton from '@/components/ui/CopyButton'
@@ -254,7 +255,7 @@ export default function HistoryPage() {
                 </div>
               )}
               <button onClick={() => setExpanded(expanded === entry.id ? null : entry.id)} className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300"><ChevronDown className={`h-3.5 w-3.5 transition-transform ${expanded === entry.id ? 'rotate-180' : ''}`} /> {expanded === entry.id ? 'Ayrıntıları kapat' : 'Ayrıntıları göster'}</button>
-              {expanded === entry.id && <div className="grid gap-3 border-t border-zinc-700/70 pt-3 text-xs sm:grid-cols-2"><div><p className="mb-1 font-semibold text-zinc-500">Girdiler</p><pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-zinc-950 p-3 text-zinc-400">{JSON.stringify(entry.input_data, null, 2)}</pre></div><div><p className="mb-1 font-semibold text-zinc-500">Çalıştırma</p><div className="space-y-1 rounded-lg bg-zinc-950 p-3 text-zinc-400"><p>Kimlik: {entry.id}</p><p>Model: {entry.model}</p><p>Token: {entry.tokens_used ?? 'Bildirilmedi'}</p><p>Tarih: {new Date(entry.created_at).toLocaleString('tr-TR')}</p></div></div></div>}
+              {expanded === entry.id && <div className="grid gap-3 border-t border-zinc-700/70 pt-3 text-xs sm:grid-cols-2"><div><p className="mb-1 font-semibold text-zinc-500">Girdiler</p><dl className="max-h-64 space-y-1.5 overflow-auto rounded-lg bg-zinc-950 p-3 text-zinc-400">{Object.entries(entry.input_data ?? {}).filter(([, v]) => v !== '' && v != null).map(([k, v]) => <div key={k}><dt className="font-semibold text-zinc-500">{humanizeKey(k)}</dt><dd className="whitespace-pre-wrap break-words">{inputPreview(v)}</dd></div>)}</dl></div><div><p className="mb-1 font-semibold text-zinc-500">Çalıştırma</p><div className="space-y-1 rounded-lg bg-zinc-950 p-3 text-zinc-400"><p>Kimlik: {entry.id}</p><p>Model: {modelDisplayName(entry.model)}</p><p>Token: {entry.tokens_used ?? 'Bildirilmedi'}</p><p>Tarih: {new Date(entry.created_at).toLocaleString('tr-TR')}</p></div></div></div>}
             </div>
           ))}
 
