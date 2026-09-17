@@ -9,6 +9,7 @@ import LoadingState from '@/components/ui/LoadingState'
 import { cn, copyToClipboard } from '@/lib/utils'
 import { Copy, Check } from 'lucide-react'
 import RawModelOutput from '@/components/ui/RawModelOutput'
+import { humanizeValue } from '@/lib/ui/outputLabels'
 
 type Platform = 'youtube' | 'blog' | 'instagram'
 
@@ -126,13 +127,16 @@ export default function FAQPage() {
             {result && !loading && (
               <div className="space-y-3">
                 <RawModelOutput content={result.raw} />
+                {(result.faqs?.length ?? 0) < count && (
+                  <p className="text-xs text-zinc-500">{count} soru istendi; kaynak metin yalnız {result.faqs?.length ?? 0} soruyu desteklediği için uydurma soru eklenmedi.</p>
+                )}
                 {result.faqs?.map((faq, i) => (
                   <div key={i} className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <p className="text-zinc-100 text-sm font-semibold leading-snug">{faq.soru}</p>
                       <span className={cn('text-[10px] px-1.5 py-0.5 rounded font-medium flex-shrink-0',
                         categoryColors[faqCategory(faq.kategori)] || categoryColors.default)}>
-                        {typeof faq.kategori === 'string' ? faq.kategori : 'Genel'}
+                        {typeof faq.kategori === 'string' ? humanizeValue(faq.kategori) : 'Genel'}
                       </span>
                     </div>
                     <p className="text-zinc-400 text-xs leading-relaxed">{faq.cevap}</p>

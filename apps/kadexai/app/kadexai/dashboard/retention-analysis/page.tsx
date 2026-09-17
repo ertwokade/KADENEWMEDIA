@@ -81,7 +81,7 @@ export default function RetentionAnalysisPage() {
                       className={cn(
                         'rounded-lg border px-2 py-2 text-xs font-medium transition-colors',
                         platform === item
-                          ? 'border-yellow-400/50 bg-yellow-400/15 text-yellow-200'
+                          ? 'border-[#f2c322] bg-violet-500/20 text-violet-300'
                           : 'border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200'
                       )}
                     >
@@ -125,7 +125,7 @@ export default function RetentionAnalysisPage() {
               <button
                 type="submit"
                 disabled={loading || !input.trim()}
-                className="w-full rounded-lg bg-yellow-400 py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-lg bg-[#f2c322] py-2.5 text-sm font-bold text-zinc-950 transition-colors hover:bg-[#ffda3f] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? 'Analiz ediliyor...' : 'İzlenme Analizi Yap'}
               </button>

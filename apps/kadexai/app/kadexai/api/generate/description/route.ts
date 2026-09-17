@@ -5,6 +5,7 @@ import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { DescriptionGenerateRequest } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
 import { asGeneratedText } from '@/lib/ai/outputValidation'
+import { removeInventedChapters, removeUnfilledPlaceholders } from '@/lib/ai/outputCleanup'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -28,7 +29,8 @@ export async function POST(req: NextRequest) {
       maxTokens: 2500,
     }, req)
 
-    const description = asGeneratedText(result.content, 12_000)
+    const generated = asGeneratedText(result.content, 12_000)
+    const description = generated ? removeInventedChapters(removeUnfilledPlaceholders(generated), `${title}\n${summary}`) : null
     if (!description) {
       return NextResponse.json({ error: 'Model kullanılabilir bir açıklama döndürmedi. Yeniden dene.' }, { status: 502 })
     }

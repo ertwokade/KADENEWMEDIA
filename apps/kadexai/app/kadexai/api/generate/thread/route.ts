@@ -4,28 +4,7 @@ import { THREAD_SYSTEM_PROMPT, buildThreadPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
 import { requireApiUser } from '@/lib/auth/server'
-import { normalizeHashtagList } from '@/lib/ai/hashtags'
-
-function normalizeThread(value: Record<string, unknown>, platform: string) {
-  const limit = platform === 'linkedin' ? 1300 : 280
-  const posts = Array.isArray(value.posts) ? value.posts.flatMap((item, index) => {
-    if (!item || typeof item !== 'object') return []
-    const row = item as Record<string, unknown>
-    const content = typeof row.icerik === 'string' ? row.icerik.trim() : ''
-    if (!content || content.length > limit) return []
-    return [{
-      no: Number.isFinite(Number(row.no)) ? Number(row.no) : index + 1,
-      icerik: content,
-      tip: typeof row.tip === 'string' ? row.tip : 'bilgi',
-    }]
-  }) : []
-  if (!posts.length) throw new Error('Model geçerli bir thread döndürmedi. Lütfen yeniden dene.')
-  return {
-    hook: typeof value.hook === 'string' ? value.hook.trim() : posts[0].icerik,
-    posts,
-    hashtags: normalizeHashtagList(value.hashtags, 20),
-  }
-}
+import { normalizeThread } from '@/lib/ai/thread'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -36,14 +15,15 @@ export async function POST(req: NextRequest) {
     if (!topic || !platform || !model) return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
 
     const result = await generateContent({
-      prompt: buildThreadPrompt(topic, platform, style || 'bilgilendirici', tweetCount || 7),
+      prompt: buildThreadPrompt(topic, platform, style || 'bilgilendirici', Math.max(3, Math.min(Number(tweetCount) || 7, 15))),
       model: model as AIModel,
       systemPrompt: THREAD_SYSTEM_PROMPT,
       maxTokens: 4000,
       toolId: 'thread',
     }, req)
 
-    const thread = normalizeThread(parseStructuredOutput(result.content), platform)
+    const requested = Math.max(3, Math.min(Number(tweetCount) || 7, 15))
+    const thread = normalizeThread(parseStructuredOutput(result.content), platform, requested)
 
     return NextResponse.json({ thread, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (e) {

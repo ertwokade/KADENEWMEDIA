@@ -9,6 +9,7 @@ import LoadingState from '@/components/ui/LoadingState'
 import { cn, getPlatformLabel } from '@/lib/utils'
 import RawModelOutput from '@/components/ui/RawModelOutput'
 import type { Platform } from '@/types'
+import { humanizeKey } from '@/lib/ui/outputLabels'
 
 const allPlatforms: Platform[] = ['instagram', 'tiktok', 'youtube', 'linkedin', 'x']
 type BioData = { platformlar: Record<string, Record<string, string>>; link_sayfasi: { baslik: string; aciklama: string; linkler: Array<{ baslik: string; aciklama: string }> }; raw?: string }
@@ -76,7 +77,7 @@ export default function BioLinkPage() {
               <div>
                 <label className="block text-zinc-400 text-xs font-medium mb-1.5">Öne Çıkan Özellikler</label>
                 <textarea value={highlights} onChange={(e) => setHighlights(e.target.value)} rows={3}
-                  placeholder="500K+ takipçi, 5 yıllık deneyim, weekly newsletter..."
+                  placeholder="Örn. İstanbul merkezli ajans, haftalık bülten, ücretsiz keşif görüşmesi"
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322] resize-none" />
               </div>
               <div>
@@ -107,6 +108,7 @@ export default function BioLinkPage() {
                 className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 transition-colors">
                 {loading ? 'Üretiliyor...' : 'Biyografi Üret'}
               </button>
+              {!loading && (!name || !niche) && <p className="text-xs text-zinc-500">Biyografi üretmek için isim ve niş alanlarını doldur.</p>}
             </form>
           </div>
           <div className="flex-1 min-w-0">
@@ -134,7 +136,7 @@ export default function BioLinkPage() {
                     {Object.entries(data.platformlar[activeTab]).map(([key, val]) => (
                       <div key={key} className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4">
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-zinc-500 text-xs capitalize">{key.replace(/_/g, ' ')}</p>
+                          <p className="text-zinc-500 text-xs">{humanizeKey(key)}</p>
                           <button onClick={() => copy(val, key)} className="text-xs text-zinc-500 hover:text-zinc-300">{copied === key ? '✓' : 'Kopyala'}</button>
                         </div>
                         <p className="text-zinc-200 text-sm whitespace-pre-wrap">{val}</p>

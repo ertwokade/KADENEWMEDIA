@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
       systemPrompt: CONTENT_STUDIO_SYSTEM_PROMPT,
       prompt: buildContentStudioPrompt({ sourceTitle, sourceUrl, sourceText, voiceSamples }),
     }, request)
-    const output = normalizeContentStudioPackage(parseStructuredOutput(result.content), sourceTitle)
+    const output = normalizeContentStudioPackage(parseStructuredOutput(result.content), sourceTitle, sourceText)
     const run = await createContentStudioRun({
       userId: user.id,
       sourceTitle,

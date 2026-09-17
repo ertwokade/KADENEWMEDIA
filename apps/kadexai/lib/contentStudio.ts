@@ -1,3 +1,5 @@
+import { verbatimQuote } from './ai/quotes'
+
 export interface ContentStudioPackage {
   title: string
   sourceSummary: string
@@ -54,7 +56,7 @@ export function voiceStrength(samples: string[]) {
   return Math.min(100, Math.round(samples.length * 20 + Math.min(40, characters / 50)))
 }
 
-export function normalizeContentStudioPackage(value: unknown, fallbackTitle: string): ContentStudioPackage {
+export function normalizeContentStudioPackage(value: unknown, fallbackTitle: string, sourceText?: string): ContentStudioPackage {
   const raw = value && typeof value === 'object' && !Array.isArray(value)
     ? value as Record<string, unknown>
     : {}
@@ -95,7 +97,10 @@ export function normalizeContentStudioPackage(value: unknown, fallbackTitle: str
       shorts: cleanLong(shortVideos.shorts, 4000),
     },
     summary: cleanList(raw.summary, 8, 500),
-    quotes: cleanList(raw.quotes, 8, 500),
+    // Kaynak metin biliniyorsa yalnız birebir geçen alıntılar tutulur.
+    quotes: sourceText
+      ? cleanList(raw.quotes, 8, 500).map((quote) => verbatimQuote(quote, sourceText)).filter((quote): quote is string => Boolean(quote))
+      : cleanList(raw.quotes, 8, 500),
     evidence,
     raw: typeof raw.raw === 'string' ? cleanLong(raw.raw, 12_000) : undefined,
   }
@@ -132,11 +137,13 @@ MARKA SESİ:
 ${samples}
 
 Bu kaynaktan yayınlanabilir bir haftalık içerik paketi üret.
+thread alanı bir haftaya yetecek şekilde 5-7 ayrı gönderi içersin (kaynak çok kısaysa en az 3).
+quotes alanındaki her öğe kaynak metinde geçen bir cümlenin kelimesi kelimesine kopyası olsun.
 JSON ŞEMASI:
 {
   "title": "paketin kısa başlığı",
   "sourceSummary": "kaynağın dürüst özeti ve varsa eksik bağlam",
-  "thread": ["X/Threads gönderisi 1", "gönderi 2"],
+  "thread": ["X/Threads gönderisi 1", "gönderi 2", "gönderi 3", "gönderi 4", "gönderi 5"],
   "linkedIn": "LinkedIn gönderisi",
   "newsletter": { "subject": "konu satırı", "body": "bülten metni" },
   "captions": {

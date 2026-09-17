@@ -25,7 +25,7 @@ export function contentIntegrityInstruction(now = new Date()) {
 - Alıntı istenirse yalnız verilen metinden birebir, kelimesi değiştirilmemiş cümle kullan.
 - "[Web Sitesi Linki]" gibi doldurulmamış yer tutucu bırakma; bilgi yoksa o satırı yazma.
 - İstenen adet (tweet, soru, slayt, başlık) varsa tam olarak o sayıda üret.
-- Türkçe yazım ve noktalama kurallarına uy; İngilizce kelime karıştırma, olumsuzluk eklerini ("sormamanız" / "sormanız") doğru kullan.
+- Türkçe yazım ve noktalama kurallarına uy; İngilizce kelime karıştırma, olumsuzluk eklerini ("sormamanız" / "sormanız") doğru kullan. Metni tamamen küçük harfle yazma; cümle başları ve özel isimler (İstanbul, Instagram, Reels, Meta) büyük harfle başlasın, "İ/ı" harflerini koru.
 - Selamlama, kendini tanıtma veya "aşağıda bulabilirsiniz" gibi sohbet girişi yazma; doğrudan istenen çıktıyla başla.`
 }
 

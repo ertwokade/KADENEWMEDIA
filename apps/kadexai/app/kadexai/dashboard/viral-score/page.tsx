@@ -15,6 +15,7 @@ interface ViralAnalysis {
   kriterler: Record<string, { puan: number; yorum: string }>
   guclu_yonler: string[]
   iyilestirme_onerileri: string[]
+  zayif_yonler?: string[]
   revize_edilmis_baslik: string
   /** Performans tahmini alanları doldurulduğunda gelir. */
   tahminler?: Record<string, string>
@@ -55,7 +56,7 @@ const criteriaLabels: Record<string, string> = {
   seo_guc: 'SEO Gücü', merak_faktoru: 'Merak Faktörü', cta_guc: 'CTA Gücü',
 }
 
-function AnalysisCard({ result }: { result: ModelResult }) {
+function AnalysisCard({ result, compact = false }: { result: ModelResult; compact?: boolean }) {
   const a = result.analysis
   return (
     <div className="space-y-4">
@@ -84,7 +85,7 @@ function AnalysisCard({ result }: { result: ModelResult }) {
       </div>
 
       {a.kriterler && (
-        <div className="grid grid-cols-2 gap-2">
+        <div className={cn('grid gap-2', !compact && 'sm:grid-cols-2')}>
           {Object.entries(a.kriterler).map(([key, val]) => (
             <div key={key} className="rounded-lg border border-zinc-700/50 bg-zinc-800/50 p-3 space-y-1">
               <div className="flex items-center justify-between">
@@ -98,12 +99,20 @@ function AnalysisCard({ result }: { result: ModelResult }) {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className={cn('grid gap-3', !compact && 'sm:grid-cols-2')}>
         {a.guclu_yonler?.length > 0 && (
           <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
             <h4 className="text-emerald-400 text-xs font-semibold mb-1.5">Güçlü Yönler</h4>
             <ul className="space-y-1">
               {a.guclu_yonler.map((item, i) => <li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-emerald-500">✓</span>{item}</li>)}
+            </ul>
+          </div>
+        )}
+        {(a.zayif_yonler?.length ?? 0) > 0 && (
+          <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
+            <h4 className="text-red-400 text-xs font-semibold mb-1.5">Zayıf Yönler</h4>
+            <ul className="space-y-1">
+              {a.zayif_yonler!.map((item, i) => <li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-red-400">!</span>{item}</li>)}
             </ul>
           </div>
         )}
@@ -117,9 +126,10 @@ function AnalysisCard({ result }: { result: ModelResult }) {
         )}
       </div>
 
-      {a.tahminler && Object.keys(a.tahminler).length > 0 && (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {Object.entries(a.tahminler).map(([key, val]) => (
+      {a.tahminler && Object.keys(a.tahminler).some((key) => key !== 'viral_potansiyel') && (
+        <div className={cn('grid grid-cols-2 gap-2', !compact && 'sm:grid-cols-3')}>
+          {/* Viral potansiyel üstteki ana skorla aynı ölçüyü ikinci kez ve farklı sayıyla gösteriyordu. */}
+          {Object.entries(a.tahminler).filter(([key]) => key !== 'viral_potansiyel').map(([key, val]) => (
             <div key={key} className="rounded-lg border border-zinc-700/50 bg-zinc-800/50 p-3">
               <p className="text-zinc-500 text-[11px]">{forecastLabels[key] || key}</p>
               <p className="text-zinc-200 text-sm font-semibold mt-1">{val}</p>
@@ -207,10 +217,8 @@ export default function ViralScorePage() {
         toplam_puan: Math.max(0, Math.min(100, Math.round(performanceScore))),
         kriterler: {},
         guclu_yonler: Array.isArray(d.guclu_yonler) ? d.guclu_yonler : [],
-        iyilestirme_onerileri: [
-          ...(Array.isArray(d.optimizasyon_onerileri) ? d.optimizasyon_onerileri : []),
-          ...(Array.isArray(d.zayif_yonler) ? d.zayif_yonler : []),
-        ],
+        iyilestirme_onerileri: Array.isArray(d.optimizasyon_onerileri) ? d.optimizasyon_onerileri : [],
+        zayif_yonler: Array.isArray(d.zayif_yonler) ? d.zayif_yonler : [],
         revize_edilmis_baslik: '',
         tahminler: d.tahminler && typeof d.tahminler === 'object' ? d.tahminler : undefined,
         ideal_yayin_zamani: typeof d.ideal_yayin_zamani === 'string' ? d.ideal_yayin_zamani : undefined,
@@ -332,8 +340,8 @@ export default function ViralScorePage() {
             {isLoading && <LoadingState model={selectedModel} />}
 
             {results.length > 0 && !isLoading && (
-              <div className={cn('grid gap-6', results.length > 1 ? 'grid-cols-1 xl:grid-cols-3' : 'grid-cols-1')}>
-                {results.map((r, index) => <AnalysisCard key={`${r.model}-${index}`} result={r} />)}
+              <div className={cn('grid gap-6', results.length === 2 ? 'grid-cols-1 lg:grid-cols-2' : results.length > 2 ? 'grid-cols-1 xl:grid-cols-3' : 'grid-cols-1')}>
+                {results.map((r, index) => <AnalysisCard key={`${r.model}-${index}`} result={r} compact={results.length > 1} />)}
               </div>
             )}
 

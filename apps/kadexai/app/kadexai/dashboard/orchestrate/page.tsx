@@ -11,6 +11,8 @@ import { ArrowDown, ArrowUp, CheckCircle2, Clock, Play, Plus, SkipForward, Trash
 import TopBar from '@/components/layout/TopBar'
 import { apiFetch, recordToolRun } from '@/lib/client/api'
 import ModelOutput from '@/components/ui/ModelOutput'
+import CopyButton from '@/components/ui/CopyButton'
+import LoadingState from '@/components/ui/LoadingState'
 
 interface Pipeline {
   id: string
@@ -218,11 +220,30 @@ export default function OrchestratePage() {
             </p>
           </form>
 
-          {steps.length > 0 && (
+          {running && (
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+              <LoadingState label={`${(selected === 'custom' ? customSteps.length : active?.steps.length) || 0} adımlı akış çalışıyor`} longRunning />
+              <ol className="mt-2 space-y-1 pl-4 text-xs text-zinc-500">
+                {(selected === 'custom' ? customSteps.map((id) => ({ id, label: customLabel(id) })) : active?.steps ?? []).map((step, index) => (
+                  <li key={step.id}>{index + 1}. {step.label}</li>
+                ))}
+              </ol>
+              <p className="mt-2 text-xs text-zinc-500">Adımlar sırayla çalışır; her adım önceki adımın çıktısını kullanır.</p>
+            </section>
+          )}
+
+          {steps.length > 0 && !running && (
             <section className="space-y-3">
               {stoppedEarly && (
                 <div className="rounded-lg border border-amber-500/25 bg-amber-500/10 p-3 text-xs text-amber-200">
-                  Akış tamamlanmadan durdu. Aşağıdaki adımlar tamamlananlardır.
+                  {steps.some((step) => step.status === 'ok')
+                    ? `Akış ${steps.filter((step) => step.status === 'ok').length}. adımdan sonra durdu. Tamamlanan adımların çıktısı aşağıda; duran adımın nedenini kartında görebilirsin.`
+                    : 'Akış ilk adımda durdu; tamamlanan adım yok. Nedeni aşağıdaki kartta yazıyor, birkaç saniye sonra yeniden deneyebilirsin.'}
+                </div>
+              )}
+              {steps.some((step) => step.output) && (
+                <div className="flex justify-end">
+                  <CopyButton text={steps.filter((step) => step.output).map((step) => `${step.label}\n${step.output}`).join('\n\n')} />
                 </div>
               )}
               {steps.map((step, index) => (
@@ -231,9 +252,9 @@ export default function OrchestratePage() {
                     <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
                       {STATUS_ICON[step.status]} {index + 1}. {step.label}
                     </h3>
-                    <span className="text-xs text-zinc-500">
+                    <span className="flex items-center gap-2 text-xs text-zinc-500">
+                      {step.output && <CopyButton text={step.output} />}
                       {(step.durationMs / 1000).toFixed(1)} sn
-                      {step.model ? ` · ${step.model}` : ''}
                       {typeof step.tokensUsed === 'number' ? ` · ${step.tokensUsed} token` : ''}
                     </span>
                   </header>

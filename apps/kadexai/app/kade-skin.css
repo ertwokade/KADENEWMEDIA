@@ -349,9 +349,16 @@ html[data-theme='light'] .kade-content-studio-hero {
   --kade-n-950: #0f1111;
   --kade-ink: #f7f3e8;
   --kade-line: rgba(255, 255, 255, .10);
+  /* Yüzey tokenları da bandın içinde koyu değerlere bağlanır; aksi hâlde
+     `.bg-zinc-900` açık yüzeye dönüp beyaz başlık görünmez oluyordu. */
+  --kade-bg: var(--kade-n-950);
+  --kade-surface: var(--kade-n-900);
+  --kade-surface-soft: var(--kade-n-800);
+  --kade-muted: var(--kade-n-400);
+  --kade-faint: var(--kade-n-500);
+  background-color: var(--kade-n-900) !important;
 }
-/* Bandın içindeki beyaz metin koyu zeminde zaten doğru; tek istisna
-   yamalarına gerek kalmadı. */
+.kade-content-studio-hero .text-white { color: var(--kade-ink) !important; }
 .kade-panel .border-zinc-800, .kade-panel .border-zinc-700, .kade-panel .border-zinc-700\/70, .kade-panel .border-zinc-700\/60, .kade-panel .border-zinc-700\/50 { border-color: var(--kade-line) !important; }
 .kade-panel .border-zinc-600 { border-color: var(--kade-line-strong) !important; }
 .kade-panel input, .kade-panel textarea, .kade-panel select { border-color: var(--kade-line-strong) !important; background: var(--kade-surface) !important; color: var(--kade-ink) !important; box-shadow: none !important; }

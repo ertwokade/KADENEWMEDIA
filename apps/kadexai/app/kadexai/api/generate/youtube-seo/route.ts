@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { removeInventedChapters, removeUnfilledPlaceholders } from '@/lib/ai/outputCleanup'
 import { generateContent } from '@/lib/ai/provider'
 import { YOUTUBE_SEO_SYSTEM_PROMPT, buildYoutubeSeoPrompt } from '@/lib/ai/prompts'
 import { AIModel } from '@/types'
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     const seo = {
       seo_skoru: asNumber(parsed?.seo_skoru),
       baslik_analizi: { puan: asNumber(titleAnalysis?.puan), sorunlar: asTextList(titleAnalysis?.sorunlar), optimize_edilmis: asText(titleAnalysis?.optimize_edilmis, 500) },
-      aciklama_analizi: { puan: asNumber(descriptionAnalysis?.puan), sorunlar: asTextList(descriptionAnalysis?.sorunlar), optimize_edilmis: asText(descriptionAnalysis?.optimize_edilmis, 5_000) },
+      aciklama_analizi: { puan: asNumber(descriptionAnalysis?.puan), sorunlar: asTextList(descriptionAnalysis?.sorunlar), optimize_edilmis: removeInventedChapters(removeUnfilledPlaceholders(asText(descriptionAnalysis?.optimize_edilmis, 5_000)), `${title || ''}\n${description || ''}`) },
       tag_analizi: { puan: asNumber(tagAnalysis?.puan), mevcut_iyi: asTextList(tagAnalysis?.mevcut_iyi), eklenecek: asTextList(tagAnalysis?.eklenecek), cikarilacak: asTextList(tagAnalysis?.cikarilacak) },
       anahtar_kelimeler: asRecordList(parsed?.anahtar_kelimeler, (item) => {
         const kelime = asText(item.kelime, 200)

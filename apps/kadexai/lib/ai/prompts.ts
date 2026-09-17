@@ -70,7 +70,8 @@ Niche: ${niche}
 İstenen toplam hashtag: ${count}
 
 Bu içerik için ${platform} platformuna özel hashtag seti oluştur.
-Yüksek hacimli (1M+), orta hacimli (100K-1M), düşük hacimli/niche (<100K) olarak grupla.`
+Yaygın kullanılan (yuksek), orta düzeyde kullanılan (orta), az kullanılan/niş (dusuk ve niche) olarak grupla. Kesin hacim bilmediğin için sayı yazma.
+Yalnız platformda gerçekten kullanılan, okunabilir etiketler öner: en fazla 3 kelimelik birleşik etiket, en fazla 22 karakter, yazım hatası yok. Cümleyi tek etikete yapıştırma, anlamsız yeni etiket icat etme.`
 }
 
 export function buildScriptPrompt(
@@ -209,6 +210,7 @@ Stil: ${style}
 Thread uzunluğu: ${tweetCount} post
 
 Her post max ${limit}. Viral, değer katan bir thread yaz.
+posts dizisi TAM ${tweetCount} öğe içersin: 1. öğe açılış (hook) gönderisidir ve "hook" alanıyla aynı metindir, son öğe CTA'dır.
 JSON formatı:
 {
   "hook": "dikkat çekici ilk post (en güçlü)",
@@ -512,9 +514,10 @@ Yanıtını SADECE JSON formatında ver.`
 export function buildCompetitorPrompt(competitorInfo: string, myNiche: string, myPlatform: string): string {
   return `Benim niche'm: ${myNiche}
 Platform: ${myPlatform}
-Rakip bilgisi: ${competitorInfo}
+Rakip bilgisi: ${competitorInfo.trim() || 'VERİLMEDİ'}
 
 Bu rakibi analiz et, güçlü/zayıf yönleri bul, benim için fırsat alanlarını tespit et.
+Yalnız rakip bilgisinde yazanlara dayan. Rakip bilgisi VERİLMEDİ ise rakip_profili ve icerik_stratejisi alanlarına "Bilgi verilmedi" yaz, rakip özelliği uydurma; fırsatları yalnız niş ve platforma göre genel olarak belirt.
 JSON formatı:
 {
   "rakip_profili": { "tahmin_abone": "", "icerik_tipi": "", "yayın_sikligi": "", "guc_alanlari": [] },
@@ -677,12 +680,14 @@ JSON: {"faqs":[{"soru":"","cevap":"","kategori":"teknik|genel|fiyat|kullanim","s
 // ═══════════════════════════════════════════════════════════════════════════
 // ALINTILAR / QUOTE EXTRACTOR
 // ═══════════════════════════════════════════════════════════════════════════
-export const QUOTE_SYSTEM_PROMPT = `Sen sosyal medya içerik uzmanısın. İçerikten paylaşılabilir, güçlü alıntılar çıkarıyor ve her platform için formatlyorsun. Yanıtını SADECE JSON formatında ver.`
+export const QUOTE_SYSTEM_PROMPT = `Sen sosyal medya içerik uzmanısın. Verilen içerikten paylaşılabilir alıntılar seçiyor ve platform öneriyorsun.
+Alıntı SEÇERSİN, YAZMAZSIN: "metin" alanı içerikte geçen bir cümlenin kelimesi kelimesine kopyası olmalı. Kelime ekleme, çıkarma, eş anlamlıyla değiştirme veya birleştirme yapma. Uygun cümle azsa daha az alıntı döndür.
+Yanıtını SADECE JSON formatında ver.`
 export function buildQuotePrompt(content: string, authorName: string): string {
   return `Yazar/Sunucu: ${authorName}
 İçerik: ${content}
 
-En güçlü, birbirinden farklı tam 3 alıntı çıkar. Açıklamaları kısa tut.
+İçerikteki cümlelerden en güçlü, birbirinden farklı en fazla 3 tanesini birebir seç. Açıklamaları kısa tut.
 JSON: {"alintilar":[{"metin":"","tip":"ilham verici|bilgi|şok edici|komik|motivasyon","platform_onerisi":"instagram|linkedin|x|tümü","gorsel_format":"story|kare|yatay","hashtag_onerisi":["#tag1"],"neden_guclu":"1 cümle açıklama"}]}`
 }
 

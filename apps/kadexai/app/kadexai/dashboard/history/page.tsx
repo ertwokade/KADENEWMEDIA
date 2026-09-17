@@ -193,7 +193,7 @@ export default function HistoryPage() {
               <div className="flex gap-1.5 flex-wrap">
               {tools.map((t) => (
                 <button key={t} onClick={() => setFilter(t)}
-                  className={cn('px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize',
+                  className={cn('px-3 py-1 rounded-full text-xs font-medium transition-colors',
                     filter === t ? 'bg-violet-500/20 text-violet-300' : 'text-zinc-500 hover:text-zinc-300')}>
                   {t === 'tümü' ? 'Tümü' : toolLabel(t)}
                   {t === 'tümü' && <span className="ml-1 text-zinc-600">({entries.length})</span>}

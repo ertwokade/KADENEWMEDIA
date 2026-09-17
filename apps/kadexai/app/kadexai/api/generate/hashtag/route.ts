@@ -31,7 +31,9 @@ export async function POST(req: NextRequest) {
       maxTokens: 2000,
     }, req)
 
-    const hashtags = parseHashtagGroups(result.content, count)
+    const parsed = parseHashtagGroups(result.content, count)
+    // Cümleyi tek etikete yapıştıran, okunamayacak uzunluktaki etiketler gösterilmez.
+    const hashtags = Object.fromEntries(Object.entries(parsed).map(([group, tags]) => [group, tags.filter((tag) => tag.length <= 23)])) as typeof parsed
 
     if (Object.values(hashtags).every((group) => group.length === 0)) return NextResponse.json({ error: 'Model kullanılabilir hashtag döndürmedi. Yeniden dene.' }, { status: 502 })
 

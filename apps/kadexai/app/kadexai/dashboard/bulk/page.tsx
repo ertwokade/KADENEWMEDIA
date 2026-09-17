@@ -190,7 +190,7 @@ export default function BulkPage() {
                     <div className="flex border-b border-zinc-700/50 overflow-x-auto">
                       {Object.keys(result.captions).map((p) => (
                         <button key={p} onClick={() => setActiveCapPlatform(p as Platform)}
-                          className={cn('px-4 py-2.5 text-xs font-medium whitespace-nowrap flex-shrink-0 transition-colors capitalize',
+                          className={cn('px-4 py-2.5 text-xs font-medium whitespace-nowrap flex-shrink-0 transition-colors',
                             activeCapPlatform === p ? 'bg-violet-500/20 text-violet-300 border-b-2 border-violet-500'
                               : 'text-zinc-500 hover:text-zinc-300')}>
                           {platformLabels[p as Platform] || p}

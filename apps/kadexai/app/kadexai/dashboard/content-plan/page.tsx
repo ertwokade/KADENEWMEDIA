@@ -132,7 +132,7 @@ export default function ContentPlanPage() {
                 <div className="grid grid-cols-3 gap-1.5">
                   {(['youtube', 'instagram', 'tiktok', 'linkedin', 'x', 'pinterest'] as Platform[]).map((p) => (
                     <button key={p} type="button" onClick={() => setPlatform(p)}
-                      className={cn('py-1.5 rounded-lg text-xs capitalize transition-colors border',
+                      className={cn('py-1.5 rounded-lg text-xs transition-colors border',
                         platform === p ? 'bg-violet-500/20 text-violet-300 border-violet-500/40' : 'bg-zinc-800 text-zinc-500 border-zinc-700')}>
                       {getPlatformLabel(p)}
                     </button>

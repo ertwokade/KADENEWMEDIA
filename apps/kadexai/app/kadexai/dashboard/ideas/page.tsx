@@ -11,6 +11,7 @@ import { Platform } from '@/types'
 import { getPlatformLabel, cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
+import { capitalizeTr } from '@/lib/ui/outputLabels'
 
 const platforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin']
 const styles = ['karışık', 'eğitici', 'eğlenceli', 'motivasyonel', 'hikaye anlatımı', 'liste', 'challenge']
@@ -160,9 +161,9 @@ export default function IdeasPage() {
                   <div className="flex gap-1.5">
                     {['tümü', 'trend', 'evergreen', 'mevsimsel', 'kolay', 'orta', 'zor'].map((f) => (
                       <button key={f} onClick={() => setFilter(f)}
-                        className={cn('px-2.5 py-1 rounded-full text-xs font-medium capitalize transition-colors',
+                        className={cn('px-2.5 py-1 rounded-full text-xs font-medium transition-colors',
                           filter === f ? 'bg-violet-500/20 text-violet-300' : 'text-zinc-500 hover:text-zinc-300')}>
-                        {f}
+                        {capitalizeTr(f)}
                       </button>
                     ))}
                   </div>
@@ -179,11 +180,11 @@ export default function IdeasPage() {
                           <p className="text-zinc-500 text-xs mt-1 leading-relaxed">{idea.aciklama}</p>
                         </div>
                         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                          <span className={cn('text-xs px-2 py-0.5 rounded-full border capitalize', tipColors[idea.tip] || tipColors.evergreen)}>
-                            {idea.tip}
+                          <span className={cn('text-xs px-2 py-0.5 rounded-full border', tipColors[idea.tip] || tipColors.evergreen)}>
+                            {capitalizeTr(idea.tip)}
                           </span>
-                          <span className={cn('text-xs font-medium capitalize', zorlukColors[idea.zorluk] || 'text-zinc-400')}>
-                            {idea.zorluk}
+                          <span className={cn('text-xs font-medium', zorlukColors[idea.zorluk] || 'text-zinc-400')}>
+                            {capitalizeTr(idea.zorluk)}
                           </span>
                         </div>
                       </div>

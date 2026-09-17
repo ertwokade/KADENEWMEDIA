@@ -11,6 +11,7 @@ import LoadingState from '@/components/ui/LoadingState'
 import { Platform, ContentTone, AIModel } from '@/types'
 import { collectSettledResults, getPlatformLabel, getModelLabel, getModelColor, cn } from '@/lib/utils'
 import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
+import { capitalizeTr } from '@/lib/ui/outputLabels'
 
 const platforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin', 'pinterest']
 const tones: ContentTone[] = ['bilgilendirici', 'eğlenceli', 'ilham verici', 'dikkat çekici', 'samimi']
@@ -122,11 +123,11 @@ export default function TitlePage() {
                   {tones.map(t => (
                     <button key={t} type="button" onClick={() => setTone(t)}
                       aria-pressed={tone === t}
-                      className={cn('py-1.5 px-2.5 rounded-lg text-xs font-medium transition-colors capitalize border',
+                      className={cn('py-1.5 px-2.5 rounded-lg text-xs font-medium transition-colors border',
                         tone === t
                           ? 'bg-violet-500/20 text-violet-300 border-violet-500/40'
                           : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-600')}>
-                      {t}
+                      {capitalizeTr(t)}
                     </button>
                   ))}
                 </div>

@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   try {
     const { goal, format, platform, audience, tone, keyPoints, model } = await req.json()
 
-    if (!goal || !format || !platform || !model) {
+    if (!goal || !format || !model) {
       return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
     }
 
@@ -23,10 +23,10 @@ export async function POST(req: NextRequest) {
       model: model as AIModel,
       maxTokens: 2600,
       systemPrompt:
-        'Sen Kade Media için çalışan kıdemli Türkçe metin yazarı ve içerik stratejistisin. Net, satılabilir, doğal ve platforma uygun metinler yaz. Doğrudan istenen çıktıyla başla; kendini tanıtma, kullanıcıya hitap etme veya "hazırladım" gibi sohbet girişi ekleme. Başlık ve listelerde temiz Markdown kullan.',
+        'Sen Kade New Media için çalışan kıdemli Türkçe metin yazarı ve içerik stratejistisin. Net, satılabilir, doğal ve platforma uygun metinler yaz. Doğrudan istenen çıktıyla başla; kendini tanıtma, kullanıcıya hitap etme veya "hazırladım" gibi sohbet girişi ekleme. Başlık ve listelerde temiz Markdown kullan; kontrol listesi gerekiyorsa "- [ ]" biçimini kullan.',
       prompt: `Amaç: ${goal}
 Format: ${format}
-Platform/Kanal: ${platform}
+Platform/Kanal: ${String(platform || '').trim() || 'belirtilmedi'}
 Hedef kitle: ${audience || 'belirtilmedi'}
 Ton: ${tone || 'net, profesyonel ve samimi'}
 Önemli noktalar:

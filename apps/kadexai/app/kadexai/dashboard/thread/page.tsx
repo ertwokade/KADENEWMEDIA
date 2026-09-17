@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 const styles = ['bilgilendirici', 'hikaye anlatımı', 'tartışmalı/cesur', 'liste', 'soru-cevap']
 
 interface ThreadPost { no: number; icerik: string; tip: string }
-interface Thread { hook: string; posts: ThreadPost[]; hashtags: string[] }
+interface Thread { hook: string; posts: ThreadPost[]; hashtags: string[]; requested?: number }
 
 export default function ThreadPage() {
   const { selectedModel } = useModel()
@@ -118,7 +118,7 @@ export default function ThreadPage() {
             {thread && !loading && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-zinc-400 text-sm"><span className="text-violet-400 font-semibold">{thread.posts?.length}</span> tweet</p>
+                  <p className="text-zinc-400 text-sm"><span className="text-violet-400 font-semibold">{thread.posts?.length}</span> tweet{thread.requested && thread.posts.length < thread.requested ? ` · ${thread.requested} istendi, model daha azını üretti` : ''}</p>
                   <button onClick={copyAll} className="px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 text-xs hover:text-zinc-200 transition-colors border border-zinc-700">
                     {copied ? '✓ Kopyalandı' : 'Tümünü Kopyala'}
                   </button>

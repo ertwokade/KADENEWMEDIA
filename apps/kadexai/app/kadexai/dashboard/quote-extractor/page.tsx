@@ -6,9 +6,12 @@ import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
-import { cn, copyToClipboard } from '@/lib/utils'
-import { Copy, Check } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import RawModelOutput from '@/components/ui/RawModelOutput'
+import CopyButton from '@/components/ui/CopyButton'
+import { humanizeValue } from '@/lib/ui/outputLabels'
+
+const QUOTE_PLATFORM_LABELS: Record<string, string> = { instagram: 'Instagram', linkedin: 'LinkedIn', x: 'X (Twitter)', tümü: 'Tüm platformlar' }
 
 interface Quote {
   metin: string
@@ -37,7 +40,6 @@ export default function QuoteExtractorPage() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<QuoteResult | null>(null)
   const [error, setError] = useState('')
-  const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
 
   // Başka araçtan veya Geçmiş'ten gelen girdiler formu doldurur; adres temizlenir.
   useEffect(() => {
@@ -45,11 +47,6 @@ export default function QuoteExtractorPage() {
     if (v.content) setContent(v.content); if (v.authorName) setAuthorName(v.authorName)
   }, [])
 
-  const handleCopy = async (text: string, idx: number) => {
-    await copyToClipboard(text)
-    setCopiedIdx(idx)
-    setTimeout(() => setCopiedIdx(null), 2000)
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -111,18 +108,15 @@ export default function QuoteExtractorPage() {
                         &ldquo;{quote.metin}&rdquo;
                         {authorName && <span className="block text-zinc-500 text-sm font-normal mt-1">— {authorName}</span>}
                       </blockquote>
-                      <button onClick={() => handleCopy(`"${quote.metin}"${authorName ? `\n— ${authorName}` : ''}`, i)}
-                        className="text-zinc-500 hover:text-violet-400 transition-colors flex-shrink-0">
-                        {copiedIdx === i ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                      </button>
+                      <CopyButton text={`"${quote.metin}"${authorName ? `\n— ${authorName}` : ''}`} className="flex-shrink-0" />
                     </div>
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <div className="flex items-center gap-2">
                         <span className={cn('text-[10px] px-2 py-0.5 rounded font-medium',
                           tipColors[quote.tip?.toLowerCase()] || tipColors.default)}>
-                          {quote.tip}
+                          {humanizeValue(quote.tip)?.replace(/^./, (letter) => letter.toLocaleUpperCase('tr-TR'))}
                         </span>
-                        <span className="text-zinc-500 text-xs">{quote.platform_onerisi}</span>
+                        <span className="text-zinc-500 text-xs">{QUOTE_PLATFORM_LABELS[quote.platform_onerisi?.toLocaleLowerCase('tr-TR')] ?? quote.platform_onerisi}</span>
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {quote.hashtag_onerisi?.map((tag, j) => (

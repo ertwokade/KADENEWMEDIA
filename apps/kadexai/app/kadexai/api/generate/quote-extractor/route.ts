@@ -5,6 +5,7 @@ import { AIModel } from '@/types'
 import { parseStructuredOutput } from '@/lib/ai/structured'
 import { requireApiUser } from '@/lib/auth/server'
 import { asRecord, asRecordList, asText, asTextList } from '@/lib/ai/outputValidation'
+import { verbatimQuote } from '@/lib/ai/quotes'
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
   if (guard) return guard
@@ -15,7 +16,8 @@ export async function POST(req: NextRequest) {
     const result = await generateContent({ prompt: buildQuotePrompt(content, authorName || ''), model: model as AIModel, systemPrompt: QUOTE_SYSTEM_PROMPT, maxTokens: 2000 }, req)
     const parsed = asRecord(parseStructuredOutput(result.content))
     const alintilar = asRecordList(parsed?.alintilar, (quote) => {
-      const metin = asText(quote.metin, 1_500)
+      // Kaynakta birebir geçmeyen "alıntı" gösterilmez.
+      const metin = verbatimQuote(asText(quote.metin, 1_500), String(content))
       if (!metin) return null
       return {
         metin,
@@ -26,7 +28,7 @@ export async function POST(req: NextRequest) {
         neden_guclu: asText(quote.neden_guclu, 600),
       }
     }, 20)
-    if (!parsed || alintilar.length === 0) return NextResponse.json({ error: 'Model geçerli alıntı döndürmedi. Yeniden dene.' }, { status: 502 })
+    if (!parsed || alintilar.length === 0) return NextResponse.json({ error: 'Metinde birebir alıntılanabilir cümle bulunamadı veya model metni değiştirerek alıntı üretti. Daha uzun bir kaynak metinle yeniden dene.' }, { status: 502 })
     const data = { alintilar }
     return NextResponse.json({ data, model: result.model, routingReason: result.routingReason, tokensUsed: result.tokensUsed })
   } catch (e) { return NextResponse.json({ error: e instanceof Error ? e.message : 'Sunucu hatası' }, { status: 500 }) }

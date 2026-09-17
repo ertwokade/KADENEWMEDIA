@@ -159,3 +159,11 @@ export function humanizeCodeList(text: string) {
     return human === match ? humanizeKey(match).toLocaleLowerCase('tr-TR') : human.toLocaleLowerCase('tr-TR')
   })
 }
+
+/**
+ * CSS `capitalize` Türkçe "i" harfini "İ" yapmadığı için ("ilham" → "Ilham")
+ * kelime başları JS ile Türkçe kurala göre büyütülür.
+ */
+export function capitalizeTr(text: string) {
+  return String(text ?? '').replace(/(^|[\s/(-])(\p{L})/gu, (_match, before: string, letter: string) => `${before}${letter.toLocaleUpperCase('tr-TR')}`)
+}

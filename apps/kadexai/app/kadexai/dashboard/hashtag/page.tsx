@@ -67,9 +67,9 @@ export default function HashtagPage() {
 
   const groups = hashtags
     ? [
-        { key: 'yuksek', label: 'Yüksek Hacim (1M+)', color: 'text-red-400', tags: hashtags.yuksek || [] },
-        { key: 'orta', label: 'Orta Hacim (100K-1M)', color: 'text-amber-400', tags: hashtags.orta || [] },
-        { key: 'dusuk', label: 'Düşük Hacim (<100K)', color: 'text-emerald-400', tags: hashtags.dusuk || [] },
+        { key: 'yuksek', label: 'Yaygın kullanılan', color: 'text-red-400', tags: hashtags.yuksek || [] },
+        { key: 'orta', label: 'Orta düzeyde kullanılan', color: 'text-amber-400', tags: hashtags.orta || [] },
+        { key: 'dusuk', label: 'Az kullanılan', color: 'text-emerald-400', tags: hashtags.dusuk || [] },
         { key: 'niche', label: 'Niş', color: 'text-violet-400', tags: hashtags.niche || [] },
       ]
     : []
@@ -131,6 +131,7 @@ export default function HashtagPage() {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
+                  <p className="text-xs text-zinc-500">Kullanım düzeyi modelin tahminidir; platformdan ölçülmüş hacim verisi değildir.</p>
                   {groups.map((g) => g.tags.length > 0 && (
                     <div key={g.key} className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4 space-y-2">
                       <p className={cn('text-xs font-semibold', g.color)}>{g.label}</p>

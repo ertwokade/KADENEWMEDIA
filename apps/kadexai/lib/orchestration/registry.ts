@@ -33,11 +33,11 @@ const CONTENT_SPRINT: Pipeline = {
   description: 'Trend tespiti → rakip analizi → içerik planı → başlık → hashtag zinciri.',
   requiresFeature: 'content-generation',
   steps: [
-    { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 30_000, maxTokens: 1_600 },
-    { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 30_000, maxTokens: 1_600 },
-    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 4_000 },
-    { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
-    { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 20_000, maxTokens: 800 },
+    { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 60_000, maxTokens: 1_600 },
+    { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 60_000, maxTokens: 1_600 },
+    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 60_000, maxTokens: 4_000 },
+    { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 60_000, maxTokens: 1_200 },
+    { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 60_000, maxTokens: 800 },
   ],
 }
 
@@ -47,10 +47,10 @@ const TREND_TO_POST: Pipeline = {
   description: 'Trend tespiti → içerik planı → başlık → hashtag zinciri.',
   requiresFeature: 'content-generation',
   steps: [
-    { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 30_000, maxTokens: 1_600 },
-    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 4_000 },
-    { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
-    { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 20_000, maxTokens: 800 },
+    { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 60_000, maxTokens: 1_600 },
+    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 60_000, maxTokens: 4_000 },
+    { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 60_000, maxTokens: 1_200 },
+    { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 60_000, maxTokens: 800 },
   ],
 }
 
@@ -60,9 +60,9 @@ const COMPETITOR_GAP: Pipeline = {
   description: 'Rakip analizi → içerik planı → başlık zinciri.',
   requiresFeature: 'content-generation',
   steps: [
-    { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 30_000, maxTokens: 1_600 },
-    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 4_000 },
-    { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
+    { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 60_000, maxTokens: 1_600 },
+    { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 60_000, maxTokens: 4_000 },
+    { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 60_000, maxTokens: 1_200 },
   ],
 }
 
@@ -77,11 +77,11 @@ export const MAX_STEPS_PER_RUN = 8
  * gönderemez.
  */
 export const CUSTOM_STEP_CATALOG: readonly OrchestrationStep[] = [
-  { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 30_000, maxTokens: 1_600 },
-  { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 30_000, maxTokens: 1_600 },
-  { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 35_000, maxTokens: 4_000 },
-  { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 25_000, maxTokens: 1_200 },
-  { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 20_000, maxTokens: 800 },
+  { id: 'trends', toolId: 'trends', label: 'Trend tespiti', timeoutMs: 60_000, maxTokens: 1_600 },
+  { id: 'competitor', toolId: 'competitor', label: 'Rakip analizi', timeoutMs: 60_000, maxTokens: 1_600 },
+  { id: 'content-plan', toolId: 'content-plan', label: 'İçerik planı', timeoutMs: 60_000, maxTokens: 4_000 },
+  { id: 'title', toolId: 'title', label: 'Başlık üretimi', timeoutMs: 60_000, maxTokens: 1_200 },
+  { id: 'hashtag', toolId: 'hashtag', label: 'Hashtag seti', timeoutMs: 60_000, maxTokens: 800 },
 ]
 
 export function createCustomPipeline(stepIds: unknown): Pipeline | undefined {
