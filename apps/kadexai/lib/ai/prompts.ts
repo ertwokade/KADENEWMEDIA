@@ -823,7 +823,7 @@ export function buildClickbaitPrompt(title: string, platform: string): string {
   return `Platform: ${platform}
 Başlık: "${title}"
 
-JSON: {"clickbait_skoru":0-100,"seviye":"güvenli|dikkatli|sınırda|clickbait|aşırı","sorunlar":[],"guclu_yonler":[],"alternatifler":[{"baslik":"","clickbait_skoru":0-100,"aciklama":""}],"genel_tavsiye":"","platform_normu":"bu platformda normal clickbait seviyesi nedir"}`
+JSON: {"clickbait_skoru":0-100,"seviye":"güvenli|dikkatli|sınırda|clickbait|aşırı","sorunlar":[],"guclu_yonler":[],"alternatifler":[{"baslik":"","clickbait_skoru":0-100,"aciklama":""}],"genel_tavsiye":"","platform_normu":"bu platformda izleyicinin başlıktan genel beklentisi; sayısal ortalama veya kaynaksız oran yazma"}`
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -86,7 +86,7 @@ function ResultCard({
 
       <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-5">
         <div className="flex items-center justify-between mb-4">
-          <p className="text-zinc-400 text-xs font-semibold uppercase tracking-wider">Clickbait Skoru</p>
+          <p className="text-zinc-400 text-xs font-semibold uppercase tracking-wider"><span lang="en">Clickbait</span> Skoru</p>
           <span className={cn('text-xs px-2 py-0.5 rounded border font-medium', seviyeColor(data.seviye))}>
             {data.seviye}
           </span>

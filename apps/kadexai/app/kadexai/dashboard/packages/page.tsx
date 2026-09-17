@@ -249,7 +249,8 @@ export default function PackagesPage() {
               <p className="kade-eyebrow">Şu anki paketin</p>
               <p className="mt-1.5 text-lg font-medium text-zinc-100">
                 {plan.tier === 'free' ? 'Ücretsiz' : plan.label || plan.tier}
-                {plan.period && plan.tier !== 'free' && (
+                {/* Süresiz (sahip) pakette dönem yazmak "yıllık" ile "süresiz"i yan yana gösteriyordu. */}
+                {plan.period && plan.tier !== 'free' && bitisMetni(plan.expiresAt) !== 'süresiz' && (
                   <span className="text-sm font-normal text-zinc-500">
                     {' · '}{plan.period === 'yearly' ? 'yıllık' : 'aylık'}
                   </span>
