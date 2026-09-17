@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { generateContent } from '@/lib/ai/provider'
 import { SYSTEM_PROMPTS, buildHookPrompt } from '@/lib/ai/prompts'
 import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
@@ -21,14 +21,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Eksik parametreler' }, { status: 400 })
     }
 
-    const result = await generateContent({
+    const request = {
       prompt: buildHookPrompt(topic, format, niche),
       model,
       systemPrompt: SYSTEM_PROMPTS.hookGenerator,
       maxTokens: 2500,
-    }, req)
-
-    const validated = normalizeHookOutput(result.content)
+    }
+    let result = await generateContent(request, req)
+    let validated = normalizeHookOutput(result.content)
+    // Model ara sıra JSON yerine düz metin döndürüyor; kullanıcıya hata göstermeden bir kez daha denenir.
+    if (validated.length === 0) {
+      result = await generateContent({ ...request, prompt: `${request.prompt}\n\nYanıtı yalnız istenen JSON biçiminde ver; açıklama ekleme.` }, req)
+      validated = normalizeHookOutput(result.content)
+    }
     if (validated.length === 0) {
       return NextResponse.json({ error: 'Model geçerli hook kartları döndürmedi. Yeniden dene.' }, { status: 502 })
     }

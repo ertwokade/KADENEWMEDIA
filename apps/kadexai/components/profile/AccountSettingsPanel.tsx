@@ -218,7 +218,7 @@ export default function AccountSettingsPanel() {
             <input type="checkbox" checked={draft.preferences.autoModel} onChange={(e) => update('preferences', 'autoModel', e.target.checked)} className="h-5 w-5 shrink-0 accent-amber-400" />
           </label>
           <label className="flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-zinc-950/60 p-3 text-sm text-zinc-300">
-            <span><strong className="block text-zinc-100">Araç girdilerini hatırla</strong><span className="mt-0.5 block text-xs text-zinc-500">Kapalıysa geçmişte istem metni saklanmaz.</span></span>
+            <span><strong className="block text-zinc-100">Araç girdilerini hatırla</strong><span className="mt-0.5 block text-xs text-zinc-500">Açıkken girdiler Geçmiş’e kaydedilir ve araç oradan aynı girdilerle yeniden açılabilir. Kapalıysa istem metni saklanmaz.</span></span>
             <input type="checkbox" checked={draft.preferences.rememberInputs} onChange={(e) => update('preferences', 'rememberInputs', e.target.checked)} className="h-5 w-5 shrink-0 accent-amber-400" />
           </label>
         </div>
