@@ -30,6 +30,7 @@ Kurallar:
 - Konuşma dilini koru; birebir sözlük çevirisi yapma, doğal karşılığını yaz.
 - Özel isimleri, marka ve ürün adlarını çevirme.
 - Küfür ve argoyu yumuşatma, aynı tonda karşıla.
+- Kaynakta argo yoksa çeviriye argo veya kısaltma ekleme ("small biz", "gonna" gibi); düzgün, yayına uygun dil kullan.
 - Yalnızca JSON dizisi döndür, açıklama yazma.`
 
 function buildPrompt(

@@ -15,7 +15,7 @@ import { useModel } from '@/lib/context/ModelContext'
 import { extractAudio, readMediaDuration } from '@/lib/media/extractAudio'
 import { assembleDubTrack, type DubSegment } from '@/lib/media/dubMixer'
 import { cuesToSrt, formatTimestamp, wordsToCues, type Cue } from '@/lib/subtitles/cues'
-import { TTS_LANGUAGES, languageLabel } from '@/lib/subtitles/languages'
+import { LANGUAGES, TTS_LANGUAGES, languageLabel } from '@/lib/subtitles/languages'
 import { cn } from '@/lib/utils'
 
 type Phase = 'idle' | 'audio' | 'transcribe' | 'translate' | 'tts' | 'mix' | 'done' | 'error'
@@ -230,7 +230,7 @@ export default function DubbingPage() {
   return (
     <div className="flex h-full flex-col">
       {confirmDialog}
-      <TopBar title="Dublaj Stüdyosu" description="Videoyu otomatik olarak başka dillerde seslendir" />
+      <TopBar title="Dublaj Stüdyosu" description="Videodaki konuşmayı başka dilde seslendir; WAV ses ve SRT olarak indir" />
       <div className="px-4 pt-4 sm:px-6"><CapabilityNotice need="transcribe" /></div>
 
       <div className="flex-1 overflow-y-auto">
@@ -288,6 +288,9 @@ export default function DubbingPage() {
                   <option key={l.code} value={l.code}>{l.label}</option>
                 ))}
               </select>
+              <p className="text-[11px] text-zinc-500">
+                Seslendirme kalitesi yeterli olmayan {LANGUAGES.filter((l) => !l.tts).map((l) => l.label).join(', ')} yalnız Altyazı Stüdyosu’nda çevrilebilir.
+              </p>
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-zinc-400">Ses karakteri</label>
