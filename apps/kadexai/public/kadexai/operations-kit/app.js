@@ -1648,6 +1648,13 @@ function bindCrm(){
   });
   document.getElementById("kanbanBoard").addEventListener("click",e=>{ const card=e.target.closest("[data-production-id]"); if(card)openProduction(card.dataset.productionId) });
   document.getElementById("dialogBody").addEventListener("click",handleDialogClick);
+  // method="dialog" formu alanda Enter'a basınca ya da örtük gönderimde kartı kapatıyordu; yalnız Kapat düğmesi kapatır.
+  document.querySelector("#productionDialog form")?.addEventListener("submit",e=>{ if(e.submitter?.value!=="close")e.preventDefault() });
+  document.getElementById("dialogBody").addEventListener("keydown",e=>{
+    if(e.key!=="Enter"||e.isComposing)return;
+    if(e.target.id==="newTaskText"){e.preventDefault();e.target.parentElement?.querySelector("[data-add-task]")?.click()}
+    else if(e.target.id==="newUpdateText"){e.preventDefault();e.target.parentElement?.querySelector("[data-add-update]")?.click()}
+  });
   document.getElementById("dialogBody").addEventListener("change",handleDialogChange);
   document.getElementById("deleteProductionBtn").addEventListener("click",async()=>{
     const prod=state.productions.find(p=>p.id===currentProductionId);

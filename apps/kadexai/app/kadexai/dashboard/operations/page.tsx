@@ -13,7 +13,7 @@ const validViews = new Set([
 ])
 // Kit statik dosya olarak servis ediliyor; sürüm damgası değişmezse
 // tarayıcı eski paketi kullanmaya devam ediyor.
-const operationsKitVersion = '20260917a'
+const operationsKitVersion = '20260917b'
 
 export default async function OperationsPage({
   searchParams,
