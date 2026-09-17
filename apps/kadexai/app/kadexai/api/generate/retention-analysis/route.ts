@@ -4,6 +4,7 @@ import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { AIModel } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
 import { asGeneratedText } from '@/lib/ai/outputValidation'
+import { removeChatIntro } from '@/lib/ai/outputCleanup'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -44,7 +45,7 @@ Bu içeriği analiz et.
 - 100 üzerinden retention skoru`,
     }, req)
 
-    const analysis = asGeneratedText(result.content, 20_000)
+    const analysis = removeChatIntro(asGeneratedText(result.content, 20_000))
     if (!analysis) {
       return NextResponse.json({ error: 'Model kullanılabilir bir izlenme analizi döndürmedi. Yeniden dene.' }, { status: 502 })
     }

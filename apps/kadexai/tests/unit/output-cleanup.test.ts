@@ -15,3 +15,11 @@ test('video süresi verilmediyse uydurma bölüm zaman damgaları kaldırılır'
   assert.match(cleaned, /Abone olmayı unutmayın\./)
   assert.equal(removeInventedChapters(text, 'Video süresi 03:10, 01:15 hedef kitle'), text)
 })
+
+test('sohbet girişi silinir, gerçek ilk paragraf korunur', async () => {
+  const { removeChatIntro } = await import('../../lib/ai/outputCleanup')
+  assert.equal(removeChatIntro('Videonuzu analiz ederek hazırladığım raporu aşağıda bulabilirsiniz.\n\n## Özet\nMetin'), '## Özet\nMetin')
+  assert.equal(removeChatIntro('Merhaba! İşte analiz:\n\nİçerik'), 'İçerik')
+  const real = 'Başlık ile metin arasında uyumsuzluk var.\n\nİkinci paragraf'
+  assert.equal(removeChatIntro(real), real)
+})

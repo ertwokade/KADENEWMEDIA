@@ -28,3 +28,16 @@ export function removeInventedChapters(text: string, userInput: string) {
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }
+
+/**
+ * "Merhaba! … raporu aşağıda bulabilirsiniz." gibi sohbet girişini kaldırır.
+ * Yalnız ilk paragraf kısa ve açıkça giriş cümlesiyse silinir; içerik korunur.
+ */
+export function removeChatIntro<T extends string | null>(text: T): T {
+  if (text === null) return text
+  const trimmed = text.trimStart()
+  const [first, ...rest] = trimmed.split(/\n\s*\n/)
+  if (!rest.length || first.length > 280 || /^#|^[-*•]|^\d+[.)]/.test(first.trim())) return text.trim() as T
+  const intro = /(aşağıda\s+(?:bulabilir|yer\s+al|sunuyor|inceleyebilir)|hazırladığım\s+(?:rapor|analiz)|^\s*(?:merhaba|selam)\b|^\s*(?:elbette|tabii|harika)\b[^\n]*[!.:]\s*$|^\s*işte\b[^\n]*:\s*$)/i
+  return (intro.test(first) ? rest.join('\n\n').trim() : text.trim()) as T
+}

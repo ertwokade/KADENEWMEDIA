@@ -4,6 +4,7 @@ import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 import { AIModel } from '@/types'
 import { requireApiUser } from '@/lib/auth/server'
 import { asGeneratedText } from '@/lib/ai/outputValidation'
+import { removeChatIntro } from '@/lib/ai/outputCleanup'
 
 export async function POST(req: NextRequest) {
   const guard = await requireApiUser()
@@ -62,12 +63,12 @@ Verilen metriklerde bulunuyorsa takipçi büyümesi, gösterim, erişim, etkile�
 5. Platform bazlı güçlü/zayıf yönler
 6. İçerik formatları, temalar, caption/hashtag önerileri
 7. Platform bazlı paylaşım zamanı (kanıt yoksa test önerisi)
-8. 30 günlük içerik takvimi
+8. 30 günlük içerik takvimi: Hafta 1, Hafta 2, Hafta 3 ve Hafta 4 için ayrı satırlar yaz; aynı hafta etiketini tekrarlama, "Hafta 1-4" gibi toplu etiket kullanma
 9. Satışa bağlanacak teklif/CTA önerileri
 10. En öncelikli 5 görev`,
     }, req)
 
-    const content = asGeneratedText(result.content, 24_000)
+    const content = removeChatIntro(asGeneratedText(result.content, 24_000))
     if (!content) {
       return NextResponse.json({ error: 'Model kullanılabilir bir sosyal medya analizi döndürmedi. Yeniden dene.' }, { status: 502 })
     }
