@@ -1171,3 +1171,10 @@ html[data-theme='dark'] .kade-auth-success { border-color: #7ee2ac; background: 
   50%      { box-shadow: 0 0 0 7px color-mix(in srgb, var(--kade-accent) 0%, transparent); }
 }
 @media (prefers-reduced-motion: reduce) { .kade-assistant-mikrofon-aktif { animation: none; } }
+
+/* Kısa ekranlarda kategori listesine yer aç: başlık ve arama alanı sıkışır. */
+@media (max-height: 820px) {
+  .kade-panel .kade-sidebar-head { min-height: 56px; padding-top: 10px; padding-bottom: 10px; }
+  .kade-panel .kade-sidebar-kicker { display: none; }
+  .kade-panel .kade-sidebar-search { padding-top: 7px; padding-bottom: 7px; }
+}
