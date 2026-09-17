@@ -252,7 +252,7 @@ const instagram: Collector = {
         errors: errors.length ? errors.slice(0, 5) : ['instagram: canlı ve ölçülmüş veri alınamadı'],
         note: hasSession
           ? 'Instagram oturumu çalışmadı veya süresi doldu; tahmini kayıt üretilmedi'
-          : 'INSTAGRAM_SESSION_ID tanımlı değil; tahmini kayıt üretilmedi',
+          : 'Instagram erişimi için yönetici ayarı gerekli; tahmini kayıt üretilmedi',
       }
     }
 

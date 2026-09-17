@@ -40,7 +40,7 @@ export async function collectTikTok(handleInput?: string): Promise<TikTokResult>
   if (!cookie) {
     return {
       items: [],
-      reason: 'TIKTOK_COOKIE tanımlı değil; TikTok profil listesi oturumsuz alınamıyor.',
+      reason: 'TikTok erişimi için yönetici ayarı gerekli; profil listesi oturumsuz alınamıyor.',
     }
   }
   const handle = (handleInput || process.env.KADE_TIKTOK_HANDLE || '@kadenewmedia').replace(/^@/, '')

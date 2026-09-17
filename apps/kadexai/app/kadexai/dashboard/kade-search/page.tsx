@@ -215,9 +215,7 @@ export default function KadeSearchApprovalPage() {
             <div role="alert" className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
               <p className="font-semibold">Trend veritabanı bağlı değil.</p>
               <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
-                Aday listesi boş dönüyor. Uygulamanın çalıştığı ortamda{' '}
-                <code className="rounded bg-amber-500/15 px-1">NEXT_PUBLIC_SUPABASE_URL</code> ve{' '}
-                <code className="rounded bg-amber-500/15 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> tanımlı olmalı.
+                Bu özellik için yönetici ayarı gerekli. Bağlantı kurulana kadar aday listesi boş görünür.
               </p>
             </div>
           )}

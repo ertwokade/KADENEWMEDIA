@@ -101,14 +101,13 @@ def generate_video(
 
     if not (config.app.get("pexels_api_keys") or config.app.get("pixabay_api_keys")):
         raise VideoEngineUnavailable(
-            "Video Fabrikası için stok görüntü anahtarı tanımlı değil "
-            "(PEXELS_API_KEY veya PIXABAY_API_KEY)."
+            # Değişken adları kullanıcıya gösterilmez; yönetici Ayarlar › Altyapı'da görür.
+            "Video Fabrikası için yönetici ayarı gerekli: stok görüntü kaynağı bağlı değil."
         )
 
     if not (config.app.get("gemini_api_key") or config.app.get("openai_api_key")):
         raise VideoEngineUnavailable(
-            "Senaryo üretimi için bir AI anahtarı gerekli (GEMINI_API_KEY veya "
-            "OPENAI_API_KEY)."
+            "Video Fabrikası için yönetici ayarı gerekli: senaryo üretecek AI sağlayıcısı bağlı değil."
         )
 
     aspect_value = (

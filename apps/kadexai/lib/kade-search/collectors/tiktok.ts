@@ -214,7 +214,7 @@ const tiktok: Collector = {
         errors: errors.length ? errors.slice(0, 6) : ['tiktok: canlı ve ölçülmüş veri alınamadı'],
         note: process.env.TIKTOK_COOKIE?.trim()
           ? 'TikTok çerezi çalışmadı veya süresi doldu; tahmini kayıt üretilmedi'
-          : 'TIKTOK_COOKIE tanımlı değil; tahmini kayıt üretilmedi',
+          : 'TikTok erişimi için yönetici ayarı gerekli; tahmini kayıt üretilmedi',
       }
     }
 

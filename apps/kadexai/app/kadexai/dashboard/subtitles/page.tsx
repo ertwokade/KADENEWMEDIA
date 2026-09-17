@@ -377,8 +377,8 @@ export default function SubtitlesPage() {
               {ytUnavailable && (
                 <p className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-2.5 text-[11px] text-amber-300">
                   {!yt?.clientConfigured
-                    ? 'GOOGLE_OAUTH_CLIENT_ID ve GOOGLE_OAUTH_CLIENT_SECRET tanımlanmadan hesap bağlanamaz.'
-                    : 'KADE_TOKEN_ENCRYPTION_KEY tanımlı değil; belirteç şifrelenemediği için bağlantı kapalı.'}
+                    ? 'YouTube hesabı bağlamak için yönetici ayarı gerekli: Google bağlantısı kurulmamış.'
+                    : 'YouTube hesabı bağlamak için yönetici ayarı gerekli: güvenli belirteç saklama kapalı.'}
                 </p>
               )}
 

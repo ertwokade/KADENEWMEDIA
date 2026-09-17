@@ -486,7 +486,7 @@ async def youtube_auth_url():
         raise HTTPException(status_code=503, detail="YouTube collector not available. Check requirements.")
     try:
         if not core_settings.youtube_client_id or not core_settings.youtube_client_secret:
-            raise HTTPException(status_code=503, detail="YOUTUBE_CLIENT_ID/SECRET ortam değişkenleri eksik.")
+            raise HTTPException(status_code=503, detail="YouTube bağlantısı için yönetici ayarı gerekli.")
         now = time.monotonic()
         for expired_state in [key for key, expires_at in _oauth_states.items() if expires_at <= now]:
             _oauth_states.pop(expired_state, None)
@@ -540,7 +540,7 @@ async def generate_insight(req: InsightRequest):
     import os
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     if not anthropic_key:
-        raise HTTPException(status_code=503, detail="ANTHROPIC_API_KEY ortam değişkeni bulunamadı.")
+        raise HTTPException(status_code=503, detail="Bu özellik için yönetici ayarı gerekli: AI sağlayıcısı bağlı değil.")
     try:
         import anthropic
         client = anthropic.Anthropic(api_key=anthropic_key, timeout=25.0, max_retries=1)
@@ -566,7 +566,7 @@ async def weekly_report():
     import os
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     if not anthropic_key:
-        raise HTTPException(status_code=503, detail="ANTHROPIC_API_KEY ortam değişkeni bulunamadı.")
+        raise HTTPException(status_code=503, detail="Bu özellik için yönetici ayarı gerekli: AI sağlayıcısı bağlı değil.")
     try:
         import anthropic
         client = anthropic.Anthropic(api_key=anthropic_key, timeout=25.0, max_retries=1)

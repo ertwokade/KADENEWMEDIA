@@ -15,8 +15,8 @@ export async function GET() {
     return NextResponse.json(
       {
         error: !status.clientConfigured
-          ? 'GOOGLE_OAUTH_CLIENT_ID / GOOGLE_OAUTH_CLIENT_SECRET tanımlı değil.'
-          : 'KADE_TOKEN_ENCRYPTION_KEY tanımlı değil; belirteç şifrelenemeden bağlantı kurulmaz.',
+          ? 'YouTube hesabı bağlamak için yönetici ayarı gerekli: Google bağlantısı kurulmamış.'
+          : 'YouTube hesabı bağlamak için yönetici ayarı gerekli: güvenli belirteç saklama kapalı.',
       },
       { status: 503 }
     )

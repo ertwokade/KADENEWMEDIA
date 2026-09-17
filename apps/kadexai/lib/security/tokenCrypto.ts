@@ -16,7 +16,7 @@ const ALGO = 'aes-256-gcm'
 function key(): Buffer {
   const raw = process.env.KADE_TOKEN_ENCRYPTION_KEY?.trim()
   if (!raw || raw.length < 16) {
-    throw new Error('KADE_TOKEN_ENCRYPTION_KEY tanımlı değil; entegrasyon belirteçleri şifrelenemiyor.')
+    throw new Error('Güvenli belirteç saklama için yönetici ayarı gerekli; entegrasyon bağlanamıyor.')
   }
   // Serbest uzunluktaki gizli degeri 32 baytlik anahtara indirger.
   return createHash('sha256').update(raw).digest()
