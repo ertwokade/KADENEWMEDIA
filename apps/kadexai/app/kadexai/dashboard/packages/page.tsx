@@ -107,25 +107,29 @@ export default function PackagesPage() {
   const [plan, setPlan] = useState<Plan | null>(null)
   const [videoAvailable, setVideoAvailable] = useState<boolean | null>(null)
 
+  // Uçlar birbirini beklemesin: paketler gelir gelmez listelenir, diğerleri arkadan dolar.
+  // Satın alma, yasal metin listesi yüklenene kadar kapalıdır (onay atlanamaz).
+  const [legalLoaded, setLegalLoaded] = useState(false)
   useEffect(() => {
-    Promise.all([
-      apiFetch(apiPath('/api/packages')).then((r) => r.json()),
-      apiFetch(apiPath('/api/payments/offers')).then((r) => r.ok ? r.json() : { offers: [] }),
-      apiFetch(apiPath('/api/legal')).then((r) => r.ok ? r.json() : { checkoutDocuments: [] }),
-      apiFetch(apiPath('/api/usage')).then((r) => r.ok ? r.json() : null),
-      apiFetch(apiPath('/api/config'), { cache: 'no-store' }).then((r) => r.ok ? r.json() : null),
-    ])
-      .then(([packageData, offerData, legalData, usageData, configData]) => {
-        setPackages(packageData.packages || [])
-        setOffers(offerData.offers || [])
-        setLegalDocuments(legalData.checkoutDocuments || [])
-        setPlan(usageData?.plan ?? null)
-        setVideoAvailable(typeof configData?.video === 'boolean' ? configData.video : null)
-        captureAnalytics('package_viewed')
-        if (offerData.offers?.length) captureAnalytics('custom_offer_viewed', { count: offerData.offers.length })
-      })
+    apiFetch(apiPath('/api/packages')).then((r) => r.json())
+      .then((packageData) => { setPackages(packageData.packages || []); captureAnalytics('package_viewed') })
       .catch(() => setError('Paketler yüklenemedi.'))
       .finally(() => setLoading(false))
+    apiFetch(apiPath('/api/payments/offers')).then((r) => r.ok ? r.json() : { offers: [] })
+      .then((offerData) => {
+        setOffers(offerData.offers || [])
+        if (offerData.offers?.length) captureAnalytics('custom_offer_viewed', { count: offerData.offers.length })
+      })
+      .catch(() => setOffers([]))
+    apiFetch(apiPath('/api/legal')).then((r) => r.ok ? r.json() : { checkoutDocuments: [] })
+      .then((legalData) => { setLegalDocuments(legalData.checkoutDocuments || []); setLegalLoaded(true) })
+      .catch(() => setError('Yasal metinler yüklenemedi; satın alma şu an kapalı.'))
+    apiFetch(apiPath('/api/usage')).then((r) => r.ok ? r.json() : null)
+      .then((usageData) => setPlan(usageData?.plan ?? null))
+      .catch(() => setPlan(null))
+    apiFetch(apiPath('/api/config'), { cache: 'no-store' }).then((r) => r.ok ? r.json() : null)
+      .then((configData) => setVideoAvailable(typeof configData?.video === 'boolean' ? configData.video : null))
+      .catch(() => setVideoAvailable(null))
   }, [])
 
   const visible = useMemo(
@@ -154,7 +158,7 @@ export default function PackagesPage() {
     }
   }
 
-  const legalReady = legalDocuments.every((document) => acceptedLegal.includes(document.slug))
+  const legalReady = legalLoaded && legalDocuments.every((document) => acceptedLegal.includes(document.slug))
 
   return (
     <div className="min-h-screen bg-zinc-950">
