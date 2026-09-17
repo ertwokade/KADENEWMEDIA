@@ -8,7 +8,7 @@ import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
 
 interface MailVersion { konu: string; metin: string }
-interface Mail { kisa_versiyon: MailVersion; uzun_versiyon: MailVersion; takip_maili: string; ipuclari: string[] }
+interface Mail { kisa_versiyon: MailVersion; uzun_versiyon: MailVersion; takip_konu?: string; takip_maili: string; ipuclari: string[] }
 
 export default function CollabMailPage() {
   const { selectedModel } = useModel()
@@ -43,7 +43,9 @@ export default function CollabMailPage() {
 
   const activeContent = activeTab === 'kisa' ? data?.kisa_versiyon : activeTab === 'uzun' ? data?.uzun_versiyon : null
   const copy = () => {
-    const text = activeTab === 'takip' ? data?.takip_maili : `Konu: ${activeContent?.konu}\n\n${activeContent?.metin}`
+    const text = activeTab === 'takip'
+      ? data?.takip_maili && (data.takip_konu ? `Konu: ${data.takip_konu}\n\n${data.takip_maili}` : data.takip_maili)
+      : `Konu: ${activeContent?.konu}\n\n${activeContent?.metin}`
     if (!text) return
     navigator.clipboard.writeText(text)
     setCopied(true); setTimeout(() => setCopied(false), 2000)
@@ -116,7 +118,13 @@ export default function CollabMailPage() {
                   </div>
                 )}
                 {activeTab === 'takip' && data.takip_maili && (
-                  <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-5">
+                  <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-5 space-y-3">
+                    {data.takip_konu && (
+                      <div className="bg-zinc-900/50 rounded-lg px-3 py-2">
+                        <span className="text-zinc-500 text-xs">Konu: </span>
+                        <span className="text-zinc-200 text-sm font-medium">{data.takip_konu}</span>
+                      </div>
+                    )}
                     <p className="text-zinc-200 text-sm leading-relaxed whitespace-pre-wrap">{data.takip_maili}</p>
                   </div>
                 )}

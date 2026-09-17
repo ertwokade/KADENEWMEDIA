@@ -1,5 +1,6 @@
 'use client'
 
+import { auditActionLabel, auditOutcomeLabel } from '@/lib/ui/auditLabels'
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { CircleDollarSign, RefreshCw, Send, ShieldCheck } from 'lucide-react'
 import TopBar from '@/components/layout/TopBar'
@@ -104,7 +105,7 @@ export default function OwnerSalesPage() {
             {loading ? <p className="p-5 text-sm text-zinc-500">Yükleniyor…</p> : !data?.orders.length ? <p className="p-5 text-sm text-zinc-500">Henüz sipariş yok.</p> : <div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-xs"><thead className="bg-zinc-950/60 text-zinc-500"><tr><th className="px-4 py-3">Paket</th><th className="px-4 py-3">Tutar</th><th className="px-4 py-3">Durum</th><th className="px-4 py-3">Tarih</th></tr></thead><tbody className="divide-y divide-zinc-800">{data.orders.map((order) => <tr key={order.id}><td className="max-w-[220px] truncate px-4 py-3 text-zinc-300">{order.product_id}</td><td className="px-4 py-3 font-semibold">{money(order.amount_minor)}</td><td className="px-4 py-3"><span className="rounded-full bg-zinc-800 px-2 py-1">{STATUS_LABEL[order.status] || order.status}</span></td><td className="px-4 py-3 text-zinc-500">{new Date(order.created_at).toLocaleString('tr-TR')}</td></tr>)}</tbody></table></div>}
           </section>
         </div>
-        <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"><h2 className="text-sm font-semibold">Son güvenli işlemler</h2><div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{data?.auditEvents.length ? data.auditEvents.map((event) => <div key={event.id} className="rounded-lg border border-zinc-800 bg-zinc-950 p-3"><p className="text-xs font-medium text-zinc-300">{event.action}</p><p className="mt-1 text-[11px] text-zinc-600">{event.outcome} · {new Date(event.created_at).toLocaleString('tr-TR')}</p></div>) : <p className="text-xs text-zinc-500">Henüz audit kaydı yok.</p>}</div></section>
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-5"><h2 className="text-sm font-semibold">Son güvenli işlemler</h2><div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{data?.auditEvents.length ? data.auditEvents.map((event) => <div key={event.id} className="rounded-lg border border-zinc-800 bg-zinc-950 p-3"><p className="text-xs font-medium text-zinc-300">{auditActionLabel(event.action)}</p><p className="mt-1 text-[11px] text-zinc-500">{auditOutcomeLabel(event.outcome)} · {new Date(event.created_at).toLocaleString('tr-TR')}</p></div>) : <p className="text-xs text-zinc-500">Henüz güvenlik kaydı yok.</p>}</div></section>
       </div></div>
     </div>
   )

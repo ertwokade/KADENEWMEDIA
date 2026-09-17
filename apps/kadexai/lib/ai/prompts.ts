@@ -313,7 +313,8 @@ JSON formatı:
 {
   "kisa_versiyon": { "konu": "mail konusu", "metin": "mail metni" },
   "uzun_versiyon": { "konu": "mail konusu", "metin": "mail metni" },
-  "takip_maili": "3 gün sonra gönderilecek takip maili",
+  "takip_konu": "takip mailinin konu satırı",
+  "takip_maili": "3 gün sonra gönderilecek takip maili (konu satırı hariç)",
   "ipuclari": ["önemli nokta 1", "önemli nokta 2"]
 }`
 }

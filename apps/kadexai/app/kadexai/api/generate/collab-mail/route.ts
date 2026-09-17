@@ -27,6 +27,8 @@ export async function POST(req: NextRequest) {
     const mail = {
       kisa_versiyon: { konu: asText(short?.konu, 300), metin: asText(short?.metin, 8_000) },
       uzun_versiyon: { konu: asText(long?.konu, 300), metin: asText(long?.metin, 12_000) },
+      // Model konu yazmazsa takip, ilk mailin konusuna yanıt olarak gider.
+      takip_konu: asText(parsed?.takip_konu, 300) || (asText(short?.konu, 300) ? `Re: ${asText(short?.konu, 300)}` : ''),
       takip_maili: asText(parsed?.takip_maili, 8_000),
       ipuclari: asTextList(parsed?.ipuclari, 20, 1_000),
     }

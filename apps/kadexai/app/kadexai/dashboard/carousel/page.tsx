@@ -6,6 +6,10 @@ import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
+import CopyButton from '@/components/ui/CopyButton'
+import Link from 'next/link'
+import { calendarHref } from '@/lib/client/calendarLink'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 import { cn, getPlatformLabel } from '@/lib/utils'
 import type { Platform } from '@/types'
 
@@ -25,6 +29,7 @@ export default function CarouselPage() {
   const { selectedModel } = useModel()
   const [topic, setTopic] = useState('')
   const [platform, setPlatform] = useState('instagram')
+  const workspaceHref = useWorkspaceHref()
   const [slideCount, setSlideCount] = useState(7)
   const [tone, setTone] = useState('bilgilendirici')
   const [loading, setLoading] = useState(false)
@@ -106,7 +111,15 @@ export default function CarouselPage() {
             {loading && <LoadingState model={selectedModel} />}
             {carousel && !loading && (
               <div className="space-y-4">
-                <p className="text-zinc-400 text-sm font-medium">{carousel.baslik}</p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <p className="flex-1 text-zinc-400 text-sm font-medium">{carousel.baslik}</p>
+                  <CopyButton text={[
+                    carousel.baslik, '',
+                    ...(carousel.slayts ?? []).map((slide) => `${slide.no}. ${slide.baslik}\n${slide.metin}`),
+                    '', carousel.caption, (carousel.hashtags ?? []).join(' '),
+                  ].filter((line) => line !== undefined).join('\n').trim()} />
+                  <Link prefetch={false} href={workspaceHref(calendarHref(carousel.baslik, platform))} className="text-xs text-violet-400 hover:text-violet-300">Takvime ekle →</Link>
+                </div>
                 {/* Slide navigator */}
                 <div className="flex gap-1.5 flex-wrap">
                   {carousel.slayts?.map((_, i) => (

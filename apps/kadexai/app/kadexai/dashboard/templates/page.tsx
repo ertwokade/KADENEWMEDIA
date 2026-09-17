@@ -41,6 +41,9 @@ export default function TemplatesPage() {
   const [baslik, setBaslik] = useState('')
   const [icerik, setIcerik] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
+  // Başlangıç şablonu düzenlenince yeni kayıt olarak kopyalanır; form bunu açıkça söyler.
+  const [starterSource, setStarterSource] = useState<string | null>(null)
+  const [notice, setNotice] = useState('')
   const [filterKategori, setFilterKategori] = useState('Tümü')
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [syncError, setSyncError] = useState('')
@@ -77,7 +80,8 @@ export default function TemplatesPage() {
       const saved = readTemplate(data.template)
       if (editingId && saved.id !== editingId) throw new Error('Şablon yanıtı kayıtla eşleşmedi.')
       setTemplates(current => editingId ? current.map(t => t.id === editingId ? saved : t) : [saved, ...current])
-      setEditingId(null); setBaslik(''); setIcerik(''); setKategori('Hook')
+      setNotice(editingId ? 'Şablon güncellendi.' : starterSource ? 'Başlangıç şablonundan kopya hesabına kaydedildi.' : 'Şablon eklendi.')
+      setEditingId(null); setStarterSource(null); setBaslik(''); setIcerik(''); setKategori('Hook')
     } catch (error) { setSyncError(error instanceof Error ? error.message : 'Şablon kaydedilemedi.') }
     finally { setPending(false) }
   }
@@ -85,6 +89,8 @@ export default function TemplatesPage() {
   const handleEdit = (t: Template) => {
     if (pending) return
     setEditingId(isStarter(t.id) ? null : t.id)
+    setStarterSource(isStarter(t.id) ? t.baslik : null)
+    setNotice('')
     setKategori(t.kategori)
     setBaslik(t.baslik)
     setIcerik(t.icerik)
@@ -134,10 +140,10 @@ export default function TemplatesPage() {
             <div className="rounded-xl border border-zinc-700/50 bg-zinc-800/50 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-zinc-200 text-sm font-semibold">
-                  {editingId ? 'Şablonu Düzenle' : 'Yeni Şablon'}
+                  {editingId ? 'Şablonu Düzenle' : starterSource ? 'Başlangıç Şablonunu Kopyala' : 'Yeni Şablon'}
                 </h3>
-                {editingId && (
-                  <button disabled={pending} aria-label="Düzenlemeyi iptal et" onClick={() => { setEditingId(null); setBaslik(''); setIcerik('') }}
+                {(editingId || starterSource) && (
+                  <button disabled={pending} aria-label="Düzenlemeyi iptal et" onClick={() => { setEditingId(null); setStarterSource(null); setBaslik(''); setIcerik('') }}
                     className="text-zinc-500 hover:text-zinc-300 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
@@ -164,7 +170,7 @@ export default function TemplatesPage() {
               </div>
               <button onClick={handleSave} disabled={loading || !!loadError || pending || !baslik.trim() || !icerik.trim()}
                 className="w-full py-2.5 rounded-lg bg-[#f2c322] text-zinc-950 text-sm font-medium hover:bg-[#ffda3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
-                {pending ? 'Kaydediliyor…' : editingId ? <><Save className="w-4 h-4" />Kaydet</> : <><Plus className="w-4 h-4" />Ekle</>}
+                {pending ? 'Kaydediliyor…' : editingId || starterSource ? <><Save className="w-4 h-4" />{editingId ? 'Kaydet' : 'Kopyayı kaydet'}</> : <><Plus className="w-4 h-4" />Ekle</>}
               </button>
             </div>
           </div>
@@ -173,6 +179,7 @@ export default function TemplatesPage() {
             {loadError && <div role="alert" className="mb-4 rounded-lg border border-amber-800/50 bg-amber-950/20 p-3 text-xs text-amber-300">
               <p>{loadError}</p><button onClick={() => setRevision(value => value + 1)} className="min-h-11 underline">Yeniden dene</button>
             </div>}
+            {notice && <div role="status" className="mb-4 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-xs text-emerald-300">{notice}</div>}
             {syncError && <div role="alert" className="mb-4 rounded-lg border border-amber-800/50 bg-amber-950/20 p-3 text-xs text-amber-300">{syncError}</div>}
             <p className="mb-3 text-xs text-zinc-500">Başlangıç seti hazır örneklerden oluşur; düzenlediğinde hesabına yeni bir şablon olarak kaydedilir. Kişisel şablonlar yalnız bu hesaptan okunur.</p>
             <div className="flex items-center gap-2 flex-wrap mb-4">
@@ -214,7 +221,7 @@ export default function TemplatesPage() {
                       </div>
                     </div>
                     <p className="text-zinc-400 text-xs leading-relaxed line-clamp-3">{t.icerik}</p>
-                    <p className="text-zinc-700 text-[10px] mt-2">{t.tarih}</p>
+                    <p className="text-zinc-500 text-[10px] mt-2">{t.tarih}</p>
                   </div>
                 ))}
               </div>
