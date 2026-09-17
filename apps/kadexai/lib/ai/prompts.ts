@@ -419,7 +419,7 @@ export const CONTENT_PLAN_SYSTEM_PROMPT = `Sen içerik stratejisti ve sosyal med
 30 günlük içerik planları oluşturuyorsun: dengeli içerik karışımı (eğitici, eğlenceli, tanıtım, kişisel).
 Her gün için spesifik fikir, format ve platform önerisi. Yanıtını SADECE JSON formatında ver.`
 
-export function buildContentPlanPrompt(niche: string, platform: string, goal: string, frequency: string): string {
+export function buildContentPlanPrompt(niche: string, platform: string, goal: string, frequency: string, slots: { gun: number; etiket: string }[] = []): string {
   const bugun = new Intl.DateTimeFormat('tr-TR', {
     timeZone: 'Europe/Istanbul',
     dateStyle: 'long',
@@ -430,7 +430,11 @@ Platform: ${platform}
 Hedef: ${goal}
 Yayın sıklığı: ${frequency}
 
-Bugünden başlayarak 30 günlük detaylı içerik planı oluştur. Haftalık temalar belirle, her gün spesifik post fikri ver. Başlıklarda geçmiş yılları güncelmiş gibi kullanma; tarih veya yıl gerekiyorsa bugünün tarihini esas al.
+Bugünden başlayarak 30 günlük içerik planı oluştur. 5 haftalık tema belirle (5. hafta yalnız 29–30. günleri kapsar).${slots.length ? `
+Yayın günleri sabittir. "gunler" dizisinde TAM ${slots.length} öğe olsun ve sırası şu günlerle birebir eşleşsin:
+${slots.map((slot) => `- gün ${slot.gun}: ${slot.etiket}`).join('\n')}
+Başka gün ekleme, gün atlama.` : ''}
+Başlıklar Türkçe olsun; İngilizce kelime karıştırma. Başlıklarda geçmiş yılları güncelmiş gibi kullanma; tarih veya yıl gerekiyorsa bugünün tarihini esas al.
 İçerik karışımı: %40 eğitici, %30 eğlenceli/trending, %20 kişisel/behind-scenes, %10 tanıtım.
 JSON formatı:
 {

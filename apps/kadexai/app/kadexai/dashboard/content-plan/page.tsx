@@ -11,10 +11,12 @@ import LoadingState from '@/components/ui/LoadingState'
 import { cn, getPlatformLabel } from '@/lib/utils'
 import RawModelOutput from '@/components/ui/RawModelOutput'
 import { Platform } from '@/types'
+import { addDays, istanbulToday, planWeek } from '@/lib/contentPlan'
+import { useWorkspaceHref } from '@/lib/workspace/WorkspaceContext'
 
-interface DayPlan { gun: number; tarih_onerisi: string; icerik_turu: string; baslik: string; format: string; aciklama: string; ipucu: string }
+interface DayPlan { gun: number; tarih?: string; tarih_onerisi: string; icerik_turu: string; baslik: string; format: string; aciklama: string; ipucu: string }
 interface WeekTheme { hafta: number; tema: string; hedef: string }
-interface Plan { strateji: string; haftalik_temalar: WeekTheme[]; gunler: DayPlan[]; kpi_hedefleri: Record<string, string>; raw?: string }
+interface Plan { strateji: string; haftalik_temalar: WeekTheme[]; gunler: DayPlan[]; kpi_hedefleri: Record<string, string>; baslangic?: string; raw?: string }
 
 const typeColors: Record<string, string> = {
   egitici: 'bg-blue-500/20 text-blue-300',
@@ -26,6 +28,7 @@ const typeColors: Record<string, string> = {
 
 export default function ContentPlanPage() {
   const router = useRouter()
+  const workspaceHref = useWorkspaceHref()
   const { selectedModel } = useModel()
   const [niche, setNiche] = useState('')
   const [platform, setPlatform] = useState('youtube')
@@ -61,29 +64,24 @@ export default function ContentPlanPage() {
       if (!res.ok) throw new Error(json.error)
       setData(json.plan)
       setPlanPlatform(platform)
-      setPlanStart(new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()))
+      setPlanStart(json.plan.baslangic || istanbulToday())
     } catch (e) { setError(e instanceof Error ? e.message : 'Hata') }
     finally { setLoading(false) }
   }
 
-  const weekDays = data?.gunler?.filter((d) => Math.ceil(d.gun / 7) === activeWeek) ?? []
+  const weekDays = data?.gunler?.filter((d) => planWeek(d.gun) === activeWeek) ?? []
 
   const addPlanToCalendar = async () => {
     if (!data?.gunler?.length || calendarSaving || calendarStatus) return
     setCalendarError('')
     const validPlatforms: Platform[] = ['youtube', 'instagram', 'tiktok', 'x', 'linkedin', 'pinterest']
     const selectedPlatform = validPlatforms.includes(planPlatform as Platform) ? planPlatform as Platform : 'youtube'
-    const toDate = (offset: number) => {
-      const date = new Date(`${planStart}T12:00:00Z`)
-      date.setUTCDate(date.getUTCDate() + offset)
-      return date.toISOString().slice(0, 10)
-    }
     if (data.gunler.some(day => !Number.isInteger(day.gun) || day.gun < 1 || day.gun > 30 || typeof day.baslik !== 'string' || !day.baslik.trim())) {
       setCalendarError('Planda geçersiz gün veya boş başlık var; takvime eksik aktarım yapılmadı.')
       return
     }
     const planned = data.gunler.map(day => ({
-      date: toDate(day.gun - 1),
+      date: /^\d{4}-\d{2}-\d{2}$/.test(day.tarih ?? '') ? day.tarih as string : addDays(planStart, day.gun - 1),
       title: day.baslik.trim(),
       platform: selectedPlatform,
       status: 'taslak' as const,
@@ -177,10 +175,10 @@ export default function ContentPlanPage() {
                     {calendarSaving ? 'Takvime kaydediliyor…' : calendarStatus ? 'Plan takvime aktarıldı' : 'Planı İçerik Takvimi’ne Aktar'}
                   </button>
                   {calendarStatus && <span role="status" className="text-xs text-emerald-400">{calendarStatus}</span>}
-                  {(calendarStatus || calendarError) && <button type="button" onClick={() => router.push('/kadexai/dashboard/calendar')} className="min-h-11 text-xs font-medium text-violet-300 hover:text-violet-200">Takvimi aç →</button>}
+                  {(calendarStatus || calendarError) && <button type="button" onClick={() => router.push(workspaceHref('/kadexai/dashboard/calendar'))} className="min-h-11 text-xs font-medium text-violet-300 hover:text-violet-200">Takvimi aç →</button>}
                 </div>
                 {calendarError && <p role="alert" className="text-xs text-red-400">{calendarError}</p>}
-                <p className="text-xs text-zinc-500">Takvim tarihleri planın oluşturulduğu İstanbul gününden itibaren hesaplanır. Aktarım otomatik yayınlama yapmaz.</p>
+                <p className="text-xs text-zinc-500">Takvime her içerik plandaki tarihiyle aktarılır. Aktarım otomatik yayınlama yapmaz.</p>
                 {data.strateji && (
                   <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-4">
                     <p className="text-violet-400 text-xs font-semibold mb-1">Strateji</p>
