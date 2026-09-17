@@ -82,7 +82,12 @@ export default function WorkspaceAssistant() {
   const oturumRef = useRef<KayitOturumu | null>(null)
   const sesRef = useRef<HTMLAudioElement | null>(null)
 
+  // Düğme sunucu HTML'inde görünüp hidrasyon bitmeden tıklanınca tepki vermiyordu
+  // ("ilk tıklamada açılmıyor"); yalnız tıklanabilir olduğunda gösterilir.
+  const [hazir, setHazir] = useState(false)
+
   useEffect(() => {
+    setHazir(true)
     setSesDestegi(sesKaydiDesteklenir())
     setMesajlar(kayitliMesajlar())
     try { setSesliCevap(window.localStorage.getItem(SES_ANAHTARI) === '1') } catch { /* tercih okunamazsa kapalı kalır */ }
@@ -252,6 +257,8 @@ export default function WorkspaceAssistant() {
       setYukleniyor(false)
     }
   }
+
+  if (!hazir) return null
 
   return (
     <>
