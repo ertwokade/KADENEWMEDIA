@@ -77,6 +77,8 @@ export default function MateryalPage() {
   const [toplaniyor, setToplaniyor] = useState(false)
   const [hata, setHata] = useState<string | null>(null)
   const [acik, setAcik] = useState<MaterialRow | null>(null)
+  const [gizlenen, setGizlenen] = useState(0)
+  const [gercekSure, setGercekSure] = useState<number | null>(null)
 
   const getir = useCallback(async (offset = 0) => {
     const request = ++requestId.current
@@ -95,8 +97,10 @@ export default function MateryalPage() {
       setMateryaller(previous => offset ? [...new Map([...previous, ...veri.materyaller].map(item => [item.id, item])).values()] : veri.materyaller)
       setToplam(veri.istatistik.toplam)
       setCanCollect(veri.canCollect === true)
-      setDevamiVar(veri.materyaller.length === 60)
-      setNextOffset(offset + veri.materyaller.length)
+      const hamAdet = Number.isFinite(veri.hamAdet) ? veri.hamAdet : veri.materyaller.length
+      setDevamiVar(hamAdet === 60)
+      setNextOffset(offset + hamAdet)
+      setGizlenen((previous) => (offset ? previous : 0) + (Number(veri.gizlenen) || 0))
       setSonKosu(veri.istatistik?.sonKosu ?? null)
     } catch (e) {
       if (request !== requestId.current) return
@@ -189,7 +193,7 @@ export default function MateryalPage() {
             onChange={(e) => setSirala(e.target.value)}
             className="px-3 py-2 rounded-lg bg-[var(--kade-surface-soft)] border border-[var(--kade-line)] text-sm outline-none"
           >
-            {SORTS.map((s) => (
+            {SORTS.filter((s) => s.key !== 'sure' || materyaller.some((m) => m.duration_sec != null)).map((s) => (
               <option key={s.key} value={s.key}>{s.label}</option>
             ))}
           </select>
@@ -207,6 +211,7 @@ export default function MateryalPage() {
 
         <p className="text-xs text-[var(--kade-faint)]">
           {toplam == null ? 'Materyal sayısı henüz doğrulanmadı' : `Havuzda ${toplam.toLocaleString('tr-TR')} materyal`} · {ozet}
+          {gizlenen > 0 && ` · ${gizlenen} materyal içerik politikası nedeniyle listelenmedi`}
         </p>
 
         {toplamaOzeti && (
@@ -238,7 +243,7 @@ export default function MateryalPage() {
               >
                 <button
                   type="button"
-                  onClick={() => { setOnizlemeHatasi(false); setAcik(m) }}
+                  onClick={() => { setOnizlemeHatasi(false); setGercekSure(null); setAcik(m) }}
                   className="relative block w-full aspect-video bg-black/30 overflow-hidden cursor-zoom-in"
                   aria-label={`${m.title} önizle`}
                 >
@@ -328,13 +333,13 @@ export default function MateryalPage() {
             {onizlemeHatasi || (!acik.media_url && !acik.thumbnail) ? (
               <p role="status" className="py-16 text-center">Önizleme açılamadı: kaynak dosyaya şu anda erişilemiyor. Materyali aşağıdaki kaynak sayfasından inceleyebilirsin.</p>
             ) : acik.kind === 'video' && acik.media_url ? (
-              <video src={apiPath(`/api/materials/download?id=${encodeURIComponent(acik.id)}&inline=1`)} poster={acik.thumbnail ? apiPath(`/api/materials/thumbnail?id=${encodeURIComponent(acik.id)}`) : undefined} onError={() => setOnizlemeHatasi(true)} controls autoPlay className="w-full max-h-[65dvh] rounded-xl bg-black" />
+              <video src={apiPath(`/api/materials/download?id=${encodeURIComponent(acik.id)}&inline=1`)} poster={acik.thumbnail ? apiPath(`/api/materials/thumbnail?id=${encodeURIComponent(acik.id)}`) : undefined} onError={() => setOnizlemeHatasi(true)} onLoadedMetadata={(event) => setGercekSure(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : null)} controls autoPlay className="w-full max-h-[65dvh] rounded-xl bg-black" />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={apiPath(`/api/materials/thumbnail?id=${encodeURIComponent(acik.id)}`)} onError={() => setOnizlemeHatasi(true)} alt={acik.title} className="w-full max-h-[65dvh] object-contain rounded-xl" />
             )}
             <div className="flex items-center justify-between gap-4 mt-3">
-              <p id="material-preview-title" className="text-sm">{acik.title}</p>
+              <p id="material-preview-title" className="text-sm">{acik.title}{gercekSure != null && <span className="ml-2 text-xs text-[var(--kade-faint)]">{sureMetni(gercekSure)}</span>}</p>
               {acik.media_url && (
                 <a
                   href={apiPath(`/api/materials/download?id=${encodeURIComponent(acik.id)}`)}

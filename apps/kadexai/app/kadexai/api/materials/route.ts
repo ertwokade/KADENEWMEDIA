@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { materialStats, queryMaterials } from '@/lib/materials/store'
+import { presentMaterials } from '@/lib/materials/present'
 import { boundedNumber } from '@/lib/kade-search/filters'
 import { getAuthenticatedUser } from '@/lib/auth/server'
 import { isSettingsOwnerUser } from '@/lib/featureAccess'
@@ -20,9 +21,11 @@ export async function GET(req: NextRequest) {
       limit: boundedNumber(params.get('limit'), 60, 1, 120),
       offset: boundedNumber(params.get('offset'), 0, 0, 100_000),
     }
-    const [materyaller, istatistik] = await Promise.all([queryMaterials(filters), materialStats()])
+    const [rows, istatistik] = await Promise.all([queryMaterials(filters), materialStats()])
+    const { visible: materyaller, hidden } = presentMaterials(rows)
     const canCollect = isSettingsOwnerUser(await getAuthenticatedUser())
-    return NextResponse.json({ adet: materyaller.length, filtreler: filters, istatistik, materyaller, canCollect })
+    // hamAdet sayfalama içindir: gizlenen kayıtlar "daha fazla göster"i bozmasın.
+    return NextResponse.json({ adet: materyaller.length, hamAdet: rows.length, gizlenen: hidden, filtreler: filters, istatistik, materyaller, canCollect })
   } catch (e) {
     return failure(e, 'Materyaller getirilemedi.')
   }

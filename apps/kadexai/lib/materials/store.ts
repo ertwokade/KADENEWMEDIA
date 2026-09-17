@@ -6,6 +6,7 @@ import 'server-only'
  * Okuma kullanicinin oturumuyla (RLS gecerli), yazma yalnizca service-role ile
  * yapilir; havuz ortak oldugu icin toplama isi kisiye bagli degildir.
  */
+import { isSensitiveMaterial } from './present'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { normalizeTitle } from './arsivhub'
@@ -139,6 +140,8 @@ export async function getMaterialById(id: string) {
     .eq('id', id)
     .maybeSingle()
   if (error) throw new Error(error.message)
+  // Listede gizlenen hassas materyal kimliğiyle de açılamaz.
+  if (data && isSensitiveMaterial(data)) return null
   return data ?? null
 }
 
