@@ -45,7 +45,7 @@ function pickList(data: unknown): Array<Record<string, unknown>> {
   if (!data) return []
   const root = data as Record<string, unknown>
   const d = (root.data ?? root) as Record<string, unknown>
-  for (const key of ['list', 'hashtag_list', 'music_list', 'creator_list', 'materials', 'videos', 'items']) {
+  for (const key of ['list', 'hashtag_list', 'music_list', 'sound_list', 'creator_list', 'materials', 'videos', 'items']) {
     if (Array.isArray(d?.[key])) return d[key] as Array<Record<string, unknown>>
   }
   if (Array.isArray(d)) return d as Array<Record<string, unknown>>
@@ -83,14 +83,18 @@ async function fetchHashtags(country: string, period: number, limit: number): Pr
 }
 
 async function fetchSongs(country: string, period: number, limit: number): Promise<RawTrendItem[]> {
-  const url = `${BASE}/popular_trend/music/list?page=1&limit=${Math.min(limit, 50)}&period=${period}&country_code=${country}&rank_type=popular&commercial_music=false`
-  const res = await getJson(url, { headers: headers(country), label: `tiktok-music-${country}` })
+  // TikTok eski music/list ucunu kaldırdı (17.09.2026 canlı kontrol: 404); ses sıralaması sound/rank_list'te.
+  const query = `page=1&limit=${Math.min(limit, 50)}&period=${period}&country_code=${country}&rank_type=popular&commercial_music=false`
+  let res = await getJson(`${BASE}/popular_trend/sound/rank_list?${query}`, { headers: headers(country), label: `tiktok-sound-${country}` })
+  if (!res.ok && res.status === 404) {
+    res = await getJson(`${BASE}/popular_trend/music/list?${query}`, { headers: headers(country), label: `tiktok-music-${country}` })
+  }
   if (!res.ok) throw new Error(`şarkı listesi alınamadı: ${res.error}`)
 
   return pickList(res.data).map((m, i) => ({
     platform: 'tiktok',
     kind: 'sound',
-    external_id: str(m.song_id ?? m.music_id ?? m.clip_id ?? m.title),
+    external_id: str(m.song_id ?? m.music_id ?? m.clip_id ?? m.sound_id ?? m.title),
     title: str(m.title ?? m.song_name ?? m.music_name, 'Bilinmeyen ses'),
     author: (m.author ?? m.artist ?? m.author_name) ? str(m.author ?? m.artist ?? m.author_name) : null,
     url: str(m.link ?? m.song_url) || (m.song_id ? `https://www.tiktok.com/music/x-${str(m.song_id)}` : null),
