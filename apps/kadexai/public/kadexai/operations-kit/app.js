@@ -2039,7 +2039,24 @@ function renderCalendarDay(){
       <div class="cal-day-main"><strong>${esc(x.prod.title||"Adsız")}</strong><span>${x.tur==="shoot"?"Çekim":"Yayın"} · ${esc(x.prod.owner||"atanmamış")}</span></div>
       <span class="cal-day-stage">${esc((stages.find(st=>st.id===x.prod.stage)||{}).label||x.prod.stage||"")}</span>
     </div>`).join(""):'<p class="empty-hint">Bu güne planlanmış iş yok.</p>';
+  liste.insertAdjacentHTML("beforeend",`<div class="cal-day-add" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+    <button type="button" class="ghost-btn" style="font-size:12px" onclick="addCalendarProduction('shoot')"><i data-lucide="clapperboard" style="width:13px;height:13px"></i> Çekim ekle</button>
+    <button type="button" class="ghost-btn" style="font-size:12px" onclick="addCalendarProduction('publish')"><i data-lucide="send" style="width:13px;height:13px"></i> Yayın ekle</button>
+  </div>`);
   refreshIcons();
+}
+
+// Takvimden seçili güne doğrudan çekim veya yayın kaydı açar (CRM kartı olarak).
+async function addCalendarProduction(tur){
+  if(!calendarSelected)return;
+  const values=await uiPrompt(tur==="shoot"?"Bu güne çekim ekle":"Bu güne yayın ekle",[{label:"Prodüksiyon adı",required:true}]);
+  const title=values?.[0]; if(!title)return;
+  snapshotUndo();
+  const prod={id:uid("p"),title,channel:state.settings.teamName||"Kade New Media",stage:"draft",shootDate:tur==="shoot"?calendarSelected:"",publishDate:tur==="publish"?calendarSelected:"",ideaId:"",owner:state.settings.members[0]||"Operasyon",tags:[],updates:[`Takvimden ${tur==="shoot"?"çekim":"yayın"} günü ${calendarSelected} olarak eklendi.`],tasks:[],budgets:[{category:"Hazırlık",items:[]}]};
+  state.productions.unshift(prod);
+  saveState();renderAll();renderCalendar();
+  showToast(`"${title}" takvime eklendi`,"success");
+  logActivity(`Takvime ${tur==="shoot"?"çekim":"yayın"} eklendi: ${title}`,"success");
 }
 
 // ── MÜŞTERİ & TESLİM ─────────────────────────────────────────────────
