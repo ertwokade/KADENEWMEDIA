@@ -1,6 +1,7 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
+import { collectedEvidenceText, findCollectedContent } from '@/lib/client/collectedEvidence'
 import { FormEvent, useState, useEffect } from 'react'
 import { readPrefill, splitList } from '@/lib/client/prefill'
 import TopBar from '@/components/layout/TopBar'
@@ -72,29 +73,25 @@ export default function SocialAuditPage() {
 
   const importMaterials = async () => {
     const query = accountName.trim()
-    if (!query) return
+    if (!query) { setMaterialNotice('Önce hesap adını yaz; toplanmış içerik bu adla aranır.'); return }
     setImportingMaterials(true)
     setMaterialNotice('')
     try {
-      const response = await apiFetch(`/api/materials?q=${encodeURIComponent(query)}&sort=yeni&limit=20`, { cache: 'no-store' })
-      const payload = await response.json()
-      if (!response.ok) throw new Error(payload.error || 'Materyal havuzu okunamadı.')
-      const materials = Array.isArray(payload.materyaller) ? payload.materyaller : []
-      if (!materials.length) {
-        setMaterialNotice('Bu hesap adıyla eşleşen toplanmış içerik bulunamadı; alanları elle tamamlayabilirsin.')
+      const items = await findCollectedContent(query)
+      if (!items.length) {
+        setMaterialNotice(`"${query}" adıyla Materyal Kütüphanesi'nde veya Trend Radar'da toplanmış içerik bulunamadı; alanları elle tamamlayabilirsin.`)
         return
       }
-      const lines = materials.map((item: Record<string, unknown>) => [item.title, item.page_url].filter(Boolean).join(' — ')).filter(Boolean)
-      const views = materials.map((item: Record<string, unknown>) => Number(item.view_count)).filter((value: number) => Number.isFinite(value) && value >= 0)
-      setRecentPosts(lines.join('\n'))
+      const views = items.map((item) => item.views).filter((value): value is number => value != null)
+      setRecentPosts(collectedEvidenceText(items))
       setMetricValues((current) => ({
         ...current,
-        total_content: String(materials.length),
-        ...(views.length ? { avg_views: String(Math.round(views.reduce((sum: number, value: number) => sum + value, 0) / views.length)) } : {}),
+        total_content: String(items.length),
+        ...(views.length ? { avg_views: String(Math.round(views.reduce((sum, value) => sum + value, 0) / views.length)) } : {}),
       }))
-      setMaterialNotice(`${materials.length} gerçek materyal eşleşmesi forma aktarıldı${views.length ? '; ortalama görüntülenme hesaplandı' : ''}.`)
+      setMaterialNotice(`${items.length} toplanmış içerik forma aktarıldı${views.length ? '; ortalama görüntülenme hesaplandı' : ''}.`)
     } catch (reason) {
-      setMaterialNotice(reason instanceof Error ? reason.message : 'Materyal havuzu okunamadı.')
+      setMaterialNotice(reason instanceof Error ? reason.message : 'Toplanmış içerikler okunamadı.')
     } finally {
       setImportingMaterials(false)
     }
@@ -141,10 +138,10 @@ export default function SocialAuditPage() {
                   placeholder="Kadir Demir / Kade Media"
                   className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-yellow-400 focus:outline-none"
                 />
-                <button type="button" onClick={importMaterials} disabled={importingMaterials || !accountName.trim()}
+                <button type="button" onClick={importMaterials} disabled={importingMaterials}
                   className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-3 py-2 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/15 disabled:opacity-40">
                   {importingMaterials ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Database className="h-3.5 w-3.5" />}
-                  Materyal havuzundaki gerçek veriyi getir
+                  Toplanmış gerçek veriyi getir
                 </button>
                 {materialNotice && <p className="mt-2 text-[11px] leading-4 text-zinc-500">{materialNotice}</p>}
               </div>

@@ -1,11 +1,13 @@
 'use client'
 
 import { apiFetch } from '@/lib/client/api'
+import { collectedEvidenceText, findCollectedContent } from '@/lib/client/collectedEvidence'
 import { useState, useEffect } from 'react'
 import { readPrefill } from '@/lib/client/prefill'
 import { useModel } from '@/lib/context/ModelContext'
 import TopBar from '@/components/layout/TopBar'
 import LoadingState from '@/components/ui/LoadingState'
+import CopyButton from '@/components/ui/CopyButton'
 import { cn, getPlatformLabel } from '@/lib/utils'
 import { Database, Loader2 } from 'lucide-react'
 import type { Platform } from '@/types'
@@ -32,26 +34,19 @@ export default function CompetitorPage() {
 
   const importMaterials = async () => {
     const query = competitorInfo.trim().split(/\n/)[0]?.slice(0, 120)
-    if (!query) return
+    if (!query) { setMaterialNotice('Önce ilk satıra rakip kanal adını yaz; toplanmış içerik bu adla aranır.'); return }
     setImportingMaterials(true)
     setMaterialNotice('')
     try {
-      const response = await apiFetch(`/api/materials?q=${encodeURIComponent(query)}&sort=izlenme&limit=20`, { cache: 'no-store' })
-      const payload = await response.json()
-      if (!response.ok) throw new Error(payload.error || 'Materyal havuzu okunamadı.')
-      const materials = Array.isArray(payload.materyaller) ? payload.materyaller : []
-      if (!materials.length) {
-        setMaterialNotice('Bu adla eşleşen toplanmış rakip içeriği bulunamadı.')
+      const items = await findCollectedContent(query)
+      if (!items.length) {
+        setMaterialNotice(`"${query}" adıyla Materyal Kütüphanesi'nde veya Trend Radar'da toplanmış rakip içeriği bulunamadı.`)
         return
       }
-      const evidence = materials.map((item: Record<string, unknown>) => {
-        const views = Number(item.view_count)
-        return `- ${String(item.title || 'Başlıksız')} | ${Number.isFinite(views) ? `${views.toLocaleString('tr-TR')} görüntülenme` : 'görüntülenme yok'} | ${String(item.page_url || '')}`
-      }).join('\n')
-      setCompetitorInfo((current) => `${current}\n\nMateryal Kütüphanesi'nden toplanan kanıtlar (${materials.length}):\n${evidence}`.trim())
-      setMaterialNotice(`${materials.length} gerçek materyal kaydı rakip briefine eklendi.`)
+      setCompetitorInfo((current) => `${current}\n\nToplanmış gerçek içerikler (${items.length}):\n${collectedEvidenceText(items)}`.trim())
+      setMaterialNotice(`${items.length} toplanmış içerik rakip briefine eklendi.`)
     } catch (reason) {
-      setMaterialNotice(reason instanceof Error ? reason.message : 'Materyal havuzu okunamadı.')
+      setMaterialNotice(reason instanceof Error ? reason.message : 'Toplanmış içerikler okunamadı.')
     } finally {
       setImportingMaterials(false)
     }
@@ -101,7 +96,7 @@ export default function CompetitorPage() {
                 <textarea value={competitorInfo} onChange={(e) => setCompetitorInfo(e.target.value)} rows={6}
                   placeholder="Rakip kanal adı, URL, içerik tipi, abone sayısı, ne hakkında içerik yapıyor gibi bilgileri gir..."
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-[#f2c322] resize-none" />
-                <button type="button" onClick={importMaterials} disabled={importingMaterials || !competitorInfo.trim()}
+                <button type="button" onClick={importMaterials} disabled={importingMaterials}
                   className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-3 py-2 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/15 disabled:opacity-40">
                   {importingMaterials ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Database className="h-3.5 w-3.5" />}
                   Havuzdaki gerçek eşleşmeleri ekle
@@ -119,7 +114,16 @@ export default function CompetitorPage() {
             {loading && <LoadingState model={selectedModel} />}
             {data && !loading && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="flex justify-end">
+                  <CopyButton text={[
+                    'Güçlü yönleri:', ...(data.guclu_yonler ?? []).map((g) => `- ${g}`),
+                    '', 'Zayıf yönleri:', ...(data.zayif_yonler ?? []).map((z) => `- ${z}`),
+                    ...(data.farklilasma_stratejisi ? ['', `Farklılaşma stratejisi: ${data.farklilasma_stratejisi}`] : []),
+                    ...(data.fırsatlar?.length ? ['', 'Fırsatlar:', ...data.fırsatlar.map((f) => `- ${f.firsat} (${f.oncelik}): ${f.nasil_kullan}`)] : []),
+                    ...(data.hemen_uygulanabilir?.length ? ['', 'Hemen uygula:', ...data.hemen_uygulanabilir.map((a, i) => `${i + 1}. ${a}`)] : []),
+                  ].join('\n')} />
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
                     <p className="text-emerald-400 text-xs font-semibold mb-2">Güçlü Yönleri</p>
                     <ul className="space-y-1">{data.guclu_yonler?.map((g, i) => <li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-emerald-500">✓</span>{g}</li>)}</ul>

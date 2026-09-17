@@ -21,8 +21,9 @@ export default function LoadingState({ model, className, label, longRunning = fa
   }, [])
 
   const config = model ? getModelConfig(model) : null
+  // Otomatik seçimde model birkaç saniyede seçilir; "seçiliyor" metni tüm süre boyunca kalmasın.
   const baseMessage = label || (model === 'auto'
-    ? 'Uygun model seçiliyor'
+    ? elapsed < 4 ? 'Uygun model seçiliyor' : 'AI çalışıyor'
     : config
       ? `${config.shortLabel} çalışıyor`
       : 'Model çalışıyor')
