@@ -120,7 +120,10 @@ export async function discoverContent(input: {
       })
       // Eski kayıtlardaki hatalı dil etiketlerini canlı keşfe taşımıyoruz.
       // Metin belirsizse DB etiketi (sorguda zaten seçilen dil) geçerli kalır.
-      return detected === 'und' || detected === input.language
+      if (detected === input.language) return true
+      // Başlık belirsizken Türkçe kanal adı, Türkçe dışı aramaya sızmasın.
+      if (input.language !== 'tr' && /[ğışĞİŞ]|TÜRK|Türk/.test(`${row.author ?? ''} ${row.title}`)) return false
+      return detected === 'und'
     })
     .map(discoveryFromTrend)
     .filter((row): row is DiscoveryResult => Boolean(row))
@@ -144,6 +147,10 @@ export async function discoverContent(input: {
   }
   if (platforms.includes('instagram') && !instagram.live) {
     notices.push('Instagram canlı erişimi bağlı değil. Doğrulanmamış veya tahmini Reels sonuçları listeye alınmadı.')
+  }
+
+  if (country !== 'TR' || input.language !== 'tr') {
+    notices.push('Ülke seçimi platformun bölge sıralamasına uygulanır; kanalın hangi ülkeden yayın yaptığı platformlarca doğrulanmaz.')
   }
 
   const results = rankDiscoveryResults([...live, ...measured], limit)

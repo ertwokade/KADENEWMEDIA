@@ -66,3 +66,14 @@ test('türetilmiş kayıtların hızı ölçülmüş gibi etiketlenmez', () => {
   assert.equal(score.acceleration, 0)
   assert.equal(scoreTrend(trend, [{ ...snap(0, 100), captured_at: 'invalid' }]), null)
 })
+
+test('skor kırılımının toplamı karttaki skora eşittir', () => {
+  const trend = { id: 'sum', first_seen: new Date().toISOString(), published_at: new Date().toISOString(), inferred: false } as TrendRow
+  const measured = scoreTrend(trend, [snap(0, 50_000, { likes: 900, rank: 4 }), snap(120, 80_000, { likes: 1_500, rank: 2 })])!
+  const single = scoreTrend(trend, [snap(0, 50_000, { likes: 900, rank: 4 })])!
+  for (const score of [measured, single]) {
+    const b = score.breakdown as Record<string, number>
+    const total = b.hacim + b.hiz + b.etkilesim + b.siralama + b.caprazPlatform + b.tazelik
+    assert.ok(Math.abs(total - score.score) <= 3, `${total} vs ${score.score}`)
+  }
+})

@@ -37,7 +37,8 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isProduction ? '' : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  // Canlı keşif sonuçlarının küçük resimleri platform CDN'lerinden gelir.
+  "img-src 'self' data: blob: https://i.ytimg.com https://*.ytimg.com https://*.ggpht.com https://*.tiktokcdn.com https://*.tiktokcdn-us.com https://*.cdninstagram.com https://*.fbcdn.net https://*.redd.it https://*.redditmedia.com",
   "font-src 'self' data:",
   "media-src 'self' data: blob:",
   "worker-src 'self' blob:",

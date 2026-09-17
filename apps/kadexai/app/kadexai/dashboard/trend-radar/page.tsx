@@ -632,12 +632,7 @@ export default function TrendRadarPage() {
                 <div className="space-y-1">
                   <p className="font-semibold">Trend veritabanı bağlı değil.</p>
                   <p className="text-xs leading-relaxed text-amber-200/80">
-                    Uçlar boş liste döndürüyor, bu yüzden bu ekranda hiçbir zaman veri
-                    görünmez. Uygulamanın çalıştığı ortamda{' '}
-                    <code className="rounded bg-amber-500/15 px-1">NEXT_PUBLIC_SUPABASE_URL</code>{' '}
-                    ve{' '}
-                    <code className="rounded bg-amber-500/15 px-1">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>{' '}
-                    tanımlı olmalı.
+                    Bu özellik için yönetici ayarı gerekli. Bağlantı kurulana kadar bu ekranda veri görünmez.
                   </p>
                 </div>
               </div>
@@ -850,13 +845,21 @@ export default function TrendRadarPage() {
                     <div key={key} className="flex items-center gap-2">
                       <span className="w-28 flex-shrink-0 text-[11px] text-zinc-400">{labels[key]}</span>
                       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                        <div className="h-full rounded-full bg-[#f2c322]" style={{ width: `${Math.min(value * 3, 100)}%` }} />
+                        <div className="h-full rounded-full bg-[#f2c322]" style={{ width: `${Math.min(value * 2.5, 100)}%` }} />
                       </div>
                       <span className="w-6 text-right text-[11px] text-zinc-500">{value}</span>
                     </div>
                   )
                 })}
+                <p className="pt-1 text-[11px] text-zinc-500">
+                  Toplam skor {(detail.score ?? 0).toFixed(0)}.
+                  {detail.breakdown?.hizOlculdu === false ? ' Hız henüz ölçülmediği için diğer bileşenler oranlanarak hesaplandı.' : ''}
+                </p>
               </div>
+            )}
+
+            {detail.history.length <= 1 && (
+              <p className="mt-4 text-[11px] text-zinc-500">Ölçüm geçmişi için en az iki ölçüm gerekir; bu trend şu ana kadar {detail.history.length} kez ölçüldü.</p>
             )}
 
             {detail.history.length > 1 && (

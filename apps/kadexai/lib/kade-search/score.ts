@@ -172,11 +172,11 @@ export function scoreTrend(trend: TrendRow, snaps: SnapshotRow[], linkCount = 0)
       W.freshness * freshness) / availableWeight) *
     100
 
-  // Ivme bonusu/cezasi
-  score *= 1 + clamp(acceleration * 0.06, -0.15, 0.15)
-
-  // Olculmus veriyle ayni siraya cikmasin
-  if (inferred) score *= 0.72
+  // Ivme bonusu/cezasi ve cikarim cezasi; kirilim da ayni carpanla olceklenir
+  // ki bilesenlerin toplami karttaki skora esit olsun.
+  const multiplier = (1 + clamp(acceleration * 0.06, -0.15, 0.15)) * (inferred ? 0.72 : 1)
+  score *= multiplier
+  const part = (value: number) => Math.round((value / availableWeight) * multiplier * 100)
 
   score = clamp(score, 0, 100)
 
@@ -202,12 +202,12 @@ export function scoreTrend(trend: TrendRow, snaps: SnapshotRow[], linkCount = 0)
     freshness: Number(freshness.toFixed(4)),
     stage,
     breakdown: {
-      hacim: Math.round(W.volume * volume_score * 100),
-      hiz: velocityMeasured ? Math.round(W.velocity * velocityNorm * volumeConfidence * 100) : 0,
-      etkilesim: Math.round(W.engagement * engagement * 100),
-      siralama: Math.round(W.rank * rank_score * 100),
-      caprazPlatform: Math.round(W.crossPlatform * cross_score * 100),
-      tazelik: Math.round(W.freshness * freshness * 100),
+      hacim: part(W.volume * volume_score),
+      hiz: velocityMeasured ? part(W.velocity * velocityNorm * volumeConfidence) : 0,
+      etkilesim: part(W.engagement * engagement),
+      siralama: part(W.rank * rank_score),
+      caprazPlatform: part(W.crossPlatform * cross_score),
+      tazelik: part(W.freshness * freshness),
       hizTahmini: false,
       hizOlculdu: velocityMeasured,
       olcumSayisi: snaps.length,

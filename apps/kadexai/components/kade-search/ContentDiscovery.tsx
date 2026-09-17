@@ -83,6 +83,7 @@ export default function ContentDiscovery() {
   const [scriptLoading, setScriptLoading] = useState(false)
   const [scriptError, setScriptError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [brokenThumbs, setBrokenThumbs] = useState<Set<string>>(new Set())
 
   const visibleCoverage = useMemo(() => response?.coverage.filter((row) => row.platform !== 'music') ?? [], [response])
 
@@ -192,7 +193,7 @@ export default function ContentDiscovery() {
         </div>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {PLATFORM_OPTIONS.map((platform) => <button key={platform} type="button" onClick={() => togglePlatform(platform)} className={cn('rounded-full border px-2.5 py-1 text-[11px] transition', platforms.includes(platform) ? 'border-violet-500/40 bg-violet-500/15 text-violet-200' : 'border-zinc-800 text-zinc-600')}>{platformLabel(platform)}</button>)}
+          {PLATFORM_OPTIONS.map((platform) => <button key={platform} type="button" onClick={() => togglePlatform(platform)} className={cn('rounded-full border px-2.5 py-1 text-[11px] transition', platforms.includes(platform) ? 'border-violet-500/40 bg-violet-500/15 text-violet-200' : 'border-zinc-700 text-zinc-400 line-through decoration-zinc-600')} aria-pressed={platforms.includes(platform)}>{platformLabel(platform)}</button>)}
         </div>
       </div>
 
@@ -202,7 +203,7 @@ export default function ContentDiscovery() {
         <div className="space-y-4 p-4 sm:p-5">
           <div className="flex flex-wrap items-center gap-2">
             <p className="mr-2 text-sm font-semibold text-zinc-100">{response.results.length} doğrulanmış sonuç</p>
-            {visibleCoverage.map((item) => <span key={item.platform} title={item.note} className={cn('rounded-full border px-2 py-1 text-[10px]', item.mode === 'live' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : item.mode === 'measured' ? 'border-sky-500/30 bg-sky-500/10 text-sky-300' : 'border-zinc-800 text-zinc-600')}>{platformLabel(item.platform)} · {item.count}</span>)}
+            {visibleCoverage.map((item) => <span key={item.platform} title={item.note} className={cn('rounded-full border px-2 py-1 text-[10px]', item.mode === 'live' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : item.mode === 'measured' ? 'border-sky-500/30 bg-sky-500/10 text-sky-300' : 'border-zinc-700 text-zinc-400')}>{platformLabel(item.platform)} · {item.count}</span>)}
           </div>
           {response.notices.map((notice) => <p key={notice} className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-2.5 text-xs text-amber-200">{notice}</p>)}
 
@@ -212,7 +213,10 @@ export default function ContentDiscovery() {
             <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
               {response.results.map((result, index) => (
                 <article key={`${result.id}:${result.url}`} className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/55">
-                  {result.thumbnail && <div role="img" aria-label={`${result.title} küçük resmi`} className="aspect-video w-full bg-zinc-900 bg-cover bg-center" style={{ backgroundImage: `url(${JSON.stringify(result.thumbnail).slice(1, -1)})` }} />}
+                  {result.thumbnail && !brokenThumbs.has(result.id) && (
+                    // eslint-disable-next-line @next/next/no-img-element -- platform CDN küçük resimleri optimize edilmez
+                    <img src={result.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" onError={() => setBrokenThumbs((current) => new Set(current).add(result.id))} className="aspect-video w-full bg-zinc-900 object-cover" />
+                  )}
                   <div className="p-3.5">
                     <div className="flex items-center justify-between gap-2 text-[10px]">
                       <div className="flex flex-wrap gap-1.5"><span className="rounded bg-violet-500/15 px-1.5 py-0.5 text-violet-300">#{index + 1} genel</span><span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-400">#{result.platformRank} {platformLabel(result.platform)}</span></div>
@@ -222,7 +226,7 @@ export default function ContentDiscovery() {
                     {result.author && <p className="mt-1 truncate text-[11px] text-zinc-600">{result.author}</p>}
                     <div className="mt-3 grid grid-cols-3 gap-2 rounded-lg bg-zinc-900 p-2 text-center">
                       <div><p className="text-xs font-semibold text-zinc-200">{fmtCount(result.views || result.posts)}</p><p className="text-[9px] uppercase text-zinc-600">{result.views ? 'izlenme' : 'hacim'}</p></div>
-                      <div><p className="text-xs font-semibold text-zinc-200">{fmtCount(result.likes + result.comments + result.shares)}</p><p className="text-[9px] uppercase text-zinc-600">etkileşim</p></div>
+                      <div title={result.likes + result.comments + result.shares ? undefined : 'Bu kaynak beğeni ve yorum sayısı vermiyor'}><p className="text-xs font-semibold text-zinc-200">{result.likes + result.comments + result.shares ? fmtCount(result.likes + result.comments + result.shares) : '—'}</p><p className="text-[9px] uppercase text-zinc-600">{result.likes + result.comments + result.shares ? 'etkileşim' : 'etkileşim ölçülmedi'}</p></div>
                       <div><p className="text-xs font-semibold text-amber-300">{result.popularityScore}</p><p className="text-[9px] uppercase text-zinc-600">güncel skor</p></div>
                     </div>
                     <div className="mt-3 flex gap-2">

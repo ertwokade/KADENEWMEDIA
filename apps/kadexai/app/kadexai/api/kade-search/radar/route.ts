@@ -7,6 +7,8 @@ import { hasMeasuredVelocity } from '@/lib/kade-search/export'
 
 export const dynamic = 'force-dynamic'
 
+const RADAR_MIN_VOLUME = 1_000
+
 /**
  * Erken radar: dusuk hacim + yuksek hiz.
  * Genis bir hiz siralamasi cekilip yalnizca erken asamalar (emerging/rising)
@@ -32,6 +34,8 @@ export async function GET(req: NextRequest) {
     const trendler = rows
       .filter((trend) => language !== 'tr' || turkceGorunuyor(trend))
       .filter((trend) => hasMeasuredVelocity(trend) && trend.velocity! > 0)
+      // Birkaç izlenmelik içerikte yüzde büyüme gürültüdür; erken radar en az 1.000 hacim ister.
+      .filter((trend) => Math.max(trend.views ?? 0, (trend.posts ?? 0) * 900, (trend.followers ?? 0) * 12) >= RADAR_MIN_VOLUME)
       .filter((trend) => trend.stage === 'emerging' || trend.stage === 'rising')
       .slice(0, limit)
 
