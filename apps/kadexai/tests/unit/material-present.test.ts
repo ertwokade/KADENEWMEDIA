@@ -12,11 +12,12 @@ test('çocukları küçük düşüren başlıklar listelenmez, sıradan çocuk i
   const { visible, hidden } = presentMaterials([
     { title: 'Tuvalette sıçarken ağlayan çocuk', source: 'arsivhub', duration_sec: 60 },
     { title: 'Satılık dilenci çocuk', source: 'arsivhub', duration_sec: 60 },
+    { title: 'osurarak merdiven çıkan çocuk', source: 'arsivhub', duration_sec: 60 },
     { title: 'Mahalle Yanarken Salıncakta Sallanan Çocuk', source: 'arsivhub', duration_sec: 60 },
     { title: 'Çocuk parkında bahar şenliği', source: 'arsivhub', duration_sec: 60 },
     { title: 'Nemo köpekbalığı', source: 'arsivhub', duration_sec: 60 },
   ])
-  assert.equal(hidden, 3)
+  assert.equal(hidden, 4)
   assert.deepEqual(visible.map((row) => row.title), ['Çocuk parkında bahar şenliği', 'Nemo köpekbalığı'])
   assert.equal(visible[0].duration_sec, null)
 })

@@ -18,7 +18,7 @@ export function trustedDuration(row: MaterialLike): number | null {
 
 // Çocukları küçük düşüren veya mahrem anını teşhir eden başlıklar listelenmez.
 const CHILD = /(çocu[kğ]|bebe[kğ]|kız\s*çocu|oğlan|ufaklık|velet)/i
-const DEGRADING = /(tuvalet|sıçar|sıçıyor|işer|çıplak|donu|ağlayan|ağlatan|dilenci|satılık|dövülen|dövüyor|tokat|aşağıla|rezil|alay|dalga geç|yanarken)/i
+const DEGRADING = /(tuvalet|sıçar|sıçıyor|işer|osur|altına|kusan|kusuyor|çıplak|donu|ağlayan|ağlatan|dilenci|satılık|dövülen|dövüyor|tokat|aşağıla|rezil|alay|dalga geç|yanarken)/i
 
 export function isSensitiveMaterial(row: MaterialLike): boolean {
   const title = (row.title ?? '').toLocaleLowerCase('tr-TR')
