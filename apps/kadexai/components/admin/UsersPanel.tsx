@@ -95,8 +95,9 @@ export default function UsersPanel() {
     if (!kullanicilar) return []
     const q = arama.trim().toLocaleLowerCase('tr-TR')
     return kullanicilar.filter((k) => {
-      if (suzgec === 'odeyen' && !k.paketTier) return false
-      if (suzgec === 'ucretsiz' && k.paketTier) return false
+      // Sahip hesaplar paket sayacına girmez; süzgeç de sayaçla aynı kuralı kullanır.
+      if (suzgec === 'odeyen' && (!k.paketTier || k.sahip)) return false
+      if (suzgec === 'ucretsiz' && (k.paketTier || k.sahip)) return false
       if (!q) return true
       return `${k.eposta} ${k.ad} ${k.alan ?? ''}`.toLocaleLowerCase('tr-TR').includes(q)
     })
@@ -160,7 +161,7 @@ export default function UsersPanel() {
       <div className="grid grid-cols-3 gap-px bg-zinc-700/50">
         {[
           { etiket: 'Kayıtlı kullanıcı', deger: ozet.toplam },
-          { etiket: 'Paketi olan', deger: ozet.odeyen },
+          { etiket: 'Paketi olan (sahip hariç)', deger: ozet.odeyen },
           { etiket: 'Son 30 günde aktif', deger: ozet.aktif30 },
         ].map((h) => (
           <div key={h.etiket} className="bg-zinc-900 p-4">

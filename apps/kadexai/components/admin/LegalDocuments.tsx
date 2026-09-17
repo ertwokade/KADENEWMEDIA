@@ -160,8 +160,8 @@ export default function LegalDocuments() {
                   <span className="min-w-0">
                     <span className="block text-sm text-zinc-200">
                       {document.title}
-                      {document.checkoutConsent && <span className="ml-2 rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] text-amber-300">ödeme onayı</span>}
-                      {document.existingPath && <span className="ml-2 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-400">ana sitede: {document.existingPath}</span>}
+                      {document.checkoutConsent && <>{' '}<span className="ml-2 rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] text-amber-300">ödeme onayı</span></>}
+                      {document.existingPath && <>{' '}<span className="ml-2 rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-400">ana sitede: {document.existingPath}</span></>}
                     </span>
                     <span className="block text-xs text-zinc-500">{document.scope}</span>
                   </span>

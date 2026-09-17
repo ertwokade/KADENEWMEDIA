@@ -9,6 +9,18 @@ import {
   type QuoteStatus,
 } from './quoteRules'
 
+/** Teklif tablosu veritabanına henüz kurulmamış (migration uygulanmamış). */
+export class QuoteStorageMissingError extends Error {
+  constructor() {
+    super('Teklif talepleri tablosu veritabanında henüz kurulmamış. supabase/migrations/202608260007_kadexai_quote_requests.sql uygulanmalı.')
+    this.name = 'QuoteStorageMissingError'
+  }
+}
+
+function isMissingTable(error: { code?: string }) {
+  return error.code === '42P01' || error.code === 'PGRST205'
+}
+
 /**
  * KadexAI "Teklif Al" akışı (§15) ve tekliften ödemeye dönüşüm (§16).
  *
@@ -69,6 +81,7 @@ export async function listAllQuoteRequests(status?: QuoteStatus | null): Promise
   let query = admin.from('kadexai_quote_requests').select('*').order('created_at', { ascending: false }).limit(200)
   if (status) query = query.eq('status', status)
   const { data, error } = await query
+  if (error && isMissingTable(error)) throw new QuoteStorageMissingError()
   if (error) throw new Error('Teklif talepleri okunamadı.')
   return (data || []) as QuoteRequestRow[]
 }

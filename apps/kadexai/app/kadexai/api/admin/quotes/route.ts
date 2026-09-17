@@ -4,6 +4,7 @@ import { isAllowedOwnerUser, isSettingsOwnerUser } from '@/lib/featureAccess'
 import {
   listAllQuoteRequests,
   QUOTE_STATUSES,
+  QuoteStorageMissingError,
   QuoteValidationError,
   updateQuoteRequest,
   type QuoteStatus,
@@ -36,7 +37,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ quotes: await listAllQuoteRequests(status), statuses: QUOTE_STATUSES }, { headers })
   } catch (error) {
     captureApiError(error, '/api/admin/quotes#get')
-    return NextResponse.json({ error: 'Teklif talepleri okunamadı.' }, { status: 503, headers })
+    // Yalnız sahip görür: kurulum eksikse sebebi açıkça söylenir.
+    const message = error instanceof QuoteStorageMissingError ? error.message : 'Teklif talepleri okunamadı.'
+    return NextResponse.json({ error: message }, { status: 503, headers })
   }
 }
 

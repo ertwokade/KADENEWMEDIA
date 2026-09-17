@@ -156,8 +156,8 @@ export default function CostPanel() {
                   {report.unpricedTemplate && (
                     <>
                       <p className="mt-2">
-                        Sağlayıcının fiyat sayfasından 1M token başına USD değerlerini yaz ve
-                        <code className="mx-1 font-mono">AI_MODEL_RATES_JSON</code>
+                        Sağlayıcının fiyat sayfasından 1M token başına USD değerlerini yaz ve{' '}
+                        <code className="font-mono">AI_MODEL_RATES_JSON</code>{' '}
                         ortam değişkenine bu satırı koy — deploy gerekmez, bir sonraki okumada devreye girer:
                       </p>
                       <pre className="mt-2 overflow-x-auto rounded bg-zinc-950 p-2 font-mono text-[11px] text-zinc-300">{report.unpricedTemplate}</pre>
