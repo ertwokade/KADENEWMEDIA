@@ -11,7 +11,6 @@ import {
   type DiscoveryResult,
 } from './discovery'
 import { searchGoogleNow } from './collectors/googleTrends'
-import { searchRedditNow } from './collectors/reddit'
 import { searchYoutubeNow } from './collectors/youtube'
 import { instagramAccess, searchInstagramGraph, searchTikTokResearch, tiktokAccess } from './officialSocial'
 import { queryTrends } from './store'
@@ -27,7 +26,7 @@ const PLATFORM_NOTES: Record<DiscoveryPlatform, string> = {
   tiktok: 'TikTok Creative Center’dan alınmış taze, gerçek ölçümler',
   instagram: 'Instagram/Reels kaynağından alınmış taze, gerçek ölçümler',
   google: 'Google’ın konuya dair taze haber ve arama sinyalleri',
-  reddit: 'Reddit araması — gerçek bağlantı, beğeni/yorum sayısı yayınlanmıyor',
+  reddit: 'Reddit içerik bulucuda kapalı',
   music: 'Müzik listesi ölçümleri',
 }
 
@@ -113,7 +112,7 @@ export async function discoverContent(input: {
 
   const tiktok = tiktokAccess()
   const instagram = instagramAccess()
-  const [stored, youtube, tiktokLive, instagramLive, googleLive, redditLive] = await Promise.all([
+  const [stored, youtube, tiktokLive, instagramLive, googleLive] = await Promise.all([
     storedTrends({
       q: query,
       platform: platforms.join(','),
@@ -134,9 +133,6 @@ export async function discoverContent(input: {
       : Promise.resolve(NO_LIVE),
     platforms.includes('google')
       ? safeSearch('Google', () => searchGoogleNow({ query, country, language: input.language, periodDays, limit: 20 }))
-      : Promise.resolve(NO_LIVE_WEB),
-    platforms.includes('reddit')
-      ? safeSearch('Reddit', () => searchRedditNow({ query, periodDays, limit: 25 }))
       : Promise.resolve(NO_LIVE_WEB),
   ])
 
@@ -160,16 +156,16 @@ export async function discoverContent(input: {
     .filter((row): row is DiscoveryResult => Boolean(row))
   /* Dil suzgeci kaynaga gore degisir. YouTube'un relevanceLanguage'i yalnizca
      siralamayi etkiler, o yuzden dili dogrulanamayan kayit disarida kalir.
-     Google Haberler ve Reddit aramasi ise istenen locale ile sorgulanir;
-     orada "und" (kisa baslik, dil cikarilamadi) kaydi elenirse platform
-     tamamen bos kalir — bu yuzden `und` kabul edilir. */
+     Google Haberler ise istenen locale ile sorgulanir; orada "und" (kisa
+     baslik, dil cikarilamadi) kaydi elenirse platform tamamen bos kalir —
+     bu yuzden `und` kabul edilir. */
   const strictLive = [youtube, tiktokLive, instagramLive].flatMap((search) => search.items
     .map((item) => enrich(item))
     .filter((item) => matchesLanguage(item.language, input.language))
     .map((item) => discoveryFromRaw(item, search.source))
     .filter((row): row is DiscoveryResult => Boolean(row)))
 
-  const localeLive = [googleLive, redditLive].flatMap((search) => search.items
+  const localeLive = [googleLive].flatMap((search) => search.items
     .map((item) => enrich(item))
     .filter((item) => {
       const detected = item.language
@@ -187,7 +183,7 @@ export async function discoverContent(input: {
   } else if (youtube.errors.length) {
     notices.push('YouTube resmi API yanıt vermedi; canlı web arama yedeği kullanıldı.')
   }
-  for (const error of [...tiktokLive.errors, ...instagramLive.errors, ...googleLive.errors, ...redditLive.errors]) {
+  for (const error of [...tiktokLive.errors, ...instagramLive.errors, ...googleLive.errors]) {
     notices.push(`${error}. Bu platformda yalnız son doğrulanmış KadeSearch ölçümleri kullanıldı.`)
   }
   if (stored.error) {

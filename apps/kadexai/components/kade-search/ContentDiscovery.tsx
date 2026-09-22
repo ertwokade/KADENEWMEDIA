@@ -23,8 +23,9 @@ const COUNTRIES = [
   ['JP', 'Japonya'], ['KR', 'Güney Kore'], ['IN', 'Hindistan'],
 ] as const
 
+/* Reddit bilerek listede yok: sonuçları istenmiyor. */
 const PLATFORM_OPTIONS = [
-  'tiktok', 'instagram', 'youtube_shorts', 'youtube', 'google', 'reddit',
+  'tiktok', 'instagram', 'youtube_shorts', 'youtube', 'google',
 ] as const
 
 const PERIODS = [
