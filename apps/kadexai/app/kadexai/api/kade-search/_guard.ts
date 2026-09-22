@@ -34,14 +34,32 @@ export async function requireCollectorAccess(req: Request): Promise<NextResponse
   return null
 }
 
-/** Trend verisini okumak icin oturum yeterlidir. */
+/**
+ * Trend verisini okumak icin oturum yeterlidir.
+ *
+ * Supabase yapilandirilmamis olmasi tek basina engel degil: canli kesif
+ * (YouTube, Google, Reddit ve resmi TikTok/Instagram erisimi) veritabanina
+ * hic dokunmuyor. Once "veritabani yok" diye 503 donuluyordu ve arac,
+ * calisabilecegi halde tamamen kapali gorunuyordu.
+ *
+ * Gercekten depolanmis trend satirina ihtiyac duyan uclar
+ * `requireStoredTrendAccess()` kullanir.
+ */
 export async function requireReaderAccess(): Promise<NextResponse | null> {
+  if (AUTH_DISABLED) return null
+  if (await getAuthenticatedUser()) return null
+  return NextResponse.json({ error: 'Oturum açman gerekiyor.' }, { status: 401 })
+}
+
+/** Yalnizca depolanmis trend tablolarini okuyan uclar icin. */
+export async function requireStoredTrendAccess(): Promise<NextResponse | null> {
+  const guard = await requireReaderAccess()
+  if (guard) return guard
   if (AUTH_DISABLED) return null
   if (!isKadeSearchConfigured()) {
     return NextResponse.json({ error: 'Veritabanı yapılandırılmamış.' }, { status: 503 })
   }
-  if (await getAuthenticatedUser()) return null
-  return NextResponse.json({ error: 'Oturum açman gerekiyor.' }, { status: 401 })
+  return null
 }
 
 export function failure(e: unknown, fallback: string) {

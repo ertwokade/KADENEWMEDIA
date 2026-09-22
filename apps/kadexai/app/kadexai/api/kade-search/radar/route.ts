@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { queryTrends } from '@/lib/kade-search/store'
-import { failure, isKadeSearchConfigured, requireReaderAccess } from '../_guard'
+import { failure, isKadeSearchConfigured, requireStoredTrendAccess } from '../_guard'
 import { ayiklanmisTrendler, turkceGorunuyor } from '@/lib/kade-search/relevance'
 import { boundedNumber, trendFiltersFromParams } from '@/lib/kade-search/filters'
 import { hasMeasuredVelocity } from '@/lib/kade-search/export'
@@ -15,7 +15,7 @@ const RADAR_MIN_VOLUME = 1_000
  * birakilir — "girmek icin en iyi an" listesi.
  */
 export async function GET(req: NextRequest) {
-  const guard = await requireReaderAccess()
+  const guard = await requireStoredTrendAccess()
   if (guard) return guard
   if (!isKadeSearchConfigured()) {
     return NextResponse.json({ adet: 0, trendler: [], localFallback: true })

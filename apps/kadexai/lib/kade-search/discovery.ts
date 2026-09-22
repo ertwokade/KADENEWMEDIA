@@ -210,12 +210,49 @@ export function rankDiscoveryResults(rows: DiscoveryResult[], limit = 36) {
   const ranked = [...unique.values()].sort((a, b) =>
     b.popularityScore - a.popularityScore || b.views - a.views || Date.parse(b.lastSeen) - Date.parse(a.lastSeen)
   )
+  const cap = Math.max(1, Math.min(limit, 60))
+
+  /*
+   * Duz skor siralamasi tek platformu one cikariyordu: izlenme sayisi
+   * yayinlayan YouTube her zaman kazaniyor, sayac vermeyen Google/Reddit
+   * kayitlari (izlenme = 0) listenin disinda kaliyordu. Kullanici tum
+   * platformlari sectiginde hepsinden sonuc gormeli.
+   *
+   * Once platformlar arasinda sirayla secilir (her turda her platformdan
+   * en iyi kayit), sonra kalan yerler genel skora gore doldurulur. Platform
+   * ici siralama hala skora gore; sadece platformlar arasi adalet saglanir.
+   */
+  const byPlatform = new Map<DiscoveryPlatform, DiscoveryResult[]>()
+  for (const row of ranked) {
+    const bucket = byPlatform.get(row.platform)
+    if (bucket) bucket.push(row)
+    else byPlatform.set(row.platform, [row])
+  }
+
+  const picked: DiscoveryResult[] = []
+  const taken = new Set<string>()
+  const buckets = [...byPlatform.values()]
+  const deepest = Math.max(0, ...buckets.map((bucket) => bucket.length))
+  for (let round = 0; round < deepest && picked.length < cap; round++) {
+    for (const bucket of buckets) {
+      if (picked.length >= cap) break
+      const row = bucket[round]
+      if (!row || taken.has(row.url)) continue
+      taken.add(row.url)
+      picked.push(row)
+    }
+  }
+
   const platformCounts = new Map<DiscoveryPlatform, number>()
-  return ranked.slice(0, Math.max(1, Math.min(limit, 60))).map((row) => {
-    const rank = (platformCounts.get(row.platform) ?? 0) + 1
-    platformCounts.set(row.platform, rank)
-    return { ...row, platformRank: rank }
-  })
+  return picked
+    .sort((a, b) =>
+      b.popularityScore - a.popularityScore || b.views - a.views || Date.parse(b.lastSeen) - Date.parse(a.lastSeen)
+    )
+    .map((row) => {
+      const rank = (platformCounts.get(row.platform) ?? 0) + 1
+      platformCounts.set(row.platform, rank)
+      return { ...row, platformRank: rank }
+    })
 }
 
 export function sanitizeDiscoverySource(value: unknown): DiscoveryResult | null {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { DISCOVERY_LANGUAGES, type DiscoveryLanguage } from '@/lib/kade-search/discovery'
 import { discoverContent } from '@/lib/kade-search/discoveryServer'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
-import { isKadeSearchConfigured, requireReaderAccess } from '../_guard'
+import { requireReaderAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -14,7 +14,10 @@ export async function POST(request: NextRequest) {
 
   const guard = await requireReaderAccess()
   if (guard) return guard
-  if (!isKadeSearchConfigured()) return NextResponse.json({ error: 'Trend veritabanı yapılandırılmamış.' }, { status: 503, headers })
+  /* Canli kesif veritabanina bagli degil: YouTube, Google ve Reddit canli
+     aranir, depolanmis trendler varsa ustune eklenir. Eskiden burada
+     "veritabani yapilandirilmamis" diye 503 donuyordu ve arama hic
+     calismiyordu. */
 
   let body: Record<string, unknown>
   try {

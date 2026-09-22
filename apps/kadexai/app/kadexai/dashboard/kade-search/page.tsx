@@ -95,12 +95,14 @@ export default function KadeSearchApprovalPage() {
         apiFetch('/api/kade-search/approvals'),
       ])
       const [ideaJson, approvalJson] = await Promise.all([ideaRes.json(), approvalRes.json()])
-      if (!ideaRes.ok) throw new Error(ideaJson.error || 'Güncel içerik adayları alınamadı.')
-      if (!approvalRes.ok) throw new Error(approvalJson.error || 'Onay kayıtları alınamadı.')
+      /* Onay merkezi veritabanina bagli, Icerik Bulucu degil. Veritabani yoksa
+         (503) sayfayi tamamen hataya dusurmek yanlisti: arama calisabiliyor.
+         Eksiklik asagida ayri bir uyariyla gosterilir. */
+      const storeMissing = approvalRes.status === 503 || ideaJson.localFallback === true
+      if (!ideaRes.ok && ideaRes.status !== 503) throw new Error(ideaJson.error || 'Güncel içerik adayları alınamadı.')
+      if (!approvalRes.ok && approvalRes.status !== 503) throw new Error(approvalJson.error || 'Onay kayıtları alınamadı.')
       const nextApprovals = (approvalJson.approvals ?? []) as Approval[]
-      /* Uc, Supabase yapilandirilmadiginda 200 + bos liste donuyor. Bunu
-         "aday yok" diye gostermek kullaniciyi yaniltiyordu. */
-      setDbMissing(ideaJson.localFallback === true)
+      setDbMissing(storeMissing)
       setIdeas(ideaJson.fikirler ?? [])
       setApprovals(nextApprovals)
       setNotes(Object.fromEntries(nextApprovals.map((row) => [row.trend_id, row.notes ?? ''])))
@@ -173,7 +175,7 @@ export default function KadeSearchApprovalPage() {
 
   return (
     <div className="flex h-full flex-col bg-zinc-950">
-      <TopBar title="KadeSearch Onay" description="Günlük trend adaylarını seç, üretim paketini hazırla ve WhatsApp’tan al" showModelSelector={false} />
+      <TopBar title="İçerik Bulucu (KadeSearch)" description="Konuyu ara, platformlardaki güncel içerikleri bul, adayı onayla ve üretim paketini al" showModelSelector={false} />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7">
         <section className="mx-auto max-w-7xl space-y-5">
           <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 via-zinc-900 to-emerald-950/30 p-5 sm:p-6">
@@ -213,9 +215,10 @@ export default function KadeSearchApprovalPage() {
           {error && <div role="alert" className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</div>}
           {dbMissing && (
             <div role="alert" className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-              <p className="font-semibold">Trend veritabanı bağlı değil.</p>
+              <p className="font-semibold">Onay merkezi veritabanı bağlı değil.</p>
               <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
-                Bu özellik için yönetici ayarı gerekli. Bağlantı kurulana kadar aday listesi boş görünür.
+                Aşağıdaki onay listesi ve günlük trend adayları için yönetici ayarı gerekli.
+                Yukarıdaki <b>canlı içerik keşfi</b> bundan bağımsız çalışır.
               </p>
             </div>
           )}

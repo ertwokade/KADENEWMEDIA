@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import { statsSummary } from '@/lib/kade-search/store'
 import { availableSources } from '@/lib/kade-search/collectors'
-import { failure, isKadeSearchConfigured, requireReaderAccess } from '../_guard'
+import { failure, isKadeSearchConfigured, requireStoredTrendAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const guard = await requireReaderAccess()
+  const guard = await requireStoredTrendAccess()
   if (guard) return guard
   if (!isKadeSearchConfigured()) {
     return NextResponse.json({

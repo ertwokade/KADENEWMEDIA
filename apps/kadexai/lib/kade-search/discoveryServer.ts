@@ -10,6 +10,8 @@ import {
   type DiscoveryPlatform,
   type DiscoveryResult,
 } from './discovery'
+import { searchGoogleNow } from './collectors/googleTrends'
+import { searchRedditNow } from './collectors/reddit'
 import { searchYoutubeNow } from './collectors/youtube'
 import { instagramAccess, searchInstagramGraph, searchTikTokResearch, tiktokAccess } from './officialSocial'
 import { queryTrends } from './store'
@@ -24,8 +26,8 @@ const PLATFORM_NOTES: Record<DiscoveryPlatform, string> = {
   youtube_shorts: 'Canlı Shorts araması ve taze KadeSearch ölçümleri',
   tiktok: 'TikTok Creative Center’dan alınmış taze, gerçek ölçümler',
   instagram: 'Instagram/Reels kaynağından alınmış taze, gerçek ölçümler',
-  google: 'Google Trends’in taze arama sinyalleri',
-  reddit: 'Tahmini RSS metrikleri popülerlik listesine alınmaz',
+  google: 'Google’ın konuya dair taze haber ve arama sinyalleri',
+  reddit: 'Reddit araması — gerçek bağlantı, beğeni/yorum sayısı yayınlanmıyor',
   music: 'Müzik listesi ölçümleri',
 }
 
@@ -59,6 +61,29 @@ function coverageNote(platform: DiscoveryPlatform) {
 type LiveSearch = { items: RawTrendItem[]; source: 'live-api' | 'live-web'; errors: string[] }
 
 const NO_LIVE: LiveSearch = { items: [], source: 'live-api', errors: [] }
+const NO_LIVE_WEB: LiveSearch = { items: [], source: 'live-web', errors: [] }
+
+/**
+ * Depolanmis trendler bir "bonus"tur, on kosul degil. Supabase baglanmamissa
+ * ya da tablo yoksa canli arama yine de sonuc dondurmeli; eskiden bu hata
+ * tum aramayi dusuruyordu.
+ */
+async function storedTrends(filters: Parameters<typeof queryTrends>[0]) {
+  try {
+    return { rows: await queryTrends(filters), error: null as string | null }
+  } catch (error) {
+    return { rows: [], error: error instanceof Error ? error.message : 'bilinmeyen hata' }
+  }
+}
+
+/** Kaynak, istenen dil/ulke ile sorgulandiysa "und" kayitlari elenmez. */
+async function safeSearch(label: string, run: () => Promise<LiveSearch>): Promise<LiveSearch> {
+  try {
+    return await run()
+  } catch (error) {
+    return { items: [], source: 'live-web', errors: [`${label}: ${(error as Error).message}`] }
+  }
+}
 
 async function officialSearch(label: string, run: () => Promise<RawTrendItem[]>): Promise<LiveSearch> {
   try {
@@ -88,8 +113,8 @@ export async function discoverContent(input: {
 
   const tiktok = tiktokAccess()
   const instagram = instagramAccess()
-  const [stored, youtube, tiktokLive, instagramLive] = await Promise.all([
-    queryTrends({
+  const [stored, youtube, tiktokLive, instagramLive, googleLive, redditLive] = await Promise.all([
+    storedTrends({
       q: query,
       platform: platforms.join(','),
       country: country === 'ALL' ? 'all' : country,
@@ -99,17 +124,23 @@ export async function discoverContent(input: {
       limit: Math.min(limit * 5, 300),
     }),
     platforms.some((platform) => platform === 'youtube' || platform === 'youtube_shorts')
-      ? searchYoutubeNow({ query, country, language: input.language, periodDays, limit: Math.min(limit, 30) })
-      : Promise.resolve({ items: [], source: 'live-web' as const, errors: [] as string[] }),
+      ? safeSearch('YouTube', () => searchYoutubeNow({ query, country, language: input.language, periodDays, limit: Math.min(limit, 30) }))
+      : Promise.resolve(NO_LIVE_WEB),
     platforms.includes('tiktok') && tiktok.official
       ? officialSearch('TikTok', () => searchTikTokResearch({ query, country, periodDays, limit: 100 }))
       : Promise.resolve(NO_LIVE),
     platforms.includes('instagram') && instagram.official
       ? officialSearch('Instagram', () => searchInstagramGraph({ query, country, periodDays, limit: 50 }))
       : Promise.resolve(NO_LIVE),
+    platforms.includes('google')
+      ? safeSearch('Google', () => searchGoogleNow({ query, country, language: input.language, periodDays, limit: 20 }))
+      : Promise.resolve(NO_LIVE_WEB),
+    platforms.includes('reddit')
+      ? safeSearch('Reddit', () => searchRedditNow({ query, periodDays, limit: 25 }))
+      : Promise.resolve(NO_LIVE_WEB),
   ])
 
-  const measured = stored
+  const measured = stored.rows
     .filter((row) => {
       const detected = detectLanguage({
         platform: row.platform,
@@ -127,11 +158,28 @@ export async function discoverContent(input: {
     })
     .map(discoveryFromTrend)
     .filter((row): row is DiscoveryResult => Boolean(row))
-  const live = [youtube, tiktokLive, instagramLive].flatMap((search) => search.items
+  /* Dil suzgeci kaynaga gore degisir. YouTube'un relevanceLanguage'i yalnizca
+     siralamayi etkiler, o yuzden dili dogrulanamayan kayit disarida kalir.
+     Google Haberler ve Reddit aramasi ise istenen locale ile sorgulanir;
+     orada "und" (kisa baslik, dil cikarilamadi) kaydi elenirse platform
+     tamamen bos kalir — bu yuzden `und` kabul edilir. */
+  const strictLive = [youtube, tiktokLive, instagramLive].flatMap((search) => search.items
     .map((item) => enrich(item))
     .filter((item) => matchesLanguage(item.language, input.language))
     .map((item) => discoveryFromRaw(item, search.source))
     .filter((row): row is DiscoveryResult => Boolean(row)))
+
+  const localeLive = [googleLive, redditLive].flatMap((search) => search.items
+    .map((item) => enrich(item))
+    .filter((item) => {
+      const detected = item.language
+      if (detected === input.language || detected === 'und' || !detected) return true
+      return false
+    })
+    .map((item) => discoveryFromRaw(item, search.source))
+    .filter((row): row is DiscoveryResult => Boolean(row)))
+
+  const live = [...strictLive, ...localeLive]
 
   const youtubeLive = live.filter((row) => row.platform === 'youtube' || row.platform === 'youtube_shorts')
   if (youtube.errors.length && !youtubeLive.length) {
@@ -139,8 +187,11 @@ export async function discoverContent(input: {
   } else if (youtube.errors.length) {
     notices.push('YouTube resmi API yanıt vermedi; canlı web arama yedeği kullanıldı.')
   }
-  for (const error of [...tiktokLive.errors, ...instagramLive.errors]) {
+  for (const error of [...tiktokLive.errors, ...instagramLive.errors, ...googleLive.errors, ...redditLive.errors]) {
     notices.push(`${error}. Bu platformda yalnız son doğrulanmış KadeSearch ölçümleri kullanıldı.`)
+  }
+  if (stored.error) {
+    notices.push('Trend veritabanına ulaşılamadı; sonuçlar yalnızca canlı aramadan geldi.')
   }
   if (platforms.includes('tiktok') && !tiktok.live) {
     notices.push('TikTok canlı erişimi bağlı değil. Doğrulanmamış veya tahmini TikTok sonuçları listeye alınmadı.')

@@ -82,12 +82,22 @@ export async function POST(req: NextRequest) {
       )
       sonuclar.push(...parca)
     }
+    const basarisiz = sonuclar.filter((r) => !r.audio)
+    /* Hepsi düştüyse 200 dönmek yanlıştı: pano "üretildi" sanıp sessiz
+       parçalar yerleştiriyordu. Tek bir parça bile üretilemediyse bu bir
+       sağlayıcı arızasıdır ve kullanıcıya nedeniyle birlikte söylenmeli. */
+    if (basarisiz.length === sonuclar.length) {
+      return NextResponse.json(
+        { error: basarisiz[0]?.hata || 'Seslendirme üretilemedi.', parcalar: sonuclar, saglayici: 'gemini' },
+        { status: 503 },
+      )
+    }
     return NextResponse.json({
       parcalar: sonuclar,
       // Gemini ham PCM veriyor, WAV kabına alınıyor; istemci mime'ı kullanıyor.
       mime: 'audio/wav',
       saglayici: 'gemini',
-      basarisiz: sonuclar.filter((r) => !r.audio).length,
+      basarisiz: basarisiz.length,
     })
   }
 

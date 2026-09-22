@@ -132,7 +132,7 @@ export const TOOL_REGISTRY: ToolDefinition[] = [
   tool('quote-extractor', 'Alıntı Çıkarıcı', 'analysis', '/dashboard/quote-extractor', 'book-open', 'Verilen metinden kullanılabilir alıntılar çıkarır.', [], false),
 
   tool('ideas', 'İçerik Fikirleri', 'planning', '/dashboard/ideas', 'lightbulb', 'Marka bağlamında içerik fikirleri üretir.', brandBasics),
-  tool('kade-search', 'KadeSearch Onay', 'planning', '/dashboard/kade-search', 'list-checks', 'Günlük trend adaylarını onayla, üretim paketini hazırla ve WhatsApp’tan al.', [], false),
+  tool('kade-search', 'İçerik Bulucu (KadeSearch)', 'planning', '/dashboard/kade-search', 'search', 'Konuyu yaz; TikTok, Reels, Shorts, YouTube, Google ve Reddit’teki güncel içerikleri bul, onayla ve üretim paketini hazırla.', [], false),
   tool('content-plan', '30 Günlük Plan', 'planning', '/dashboard/content-plan', 'calendar-days', 'Hedef ve sıklığa göre içerik planı üretir.', brandBasics),
   tool('bio-link', 'Bağlantı Bio', 'planning', '/dashboard/bio-link', 'link', 'Profil ve bağlantı sayfası metni üretir.', ['profile.displayName', 'brand.name', 'brand.niche']),
   tool('calendar', 'İçerik Takvimi', 'planning', '/dashboard/calendar', 'calendar', 'Yayın planını saklar ve yönetir.', [], false),

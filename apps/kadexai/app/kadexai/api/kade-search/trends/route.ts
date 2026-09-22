@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { queryTrends } from '@/lib/kade-search/store'
-import { failure, isKadeSearchConfigured, requireReaderAccess } from '../_guard'
+import { failure, isKadeSearchConfigured, requireStoredTrendAccess } from '../_guard'
 import { trendFiltersFromParams } from '@/lib/kade-search/filters'
 import { ayiklanmisTrendler } from '@/lib/kade-search/relevance'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const guard = await requireReaderAccess()
+  const guard = await requireStoredTrendAccess()
   if (guard) return guard
   if (!isKadeSearchConfigured()) {
     const filters = trendFiltersFromParams(req.nextUrl.searchParams)

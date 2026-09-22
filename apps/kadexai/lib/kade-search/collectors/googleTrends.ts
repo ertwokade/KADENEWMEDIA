@@ -80,3 +80,69 @@ const googleTrends: Collector = {
 }
 
 export default googleTrends
+
+/**
+ * Sorgu bazli canli Google aramasi (icerik bulucu icin).
+ *
+ * Trending RSS yalnizca "bugun ne yukseliyor" listesini verir, konu aramasi
+ * yapmaz. Konu bazli taze sinyal icin Google Haberler RSS aramasi kullanilir:
+ * anahtar gerektirmez, dil/ulke parametresi alir ve `when:<gun>d` ile donem
+ * daraltilir. Tiklanma/izlenme sayisi vermedigi icin metrik uydurulmaz.
+ */
+export async function searchGoogleNow(opts: {
+  query: string
+  country: string
+  language: string
+  periodDays: number
+  limit: number
+}): Promise<{ items: RawTrendItem[]; source: 'live-web'; errors: string[] }> {
+  const query = opts.query.trim().slice(0, 120)
+  if (query.length < 2) return { items: [], source: 'live-web', errors: [] }
+  const country = /^[A-Z]{2}$/.test(opts.country) ? opts.country : 'TR'
+  const language = /^[a-z]{2}$/.test(opts.language) ? opts.language : 'tr'
+  const days = Math.max(1, Math.min(Math.floor(opts.periodDays) || 7, 30))
+  const limit = Math.max(1, Math.min(Math.floor(opts.limit) || 15, 25))
+  const search = `${query} when:${days}d`
+  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(search)}`
+    + `&hl=${language}-${country}&gl=${country}&ceid=${country}:${language}`
+
+  const res = await getText(url, {
+    headers: { accept: 'application/rss+xml, application/xml, text/xml' },
+    label: `google-news-${country}`,
+  })
+  if (!res.ok) return { items: [], source: 'live-web', errors: [`google: ${res.error}`] }
+
+  const items: RawTrendItem[] = []
+  for (const block of res.data.split(/<item>/).slice(1, limit + 1)) {
+    const pick = (tag: string) => {
+      const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'i'))
+      return m ? stripTags(m[1].replace(/<!\[CDATA\[|\]\]>/g, '')).trim() : ''
+    }
+    const title = pick('title')
+    const link = pick('link')
+    if (!title || !/^https?:\/\//.test(link)) continue
+    const pubDate = pick('pubDate')
+    items.push({
+      platform: 'google',
+      kind: 'topic',
+      external_id: pick('guid') || link,
+      title,
+      description: pick('source') || null,
+      author: pick('source') || null,
+      url: link,
+      thumbnail: null,
+      country,
+      // Locale ile istendi; dil tespiti kisa baslikta "und" dondugu icin
+      // dogru bilgiyi kaybetmemek adina acikca isaretlenir.
+      language,
+      rank: items.length + 1,
+      published_at: pubDate && Number.isFinite(Date.parse(pubDate)) ? new Date(pubDate).toISOString() : null,
+      hint: `google haber arama ${query}`,
+      inferred: false,
+      metrics: { extra: { kaynak: 'google-news-rss', olcum_yok: true } },
+      raw: { source: 'news-rss', query: search },
+    })
+  }
+
+  return { items, source: 'live-web', errors: [] }
+}

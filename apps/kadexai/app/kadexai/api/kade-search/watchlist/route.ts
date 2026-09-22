@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthenticatedUser } from '@/lib/auth/server'
 import { watchlistAdd, watchlistAll, watchlistRemove } from '@/lib/kade-search/store'
-import { failure, requireReaderAccess } from '../_guard'
+import { failure, requireStoredTrendAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +11,7 @@ async function currentUserId() {
 }
 
 export async function GET() {
-  const guard = await requireReaderAccess()
+  const guard = await requireStoredTrendAccess()
   if (guard) return guard
   try {
     const userId = await currentUserId()
@@ -23,7 +23,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const guard = await requireReaderAccess()
+  const guard = await requireStoredTrendAccess()
   if (guard) return guard
   try {
     const userId = await currentUserId()
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const guard = await requireReaderAccess()
+  const guard = await requireStoredTrendAccess()
   if (guard) return guard
   try {
     const userId = await currentUserId()

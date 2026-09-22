@@ -34,7 +34,11 @@ Yanıtı YALNIZCA şu biçimde bir JSON nesnesi olarak ver, başka hiçbir şey 
 - "baslangic" ve "bitis" saniye cinsinden ondalık sayı olsun.
 - Her bölüm bir cümle ya da doğal bir duraklamaya kadar olan parça olsun; 8 saniyeyi geçmesin.
 - Konuşulan dili olduğu gibi yaz, çevirme.
-- Konuşma yoksa "bolumler" boş dizi olsun.`
+- Konuşma yoksa "bolumler" boş dizi olsun.
+- ASLA uydurma. Yalnızca gerçekten duyduğun kelimeleri yaz.
+- Ses müzik, alkış, gürültü, ton sesi, sessizlik ya da anlaşılmaz konuşma ise
+  hiçbir metin üretme; "bolumler" boş dizi olsun.
+- Emin olmadığın bir bölümü tahmin etmek yerine atla.`
 
 function jsonAyikla(ham: string): unknown {
   const kod = ham.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '')

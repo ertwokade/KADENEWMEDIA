@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { recentAlerts } from '@/lib/kade-search/store'
-import { failure, isKadeSearchConfigured, requireReaderAccess } from '../_guard'
+import { failure, isKadeSearchConfigured, requireStoredTrendAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const guard = await requireReaderAccess()
+  const guard = await requireStoredTrendAccess()
   if (guard) return guard
   if (!isKadeSearchConfigured()) {
     return NextResponse.json({ uyarilar: [], localFallback: true })

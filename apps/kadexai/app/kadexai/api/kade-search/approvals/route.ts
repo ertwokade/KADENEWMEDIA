@@ -3,7 +3,7 @@ import { getAuthenticatedUser } from '@/lib/auth/server'
 import { buildApprovalDraft, formatApprovalWhatsApp, normalizeApprovalStatus, sanitizeApprovalIdea } from '@/lib/kade-search/approvals'
 import { approvalGet, approvalList, approvalUpsert } from '@/lib/kade-search/store'
 import { sendWhatsAppMessage, whatsappConfiguration } from '@/lib/notifications/whatsapp'
-import { failure, requireReaderAccess } from '../_guard'
+import { failure, requireStoredTrendAccess } from '../_guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +12,7 @@ async function userId() {
 }
 
 export async function GET() {
-  const guard = await requireReaderAccess()
+  const guard = await requireStoredTrendAccess()
   if (guard) return guard
   try {
     const id = await userId()
@@ -24,7 +24,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const guard = await requireReaderAccess()
+  const guard = await requireStoredTrendAccess()
   if (guard) return guard
   try {
     const id = await userId()
