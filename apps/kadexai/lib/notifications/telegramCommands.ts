@@ -8,7 +8,14 @@ import { telegramConfiguration } from './telegramConfig'
 import type { TelegramBotChatType, TelegramBotCommand } from './telegramBot'
 import { parseTelegramContentPlatform } from './telegramContentLinks'
 import { formatSavedContentResult, formatTelegramContentList } from './telegramContentPresentation'
-import { deleteTelegramContent, listTelegramContent, refreshTelegramContent, saveTelegramContent } from './telegramSavedContent'
+import {
+  deleteShotTelegramContent,
+  deleteTelegramContent,
+  listTelegramContent,
+  markTelegramContentStatus,
+  refreshTelegramContent,
+  saveTelegramContent,
+} from './telegramSavedContent'
 import { whatsappConfiguration } from './whatsappConfig'
 
 const OPERATION_LABELS: Record<string, string> = {
@@ -184,12 +191,32 @@ async function saveContentMessage(context: TelegramCommandContext) {
   return formatSavedContentResult(result.row, result.updated)
 }
 
-async function savedContentMessage(context: TelegramCommandContext, sort: 'performance' | 'latest') {
-  const platform = parseTelegramContentPlatform(context.args ?? '')
-  const rows = await listTelegramContent({ chatId: contentLibraryChatId(context), platform, sort, limit: 10 })
+function contentListArgs(args: string | undefined) {
+  const value = args ?? ''
+  const platform = parseTelegramContentPlatform(value)
+  const pageToken = value.split(/\s+/).find((token) => /^\d{1,3}$/.test(token))
+  const page = Math.max(1, Math.min(Number(pageToken) || 1, 100))
+  return { platform, page }
+}
+
+async function savedContentMessage(
+  context: TelegramCommandContext,
+  sort: 'performance' | 'latest',
+  status?: 'pending' | 'shot',
+) {
+  const { platform, page } = contentListArgs(context.args)
+  const rows = await listTelegramContent({
+    chatId: contentLibraryChatId(context), platform, status, sort, limit: 500,
+  })
   const platformLabel = platform === 'instagram' ? ' · Instagram Reels' : platform === 'tiktok' ? ' · TikTok' : ''
-  const title = sort === 'latest' ? `🕘 Son eklenen içerikler${platformLabel}` : `🏆 Kayıtlı içerikler${platformLabel}`
-  return formatTelegramContentList(rows, { title, sort, limit: 10 })
+  const baseCommand = status === 'shot' ? 'cekilenler' : status === 'pending' ? 'bekleyenler' : sort === 'latest' ? 'son' : 'icerikler'
+  const command = `${baseCommand}${platform ? ` ${platform}` : ''}`
+  const title = status === 'shot'
+    ? `✅ Çekilmiş içerikler${platformLabel}`
+    : status === 'pending'
+      ? `⏳ Çekim bekleyen içerikler${platformLabel}`
+      : sort === 'latest' ? `🕘 Son eklenen içerikler${platformLabel}` : `📋 Kayıtlı içerikler${platformLabel}`
+  return formatTelegramContentList(rows, { title, sort, limit: 8, page, command })
 }
 
 async function refreshContentMessage(context: TelegramCommandContext) {
@@ -212,6 +239,40 @@ async function deleteContentMessage(context: TelegramCommandContext) {
   const deleted = await deleteTelegramContent(contentLibraryChatId(context), reference)
   if (!deleted) return '⚠️ Ortak içerik kütüphanesinde belirtilen kod veya sıra bulunamadı. Önce /icerikler yaz.'
   return `🗑️ İçerik silindi\n\n${deleted.platform === 'instagram' ? 'Instagram Reels' : 'TikTok'} · ${clean(deleted.title || deleted.description || deleted.canonical_url, 160)}`
+}
+
+async function markContentMessage(context: TelegramCommandContext, status: 'pending' | 'shot') {
+  const reference = context.args?.trim()
+  if (!reference) {
+    return status === 'shot'
+      ? '✅ Çekildi olarak işaretlemek için: /cekildi KOD'
+      : '↩️ Çekildi işaretini geri almak için: /cekilmedi KOD'
+  }
+  const row = await markTelegramContentStatus(contentLibraryChatId(context), context.actorId, reference, status)
+  if (!row) return '⚠️ Belirtilen içerik kodu bulunamadı. Önce /icerikler yaz.'
+  return [
+    status === 'shot' ? '✅ İçerik çekildi olarak işaretlendi.' : '↩️ İçerik yeniden bekleyenlere alındı.',
+    '',
+    `${row.platform === 'instagram' ? 'Instagram Reels' : 'TikTok'} · ${clean(row.title || row.description || row.canonical_url, 160)}`,
+    `Kod: ${row.id.slice(0, 8)}`,
+    row.canonical_url,
+  ].join('\n')
+}
+
+async function deleteShotContentMessage(context: TelegramCommandContext) {
+  const chatId = contentLibraryChatId(context)
+  const rows = await listTelegramContent({ chatId, status: 'shot', sort: 'latest', limit: 500 })
+  if (!rows.length) return 'ℹ️ Silinecek çekilmiş içerik yok.'
+  if (context.args?.trim().toLocaleUpperCase('tr-TR') !== 'ONAY') {
+    return [
+      '⚠️ Toplu silme onayı gerekiyor.',
+      '',
+      `${rows.length} çekilmiş içerik kalıcı olarak silinecek. Bekleyen içeriklere dokunulmayacak.`,
+      'Devam etmek için: /cekilenlerisil ONAY',
+    ].join('\n')
+  }
+  const deleted = await deleteShotTelegramContent(chatId)
+  return `🗑️ ${deleted} çekilmiş içerik silindi. Bekleyen içerikler korundu.`
 }
 
 async function quotesMessage() {
@@ -518,9 +579,14 @@ function helpMessage(start = false, context?: TelegramCommandContext) {
     'İÇERİK VE TEKNİK',
     '/trendler — 8 güncel fırsat',
     '/ekle BAĞLANTI — Reel veya TikTok kaydet',
-    '/icerikler [instagram|tiktok] — performansa göre listele',
-    '/son [instagram|tiktok] — son eklenenleri göster',
-    '/eniyi [instagram|tiktok] — en yüksek performanslıları göster',
+    '/icerikler [instagram|tiktok] [SAYFA] — sayfalı içerik tablosu',
+    '/son [instagram|tiktok] [SAYFA] — son eklenenleri göster',
+    '/eniyi [instagram|tiktok] [SAYFA] — en yüksek performanslıları göster',
+    '/bekleyenler [SAYFA] — çekim bekleyenleri göster',
+    '/cekildi KOD — içeriği çekildi olarak işaretle',
+    '/cekilmedi KOD — çekildi işaretini geri al',
+    '/cekilenler [SAYFA] — çekilmiş içerikleri göster',
+    '/cekilenlerisil — güvenli toplu silme onayını göster',
     '/guncelle [instagram|tiktok] — metadata ve metrikleri yenile',
     '/sil KOD — kayıtlı içeriği sil',
     '/durum — servis ve veritabanı sağlığı',
@@ -554,6 +620,11 @@ export async function executeTelegramCommand(command: TelegramBotCommand, contex
     case 'icerikler': return savedContentMessage(context, 'performance')
     case 'son': return savedContentMessage(context, 'latest')
     case 'eniyi': return savedContentMessage(context, 'performance')
+    case 'bekleyenler': return savedContentMessage(context, 'latest', 'pending')
+    case 'cekildi': return markContentMessage(context, 'shot')
+    case 'cekilmedi': return markContentMessage(context, 'pending')
+    case 'cekilenler': return savedContentMessage(context, 'latest', 'shot')
+    case 'cekilenlerisil': return deleteShotContentMessage(context)
     case 'guncelle': return refreshContentMessage(context)
     case 'sil': return deleteContentMessage(context)
     case 'teklifler': return quotesMessage()

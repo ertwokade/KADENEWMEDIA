@@ -15,7 +15,8 @@ const base: TelegramSavedContent = {
   canonical_url: 'https://www.tiktok.com/@kade/video/1234567890123456789', title: 'Örnek video',
   description: null, author_name: '@kade', views: null, likes: null, comments: null, shares: null, saves: null,
   metadata_source: 'TikTok resmî oEmbed', metrics_source: null, metrics_status: 'unavailable',
-  metric_updated_at: null, added_at: '2026-09-28T07:00:00.000Z', updated_at: '2026-09-28T07:00:00.000Z',
+  metric_updated_at: null, production_status: 'pending', shot_at: null,
+  added_at: '2026-09-28T07:00:00.000Z', updated_at: '2026-09-28T07:00:00.000Z',
 }
 
 test('social content links are canonicalized and tracking parameters are removed', () => {
@@ -69,12 +70,29 @@ test('content ranking uses real views first, engagement fallback second, then re
   assert.deepEqual(sortTelegramSavedContent([empty, engaged, viewed], 'performance').map((row) => row.id), [viewed.id, engaged.id, empty.id])
 })
 
-test('content list explicitly labels unavailable metrics and includes source/update time', () => {
+test('content list is a paginated production-status table with copyable codes', () => {
   const output = formatTelegramContentList([base], { title: 'Kayıtlı içerikler', sort: 'performance' })
   assert.match(output, /Performans: veri alınamadı/)
-  assert.match(output, /Kaynak: TikTok resmî oEmbed/)
-  assert.match(output, /Kod: 11111111/)
+  assert.match(output, /Sayfa 1\/1/)
+  assert.match(output, /01 │ ⏳ │ TT │ 11111111/)
+  assert.match(output, /İşaretle: \/cekildi KOD/)
   assert.ok(output.length <= 4096)
+})
+
+test('content list paginates and labels shot items', () => {
+  const rows = Array.from({ length: 9 }, (_, index) => ({
+    ...base,
+    id: `${String(index + 1).padStart(8, '0')}-1111-4111-8111-111111111111`,
+    production_status: index === 8 ? 'shot' as const : 'pending' as const,
+    shot_at: index === 8 ? '2026-09-28T08:00:00.000Z' : null,
+    added_at: `2026-09-28T${String(index).padStart(2, '0')}:00:00.000Z`,
+  }))
+  const output = formatTelegramContentList(rows, {
+    title: 'İçerik tablosu', sort: 'latest', limit: 8, page: 2, command: 'icerikler',
+  })
+  assert.match(output, /Sayfa 2\/2/)
+  assert.match(output, /09 │ ⏳ │ TT │ 00000001/)
+  assert.match(output, /Önceki sayfa: \/icerikler 1/)
 })
 
 test('content list uses a stable platform and content-code label when a public title is unavailable', () => {
@@ -111,11 +129,18 @@ test('Telegram delegated access is persistent, service-role only, and primary-ow
   assert.match(webhook, /approveTelegramUser/)
 })
 
+test('Telegram content production status is constrained and indexed', async () => {
+  const migration = await readFile(new URL('../../supabase/migrations/202609280003_telegram_content_production_status.sql', import.meta.url), 'utf8')
+  assert.match(migration, /production_status IN \('pending', 'shot'\)/)
+  assert.match(migration, /telegram_saved_content_shot_consistency/)
+  assert.match(migration, /chat_id, production_status, added_at DESC/)
+})
+
 test('Telegram private accounts and groups use the primary owner shared content library', async () => {
   const webhook = await readFile(new URL('../../app/kadexai/api/telegram/webhook/route.ts', import.meta.url), 'utf8')
   const commands = await readFile(new URL('../../lib/notifications/telegramCommands.ts', import.meta.url), 'utf8')
 
   assert.match(webhook, /contentLibraryChatId: primaryOwnerIds\[0\] \?\? action\.chatId/)
-  assert.match(commands, /listTelegramContent\(\{ chatId: contentLibraryChatId\(context\)/)
+  assert.match(commands, /listTelegramContent\(\{[\s\S]*chatId: contentLibraryChatId\(context\)/)
   assert.match(commands, /saveTelegramContent\(\{ chatId: contentLibraryChatId\(context\)/)
 })

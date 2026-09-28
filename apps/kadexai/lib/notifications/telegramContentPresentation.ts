@@ -17,6 +17,8 @@ export interface TelegramSavedContent {
   metrics_source: string | null
   metrics_status: 'available' | 'partial' | 'unavailable'
   metric_updated_at: string | null
+  production_status: 'pending' | 'shot'
+  shot_at: string | null
   added_at: string
   updated_at: string
 }
@@ -83,26 +85,42 @@ function contentTitle(row: TelegramSavedContent) {
 
 export function formatTelegramContentList(
   rows: TelegramSavedContent[],
-  options: { title: string; sort: TelegramContentSort; limit?: number },
+  options: {
+    title: string
+    sort: TelegramContentSort
+    limit?: number
+    page?: number
+    command?: string
+  },
 ) {
-  const selected = sortTelegramSavedContent(rows, options.sort).slice(0, Math.max(1, Math.min(options.limit ?? 8, 12)))
-  if (!selected.length) {
+  const limit = Math.max(1, Math.min(options.limit ?? 8, 10))
+  const sorted = sortTelegramSavedContent(rows, options.sort)
+  const totalPages = Math.max(1, Math.ceil(sorted.length / limit))
+  const page = Math.max(1, Math.min(options.page ?? 1, totalPages))
+  const offset = (page - 1) * limit
+  const selected = sorted.slice(offset, offset + limit)
+  if (!sorted.length) {
     return `${options.title}\n\nHenüz kayıtlı içerik yok. Bir Instagram Reel veya TikTok bağlantısını doğrudan göndererek ekleyebilirsin.`
   }
+  const command = options.command ?? 'icerikler'
   return [
-    options.title,
+    `${options.title} · Sayfa ${page}/${totalPages}`,
+    `Toplam: ${sorted.length} · ⏳ Bekliyor · ✅ Çekildi`,
     '',
     ...selected.flatMap((row, index) => [
-      `${index + 1}. ${row.platform === 'instagram' ? 'Instagram Reels' : 'TikTok'} · ${contentTitle(row)}`,
+      `${String(offset + index + 1).padStart(2, '0')} │ ${row.production_status === 'shot' ? '✅' : '⏳'} │ ${row.platform === 'instagram' ? 'IG' : 'TT'} │ ${row.id.slice(0, 8)}`,
+      `   ${contentTitle(row)}`,
       `   ${metricsLine(row)}`,
-      `   Kaynak: ${compact(row.metrics_source || row.metadata_source, 90)} · Güncelleme: ${istanbulTime(row.metric_updated_at || row.updated_at)}`,
-      `   Kod: ${row.id.slice(0, 8)} · ${row.canonical_url}`,
+      `   ${row.canonical_url}`,
     ]),
     '',
     options.sort === 'performance'
       ? 'Sıralama: önce erişilebilen performans verisi, veri yoksa en yeni eklenen.'
       : 'Sıralama: en yeni eklenen önce.',
-    'Silmek için: /sil KOD',
+    ...(page < totalPages ? [`Sonraki sayfa: /${command} ${page + 1}`] : []),
+    ...(page > 1 ? [`Önceki sayfa: /${command} ${page - 1}`] : []),
+    'İşaretle: /cekildi KOD · Geri al: /cekilmedi KOD',
+    'Tek kayıt sil: /sil KOD',
   ].join('\n').slice(0, 4096)
 }
 
@@ -116,6 +134,7 @@ export function formatSavedContentResult(row: TelegramSavedContent, updated: boo
     `Metrik: ${compact(row.metrics_source || 'veri alınamadı', 100)}`,
     `Son güncelleme: ${istanbulTime(row.metric_updated_at || row.updated_at)}`,
     `Kod: ${row.id.slice(0, 8)}`,
+    `Durum: ${row.production_status === 'shot' ? '✅ Çekildi' : '⏳ Bekliyor'}`,
     row.canonical_url,
   ].join('\n')
 }

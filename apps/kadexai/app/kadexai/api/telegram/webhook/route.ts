@@ -20,7 +20,7 @@ export const runtime = 'nodejs'
 export const maxDuration = 60
 
 const seenUpdates = new Set<number>()
-const OWNER_ONLY_COMMANDS = new Set(['ekle', 'guncelle', 'sil'])
+const OWNER_ONLY_COMMANDS = new Set(['ekle', 'guncelle', 'cekildi', 'cekilmedi', 'cekilenlerisil', 'sil'])
 const ACCESS_ADMIN_COMMANDS = new Set(['yetkiver', 'yetkial', 'yetkililer'])
 
 function clean(value: string | undefined, max = 120) {
@@ -260,7 +260,7 @@ export async function POST(request: Request) {
     if (isGroup && OWNER_ONLY_COMMANDS.has(action.command) && !ownerActor) {
       await sendTelegramBotReply(
         action.chatId,
-        '🔒 Bu grupta içerik ekleme, yenileme ve silme işlemlerini yalnız yetkili sahip yapabilir.',
+        '🔒 Bu grupta içerik ekleme, yenileme, çekim durumu ve silme işlemlerini yalnız yetkili sahip yapabilir.',
         TELEGRAM_MAIN_KEYBOARD,
         [action.chatId],
       )

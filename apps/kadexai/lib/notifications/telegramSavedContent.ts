@@ -39,7 +39,7 @@ interface CollectedContent {
 const SELECT_COLUMNS = [
   'id', 'chat_id', 'platform', 'canonical_url', 'title', 'description', 'author_name',
   'views', 'likes', 'comments', 'shares', 'saves', 'metadata_source', 'metrics_source',
-  'metrics_status', 'metric_updated_at', 'added_at', 'updated_at',
+  'metrics_status', 'metric_updated_at', 'production_status', 'shot_at', 'added_at', 'updated_at',
 ].join(',')
 
 function clean(value: unknown, max: number) {
@@ -321,28 +321,66 @@ export async function saveTelegramContent(input: { chatId: string; actorId: stri
 }
 
 export async function listTelegramContent(input: {
-  chatId: string; platform?: TelegramContentPlatform | null; sort?: TelegramContentSort; limit?: number
+  chatId: string
+  platform?: TelegramContentPlatform | null
+  status?: TelegramSavedContent['production_status'] | null
+  sort?: TelegramContentSort
+  limit?: number
 }) {
   const admin = createAdminClient()
   let query = admin.from('telegram_saved_content').select(SELECT_COLUMNS).eq('chat_id', input.chatId).limit(500)
   if (input.platform) query = query.eq('platform', input.platform)
+  if (input.status) query = query.eq('production_status', input.status)
   const { data, error } = await query
   if (error) throw new Error('Kayıtlı içerikler okunamadı.')
   return sortTelegramSavedContent((data ?? []) as unknown as TelegramSavedContent[], input.sort ?? 'performance')
-    .slice(0, Math.max(1, Math.min(input.limit ?? 12, 100)))
+    .slice(0, Math.max(1, Math.min(input.limit ?? 12, 500)))
+}
+
+async function resolveTelegramContent(chatId: string, reference: string) {
+  const rows = await listTelegramContent({ chatId, sort: 'performance', limit: 500 })
+  const normalized = reference.trim().toLocaleLowerCase('en-US')
+  return /^\d{1,3}$/.test(normalized)
+    ? rows[Number(normalized) - 1] ?? null
+    : rows.find((row) => row.id.toLocaleLowerCase('en-US').startsWith(normalized)) ?? null
 }
 
 export async function deleteTelegramContent(chatId: string, reference: string) {
-  const rows = await listTelegramContent({ chatId, sort: 'performance', limit: 100 })
-  const normalized = reference.trim().toLocaleLowerCase('en-US')
-  const selected = /^\d{1,3}$/.test(normalized)
-    ? rows[Number(normalized) - 1]
-    : rows.find((row) => row.id.toLocaleLowerCase('en-US').startsWith(normalized))
+  const selected = await resolveTelegramContent(chatId, reference)
   if (!selected) return null
   const admin = createAdminClient()
   const { error } = await admin.from('telegram_saved_content').delete().eq('id', selected.id).eq('chat_id', chatId)
   if (error) throw new Error('İçerik silinemedi.')
   return selected
+}
+
+export async function markTelegramContentStatus(
+  chatId: string,
+  actorId: string,
+  reference: string,
+  status: TelegramSavedContent['production_status'],
+) {
+  const selected = await resolveTelegramContent(chatId, reference)
+  if (!selected) return null
+  const now = new Date().toISOString()
+  const { data, error } = await createAdminClient().from('telegram_saved_content').update({
+    production_status: status,
+    shot_at: status === 'shot' ? now : null,
+    shot_by: status === 'shot' ? actorId : null,
+    updated_at: now,
+  }).eq('id', selected.id).eq('chat_id', chatId).select(SELECT_COLUMNS).single()
+  if (error || !data) throw new Error('İçerik çekim durumu güncellenemedi.')
+  return data as unknown as TelegramSavedContent
+}
+
+export async function deleteShotTelegramContent(chatId: string) {
+  const admin = createAdminClient()
+  const { count, error } = await admin.from('telegram_saved_content')
+    .delete({ count: 'exact' })
+    .eq('chat_id', chatId)
+    .eq('production_status', 'shot')
+  if (error) throw new Error('Çekilmiş içerikler silinemedi.')
+  return count ?? 0
 }
 
 export async function refreshTelegramContent(chatId: string, limit = 12, platform?: TelegramContentPlatform | null) {

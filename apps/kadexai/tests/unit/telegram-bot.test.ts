@@ -82,11 +82,29 @@ test('Telegram bot maps unknown text to help and every button to a registered co
     },
   })
   assert.equal(action?.command, 'yardim')
-  assert.equal(TELEGRAM_COMMANDS.length, 32)
+  assert.equal(TELEGRAM_COMMANDS.length, 37)
 
   const registered = new Set(TELEGRAM_COMMANDS.map((item) => item.command))
   for (const row of TELEGRAM_MAIN_KEYBOARD.inline_keyboard) {
     for (const button of row) assert.equal(registered.has(button.callback_data.replace('cmd:', '') as never), true)
+  }
+})
+
+test('Telegram bot parses production-status and paginated content commands', () => {
+  const cases = [
+    ['/icerikler instagram 2', 'icerikler', 'instagram 2'],
+    ['/çekildi a1b2c3d4', 'cekildi', 'a1b2c3d4'],
+    ['/cekilmedi a1b2c3d4', 'cekilmedi', 'a1b2c3d4'],
+    ['/çekilenler 3', 'cekilenler', '3'],
+    ['/cekilenlerisil ONAY', 'cekilenlerisil', 'ONAY'],
+  ] as const
+  for (const [text, command, args] of cases) {
+    const action = parseTelegramBotUpdate({
+      update_id: 700 + text.length,
+      message: { text, from: { id: 123456789 }, chat: { id: 123456789, type: 'private' } },
+    })
+    assert.equal(action?.command, command)
+    assert.equal(action?.args, args)
   }
 })
 
