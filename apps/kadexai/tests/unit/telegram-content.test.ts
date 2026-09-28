@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
 import { parseTelegramContentLink, parseTelegramContentPlatform } from '../../lib/notifications/telegramContentLinks'
+import { parseInstagramPublicMetadata, parseTikTokPublicMetadata } from '../../lib/notifications/telegramPublicMetadata'
 import {
   contentPerformanceValue,
   formatTelegramContentList,
@@ -33,6 +34,31 @@ test('social content links are canonicalized and tracking parameters are removed
   assert.equal(parseTelegramContentLink('https://evil.example/reel/AbC_123/'), null)
   assert.equal(parseTelegramContentLink('https://vm.tiktok.com/ZMExample/ABC')?.needsResolution, true)
   assert.equal(parseTelegramContentPlatform('TikTok içerikleri'), 'tiktok')
+})
+
+test('public social pages provide honest fallback titles when official oEmbed is unavailable', () => {
+  const instagram = parseInstagramPublicMetadata(`
+    <meta property="og:title" content="Hakan Y&#x131;lmaz on Instagram: &quot;Hahshshsh &#064;hakobenx&quot;" />
+    <meta property="og:description" content="2,330 likes - hakobenx: &quot;Hahshshsh&quot;" />
+  `)
+  assert.equal(instagram?.title, 'Hahshshsh @hakobenx')
+  assert.equal(instagram?.authorName, 'Hakan Yılmaz')
+
+  const tiktokPayload = JSON.stringify({
+    __DEFAULT_SCOPE__: {
+      'webapp.video-detail': {
+        itemInfo: { itemStruct: {
+          desc: 'En iyi sandviçi yapan kazanır!',
+          author: { uniqueId: 'tasariminho', nickname: 'Tasarımınho' },
+          video: { cover: 'https://cdn.example/cover.jpg' },
+        } },
+      },
+    },
+  })
+  const tiktok = parseTikTokPublicMetadata(`<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__" type="application/json">${tiktokPayload}</script>`)
+  assert.equal(tiktok?.title, 'En iyi sandviçi yapan kazanır!')
+  assert.equal(tiktok?.authorName, '@tasariminho')
+  assert.equal(tiktok?.thumbnailUrl, 'https://cdn.example/cover.jpg')
 })
 
 test('content ranking uses real views first, engagement fallback second, then recency', () => {

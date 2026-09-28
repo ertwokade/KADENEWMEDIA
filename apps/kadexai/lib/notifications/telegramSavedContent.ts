@@ -12,6 +12,7 @@ import {
   type TelegramContentSort,
   type TelegramSavedContent,
 } from './telegramContentPresentation'
+import { fetchTelegramPublicMetadata } from './telegramPublicMetadata'
 
 type FetchLike = (input: string, init?: RequestInit) => Promise<Response>
 
@@ -220,6 +221,13 @@ export async function collectTelegramContent(
       : await instagramOembed(link, env, fetchImpl)
   } catch (error) {
     errors.push(safeError(error))
+  }
+  if (!metadata) {
+    try {
+      metadata = await fetchTelegramPublicMetadata(link, fetchImpl)
+    } catch (error) {
+      errors.push(safeError(error))
+    }
   }
 
   const trend = await knownTrend(link).catch((error) => {

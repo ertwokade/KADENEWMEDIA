@@ -67,7 +67,7 @@ test('Telegram delivery uses POST, limits text and masks recipients', async () =
     assert.equal(body.chat_id, '123456789')
     assert.equal([...body.text].length, 4096)
     assert.deepEqual(body.link_preview_options, { is_disabled: true })
-    assert.equal(body.protect_content, true)
+    assert.equal('protect_content' in body, false)
     return Response.json({ ok: true, result: { message_id: 42 } })
   })
 
@@ -113,7 +113,7 @@ test('Telegram bot replies only to an allowed chat and includes inline buttons',
       const body = JSON.parse(String(init?.body))
       assert.equal(body.chat_id, '123456789')
       assert.deepEqual(body.reply_markup, replyMarkup)
-      assert.equal(body.protect_content, true)
+      assert.equal('protect_content' in body, false)
       return Response.json({ ok: true, result: { message_id: 77 } })
     },
   )

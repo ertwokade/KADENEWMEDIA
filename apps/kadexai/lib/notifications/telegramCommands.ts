@@ -194,7 +194,7 @@ async function savedContentMessage(context: TelegramCommandContext, sort: 'perfo
 
 async function refreshContentMessage(context: TelegramCommandContext) {
   const platform = parseTelegramContentPlatform(context.args ?? '')
-  const result = await refreshTelegramContent(contentLibraryChatId(context), 20, platform)
+  const result = await refreshTelegramContent(contentLibraryChatId(context), 50, platform)
   if (!result.total) return '♻️ Güncellenecek kayıtlı içerik yok.'
   return [
     '♻️ İçerik verileri yenilendi',

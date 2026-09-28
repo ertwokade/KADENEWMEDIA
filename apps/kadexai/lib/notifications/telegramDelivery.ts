@@ -41,7 +41,6 @@ async function deliverOneTelegram(
         chat_id: chatId,
         text,
         link_preview_options: { is_disabled: true },
-        protect_content: true,
         ...(options.replyMarkup ? { reply_markup: options.replyMarkup } : {}),
       }),
       cache: 'no-store',
