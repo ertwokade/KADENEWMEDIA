@@ -74,7 +74,7 @@ function metricsLine(row: TelegramSavedContent) {
 }
 
 function contentTitle(row: TelegramSavedContent) {
-  const supplied = compact(row.title || row.description)
+  const supplied = compact(row.title || row.description, 76)
   if (supplied) return supplied
   const link = parseTelegramContentLink(row.canonical_url)
   const kind = row.platform === 'instagram'
@@ -103,24 +103,30 @@ export function formatTelegramContentList(
     return `${options.title}\n\nHenüz kayıtlı içerik yok. Bir Instagram Reel veya TikTok bağlantısını doğrudan göndererek ekleyebilirsin.`
   }
   const command = options.command ?? 'icerikler'
+  const cards = selected.flatMap((row, index) => {
+    const metrics = metricsLine(row)
+    return [
+      `${String(offset + index + 1).padStart(2, '0')}. ${row.production_status === 'shot' ? '✅' : '⏳'} ${row.platform === 'instagram' ? 'Instagram' : 'TikTok'}  •  ${row.id.slice(0, 8)}`,
+      contentTitle(row),
+      ...(metrics === 'Performans: veri alınamadı' ? [] : [metrics]),
+      `🔗 ${row.canonical_url}`,
+      '',
+    ]
+  })
   return [
-    `${options.title} · Sayfa ${page}/${totalPages}`,
-    `Toplam: ${sorted.length} · ⏳ Bekliyor · ✅ Çekildi`,
+    options.title,
+    `Sayfa ${page}/${totalPages}  •  ${sorted.length} kayıt`,
     '',
-    ...selected.flatMap((row, index) => [
-      `${String(offset + index + 1).padStart(2, '0')} │ ${row.production_status === 'shot' ? '✅' : '⏳'} │ ${row.platform === 'instagram' ? 'IG' : 'TT'} │ ${row.id.slice(0, 8)}`,
-      `   ${contentTitle(row)}`,
-      `   ${metricsLine(row)}`,
-      `   ${row.canonical_url}`,
-    ]),
+    ...cards,
+    'SAYFALAR',
+    ...(page > 1 ? [`⬅️ /${command} ${page - 1}`] : []),
+    ...(page < totalPages ? [`➡️ /${command} ${page + 1}`] : []),
+    ...(totalPages === 1 ? ['Bu liste tek sayfa.'] : []),
     '',
-    options.sort === 'performance'
-      ? 'Sıralama: önce erişilebilen performans verisi, veri yoksa en yeni eklenen.'
-      : 'Sıralama: en yeni eklenen önce.',
-    ...(page < totalPages ? [`Sonraki sayfa: /${command} ${page + 1}`] : []),
-    ...(page > 1 ? [`Önceki sayfa: /${command} ${page - 1}`] : []),
-    'İşaretle: /cekildi KOD · Geri al: /cekilmedi KOD',
-    'Tek kayıt sil: /sil KOD',
+    'İŞLEMLER',
+    '✅ Çekildi: /cekildi KOD',
+    '↩️ Geri al: /cekilmedi KOD',
+    '🗑️ Sil: /sil KOD',
   ].join('\n').slice(0, 4096)
 }
 

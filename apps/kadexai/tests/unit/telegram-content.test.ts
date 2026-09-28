@@ -70,12 +70,12 @@ test('content ranking uses real views first, engagement fallback second, then re
   assert.deepEqual(sortTelegramSavedContent([empty, engaged, viewed], 'performance').map((row) => row.id), [viewed.id, engaged.id, empty.id])
 })
 
-test('content list is a paginated production-status table with copyable codes', () => {
+test('content list is a readable paginated production list with copyable codes', () => {
   const output = formatTelegramContentList([base], { title: 'Kayıtlı içerikler', sort: 'performance' })
-  assert.match(output, /Performans: veri alınamadı/)
-  assert.match(output, /Sayfa 1\/1/)
-  assert.match(output, /01 │ ⏳ │ TT │ 11111111/)
-  assert.match(output, /İşaretle: \/cekildi KOD/)
+  assert.doesNotMatch(output, /Performans: veri alınamadı/)
+  assert.match(output, /Sayfa 1\/1  •  1 kayıt/)
+  assert.match(output, /01\. ⏳ TikTok  •  11111111/)
+  assert.match(output, /İŞLEMLER\n✅ Çekildi: \/cekildi KOD/)
   assert.ok(output.length <= 4096)
 })
 
@@ -90,9 +90,9 @@ test('content list paginates and labels shot items', () => {
   const output = formatTelegramContentList(rows, {
     title: 'İçerik tablosu', sort: 'latest', limit: 8, page: 2, command: 'icerikler',
   })
-  assert.match(output, /Sayfa 2\/2/)
-  assert.match(output, /09 │ ⏳ │ TT │ 00000001/)
-  assert.match(output, /Önceki sayfa: \/icerikler 1/)
+  assert.match(output, /Sayfa 2\/2  •  9 kayıt/)
+  assert.match(output, /09\. ⏳ TikTok  •  00000001/)
+  assert.match(output, /⬅️ \/icerikler 1/)
 })
 
 test('content list uses a stable platform and content-code label when a public title is unavailable', () => {
