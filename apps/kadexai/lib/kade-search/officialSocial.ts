@@ -223,6 +223,39 @@ export async function searchTikTokResearch(
     .map((item, index) => ({ ...item, rank: index + 1 }))
 }
 
+/** Tek bir TikTok video kimliğini resmî Research API üzerinden doğrular. */
+export async function getTikTokResearchVideoById(
+  videoId: string,
+  env: Env = process.env,
+  fetchImpl: FetchLike = fetch,
+): Promise<RawTrendItem | null> {
+  if (!/^\d{5,30}$/.test(videoId)) throw new OfficialApiError('Geçersiz TikTok video kimliği')
+  const token = await tiktokToken(env, fetchImpl)
+  const end = new Date()
+  const start = new Date(end.getTime() - 29 * 86400e3)
+  const { response, body } = await fetchJson(fetchImpl, `${TIKTOK_API}/research/video/query/?fields=${TIKTOK_FIELDS}`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+    body: JSON.stringify({
+      query: { and: [{ operation: 'EQ', field_name: 'video_id', field_values: [videoId] }] },
+      start_date: yyyymmdd(start),
+      end_date: yyyymmdd(end),
+      max_count: 1,
+      is_random: false,
+    }),
+  })
+  const error = body?.error as { code?: string } | undefined
+  if (!response.ok || (error?.code && error.code !== 'ok')) {
+    if (response.status === 401) tokenCache.clear()
+    const reason = response.status === 429 ? 'günlük TikTok Research API kotası doldu'
+      : response.status === 401 || response.status === 403 ? 'TikTok Research API yetkisi reddedildi'
+      : `TikTok Research API hatası (${text(error?.code, 40) || response.status})`
+    throw new OfficialApiError(reason, response.status, text(error?.code, 40))
+  }
+  const videos = ((body?.data as { videos?: TikTokResearchVideo[] } | undefined)?.videos ?? [])
+  return videos.map((video) => mapTikTokResearchVideo(video, 1)).find((item) => item?.external_id === videoId) ?? null
+}
+
 /* -------------------------------- Instagram ------------------------------- */
 
 const hashtagIdCache = new Map<string, string>()

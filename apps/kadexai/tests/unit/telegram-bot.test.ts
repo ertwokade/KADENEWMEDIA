@@ -82,12 +82,44 @@ test('Telegram bot maps unknown text to help and every button to a registered co
     },
   })
   assert.equal(action?.command, 'yardim')
-  assert.equal(TELEGRAM_COMMANDS.length, 22)
+  assert.equal(TELEGRAM_COMMANDS.length, 28)
 
   const registered = new Set(TELEGRAM_COMMANDS.map((item) => item.command))
   for (const row of TELEGRAM_MAIN_KEYBOARD.inline_keyboard) {
     for (const button of row) assert.equal(registered.has(button.callback_data.replace('cmd:', '') as never), true)
   }
+})
+
+test('Telegram bot recognizes social links and natural-language content commands', () => {
+  const reel = parseTelegramBotUpdate({
+    update_id: 301,
+    message: {
+      text: 'Şunu kaydet https://www.instagram.com/reel/AbC_123/?utm_source=ig_web_copy_link',
+      from: { id: 123456789 }, chat: { id: 123456789, type: 'private' },
+    },
+  })
+  assert.equal(reel?.command, 'ekle')
+  assert.equal(reel?.args, 'https://www.instagram.com/reel/AbC_123/?utm_source=ig_web_copy_link')
+
+  const best = parseTelegramBotUpdate({
+    update_id: 302,
+    message: {
+      text: 'Instagram en çok izlenenleri listele',
+      from: { id: 123456789 }, chat: { id: 123456789, type: 'private' },
+    },
+  })
+  assert.equal(best?.command, 'eniyi')
+  assert.equal(best?.args, 'instagram')
+
+  const remove = parseTelegramBotUpdate({
+    update_id: 303,
+    message: {
+      text: 'sil a1b2c3d4',
+      from: { id: 123456789 }, chat: { id: 123456789, type: 'private' },
+    },
+  })
+  assert.equal(remove?.command, 'sil')
+  assert.equal(remove?.args, 'a1b2c3d4')
 })
 
 test('Telegram bot supports Turkish and English lifecycle aliases', () => {

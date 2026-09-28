@@ -32,6 +32,10 @@ logged on. Caddy runs independently as the automatic Windows service `caddy`.
 Scheduled application jobs are installed from `kadexai.cron` and keep Vercel's
 UTC schedule. The stale `/api/reminders?action=check` entry is intentionally
 excluded because that route is not present in this application tree.
+Telegram saved-content summaries run at 06:00 and 09:00 UTC, corresponding to
+09:00 and 12:00 in the fixed Europe/Istanbul UTC+3 time zone. Delivery slots
+are persisted in Supabase so a repeated cron invocation cannot duplicate a
+summary after a container restart.
 
 The separately pinned self-hosted Supabase stack lives in `/srv/supabase`.
 Its API gateway and PostgreSQL pooler bind only to WSL localhost; Windows

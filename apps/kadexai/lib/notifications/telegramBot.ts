@@ -1,4 +1,5 @@
 import type { TelegramReplyMarkup } from './telegramDelivery'
+import { extractTelegramContentUrl, parseTelegramContentPlatform } from './telegramContentLinks'
 
 export const TELEGRAM_COMMANDS = [
   { command: 'start', description: 'KadeX ana menüsünü aç' },
@@ -10,6 +11,12 @@ export const TELEGRAM_COMMANDS = [
   { command: 'hafta', description: 'Son 7 günün operasyon özetini göster' },
   { command: 'sonislemler', description: 'Son operasyon kayıtlarını göster' },
   { command: 'trendler', description: 'Güncel içerik fırsatlarını göster' },
+  { command: 'ekle', description: 'Instagram Reel veya TikTok bağlantısı kaydet' },
+  { command: 'icerikler', description: 'Kayıtlı sosyal içerikleri listele' },
+  { command: 'son', description: 'Son eklenen sosyal içerikleri göster' },
+  { command: 'eniyi', description: 'En iyi performanslı içerikleri göster' },
+  { command: 'guncelle', description: 'Kayıtlı içerik verilerini yenile' },
+  { command: 'sil', description: 'Kayıtlı içeriği kısa koduyla sil' },
   { command: 'teklifler', description: 'Tekliflerin durum özetini göster' },
   { command: 'abonelikler', description: 'Aboneliklerin durum özetini göster' },
   { command: 'kullanicilar', description: 'KadexAI kullanıcı sayısını göster' },
@@ -35,25 +42,46 @@ export interface TelegramBotAction {
   chatType: TelegramBotChatType
   chatTitle?: string
   command: TelegramBotCommand
+  args?: string
   callbackQueryId?: string
 }
 
 const COMMANDS = new Set<TelegramBotCommand>(TELEGRAM_COMMANDS.map((item) => item.command))
 
-function normalizedCommand(value: unknown): TelegramBotCommand {
-  const raw = String(value ?? '').trim().toLocaleLowerCase('tr-TR')
-  const withoutPrefix = raw.startsWith('cmd:') ? raw.slice(4) : raw
-  const firstToken = withoutPrefix.split(/\s+/, 1)[0] ?? ''
-  const command = firstToken.replace(/^\//, '').split('@', 1)[0]
+function normalizedCommand(value: unknown): { command: TelegramBotCommand; args?: string } {
+  const original = String(value ?? '').trim()
+  const raw = original.toLocaleLowerCase('tr-TR')
+  const withoutPrefix = original.startsWith('cmd:') ? original.slice(4) : original
+  const [firstToken = '', ...rest] = withoutPrefix.split(/\s+/)
+  const command = firstToken.toLocaleLowerCase('tr-TR').replace(/^\//, '').split('@', 1)[0]
   const aliases: Record<string, TelegramBotCommand> = {
     help: 'yardim', menu: 'yardim', yardım: 'yardim',
     başlat: 'baslat', ac: 'baslat', aç: 'baslat',
     stop: 'durdur', kapat: 'durdur',
     weekly: 'hafta', today: 'bugun', status: 'durum',
     users: 'kullanicilar', usage: 'kullanim', about: 'hakkinda',
+    içerikler: 'icerikler', liste: 'icerikler', kayitlar: 'icerikler', kayıtlar: 'icerikler',
+    ekle: 'ekle', add: 'ekle',
+    son: 'son', latest: 'son',
+    eniyiler: 'eniyi', best: 'eniyi',
+    güncelle: 'guncelle', refresh: 'guncelle', yenile: 'guncelle',
+    delete: 'sil', kaldır: 'sil', kaldir: 'sil',
   }
-  if (aliases[command]) return aliases[command]
-  return COMMANDS.has(command as TelegramBotCommand) ? command as TelegramBotCommand : 'yardim'
+  const explicit = aliases[command] ?? (COMMANDS.has(command as TelegramBotCommand) ? command as TelegramBotCommand : null)
+  if (explicit) return { command: explicit, ...(rest.length ? { args: rest.join(' ') } : {}) }
+
+  const contentUrl = extractTelegramContentUrl(original)
+  if (contentUrl) return { command: 'ekle', args: contentUrl }
+
+  const platform = parseTelegramContentPlatform(raw)
+  const args = platform ?? undefined
+  if (/\b(?:en çok izlenen(?:ler(?:i)?)?|en cok izlenen(?:ler(?:i)?)?|en iyi|en iyiler|performans)\b/u.test(raw)) return { command: 'eniyi', args }
+  if (/\b(?:son eklenen|son eklenenler|yeniler|en yeni)\b/u.test(raw)) return { command: 'son', args }
+  if (/\b(?:listele|içerikler|icerikler|kayıtlar|kayitlar)\b/u.test(raw)) return { command: 'icerikler', args }
+  if (/^(?:güncelle|guncelle|yenile)\b/u.test(raw)) return { command: 'guncelle', args }
+  const deleteMatch = raw.match(/^(?:sil|kaldır|kaldir)\s+([a-f0-9-]{4,36}|\d{1,3})$/u)
+  if (deleteMatch) return { command: 'sil', args: deleteMatch[1] }
+  return { command: 'yardim' }
 }
 
 function parsedChat(message: unknown, fromId: unknown) {
@@ -91,7 +119,7 @@ export function parseTelegramBotUpdate(input: unknown): TelegramBotAction | null
     return {
       updateId: update.update_id as number,
       ...chat,
-      command: normalizedCommand(callback.data),
+      ...normalizedCommand(callback.data),
       callbackQueryId: callback.id,
     }
   }
@@ -103,7 +131,7 @@ export function parseTelegramBotUpdate(input: unknown): TelegramBotAction | null
     return {
       updateId: update.update_id as number,
       ...chat,
-      command: normalizedCommand(message.text),
+      ...normalizedCommand(message.text),
     }
   }
 
@@ -123,6 +151,10 @@ export const TELEGRAM_MAIN_KEYBOARD: TelegramReplyMarkup = {
     [
       { text: '🔥 Trendler', callback_data: 'cmd:trendler' },
       { text: '📄 Teklifler', callback_data: 'cmd:teklifler' },
+    ],
+    [
+      { text: '🎬 İçerikler', callback_data: 'cmd:icerikler' },
+      { text: '🏆 En iyiler', callback_data: 'cmd:eniyi' },
     ],
     [
       { text: '🔁 Abonelikler', callback_data: 'cmd:abonelikler' },

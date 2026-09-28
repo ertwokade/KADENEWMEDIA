@@ -12,6 +12,7 @@ export const runtime = 'nodejs'
 export const maxDuration = 60
 
 const seenUpdates = new Set<number>()
+const OWNER_ONLY_COMMANDS = new Set(['ekle', 'guncelle', 'sil'])
 
 function sameSecret(provided: string, expected: string) {
   const left = Buffer.from(provided)
@@ -97,7 +98,23 @@ export async function POST(request: Request) {
     if (action.callbackQueryId) {
       await acknowledgeTelegramButton(action.callbackQueryId).catch(() => undefined)
     }
-    const message = await executeTelegramCommand(action.command, { chatType: action.chatType, groupActive })
+    if (isGroup && OWNER_ONLY_COMMANDS.has(action.command) && !ownerActor) {
+      await sendTelegramBotReply(
+        action.chatId,
+        '🔒 Bu grupta içerik ekleme, yenileme ve silme işlemlerini yalnız yetkili sahip yapabilir.',
+        TELEGRAM_MAIN_KEYBOARD,
+        [action.chatId],
+      )
+      return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
+    }
+    const message = await executeTelegramCommand(action.command, {
+      chatType: action.chatType,
+      groupActive,
+      chatId: action.chatId,
+      actorId: action.actorId,
+      ownerActor,
+      args: action.args,
+    })
     await sendTelegramBotReply(
       action.chatId,
       message,

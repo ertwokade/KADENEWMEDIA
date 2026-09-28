@@ -6,6 +6,9 @@ import { dailyDigestCandidates } from '@/lib/kade-search/store'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { telegramConfiguration } from './telegramConfig'
 import type { TelegramBotChatType, TelegramBotCommand } from './telegramBot'
+import { parseTelegramContentPlatform } from './telegramContentLinks'
+import { formatSavedContentResult, formatTelegramContentList } from './telegramContentPresentation'
+import { deleteTelegramContent, listTelegramContent, refreshTelegramContent, saveTelegramContent } from './telegramSavedContent'
 import { whatsappConfiguration } from './whatsappConfig'
 
 const OPERATION_LABELS: Record<string, string> = {
@@ -29,6 +32,10 @@ const AI_PROVIDERS = [
 export interface TelegramCommandContext {
   chatType: TelegramBotChatType
   groupActive: boolean
+  chatId: string
+  actorId: string
+  ownerActor: boolean
+  args?: string
 }
 
 function clean(value: unknown, max = 160) {
@@ -161,6 +168,45 @@ async function trendsMessage() {
     '',
     'Detay: https://kadenewmedia.com/kadexai/dashboard/kade-search',
   ].join('\n')
+}
+
+async function saveContentMessage(context: TelegramCommandContext) {
+  const url = context.args?.trim()
+  if (!url) {
+    return '🎬 İçerik ekleme\n\nBir Instagram Reel veya TikTok video bağlantısını doğrudan gönder ya da /ekle BAĞLANTI yaz.'
+  }
+  const result = await saveTelegramContent({ chatId: context.chatId, actorId: context.actorId, url })
+  return formatSavedContentResult(result.row, result.updated)
+}
+
+async function savedContentMessage(context: TelegramCommandContext, sort: 'performance' | 'latest') {
+  const platform = parseTelegramContentPlatform(context.args ?? '')
+  const rows = await listTelegramContent({ chatId: context.chatId, platform, sort, limit: 10 })
+  const platformLabel = platform === 'instagram' ? ' · Instagram Reels' : platform === 'tiktok' ? ' · TikTok' : ''
+  const title = sort === 'latest' ? `🕘 Son eklenen içerikler${platformLabel}` : `🏆 Kayıtlı içerikler${platformLabel}`
+  return formatTelegramContentList(rows, { title, sort, limit: 10 })
+}
+
+async function refreshContentMessage(context: TelegramCommandContext) {
+  const platform = parseTelegramContentPlatform(context.args ?? '')
+  const result = await refreshTelegramContent(context.chatId, 20, platform)
+  if (!result.total) return '♻️ Güncellenecek kayıtlı içerik yok.'
+  return [
+    '♻️ İçerik verileri yenilendi',
+    '',
+    `Başarılı: ${result.refreshed}/${result.total}`,
+    `Veri alınamayan: ${result.failed}`,
+    '',
+    'Platform bir metriği vermiyorsa değer uydurulmaz; listede “veri alınamadı” görünür.',
+  ].join('\n')
+}
+
+async function deleteContentMessage(context: TelegramCommandContext) {
+  const reference = context.args?.trim()
+  if (!reference) return '🗑️ Silmek için listedeki kısa kodu kullan: /sil KOD'
+  const deleted = await deleteTelegramContent(context.chatId, reference)
+  if (!deleted) return '⚠️ Bu sohbette belirtilen kod veya sıra bulunamadı. Önce /icerikler yaz.'
+  return `🗑️ İçerik silindi\n\n${deleted.platform === 'instagram' ? 'Instagram Reels' : 'TikTok'} · ${clean(deleted.title || deleted.description || deleted.canonical_url, 160)}`
 }
 
 async function quotesMessage() {
@@ -435,11 +481,13 @@ function aboutMessage() {
     '• Kade New Media ve KadexAI servislerini canlı kontrol eder.',
     '• Operasyon, kullanıcı, teklif ve abonelik sayılarını özetler.',
     '• Güncel trendleri ve içerik fırsatlarını getirir.',
+    '• Instagram Reels ve TikTok bağlantılarını metadata ve erişilebilen gerçek metriklerle saklar.',
+    '• Kayıtlı içerikleri performansa veya eklenme zamanına göre sıralar; 09:00 ve 12:00’de özetler.',
     '• AI kullanımı, token ve bilinen maliyeti raporlar.',
     '• Son hata ve işlem kayıtlarını güvenli biçimde gösterir.',
     '• Özel sohbette ve sahip tarafından etkinleştirilen gruplarda çalışır.',
     '',
-    'KadeX salt-okunur tasarlanmıştır; veri silmez, ödeme yapmaz ve parola/anahtar göstermez.',
+    'KadeX yalnız kayıtlı sosyal içeriklerde açıkça istenen ekleme, yenileme ve silme işlemlerini yapar; ödeme yapmaz ve parola/anahtar göstermez.',
   ].join('\n')
 }
 
@@ -464,6 +512,12 @@ function helpMessage(start = false, context?: TelegramCommandContext) {
     '',
     'İÇERİK VE TEKNİK',
     '/trendler — 8 güncel fırsat',
+    '/ekle BAĞLANTI — Reel veya TikTok kaydet',
+    '/icerikler [instagram|tiktok] — performansa göre listele',
+    '/son [instagram|tiktok] — son eklenenleri göster',
+    '/eniyi [instagram|tiktok] — en yüksek performanslıları göster',
+    '/guncelle [instagram|tiktok] — metadata ve metrikleri yenile',
+    '/sil KOD — kayıtlı içeriği sil',
     '/durum — servis ve veritabanı sağlığı',
     '/performans — canlı hız ölçümü',
     '/sitemap — site haritası kontrolü',
@@ -476,7 +530,8 @@ function helpMessage(start = false, context?: TelegramCommandContext) {
     '/baslat · /durdur · /grup · /hakkinda · /yardim',
     '',
     groupNote,
-    'Raporlar salt okunurdur; kişisel bilgi, parola veya API anahtarı gösterilmez.',
+    'Bağlantıyı doğrudan göndermek de /ekle ile aynıdır. Gruplarda yazma işlemleri yalnız yetkili sahibe açıktır.',
+    'Kişisel bilgi, parola veya API anahtarı gösterilmez.',
   ].join('\n')
 }
 
@@ -488,6 +543,12 @@ export async function executeTelegramCommand(command: TelegramBotCommand, contex
     case 'hafta': return periodOperationsMessage(7, '📅 Son 7 gün KadexAI operasyonları')
     case 'sonislemler': return recentOperationsMessage()
     case 'trendler': return trendsMessage()
+    case 'ekle': return saveContentMessage(context)
+    case 'icerikler': return savedContentMessage(context, 'performance')
+    case 'son': return savedContentMessage(context, 'latest')
+    case 'eniyi': return savedContentMessage(context, 'performance')
+    case 'guncelle': return refreshContentMessage(context)
+    case 'sil': return deleteContentMessage(context)
     case 'teklifler': return quotesMessage()
     case 'abonelikler': return subscriptionsMessage()
     case 'kullanicilar': return usersMessage()

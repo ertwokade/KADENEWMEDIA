@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
   checkOfficialSocialAccess,
+  getTikTokResearchVideoById,
   instagramAccess,
   mapInstagramGraphMedia,
   resetOfficialSocialCaches,
@@ -31,6 +32,21 @@ test('erişim modu resmi bilgileri çereze tercih eder ve devre dışı bırakma
   assert.equal(tiktokAccess({ TIKTOK_RESEARCH_CLIENT_KEY: 'yalniz-anahtar' }).official, false)
   assert.equal(instagramAccess(IG_ENV).mode, 'official')
   assert.equal(instagramAccess({ ...IG_ENV, KADE_DISABLED_INTEGRATIONS: 'youtube, Instagram' }).live, false)
+})
+
+test('TikTok Research API tek video kimliğini gerçek metrikleriyle sorgular', async () => {
+  resetOfficialSocialCaches()
+  const { impl, calls } = fakeFetch((url) => url.includes('/oauth/token/')
+    ? { body: { access_token: 'tok', expires_in: 7200 } }
+    : { body: { data: { videos: [{
+      id: '1234567890123456789', username: 'kade', video_description: 'Canlı ölçüm',
+      view_count: 42_000, like_count: 1_200, comment_count: 30, share_count: 10,
+    }] }, error: { code: 'ok' } } })
+  const item = await getTikTokResearchVideoById('1234567890123456789', TIKTOK_ENV, impl)
+  assert.equal(item?.metrics?.views, 42_000)
+  const body = JSON.parse(String(calls[1].init?.body))
+  assert.deepEqual(body.query.and, [{ operation: 'EQ', field_name: 'video_id', field_values: ['1234567890123456789'] }])
+  assert.equal(body.max_count, 1)
 })
 
 test('TikTok Research API gerçek ölçümleri izlenmeye göre sıralar ve belirteci önbellekler', async () => {

@@ -10,4 +10,6 @@ CRON_TZ=UTC
 0 7 * * 1 root /srv/kade/bin/run-cron-job weekly-site /kadexai/api/reports/weekly-site
 30 3 * * * root /srv/kade/bin/run-cron-job subscription-sweep /kadexai/api/subscriptions/sweep
 0 5 * * * root /srv/kade/bin/run-cron-job morning-briefing /kadexai/api/notifications/morning-briefing
+0 6 * * * root /srv/kade/bin/run-cron-job telegram-content-0900 '/kadexai/api/telegram/content-digest?slot=09'
+0 9 * * * root /srv/kade/bin/run-cron-job telegram-content-1200 '/kadexai/api/telegram/content-digest?slot=12'
 0 20 * * * root /srv/kade/bin/run-cron-job daily-summary /kadexai/api/notifications/daily-summary

@@ -7,6 +7,14 @@ KadeSearch resmi bilgiler sunucu ortamına eklendiği anda **kod değişikliği 
 | TikTok | `TIKTOK_RESEARCH_CLIENT_KEY`, `TIKTOK_RESEARCH_CLIENT_SECRET` | KadeSearch canlı arama, TikTok trend toplayıcı, Ayarlar durumu |
 | Instagram | `INSTAGRAM_BUSINESS_ACCOUNT_ID`, `INSTAGRAM_GRAPH_ACCESS_TOKEN`, (ops.) `META_GRAPH_API_VERSION` | KadeSearch canlı Reels araması, Instagram trend toplayıcı, Ayarlar durumu |
 
+Telegram botuna gönderilen sosyal bağlantılar da bu erişimleri kullanır. TikTok
+metadata'sı resmî oEmbed'den, onay varsa metrikleri Research API'den alınır.
+Instagram'da `INSTAGRAM_GRAPH_ACCESS_TOKEN` (veya oEmbed ürünü için ayrı
+`INSTAGRAM_OEMBED_ACCESS_TOKEN`) metadata sağlar. Bağlantı bağlı işletme
+hesabına aitse Graph API'nin verdiği beğeni/yorum ve erişilebilen insight
+metrikleri kaydedilir. Meta başkasının Reel izlenmesini vermiyorsa alan açıkça
+`veri alınamadı` kalır; tahmin üretilmez.
+
 Öncelik sırası: **resmi API → eski çerez yolu (`TIKTOK_COOKIE`, `INSTAGRAM_SESSION_ID`) → kaynak kapalı**. Hiçbir durumda tahmini sonuç üretilmez. Geçici kapatmak için: `KADE_DISABLED_INTEGRATIONS=tiktok,instagram`.
 
 ## 1. TikTok Research API

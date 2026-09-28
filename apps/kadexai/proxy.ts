@@ -109,6 +109,7 @@ export async function proxy(request: NextRequest) {
     '/api/subscriptions/sweep',
     '/api/notifications/daily-summary',
     '/api/notifications/morning-briefing',
+    '/api/telegram/content-digest',
   ].includes(pathname)
   const cronSecret = process.env.CRON_SECRET?.trim()
   const hasCronAccess = Boolean(
