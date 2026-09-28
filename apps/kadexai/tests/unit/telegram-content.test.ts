@@ -26,6 +26,10 @@ test('social content links are canonicalized and tracking parameters are removed
     platform: 'tiktok', url: 'https://m.tiktok.com/@kade/video/1234567890123456789?is_from_webapp=1',
     canonicalUrl: 'https://www.tiktok.com/@kade/video/1234567890123456789', externalId: '1234567890123456789', needsResolution: false,
   })
+  assert.deepEqual(parseTelegramContentLink('https://www.tiktok.com/@kade/photo/7689990769498754324?_r=1'), {
+    platform: 'tiktok', url: 'https://www.tiktok.com/@kade/photo/7689990769498754324?_r=1',
+    canonicalUrl: 'https://www.tiktok.com/@kade/photo/7689990769498754324', externalId: '7689990769498754324', needsResolution: false,
+  })
   assert.equal(parseTelegramContentLink('https://evil.example/reel/AbC_123/'), null)
   assert.equal(parseTelegramContentLink('https://vm.tiktok.com/ZMExample/ABC')?.needsResolution, true)
   assert.equal(parseTelegramContentPlatform('TikTok içerikleri'), 'tiktok')

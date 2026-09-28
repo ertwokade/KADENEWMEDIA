@@ -59,7 +59,7 @@ export function parseTelegramContentLink(input: string): TelegramContentLink | n
     }
   }
 
-  const match = parsed.pathname.match(/^\/@([^/]{1,80})\/video\/(\d{5,30})(?:\/|$)/)
+  const match = parsed.pathname.match(/^\/@([^/]{1,80})\/(video|photo)\/(\d{5,30})(?:\/|$)/)
   if (!match) return null
   let username: string
   try {
@@ -70,8 +70,8 @@ export function parseTelegramContentLink(input: string): TelegramContentLink | n
   return {
     platform: 'tiktok',
     url: raw,
-    canonicalUrl: `https://www.tiktok.com/@${username}/video/${match[2]}`,
-    externalId: match[2],
+    canonicalUrl: `https://www.tiktok.com/@${username}/${match[2]}/${match[3]}`,
+    externalId: match[3],
     needsResolution: false,
   }
 }

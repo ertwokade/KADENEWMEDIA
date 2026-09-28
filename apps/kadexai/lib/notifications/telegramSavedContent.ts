@@ -210,7 +210,7 @@ export async function collectTelegramContent(
   fetchImpl: FetchLike = fetch,
 ): Promise<CollectedContent> {
   const initial = parseTelegramContentLink(rawUrl)
-  if (!initial) throw new Error('Yalnız geçerli Instagram Reel veya TikTok video bağlantısı kabul edilir.')
+  if (!initial) throw new Error('Yalnız geçerli Instagram Reel veya TikTok video/fotoğraf bağlantısı kabul edilir.')
   const link = await resolveTikTokShortLink(initial, fetchImpl)
   const errors: string[] = []
   let metadata: Awaited<ReturnType<typeof tiktokOembed>> | null = null

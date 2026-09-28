@@ -173,7 +173,7 @@ async function trendsMessage() {
 async function saveContentMessage(context: TelegramCommandContext) {
   const url = context.args?.trim()
   if (!url) {
-    return '🎬 İçerik ekleme\n\nBir Instagram Reel veya TikTok video bağlantısını doğrudan gönder ya da /ekle BAĞLANTI yaz.'
+    return '🎬 İçerik ekleme\n\nBir Instagram Reel veya TikTok video/fotoğraf bağlantısını doğrudan gönder ya da /ekle BAĞLANTI yaz.'
   }
   const result = await saveTelegramContent({ chatId: context.chatId, actorId: context.actorId, url })
   return formatSavedContentResult(result.row, result.updated)
