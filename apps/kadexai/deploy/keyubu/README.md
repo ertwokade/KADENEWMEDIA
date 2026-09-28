@@ -37,6 +37,14 @@ Telegram saved-content summaries run at 06:00 and 09:00 UTC, corresponding to
 are persisted in Supabase so a repeated cron invocation cannot duplicate a
 summary after a container restart.
 
+Telegram access is account-based, not device-based. A second Telegram account
+opens `@KadeXAiBot` and sends `/start` or `/yetkiiste`. The primary numeric
+account in `TELEGRAM_CHAT_IDS` receives an approval button and can also use
+`/yetkiver ID`, `/yetkial ID`, and `/yetkililer`. Delegated access is stored in
+the service-role-only `telegram_bot_users` table and survives restarts; primary
+owners remain controlled by the server environment and cannot be revoked from
+Telegram.
+
 The separately pinned self-hosted Supabase stack lives in `/srv/supabase`.
 Its API gateway and PostgreSQL pooler bind only to WSL localhost; Windows
 Caddy is the only public entry point. Daily encrypted database backups are

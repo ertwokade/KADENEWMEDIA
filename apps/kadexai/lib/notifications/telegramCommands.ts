@@ -528,6 +528,8 @@ function helpMessage(start = false, context?: TelegramCommandContext) {
     '',
     'GRUP VE YARDIM',
     '/baslat · /durdur · /grup · /hakkinda · /yardim',
+    '/yetkiiste — başka Telegram hesabından erişim iste',
+    '/yetkiver ID · /yetkial ID · /yetkililer — ana sahip erişim yönetimi',
     '',
     groupNote,
     'Bağlantıyı doğrudan göndermek de /ekle ile aynıdır. Gruplarda yazma işlemleri yalnız yetkili sahibe açıktır.',
@@ -560,6 +562,10 @@ export async function executeTelegramCommand(command: TelegramBotCommand, contex
     case 'sitemap': return sitemapMessage()
     case 'rapor': return reportMessage()
     case 'grup': return groupMessage(context)
+    case 'yetkiiste': return '🔐 Bu komut Telegram hesap eşleştirme akışında işlenir.'
+    case 'yetkiver': return '🔐 Bu komut yalnız ana sahip tarafından özel sohbette kullanılabilir.'
+    case 'yetkial': return '🔐 Bu komut yalnız ana sahip tarafından özel sohbette kullanılabilir.'
+    case 'yetkililer': return '🔐 Bu komut yalnız ana sahip tarafından özel sohbette kullanılabilir.'
     case 'hakkinda': return aboutMessage()
     case 'baslat': return lifecycleMessage('baslat', context)
     case 'durdur': return lifecycleMessage('durdur', context)

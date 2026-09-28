@@ -28,6 +28,10 @@ export const TELEGRAM_COMMANDS = [
   { command: 'sitemap', description: 'Site haritasını kontrol et' },
   { command: 'rapor', description: 'Kapsamlı canlı rapor hazırla' },
   { command: 'grup', description: 'Bu sohbetin bot durumunu göster' },
+  { command: 'yetkiiste', description: 'Bu hesap için KadeX erişimi iste' },
+  { command: 'yetkiver', description: 'Bekleyen Telegram hesabına erişim ver' },
+  { command: 'yetkial', description: 'Telegram hesabının erişimini kaldır' },
+  { command: 'yetkililer', description: 'Telegram erişim listesini göster' },
   { command: 'hakkinda', description: 'KadeX yeteneklerini göster' },
   { command: 'yardim', description: 'Tüm komutları göster' },
 ] as const
@@ -39,6 +43,8 @@ export interface TelegramBotAction {
   updateId: number
   chatId: string
   actorId: string
+  actorName?: string
+  actorUsername?: string
   chatType: TelegramBotChatType
   chatTitle?: string
   command: TelegramBotCommand
@@ -66,6 +72,9 @@ function normalizedCommand(value: unknown): { command: TelegramBotCommand; args?
     eniyiler: 'eniyi', best: 'eniyi',
     güncelle: 'guncelle', refresh: 'guncelle', yenile: 'guncelle',
     delete: 'sil', kaldır: 'sil', kaldir: 'sil',
+    yetki: 'yetkiiste', iziniste: 'yetkiiste',
+    onayla: 'yetkiver', izinver: 'yetkiver',
+    yetkikaldir: 'yetkial', izinkaldir: 'yetkial',
   }
   const explicit = aliases[command] ?? (COMMANDS.has(command as TelegramBotCommand) ? command as TelegramBotCommand : null)
   if (explicit) return { command: explicit, ...(rest.length ? { args: rest.join(' ') } : {}) }
@@ -84,7 +93,14 @@ function normalizedCommand(value: unknown): { command: TelegramBotCommand; args?
   return { command: 'yardim' }
 }
 
-function parsedChat(message: unknown, fromId: unknown) {
+function parsedChat(message: unknown, actor: unknown) {
+  const from = actor && typeof actor === 'object' ? actor as {
+    id?: unknown
+    first_name?: unknown
+    last_name?: unknown
+    username?: unknown
+  } : null
+  const fromId = from?.id
   if (!message || typeof message !== 'object' || !Number.isSafeInteger(fromId)) return null
   const chat = (message as { chat?: unknown }).chat
   if (!chat || typeof chat !== 'object') return null
@@ -97,6 +113,10 @@ function parsedChat(message: unknown, fromId: unknown) {
   return {
     chatId: String(id),
     actorId: String(fromId),
+    ...([from?.first_name, from?.last_name].filter((value) => typeof value === 'string' && value.trim()).length
+      ? { actorName: [from?.first_name, from?.last_name].filter((value) => typeof value === 'string').join(' ').trim() }
+      : {}),
+    ...(typeof from?.username === 'string' && from.username.trim() ? { actorUsername: from.username.trim() } : {}),
     chatType: type as TelegramBotChatType,
     ...(typeof title === 'string' && title.trim() ? { chatTitle: title } : {}),
   }
@@ -114,7 +134,7 @@ export function parseTelegramBotUpdate(input: unknown): TelegramBotAction | null
       from?: { id?: unknown }
       message?: unknown
     }
-    const chat = parsedChat(callback.message, callback.from?.id)
+    const chat = parsedChat(callback.message, callback.from)
     if (!chat || typeof callback.id !== 'string' || callback.id.length < 1 || callback.id.length > 128) return null
     return {
       updateId: update.update_id as number,
@@ -125,8 +145,11 @@ export function parseTelegramBotUpdate(input: unknown): TelegramBotAction | null
   }
 
   if (update.message && typeof update.message === 'object') {
-    const message = update.message as { text?: unknown; from?: { id?: unknown } }
-    const chat = parsedChat(update.message, message.from?.id)
+    const message = update.message as {
+      text?: unknown
+      from?: { id?: unknown; first_name?: unknown; last_name?: unknown; username?: unknown }
+    }
+    const chat = parsedChat(update.message, message.from)
     if (!chat || typeof message.text !== 'string') return null
     return {
       updateId: update.update_id as number,

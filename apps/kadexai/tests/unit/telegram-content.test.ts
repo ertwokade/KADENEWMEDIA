@@ -59,3 +59,16 @@ test('Telegram content persistence is service-role only and cron uses Istanbul 0
   assert.match(route, /hasCronAccess/)
   assert.match(route, /hour !== '09' && hour !== '12'/)
 })
+
+test('Telegram delegated access is persistent, service-role only, and primary-owner approved', async () => {
+  const migration = await readFile(new URL('../../supabase/migrations/202609280002_telegram_bot_user_access.sql', import.meta.url), 'utf8')
+  assert.match(migration, /status IN \('pending', 'active', 'revoked'\)/)
+  assert.match(migration, /telegram_bot_users FORCE ROW LEVEL SECURITY/)
+  assert.match(migration, /REVOKE ALL ON public\.telegram_bot_users FROM anon, authenticated/)
+
+  const webhook = await readFile(new URL('../../app/kadexai/api/telegram/webhook/route.ts', import.meta.url), 'utf8')
+  assert.match(webhook, /config\.chatIds\.includes\(action\.actorId\)/)
+  assert.match(webhook, /if \(!primaryOwner\) return '🔒 Telegram hesap yetkilerini yalnız ana sahip hesabı yönetebilir\.'/)
+  assert.match(webhook, /requestTelegramUserAccess/)
+  assert.match(webhook, /approveTelegramUser/)
+})

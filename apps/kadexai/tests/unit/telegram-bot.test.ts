@@ -82,12 +82,42 @@ test('Telegram bot maps unknown text to help and every button to a registered co
     },
   })
   assert.equal(action?.command, 'yardim')
-  assert.equal(TELEGRAM_COMMANDS.length, 28)
+  assert.equal(TELEGRAM_COMMANDS.length, 32)
 
   const registered = new Set(TELEGRAM_COMMANDS.map((item) => item.command))
   for (const row of TELEGRAM_MAIN_KEYBOARD.inline_keyboard) {
     for (const button of row) assert.equal(registered.has(button.callback_data.replace('cmd:', '') as never), true)
   }
+})
+
+test('Telegram bot parses access requests and owner approvals with actor identity', () => {
+  assert.deepEqual(parseTelegramBotUpdate({
+    update_id: 401,
+    message: {
+      text: '/start',
+      from: { id: 555666777, first_name: 'İkinci', last_name: 'Telefon', username: 'kade_second' },
+      chat: { id: 555666777, type: 'private' },
+    },
+  }), {
+    updateId: 401,
+    chatId: '555666777',
+    actorId: '555666777',
+    actorName: 'İkinci Telefon',
+    actorUsername: 'kade_second',
+    chatType: 'private',
+    command: 'start',
+  })
+
+  const approval = parseTelegramBotUpdate({
+    update_id: 402,
+    message: {
+      text: '/yetkiver 555666777',
+      from: { id: 123456789 },
+      chat: { id: 123456789, type: 'private' },
+    },
+  })
+  assert.equal(approval?.command, 'yetkiver')
+  assert.equal(approval?.args, '555666777')
 })
 
 test('Telegram bot recognizes social links and natural-language content commands', () => {

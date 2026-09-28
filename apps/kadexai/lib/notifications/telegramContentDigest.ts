@@ -6,6 +6,7 @@ import { TELEGRAM_MAIN_KEYBOARD } from './telegramBot'
 import { telegramConfiguration } from './telegramConfig'
 import { formatTelegramContentList } from './telegramContentPresentation'
 import { telegramGroupIsActive } from './telegramGroupAccess'
+import { telegramUserIsAuthorized } from './telegramUserAccess'
 import { listTelegramContent, refreshTelegramContent, telegramContentChatIds } from './telegramSavedContent'
 
 export type TelegramDigestHour = '09' | '12'
@@ -52,7 +53,7 @@ export async function sendTelegramContentDigests(hour: TelegramDigestHour, now =
   const result = { scheduleKey, chats: chatIds.length, sent: 0, skipped: 0, failed: 0, items: 0 }
 
   for (const chatId of chatIds) {
-    const privateAllowed = config.chatIds.includes(chatId)
+    const privateAllowed = config.chatIds.includes(chatId) || await telegramUserIsAuthorized(chatId)
     const groupAllowed = chatId.startsWith('-') && await telegramGroupIsActive(chatId)
     if (!privateAllowed && !groupAllowed) {
       result.skipped += 1

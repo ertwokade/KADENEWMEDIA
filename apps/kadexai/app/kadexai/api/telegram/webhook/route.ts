@@ -6,6 +6,14 @@ import { telegramWebhookConfiguration } from '@/lib/notifications/telegramConfig
 import { executeTelegramCommand } from '@/lib/notifications/telegramCommands'
 import { parseTelegramBotUpdate, TELEGRAM_MAIN_KEYBOARD } from '@/lib/notifications/telegramBot'
 import { activateTelegramGroup, deactivateTelegramGroup, telegramGroupIsActive } from '@/lib/notifications/telegramGroupAccess'
+import {
+  approveTelegramUser,
+  listTelegramUsers,
+  requestTelegramUserAccess,
+  revokeTelegramUser,
+  telegramUserIsAuthorized,
+  validTelegramUserId,
+} from '@/lib/notifications/telegramUserAccess'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -13,6 +21,75 @@ export const maxDuration = 60
 
 const seenUpdates = new Set<number>()
 const OWNER_ONLY_COMMANDS = new Set(['ekle', 'guncelle', 'sil'])
+const ACCESS_ADMIN_COMMANDS = new Set(['yetkiver', 'yetkial', 'yetkililer'])
+
+function clean(value: string | undefined, max = 120) {
+  return String(value ?? '').replace(/[\u0000-\u001f\u007f]/g, '').replace(/\s+/g, ' ').trim().slice(0, max)
+}
+
+function accessLabel(input: { actorId: string; actorName?: string; actorUsername?: string }) {
+  const name = clean(input.actorName) || 'İsimsiz Telegram hesabı'
+  const username = clean(input.actorUsername, 32)
+  return `${name}${username ? ` · @${username}` : ''}\nID: ${input.actorId}`
+}
+
+function accessTarget(args: string | undefined) {
+  const target = String(args ?? '').trim().split(/\s+/, 1)[0] ?? ''
+  return validTelegramUserId(target) ? target : null
+}
+
+async function handleAccessAdminCommand(
+  action: NonNullable<ReturnType<typeof parseTelegramBotUpdate>>,
+  primaryOwner: boolean,
+  primaryOwnerIds: string[],
+) {
+  if (!ACCESS_ADMIN_COMMANDS.has(action.command)) return null
+  if (!primaryOwner) return '🔒 Telegram hesap yetkilerini yalnız ana sahip hesabı yönetebilir.'
+
+  if (action.command === 'yetkililer') {
+    const users = await listTelegramUsers()
+    const lines = users.map((user) => {
+      const icon = user.status === 'active' ? '✅' : user.status === 'pending' ? '⏳' : '⛔'
+      const label = user.username ? `@${user.username}` : user.display_name || 'İsimsiz hesap'
+      return `${icon} ${label} · ${user.user_id}`
+    })
+    return [
+      '👥 KadeX Telegram erişimleri',
+      '',
+      `Ana sahip: ${primaryOwnerIds.length}`,
+      ...(lines.length ? lines : ['Henüz ek yetki veya bekleyen istek yok.']),
+      '',
+      'Yetki ver: /yetkiver ID',
+      'Yetki kaldır: /yetkial ID',
+    ].join('\n')
+  }
+
+  const target = accessTarget(action.args)
+  if (!target) return `⚠️ Kullanım: /${action.command} TELEGRAM_ID`
+  if (primaryOwnerIds.includes(target)) return 'ℹ️ Bu hesap ana sahip listesinde; Telegram içinden yetkisi kaldırılamaz.'
+
+  if (action.command === 'yetkiver') {
+    const user = await approveTelegramUser(target, action.actorId)
+    await sendTelegramBotReply(
+      target,
+      '✅ KadeX erişimin açıldı. Şimdi /start veya /yardim yazarak bütün komutları kullanabilirsin.',
+      TELEGRAM_MAIN_KEYBOARD,
+      [target],
+    )
+    const label = user.username ? `@${user.username}` : user.display_name || target
+    return `✅ KadeX erişimi verildi\n\n${label} · ${target}`
+  }
+
+  const user = await revokeTelegramUser(target)
+  if (!user) return '⚠️ Bu ID için kayıtlı ek Telegram yetkisi bulunamadı.'
+  await sendTelegramBotReply(
+    target,
+    '⛔ KadeX erişimin ana sahip tarafından kapatıldı.',
+    undefined,
+    [target],
+  ).catch(() => undefined)
+  return `⛔ KadeX erişimi kaldırıldı\n\n${target}`
+}
 
 function sameSecret(provided: string, expected: string) {
   const left = Buffer.from(provided)
@@ -55,14 +132,96 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
   }
 
-  const ownerActor = config.chatIds.includes(action.actorId)
+  const primaryOwnerIds = config.chatIds.filter((chatId) => /^[0-9]{5,20}$/.test(chatId))
+  const primaryOwner = config.chatIds.includes(action.actorId)
   const isGroup = action.chatType !== 'private'
+  let delegatedActor = false
+  try {
+    delegatedActor = !primaryOwner && await telegramUserIsAuthorized(action.actorId)
+  } catch (error) {
+    captureApiError(error, '/api/telegram/webhook/access-check')
+  }
+  const ownerActor = primaryOwner || delegatedActor
+
   if (!isGroup && (!ownerActor || action.chatId !== action.actorId)) {
+    try {
+      if (action.command === 'start' || action.command === 'yetkiiste') {
+        const requestResult = await requestTelegramUserAccess({
+          userId: action.actorId,
+          displayName: action.actorName,
+          username: action.actorUsername,
+        })
+        if (requestResult.created) {
+          const approvalKeyboard = {
+            inline_keyboard: [[
+              { text: '✅ Yetki ver', callback_data: `cmd:yetkiver ${action.actorId}` },
+              { text: '🚫 Reddet', callback_data: `cmd:yetkial ${action.actorId}` },
+            ]],
+          }
+          await Promise.allSettled(primaryOwnerIds.map((ownerId) => sendTelegramBotReply(
+            ownerId,
+            `🔐 Yeni KadeX erişim isteği\n\n${accessLabel(action)}\n\nYalnız hesabı tanıyorsan onayla.`,
+            approvalKeyboard,
+          )))
+        }
+        await sendTelegramBotReply(
+          action.chatId,
+          requestResult.active
+            ? '✅ Bu Telegram hesabı zaten KadeX için yetkili. /start yazarak devam edebilirsin.'
+            : `⏳ KadeX erişim isteğin ana hesaba gönderildi.\n\nTelegram ID: ${action.actorId}\nOnay verildiğinde bot sana bildirim gönderecek.`,
+          undefined,
+          [action.chatId],
+        )
+      } else {
+        await sendTelegramBotReply(
+          action.chatId,
+          `🔒 Bu Telegram hesabı henüz yetkili değil.\n\nErişim istemek için /yetkiiste yaz.\nTelegram ID: ${action.actorId}`,
+          undefined,
+          [action.chatId],
+        )
+      }
+    } catch (error) {
+      captureApiError(error, '/api/telegram/webhook/access-request')
+      await sendTelegramBotReply(
+        action.chatId,
+        '⚠️ Erişim isteği şu anda kaydedilemedi. Biraz sonra /yetkiiste komutunu yeniden dene.',
+        undefined,
+        [action.chatId],
+      ).catch(() => undefined)
+    }
     return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
   }
 
   let canReply = !isGroup && ownerActor
   try {
+    if (isGroup && (ACCESS_ADMIN_COMMANDS.has(action.command) || action.command === 'yetkiiste')) {
+      await sendTelegramBotReply(
+        action.chatId,
+        '🔐 Telegram hesap yetkilerini yönetmek için KadeX ile özel sohbeti aç ve komutu orada kullan.',
+        undefined,
+        [action.chatId],
+      )
+      return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
+    }
+    const accessMessage = await handleAccessAdminCommand(action, primaryOwner, primaryOwnerIds)
+    if (accessMessage) {
+      await sendTelegramBotReply(
+        action.chatId,
+        accessMessage,
+        TELEGRAM_MAIN_KEYBOARD,
+        isGroup || delegatedActor ? [action.chatId] : [],
+      )
+      return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
+    }
+    if (action.command === 'yetkiiste') {
+      await sendTelegramBotReply(
+        action.chatId,
+        primaryOwner ? '✅ Bu hesap ana KadeX sahibi.' : '✅ Bu Telegram hesabının KadeX erişimi zaten açık.',
+        TELEGRAM_MAIN_KEYBOARD,
+        delegatedActor ? [action.chatId] : [],
+      )
+      return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })
+    }
     let groupActive = false
     if (isGroup) {
       if (action.command === 'baslat') {
@@ -119,7 +278,7 @@ export async function POST(request: Request) {
       action.chatId,
       message,
       TELEGRAM_MAIN_KEYBOARD,
-      isGroup ? [action.chatId] : [],
+      isGroup || delegatedActor ? [action.chatId] : [],
     )
   } catch (error) {
     captureApiError(error, '/api/telegram/webhook')
@@ -128,7 +287,7 @@ export async function POST(request: Request) {
         action.chatId,
         '⚠️ KadeX bu komutu şu anda tamamlayamadı. Sistem kaydı alındı; biraz sonra yeniden deneyebilirsin.',
         TELEGRAM_MAIN_KEYBOARD,
-        isGroup ? [action.chatId] : [],
+        isGroup || delegatedActor ? [action.chatId] : [],
       ).catch(() => undefined)
     }
   }
