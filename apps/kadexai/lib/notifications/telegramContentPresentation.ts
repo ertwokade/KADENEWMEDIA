@@ -1,4 +1,4 @@
-import type { TelegramContentPlatform } from './telegramContentLinks'
+import { parseTelegramContentLink, type TelegramContentPlatform } from './telegramContentLinks'
 
 export interface TelegramSavedContent {
   id: string
@@ -71,6 +71,16 @@ function metricsLine(row: TelegramSavedContent) {
   return metrics.length ? metrics.join(' · ') : 'Performans: veri alınamadı'
 }
 
+function contentTitle(row: TelegramSavedContent) {
+  const supplied = compact(row.title || row.description)
+  if (supplied) return supplied
+  const link = parseTelegramContentLink(row.canonical_url)
+  const kind = row.platform === 'instagram'
+    ? 'Instagram Reel'
+    : row.canonical_url.includes('/photo/') ? 'TikTok fotoğrafı' : 'TikTok videosu'
+  return `${kind} · ${link?.externalId ?? row.id.slice(0, 8)}`
+}
+
 export function formatTelegramContentList(
   rows: TelegramSavedContent[],
   options: { title: string; sort: TelegramContentSort; limit?: number },
@@ -83,7 +93,7 @@ export function formatTelegramContentList(
     options.title,
     '',
     ...selected.flatMap((row, index) => [
-      `${index + 1}. ${row.platform === 'instagram' ? 'Instagram Reels' : 'TikTok'} · ${compact(row.title || row.description || 'Başlık alınamadı')}`,
+      `${index + 1}. ${row.platform === 'instagram' ? 'Instagram Reels' : 'TikTok'} · ${contentTitle(row)}`,
       `   ${metricsLine(row)}`,
       `   Kaynak: ${compact(row.metrics_source || row.metadata_source, 90)} · Güncelleme: ${istanbulTime(row.metric_updated_at || row.updated_at)}`,
       `   Kod: ${row.id.slice(0, 8)} · ${row.canonical_url}`,
@@ -100,7 +110,7 @@ export function formatSavedContentResult(row: TelegramSavedContent, updated: boo
   return [
     updated ? '♻️ Bağlantı zaten kayıtlıydı; verileri yenilendi.' : '✅ İçerik kaydedildi.',
     '',
-    `${row.platform === 'instagram' ? 'Instagram Reels' : 'TikTok'} · ${compact(row.title || row.description || 'Başlık alınamadı', 150)}`,
+    `${row.platform === 'instagram' ? 'Instagram Reels' : 'TikTok'} · ${contentTitle(row)}`,
     metricsLine(row),
     `Metadata: ${compact(row.metadata_source, 100)}`,
     `Metrik: ${compact(row.metrics_source || 'veri alınamadı', 100)}`,

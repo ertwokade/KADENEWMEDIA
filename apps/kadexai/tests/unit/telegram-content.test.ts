@@ -77,6 +77,14 @@ test('content list explicitly labels unavailable metrics and includes source/upd
   assert.ok(output.length <= 4096)
 })
 
+test('content list uses a stable platform and content-code label when a public title is unavailable', () => {
+  const output = formatTelegramContentList([{ ...base, title: null, description: null }], {
+    title: 'Kayıtlı içerikler', sort: 'latest',
+  })
+  assert.match(output, /TikTok videosu · 1234567890123456789/)
+  assert.doesNotMatch(output, /Başlık alınamadı/)
+})
+
 test('Telegram content persistence is service-role only and cron uses Istanbul 09:00/12:00', async () => {
   const migration = await readFile(new URL('../../supabase/migrations/202609280001_telegram_saved_social_content.sql', import.meta.url), 'utf8')
   assert.match(migration, /UNIQUE \(chat_id, canonical_url\)/)
