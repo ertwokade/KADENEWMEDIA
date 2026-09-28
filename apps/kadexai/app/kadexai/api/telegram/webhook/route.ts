@@ -270,6 +270,7 @@ export async function POST(request: Request) {
       chatType: action.chatType,
       groupActive,
       chatId: action.chatId,
+      contentLibraryChatId: primaryOwnerIds[0] ?? action.chatId,
       actorId: action.actorId,
       ownerActor,
       args: action.args,

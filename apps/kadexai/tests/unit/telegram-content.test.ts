@@ -76,3 +76,12 @@ test('Telegram delegated access is persistent, service-role only, and primary-ow
   assert.match(webhook, /requestTelegramUserAccess/)
   assert.match(webhook, /approveTelegramUser/)
 })
+
+test('Telegram private accounts and groups use the primary owner shared content library', async () => {
+  const webhook = await readFile(new URL('../../app/kadexai/api/telegram/webhook/route.ts', import.meta.url), 'utf8')
+  const commands = await readFile(new URL('../../lib/notifications/telegramCommands.ts', import.meta.url), 'utf8')
+
+  assert.match(webhook, /contentLibraryChatId: primaryOwnerIds\[0\] \?\? action\.chatId/)
+  assert.match(commands, /listTelegramContent\(\{ chatId: contentLibraryChatId\(context\)/)
+  assert.match(commands, /saveTelegramContent\(\{ chatId: contentLibraryChatId\(context\)/)
+})

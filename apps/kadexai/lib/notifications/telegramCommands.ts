@@ -33,9 +33,14 @@ export interface TelegramCommandContext {
   chatType: TelegramBotChatType
   groupActive: boolean
   chatId: string
+  contentLibraryChatId?: string
   actorId: string
   ownerActor: boolean
   args?: string
+}
+
+function contentLibraryChatId(context: TelegramCommandContext) {
+  return context.contentLibraryChatId ?? context.chatId
 }
 
 function clean(value: unknown, max = 160) {
@@ -175,13 +180,13 @@ async function saveContentMessage(context: TelegramCommandContext) {
   if (!url) {
     return '🎬 İçerik ekleme\n\nBir Instagram Reel veya TikTok video/fotoğraf bağlantısını doğrudan gönder ya da /ekle BAĞLANTI yaz.'
   }
-  const result = await saveTelegramContent({ chatId: context.chatId, actorId: context.actorId, url })
+  const result = await saveTelegramContent({ chatId: contentLibraryChatId(context), actorId: context.actorId, url })
   return formatSavedContentResult(result.row, result.updated)
 }
 
 async function savedContentMessage(context: TelegramCommandContext, sort: 'performance' | 'latest') {
   const platform = parseTelegramContentPlatform(context.args ?? '')
-  const rows = await listTelegramContent({ chatId: context.chatId, platform, sort, limit: 10 })
+  const rows = await listTelegramContent({ chatId: contentLibraryChatId(context), platform, sort, limit: 10 })
   const platformLabel = platform === 'instagram' ? ' · Instagram Reels' : platform === 'tiktok' ? ' · TikTok' : ''
   const title = sort === 'latest' ? `🕘 Son eklenen içerikler${platformLabel}` : `🏆 Kayıtlı içerikler${platformLabel}`
   return formatTelegramContentList(rows, { title, sort, limit: 10 })
@@ -189,7 +194,7 @@ async function savedContentMessage(context: TelegramCommandContext, sort: 'perfo
 
 async function refreshContentMessage(context: TelegramCommandContext) {
   const platform = parseTelegramContentPlatform(context.args ?? '')
-  const result = await refreshTelegramContent(context.chatId, 20, platform)
+  const result = await refreshTelegramContent(contentLibraryChatId(context), 20, platform)
   if (!result.total) return '♻️ Güncellenecek kayıtlı içerik yok.'
   return [
     '♻️ İçerik verileri yenilendi',
@@ -204,8 +209,8 @@ async function refreshContentMessage(context: TelegramCommandContext) {
 async function deleteContentMessage(context: TelegramCommandContext) {
   const reference = context.args?.trim()
   if (!reference) return '🗑️ Silmek için listedeki kısa kodu kullan: /sil KOD'
-  const deleted = await deleteTelegramContent(context.chatId, reference)
-  if (!deleted) return '⚠️ Bu sohbette belirtilen kod veya sıra bulunamadı. Önce /icerikler yaz.'
+  const deleted = await deleteTelegramContent(contentLibraryChatId(context), reference)
+  if (!deleted) return '⚠️ Ortak içerik kütüphanesinde belirtilen kod veya sıra bulunamadı. Önce /icerikler yaz.'
   return `🗑️ İçerik silindi\n\n${deleted.platform === 'instagram' ? 'Instagram Reels' : 'TikTok'} · ${clean(deleted.title || deleted.description || deleted.canonical_url, 160)}`
 }
 
