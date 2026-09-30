@@ -4,6 +4,7 @@ import { appRoutes, withBasePath } from '@/lib/appConfig'
 import { signInWithAdminCredentials } from '@/lib/auth/adminBridge'
 import { isLoginIdentifier } from '@/lib/auth/adminIdentity'
 import { getSignupPasswordError, mapSignupProviderError } from '@/lib/auth/passwordPolicy'
+import { getLeakedPasswordError } from '@/lib/auth/leakedPassword'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
 import { notifyOperation } from '@/lib/notifications/operationFeed'
 
@@ -106,6 +107,14 @@ export async function POST(request: NextRequest) {
         }, { status: 401, headers })
       }
       return NextResponse.json({ ok: true, next: appRoutes.dashboard }, { headers })
+    }
+
+    const leakedPasswordError = await getLeakedPasswordError(password)
+    if (leakedPasswordError) {
+      return NextResponse.json(
+        { error: leakedPasswordError.message },
+        { status: leakedPasswordError.status, headers },
+      )
     }
 
     const callback = `${appRoutes.authCallback}?next=${encodeURIComponent(appRoutes.onboarding)}`

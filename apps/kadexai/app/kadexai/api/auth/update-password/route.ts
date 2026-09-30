@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getRateLimitKey, rateLimit, rateLimitHeaders } from '@/lib/rateLimit'
+import { getSignupPasswordError } from '@/lib/auth/passwordPolicy'
+import { getLeakedPasswordError } from '@/lib/auth/leakedPassword'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,14 +18,22 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'Geçersiz istek gövdesi.' }, { status: 400, headers })
   }
-  if (password.length < 8 || password.length > 128) {
-    return NextResponse.json({ error: 'Parola 8–128 karakter arasında olmalıdır.' }, { status: 400, headers })
+  const passwordError = getSignupPasswordError(password)
+  if (passwordError) {
+    return NextResponse.json({ error: passwordError }, { status: 400, headers })
   }
 
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Parola yenileme oturumu geçersiz veya süresi dolmuş.' }, { status: 401, headers })
+    const leakedPasswordError = await getLeakedPasswordError(password)
+    if (leakedPasswordError) {
+      return NextResponse.json(
+        { error: leakedPasswordError.message },
+        { status: leakedPasswordError.status, headers },
+      )
+    }
     const { error } = await supabase.auth.updateUser({ password })
     if (error) return NextResponse.json({ error: 'Parola güncellenemedi.' }, { status: 400, headers })
     await supabase.auth.signOut({ scope: 'local' })
