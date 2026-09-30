@@ -103,6 +103,16 @@ test('public schema lockdown enables RLS on every base and partitioned table and
   assert.doesNotMatch(sql, /DISABLE ROW LEVEL SECURITY/)
 })
 
+test('active entitlements view evaluates access as the querying user', async () => {
+  const sql = await readFile(
+    new URL('../../supabase/migrations/202609300002_security_invoker_views.sql', import.meta.url),
+    'utf8',
+  )
+  assert.match(sql, /ALTER VIEW public\.active_entitlements/)
+  assert.match(sql, /security_invoker\s*=\s*true/)
+  assert.doesNotMatch(sql, /security_invoker\s*=\s*false/)
+})
+
 test('proxy forwards server request headers to route handlers', async () => {
   const source = await readFile(new URL('../../proxy.ts', import.meta.url), 'utf8')
   assert.match(source, /new Headers\(request\.headers\)/)

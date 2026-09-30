@@ -11,6 +11,7 @@ const files = await Promise.all(names.map(async (name) => ({ name, sql: await re
 const finalRls = files.find(({ name }) => name.includes('explicit_rls_and_payments'))?.sql || ''
 const finalGrants = files.find(({ name }) => name.includes('explicit_table_grants'))?.sql || ''
 const publicRlsLockdown = files.find(({ name }) => name.includes('public_schema_rls_lockdown'))?.sql || ''
+const securityInvokerViews = files.find(({ name }) => name.includes('security_invoker_views'))?.sql || ''
 
 for (const table of ['profiles', 'workspaces', 'workspace_members', 'brands', 'user_preferences', 'integrations', 'tool_runs', 'content_calendar_items', 'content_templates', 'payment_orders', 'payment_events']) {
   const combined = `${finalRls}\n${finalGrants}`
@@ -24,5 +25,8 @@ if (!/namespace\.nspname = 'public'/i.test(publicRlsLockdown)) throw new Error('
 if (!/relation\.relkind IN \('r', 'p'\)/i.test(publicRlsLockdown)) throw new Error('RLS lockdown does not cover base and partitioned tables.')
 if (!/ALTER TABLE %I\.%I ENABLE ROW LEVEL SECURITY/i.test(publicRlsLockdown)) throw new Error('RLS lockdown does not enable row-level security.')
 if (!/RAISE EXCEPTION 'RLS lockdown failed/i.test(publicRlsLockdown)) throw new Error('RLS lockdown does not fail closed.')
+if (!/ALTER VIEW public\.active_entitlements[\s\S]+security_invoker\s*=\s*true/i.test(securityInvokerViews)) {
+  throw new Error('Active entitlements view is not configured as a security invoker.')
+}
 
 console.log(JSON.stringify({ migrations: names, result: 'PASS', liveApply: 'BLOCKED_BY_ENVIRONMENT' }, null, 2))
