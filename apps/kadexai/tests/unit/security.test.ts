@@ -90,6 +90,19 @@ test('latest RLS migration uses explicit operations and isolates payment ownersh
   assert.match(sql, /REVOKE ALL ON public\.payment_events FROM anon, authenticated/)
 })
 
+test('public schema lockdown enables RLS on every base and partitioned table and fails closed', async () => {
+  const sql = await readFile(
+    new URL('../../supabase/migrations/202609300001_public_schema_rls_lockdown.sql', import.meta.url),
+    'utf8',
+  )
+  assert.match(sql, /namespace\.nspname = 'public'/)
+  assert.match(sql, /relation\.relkind IN \('r', 'p'\)/)
+  assert.match(sql, /ALTER TABLE %I\.%I ENABLE ROW LEVEL SECURITY/)
+  assert.match(sql, /AND NOT relation\.relrowsecurity/)
+  assert.match(sql, /RAISE EXCEPTION 'RLS lockdown failed/)
+  assert.doesNotMatch(sql, /DISABLE ROW LEVEL SECURITY/)
+})
+
 test('proxy forwards server request headers to route handlers', async () => {
   const source = await readFile(new URL('../../proxy.ts', import.meta.url), 'utf8')
   assert.match(source, /new Headers\(request\.headers\)/)
