@@ -113,6 +113,36 @@ test('active entitlements view evaluates access as the querying user', async () 
   assert.doesNotMatch(sql, /security_invoker\s*=\s*false/)
 })
 
+test('security definer helpers are removed from the public RPC schema', async () => {
+  const sql = await readFile(
+    new URL('../../supabase/migrations/202609300003_function_execution_lockdown.sql', import.meta.url),
+    'utf8',
+  )
+  const privateSql = await readFile(
+    new URL('../../supabase/migrations/202609300004_private_rls_helpers.sql', import.meta.url),
+    'utf8',
+  )
+  for (const signature of [
+    /is_workspace_member\(UUID\)/,
+    /can_manage_workspace\(UUID\)/,
+    /handle_kadexai_new_user\(\)/,
+    /kade_unique_workspace_slug\(TEXT, UUID\)/,
+    /kade_set_updated_at\(\)/,
+  ]) {
+    assert.match(sql, new RegExp(`REVOKE ALL ON FUNCTION public\\.${signature.source}[\\s\\S]+FROM PUBLIC, anon, authenticated`, 'i'))
+  }
+  assert.match(sql, /GRANT EXECUTE ON FUNCTION public\.is_workspace_member\(UUID\) TO authenticated/)
+  assert.match(sql, /GRANT EXECUTE ON FUNCTION public\.can_manage_workspace\(UUID\) TO authenticated/)
+  assert.doesNotMatch(sql, /GRANT EXECUTE ON FUNCTION public\.handle_kadexai_new_user/)
+  assert.doesNotMatch(sql, /GRANT EXECUTE ON FUNCTION public\.kade_unique_workspace_slug/)
+  assert.match(sql, /ALTER FUNCTION public\.kade_set_updated_at\(\) SET search_path = ''/)
+  assert.match(privateSql, /REVOKE ALL ON SCHEMA private FROM PUBLIC, anon, authenticated/)
+  assert.match(privateSql, /ALTER FUNCTION public\.is_workspace_member\(UUID\) SET SCHEMA private/)
+  assert.match(privateSql, /ALTER FUNCTION public\.can_manage_workspace\(UUID\) SET SCHEMA private/)
+  assert.match(privateSql, /GRANT EXECUTE ON FUNCTION private\.is_workspace_member\(UUID\) TO authenticated/)
+  assert.match(privateSql, /GRANT EXECUTE ON FUNCTION private\.can_manage_workspace\(UUID\) TO authenticated/)
+})
+
 test('proxy forwards server request headers to route handlers', async () => {
   const source = await readFile(new URL('../../proxy.ts', import.meta.url), 'utf8')
   assert.match(source, /new Headers\(request\.headers\)/)

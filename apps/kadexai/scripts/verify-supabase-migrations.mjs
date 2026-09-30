@@ -12,6 +12,8 @@ const finalRls = files.find(({ name }) => name.includes('explicit_rls_and_paymen
 const finalGrants = files.find(({ name }) => name.includes('explicit_table_grants'))?.sql || ''
 const publicRlsLockdown = files.find(({ name }) => name.includes('public_schema_rls_lockdown'))?.sql || ''
 const securityInvokerViews = files.find(({ name }) => name.includes('security_invoker_views'))?.sql || ''
+const functionExecutionLockdown = files.find(({ name }) => name.includes('function_execution_lockdown'))?.sql || ''
+const privateRlsHelpers = files.find(({ name }) => name.includes('private_rls_helpers'))?.sql || ''
 
 for (const table of ['profiles', 'workspaces', 'workspace_members', 'brands', 'user_preferences', 'integrations', 'tool_runs', 'content_calendar_items', 'content_templates', 'payment_orders', 'payment_events']) {
   const combined = `${finalRls}\n${finalGrants}`
@@ -27,6 +29,36 @@ if (!/ALTER TABLE %I\.%I ENABLE ROW LEVEL SECURITY/i.test(publicRlsLockdown)) th
 if (!/RAISE EXCEPTION 'RLS lockdown failed/i.test(publicRlsLockdown)) throw new Error('RLS lockdown does not fail closed.')
 if (!/ALTER VIEW public\.active_entitlements[\s\S]+security_invoker\s*=\s*true/i.test(securityInvokerViews)) {
   throw new Error('Active entitlements view is not configured as a security invoker.')
+}
+for (const signature of [
+  'is_workspace_member\\(UUID\\)',
+  'can_manage_workspace\\(UUID\\)',
+  'handle_kadexai_new_user\\(\\)',
+  'kade_unique_workspace_slug\\(TEXT, UUID\\)',
+  'kade_set_updated_at\\(\\)',
+]) {
+  const revoke = new RegExp(`REVOKE ALL ON FUNCTION public\\.${signature}[\\s\\S]+FROM PUBLIC, anon, authenticated`, 'i')
+  if (!revoke.test(functionExecutionLockdown)) throw new Error(`Function privilege lockdown missing for ${signature}.`)
+}
+if (!/GRANT EXECUTE ON FUNCTION public\.is_workspace_member\(UUID\) TO authenticated/i.test(functionExecutionLockdown)) {
+  throw new Error('Workspace membership helper is not granted to signed-in users.')
+}
+if (!/GRANT EXECUTE ON FUNCTION public\.can_manage_workspace\(UUID\) TO authenticated/i.test(functionExecutionLockdown)) {
+  throw new Error('Workspace management helper is not granted to signed-in users.')
+}
+if (!/ALTER FUNCTION public\.kade_set_updated_at\(\) SET search_path = ''/i.test(functionExecutionLockdown)) {
+  throw new Error('Updated-at trigger function does not use an immutable search path.')
+}
+for (const signature of ['is_workspace_member\\(UUID\\)', 'can_manage_workspace\\(UUID\\)']) {
+  if (!new RegExp(`ALTER FUNCTION public\\.${signature} SET SCHEMA private`, 'i').test(privateRlsHelpers)) {
+    throw new Error(`Public RLS helper is not moved to the private schema: ${signature}.`)
+  }
+  if (!new RegExp(`GRANT EXECUTE ON FUNCTION private\\.${signature} TO authenticated`, 'i').test(privateRlsHelpers)) {
+    throw new Error(`Private RLS helper is not available to signed-in users: ${signature}.`)
+  }
+}
+if (!/REVOKE ALL ON SCHEMA private FROM PUBLIC, anon, authenticated/i.test(privateRlsHelpers)) {
+  throw new Error('Private helper schema is not locked down.')
 }
 
 console.log(JSON.stringify({ migrations: names, result: 'PASS', liveApply: 'BLOCKED_BY_ENVIRONMENT' }, null, 2))
