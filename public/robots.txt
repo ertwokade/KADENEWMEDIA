@@ -1,4 +1,25 @@
-# Tarama açık tutulur ki arama motorları sayfalardaki noindex direktifini
-# görebilsin. İndeksleme meta etiketi ve X-Robots-Tag ile kapalıdır.
 User-agent: *
 Allow: /
+
+# Özel / oturum gerektiren alanlar
+Disallow: /admin
+Disallow: /api/
+Disallow: /tesekkur
+Disallow: /musteri-panel
+Disallow: /proje-takip
+Disallow: /giris
+Disallow: /kade-kit-business
+Disallow: /kadexai/dashboard
+Disallow: /kadexai/api/
+Disallow: /kadexai/onboarding
+Disallow: /organizasyon-kiti
+
+# Ham uygulama kabuğu, kısa linkler ve hata ekranları
+Disallow: /app.html
+Disallow: /s/
+Disallow: /401
+Disallow: /403
+Disallow: /429
+Disallow: /bakim
+
+Sitemap: https://kadenewmedia.com/sitemap.xml

@@ -69,11 +69,32 @@ async function copyAssets(dir) {
 // Uygulama, giriş, yönetim ve müşteri rotaları bu izin listesinde olmadığı için
 // generate-static-routes.mjs tarafından üretilen React kabuklarını korur.
 const comingSoonHtml = await readFile(join(root, 'public', 'site.html'), 'utf8')
+const ROBOTS_META = /<meta name="robots" content="[^"]*"\s*\/?>/i
+const CANONICAL_TAG = /<link rel="canonical" href="[^"]*"\s*\/?>/i
+const OG_URL_TAG = /<meta property="og:url" content="[^"]*"\s*\/?>/i
+
+function routeUrl(route) {
+  return route ? `https://kadenewmedia.com/${route}` : 'https://kadenewmedia.com/'
+}
+
+async function comingSoonFor(route, generatedPath) {
+  // Rota üreticisinin kararını koru: herkese açık sayfalar index, follow;
+  // özel/noindex sayfalar ise coming soon kabuğu altında da kapalı kalsın.
+  const generated = await readFile(generatedPath, 'utf8').catch(() => '')
+  const robots = generated.match(/<meta name="robots" content="([^"]*)"/i)?.[1] || 'index, follow'
+  const canonical = routeUrl(route)
+
+  return comingSoonHtml
+    .replace(ROBOTS_META, `<meta name="robots" content="${robots}" />`)
+    .replace(CANONICAL_TAG, `<link rel="canonical" href="${canonical}" />`)
+    .replace(OG_URL_TAG, `<meta property="og:url" content="${canonical}" />`)
+}
 
 async function copyPage(route) {
   const to = join(dist, route, 'index.html')
+  const html = await comingSoonFor(route, to)
   await mkdir(dirname(to), { recursive: true })
-  await writeFile(to, comingSoonHtml)
+  await writeFile(to, html)
   pages += 1
 }
 

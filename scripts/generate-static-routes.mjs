@@ -12,10 +12,9 @@ const tr = translations.tr
 const BASE = 'https://kadenewmedia.com'
 const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
 const template = await readFile(join(DIST, 'app.html'), 'utf8')
-// Geçici yayın modu: ana site "coming soon" ekranındayken hiçbir statik ya da
-// korumalı rota arama motorlarına açılmamalı. Tek bayrak, rota listesindeki eski
-// index/noindex kararlarının yanlışlıkla üretime sızmasını engeller.
-const SEARCH_BLOCKED = true
+// Coming soon ekranı ana sitenin geçici arayüzüdür; herkese açık rotalar Google'da
+// görünmeye devam eder. Bu bayrak yalnız acil ve site-geneli indeks kapatma için.
+const SEARCH_BLOCKED = false
 
 const routes = [
   // Hata ve bakım kabukları listede yoktu: ana sayfa şablonunu miras alıyor,

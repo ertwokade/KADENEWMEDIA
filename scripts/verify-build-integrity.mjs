@@ -64,10 +64,10 @@ if (!snapshotHtml) {
   else if (!await exists(join(DIST, 'kade-coming-soon-icon.png'))) fail('dist/kade-coming-soon-icon.png yok')
   else ok('Kade metal ikon dosyası build çıktısında')
 
-  if (!/<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/.test(snapshotHtml)) {
-    fail('dist/site.html: güçlü noindex direktifi yok')
+  if (!/<meta name="robots" content="index, follow"/.test(snapshotHtml)) {
+    fail('dist/site.html: index, follow direktifi yok')
   } else {
-    ok('noindex + nofollow + noarchive direktifi yerinde')
+    ok('coming soon sayfası indekslenebilir')
   }
 
   if (indexHtml !== snapshotHtml) fail('dist/index.html coming soon kabuğuyla aynı değil')
@@ -103,8 +103,8 @@ if (process.env.FINAL_MERGE === '1' && await exists(marketingPath)) {
   const marketingHtml = await readFile(marketingPath, 'utf8')
   if (bundleOf(marketingHtml)) fail('/hakkimizda coming soon kabuğu yerine React bundle yüklüyor')
   else if (!/data-coming-soon/.test(marketingHtml)) fail('/hakkimizda coming soon kabuğunu yüklemiyor')
-  else if (!/<meta name="robots" content="noindex, nofollow/.test(marketingHtml)) fail('/hakkimizda noindex değil')
-  else ok('public pazarlama rotaları noindex coming soon kabuğunu yüklüyor')
+  else if (!/<meta name="robots" content="index, follow/.test(marketingHtml)) fail('/hakkimizda index, follow değil')
+  else ok('public pazarlama rotaları indekslenebilir coming soon kabuğunu yüklüyor')
 }
 
 // ── 2. Tasarım token katmanı ───────────────────────────────────────────────
