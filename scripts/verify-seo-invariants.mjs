@@ -52,7 +52,8 @@ const canonicalOf = (html) => tag(html, /<link rel="canonical" href="([^"]*)"/)
 
 // Geçici coming-soon yayını kendi SEO sözleşmesine sahiptir: public sayfalar
 // aynı bekleme kabuğunu taşır, uygulama sayfaları çalışmaya devam eder ama
-// bütün HTML çıktıları noindex olur ve robots.txt taramayı tamamen kapatır.
+// bütün HTML çıktıları noindex olur. robots.txt taramayı açık tutar; aksi halde
+// arama motoru sayfadaki noindex direktifini göremez.
 const maintenanceHome = await read('/')
 if (/data-coming-soon/.test(maintenanceHome)) {
   console.log('\n── Coming soon SEO kilidi ──')
@@ -73,10 +74,10 @@ if (/data-coming-soon/.test(maintenanceHome)) {
   }
 
   const maintenanceRobots = await readFile(join(DIST, 'robots.txt'), 'utf8')
-  if (!/^User-agent:\s*\*\s*$[\s\S]*^Disallow:\s*\/\s*$/m.test(maintenanceRobots)) {
-    fail('robots.txt tüm taramayı kapatmıyor')
+  if (!/^User-agent:\s*\*\s*$[\s\S]*^Allow:\s*\/\s*$/m.test(maintenanceRobots)) {
+    fail('robots.txt noindex direktifinin taranmasına izin vermiyor')
   } else {
-    ok('robots.txt → User-agent: * / Disallow: /')
+    ok('robots.txt → tarama açık, indeksleme noindex ile kapalı')
   }
 
   if (failures.length) {

@@ -1,4 +1,4 @@
-# Kade New Media geçici "coming soon" dönemindedir.
-# Site yeniden yayına açılırken bu kural SEO ayarlarıyla birlikte kaldırılmalıdır.
+# Tarama açık tutulur ki arama motorları sayfalardaki noindex direktifini
+# görebilsin. İndeksleme meta etiketi ve X-Robots-Tag ile kapalıdır.
 User-agent: *
-Disallow: /
+Allow: /
