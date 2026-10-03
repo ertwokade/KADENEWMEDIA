@@ -47,7 +47,7 @@ jobs:
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$KEYUBU_USER@$KEYUBU_HOST" \
-            "wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'du -sh /srv/kade/media /srv/kade/redis /srv/kade/backups/selfhosted-supabase 2>/dev/null || true; find /srv/kade/backups/selfhosted-supabase -maxdepth 1 -type f -name \"supabase-*.tar.gz.enc\" -printf \"%f %s bytes\\n\" | sort | tail -n 3'"
+            "wsl.exe -d Ubuntu-24.04 -u root -- du -sh /srv/kade/media /srv/kade/redis /srv/kade/backups/selfhosted-supabase"
 
       - name: Create and verify offsite backup
         if: github.event_name == 'schedule' || inputs.inventory_only != true
