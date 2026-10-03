@@ -54,9 +54,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # İlk kurulumda deploy helper'ın çalışan eski kopyası yeni yardımcıyı
-          # henüz /srv/kade/bin'e taşımamış olabilir. Aktif release'ten idempotent
-          # biçimde yerleştir; sonraki çalışmalarda aynı dosyalar yenilenir.
+          # Script ve public key'i workflow'un sabit commit'inden al. Böylece
+          # uygulama Docker deploy'u sırada olsa bile yedekleyici güncel ve
+          # tekrar üretilebilir kalır; mutable main/raw URL kullanılmaz.
           ssh -i ~/.ssh/keyubu \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
@@ -66,12 +66,17 @@ jobs:
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$KEYUBU_USER@$KEYUBU_HOST" \
-            "wsl.exe -d Ubuntu-24.04 -u root -- install -m 644 /srv/kade/current/apps/kadexai/deploy/keyubu/offsite-backup-public.pem /srv/kade/config/offsite-backup-public.pem"
+            "wsl.exe -d Ubuntu-24.04 -u root -- curl --fail --silent --show-error --location --output /srv/kade/config/offsite-backup-public.pem https://raw.githubusercontent.com/ertwokade/KADENEWMEDIA/$GITHUB_SHA/apps/kadexai/deploy/keyubu/offsite-backup-public.pem"
           ssh -i ~/.ssh/keyubu \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$KEYUBU_USER@$KEYUBU_HOST" \
-            "wsl.exe -d Ubuntu-24.04 -u root -- install -m 700 /srv/kade/current/apps/kadexai/deploy/keyubu/backup-keyubu-offsite.sh /srv/kade/bin/backup-keyubu-offsite"
+            "wsl.exe -d Ubuntu-24.04 -u root -- curl --fail --silent --show-error --location --output /srv/kade/bin/backup-keyubu-offsite https://raw.githubusercontent.com/ertwokade/KADENEWMEDIA/$GITHUB_SHA/apps/kadexai/deploy/keyubu/backup-keyubu-offsite.sh"
+          ssh -i ~/.ssh/keyubu \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$KEYUBU_USER@$KEYUBU_HOST" \
+            "wsl.exe -d Ubuntu-24.04 -u root -- chmod 700 /srv/kade/bin/backup-keyubu-offsite"
           ssh -i ~/.ssh/keyubu \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \

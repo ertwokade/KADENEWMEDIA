@@ -93,7 +93,9 @@ database_archive="$(find /srv/kade/backups/selfhosted-supabase -maxdepth 1 -type
 sha256sum --check "$database_archive.sha256" >/dev/null
 
 encrypt_directory() {
-  local logical_name="$1" source_path="$2" output_path="$work_directory/$logical_name.tar.gz.enc"
+  local logical_name="$1"
+  local source_path="$2"
+  local output_path="$work_directory/$logical_name.tar.gz.enc"
   if [[ ! -d "$source_path" ]]; then
     return 0
   fi
@@ -133,7 +135,9 @@ printf '%s' "$KADE_BACKUP_ENCRYPTION_KEY" |
 printf 'logical_name\tlocal_name\tbytes\tsha256\n' > "$work_directory/objects.tsv"
 
 chunk_archive() {
-  local logical_name="$1" archive_path="$2" part_prefix="$work_directory/${logical_name}.part"
+  local logical_name="$1"
+  local archive_path="$2"
+  local part_prefix="$work_directory/${logical_name}.part"
   split -b "$chunk_size" -d -a 4 "$archive_path" "$part_prefix"
   local part
   for part in "$part_prefix"*; do
