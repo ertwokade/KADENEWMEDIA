@@ -68,6 +68,16 @@ eskiden en yeniye.
   envanteri üretimle eşleşince geçici veritabanı silinir. 11 Eylül arşiviyle
   123 tablo için gerçek restore doğrulaması başarılıdır. 12 Eylül migration'ı
   öncesinde ayrıca taze şifreli yedek alınmıştır.
+- **Sunucu dışı afet yedeği:** GitHub Actions her gün 03:15 UTC'de Keyubu'ya
+  bağlanır; taze PostgreSQL yedeğini, `/srv/kade/media` çalışma alanını,
+  Redis'in tutarlı RDB görüntüsünü ve `/srv/kade/secrets` yapılandırmasını
+  şifreleyip yönetilen Supabase'in private `keyubu-disaster-recovery` bucket'ına
+  parçalı olarak yükler. Her snapshot'ın
+  manifesti ve SHA-256 değerleri geri indirilerek doğrulanır, 30 günden eski
+  nesneler temizlenir. Simetrik yedek anahtarı ayrıca RSA-OAEP ile sarılır;
+  private kurtarma anahtarı Keyubu'da tutulmaz ve yalnız
+  `~/.config/kade-backup/offsite-recovery-private.pem` konumundadır. Kurtarma
+  aracı: `apps/kadexai/deploy/keyubu/restore-keyubu-offsite.sh`.
 - **Kod:** Git (GitHub) — her commit push edildiğinde otomatik yedek.
 - **Medya:** Şu an base64 olarak `kade_media`/`kade_link_profiles`
   tablolarında saklanıyor (bkz. `docs/01` bulgusu) — bu, DB backup'ının

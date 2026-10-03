@@ -113,8 +113,11 @@ deploy_started=1
 install -m 700 "$release_directory/$compose_relative/deploy-release.sh" /srv/kade/bin/deploy-kadexai-release
 install -m 700 "$release_directory/$compose_relative/run-cron-job.sh" /srv/kade/bin/run-cron-job
 install -m 700 "$release_directory/$compose_relative/backup-selfhosted-supabase.sh" /srv/kade/bin/backup-selfhosted-supabase
+install -m 700 "$release_directory/$compose_relative/backup-keyubu-offsite.sh" /srv/kade/bin/backup-keyubu-offsite
 install -m 700 "$release_directory/$compose_relative/verify-selfhosted-supabase-backup.sh" /srv/kade/bin/verify-selfhosted-supabase-backup
 install -m 700 "$release_directory/$compose_relative/healthcheck-supabase.sh" /srv/kade/bin/healthcheck-supabase
+install -d -m 755 /srv/kade/config
+install -m 644 "$release_directory/$compose_relative/offsite-backup-public.pem" /srv/kade/config/offsite-backup-public.pem
 install -m 644 "$release_directory/$compose_relative/kadexai.cron" /etc/cron.d/kadexai
 
 cd "$release_directory/$compose_relative"

@@ -1,0 +1,63 @@
+name: Backup Keyubu to Supabase
+
+on:
+  schedule:
+    - cron: "15 3 * * *"
+  workflow_dispatch:
+    inputs:
+      inventory_only:
+        description: "Only report persistent-data sizes; do not upload"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keyubu-offsite-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    environment: keyubu-production
+    env:
+      KEYUBU_HOST: ${{ secrets.KEYUBU_HOST }}
+      KEYUBU_USER: ${{ secrets.KEYUBU_USER }}
+      KEYUBU_SSH_KEY: ${{ secrets.KEYUBU_SSH_KEY }}
+      KEYUBU_KNOWN_HOSTS: ${{ secrets.KEYUBU_KNOWN_HOSTS }}
+
+    steps:
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEYUBU_SSH_KEY" > ~/.ssh/keyubu
+          printf '%s\n' "$KEYUBU_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/keyubu ~/.ssh/known_hosts
+
+      - name: Inventory persistent data
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/keyubu \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$KEYUBU_USER@$KEYUBU_HOST" \
+            "wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'du -sh /srv/kade/media /srv/kade/redis /srv/kade/backups/selfhosted-supabase 2>/dev/null || true; find /srv/kade/backups/selfhosted-supabase -maxdepth 1 -type f -name \"supabase-*.tar.gz.enc\" -printf \"%f %s bytes\\n\" | sort | tail -n 3'"
+
+      - name: Create and verify offsite backup
+        if: github.event_name == 'schedule' || inputs.inventory_only != true
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/keyubu \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=4 \
+            "$KEYUBU_USER@$KEYUBU_HOST" \
+            "wsl.exe -d Ubuntu-24.04 -u root -- /srv/kade/bin/backup-keyubu-offsite"
