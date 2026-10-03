@@ -50,6 +50,43 @@ const tag = (html, re) => (html.match(re) || [])[1] || null
 const robotsOf = (html) => tag(html, /<meta name="robots" content="([^"]*)"/)
 const canonicalOf = (html) => tag(html, /<link rel="canonical" href="([^"]*)"/)
 
+// Geçici coming-soon yayını kendi SEO sözleşmesine sahiptir: public sayfalar
+// aynı bekleme kabuğunu taşır, uygulama sayfaları çalışmaya devam eder ama
+// bütün HTML çıktıları noindex olur ve robots.txt taramayı tamamen kapatır.
+const maintenanceHome = await read('/')
+if (/data-coming-soon/.test(maintenanceHome)) {
+  console.log('\n── Coming soon SEO kilidi ──')
+  const publicRoutes = [...new Set([...INDEXABLE, ...PUBLIC_NOINDEX])]
+  for (const route of publicRoutes) {
+    let html
+    try { html = await read(route) } catch { fail(`${route}: ön-render dosyası üretilmedi`); continue }
+    if (!/data-coming-soon/.test(html)) fail(`${route}: coming soon kabuğu yok`)
+    else if (!robotsOf(html)?.startsWith('noindex, nofollow')) fail(`${route}: güçlü noindex direktifi yok`)
+    else ok(`${route} → coming soon + noindex`)
+  }
+
+  for (const route of PROTECTED) {
+    let html
+    try { html = await read(route) } catch { fail(`${route}: ön-render dosyası üretilmedi`); continue }
+    if (!robotsOf(html)?.startsWith('noindex, nofollow')) fail(`${route}: uygulama kabuğu noindex değil`)
+    else ok(`${route} → uygulama erişilebilir, noindex`)
+  }
+
+  const maintenanceRobots = await readFile(join(DIST, 'robots.txt'), 'utf8')
+  if (!/^User-agent:\s*\*\s*$[\s\S]*^Disallow:\s*\/\s*$/m.test(maintenanceRobots)) {
+    fail('robots.txt tüm taramayı kapatmıyor')
+  } else {
+    ok('robots.txt → User-agent: * / Disallow: /')
+  }
+
+  if (failures.length) {
+    console.error(`\n${failures.length} SEO ihlali.\n`)
+    process.exit(1)
+  }
+  console.log('\nComing soon SEO kilidi doğrulandı.\n')
+  process.exit(0)
+}
+
 console.log('\n── İndekslenen sayfalar (ön-render + canonical + robots) ──')
 for (const route of INDEXABLE) {
   let html

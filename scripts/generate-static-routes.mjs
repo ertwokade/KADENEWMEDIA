@@ -12,6 +12,10 @@ const tr = translations.tr
 const BASE = 'https://kadenewmedia.com'
 const DIST = fileURLToPath(new URL('../dist/', import.meta.url))
 const template = await readFile(join(DIST, 'app.html'), 'utf8')
+// Geçici yayın modu: ana site "coming soon" ekranındayken hiçbir statik ya da
+// korumalı rota arama motorlarına açılmamalı. Tek bayrak, rota listesindeki eski
+// index/noindex kararlarının yanlışlıkla üretime sızmasını engeller.
+const SEARCH_BLOCKED = true
 
 const routes = [
   // Hata ve bakım kabukları listede yoktu: ana sayfa şablonunu miras alıyor,
@@ -262,13 +266,12 @@ function replaceRequired(html, pattern, replacement, label) {
 
 function render(route, title, description, noindex) {
   const canonical = `${BASE}${route}`
-  const schemaMarkup = structuredData(route, title, description, noindex)
+  const preventIndexing = SEARCH_BLOCKED || noindex
+  const schemaMarkup = structuredData(route, title, description, preventIndexing)
   let html = template
   html = replaceRequired(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`, 'title')
   html = replaceRequired(html, /<meta name="description" content="[^"]*"\s*\/>/, `<meta name="description" content="${escapeHtml(description)}" />`, 'description')
-  // `nofollow` yerine `follow`: bu sayfalar indekslenmesin ama üzerlerindeki
-  // bağlantılar (ör. /partnerler -> /partnerler/:id) taranabilir kalsın.
-  html = replaceRequired(html, /<meta name="robots" content="[^"]*"\s*\/>/, `<meta name="robots" content="${noindex ? 'noindex, follow' : 'index, follow'}" />`, 'robots')
+  html = replaceRequired(html, /<meta name="robots" content="[^"]*"\s*\/>/, `<meta name="robots" content="${preventIndexing ? 'noindex, nofollow, noarchive, nosnippet, noimageindex' : 'index, follow'}" />`, 'robots')
   html = replaceRequired(html, /<meta property="og:title" content="[^"]*"\s*\/>/, `<meta property="og:title" content="${escapeHtml(title)}" />`, 'og:title')
   html = replaceRequired(html, /<meta property="og:description" content="[^"]*"\s*\/>/, `<meta property="og:description" content="${escapeHtml(description)}" />`, 'og:description')
   html = replaceRequired(html, /<meta name="twitter:title" content="[^"]*"\s*\/>/, `<meta name="twitter:title" content="${escapeHtml(title)}" />`, 'twitter:title')

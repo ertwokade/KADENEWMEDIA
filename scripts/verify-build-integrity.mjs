@@ -4,20 +4,10 @@
  *
  * İki regresyonu kalıcı olarak kilitler:
  *
- *  1) Anasayfa snapshot'ı eksiksiz çıksın. Anasayfa (yalnız "/") derlenmiş bir
- *     statik snapshot ile servis ediliyor: public/site.html + public/_kade/**.
- *     (Yol adı _next DEĞİL: tek dağıtım mimarisinde /_next/ Next.js'in kendi
- *     build çıktısına ayrılmıştır — bkz. haoqi-clone/kade-html-transform.mjs.)
- *     Build sonunda snapshot hem dist/site.html hem de fiziksel
- *     dist/index.html olarak bulunur; Vercel rewrite önceliğine güvenilmez. Bir
- *     dönem kaldırılmış, yerine React anasayfası konmuştu; site sahibinin
- *     talebiyle geri alındı. Bu kontrol artık TERSİ yönde koruyor: snapshot
- *     ya da referans verdiği chunk'lardan biri dist'e girmezse anasayfa
- *     sessizce boş/bozuk yayına çıkar — build burada durur.
- *
- *     Ana sayfa ve public pazarlama rotaları kürate edilmiş statik Kade
- *     kabuğundan, giriş/admin/portal gibi uygulama rotaları React bundle'ından
- *     gelir (bkz. aşağıdaki iki-kabuk kontrolü).
+ *  1) Geçici "coming soon" kabuğu eksiksiz çıksın. Ana sayfa ve public
+ *     pazarlama rotaları aynı statik kabuktan; giriş/admin/portal gibi uygulama
+ *     rotaları React bundle'ından gelir. Arama motoru engeli, logo varlığı ve
+ *     iki fiziksel ana sayfa çıktısının eşitliği burada doğrulanır.
  *
  *  2) Tasarım token katmanı bundle'a girsin. src/styles/kade-tokens.css tek
  *     doğruluk kaynağı; bir import zinciri kopar da token'lar üretilen CSS'e
@@ -53,9 +43,9 @@ const rel = (path) => path.slice(DIST.length)
 const htmlFiles = files.filter((f) => f.endsWith('.html'))
 const cssFiles = files.filter((f) => f.endsWith('.css'))
 
-// ── 1. Anasayfa snapshot'ı ─────────────────────────────────────────────────
+// ── 1. Coming soon kabuğu ──────────────────────────────────────────────────
 
-console.log('\nAnasayfa snapshot kontrolü')
+console.log('\nComing soon kabuğu kontrolü')
 
 const SNAPSHOT = join(DIST, 'site.html')
 const INDEX = join(DIST, 'index.html')
@@ -63,44 +53,25 @@ const snapshotHtml = (await exists(SNAPSHOT)) ? await readFile(SNAPSHOT, 'utf8')
 const indexHtml = (await exists(INDEX)) ? await readFile(INDEX, 'utf8') : null
 
 if (!snapshotHtml) {
-  fail('dist/site.html yok — anasayfa snapshot\'ı build çıktısına girmemiş')
+  fail('dist/site.html yok — coming soon kabuğu build çıktısına girmemiş')
 } else {
   ok('dist/site.html üretilmiş')
 
-  // site.html'in referans verdiği HER chunk dist'te bulunmalı. Eksik tek bir
-  // dosya bile anasayfayı boş ekrana düşürür ve bu ancak canlıda fark edilir.
-  const referenced = [...new Set(
-    [...snapshotHtml.matchAll(/(?:src|href)="(\/_kade\/static\/chunks\/[^"]+)"/g)].map((m) => m[1]),
-  )]
-  const missing = []
-  for (const path of referenced) {
-    if (!await exists(join(DIST, path.slice(1)))) missing.push(path)
+  if (!/data-coming-soon/.test(snapshotHtml)) fail('dist/site.html: coming soon işareti yok')
+  else ok('coming soon işareti yerinde')
+
+  if (!/src="\/kade-coming-soon-icon\.png"/.test(snapshotHtml)) fail('dist/site.html: Kade metal ikon bağlantısı yok')
+  else if (!await exists(join(DIST, 'kade-coming-soon-icon.png'))) fail('dist/kade-coming-soon-icon.png yok')
+  else ok('Kade metal ikon dosyası build çıktısında')
+
+  if (!/<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex"/.test(snapshotHtml)) {
+    fail('dist/site.html: güçlü noindex direktifi yok')
+  } else {
+    ok('noindex + nofollow + noarchive direktifi yerinde')
   }
-  if (!referenced.length) fail('dist/site.html hiçbir /_kade/ chunk\'ına referans vermiyor — snapshot bozuk')
-  else if (missing.length) fail(`snapshot chunk'ları eksik (${missing.length}): ${missing.join(', ')}`)
-  else ok(`snapshot'ın ${referenced.length} chunk referansının tamamı dist'te`)
 
-  // Snapshot yabancı kaynaklı; orijinal imza SVG'sini Kade sürümüne çeviren
-  // yama site.html içinde satır içi duruyor. Yama düşerse anasayfada başka
-  // bir markanın imzası görünür.
-  if (!/svg-sign/.test(snapshotHtml)) fail('dist/site.html: Kade imza yaması kaybolmuş')
-  else ok('Kade imza yaması yerinde')
-
-  if (!/src="\/homepage-admin\.js"/.test(snapshotHtml)) fail('dist/site.html: admin ana sayfa runtime bağlantısı yok')
-  else if (!await exists(join(DIST, 'homepage-admin.js'))) fail('dist/homepage-admin.js yok — admin içerikleri ana sayfaya uygulanamaz')
-  else ok('admin ana sayfa runtime bağlantısı yerinde')
-
-  const foreignVisibleMarkers = [
-    '>I explore how to shape AI-era workflows', '>I’m building', '>reunimos™<',
-    '>Reunimos™<', '>aDrive<', '>aDrive 阿里云盘<', '>Teambition<',
-    '>Inspire Mono<', '>Wasm design utils<', '>VectorSymbols<', '>DarkSide<',
-  ]
-  const foreignVisible = foreignVisibleMarkers.filter((marker) => snapshotHtml.includes(marker))
-  if (foreignVisible.length) fail(`dist/site.html: görünür eski şablon içeriği kaldı (${foreignVisible.join(', ')})`)
-  else ok('JavaScript kapalıyken görünür eski şablon içeriği yok')
-
-  if (indexHtml !== snapshotHtml) fail('dist/index.html Kade snapshot\'ıyla aynı değil — Vercel kökte React fallback servis edebilir')
-  else ok('dist/index.html doğrudan Kade snapshot\'ını içeriyor')
+  if (indexHtml !== snapshotHtml) fail('dist/index.html coming soon kabuğuyla aynı değil')
+  else ok('dist/index.html doğrudan coming soon kabuğunu içeriyor')
 }
 
 // Snapshot DIŞINDAKİ hiçbir HTML yabancı bundle'a referans vermemeli; verirse
@@ -116,8 +87,7 @@ for (const file of htmlFiles) {
 if (!failures.some((f) => f.includes('sızmış'))) ok(`${htmlFiles.length - 2} iç sayfa HTML'inde snapshot varlık referansı yok`)
 
 // Uygulama rotaları app.html ile aynı React bundle'ını; public pazarlama
-// rotaları ise kade-site.js statik kabuğunu yüklemeli. Bu iki mimariyi birbirine
-// eşitlemeye çalışmak final merge'den sonra yanlış alarm üretiyordu.
+// rotaları ise statik coming soon kabuğunu yüklemeli.
 const bundleOf = (html) => (html.match(/\/assets\/(index-[A-Za-z0-9_-]+\.js)/) || [])[1] || null
 const appBundle = bundleOf(await readFile(join(DIST, 'app.html'), 'utf8'))
 const adminPath = join(DIST, 'admin', 'index.html')
@@ -131,9 +101,10 @@ if (!appBundle) {
 }
 if (process.env.FINAL_MERGE === '1' && await exists(marketingPath)) {
   const marketingHtml = await readFile(marketingPath, 'utf8')
-  if (bundleOf(marketingHtml)) fail('/hakkimizda statik Kade kabuğu yerine React bundle yüklüyor')
-  else if (!/src="\/kade-site\.js"/.test(marketingHtml)) fail('/hakkimizda statik Kade runtime bağlantısını yüklemiyor')
-  else ok('public pazarlama rotaları statik Kade kabuğunu yüklüyor')
+  if (bundleOf(marketingHtml)) fail('/hakkimizda coming soon kabuğu yerine React bundle yüklüyor')
+  else if (!/data-coming-soon/.test(marketingHtml)) fail('/hakkimizda coming soon kabuğunu yüklemiyor')
+  else if (!/<meta name="robots" content="noindex, nofollow/.test(marketingHtml)) fail('/hakkimizda noindex değil')
+  else ok('public pazarlama rotaları noindex coming soon kabuğunu yüklüyor')
 }
 
 // ── 2. Tasarım token katmanı ───────────────────────────────────────────────
