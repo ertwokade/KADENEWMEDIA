@@ -13,7 +13,39 @@
    ========================================================================== */
 
 /* ---------------------------------------------------------------------------
-   1) POPPINS — self-host, latin + latin-ext (Türkçe ı İ ğ Ğ ş Ş için gerekli)
+   1) MONTSERRAT KADE — homepage ile aynı self-host aile
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Montserrat Kade';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/kade/montserrat-400.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Montserrat Kade';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/kade/montserrat-500.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Montserrat Kade';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/kade/montserrat-600.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Montserrat Kade';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/kade/montserrat-700.ttf') format('truetype');
+}
+
+/* Legacy Poppins declarations are retained temporarily for old exported
+   documents, but the live application no longer selects this family.
    Yalnızca kullanılan 5 ağırlık yüklenir: 300 / 400 / 500 / 600 / 700.
    Toplam ~66 KB (10 dosya). Google Fonts'a runtime bağımlılık yoktur, bu yüzden
    CSP'nin font-src/style-src kuralları için harici izin gerekmez.
@@ -106,7 +138,7 @@
      mevcut `var(--font-primary)`, `var(--ky-mono)` gibi ~70 kullanım
      dokunulmadan Poppins'e döner. Yeni kodda `--font-sans` kullanın.
   ------------------------------------------------------------------------- */
-  --font-sans: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Montserrat Kade', Arial, sans-serif;
   /* Kullanıcının marka kararı: pazarlama sayfaları, ürün arayüzleri, küçük
      etiketler, form elemanları ve teknik görünümlü metinler dahil sitenin
      tamamı aynı Poppins ailesini kullanır. Bu iki takma ad, eski bileşenleri
@@ -160,7 +192,7 @@
 
   /* Vurgu — asidik yeşil. Yalnız küçük etiket/rozet zeminlerinde kullanılır
      (üzerine her zaman koyu mürekkep yazılır), metin rengi olarak değil. */
-  --kade-accent: #c0fe04;
+  --kade-accent: #e0a81f;
 
   /* Mürekkep tonları — koyu zemin (#0f1111) üzerinde ölçülmüştür.
      WCAG 2.1 AA küçük metin için 4.5:1, büyük metin (≥18.66px bold veya

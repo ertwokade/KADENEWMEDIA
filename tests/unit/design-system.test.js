@@ -19,40 +19,34 @@ async function walk(dir) {
   return out
 }
 
-// ── Poppins: tek font ailesi ───────────────────────────────────────────────
+// ── Montserrat Kade: homepage ile ortak font ailesi ───────────────────────
 
-test('kade-tokens.css tek font kaynağıdır ve Poppins tanımlar', async () => {
+test('kade-tokens.css tek font kaynağıdır ve Montserrat Kade tanımlar', async () => {
   const css = await readRepo('src/styles/kade-tokens.css')
-  assert.match(css, /--font-sans:\s*'Poppins'/, '--font-sans Poppins olmalı')
+  assert.match(css, /--font-sans:\s*'Montserrat Kade'/, '--font-sans Montserrat Kade olmalı')
   assert.match(css, /font-display:\s*swap/, 'font-display: swap zorunlu')
 
-  // Kullanılan 4 ağırlığın her biri latin ve latin-ext olarak tanımlı olmalı;
-  // latin-ext olmadan ı/İ/ğ/ş glifleri fallback fonttan gelir.
+  // Homepage ile aynı dört ağırlık merkezi token dosyasında tanımlı olmalı.
   for (const weight of [400, 500, 600, 700]) {
-    for (const subset of ['latin', 'latin-ext']) {
-      assert.ok(
-        css.includes(`/fonts/poppins/poppins-${weight}-${subset}.woff2`),
-        `Poppins ${weight}/${subset} tanımı eksik`,
-      )
-    }
+    assert.ok(
+      css.includes(`/fonts/kade/montserrat-${weight}.ttf`),
+      `Montserrat Kade ${weight} tanımı eksik`,
+    )
   }
 
   // Fallback zinciri sistem fontlarıyla bitmeli.
   assert.match(css, /--font-sans:[^;]*sans-serif;/, 'fallback zinciri sans-serif ile bitmeli')
 })
 
-test('Poppins woff2 dosyaları gerçekten mevcut ve makul boyutta', async () => {
+test('Montserrat Kade dosyaları gerçekten mevcut ve makul boyutta', async () => {
   let total = 0
   for (const weight of [400, 500, 600, 700]) {
-    for (const subset of ['latin', 'latin-ext']) {
-      const path = new URL(`public/fonts/poppins/poppins-${weight}-${subset}.woff2`, ROOT)
-      const info = await stat(path)
-      assert.ok(info.size > 1000, `poppins-${weight}-${subset}.woff2 boş görünüyor`)
-      total += info.size
-    }
+    const path = new URL(`haoqi-clone/fonts/kade/montserrat-${weight}.ttf`, ROOT)
+    const info = await stat(path)
+    assert.ok(info.size > 1000, `montserrat-${weight}.ttf boş görünüyor`)
+    total += info.size
   }
-  // Regresyon koruması: yanlışlıkla tam (subset'lenmemiş) dosya eklenirse yakalar.
-  assert.ok(total < 200 * 1024, `Poppins toplamı çok büyük: ${(total / 1024).toFixed(0)} KB`)
+  assert.ok(total < 2 * 1024 * 1024, `Montserrat toplamı çok büyük: ${(total / 1024).toFixed(0)} KB`)
 })
 
 test('form elemanları ve dialog fontu miras alır', async () => {
@@ -87,11 +81,9 @@ test('kaynak CSS dosyalarında eski font aileleri kalmadı', async () => {
   }
 })
 
-test('index.html Google Fonts yerine self-host Poppins preload eder', async () => {
+test('index.html harici Google Fonts yüklemez', async () => {
   const html = await readRepo('index.html')
   assert.ok(!html.includes('fonts.googleapis.com'), 'Google Fonts stylesheet kaldırılmalı')
-  assert.ok(html.includes('/fonts/poppins/poppins-400-latin.woff2'), 'Poppins 400 preload yok')
-  assert.match(html, /rel="preload"[^>]*as="font"[^>]*crossorigin/, 'font preload crossorigin olmalı')
 })
 
 test('snapshot varlıkları eksiksiz, hazırlama scriptleri yok', async () => {
@@ -163,12 +155,18 @@ test('ana sayfa snapshot\'tan, public pazarlama sayfaları statik Kade kabuğund
   assert.match(home, /lazy\(\s*\(\)\s*=>\s*import\(.*KadeScene/s, 'KadeScene lazy yüklenmeli')
   assert.match(home, /Suspense/, 'sahne Suspense ile sarılmalı')
 })
-test('hata, offline ve gömülü organizasyon kabukları da Poppins kullanır', async () => {
-  for (const path of ['public/404.html', 'public/offline.html', 'src/embedded/kadir-organizasyon-kiti/styles.css']) {
+test('hata ve offline kabukları yerel Poppins kullanır', async () => {
+  for (const path of ['public/404.html', 'public/offline.html']) {
     const source = await readRepo(path)
     assert.match(source, /Poppins/, `${path} Poppins kullanmalı`)
     assert.doesNotMatch(source, /fonts\.googleapis\.com|font-family:\s*Inter\b/, `${path} uzaktaki/eski fontu kullanmamalı`)
   }
+})
+
+test('gömülü organizasyon aracı da ana Kade fontunu kullanır', async () => {
+  const source = await readRepo('src/embedded/kadir-organizasyon-kiti/styles.css')
+  assert.match(source, /Montserrat Kade/, 'organizasyon aracı Montserrat Kade kullanmalı')
+  assert.doesNotMatch(source, /fonts\.googleapis\.com|font-family:\s*Inter\b/, 'organizasyon aracı uzaktaki/eski fontu kullanmamalı')
 })
 
 test('takip edilen eski kök font dosyaları kaldırılmıştır', async () => {

@@ -37,6 +37,16 @@
         "haoqi-clone/server.mjs"
       ],
       "port": 4180
+    },
+    {
+      "name": "kadexai-kit",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/private/tmp/claude-501/-Users-kadirdemir-Desktop-KADENEWMEDIA/0f7d77fc-a559-45e6-aedf-758907905b60/scratchpad/static.mjs",
+        "apps/kadexai/public",
+        "4190"
+      ],
+      "port": 4190
     }
   ]
 }

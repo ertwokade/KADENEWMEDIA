@@ -5,32 +5,15 @@
 html body,html body *{font-family:"Montserrat Kade",Arial,sans-serif!important}
 html body [class*="font-bold"][class*="uppercase"],html body [class*="font-bold"][class*="uppercase"] *{font-weight:700!important;letter-spacing:-.04em!important}
 span[aria-label^="Sound"],span[aria-label^="Ses"],header span[class*="lg:hidden p-2 uppercase"],header span[class*="hidden lg:inline p-2 uppercase"],header span[class*="lg:bottom-7 lg:left-1/2"],header div[class*="hidden lg:block p-2 shrink-0"]{display:none!important}
-/* Fixed palette measured from the live kadenewmedia.com homepage in Chrome. */
-:root,html[data-theme="light"]{
-  --bg:#fbfaf4;
-  --text:#000;
-  --muted:rgba(54,54,48,.6);
-  --line:rgba(54,54,48,.1);
-  --accent:#c0fe04;
-  --panel:rgba(54,54,48,.035);
-  --background-deep:251,250,244;
-  --background-1:rgb(251,250,244);
-  --background-elevated:#efede7;
-  --label:0,0,0;
-  --label-d:54,54,48;
-  --label-1:rgba(0,0,0,1);
-  --label-2:rgba(54,54,48,.6);
-  --label-3:rgba(54,54,48,.32);
-  --label-4:rgba(54,54,48,.18);
-  --selection-bg:#c0fe04;
-  color-scheme:light
-}
-html.dark,html[data-theme="dark"]{
+/* Kade's canonical palette: dark by default, with the existing cream/yellow
+   brand colours. Keeping the dark tokens on :root prevents a light flash
+   before the theme bootstrap runs. */
+:root,html.dark,html[data-theme="dark"]{
   --bg:#000;
   --text:#fbfaf4;
   --muted:rgba(251,250,244,.62);
   --line:rgba(251,250,244,.14);
-  --accent:#c0fe04;
+  --accent:#e0a81f;
   --panel:rgba(239,237,231,.08);
   --background-deep:0,0,0;
   --background-1:#000;
@@ -41,8 +24,27 @@ html.dark,html[data-theme="dark"]{
   --label-2:rgba(251,250,244,.62);
   --label-3:rgba(251,250,244,.34);
   --label-4:rgba(251,250,244,.18);
-  --selection-bg:#c0fe04;
+  --selection-bg:#e0a81f;
   color-scheme:dark
+}
+html[data-theme="light"]{
+  --bg:#fbfaf4;
+  --text:#000;
+  --muted:rgba(54,54,48,.6);
+  --line:rgba(54,54,48,.1);
+  --accent:#e0a81f;
+  --panel:rgba(54,54,48,.035);
+  --background-deep:251,250,244;
+  --background-1:rgb(251,250,244);
+  --background-elevated:#efede7;
+  --label:0,0,0;
+  --label-d:54,54,48;
+  --label-1:rgba(0,0,0,1);
+  --label-2:rgba(54,54,48,.6);
+  --label-3:rgba(54,54,48,.32);
+  --label-4:rgba(54,54,48,.18);
+  --selection-bg:#e0a81f;
+  color-scheme:light
 }
 html{background:var(--bg)!important;color:var(--text)!important;transition:background-color .3s ease,color .3s ease}
 html body,html .kade-home-static{background-color:var(--bg)!important;color:var(--text)!important}
@@ -78,6 +80,126 @@ html.dark .client-card::before{opacity:.28}
   transition:opacity .2s ease,color .3s ease!important;
 }
 html:not([data-kade-loaded]) header.z-50{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+/* Stable first frame while WebGL hydrates. It carries the real headline and
+   palette instead of exposing the snapshot's scrambling intermediate text. */
+.kade-first-frame{
+  position:fixed;
+  inset:0;
+  z-index:54;
+  overflow:hidden;
+  background:
+    radial-gradient(62vw 62vh at 63% 44%,rgba(224,168,31,.13),transparent 62%),
+    linear-gradient(90deg,rgba(251,250,244,.11) 1px,transparent 1px),
+    #081228;
+  background-size:auto,33.333% 100%,auto;
+  color:#fbfaf4;
+  opacity:1;
+  visibility:visible;
+  transition:opacity .18s ease,visibility 0s linear .18s;
+}
+.kade-first-frame__hud{
+  position:absolute;
+  top:22px;
+  left:4vw;
+  right:4vw;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:28px;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.kade-first-frame__brand{font-size:15px;font-weight:700;letter-spacing:.06em}
+.kade-first-frame__nav{display:flex;gap:28px;color:rgba(251,250,244,.72)}
+.kade-first-frame__meta{
+  position:absolute;
+  top:14vh;
+  left:4.4vw;
+  right:8vw;
+  display:grid;
+  grid-template-columns:1fr 1fr 1.3fr;
+  gap:5vw;
+  align-items:start;
+  font-size:clamp(14px,1.6vw,24px);
+  line-height:1.35;
+}
+.kade-first-frame__meta span:nth-child(n+2){font-size:clamp(12px,1vw,16px);color:rgba(251,250,244,.72)}
+.kade-first-frame__title{
+  position:absolute;
+  left:4.4vw;
+  bottom:12vh;
+  max-width:11ch;
+  margin:0;
+  color:#fbfaf4;
+  font-size:clamp(54px,6.2vw,96px)!important;
+  font-weight:700!important;
+  line-height:.88!important;
+  letter-spacing:-.055em!important;
+  text-transform:uppercase;
+}
+.kade-first-frame__title em{color:#e0a81f;font-style:normal}
+html[data-kade-scene-ready] .kade-first-frame{opacity:0;visibility:hidden;pointer-events:none}
+@media(max-width:900px){
+  .kade-first-frame{background-size:auto,50% 100%,auto}
+  .kade-first-frame__hud{top:20px;left:18px;right:18px}
+  .kade-first-frame__nav{display:none}
+  .kade-first-frame__meta{top:13vh;left:20px;right:20px;grid-template-columns:1fr}
+  .kade-first-frame__meta span:nth-child(n+2){display:none}
+  .kade-first-frame__title{left:20px;bottom:13vh;font-size:clamp(48px,15vw,76px)!important}
+}
+/* React owns the homepage body and can discard fallback DOM during hydration.
+   Root pseudo-elements cannot be removed by React, so they guarantee a useful,
+   fully composed first frame until the native scene is settled. */
+html:has(link[href^="/_kade/"]):not([data-kade-scene-ready])::before{
+  content:'BİZ\A MARKANI\A BÜYÜTÜYORUZ';
+  position:fixed;
+  inset:0;
+  z-index:2147482000;
+  display:flex;
+  align-items:flex-end;
+  padding:0 4.4vw 12vh;
+  background:
+    radial-gradient(62vw 62vh at 63% 44%,rgba(224,168,31,.13),transparent 62%),
+    linear-gradient(90deg,rgba(251,250,244,.11) 1px,transparent 1px),
+    #081228;
+  background-size:auto,33.333% 100%,auto;
+  color:#fbfaf4;
+  font-family:'Montserrat Kade',Arial,sans-serif!important;
+  font-size:clamp(54px,6.2vw,96px);
+  font-weight:700;
+  line-height:.88;
+  letter-spacing:-.055em;
+  white-space:pre;
+  pointer-events:none;
+}
+html:has(link[href^="/_kade/"]):not([data-kade-scene-ready])::after{
+  content:'KADE NEW MEDIA   ·   SOSYAL MEDYA & DİJİTAL PAZARLAMA';
+  position:fixed;
+  z-index:2147482001;
+  top:24px;
+  left:4.4vw;
+  color:#fbfaf4;
+  font-family:'Montserrat Kade',Arial,sans-serif!important;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.08em;
+  pointer-events:none;
+}
+@media(max-width:900px){
+  html:has(link[href^="/_kade/"]):not([data-kade-scene-ready])::before{
+    padding:0 20px 13vh;
+    background-size:auto,50% 100%,auto;
+    font-size:clamp(48px,15vw,76px);
+  }
+  html:has(link[href^="/_kade/"]):not([data-kade-scene-ready])::after{
+    top:20px;
+    left:20px;
+    max-width:calc(100vw - 40px);
+    font-size:10px;
+  }
+}
 /* Keep the cloned app's loading state functional, but do not cover the page
    with a blank sheet or show a progress bar. */
 div[class*="left-1/2"][class*="top-1/2"][class*="z-40"][aria-hidden="true"]{visibility:hidden!important}
@@ -176,7 +298,7 @@ header.z-50>div:first-child>div:has(>:is([data-theme-toggle],[aria-label^="Theme
 header.z-50 a[href="/"]>span{display:none!important}
 header.z-50 a[href="/"]::after{content:'Kade New Media'}
 footer a[href^="mailto:"]{text-transform:none!important}
-::selection{background:#c0fe04;color:#000}
+::selection{background:#e0a81f;color:#000}
 
 @media(max-width:900px){
   header.z-50>div:first-child{
@@ -245,6 +367,17 @@ footer a[href^="mailto:"]{text-transform:none!important}
   header.z-50>div:first-child>a{padding-left:4px!important;padding-right:4px!important;font-size:14px!important}
   .kade-hero-cta{left:16px;max-width:calc(100% - 32px)}
 }
+.hud nav a,
+.hud nav button,
+.kade-access-panel__actions a,
+.kade-services-panel__close,
+.kade-services-panel__footer a{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.hud .kade-static-menu-toggle{min-height:44px}
 .kade-hero-cta{display:none}
 @media(max-width:900px){.kade-hero-cta{display:flex}}
 @media(min-width:600px) and (max-width:900px){.kade-hero-cta{top:clamp(270px,27dvh,310px)}}

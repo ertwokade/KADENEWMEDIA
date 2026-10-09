@@ -1,0 +1,256 @@
+/* ========================================================================== 
+   KADE UNIFIED DARK
+   Final site-wide bridge between the Haoqi-derived homepage and React routes.
+   The layout language comes from the homepage; the canonical Kade cream and
+   yellow palette remains unchanged.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Montserrat Kade';
+  src: url('/fonts/kade/montserrat-400.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat Kade';
+  src: url('/fonts/kade/montserrat-500.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat Kade';
+  src: url('/fonts/kade/montserrat-600.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat Kade';
+  src: url('/fonts/kade/montserrat-700.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --font-sans: 'Montserrat Kade', Arial, sans-serif;
+  --font-display: var(--font-sans);
+  --font-primary: var(--font-sans);
+  --font-secondary: var(--font-sans);
+  --font-mono: var(--font-sans);
+  --font-mono-ui: var(--font-sans);
+  --font-serif: var(--font-sans);
+  --font: var(--font-sans);
+  --ky-mono: var(--font-sans);
+  --ky-tech: var(--font-sans);
+  --kf-display: var(--font-sans);
+  --kf-mono: var(--font-sans);
+  --kf-tech: var(--font-sans);
+
+  --kade-canvas: #000;
+  --kade-surface: #000;
+  --kade-elevated: #171818;
+  --kade-gold: #e0a81f;
+  --kade-gold-deep: #c8901a;
+  --kade-gold-text: #ebc669;
+  --kade-accent: #e0a81f;
+  --primary: #e0a81f;
+  --primary-dark: #c8901a;
+  --primary-light: #fff2cc;
+  --bg-primary: #000;
+  --black: #000;
+  --black-light: #101111;
+  --black-lighter: #171818;
+  --card-bg: rgba(251, 250, 244, 0.035);
+  --gradient-primary: linear-gradient(135deg, #f3d367 0%, #e0a81f 52%, #c8901a 100%);
+  --gradient-dark: linear-gradient(180deg, #000 0%, #0c0d0d 100%);
+  --gradient-card: linear-gradient(145deg, rgba(251, 250, 244, 0.055), rgba(251, 250, 244, 0.018));
+  --border-color-hover: rgba(224, 168, 31, 0.7);
+}
+
+/* Admin used to be pinned to a cream compatibility palette. It now inherits
+   the same dark roles as every other product surface. */
+body.kade-app-ui {
+  color-scheme: dark;
+  --kade-ink: #fbfaf4;
+  --kade-ink-2: rgba(251, 250, 244, 0.78);
+  --kade-ink-3: rgba(251, 250, 244, 0.64);
+  --kade-ink-4: rgba(251, 250, 244, 0.34);
+  --kade-ink-ghost: rgba(251, 250, 244, 0.12);
+  --kade-on-brand: #17130a;
+  --kade-gold-text: #ebc669;
+  --kade-canvas: #000;
+  --kade-surface: #000;
+  --kade-surface-2: rgba(251, 250, 244, 0.05);
+  --kade-surface-3: rgba(251, 250, 244, 0.09);
+  --kade-elevated: #171818;
+  --kade-line: rgba(251, 250, 244, 0.12);
+  --kade-line-strong: rgba(251, 250, 244, 0.28);
+  --bg-primary: #000;
+  --bg-secondary: rgba(251, 250, 244, 0.05);
+  --card-bg: rgba(251, 250, 244, 0.035);
+  --text-primary: #fbfaf4;
+  --text-secondary: rgba(251, 250, 244, 0.64);
+  --white: #fbfaf4;
+  --gray-light: rgba(251, 250, 244, 0.6);
+  --gray-lighter: rgba(251, 250, 244, 0.78);
+  --border-color: rgba(251, 250, 244, 0.12);
+  background: #000;
+  color: #fbfaf4;
+}
+
+html,
+body,
+#root,
+#root *,
+button,
+input,
+textarea,
+select,
+option,
+code,
+pre,
+kbd {
+  font-family: var(--font-sans) !important;
+}
+
+html[data-theme='dark'],
+html[data-theme='dark'] body,
+html[data-theme='dark'] #root {
+  background:
+    radial-gradient(62vw 54vh at 72% -8%, rgba(224, 168, 31, 0.11), transparent 65%),
+    linear-gradient(90deg, rgba(251, 250, 244, 0.055) 1px, transparent 1px),
+    #000 !important;
+  background-size: auto, 25% 100%, auto !important;
+  color: #fbfaf4;
+}
+
+html[data-theme='dark'] body::before {
+  background:
+    radial-gradient(circle at var(--pointer-x, 50%) var(--pointer-y, 18%), rgba(224, 168, 31, 0.12), transparent 24%),
+    linear-gradient(115deg, transparent 20%, rgba(251, 250, 244, 0.025) 50%, transparent 80%) !important;
+}
+
+/* Homepage vocabulary: flat hairline surfaces, square corners and dotted
+   interaction outlines instead of unrelated glass/pill card systems. */
+:where(
+  .glass-card, .service-card, .stat-card, .testimonial-card,
+  .partner-preview-card, .partner-card, .package-card, .blog-card,
+  .blog-featured, .contact-card, .contact-form, .tool-card, .cp-card,
+  .login-card, .legal-content, .case-card, .portfolio-card, .team-card,
+  .faq-card, .sss-item, .referans-kart, .basin-kart, .neden-avantaj,
+  .odul-kart, .job-card, .perk-card, .value-card, .visual-card,
+  .audit-card, .quote-form, .quote-summary-card, .referral-form,
+  .referral-step, .referral-reward
+) {
+  border: 1px solid var(--kade-line) !important;
+  border-radius: 0 !important;
+  background: rgba(251, 250, 244, 0.035) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:where(
+  .glass-card, .service-card, .stat-card, .testimonial-card,
+  .partner-preview-card, .partner-card, .package-card, .blog-card,
+  .case-card, .portfolio-card, .team-card, .job-card, .perk-card,
+  .value-card
+):hover {
+  border-color: var(--kade-gold) !important;
+  background: rgba(224, 168, 31, 0.055) !important;
+  box-shadow: none !important;
+}
+
+:where(.btn, .kade-btn, .gate-btn, .button-link, button[type='submit']) {
+  min-height: 44px;
+  border-radius: 0 !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:where(.btn-primary, .kade-btn--primary, .gate-btn, .button-link) {
+  background: var(--kade-gold) !important;
+  color: var(--kade-on-brand) !important;
+  border-color: var(--kade-gold) !important;
+  box-shadow: none !important;
+}
+
+:where(input:not([type='checkbox']):not([type='radio']), textarea, select) {
+  min-height: 44px;
+  border-radius: 0 !important;
+}
+
+.knav,
+.knav-mobile,
+.kfoot,
+.gate-hud,
+.cp-header {
+  background-color: color-mix(in srgb, #000 90%, transparent) !important;
+  border-color: var(--kade-line) !important;
+}
+
+.knav-giris,
+.knav-giris:hover {
+  background: var(--kade-gold) !important;
+  color: var(--kade-on-brand) !important;
+  border-radius: 0 !important;
+}
+
+.section-title,
+[class*='hero'] h1,
+.page-title,
+.gate-head h1,
+.error-state-title {
+  font-weight: 700 !important;
+  letter-spacing: -0.05em !important;
+}
+
+.section-title span,
+.hero-highlight,
+.cta-content h2 span {
+  color: var(--kade-gold-text) !important;
+  font-style: normal !important;
+  text-shadow: none !important;
+}
+
+.section-badge::before,
+.hero-badge::before,
+.gate-eyebrow::before,
+.cp-access-heading > span::before,
+.cp-access-heading > p:first-child::before {
+  border-radius: 0 !important;
+  background: var(--kade-gold) !important;
+  box-shadow: none !important;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none !important;
+}
+
+@media (max-width: 1024px) {
+  :where(a, button, summary, [role='button']) {
+    min-height: 44px;
+  }
+
+  .knav-burger,
+  .theme-toggle,
+  .kd-icon-btn {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}

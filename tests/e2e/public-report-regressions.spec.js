@@ -48,15 +48,15 @@ test('public stats show real zero, not invented counters; retry is distinct from
   await expect(stats).toContainText('Sayısal sonuçlar henüz yayınlanmadı')
 })
 
-test('package heading matches navigation and static pages follow system theme', async ({ page }) => {
+test('package heading matches navigation and static pages launch dark', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' })
   await page.goto('/paketler')
   await expect(page).toHaveTitle('Paketler | Kade New Media')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Paketler')
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   await page.emulateMedia({ colorScheme: 'light' })
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
-  expect(await page.evaluate(() => localStorage.getItem('theme'))).toBeNull()
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark')
   const mobileMenu = page.getByRole('button', { name: 'Menüyü aç', exact: true })
   if (await mobileMenu.isVisible()) await mobileMenu.click()
   await page.getByRole('button', { name: 'Karanlık temaya geç' }).first().click()
@@ -69,29 +69,29 @@ test('package heading matches navigation and static pages follow system theme', 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
 })
 
-test('React article entry respects system theme without overwriting a saved choice', async ({ page }) => {
+test('React article entry launches dark and respects a later saved choice', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' })
   await page.route('**/api/blog*', route => route.fulfill({ json: [] }))
   await page.goto('/blog/olmayan-yazi')
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('theme'))).toBe('system')
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('theme'))).toBe('dark')
   await page.emulateMedia({ colorScheme: 'light' })
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   await page.evaluate(() => localStorage.setItem('theme', 'dark'))
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark')
 })
 
-test('homepage snapshot keeps its native theme and shared CSS theme synchronized', async ({ page }) => {
+test('homepage snapshot launches dark and keeps manual theme choice synchronized', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' })
   await page.goto('/')
   await expect(page.locator('html')).toHaveAttribute('data-kade-enhanced', '', { timeout: 15000 })
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   await page.emulateMedia({ colorScheme: 'light' })
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   await page.getByRole('button', { name: /^Theme:/ }).filter({ visible: true }).first().click()
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
   await page.goto('/paketler')
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
 })

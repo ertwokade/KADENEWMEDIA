@@ -34,6 +34,7 @@
   font-size:clamp(36px,5.4vw,74px)!important;
   line-height:.98!important;
   letter-spacing:-.05em!important;
+  text-transform:uppercase;
 }
 .lead{max-width:58ch;margin-top:clamp(16px,1.8vw,24px)!important;font-size:clamp(14px,1.1vw,17px)!important;line-height:1.55!important}
 .rule{display:none!important}

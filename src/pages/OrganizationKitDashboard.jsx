@@ -29,42 +29,42 @@ const kadeThemeOverride = `
       --surface: rgba(255,255,255,0.035);
       --surface-hover: rgba(255,255,255,0.065);
       --border: rgba(255,255,255,0.09);
-      --border-hover: rgba(234,195,33,0.26);
-      --ink: #ffffff;
-      --ink2: #b7b7b7;
+      --border-hover: rgba(224,168,31,0.28);
+      --ink: #fbfaf4;
+      --ink2: rgba(251,250,244,0.72);
       --ink3: #747474;
-      --teal: #eac321;
-      --teal-dim: rgba(234,195,33,0.12);
-      --teal-glow: rgba(234,195,33,0.26);
-      --indigo: #f4d95d;
-      --indigo-dim: rgba(244,217,93,0.1);
-      --gold: #eac321;
-      --gold-dim: rgba(234,195,33,0.12);
+      --teal: #e0a81f;
+      --teal-dim: rgba(224,168,31,0.12);
+      --teal-glow: rgba(224,168,31,0.26);
+      --indigo: #fbfaf4;
+      --indigo-dim: rgba(251,250,244,0.1);
+      --gold: #e0a81f;
+      --gold-dim: rgba(224,168,31,0.12);
       --radius: 10px;
       --radius-lg: 14px;
     }
     html, body { background: transparent !important; }
     body {
       background:
-        radial-gradient(circle at 20% 20%, rgba(234,195,33,0.09), transparent 30%),
-        radial-gradient(circle at 78% 18%, rgba(234,195,33,0.06), transparent 26%),
+        radial-gradient(circle at 20% 20%, rgba(224,168,31,0.09), transparent 30%),
+        radial-gradient(circle at 78% 18%, rgba(224,168,31,0.06), transparent 26%),
         #08090d !important;
     }
     .sidebar,
     .topbar {
       background: rgba(8,9,13,0.86) !important;
-      border-color: rgba(234,195,33,0.14) !important;
+      border-color: rgba(224,168,31,0.14) !important;
     }
     .brand-mark {
-      background: linear-gradient(135deg, #eac321, #f4d95d) !important;
+      background: linear-gradient(135deg, #e0a81f, #fbfaf4) !important;
       color: #08090d !important;
-      box-shadow: 0 0 18px rgba(234,195,33,0.24) !important;
+      box-shadow: 0 0 18px rgba(224,168,31,0.24) !important;
     }
     .nav-item.active,
     .filter-chip.active,
     .primary-btn {
-      background: #eac321 !important;
-      border-color: #eac321 !important;
+      background: #e0a81f !important;
+      border-color: #e0a81f !important;
       color: #08090d !important;
     }
     .nav-item:hover,
@@ -73,9 +73,9 @@ const kadeThemeOverride = `
     input:focus,
     textarea:focus,
     select:focus {
-      border-color: rgba(234,195,33,0.42) !important;
-      color: #eac321 !important;
-      box-shadow: 0 0 0 3px rgba(234,195,33,0.1) !important;
+      border-color: rgba(224,168,31,0.42) !important;
+      color: #e0a81f !important;
+      box-shadow: 0 0 0 3px rgba(224,168,31,0.1) !important;
     }
     .panel,
     .kpi,
@@ -88,10 +88,10 @@ const kadeThemeOverride = `
     .panel:hover,
     .kpi:hover,
     .production-card:hover {
-      border-color: rgba(234,195,33,0.24) !important;
+      border-color: rgba(224,168,31,0.24) !important;
     }
     .icon-area {
-      background: rgba(234,195,33,0.1) !important;
+      background: rgba(224,168,31,0.1) !important;
     }
     .icon-area i,
     .nav-item.active i,
@@ -99,12 +99,12 @@ const kadeThemeOverride = `
     .eyebrow,
     .pill.teal,
     .word.positive {
-      color: #eac321 !important;
+      color: #e0a81f !important;
     }
     .answer-box,
     .transcript-summary {
-      border-left-color: #eac321 !important;
-      background: rgba(234,195,33,0.1) !important;
+      border-left-color: #e0a81f !important;
+      background: rgba(224,168,31,0.1) !important;
     }
   </style>
 `

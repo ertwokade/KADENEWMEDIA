@@ -883,8 +883,7 @@ input, textarea {
   --container-width: 1280px;
 }
 
-[data-theme="light"],
-body.kade-app-ui {
+[data-theme="light"] {
   --black: #fdf6e3;
   --black-light: #f7edd6;
   --black-lighter: #f2e6c9;

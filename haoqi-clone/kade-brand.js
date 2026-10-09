@@ -334,7 +334,7 @@
         if(kadePaths[index])path.setAttribute('d',kadePaths[index]);
         var length=Math.ceil(path.getTotalLength());
         path.setAttribute('fill','none');
-        path.setAttribute('stroke','#C0FE04');
+        path.setAttribute('stroke','#E0A81F');
         path.setAttribute('stroke-width','4');
         path.style.strokeDasharray=length;
         path.style.strokeDashoffset=length;
@@ -378,6 +378,10 @@
          yeniden render ettiği anda removeChild hatasına ve sayfanın boşalmasına
          yol açıyordu; bu yüzden kaldırıldı. */
       installExperience();
+      /* Keep the stable first frame over the snapshot's native character
+         scramble and the asynchronous WebGL warm-up. By the time this flag is
+         set, the hero copy and model have both settled in normal conditions. */
+      setTimeout(function(){document.documentElement.setAttribute('data-kade-scene-ready','')},5000);
     }
     function revealControlsWhenReady(done){
       var loader=document.querySelector('div[class*="left-1/2"][class*="top-1/2"][class*="z-40"]');
@@ -428,12 +432,16 @@
       if(!control)return;
       event.preventDefault();event.stopImmediatePropagation();control.click();
     },true);
+    /* The native loader can occasionally remain in React's DOM after a
+       recoverable hydration pass. Release the first-frame cover on an
+       independent clock so the real scene can never stay hidden forever. */
+    setTimeout(function(){document.documentElement.setAttribute('data-kade-scene-ready','')},5000);
     if(document.readyState==='loading')addEventListener('DOMContentLoaded',startNext,{once:true});else startNext();
     return;
   }
   var modeKey='theme';
   var themeQuery=window.matchMedia('(prefers-color-scheme: dark)');
-  var preference='system';
+  var preference='dark';
   try{
     var stored=localStorage.getItem(modeKey)||localStorage.getItem('kade-theme-mode')||localStorage.getItem('kade-mode');
     if(stored==='light'||stored==='dark')preference=stored;

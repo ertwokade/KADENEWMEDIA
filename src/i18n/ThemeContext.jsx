@@ -18,8 +18,9 @@ const ThemeContext = createContext()
  */
 const THEME_STORAGE_KEY = 'theme'
 const LEGACY_STORAGE_KEY = 'kade-theme-mode'
+const DARK_MIGRATION_KEY = 'kade-unified-dark-v1'
 const MODES = ['light', 'dark', 'system']
-const DEFAULT_MODE = 'system'
+const DEFAULT_MODE = 'dark'
 
 const prefersDark = () =>
   typeof window !== 'undefined' &&
@@ -31,12 +32,20 @@ const resolveTheme = (mode) => (mode === 'system' ? (prefersDark() ? 'dark' : 'l
 function getStoredMode() {
   if (typeof window === 'undefined') return DEFAULT_MODE
   try {
+    // The unified design launches dark. Migrate earlier light/system choices
+    // once, then keep respecting any choice the visitor makes afterwards.
+    if (window.localStorage.getItem(DARK_MIGRATION_KEY) !== '1') {
+      window.localStorage.setItem(DARK_MIGRATION_KEY, '1')
+      window.localStorage.setItem(THEME_STORAGE_KEY, 'dark')
+      window.localStorage.setItem(LEGACY_STORAGE_KEY, 'dark')
+      return 'dark'
+    }
     const stored = window.localStorage.getItem(THEME_STORAGE_KEY)
-    if (MODES.includes(stored)) return stored
+    if (stored === 'light' || stored === 'dark') return stored
     // Eski anahtarla kaydedilmiş tercih varsa bir kez devralınır.
     const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY)
       || window.localStorage.getItem('kade-mode')
-    return MODES.includes(legacy) ? legacy : DEFAULT_MODE
+    return legacy === 'light' || legacy === 'dark' ? legacy : DEFAULT_MODE
   } catch {
     return DEFAULT_MODE
   }
@@ -87,11 +96,7 @@ export function ThemeProvider({ children }) {
 
   const setMode = useCallback((nextMode) => {
     const safeMode = MODES.includes(nextMode) ? nextMode : DEFAULT_MODE
-    if (typeof document !== 'undefined' && document.startViewTransition) {
-      document.startViewTransition(() => setModeState(safeMode))
-    } else {
-      setModeState(safeMode)
-    }
+    setModeState(safeMode)
   }, [])
 
   /**

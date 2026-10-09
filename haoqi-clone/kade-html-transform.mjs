@@ -3,6 +3,8 @@
    this, so what runs locally is byte-for-byte what ships. */
 
 const COPY = [
+  ['#C0FE04', '#E0A81F'],
+  ['#c0fe04', '#e0a81f'],
   ['HAOQI©2026', 'Kade New Media | Dijital Pazarlama Ajansı'],
   ['Digital Product Designer &amp; Builder © 2026', 'Kade New Media — İstanbul merkezli sosyal medya ve dijital pazarlama ajansı.'],
   ['Digital Product Designer \\u0026 Builder © 2026', 'Kade New Media — İstanbul merkezli sosyal medya ve dijital pazarlama ajansı.'],
@@ -96,6 +98,8 @@ const COPY = [
 /* Bundle içi metinler: footer geç mount olduğu için kade-brand.js'in DOM
    düzeltmesi oraya yetişmiyordu; kaynağında düzeltmek daha güvenilir. */
 export const SCRIPT_COPY = [
+  ['#C0FE04', '#E0A81F'],
+  ['#c0fe04', '#e0a81f'],
   /* Düşen 3B çıkartmaların dördüncüsü eski ürün adını görünür biçimde
      taşıyordu. Aynı sahne/animasyon korunur, yabancı marka dokusu Kade
      logosuyla değiştirilir. */
@@ -180,12 +184,12 @@ export function transformScript(code) {
   return code
 }
 
-const BOOTSTRAP = `<script data-kade-bootstrap>(function(){var root=document.documentElement;var mode='system';var locale='tr';try{mode=localStorage.getItem('theme')||localStorage.getItem('kade-theme-mode')||localStorage.getItem('kade-mode')||'system';locale=localStorage.getItem('kade-locale')==='en'?'en':'tr'}catch(error){}var theme=mode==='dark'||mode==='light'?mode:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');root.classList.toggle('dark',theme==='dark');root.setAttribute('data-theme',theme);root.style.colorScheme=theme;root.setAttribute('data-locale',locale);root.lang=locale;try{localStorage.setItem('sound','off')}catch(error){}var nativePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this instanceof HTMLAudioElement){this.pause();return Promise.resolve()}return nativePlay.apply(this,arguments)}})();</script>`
+const BOOTSTRAP = `<script data-kade-bootstrap>(function(){var root=document.documentElement;var mode='dark';var locale='tr';try{if(localStorage.getItem('kade-unified-dark-v1')!=='1'){localStorage.setItem('kade-unified-dark-v1','1');localStorage.setItem('theme','dark');localStorage.setItem('kade-theme-mode','dark')}var stored=localStorage.getItem('theme')||localStorage.getItem('kade-theme-mode')||localStorage.getItem('kade-mode');mode=stored==='light'||stored==='dark'?stored:'dark';locale=localStorage.getItem('kade-locale')==='en'?'en':'tr'}catch(error){}root.classList.toggle('dark',mode==='dark');root.setAttribute('data-theme',mode);root.setAttribute('data-theme-mode',mode);root.setAttribute('data-kade-loaded','');root.style.colorScheme=mode;root.setAttribute('data-locale',locale);root.lang=locale;try{localStorage.setItem('sound','off')}catch(error){}var nativePlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){if(this instanceof HTMLAudioElement){this.pause();return Promise.resolve()}return nativePlay.apply(this,arguments)}})();</script>`
 
 /* The real page finishes behind three lightweight CSS panels, then enters as a
    single composed frame. The panels reuse the site's grid and fold away in 3D;
    there is no progress indicator, temporary copy or extra model to download. */
-const CRITICAL_FIRST_PAINT = `<style data-kade-critical-first-paint>html::before,body::before,body::after{content:"";position:fixed;top:0;bottom:0;width:calc(33.334vw + 1px);z-index:2147483000;background-color:#fbfaf4;background-image:linear-gradient(rgba(54,54,48,.1) 1px,transparent 1px);background-size:100% 33.333vh;box-shadow:inset -1px 0 rgba(54,54,48,.1);backface-visibility:hidden;will-change:transform,opacity;pointer-events:none}html::before{left:0;transform-origin:left center}body::before{left:33.333vw;transform-origin:center center}body::after{left:66.666vw;transform-origin:right center}html[data-kade-loaded]::before{transform:perspective(1200px) rotateY(-102deg);opacity:0;visibility:hidden;transition:transform .72s cubic-bezier(.77,0,.18,1),opacity .18s ease .42s,visibility 0s linear .76s}html[data-kade-loaded] body::before{transform:perspective(1200px) rotateY(96deg);opacity:0;visibility:hidden;transition:transform .72s cubic-bezier(.77,0,.18,1) .06s,opacity .18s ease .48s,visibility 0s linear .82s}html[data-kade-loaded] body::after{transform:perspective(1200px) rotateY(102deg);opacity:0;visibility:hidden;transition:transform .72s cubic-bezier(.77,0,.18,1) .12s,opacity .18s ease .54s,visibility 0s linear .88s}html.dark::before,html.dark body::before,html.dark body::after{background-color:#000;background-image:linear-gradient(rgba(251,250,244,.14) 1px,transparent 1px);box-shadow:inset -1px 0 rgba(251,250,244,.14)}@media(prefers-reduced-motion:reduce){html[data-kade-loaded]::before,html[data-kade-loaded] body::before,html[data-kade-loaded] body::after{transform:none;opacity:0;transition:opacity .12s ease;visibility:hidden}}</style><link rel="preload" href="/model/hello.gltf" as="fetch" crossorigin><link rel="preload" href="/model/hello.bin" as="fetch" crossorigin><link rel="preload" href="/model/cnt.gltf" as="fetch" crossorigin><link rel="preload" href="/model/cnt.bin" as="fetch" crossorigin><link rel="preload" href="/model/cursor.glb" as="fetch" crossorigin>`
+const CRITICAL_FIRST_PAINT = `<style data-kade-critical-first-paint>html,body{background:#081228;color:#fbfaf4}</style><link rel="preload" href="/model/hello.gltf" as="fetch" crossorigin><link rel="preload" href="/model/hello.bin" as="fetch" crossorigin><link rel="preload" href="/model/cnt.gltf" as="fetch" crossorigin><link rel="preload" href="/model/cnt.bin" as="fetch" crossorigin><link rel="preload" href="/model/cursor.glb" as="fetch" crossorigin>`
 
 const HEAD_ASSETS = [
   ['/kade-brand.css', '<link rel="preload" href="/fonts/kade/montserrat-400.ttf" as="font" type="font/ttf" crossorigin><link rel="preload" href="/fonts/kade/montserrat-700.ttf" as="font" type="font/ttf" crossorigin><link rel="stylesheet" href="/kade-brand.css">'],

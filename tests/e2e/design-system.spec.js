@@ -8,8 +8,8 @@ const LAYOUT_ROUTES = [
   ['/hizmetler/sosyal-medya-yonetimi', 'Montserrat Kade'],
   ['/iletisim', 'Montserrat Kade'],
   ['/teklif-al', 'Montserrat Kade'],
-  ['/giris', 'Poppins'],
-  ['/admin', 'Poppins'],
+  ['/giris', 'Montserrat Kade'],
+  ['/admin', 'Montserrat Kade'],
 ]
 
 const firstFamily = (fontFamily) => fontFamily.split(',')[0].replace(/["']/g, '').trim()

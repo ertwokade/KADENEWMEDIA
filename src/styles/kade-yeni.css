@@ -17,8 +17,7 @@
 /* `:root` BİLEREK yok: koyu tema artık varsayılan ve aşağıdaki
    `html[data-theme="dark"]` bloğundan gelir. Bu blok yalnız açık temayı ve
    açık palete sabitlenmiş ürün arayüzlerini besler. */
-[data-theme="light"],
-body.kade-app-ui {
+[data-theme="light"] {
   --bg-primary: #fbfaf4;
   --black: #fbfaf4;
   --black-light: #f4f2e9;
@@ -34,9 +33,7 @@ body.kade-app-ui {
 
 html[data-theme="light"],
 html[data-theme="light"] body,
-html[data-theme="light"] #root,
-body.kade-app-ui,
-body.kade-app-ui #root {
+html[data-theme="light"] #root {
   background: #fbfaf4 !important;
 }
 
@@ -1219,12 +1216,12 @@ html[data-theme="dark"] .grid-bg {
 
 /* Tüm site ve yönetim ekranlarında tek tip marka yazı karakteri. */
 :root {
-  --font-display: 'Poppins', sans-serif;
-  --font-primary: 'Poppins', sans-serif;
-  --font-secondary: 'Poppins', sans-serif;
-  --font-mono: 'Poppins', sans-serif;
-  --ky-mono: 'Poppins', sans-serif;
-  --ky-tech: 'Poppins', sans-serif;
+  --font-display: 'Montserrat Kade', Arial, sans-serif;
+  --font-primary: 'Montserrat Kade', Arial, sans-serif;
+  --font-secondary: 'Montserrat Kade', Arial, sans-serif;
+  --font-mono: 'Montserrat Kade', Arial, sans-serif;
+  --ky-mono: 'Montserrat Kade', Arial, sans-serif;
+  --ky-tech: 'Montserrat Kade', Arial, sans-serif;
 }
 
 html,
@@ -1239,7 +1236,7 @@ option,
 code,
 pre,
 kbd {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Montserrat Kade', Arial, sans-serif !important;
 }
 
 /* ---------------------------------------------------------------------
