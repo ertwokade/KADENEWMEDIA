@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/kadexai",
+      "destination": "https://kadexai.vercel.app/kadexai"
+    },
+    {
+      "source": "/kadexai/:path*",
+      "destination": "https://kadexai.vercel.app/kadexai/:path*"
+    }
+  ]
+}

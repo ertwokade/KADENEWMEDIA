@@ -62,8 +62,8 @@ export const metadata: Metadata = {
     description: 'AI içerik ve operasyon araçları tek panelde.',
   },
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
   appleWebApp: {
     capable: true,
