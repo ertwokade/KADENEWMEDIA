@@ -10,7 +10,7 @@
  * legacy:build sonunda çalışır; generate-static-routes.mjs'den SONRA gelmesi
  * şart, aksi halde React'in ürettiği sayfalar klonun üzerine yazar.
  */
-import { cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
+import { cp, mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -65,46 +65,47 @@ async function copyAssets(dir) {
   }
 }
 
-// Public pazarlama rotaları geçici olarak tek bir "coming soon" kabuğu taşır.
-// Uygulama, giriş, yönetim ve müşteri rotaları bu izin listesinde olmadığı için
-// generate-static-routes.mjs tarafından üretilen React kabuklarını korur.
-const comingSoonHtml = await readFile(join(root, 'public', 'site.html'), 'utf8')
-const ROBOTS_META = /<meta name="robots" content="[^"]*"\s*\/?>/i
-const CANONICAL_TAG = /<link rel="canonical" href="[^"]*"\s*\/?>/i
-const OG_URL_TAG = /<meta property="og:url" content="[^"]*"\s*\/?>/i
-
-function routeUrl(route) {
-  return route ? `https://kadenewmedia.com/${route}` : 'https://kadenewmedia.com/'
-}
-
-async function comingSoonFor(route, generatedPath) {
-  // Rota üreticisinin kararını koru: herkese açık sayfalar index, follow;
-  // özel/noindex sayfalar ise coming soon kabuğu altında da kapalı kalsın.
-  const generated = await readFile(generatedPath, 'utf8').catch(() => '')
-  const robots = generated.match(/<meta name="robots" content="([^"]*)"/i)?.[1] || 'index, follow'
-  const canonical = routeUrl(route)
-
-  return comingSoonHtml
-    .replace(ROBOTS_META, `<meta name="robots" content="${robots}" />`)
-    .replace(CANONICAL_TAG, `<link rel="canonical" href="${canonical}" />`)
-    .replace(OG_URL_TAG, `<meta property="og:url" content="${canonical}" />`)
-}
+/* Klon kabuğu, generate-static-routes.mjs'in ürettiği kabuğun ÜZERİNE yazılıyor.
+   İki kaynak robots etiketinde ayrışabiliyor ve üretilen dosyadaki `noindex`
+   niyeti sessizce kayboluyordu: /fiyat-hesaplama ve /referans-programi
+   canlıda "index, follow" ile duruyordu, oysa ikisi de noindex işaretliydi.
+   Kopyalamadan ÖNCE hedefteki robots değeri okunup kopyanın üstüne
+   yazılıyor — içerik klondan, indeksleme kararı tek kaynaktan. */
+const ROBOTS = /<meta name="robots" content="([^"]*)"\s*\/?>/i
 
 async function copyPage(route) {
+  const from = join(source, route, 'index.html')
+  if (!await stat(from).catch(() => null)) {
+    console.warn(`  ! klonda yok, atlandı: /${route}`)
+    return
+  }
   const to = join(dist, route, 'index.html')
-  const html = await comingSoonFor(route, to)
+
+  const uretilen = await readFile(to, 'utf8').catch(() => null)
+  const karar = uretilen?.match(ROBOTS)?.[1] ?? null
+
   await mkdir(dirname(to), { recursive: true })
-  await writeFile(to, html)
+
+  if (karar) {
+    const klon = await readFile(from, 'utf8')
+    const duzeltilmis = klon.replace(ROBOTS, `<meta name="robots" content="${karar}" />`)
+    if (duzeltilmis !== klon) console.log(`  robots korundu: /${route} → ${karar}`)
+    await writeFile(to, duzeltilmis)
+  } else {
+    await cp(from, to)
+  }
+
   pages += 1
 }
 
 await copyAssets(source)
 
 /* Ana sayfa: Vercel rewrite'ı /site.html'e bakıyor, fiziksel dosya da dursun. */
-await writeFile(join(dist, 'site.html'), comingSoonHtml)
-await writeFile(join(dist, 'index.html'), comingSoonHtml)
+const home = await readFile(join(source, 'index.html'), 'utf8')
+await writeFile(join(dist, 'site.html'), home)
+await writeFile(join(dist, 'index.html'), home)
 pages += 2
 
 for (const route of PAGES) await copyPage(route)
 
-console.log(`Coming soon katmanı bindirildi — ${pages} sayfa, ${assets} ortak dosya (api/, uygulama rotaları ve hata sayfaları korundu).`)
+console.log(`Klon katmanı bindirildi — ${pages} sayfa, ${assets} dosya (api/, uygulama rotaları ve hata sayfaları korundu).`)

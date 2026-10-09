@@ -2,11 +2,23 @@
   "rewrites": [
     {
       "source": "/kadexai",
-      "destination": "https://kadexai.vercel.app/kadexai"
+      "destination": "https://kadeai.vercel.app/kadeai"
     },
     {
       "source": "/kadexai/:path*",
-      "destination": "https://kadexai.vercel.app/kadexai/:path*"
+      "destination": "https://kadeai.vercel.app/kadeai/:path*"
+    },
+    {
+      "source": "/kadeai",
+      "destination": "https://kadeai.vercel.app/kadeai"
+    },
+    {
+      "source": "/kadeai/:path*",
+      "destination": "https://kadeai.vercel.app/kadeai/:path*"
+    },
+    {
+      "source": "/_next/:path*",
+      "destination": "https://kadeai.vercel.app/_next/:path*"
     }
   ]
 }

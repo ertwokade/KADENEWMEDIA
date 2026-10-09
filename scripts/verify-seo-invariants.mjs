@@ -50,54 +50,6 @@ const tag = (html, re) => (html.match(re) || [])[1] || null
 const robotsOf = (html) => tag(html, /<meta name="robots" content="([^"]*)"/)
 const canonicalOf = (html) => tag(html, /<link rel="canonical" href="([^"]*)"/)
 
-// Geçici coming-soon yayını kendi SEO sözleşmesine sahiptir: public sayfalar
-// aynı bekleme kabuğunu taşır ve Google'da görünmeye devam eder. Yalnız zaten
-// özel/noindex olan sayfalar ile uygulama alanları indeks dışı kalır.
-const maintenanceHome = await read('/')
-if (/data-coming-soon/.test(maintenanceHome)) {
-  console.log('\n── İndekslenebilir coming soon SEO sözleşmesi ──')
-  for (const route of INDEXABLE) {
-    let html
-    try { html = await read(route) } catch { fail(`${route}: ön-render dosyası üretilmedi`); continue }
-    const canonical = canonicalOf(html)
-    if (!/data-coming-soon/.test(html)) fail(`${route}: coming soon kabuğu yok`)
-    else if (!robotsOf(html)?.startsWith('index, follow')) fail(`${route}: index, follow direktifi yok`)
-    else if (canonical !== `${BASE}${route}`) fail(`${route}: canonical "${canonical}"`)
-    else ok(`${route} → coming soon + index`)
-  }
-
-  for (const route of PUBLIC_NOINDEX) {
-    let html
-    try { html = await read(route) } catch { fail(`${route}: ön-render dosyası üretilmedi`); continue }
-    if (!/data-coming-soon/.test(html)) fail(`${route}: coming soon kabuğu yok`)
-    else if (!robotsOf(html)?.startsWith('noindex')) fail(`${route}: noindex direktifi yok`)
-    else ok(`${route} → coming soon + noindex`)
-  }
-
-  for (const route of PROTECTED) {
-    let html
-    try { html = await read(route) } catch { fail(`${route}: ön-render dosyası üretilmedi`); continue }
-    if (!robotsOf(html)?.startsWith('noindex, nofollow')) fail(`${route}: uygulama kabuğu noindex değil`)
-    else ok(`${route} → uygulama erişilebilir, noindex`)
-  }
-
-  const maintenanceRobots = await readFile(join(DIST, 'robots.txt'), 'utf8')
-  if (!/^User-agent:\s*\*\s*$[\s\S]*^Allow:\s*\/\s*$/m.test(maintenanceRobots)) {
-    fail('robots.txt public taramaya izin vermiyor')
-  } else if (!maintenanceRobots.includes('Sitemap: https://kadenewmedia.com/sitemap.xml')) {
-    fail('robots.txt sitemap adresini içermiyor')
-  } else {
-    ok('robots.txt → public tarama ve sitemap açık')
-  }
-
-  if (failures.length) {
-    console.error(`\n${failures.length} SEO ihlali.\n`)
-    process.exit(1)
-  }
-  console.log('\nİndekslenebilir coming soon SEO sözleşmesi doğrulandı.\n')
-  process.exit(0)
-}
-
 console.log('\n── İndekslenen sayfalar (ön-render + canonical + robots) ──')
 for (const route of INDEXABLE) {
   let html
